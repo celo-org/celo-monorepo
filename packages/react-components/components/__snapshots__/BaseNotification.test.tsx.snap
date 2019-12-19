@@ -1,45 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BaseNotification renders correctly 1`] = `
-<View
-  style={
-    Array [
-      Object {
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "padding": 16,
-        "width": "100%",
-      },
-      undefined,
-    ]
-  }
->
+<View>
   <View
     style={
-      Object {
-        "flex": 1,
-        "justifyContent": "space-between",
-      }
+      Array [
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "padding": 16,
+          "width": "100%",
+        },
+        Object {
+          "elevation": 2,
+          "shadowColor": "black",
+          "shadowOffset": Object {
+            "height": 1,
+            "width": 0,
+          },
+          "shadowOpacity": 0.3,
+          "shadowRadius": 1.6,
+        },
+      ]
     }
   >
-    <Text
+    <View
       style={
         Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Bold",
-          "fontSize": 14,
-          "lineHeight": 18,
+          "flex": 1,
+          "justifyContent": "space-between",
         }
       }
     >
-      Test
-    </Text>
-    <View>
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        Test
+      </Text>
       <View
         style={
           Object {
             "justifyContent": "space-between",
-            "minHeight": 70,
+            "minHeight": 60,
+            "paddingTop": 8,
           }
         }
       >
@@ -50,7 +61,7 @@ exports[`BaseNotification renders correctly 1`] = `
           style={
             Object {
               "flexDirection": "row",
-              "marginTop": 15,
+              "marginTop": 5,
             }
           }
         >

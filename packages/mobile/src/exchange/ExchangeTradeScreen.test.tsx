@@ -2,9 +2,10 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import ExchangeTradeScreenConnected, { ExchangeTradeScreen } from 'src/exchange/ExchangeTradeScreen'
+import { ExchangeTradeScreen } from 'src/exchange/ExchangeTradeScreen'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { createMockStore, getMockI18nProps } from 'test/utils'
+import { CURRENCY_ENUM } from 'src/geth/consts'
+import { createMockNavigationProp, createMockStore, getMockI18nProps } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -22,31 +23,41 @@ const store = createMockStore({
   exchange: {
     exchangeRatePair,
   },
-  goldToken: {
-    balance: '100',
-  },
-  stableToken: {
-    balance: '200',
-  },
 })
 
 describe(ExchangeTradeScreen, () => {
   it('renders correctly', () => {
+    const navigation = createMockNavigationProp({
+      makerToken: CURRENCY_ENUM.GOLD,
+      makerTokenBalance: '20',
+    })
     const tree = renderer.create(
       <Provider store={store}>
-        <ExchangeTradeScreenConnected />
+        <ExchangeTradeScreen
+          navigation={navigation}
+          error={null}
+          fetchExchangeRate={jest.fn()}
+          showError={jest.fn()}
+          hideAlert={jest.fn()}
+          exchangeRatePair={exchangeRatePair}
+          {...getMockI18nProps()}
+        />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
+
   describe('methods:', () => {
-    it('setExchangeAmount updates Errors', () => {
+    it('setExchangeAmount updates Errors selling gold', () => {
       const mockShowError = jest.fn()
       const mockhideAlert = jest.fn()
+      const navigation = createMockNavigationProp({
+        makerToken: CURRENCY_ENUM.GOLD,
+        makerTokenBalance: '20',
+      })
       const component = renderer.create(
         <ExchangeTradeScreen
-          dollarBalance={'100'}
-          goldBalance={'200'}
+          navigation={navigation}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={mockShowError}
@@ -55,20 +66,48 @@ describe(ExchangeTradeScreen, () => {
           {...getMockI18nProps()}
         />
       )
-
-      component.root.instance.onChangeExchangeAmount('500')
-      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_DOLLARS)
-      component.root.instance.onPressSwapIcon()
-      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_GOLD)
-      component.root.instance.onChangeExchangeAmount('5')
-      expect(mockhideAlert).toBeCalled()
+      component.root.instance.onChangeExchangeAmount('50')
+      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_GOLD) // Can't afford 50 gold
+      component.root.instance.switchInputToken()
+      expect(mockhideAlert).toBeCalled() // Can afford 50 cUSD worth of gold
+      component.root.instance.onChangeExchangeAmount('1000')
+      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_GOLD) // Can't afford 1000 cUSD worth of gold
     })
 
-    it.only('validates amount', () => {
+    it('setExchangeAmount updates Errors selling dollars', () => {
+      const mockShowError = jest.fn()
+      const mockhideAlert = jest.fn()
+      const navigation = createMockNavigationProp({
+        makerToken: CURRENCY_ENUM.DOLLAR,
+        makerTokenBalance: '20.02',
+      })
       const component = renderer.create(
         <ExchangeTradeScreen
-          dollarBalance={'1'}
-          goldBalance={'0.5'}
+          navigation={navigation}
+          error={null}
+          fetchExchangeRate={jest.fn()}
+          showError={mockShowError}
+          hideAlert={mockhideAlert}
+          exchangeRatePair={exchangeRatePair}
+          {...getMockI18nProps()}
+        />
+      )
+      component.root.instance.onChangeExchangeAmount('10')
+      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_DOLLARS) // Can't afford 10 gold
+      component.root.instance.switchInputToken()
+      expect(mockhideAlert).toBeCalled() // Can afford 10 USD worth of gold
+      component.root.instance.onChangeExchangeAmount('20')
+      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_DOLLARS) // Can't afford 20 cUSD worth of gold
+    })
+
+    it('validates amount', () => {
+      const navigation = createMockNavigationProp({
+        makerToken: CURRENCY_ENUM.DOLLAR,
+        makerTokenBalance: '200',
+      })
+      const component = renderer.create(
+        <ExchangeTradeScreen
+          navigation={navigation}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={jest.fn()}

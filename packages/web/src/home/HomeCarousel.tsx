@@ -223,7 +223,6 @@ const styles = StyleSheet.create({
   dot: {
     // @ts-ignore
     transformOrigin: 'middle right',
-    // @ts-ignore
     animationDuration: '3s',
     animationIterationCount: 'infinite',
     animationTimingFunction: 'easeOut',

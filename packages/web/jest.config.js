@@ -3,9 +3,14 @@ const defaultConfig = require('../../jest.config.js')
 module.exports = {
   ...defaultConfig,
   globals: {
-    navigator: true,
-    window: true,
+    'ts-jest': {
+      isolatedModules: true,
+      tsConfig: 'tsconfig.jest.json',
+    },
   },
-  preset: './node_modules/react-native-web/jest-preset.js',
+  moduleNameMapper: {
+    'src/(.*)$': '<rootDir>/src/$1',
+  },
+  preset: 'react-native-web',
   testEnvironment: 'node',
 }

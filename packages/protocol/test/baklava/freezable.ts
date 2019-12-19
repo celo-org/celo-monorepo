@@ -1,4 +1,4 @@
-import { assertSameAddress, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertLogMatches2, assertRevert, assertSameAddress } from '@celo/protocol/lib/test-utils'
 import { FreezableTestInstance } from 'types'
 
 contract('Freezable', (accounts: string[]) => {
@@ -7,7 +7,7 @@ contract('Freezable', (accounts: string[]) => {
 
   beforeEach(async () => {
     freezableTest = await FreezableTest.new()
-    freezableTest.setFreezer(accounts[0])
+    await freezableTest.setFreezer(accounts[0])
   })
 
   describe('_setFreezer', () => {
@@ -55,7 +55,7 @@ contract('Freezable', (accounts: string[]) => {
 
   describe('unfreeze', () => {
     beforeEach(async () => {
-      freezableTest.freeze()
+      await freezableTest.freeze()
     })
 
     it('should allow freezer to unfreeze the contract', async () => {
