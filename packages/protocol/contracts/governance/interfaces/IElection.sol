@@ -7,4 +7,7 @@ interface IElection {
   function markGroupIneligible(address) external;
   function markGroupEligible(address, address, address) external;
   function electValidatorSigners() external view returns (address[] memory);
+  function slashVotes(address, uint256, address[] calldata, address[] calldata, uint256[] calldata)
+    external
+    returns (bool);
 }

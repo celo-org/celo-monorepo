@@ -31,6 +31,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   mapping(address => Balances) private balances;
+  mapping(address => bool) public isSlasher;
+
+  modifier onlySlasher() {
+    require(isSlasher[msg.sender], "Caller must be registered slasher");
+    _;
+  }
+
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -235,5 +242,63 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
     list.length = lastIndex;
+  }
+
+  /**
+   * @notice Adds `slasher` to whitelist of approved slashing addresses.
+   * @param slasher Address to whitelist.
+   */
+  function addSlasher(address slasher) external onlyOwner {
+    require(slasher != address(0));
+    isSlasher[slasher] = true;
+  }
+
+  /**
+   * @notice Removes `slasher` from whitelist of approved slashing addresses.
+   * @param slasher Address to remove from whitelist.
+   */
+  function removeSlasher(address slasher) external onlyOwner {
+    require(slasher != address(0));
+    isSlasher[slasher] = false;
+  }
+
+  /**
+   * @notice Slashes `account` by reducing its nonvoting locked gold by `penalty`.
+   *         If there is not enough nonvoting locked gold to slash, calls into
+   *         `Election.slashVotes` to slash the remaining gold. Also sends `reward`
+   *         gold to the reporter, and penalty-reward to the Community Fund.
+   * @param account Address of account being slashed.
+   * @param penalty Amount to slash account.
+   * @param reporter Address of account reporting the slasher.
+   * @param reward Reward to give reporter.
+   * @param lessers The groups receiving fewer votes than i'th group, or 0 if the i'th group has
+   *                the fewest votes of any validator group.
+   * @param greaters The groups receiving more votes than the i'th group, or 0 if the i'th group
+   *                 has the most votes of any validator group.
+   * @param indices The indices of the i'th group in `account`'s voting list.
+   */
+  function slash(
+    address account,
+    uint256 penalty,
+    address reporter,
+    uint256 reward,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external onlySlasher {
+    require(
+      getAccountTotalLockedGold(account) >= penalty,
+      "trying to slash more gold than is locked"
+    );
+    uint256 nonvotingBalance = balances[account].nonvoting;
+    // If not enough nonvoting, revoke the difference
+    if (nonvotingBalance < penalty) {
+      uint256 difference = penalty.sub(nonvotingBalance);
+      getElection().slashVotes(account, difference, lessers, greaters, indices);
+    }
+    _decrementNonvotingAccountBalance(account, penalty);
+    _incrementNonvotingAccountBalance(reporter, reward);
+    // TODO(lucas): How to send to community fund
+    // address(uint160(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID))).transfer(penalty - reward);
   }
 }
