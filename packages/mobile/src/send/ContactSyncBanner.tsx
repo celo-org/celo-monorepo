@@ -3,14 +3,17 @@ import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
+import { Namespaces } from 'src/i18n'
 import {
   contactMappingProgressSelector,
   isLoadingImportContactsSelector,
 } from 'src/identity/reducer'
 
 export function ContactSyncBanner() {
+  const { t } = useTranslation(Namespaces.sendFlow7)
   const [isVisible, setIsVisible] = React.useState(true)
   const isLoadingContacts = useSelector(isLoadingImportContactsSelector)
   const { total, current } = useSelector(contactMappingProgressSelector)
@@ -48,8 +51,10 @@ export function ContactSyncBanner() {
           ))}
       </View>
       <View style={styles.textContainer}>
-        <Text style={fontStyles.bodySmallSemiBold}>{'TODO'}</Text>
-        <Text style={fontStyles.bodySmall}>{current + ' of ' + total}</Text>
+        <Text style={fontStyles.bodySmallSemiBold}>{t('contactSyncProgress.header')}</Text>
+        <Text style={fontStyles.bodySmall}>
+          {t('contactSyncProgress.progress', { current, total })}
+        </Text>
       </View>
     </View>
   )
