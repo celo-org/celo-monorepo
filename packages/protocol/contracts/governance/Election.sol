@@ -301,8 +301,8 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) public returns (uint256) {
-    require(group != address(0) && 0 < value, "null group");
+  ) internal returns (uint256) {
+    require(group != address(0) && 0 < value);
     uint256 remainingValue = value;
     uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
     if (pendingVotes > 0) {
@@ -323,12 +323,14 @@ contract Election is
       remainingValue = remainingValue.sub(maxValue);
     }
     uint256 difference = value.sub(remainingValue);
-    decrementTotalVotes(group, difference, lesser, greater);
-    getLockedGold().incrementNonvotingAccountBalance(account, difference);
+    if (difference > 0) {
+      decrementTotalVotes(group, difference, lesser, greater);
+      getLockedGold().incrementNonvotingAccountBalance(account, difference);
+      emit ValidatorGroupVoteRevoked(account, group, difference);
+    }
     if (getTotalVotesForGroupByAccount(group, account) == 0) {
       deleteElement(votes.groupsVotedFor[account], group, index);
     }
-    emit ValidatorGroupVoteRevoked(account, group, difference);
     return difference;
   }
 
@@ -917,6 +919,6 @@ contract Election is
         return true;
       }
     }
-    return false;
+    require(false, "Cannot slash all provided votes");
   }
 }
