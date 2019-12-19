@@ -125,10 +125,6 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
 
   describe('When performing slashing', () => {
     before(async () => {
-      console.log(
-        'before slashing',
-        (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10)
-      )
       await timeTravel(config.governance.referendumStageDuration, web3)
       await governanceSlasher.slash(accounts[1], [], [], [])
     })
@@ -139,10 +135,6 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
 
     it('should slash the account', async () => {
       // slashing not yet implemented in LockedGold
-      console.log(
-        'after slashing',
-        (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10)
-      )
     })
   })
 })
