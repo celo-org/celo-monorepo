@@ -71,5 +71,19 @@
   "askForContactsPermissionAction": "Accede a tus contactos",
   "newAccountBalance": "Nuevo saldo de cuenta: ",
   "estimatingFee": "Estimando tarifa ",
-  "estimatedFee": "Tarifa estimada: "
+  "estimatedFee": "Tarifa estimada: ",
+  "verificationCta": {
+    "header": "Sending to a friend?",
+    "body": "Verify your phone and sync your contacts to quickly send to your friends.",
+    "cta": "Start Verification"
+  },
+  "importContactsCta": {
+    "header": "Import Contacts",
+    "body": "Please enable Contacts in your phone’s Settings to find your friends by name.",
+    "cta": "Settings"
+  },
+  "contactSyncProgress": {
+    "header": "Syncing Contacts",
+    "progress": "{{current}} of {{total}}"
+  }
 }

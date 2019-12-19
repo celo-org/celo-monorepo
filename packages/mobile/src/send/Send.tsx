@@ -1,11 +1,11 @@
-import Touchable from '@celo/react-components/components/Touchable'
-import QRCode from '@celo/react-components/icons/QRCode'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
+import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -16,6 +16,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces } from 'src/i18n'
+import VerifyAddressBook from 'src/icons/VerifyAddressBook'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
@@ -32,6 +33,12 @@ import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
+import { ContactSyncBanner } from 'src/send/ContactSyncBanner'
+import { QRCodeIcon } from 'src/send/QRCodeIcon'
+import { SendCallToAction } from 'src/send/SendCallToAction'
+import { SendSearchInput } from 'src/send/SendSearchInput'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { navigateToPhoneSettings } from 'src/utils/linking'
 import { checkContactsPermission } from 'src/utils/permissions'
 
 const SEARCH_THROTTLE_TIME = 50
@@ -53,16 +60,16 @@ interface Section {
 }
 
 interface State {
-  loading: boolean
   searchQuery: string
   allFiltered: Recipient[]
   recentFiltered: Recipient[]
-  hasGivenPermission: boolean
+  hasGivenContactPermission: boolean
 }
 
 interface StateProps {
   defaultCountryCode: string
   e164PhoneNumber: string
+  numberVerified: boolean
   devModeActive: boolean
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   recentRecipients: Recipient[]
@@ -82,6 +89,7 @@ type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedPro
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: state.account.defaultCountryCode,
   e164PhoneNumber: state.account.e164PhoneNumber,
+  numberVerified: state.app.numberVerified,
   devModeActive: state.account.devModeActive || false,
   e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
   recentRecipients: state.account.devModeActive
@@ -100,18 +108,6 @@ const mapDispatchToProps = {
 
 type FilterType = (searchQuery: string) => Recipient[]
 
-function QRCodeIcon() {
-  const onQrCodePress = React.useCallback(() => {
-    navigate(Screens.QRScanner)
-  }, [])
-
-  return (
-    <Touchable onPress={onQrCodePress} style={style.qrCodeContainer}>
-      <QRCode height={28} />
-    </Touchable>
-  )
-}
-
 class Send extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithCancelButton,
@@ -127,11 +123,10 @@ class Send extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      loading: true,
       searchQuery: '',
       allFiltered: [],
       recentFiltered: [],
-      hasGivenPermission: true,
+      hasGivenContactPermission: true,
     }
 
     this.allRecipientsFilter = filterRecipientFactory(this.props.allRecipients)
@@ -149,13 +144,12 @@ class Send extends React.Component<Props, State> {
     const { recentRecipients, allRecipients } = this.props
 
     this.setState({
-      loading: false,
       recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
       allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
     })
 
-    const hasGivenPermission = await checkContactsPermission()
-    this.setState({ hasGivenPermission })
+    const hasGivenContactPermission = await checkContactsPermission()
+    this.setState({ hasGivenContactPermission })
 
     // Trigger a fee estimation so it'll likely be finished and cached
     // when SendAmount screen is shown
@@ -170,7 +164,6 @@ class Send extends React.Component<Props, State> {
       allRecipients !== prevPops.allRecipients
     ) {
       this.setState({
-        loading: false,
         recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
         allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
       })
@@ -210,8 +203,16 @@ class Send extends React.Component<Props, State> {
     this.props.importContacts()
     this.setState({
       searchQuery: '',
-      hasGivenPermission: true,
+      hasGivenContactPermission: true,
     })
+  }
+
+  onPressStartVerification = () => {
+    navigate(Screens.VerificationEducationScreen)
+  }
+
+  onPressContactsSettings = () => {
+    navigateToPhoneSettings()
   }
 
   buildSections = (): Section[] => {
@@ -226,28 +227,50 @@ class Send extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, defaultCountryCode } = this.props
-    const { loading, searchQuery } = this.state
+    const { t, defaultCountryCode, numberVerified } = this.props
+    const { searchQuery, hasGivenContactPermission } = this.state
 
     return (
       <SafeAreaView style={style.body}>
-        {loading ? (
+        <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
+          <DisconnectBanner />
+          <SendSearchInput t={t} isPhoneEnabled={false} onInputChange={this.onSearchQueryChanged} />
+          {!numberVerified && (
+            <SendCallToAction
+              icon={<VerifyPhone height={49} />}
+              header={t('verificationCta.header')}
+              body={t('verificationCta.body')}
+              cta={t('verificationCta.cta')}
+              onPressCta={this.onPressStartVerification}
+            />
+          )}
+          {(numberVerified && !hasGivenContactPermission) ||
+            (true && (
+              <SendCallToAction
+                icon={<VerifyAddressBook />}
+                header={t('importContactsCta.header')}
+                body={t('importContactsCta.body')}
+                cta={t('importContactsCta.cta')}
+                onPressCta={this.onPressContactsSettings}
+              />
+            ))}
+          <ContactSyncBanner />
+
+          {/* {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
             <Text style={fontStyles.bodySecondary}>{t('loadingContacts')}</Text>
           </View>
-        ) : (
+        ) : ( */}
           <RecipientPicker
             testID={'RecipientPicker'}
             sections={this.buildSections()}
             searchQuery={searchQuery}
             defaultCountryCode={defaultCountryCode}
-            hasAcceptedContactPermission={this.state.hasGivenPermission}
             onSelectRecipient={this.onSelectRecipient}
-            onSearchQueryChanged={this.onSearchQueryChanged}
-            onPermissionsAccepted={this.onPermissionsAccepted}
           />
-        )}
+        </KeyboardAwareScrollView>
+        <KeyboardSpacer />
       </SafeAreaView>
     )
   }
@@ -268,9 +291,6 @@ const style = StyleSheet.create({
     marginBottom: 20,
     height: 60,
     width: 60,
-  },
-  qrCodeContainer: {
-    paddingRight: 15,
   },
 })
 

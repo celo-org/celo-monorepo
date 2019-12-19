@@ -5,12 +5,14 @@ import Svg, { Circle, Path } from 'svgs'
 
 interface Props {
   color?: string
+  width?: number
   style?: ViewStyle
 }
 
 export default class Error extends React.PureComponent<Props> {
   static defaultProps = {
     color: colors.white,
+    width: 16,
     style: {},
   }
 
@@ -18,9 +20,9 @@ export default class Error extends React.PureComponent<Props> {
     return (
       <View style={this.props.style}>
         <Svg
-          width={'16'}
-          height="16"
-          viewBox="0 0 16 16"
+          width={this.props.width}
+          height={this.props.width}
+          viewBox="3 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >

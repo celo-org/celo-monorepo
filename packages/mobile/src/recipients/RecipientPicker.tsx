@@ -1,9 +1,4 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHead from '@celo/react-components/components/SectionHead'
-import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
-import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
-import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
@@ -21,7 +16,6 @@ import {
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
-import Search from 'src/icons/Search'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import {
   getRecipientFromAddress,
@@ -34,15 +28,8 @@ import {
 import RecipientItem from 'src/recipients/RecipientItem'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
-import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
-
-const RecipientSearchInput = withTextInputPasteAware(
-  withTextInputLabeling<TextInputProps>(TextInput),
-  { right: 22 }
-)
 
 interface Section {
   key: string
@@ -54,10 +41,7 @@ interface Props {
   searchQuery: string
   sections: Section[]
   defaultCountryCode: string
-  hasAcceptedContactPermission: boolean
   onSelectRecipient(recipient: Recipient): void
-  onSearchQueryChanged(searchQuery: string): void
-  onPermissionsAccepted(): void
 }
 
 interface StateProps {
@@ -99,6 +83,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
   renderItemSeparator = () => <View style={style.separator} />
 
+  //TODO move
   renderFooter = () => (
     <>
       {this.renderItemSeparator()}
@@ -106,6 +91,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     </>
   )
 
+  //TODO move
   renderEmptyView = (
     addressToE164Number: AddressToE164NumberType,
     recipientCache: NumberToRecipient
@@ -158,30 +144,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     )
   }
 
-  renderRequestContactPermission = () => {
-    return (
-      <>
-        {!this.props.hasAcceptedContactPermission && (
-          <Button
-            text={this.props.t('askForContactsPermissionAction')}
-            style={style.button}
-            onPress={this.requestContactsPermission}
-            standard={true}
-            type={BtnTypes.SECONDARY}
-          />
-        )}
-      </>
-    )
-  }
-
-  requestContactsPermission = async () => {
-    const granted = await requestContactsPermission()
-
-    if (granted) {
-      this.props.onPermissionsAccepted()
-    }
-  }
-
   renderSendToAddress = () => {
     const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
     const existingContact = getRecipientFromAddress(
@@ -214,22 +176,11 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   render() {
-    const { sections, t, addressToE164Number, recipientCache } = this.props
+    const { sections, addressToE164Number, recipientCache } = this.props
     const showFooter = sections.length > 0
 
     return (
       <View style={style.body} testID={this.props.testID}>
-        <DisconnectBanner />
-        <View style={style.textInputContainer}>
-          <RecipientSearchInput
-            placeholder={t('nameOrPhoneNumber')}
-            value={this.props.searchQuery}
-            onChangeText={this.props.onSearchQueryChanged}
-            icon={<Search />}
-            style={style.textInput}
-            shouldShowClipboard={isValidAddress}
-          />
-        </View>
         <SectionList
           renderItem={this.renderItem}
           renderSectionHeader={this.renderSectionHeader}
@@ -241,8 +192,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           initialNumToRender={30}
           keyboardShouldPersistTaps="handled"
         />
-        {this.renderRequestContactPermission()}
-        <KeyboardSpacer />
       </View>
     )
   }
@@ -251,22 +200,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 const style = StyleSheet.create({
   body: {
     flex: 1,
-  },
-  button: {
-    marginTop: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  textInputContainer: {
-    paddingBottom: 5,
-    borderBottomColor: colors.listBorder,
-    borderBottomWidth: 1,
-  },
-  textInput: {
-    alignSelf: 'center',
-    color: colors.dark,
-    height: 54,
-    marginHorizontal: 8,
   },
   separator: {
     backgroundColor: colors.darkLightest,
@@ -294,32 +227,6 @@ const style = StyleSheet.create({
   emptyViewBodySmall: {
     justifyContent: 'center',
     textAlign: 'center',
-  },
-  qrcodeRow: {
-    padding: 5,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 5,
-    marginHorizontal: 10,
-  },
-  qrcodeIconLeft: {
-    borderWidth: 1,
-    borderRadius: 15,
-    borderColor: colors.celoGreen,
-    padding: 4,
-  },
-  qrcodeTextContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    textAlignVertical: 'center',
-    padding: 3,
-  },
-  qrcodeText: {
-    alignSelf: 'center',
-    lineHeight: 30,
   },
 })
 

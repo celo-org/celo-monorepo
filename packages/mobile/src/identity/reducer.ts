@@ -163,3 +163,7 @@ export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
+export const contactMappingProgressSelector = (state: RootState) =>
+  state.identity.contactMappingProgress
+export const isLoadingImportContactsSelector = (state: RootState) =>
+  state.identity.isLoadingImportContacts

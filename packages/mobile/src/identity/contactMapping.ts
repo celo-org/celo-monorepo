@@ -33,39 +33,12 @@ const TAG = 'identity/contactMapping'
 const MAPPING_CHUNK_SIZE = 25
 const NUM_PARALLEL_REQUESTS = 1
 
-export function* doImportContacts() {
-  Logger.debug(TAG, 'Importing user contacts')
+export function* doImportContactsWrapper() {
+  yield call(getConnectedAccount)
   try {
-    yield call(getConnectedAccount)
+    Logger.debug(TAG, 'Importing user contacts')
 
-    const result: boolean = yield call(checkContactsPermission)
-
-    if (!result) {
-      return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
-    }
-
-    const contacts: MinimalContact[] = yield call(getAllContacts)
-    if (!contacts || !contacts.length) {
-      return Logger.warn(TAG, 'Empty contacts list. Skipping import.')
-    }
-
-    const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
-    const e164NumberToAddress: E164NumberToAddressType = yield select(e164NumberToAddressSelector)
-    const recipients = contactsToRecipients(contacts, defaultCountryCode, e164NumberToAddress)
-    if (!recipients) {
-      return Logger.warn(TAG, 'No recipients found')
-    }
-    const { e164NumberToRecipients, otherRecipients } = recipients
-
-    yield call(updateUserContact, e164NumberToRecipients)
-
-    // We call this here before we've refreshed the contact mapping
-    //   so that users can see a recipients list asap
-    yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
-
-    yield put(updateImportSyncProgress(0, Object.keys(e164NumberToRecipients).length))
-
-    yield call(lookupNewRecipients, e164NumberToAddress, e164NumberToRecipients, otherRecipients)
+    yield call(doImportContacts)
 
     Logger.debug(TAG, 'Done importing user contacts')
     yield put(endImportContacts(true))
@@ -74,6 +47,37 @@ export function* doImportContacts() {
     yield put(showError(ErrorMessages.IMPORT_CONTACTS_FAILED))
     yield put(endImportContacts(false))
   }
+}
+
+function* doImportContacts() {
+  const result: boolean = yield call(checkContactsPermission)
+
+  if (!result) {
+    return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+  }
+
+  const contacts: MinimalContact[] = yield call(getAllContacts)
+  if (!contacts || !contacts.length) {
+    return Logger.warn(TAG, 'Empty contacts list. Skipping import.')
+  }
+
+  const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
+  const e164NumberToAddress: E164NumberToAddressType = yield select(e164NumberToAddressSelector)
+  const recipients = contactsToRecipients(contacts, defaultCountryCode, e164NumberToAddress)
+  if (!recipients) {
+    return Logger.warn(TAG, 'No recipients found')
+  }
+  const { e164NumberToRecipients, otherRecipients } = recipients
+
+  yield call(updateUserContact, e164NumberToRecipients)
+
+  // We call this here before we've refreshed the contact mapping
+  //   so that users can see a recipients list asap
+  yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
+
+  yield put(updateImportSyncProgress(0, Object.keys(e164NumberToRecipients).length))
+
+  yield call(lookupNewRecipients, e164NumberToAddress, e164NumberToRecipients, otherRecipients)
 }
 
 // Find the user's contact among those important and save useful bits
