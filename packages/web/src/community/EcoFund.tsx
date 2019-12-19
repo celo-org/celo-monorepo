@@ -76,7 +76,6 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
             </View>
           </View>
           <Button
-            // @ts-ignore
             style={styles.button}
             text={t('ecoFund.link')}
             kind={BTN.NAKED}
@@ -128,7 +127,6 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                         value={formState.form[key]}
                         name={key}
                         multiline={key === 'product'}
-                        // @ts-ignore
                         onInput={onInput}
                         hasError={formState.errors.includes(key)}
                       />
@@ -172,7 +170,6 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                         value={formState.form[key]}
                         name={key}
                         multiline={key === 'why'}
-                        // @ts-ignore
                         onInput={onInput}
                         hasError={formState.errors.includes(key)}
                       />

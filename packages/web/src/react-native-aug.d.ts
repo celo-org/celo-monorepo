@@ -10,7 +10,7 @@ declare module 'react-native' {
   }
 
   interface ViewStyle {
-    position?: 'absolute' | 'relative' | 'fixed'
+    position?: 'absolute' | 'relative' | 'fixed' | 'static'
     isolation?: 'isolate'
     appearance?: string
     transformOrigin?: string | number
@@ -22,7 +22,7 @@ declare module 'react-native' {
     animationTimingFunction?: string
     scrollPadding?: number
     cursor?: string
-    display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item'
+    display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item' | 'block'
     fill?: string
     filter?: string
     mixBlendMode?: 'multiply' | 'screen'
