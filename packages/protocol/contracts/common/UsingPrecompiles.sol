@@ -2,9 +2,16 @@ pragma solidity ^0.5.3;
 
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
+  address constant TRANSFER = address(0xff - 2);
+  address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
-  address constant GET_BLOCK_NUMBER_FROM_HEADER = address(0xff - 8);
+  address constant GET_VALIDATOR = address(0xff - 5);
+  address constant NUMBER_VALIDATORS = address(0xff - 6);
+  address constant EPOCH_SIZE = address(0xff - 7);
+  address constant BLOCK_NUMBER_FROM_HEADER = address(0xff - 8);
   address constant HASH_HEADER = address(0xff - 9);
+  address constant GET_PARENT_SEAL_BITMAP = address(0xff - 10);
+  address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -91,20 +98,31 @@ contract UsingPrecompiles {
 
   /**
    * @notice Gets a validator address from the current validator set.
-   * @param index Index of requested validator in the validator set as sorted by the election.
+   * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
    */
   function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
-    address validatorAddress;
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(newCallDataPosition, index)
-      let success := staticcall(5000, 0xfa, newCallDataPosition, 32, 0, 0)
-      returndatacopy(add(newCallDataPosition, 64), 0, 32)
-      validatorAddress := mload(add(newCallDataPosition, 64))
-    }
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
+    return getAddressFromBytes(out, 0);
+  }
 
-    return validatorAddress;
+  /**
+   * @notice Gets a validator address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator at the requested index.
+   */
+  function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
+    public
+    view
+    returns (address)
+  {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
+    return getAddressFromBytes(out, 0);
   }
 
   /**
@@ -112,15 +130,22 @@ contract UsingPrecompiles {
    * @return Size of the current elected validator set.
    */
   function numberValidatorsInCurrentSet() public view returns (uint256) {
-    uint256 numberValidators;
-    assembly {
-      let success := staticcall(5000, 0xf9, 0, 0, 0, 0)
-      let returnData := mload(0x40)
-      returndatacopy(returnData, 0, 32)
-      numberValidators := mload(returnData)
-    }
+    bytes memory out;
+    bool success;
+    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
+    return getUint256FromBytes(out, 0);
+  }
 
-    return numberValidators;
+  /**
+   * @notice Gets the size of the validator set that must sign the given block number.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Size of the validator set.
+   */
+  function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
+    bytes memory out;
+    bool success;
+    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
+    return getUint256FromBytes(out, 0);
   }
 
   /**
@@ -134,12 +159,11 @@ contract UsingPrecompiles {
    */
   function checkProofOfPossession(address sender, bytes memory blsKey, bytes memory blsPop)
     public
+    view
     returns (bool)
   {
     bool success;
-    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(
-      abi.encodePacked(sender, blsKey, blsPop)
-    );
+    (success, ) = PROOF_OF_POSSESSION.staticcall(abi.encodePacked(sender, blsKey, blsPop));
     return success;
   }
 
@@ -148,13 +172,11 @@ contract UsingPrecompiles {
    * @param header RLP encoded header
    * @return Block number.
    */
-  function getBlockNumberFromHeader(bytes memory header) public returns (uint256) {
-    bytes memory blockNumber;
+  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {
+    bytes memory out;
     bool success;
-    (success, blockNumber) = GET_BLOCK_NUMBER_FROM_HEADER.call.value(0).gas(gasleft())(
-      abi.encodePacked(header)
-    );
-    return getUint256FromBytes(blockNumber, 0);
+    (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
+    return getUint256FromBytes(out, 0);
   }
 
   /**
@@ -162,12 +184,50 @@ contract UsingPrecompiles {
    * @param header RLP encoded header
    * @return Header hash.
    */
-  function hashHeader(bytes memory header) public returns (bytes32) {
-    //return IHashHeader(HASH_HEADER).hashHeader(header);
-    bytes memory hash;
+  function hashHeader(bytes memory header) public view returns (bytes32) {
+    bytes memory out;
     bool success;
-    (success, hash) = HASH_HEADER.call.value(0).gas(gasleft())(abi.encodePacked(header));
-    return getBytes32fromBytes(hash, 0);
+    (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Gets the parent seal bitmap from the header at the given block number.
+   * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current block number.
+   * @return Bytes32 bitmap parent seal where a 1 corresponds to signature from the signer at that index.
+   */
+  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Verifies the given header and returns the seal bitmap is successful.
+   * @param header RLP encoded header
+   * @return Bytes32 bitmap seal where a 1 corresponds to signature from the signer at that index.
+   */
+  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Converts bytes to address
+   * @param bs byte[] data
+   * @param start offset into byte data to convert
+   * @return address data
+   */
+  function getAddressFromBytes(bytes memory bs, uint256 start) internal pure returns (address) {
+    require(bs.length >= start + 32, "slicing out of range");
+    address x;
+    assembly {
+      x := mload(add(bs, add(0x20, start)))
+    }
+    return x;
   }
 
   /**
@@ -176,7 +236,7 @@ contract UsingPrecompiles {
    * @param start offset into byte data to convert
    * @return bytes32 data
    */
-  function getBytes32fromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
+  function getBytes32FromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
     require(bs.length >= start + 32, "slicing out of range");
     bytes32 x;
     assembly {
