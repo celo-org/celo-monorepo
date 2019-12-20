@@ -2,7 +2,7 @@ pragma solidity ^0.5.3;
 
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
-  address constant FRACTUON_MU_EXP = address(0xff - 3);
+  address constant FRACTION_MUL_EXP = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
   address constant GET_VALIDATOR = address(0xff - 5);
   address constant NUMBER_OF_VALIDATORS = address(0xff - 6);
@@ -32,7 +32,7 @@ contract UsingPrecompiles {
 
     bool success;
     bytes memory result;
-    (success, result) = FRACTUON_MU_EXP.staticcall(
+    (success, result) = FRACTION_MUL_EXP.staticcall(
       abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
     );
     require(
