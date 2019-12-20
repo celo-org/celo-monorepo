@@ -36,7 +36,7 @@ e2e-defaults: &e2e-defaults
   docker:
     - image: celohq/circleci
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: trianglesphere/community_rewards
 
 general:
   artifacts:
