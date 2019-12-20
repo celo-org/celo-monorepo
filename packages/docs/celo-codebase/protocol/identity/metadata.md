@@ -36,29 +36,29 @@ You can interact with metadata files easily through the [CLI](../../../command-l
 You can create an empty metadata file with:
 
 ```bash
-$celocli account:create-metadata ./metadata.json --from $ACCOUNT_ADDRESS
+celocli account:create-metadata ./metadata.json --from $ACCOUNT_ADDRESS
 ```
 
 You can add claims with various commands:
 
 ```bash
-$celocli account:claim-attestation-service-url ./metadata.json --from $ACCOUNT_ADDRESS --url $ATTESTATION_SERVICE_URL
+celocli account:claim-attestation-service-url ./metadata.json --from $ACCOUNT_ADDRESS --url $ATTESTATION_SERVICE_URL
 ```
 
 You can display the claims in your file and their status with:
 
 ```bash
-$celocli account:show-metadata ./metadata.json
+celocli account:show-metadata ./metadata.json
 ```
 
 Once you are satisfied with your claims, you can upload your file to your own web site or a site that will host the file (for example, [https://gist.github.com](https://gist.github.com)) and then register it with the `Accounts` smart contract by running:
 
 ```bash
-$celocli account:register-metadata --url $METADATA_URL --from $ACCOUNT_ADDRESS
+celocli account:register-metadata --url $METADATA_URL --from $ACCOUNT_ADDRESS
 ```
 
 Then, anyone can lookup your claims and verify them by running:
 
 ```bash
-$celocli account:get-metadata $ACCOUNT_ADDRESS
+celocli account:get-metadata $ACCOUNT_ADDRESS
 ```
