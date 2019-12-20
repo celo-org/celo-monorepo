@@ -97,8 +97,6 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
 
-    console.log(await findLessersAndGreaters(slashedAccount, penalty, lockedGold, election))
-
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
     value = await lockedGold.getAccountTotalLockedGold(accounts[0])
