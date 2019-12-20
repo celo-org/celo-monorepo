@@ -196,6 +196,47 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
+  describe('#setCommunityRewardFraction()', () => {
+    describe('when the fraction is different', () => {
+      const newFraction = communityRewardFraction.plus(1)
+
+      describe('when called by the owner', () => {
+        it('should set the community reward fraction', async () => {
+          await epochRewards.setCommunityRewardFraction(newFraction)
+          assertEqualBN(await epochRewards.getCommunityRewardFraction(), newFraction)
+        })
+
+        it('should emit the CommunityRewardFractionSet event', async () => {
+          const resp = await epochRewards.setCommunityRewardFraction(newFraction)
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'CommunityRewardFractionSet',
+            args: {
+              fraction: newFraction,
+            },
+          })
+        })
+
+        describe('when called by a non-owner', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              epochRewards.setCommunityRewardFraction(newFraction, {
+                from: nonOwner,
+              })
+            )
+          })
+        })
+      })
+
+      describe('when the fraction is the same', () => {
+        it('should revert', async () => {
+          await assertRevert(epochRewards.setCommunityRewardFraction(communityRewardFraction))
+        })
+      })
+    })
+  })
+
   describe('#setTargetValidatorEpochPayment()', () => {
     describe('when the payment is different', () => {
       const newPayment = targetValidatorEpochPayment.plus(1)
