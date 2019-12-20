@@ -108,7 +108,7 @@ contract UsingPrecompiles {
       "UsingPrecompiles :: numberValidatorsInCurrentSet Unsuccessful getting number of validators "
     );
     assembly {
-      numberValidators := mload(result)
+      numberValidators := mload(add(result, 32))
     }
 
     return numberValidators;
