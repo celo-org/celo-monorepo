@@ -17,7 +17,6 @@ import {
   RegistryInstance,
   ReserveInstance,
   StableTokenInstance,
-  ValidatorsInstance,
 } from 'types'
 
 enum VoteValue {
@@ -36,6 +35,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   let governanceSlasher: GovernanceSlasherInstance
   let proposalTransactions: any
   const value = new BigNumber('1000000000000000000')
+  const penalty = new BigNumber('100')
 
   before(async () => {
     accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
@@ -48,10 +48,6 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     await lockedGold.lock({ value })
     // @ts-ignore
     await lockedGold.lock({ value, from: accounts[1] })
-
-    // Try to find out who is a validator?
-    const validators: ValidatorsInstance = await getDeployedProxiedContract('Validators', artifacts)
-    console.info('validators', await validators.getRegisteredValidators())
 
     proposalTransactions = [
       {
@@ -126,14 +122,16 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
 
     it('should execute the proposal', async () => {
-      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 100)
+      assertEqualBN(await governanceSlasher.getApprovedSlashing(accounts[1]), penalty)
     })
   })
 
   describe('When performing slashing', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
+      console.info('before', (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10))
       await governanceSlasher.slash(accounts[1], [], [], [])
+      console.info('after', (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10))
     })
 
     it('should set approved slashing to zero', async () => {
@@ -141,7 +139,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
 
     it('should slash the account', async () => {
-      // slashing not yet implemented in LockedGold
+      assertEqualBN(await lockedGold.getAccountTotalLockedGold(accounts[1]), value.minus(penalty))
     })
   })
 })
