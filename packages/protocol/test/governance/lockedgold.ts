@@ -11,10 +11,10 @@ import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
-  LockedGoldContract,
-  LockedGoldInstance,
   ElectionContract,
   ElectionInstance,
+  LockedGoldContract,
+  LockedGoldInstance,
   MockElectionContract,
   MockElectionInstance,
   MockGoldTokenContract,
