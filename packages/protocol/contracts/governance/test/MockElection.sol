@@ -48,14 +48,14 @@ contract MockElection is IElection {
     return electedValidators;
   }
 
-  function slashVotes(
+  function forceRevokeVotes(
     address,
     uint256 value,
     address[] calldata,
     address[] calldata,
     uint256[] calldata
-  ) external returns (bool) {
+  ) external returns (uint256) {
     this.setActiveVotes(this.getActiveVotes() - value);
-    return true;
+    return value;
   }
 }
