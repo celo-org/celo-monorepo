@@ -2,7 +2,11 @@ pragma solidity ^0.5.3;
 
 // TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
+  address constant FRACTUON_MU_EXP = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
+  address constant GET_VALIDATOR = address(0xff - 5);
+  address constant NUMBER_OF_VALIDATORS = address(0xff - 6);
+  address constant EPOCH_SIZE = address(0xff - 7);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -25,38 +29,51 @@ contract UsingPrecompiles {
     require(aDenominator != 0 && bDenominator != 0);
     uint256 returnNumerator;
     uint256 returnDenominator;
-    // solhint-disable-next-line no-inline-assembly
+    // assembly {
+    //   let newCallDataPosition := mload(0x40)
+    //   mstore(0x40, add(newCallDataPosition, calldatasize))
+    //   mstore(newCallDataPosition, aNumerator)
+    //   mstore(add(newCallDataPosition, 32), aDenominator)
+    //   mstore(add(newCallDataPosition, 64), bNumerator)
+    //   mstore(add(newCallDataPosition, 96), bDenominator)
+    //   mstore(add(newCallDataPosition, 128), exponent)
+    //   mstore(add(newCallDataPosition, 160), _decimals)
+    //   let success := staticcall(
+    //     1050, // estimated gas cost for this function
+    //     0xfc,
+    //     newCallDataPosition,
+    //     0xc4, // input size, 6 * 32 = 192 bytes
+    //     0,
+    //     0
+    //   )
+
+    //   let returnDataSize := returndatasize
+    //   let returnDataPosition := mload(0x40)
+    //   mstore(0x40, add(returnDataPosition, returnDataSize))
+    //   returndatacopy(returnDataPosition, 0, returnDataSize)
+
+    //   switch success
+    //     case 0 {
+    //       revert(returnDataPosition, returnDataSize)
+    //     }
+    //     default {
+    //       returnNumerator := mload(returnDataPosition)
+    //       returnDenominator := mload(add(returnDataPosition, 32))
+    //     }
+    // }
+
+    bool success;
+    bytes memory result;
+    (success, result) = FRACTUON_MU_EXP.staticcall(
+      abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
+    );
+    require(
+      success,
+      "UsingPrecompiles :: fractionMulExp Unsuccessful invocation of fraction exponent"
+    );
     assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(0x40, add(newCallDataPosition, calldatasize))
-      mstore(newCallDataPosition, aNumerator)
-      mstore(add(newCallDataPosition, 32), aDenominator)
-      mstore(add(newCallDataPosition, 64), bNumerator)
-      mstore(add(newCallDataPosition, 96), bDenominator)
-      mstore(add(newCallDataPosition, 128), exponent)
-      mstore(add(newCallDataPosition, 160), _decimals)
-      let success := staticcall(
-        1050, // estimated gas cost for this function
-        0xfc,
-        newCallDataPosition,
-        0xc4, // input size, 6 * 32 = 192 bytes
-        0,
-        0
-      )
-
-      let returnDataSize := returndatasize
-      let returnDataPosition := mload(0x40)
-      mstore(0x40, add(returnDataPosition, returnDataSize))
-      returndatacopy(returnDataPosition, 0, returnDataSize)
-
-      switch success
-        case 0 {
-          revert(returnDataPosition, returnDataSize)
-        }
-        default {
-          returnNumerator := mload(returnDataPosition)
-          returnDenominator := mload(add(returnDataPosition, 32))
-        }
+      returnNumerator := mload(add(result, 32))
+      returnDenominator := mload(add(result, 64))
     }
     return (returnNumerator, returnDenominator);
   }
@@ -67,13 +84,12 @@ contract UsingPrecompiles {
    */
   function getEpochSize() public view returns (uint256) {
     uint256 ret;
-    // solhint-disable-next-line no-inline-assembly
+    bool success;
+    bytes memory result;
+    (success, result) = EPOCH_SIZE.staticcall("");
+    require(success, "UsingPrecompiles :: getEpochSize Unsuccessful getting of the epoch size");
     assembly {
-      let newCallDataPosition := mload(0x40)
-      let success := staticcall(1000, 0xf8, newCallDataPosition, 0, 0, 0)
-
-      returndatacopy(add(newCallDataPosition, 32), 0, 32)
-      ret := mload(add(newCallDataPosition, 32))
+      ret := mload(add(result, 32))
     }
     return ret;
   }
@@ -94,12 +110,16 @@ contract UsingPrecompiles {
    */
   function validatorAddressFromCurrentSet(uint256 index) public view returns (address) {
     address validatorAddress;
+
+    bool success;
+    bytes memory result;
+    (success, result) = GET_VALIDATOR.staticcall(abi.encodePacked(index));
+    require(
+      success,
+      "UsingPrecompiles :: validatorAddressFromCurrentSet Unsuccessful getting of the validator address for index"
+    );
     assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(newCallDataPosition, index)
-      let success := staticcall(5000, 0xfa, newCallDataPosition, 32, 0, 0)
-      returndatacopy(add(newCallDataPosition, 64), 0, 32)
-      validatorAddress := mload(add(newCallDataPosition, 64))
+      validatorAddress := mload(add(result, 20))
     }
 
     return validatorAddress;
@@ -111,11 +131,16 @@ contract UsingPrecompiles {
    */
   function numberValidatorsInCurrentSet() public view returns (uint256) {
     uint256 numberValidators;
+
+    bool success;
+    bytes memory result;
+    (success, result) = NUMBER_OF_VALIDATORS.staticcall("");
+    require(
+      success,
+      "UsingPrecompiles :: numberValidatorsInCurrentSet Unsuccessful getting number of validators "
+    );
     assembly {
-      let success := staticcall(5000, 0xf9, 0, 0, 0, 0)
-      let returnData := mload(0x40)
-      returndatacopy(returnData, 0, 32)
-      numberValidators := mload(returnData)
+      numberValidators := mload(result)
     }
 
     return numberValidators;
