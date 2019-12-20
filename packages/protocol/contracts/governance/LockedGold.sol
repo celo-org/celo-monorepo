@@ -45,6 +45,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
+  event SlasherWhitelistAdded(address slasher);
+  event SlasherWhitelistRemoved(address slasher);
+  event AccountSlashed(address slashed, uint256 penalty, address reporter, uint256 reward);
 
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
@@ -251,6 +254,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function addSlasher(address slasher) external onlyOwner {
     require(slasher != address(0));
     isSlasher[slasher] = true;
+    emit SlasherWhitelistAdded(slasher);
   }
 
   /**
@@ -258,8 +262,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param slasher Address to remove from whitelist.
    */
   function removeSlasher(address slasher) external onlyOwner {
-    require(slasher != address(0));
+    require(isSlasher[slasher]);
     isSlasher[slasher] = false;
+    emit SlasherWhitelistRemoved(slasher);
   }
 
   /**
@@ -290,15 +295,24 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       getAccountTotalLockedGold(account) >= penalty,
       "trying to slash more gold than is locked"
     );
-    uint256 nonvotingBalance = balances[account].nonvoting;
-    // If not enough nonvoting, revoke the difference
-    if (nonvotingBalance < penalty) {
-      uint256 difference = penalty.sub(nonvotingBalance);
-      getElection().slashVotes(account, difference, lessers, greaters, indices);
+    require(penalty >= reward, "reward cannot exceed penalty.");
+    {
+      uint256 nonvotingBalance = balances[account].nonvoting;
+      uint256 difference = 0;
+      // If not enough nonvoting, revoke the difference
+      if (nonvotingBalance < penalty) {
+        difference = penalty.sub(nonvotingBalance);
+        require(
+          getElection().forceRevokeVotes(account, difference, lessers, greaters, indices) ==
+            difference
+        );
+      }
+      // forceRevokeVotes does not increment nonvoting account balance, so we can't double count
+      _decrementNonvotingAccountBalance(account, penalty - difference);
+      _incrementNonvotingAccountBalance(reporter, reward);
     }
-    _decrementNonvotingAccountBalance(account, penalty);
-    _incrementNonvotingAccountBalance(reporter, reward);
-    // TODO(lucas): How to send to community fund
-    // address(uint160(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID))).transfer(penalty - reward);
+    address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    getGoldToken().transfer(communityFund, penalty.sub(reward));
+    emit AccountSlashed(account, penalty, reporter, reward);
   }
 }
