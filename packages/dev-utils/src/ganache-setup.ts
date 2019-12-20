@@ -43,7 +43,7 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
     network_id: 1101,
     db_path: datadir,
     mnemonic: MNEMONIC,
-    gasLimit: 10000000,
+    gasLimit: 15000000,
     allowUnlimitedContractSize: true,
   })
 

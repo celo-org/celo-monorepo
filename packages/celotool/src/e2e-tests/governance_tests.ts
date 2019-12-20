@@ -352,6 +352,7 @@ describe('governance tests', () => {
 
       // Wait for an epoch transition so we can activate our vote.
       await waitForEpochTransition(epoch)
+      await sleep(5)
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(epoch)
 
@@ -602,6 +603,7 @@ describe('governance tests', () => {
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
       const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
         const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
+        // @ts-ignore - TODO: remove when web3 upgrade completed
         const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
         return new BigNumber(gpm).times(new BigNumber(gas))
       }

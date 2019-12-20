@@ -429,6 +429,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                         style={
                           Object {
                             "height": 12,
+                            "tintColor": "#42D689",
                             "width": 12,
                           }
                         }
@@ -1540,6 +1541,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                         style={
                           Object {
                             "height": 12,
+                            "tintColor": "#42D689",
                             "width": 12,
                           }
                         }
@@ -2651,6 +2653,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                         style={
                           Object {
                             "height": 12,
+                            "tintColor": "#42D689",
                             "width": 12,
                           }
                         }
@@ -3756,6 +3759,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                         style={
                           Object {
                             "height": 12,
+                            "tintColor": "#42D689",
                             "width": 12,
                           }
                         }
@@ -4867,6 +4871,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         style={
                           Object {
                             "height": 12,
+                            "tintColor": "#42D689",
                             "width": 12,
                           }
                         }
@@ -5978,6 +5983,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         style={
                           Object {
                             "height": 12,
+                            "tintColor": "#42D689",
                             "width": 12,
                           }
                         }

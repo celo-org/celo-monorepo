@@ -9,13 +9,13 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
+import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
 import { RecipientWithContact } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import FeeIcon from 'src/send/FeeIcon'
 import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 export interface OwnProps {
@@ -74,10 +74,12 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
               {recipientContact.displayName}
             </Text>
           )}
-          <PhoneNumberWithFlag
-            e164PhoneNumber={recipientPhone}
-            defaultCountryCode={defaultCountryCode}
-          />
+          {recipientPhone && (
+            <PhoneNumberWithFlag
+              e164PhoneNumber={recipientPhone}
+              defaultCountryCode={defaultCountryCode}
+            />
+          )}
         </View>
         <View style={style.feeContainer}>
           <LineItemRow
@@ -111,7 +113,6 @@ const style = StyleSheet.create({
     padding: 20,
   },
   feeContainer: {
-    marginTop: 10,
     marginBottom: 10,
     justifyContent: 'center',
     alignItems: 'stretch',

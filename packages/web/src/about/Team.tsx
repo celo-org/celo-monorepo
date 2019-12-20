@@ -58,7 +58,6 @@ export class Team extends React.Component<Props & I18nProps> {
   }
 }
 
-// @ts-ignore
 const styles = StyleSheet.create({
   container: {
     flex: 1,

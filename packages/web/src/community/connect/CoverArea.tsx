@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     animationDuration: `4s`,
     animationDelay: '3s',
     animationFillMode: 'both',
-    animationIterationCount: '8',
+    animationIterationCount: 8,
     animationKeyframes: [
       {
         '0%': {

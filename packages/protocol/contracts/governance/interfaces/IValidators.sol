@@ -10,4 +10,5 @@ interface IValidators {
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool);
   function isValidator(address) external view returns (bool);
   function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256);
+  function getValidatorGroupSlashingMultiplier(address) external view returns (uint256);
 }

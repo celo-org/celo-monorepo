@@ -1,8 +1,8 @@
 import { CURRENCY_ENUM as Tokens } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { TransactionConfig, TransactionReceipt } from 'web3-eth'
 import { TransactionObject } from 'web3/eth/types'
-import { TransactionReceipt } from 'web3/types'
 import { Exchange } from '../types/Exchange'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
 import { GoldToken as GoldTokenType } from '../types/GoldToken'
@@ -93,7 +93,7 @@ export default class ContractUtils {
       gatewayFee: gatewayFee && gatewayFee.toString(),
     }
     Logger.debug('sendGold', `Transaction is ${JSON.stringify(transaction)}`)
-    return web3.eth.sendTransaction(transaction)
+    return web3.eth.sendTransaction(transaction as TransactionConfig)
   }
 
   static async sendDollar(

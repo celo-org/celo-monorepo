@@ -18,11 +18,13 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.2.0",
+    "@celo/utils": "^0.1.0",
     "apollo-datasource-rest": "^0.3.1",
     "apollo-server-express": "^2.4.2",
     "bignumber.js": "^7.2.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
+    "firebase-admin": "^8.6.1",
     "graphql": "^14.1.1",
     "utf8": "^3.0.0",
     "web3-eth-abi": "1.0.0-beta.37"
@@ -35,7 +37,7 @@
     "@types/web3": "^1.0.18",
     "jest-fetch-mock": "^2.1.2",
     "tsc-watch": "^1.0.31",
-    "typescript": "^3.5.3"
+    "typescript": "^3.7.3"
   },
   "resolutions": {
     "**/cross-fetch": "3.0.4"

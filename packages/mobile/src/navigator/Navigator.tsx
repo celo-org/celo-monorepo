@@ -13,7 +13,7 @@ import {
 } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
-import CeloLite from 'src/account/CeloLite'
+import DataSaver from 'src/account/DataSaver'
 import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import GoldEducation from 'src/account/GoldEducation'
@@ -250,7 +250,7 @@ const SettingsStack = createStackNavigator(
     [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
-    [Screens.CeloLite]: { screen: CeloLite },
+    [Screens.DataSaver]: { screen: DataSaver },
     [Screens.EditProfile]: { screen: EditProfile },
     [Screens.Profile]: { screen: Profile },
     [Screens.Invite]: { screen: Invite },
@@ -278,6 +278,12 @@ const AppStack = createStackNavigator(
     // Note, WalletHome isn't in this stack because it's part of the tab navigator
     [Screens.TabNavigator]: { screen: TabNavigator },
     [Stacks.SendStack]: { screen: SendStack },
+    // Adding this screen, so it possbile to go back to Home screen from it
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+    // Adding this screen, so it possbile to go back to Home screen from it
+    [Screens.ReclaimPaymentConfirmationScreen]: {
+      screen: ReclaimPaymentConfirmationScreen,
+    },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
     [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
@@ -290,6 +296,7 @@ const AppStack = createStackNavigator(
     [Screens.PhotosEducation]: { screen: PhotosEducation },
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.FeeEducation]: { screen: FeeEducation },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation }, // Included so it is possible to go back to Home screen from it
     ...commonScreens,
   },
   {
