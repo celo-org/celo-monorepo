@@ -1,12 +1,49 @@
 {
 	"rules": {
+		"totalNonVotingGEAccountNonVoting": {
+		"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getPendingWithdrawalsLength(address)", "getNonvotingLockedGold()", "owner()", "isOwner()", "init_state()", "getunlockingPeriod()", "setRegistry(address)", "ercBalanceOf(address)", "relock(uint256,uint256)", "getTotalPendingWithdrawals(address)", "totalNonvoting()", "getPendingWithdrawalsIndex(address,uint256)", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+		"totalPreserved": {
+		"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getPendingWithdrawalsLength(address)", "getNonvotingLockedGold()", "owner()", "isOwner()", "init_state()", "getunlockingPeriod()", "setRegistry(address)", "ercBalanceOf(address)", "relock(uint256,uint256)", "getTotalPendingWithdrawals(address)", "totalNonvoting()", "getPendingWithdrawalsIndex(address,uint256)", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+		"noChangeByOther": {
+		"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getPendingWithdrawalsLength(address)", "getNonvotingLockedGold()", "owner()", "isOwner()", "init_state()", "getunlockingPeriod()", "setRegistry(address)", "ercBalanceOf(address)", "relock(uint256,uint256)", "getTotalPendingWithdrawals(address)", "totalNonvoting()", "getPendingWithdrawalsIndex(address,uint256)", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+		"withdraw": "SUCCESS",
+		"noWithdrawBeforeUnlocking": {
+		"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getPendingWithdrawalsLength(address)", "getNonvotingLockedGold()", "owner()", "isOwner()", "init_state()", "getunlockingPeriod()", "setRegistry(address)", "ercBalanceOf(address)", "relock(uint256,uint256)", "getTotalPendingWithdrawals(address)", "totalNonvoting()", "getPendingWithdrawalsIndex(address,uint256)", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
 		"only_initializer_changes_initialized_field": {
-			"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getNonvotingLockedGold()", "owner()", "isOwner()", "setRegistry(address)", "relock(uint256,uint256)", "totalNonvoting()", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
-			"FAIL": [],
-			"UNKNOWN": [],
-			"TIMEOUT": []
-		},
-		"check_initializer": "SUCCESS"
+		"SUCCESS": ["0", "initialized()", "decrementNonvotingAccountBalance(address,uint256)", "unlockingPeriod()", "withdraw(uint256)", "getTotalLockedGold()", "getAccountTotalLockedGold(address)", "getAccountNonvotingLockedGold(address)", "unlock(uint256)", "setUnlockingPeriod(uint256)", "incrementNonvotingAccountBalance(address,uint256)", "renounceOwnership()", "registry()", "getPendingWithdrawalsLength(address)", "getNonvotingLockedGold()", "owner()", "isOwner()", "init_state()", "getunlockingPeriod()", "setRegistry(address)", "ercBalanceOf(address)", "relock(uint256,uint256)", "getTotalPendingWithdrawals(address)", "totalNonvoting()", "getPendingWithdrawalsIndex(address,uint256)", "initialize(address,uint256)", "transferOwnership(address)", "getPendingWithdrawals(address)", "lock()"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+		"check_initializer": "SUCCESS",
+		"envfreeFuncsAreNonpayable": {
+		"SUCCESS": ["getAccountNonvotingLockedGold(address)", "getPendingWithdrawalsLength(address)", "getNonvotingLockedGold()", "getunlockingPeriod()", "getTotalPendingWithdrawals(address)", "getPendingWithdrawalsIndex(address,uint256)"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	},
+		"envfreeFuncsStaticCheck": {
+		"SUCCESS": ["getNonvotingLockedGold", "getAccountNonvotingLockedGold", "getTotalPendingWithdrawals", "getPendingWithdrawalsLength", "getPendingWithdrawalsIndex", "getunlockingPeriod"],
+		"FAIL": [],
+		"UNKNOWN": [],
+		"TIMEOUT": []
+	}
 	},
 	"assertMessages": {
 	}
