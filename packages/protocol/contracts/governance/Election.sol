@@ -302,46 +302,6 @@ contract Election is
     return true;
   }
 
-  function _revokeVotes(
-    address account,
-    address group,
-    uint256 value,
-    address lesser,
-    address greater,
-    uint256 index
-  ) internal returns (uint256) {
-    require(group != address(0) && 0 < value);
-    uint256 remainingValue = value;
-    uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
-    if (pendingVotes > 0) {
-      uint256 maxValue = remainingValue;
-      if (pendingVotes < maxValue) {
-        maxValue = pendingVotes;
-      }
-      decrementPendingVotes(group, account, maxValue);
-      remainingValue = remainingValue.sub(maxValue);
-    }
-    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
-    if (activeVotes > 0) {
-      uint256 maxValue = remainingValue;
-      if (activeVotes < maxValue) {
-        maxValue = activeVotes;
-      }
-      decrementActiveVotes(group, account, maxValue);
-      remainingValue = remainingValue.sub(maxValue);
-    }
-    uint256 difference = value.sub(remainingValue);
-    if (difference > 0) {
-      decrementTotalVotes(group, difference, lesser, greater);
-      getLockedGold().incrementNonvotingAccountBalance(account, difference);
-      emit ValidatorGroupVoteRevoked(account, group, difference);
-    }
-    if (getTotalVotesForGroupByAccount(group, account) == 0) {
-      deleteElement(votes.groupsVotedFor[account], group, index);
-    }
-    return difference;
-  }
-
   /**
    * @notice Revokes `value` active votes for `group`
    * @param group The validator group to revoke votes from.
@@ -377,6 +337,52 @@ contract Election is
     }
     emit ValidatorGroupVoteRevoked(account, group, value);
     return true;
+  }
+
+  /**
+   * @notice Revokes `value` pending or active votes for `group`. First revokes all pending votes
+   *         and, if `value` haven't been revoked yet, revokes additional active votes.
+   *         Basically calls `revokePending` and `revokeActive` but only resorts groups once.
+   * @param group The validator group to revoke votes from.
+   * @param value The number of votes to revoke.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *               or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *                or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @return uint256 Number of votes successfully revoked, with a max of `value`.
+   */
+  function _revokeVotes(
+    address account,
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) internal returns (uint256) {
+    require(group != address(0) && 0 < value);
+    uint256 remainingValue = value;
+    uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
+    if (pendingVotes > 0) {
+      uint256 decrementValue = Math.min(remainingValue, pendingVotes);
+      decrementPendingVotes(group, account, decrementValue);
+      remainingValue = remainingValue.sub(decrementValue);
+    }
+    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
+    if (activeVotes > 0 && remainingValue > 0) {
+      uint256 decrementValue = Math.min(remainingValue, activeVotes);
+      decrementActiveVotes(group, account, decrementValue);
+      remainingValue = remainingValue.sub(decrementValue);
+    }
+    uint256 decrementedValue = value.sub(remainingValue);
+    if (decrementedValue > 0) {
+      decrementTotalVotes(group, decrementedValue, lesser, greater);
+      emit ValidatorGroupVoteRevoked(account, group, decrementedValue);
+      if (getTotalVotesForGroupByAccount(group, account) == 0) {
+        deleteElement(votes.groupsVotedFor[account], group, index);
+      }
+    }
+    return decrementedValue;
   }
 
   /**
@@ -898,24 +904,37 @@ contract Election is
     return res;
   }
 
-  struct SlashVotesInfo {
+  struct RevokeVotesInfo {
     address[] groups;
     uint256 remainingValue;
   }
 
-  // Iterates in reverse order over all groups voted for by `account`,
-  // reducing the total amount of voting gold by `value` in total.
-  // For each group, if there `value` gold has left to be slashed, reduces
-  // the number of pending and active votes for that group by as much as
-  // possible without exceeding the total value that needs to be slashed.
-  function slashVotes(
+  /**
+   * @notice Reduces the total amount of `account`'s voting gold by `value` by
+   *         iterating over all groups voted for by account.
+   * @param account Address to revoke votes from.
+   * @param value Amount of votes to revoke.
+   * @param lessers The groups receiving fewer votes than the i'th `group`, or 0 if
+   *                the i'th `group` has the fewest votes of any validator group.
+   * @param greaters The groups receivier more votes than the i'th `group`, or 0 if
+   *                the i'th `group` has the most votes of any validator group.
+   * @param indices The indices of the i'th group in the account's voting list.
+   */
+  function forceRevokeVotes(
     address account,
     uint256 value,
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
-  ) external nonReentrant returns (bool) {
-    SlashVotesInfo memory info = SlashVotesInfo(votes.groupsVotedFor[account], value);
+  ) external nonReentrant onlyRegisteredContract(LOCKED_GOLD_REGISTRY_ID) returns (uint256) {
+    require(value > 0 && value <= this.getTotalVotesByAccount(account));
+    RevokeVotesInfo memory info = RevokeVotesInfo(votes.groupsVotedFor[account], value);
+    require(
+      info.groups.length == lessers.length &&
+        lessers.length == greaters.length &&
+        greaters.length == indices.length
+    );
+    // Iterate in reverse order to hopefully optimize removing pending votes before active votes
     for (uint256 i = info.groups.length; i > 0; i = i.sub(1)) {
       info.remainingValue = info.remainingValue.sub(
         _revokeVotes(
@@ -928,9 +947,8 @@ contract Election is
         )
       );
       if (info.remainingValue == 0) {
-        return true;
+        return value;
       }
     }
-    require(false, "Cannot slash all provided votes");
   }
 }
