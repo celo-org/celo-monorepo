@@ -44,7 +44,7 @@
     "@celo/contractkit": "0.2.8-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "^0.1.1",
+    "@celo/utils": "0.1.5-dev",
     "@celo/walletkit": "^0.0.15",
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/netinfo": "^4.4.0",
@@ -117,7 +117,7 @@
     "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^9.11.1",
     "react-native-swiper": "^1.5.14",
-    "react-native-tcp": "https://github.com/cmcewen/react-native-tcp#408b674",
+    "react-native-tcp": "https://github.com/cmcewen/react-native-tcp#65a1e45",
     "react-native-udp": "git+https://github.com/celo-org/react-native-udp#730f295",
     "react-native-version-check": "^3.3.0",
     "react-native-webview": "^7.4.1",
@@ -134,7 +134,7 @@
     "tslib": "^1.9.1",
     "utf8": "^3.0.0",
     "vm-browserify": "^1.0.1",
-    "web3": "1.0.0-beta.37"
+    "web3": "1.2.4"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",

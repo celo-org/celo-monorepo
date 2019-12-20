@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   containerClosed: {
-    // @ts-ignore
     position: 'static',
     zIndex: -1,
   },

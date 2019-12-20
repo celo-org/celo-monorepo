@@ -1,10 +1,9 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
-import { parseSignature } from "@celo/utils/lib/signatureUtils"
-import { bytes, hash, nat, RLP } from 'eth-lib'
+import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
 import * as _ from 'underscore'
 import * as helpers from 'web3-core-helpers'
-import * as Account from 'web3-eth-accounts/node_modules/eth-lib/lib/account'
 import * as utils from 'web3-utils'
 
 import Web3 = require('web3')
