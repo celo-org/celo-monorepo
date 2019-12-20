@@ -16,12 +16,16 @@ import {
 const Registry: RegistryContract = artifacts.require('Registry')
 const GasPriceMinimum: GasPriceMinimumContract = artifacts.require('GasPriceMinimum')
 
+// @ts-ignore
+// TODO(mcortesi): Use BN
+GasPriceMinimum.numberFormat = 'BigNumber'
+
 contract('GasPriceMinimum', (accounts: string[]) => {
   let gasPriceMinimum: GasPriceMinimumInstance
   let registry: RegistryInstance
   const nonOwner = accounts[1]
-  const initialGasPriceMinimum = new BigNumber(500)
-  const gasPriceMinimumThreshold = new BigNumber(100)
+  const gasPriceMinimumFloor = new BigNumber(100)
+  const initialGasPriceMinimum = gasPriceMinimumFloor
   const targetDensity = toFixed(1 / 2)
   const adjustmentSpeed = toFixed(1 / 2)
 
@@ -31,8 +35,7 @@ contract('GasPriceMinimum', (accounts: string[]) => {
 
     await gasPriceMinimum.initialize(
       registry.address,
-      initialGasPriceMinimum,
-      gasPriceMinimumThreshold,
+      gasPriceMinimumFloor,
       targetDensity,
       adjustmentSpeed
     )
@@ -59,17 +62,16 @@ contract('GasPriceMinimum', (accounts: string[]) => {
       assertEqualBN(actualAdjustmentSpeed, adjustmentSpeed)
     })
 
-    it('should set the gas price minimum threshold', async () => {
-      const actualGasPriceMinimumThreshold = await gasPriceMinimum.gasPriceMinimumThreshold()
-      assertEqualBN(actualGasPriceMinimumThreshold, gasPriceMinimumThreshold)
+    it('should set the gas price minimum floor', async () => {
+      const actualGasPriceMinimumFloor = await gasPriceMinimum.gasPriceMinimumFloor()
+      assertEqualBN(actualGasPriceMinimumFloor, gasPriceMinimumFloor)
     })
 
     it('should not be callable again', async () => {
       await assertRevert(
         gasPriceMinimum.initialize(
           registry.address,
-          initialGasPriceMinimum,
-          gasPriceMinimumThreshold,
+          gasPriceMinimumFloor,
           targetDensity,
           adjustmentSpeed
         )
@@ -141,34 +143,34 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
   })
 
-  describe('#setGasPriceMinimumThreshold', () => {
-    const newGasPriceMinThreshold = new BigNumber(150)
+  describe('#setGasPriceMinimumFloor', () => {
+    const newGasPriceMinFloor = new BigNumber(150)
 
-    it('should set the minimum gas price threshold', async () => {
-      await gasPriceMinimum.setGasPriceMinimumThreshold(newGasPriceMinThreshold)
-      const actualThreshold = await gasPriceMinimum.gasPriceMinimumThreshold()
-      assertEqualBN(actualThreshold, newGasPriceMinThreshold)
+    it('should set the minimum gas price floor', async () => {
+      await gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinFloor)
+      const actualFloor = await gasPriceMinimum.gasPriceMinimumFloor()
+      assertEqualBN(actualFloor, newGasPriceMinFloor)
     })
 
-    it('should emit the MinimumGasPriceThresholdSet event', async () => {
-      const resp = await gasPriceMinimum.setGasPriceMinimumThreshold(newGasPriceMinThreshold)
+    it('should emit the MinimumGasPriceFloorSet event', async () => {
+      const resp = await gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinFloor)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'GasPriceMinimumThresholdSet',
+        event: 'GasPriceMinimumFloorSet',
         args: {
-          gasPriceMinimumThreshold: newGasPriceMinThreshold,
+          gasPriceMinimumFloor: newGasPriceMinFloor,
         },
       })
     })
 
-    it('should revert when the provided threshold is zero', async () => {
-      await assertRevert(gasPriceMinimum.setGasPriceMinimumThreshold(0))
+    it('should revert when the provided floor is zero', async () => {
+      await assertRevert(gasPriceMinimum.setGasPriceMinimumFloor(0))
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        gasPriceMinimum.setGasPriceMinimumThreshold(newGasPriceMinThreshold, {
+        gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinFloor, {
           from: nonOwner,
         })
       )
@@ -177,11 +179,11 @@ contract('GasPriceMinimum', (accounts: string[]) => {
 
   describe('#getUpdatedGasPriceMinimum', () => {
     describe('when the block is full', () => {
-      it('should return 25% more than the initial minimum and should not be limited by the gas price minimum threshold as a whole', async () => {
+      it('should return 25% more than the initial minimum and should not be limited by the gas price minimum floor as a whole', async () => {
         const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()
-        await gasPriceMinimum.setGasPriceMinimumThreshold(currentGasPriceMinimum)
+        await gasPriceMinimum.setGasPriceMinimumFloor(currentGasPriceMinimum)
         const actualUpdatedGasPriceMinimum = await gasPriceMinimum.getUpdatedGasPriceMinimum(1, 1)
-        const expectedUpdatedGasPriceMinimum = new BigNumber(currentGasPriceMinimum.toString())
+        const expectedUpdatedGasPriceMinimum = currentGasPriceMinimum
           .times(5)
           .div(4)
           .plus(1)
@@ -190,19 +192,19 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     describe('when the block is empty', () => {
-      it('should return 25% less than the initial minimum, but be limited by the gas price minimum threshold if new gas price lies below minimum', async () => {
+      it('should return 25% less than the initial minimum, but be limited by the gas price minimum floor if new gas price lies below minimum', async () => {
         const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()
-        await gasPriceMinimum.setGasPriceMinimumThreshold(currentGasPriceMinimum)
+        await gasPriceMinimum.setGasPriceMinimumFloor(currentGasPriceMinimum)
         const actualUpdatedGasPriceMinimum = await gasPriceMinimum.getUpdatedGasPriceMinimum(0, 1)
-        const expectedCappedUpdatedGasPriceMinimum = await gasPriceMinimum.gasPriceMinimumThreshold()
+        const expectedCappedUpdatedGasPriceMinimum = await gasPriceMinimum.gasPriceMinimumFloor()
         assertEqualBN(actualUpdatedGasPriceMinimum, expectedCappedUpdatedGasPriceMinimum)
       })
 
-      it('should return 25% less than the initial minimum, but not be limited by the gas price minimum threshold if new gas price lies above minimum', async () => {
+      it('should return 25% less than the initial minimum, but not be limited by the gas price minimum floor if new gas price lies above minimum', async () => {
         const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()
-        await gasPriceMinimum.setGasPriceMinimumThreshold(1)
+        await gasPriceMinimum.setGasPriceMinimumFloor(1)
         const actualUpdatedGasPriceMinimum = await gasPriceMinimum.getUpdatedGasPriceMinimum(0, 1)
-        const expectedUpdatedGasPriceMinimum = new BigNumber(currentGasPriceMinimum.toString())
+        const expectedUpdatedGasPriceMinimum = currentGasPriceMinimum
           .times(3)
           .div(4)
           .plus(1)
@@ -212,13 +214,14 @@ contract('GasPriceMinimum', (accounts: string[]) => {
 
     describe('when the fullness of the block is random', () => {
       const getUpdatedGasPriceMinimum = (
+        gasPriceMinFloor,
         previousGasPriceMinimum,
         density,
         targetDensity,
         adjustmentSpeed
       ) => {
         const one = new BigNumber(1)
-        return previousGasPriceMinimum
+        const newGasPriceMinimum = previousGasPriceMinimum
           .times(
             one.plus(
               fromFixed(adjustmentSpeed).times(fromFixed(density).minus(fromFixed(targetDensity)))
@@ -226,11 +229,19 @@ contract('GasPriceMinimum', (accounts: string[]) => {
           )
           .plus(one)
           .integerValue(BigNumber.ROUND_DOWN)
+
+        return newGasPriceMinimum.lt(gasPriceMinFloor) ? gasPriceMinFloor : newGasPriceMinimum
       }
 
       it('should return an updated gas price minimum that matches a typescript implementation', async () => {
         const numIterations = 100
+        const currentGasPriceMinimum = await gasPriceMinimum.gasPriceMinimum()
+        const gasPriceMinFloor = currentGasPriceMinimum
+        await gasPriceMinimum.setGasPriceMinimumFloor(gasPriceMinFloor)
+
         for (let i = 0; i < numIterations; i++) {
+          const curGas = await gasPriceMinimum.gasPriceMinimum()
+
           const blockGasLimit = new BigNumber(web3.utils.randomHex(4))
           const gasUsed = BigNumber.random()
             .times(blockGasLimit)
@@ -239,12 +250,15 @@ contract('GasPriceMinimum', (accounts: string[]) => {
             gasUsed,
             blockGasLimit
           )
+
           const expectedUpdatedGasPriceMinimum = getUpdatedGasPriceMinimum(
-            initialGasPriceMinimum,
+            gasPriceMinFloor,
+            curGas,
             toFixed(gasUsed.div(blockGasLimit)),
             targetDensity,
             adjustmentSpeed
           )
+
           assertEqualBN(actualUpdatedGasPriceMinimum, expectedUpdatedGasPriceMinimum)
         }
       })

@@ -79,7 +79,7 @@ contract UsingRegistry is Ownable {
     return IExchange(registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID));
   }
 
-  function getGasCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
+  function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
     return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
   }
 
@@ -95,12 +95,12 @@ contract UsingRegistry is Ownable {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 
-  function getReserve() internal view returns (IReserve) {
-    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-  }
-
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getReserve() internal view returns (IReserve) {
+    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {

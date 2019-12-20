@@ -15,11 +15,11 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
 
   event TargetDensitySet(uint256 targetDensity);
-  event GasPriceMinimumThresholdSet(uint256 gasPriceMinimumThreshold);
+  event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
   event AdjustmentSpeedSet(uint256 adjustmentSpeed);
 
   uint256 public gasPriceMinimum;
-  uint256 public gasPriceMinimumThreshold;
+  uint256 public gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
   FixidityLib.Fraction public targetDensity;
@@ -34,15 +34,14 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
 
   function initialize(
     address _registryAddress,
-    uint256 initialGas,
-    uint256 _gasPriceMinimumThreshold,
+    uint256 _gasPriceMinimumFloor,
     uint256 _targetDensity,
     uint256 _adjustmentSpeed
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
-    gasPriceMinimum = initialGas;
-    gasPriceMinimumThreshold = _gasPriceMinimumThreshold;
+    gasPriceMinimum = _gasPriceMinimumFloor;
+    setGasPriceMinimumFloor(_gasPriceMinimumFloor);
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
   }
@@ -71,10 +70,10 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    * @notice Set the minimum gas price treshold.
    * @dev Value is expected to be > 0.
    */
-  function setGasPriceMinimumThreshold(uint256 _gasPriceMinimumThreshold) public onlyOwner {
-    require(_gasPriceMinimumThreshold > 0, "gas price minimum threshold must be greater than zero");
-    gasPriceMinimumThreshold = _gasPriceMinimumThreshold;
-    emit GasPriceMinimumThresholdSet(_gasPriceMinimumThreshold);
+  function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner {
+    require(_gasPriceMinimumFloor > 0, "gas price minimum floor must be greater than zero");
+    gasPriceMinimumFloor = _gasPriceMinimumFloor;
+    emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
   /**
@@ -146,9 +145,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
       .add(FixidityLib.fixed1())
       .fromFixed();
 
-    return
-      newGasPriceMinimum >= gasPriceMinimumThreshold
-        ? newGasPriceMinimum
-        : gasPriceMinimumThreshold;
+    return newGasPriceMinimum >= gasPriceMinimumFloor ? newGasPriceMinimum : gasPriceMinimumFloor;
   }
 }

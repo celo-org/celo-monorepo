@@ -1,53 +1,9 @@
-import { assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { assertEqualBN, assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
 import * as _ from 'lodash'
 import { MultiSigContract, MultiSigInstance } from 'types'
 
 const MultiSig: MultiSigContract = artifacts.require('MultiSig')
-
-const encodeAddOwnerFunc = (web3, ownerAddress) => {
-  return web3.eth.abi.encodeFunctionCall(
-    {
-      name: 'addOwner',
-      type: 'function',
-      inputs: [{ name: 'owner', type: 'address' }],
-    },
-    [ownerAddress]
-  )
-}
-
-const encodeRemoveOwnerFunc = (web3, ownerAddress) => {
-  return web3.eth.abi.encodeFunctionCall(
-    {
-      name: 'removeOwner',
-      type: 'function',
-      inputs: [{ name: 'owner', type: 'address' }],
-    },
-    [ownerAddress]
-  )
-}
-
-const encodeReplaceOwnerFunc = (web3, oldOwner, newOwner) => {
-  return web3.eth.abi.encodeFunctionCall(
-    {
-      name: 'replaceOwner',
-      type: 'function',
-      inputs: [{ name: 'owner', type: 'address' }, { name: 'newOwner', type: 'address' }],
-    },
-    [oldOwner, newOwner]
-  )
-}
-
-const encodeChangeRequirementFunc = (web3, required) => {
-  return web3.eth.abi.encodeFunctionCall(
-    {
-      name: 'changeRequirement',
-      type: 'function',
-      inputs: [{ name: '_required', type: 'uint256' }],
-    },
-    [required]
-  )
-}
 
 // TODO(asa): Test more governance configurations, calling functions on external contracts.
 contract('MultiSig', (accounts: any) => {
@@ -79,7 +35,8 @@ contract('MultiSig', (accounts: any) => {
   describe('#submitTransaction()', () => {
     let txData: string
     beforeEach(async () => {
-      txData = encodeAddOwnerFunc(web3, accounts[2])
+      // @ts-ignore
+      txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
     })
 
     it('should allow an owner to submit a transaction', async () => {
@@ -120,7 +77,8 @@ contract('MultiSig', (accounts: any) => {
     let txId: number
     let tx: string
     beforeEach(async () => {
-      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      // @ts-ignore
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
       // @ts-ignore: TODO(mcortesi): fix typings
       tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
@@ -155,7 +113,8 @@ contract('MultiSig', (accounts: any) => {
     let txId: number
     let tx: string
     beforeEach(async () => {
-      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      // @ts-ignore
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
       // @ts-ignore: TODO(mcortesi): fix typings
       tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
@@ -184,7 +143,8 @@ contract('MultiSig', (accounts: any) => {
 
   describe('#addOwner()', () => {
     it('should allow a new owner to be added via the MultiSig', async () => {
-      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      // @ts-ignore
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
       // @ts-ignore: TODO(mcortesi): fix typings
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
@@ -201,18 +161,39 @@ contract('MultiSig', (accounts: any) => {
     })
 
     it('should not allow an external account to add an owner', async () => {
-      await assertRevert(multiSig.addOwner(accounts[3]))
+      // @ts-ignore
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
+      // @ts-ignore: TODO(mcortesi): fix typings
+      await assertRevert(
+        multiSig.submitTransaction(multiSig.address, 0, txData, {
+          from: accounts[3],
+        })
+      )
     })
 
     it('should not allow adding the null address', async () => {
-      await assertRevert(multiSig.addOwner(NULL_ADDRESS))
+      // @ts-ignore
+      const txData = multiSig.contract.methods.addOwner(NULL_ADDRESS).encodeABI()
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      const txId = txEvent.args.transactionId
+      // @ts-ignore: TODO(mcortesi): fix typings
+      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
     })
   })
 
   describe('#removeOwner()', () => {
     it('should allow an owner to be removed via the MultiSig', async () => {
-      // @ts-ignore contract is a property
-      const txData = encodeRemoveOwnerFunc(web3, accounts[1])
+      // @ts-ignore
+      const txData = multiSig.contract.methods.removeOwner(accounts[1]).encodeABI()
+
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
@@ -228,18 +209,25 @@ contract('MultiSig', (accounts: any) => {
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
 
       assert.isFalse(await multiSig.isOwner(accounts[1]))
-      assert.equal((await multiSig.required()).toNumber(), 1)
+      assertEqualBN(await multiSig.required(), 1)
     })
 
     it('should not allow an external account to remove an owner', async () => {
-      await assertRevert(multiSig.removeOwner(accounts[1]))
+      // @ts-ignore
+      const txData = multiSig.contract.methods.removeOwner(accounts[1]).encodeABI()
+      // @ts-ignore: TODO(mcortesi): fix typings
+      await assertRevert(
+        multiSig.submitTransaction(multiSig.address, 0, txData, {
+          from: accounts[3],
+        })
+      )
     })
   })
 
   describe('#replaceOwner()', () => {
     it('should allow an existing owner to be replaced by a new one via the MultiSig', async () => {
-      // @ts-ignore contract is a property
-      const txData = encodeReplaceOwnerFunc(web3, accounts[1], accounts[2])
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txData = multiSig.contract.methods.replaceOwner(accounts[1], accounts[2]).encodeABI()
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
@@ -256,18 +244,38 @@ contract('MultiSig', (accounts: any) => {
     })
 
     it('should not allow an external account to replace an owner', async () => {
-      await assertRevert(multiSig.replaceOwner(accounts[1], accounts[2]))
+      // @ts-ignore
+      const txData = multiSig.contract.methods.replaceOwner(accounts[1], accounts[2]).encodeABI()
+      // @ts-ignore: TODO(mcortesi): fix typings
+      await assertRevert(
+        multiSig.submitTransaction(multiSig.address, 0, txData, {
+          from: accounts[3],
+        })
+      )
     })
 
     it('should not allow an owner to be replaced by the null address', async () => {
-      await assertRevert(multiSig.replaceOwner(accounts[1], NULL_ADDRESS))
+      // @ts-ignore
+      const txData = multiSig.contract.methods.replaceOwner(accounts[1], NULL_ADDRESS).encodeABI()
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      const txId = txEvent.args.transactionId
+      // @ts-ignore: TODO(mcortesi): fix typings
+      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
     })
   })
 
   describe('#changeRequirement()', () => {
     it('should allow the requirement to be changed via the MultiSig', async () => {
       // @ts-ignore: TODO(mcortesi): fix typings
-      const txData = encodeChangeRequirementFunc(web3, 1)
+      const txData = multiSig.contract.methods.changeRequirement(1).encodeABI()
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
@@ -284,7 +292,14 @@ contract('MultiSig', (accounts: any) => {
     })
 
     it('should not allow an external account to change the requirement', async () => {
-      await assertRevert(multiSig.changeRequirement(1))
+      // @ts-ignore
+      const txData = multiSig.contract.methods.changeRequirement(3).encodeABI()
+      // @ts-ignore: TODO(mcortesi): fix typings
+      await assertRevert(
+        multiSig.submitTransaction(multiSig.address, 0, txData, {
+          from: accounts[3],
+        })
+      )
     })
   })
 
@@ -292,7 +307,7 @@ contract('MultiSig', (accounts: any) => {
     let txId: number
     beforeEach(async () => {
       // @ts-ignore: TODO(mcortesi): fix typings
-      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
@@ -305,21 +320,21 @@ contract('MultiSig', (accounts: any) => {
     })
 
     it('should return the confirmation count', async () => {
-      assert.equal((await multiSig.getConfirmationCount(txId)).toNumber(), 1)
+      assertEqualBN(await multiSig.getConfirmationCount(txId), 1)
     })
   })
 
   describe('#getTransactionCount()', () => {
     beforeEach(async () => {
       // @ts-ignore: TODO(mcortesi): fix typings
-      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
       await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
     })
 
     it('should return the transaction count', async () => {
-      assert.equal((await multiSig.getTransactionCount(true, true)).toNumber(), 1)
+      assertEqualBN(await multiSig.getTransactionCount(true, true), 1)
     })
   })
 
@@ -333,7 +348,7 @@ contract('MultiSig', (accounts: any) => {
     let txId: number
     beforeEach(async () => {
       // @ts-ignore: TODO(mcortesi): fix typings
-      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
@@ -353,7 +368,7 @@ contract('MultiSig', (accounts: any) => {
   describe('#getTransactionIds()', () => {
     beforeEach(async () => {
       // @ts-ignore: TODO(mcortesi): fix typings
-      const txData = encodeAddOwnerFunc(web3, accounts[2])
+      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
       await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
