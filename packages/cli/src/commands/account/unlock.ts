@@ -1,5 +1,5 @@
-import { IArg } from '@oclif/parser/lib/args'
 import { flags } from '@oclif/command'
+import { IArg } from '@oclif/parser/lib/args'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
