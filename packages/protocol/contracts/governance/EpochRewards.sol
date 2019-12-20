@@ -154,6 +154,14 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
+   * @notice Returns the community reward fraction.
+   * @return The percentage of total reward which goes to the community funds.
+   */
+  function getCommunityRewardFraction() external view returns (uint256) {
+    return communityRewardFraction.unwrap();
+  }
+
+  /**
    * @notice Sets the target voting Gold fraction.
    * @param value The percentage of floating Gold voting to target.
    * @return True upon success.
