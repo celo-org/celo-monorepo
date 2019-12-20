@@ -55,9 +55,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   RewardsMultiplierParameters private rewardsMultiplierParams;
   TargetVotingYieldParameters private targetVotingYieldParams;
   FixidityLib.Fraction private targetVotingGoldFraction;
+  FixidityLib.Fraction private communityRewardFraction;
   uint256 public targetValidatorEpochPayment;
 
   event TargetVotingGoldFractionSet(uint256 fraction);
+  event CommunityRewardFractionSet(uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event RewardsMultiplierParametersSet(
@@ -81,6 +83,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   rewards when the protocol is running ahead of the target Gold supply.
    * @param _targetVotingGoldFraction The percentage of floating Gold voting to target.
    * @param _targetValidatorEpochPayment The target validator epoch payment.
+   * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @dev Should be called only once.
    */
   function initialize(
@@ -93,7 +96,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 rewardsMultiplierUnderspendAdjustmentFactor,
     uint256 rewardsMultiplierOverspendAdjustmentFactor,
     uint256 _targetVotingGoldFraction,
-    uint256 _targetValidatorEpochPayment
+    uint256 _targetValidatorEpochPayment,
+    uint256 _communityRewardFraction
   ) external initializer {
     _transferOwnership(msg.sender);
     setFreezer(_freezer);
@@ -106,6 +110,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     );
     setTargetVotingGoldFraction(_targetVotingGoldFraction);
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
+    setCommunityRewardFraction(_communityRewardFraction);
     targetVotingYieldParams.target = FixidityLib.wrap(targetVotingYieldInitial);
     startTime = now;
   }
@@ -134,6 +139,18 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   function setFreezer(address freezer) public onlyOwner {
     _setFreezer(freezer);
+  }
+
+  /**
+   * @notice Sets the community reward percentage
+   * @param value The percentage of the total reward to be sent to the community funds.
+   * @return True upon success.
+   */
+  function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
+    require(value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    communityRewardFraction = FixidityLib.wrap(value);
+    emit CommunityRewardFractionSet(value);
+    return true;
   }
 
   /**

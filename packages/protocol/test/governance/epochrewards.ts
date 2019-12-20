@@ -67,6 +67,7 @@ contract('EpochRewards', (accounts: string[]) => {
     },
   }
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
+  const communityRewardFraction = toFixed(new BigNumber(1 / 4))
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
   const mockStableTokenAddress = web3.utils.randomHex(20)
@@ -106,7 +107,8 @@ contract('EpochRewards', (accounts: string[]) => {
       rewardsMultiplier.adjustments.underspend,
       rewardsMultiplier.adjustments.overspend,
       targetVotingGoldFraction,
-      targetValidatorEpochPayment
+      targetValidatorEpochPayment,
+      communityRewardFraction
     )
   })
 
@@ -146,7 +148,8 @@ contract('EpochRewards', (accounts: string[]) => {
           rewardsMultiplier.adjustments.underspend,
           rewardsMultiplier.adjustments.overspend,
           targetVotingGoldFraction,
-          targetValidatorEpochPayment
+          targetValidatorEpochPayment,
+          communityRewardFraction
         )
       )
     })
