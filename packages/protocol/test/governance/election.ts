@@ -1213,7 +1213,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#slashVotes', () => {
+  describe('#forceRevokeVotes', () => {
     const voter = accounts[0]
     const group = accounts[1]
     const value = 1000
@@ -1228,7 +1228,7 @@ contract('Election', (accounts: string[]) => {
         await mockValidators.setNumRegisteredValidators(1)
         await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
         await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
-        // await accountsInstance.createAccount({ from: mockLockedGold.address })
+        await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
       })
 
       describe('when the account only has pending votes', () => {
@@ -1237,7 +1237,16 @@ contract('Election', (accounts: string[]) => {
           const slashedValue = value
           const remaining = value - slashedValue
           beforeEach(async () => {
-            await election.slashVotes(voter, slashedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
+            await election.forceRevokeVotes(
+              voter,
+              slashedValue,
+              [NULL_ADDRESS],
+              [NULL_ADDRESS],
+              [index],
+              {
+                from: accounts[2],
+              }
+            )
           })
 
           it('should decrement pending votes to zero', async () => {
@@ -1249,10 +1258,6 @@ contract('Election', (accounts: string[]) => {
             assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
             assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
             assertEqualBN(await election.getTotalVotes(), remaining)
-          })
-
-          it("should increment `voter`'s nonvoting account balance", async () => {
-            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), slashedValue)
           })
 
           it("should remove the group from the voter's voted set", async () => {
@@ -1272,7 +1277,16 @@ contract('Election', (accounts: string[]) => {
           const slashedValue = value
           const remaining = value - slashedValue
           beforeEach(async () => {
-            await election.slashVotes(voter, slashedValue, [NULL_ADDRESS], [NULL_ADDRESS], [index])
+            await election.forceRevokeVotes(
+              voter,
+              slashedValue,
+              [NULL_ADDRESS],
+              [NULL_ADDRESS],
+              [index],
+              {
+                from: accounts[2],
+              }
+            )
           })
 
           it('should decrement active voted gold to zero', async () => {
@@ -1284,10 +1298,6 @@ contract('Election', (accounts: string[]) => {
             assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
             assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
             assertEqualBN(await election.getTotalVotes(), remaining)
-          })
-
-          it("should increment `voter`'s nonvoting account balance", async () => {
-            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), slashedValue)
           })
 
           it("should remove the group from the voter's voted set", async () => {
@@ -1312,6 +1322,7 @@ contract('Election', (accounts: string[]) => {
         await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
         await election.vote(group, value / 2, group2, NULL_ADDRESS)
         await election.vote(group2, value / 2, NULL_ADDRESS, group)
+        await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
       })
 
       describe('when the accounts only have pending votes', () => {
@@ -1320,12 +1331,13 @@ contract('Election', (accounts: string[]) => {
           const remaining = value - slashedValue
 
           beforeEach(async () => {
-            await election.slashVotes(
+            await election.forceRevokeVotes(
               voter,
               slashedValue,
               [group2, NULL_ADDRESS],
               [NULL_ADDRESS, group],
-              [0, 1]
+              [0, 1],
+              { from: accounts[2] }
             )
           })
 
@@ -1340,10 +1352,6 @@ contract('Election', (accounts: string[]) => {
             assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
             assertEqualBN(await election.getTotalVotesForGroup(group2), remaining)
             assertEqualBN(await election.getTotalVotes(), remaining)
-          })
-
-          it("should increment `voter`'s nonvoting account balance", async () => {
-            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), slashedValue)
           })
 
           it("should remove the groups from the voter's voted set", async () => {
@@ -1379,18 +1387,20 @@ contract('Election', (accounts: string[]) => {
           await election.activate(group2)
           await election.vote(group2, value2 / 2, group, NULL_ADDRESS)
           await election.vote(group, value / 2, NULL_ADDRESS, group2)
+          await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
         })
 
         describe("when we slash 1 more vote than group 1's passive vote total", async () => {
           const slashedValue = value / 2 + 1
           const remaining = value - slashedValue
           beforeEach(async () => {
-            await election.slashVotes(
+            await election.forceRevokeVotes(
               voter,
               slashedValue,
               [NULL_ADDRESS, NULL_ADDRESS],
               [group, group2],
-              [0, 1]
+              [0, 1],
+              { from: accounts[2] }
             )
           })
 
@@ -1426,12 +1436,13 @@ contract('Election', (accounts: string[]) => {
           const group2PendingRemaining = value2 / 2 - 1
           const group2ActiveRemaining = value2 / 2
           beforeEach(async () => {
-            await election.slashVotes(
+            await election.forceRevokeVotes(
               voter,
               slashedValue,
               [group, NULL_ADDRESS],
               [NULL_ADDRESS, group2],
-              [0, 1]
+              [0, 1],
+              { from: accounts[2] }
             )
           })
 
@@ -1479,16 +1490,56 @@ contract('Election', (accounts: string[]) => {
         })
       })
 
-      describe('when `slashVotes` is called with malformed inputs', () => {
+      describe('when a slash affects the election order', () => {
+        const slashedValue = value / 4
+        const group1RemainingActiveVotes = value - slashedValue
+        let initialGroupOrdering = []
+
+        beforeEach(async () => {
+          await election.vote(group, value / 2, group2, NULL_ADDRESS)
+          await mineBlocks(EPOCH, web3)
+          await election.activate(group)
+          await mineBlocks(EPOCH, web3)
+          await election.activate(group2)
+          initialGroupOrdering = (await election.getTotalVotesForEligibleValidatorGroups())[0]
+          await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
+          await election.forceRevokeVotes(
+            voter,
+            slashedValue,
+            [group, NULL_ADDRESS],
+            [NULL_ADDRESS, group2],
+            [0, 1],
+            { from: accounts[2] }
+          )
+        })
+
+        it("should decrement group 1's total votes by 1/4", async () => {
+          assertEqualBN(
+            await election.getTotalVotesForGroupByAccount(group, voter),
+            group1RemainingActiveVotes
+          )
+          assertEqualBN(await election.getTotalVotesForGroup(group), group1RemainingActiveVotes)
+        })
+
+        it('should change the ordering of the election', async () => {
+          const newGroupOrdering = (await election.getTotalVotesForEligibleValidatorGroups())[0]
+          assert.notEqual(initialGroupOrdering, newGroupOrdering)
+          assert.equal(initialGroupOrdering[0], newGroupOrdering[1])
+          assert.equal(initialGroupOrdering[1], newGroupOrdering[0])
+        })
+      })
+
+      describe('when `forceRevokeVotes` is called with malformed inputs', () => {
         describe('when called to slash more value than groups have', () => {
           it('should revert', async () => {
             await assertRevert(
-              election.slashVotes(
+              election.forceRevokeVotes(
                 voter,
                 value + value2 + 1,
                 [group, NULL_ADDRESS],
                 [NULL_ADDRESS, group2],
-                [0, 1]
+                [0, 1],
+                { from: accounts[2] }
               )
             )
           })
@@ -1499,12 +1550,13 @@ contract('Election', (accounts: string[]) => {
             const slashedValue = value
             // `group` should be listed as a lesser for index 0 (group2's lesser)
             await assertRevert(
-              election.slashVotes(
+              election.forceRevokeVotes(
                 voter,
                 slashedValue,
                 [NULL_ADDRESS, NULL_ADDRESS],
                 [NULL_ADDRESS, group2],
-                [0, 1]
+                [0, 1],
+                { from: accounts[2] }
               )
             )
           })
@@ -1514,9 +1566,24 @@ contract('Election', (accounts: string[]) => {
           it('should revert', async () => {
             const slashedValue = value
             await assertRevert(
-              election.slashVotes(
+              election.forceRevokeVotes(
                 voter,
                 slashedValue,
+                [group, NULL_ADDRESS],
+                [NULL_ADDRESS, group2],
+                [0, 0],
+                { from: accounts[2] }
+              )
+            )
+          })
+        })
+
+        describe('when called from an address other than the locked gold contract', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              election.forceRevokeVotes(
+                voter,
+                value,
                 [group, NULL_ADDRESS],
                 [NULL_ADDRESS, group2],
                 [0, 0]
