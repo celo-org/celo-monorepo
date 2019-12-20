@@ -238,7 +238,7 @@ contract UsingPrecompiles {
     require(bs.length >= start + 32, "slicing out of range");
     bytes32 x;
     assembly {
-      x := mload(add(bs, add(0x20, start)))
+      x := mload(add(bs, add(start, 32)))
     }
     return x;
   }
