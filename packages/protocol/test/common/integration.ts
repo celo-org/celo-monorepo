@@ -8,7 +8,6 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
 import {
-  AccountsInstance,
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceInstance,
@@ -29,25 +28,21 @@ enum VoteValue {
 contract('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
-  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
   let governance: GovernanceInstance
   let governanceSlasher: GovernanceSlasherInstance
   let proposalTransactions: any
-  const value = new BigNumber('1000000000000000000')
+  let value: BigNumber
+  let valueOfSlashed: BigNumber
   const penalty = new BigNumber('100')
 
   before(async () => {
-    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
+    // @ts-ignore
+    await lockedGold.lock({ value: '10000000000000000000000000' })
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
-    await accountsInstance.createAccount()
-    await accountsInstance.createAccount({ from: accounts[1] })
-    // @ts-ignore
-    await lockedGold.lock({ value })
-    // @ts-ignore
-    await lockedGold.lock({ value, from: accounts[1] })
+    value = await lockedGold.getAccountTotalLockedGold(accounts[0])
 
     proposalTransactions = [
       {
@@ -129,6 +124,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   describe('When performing slashing', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
+      valueOfSlashed = await lockedGold.getAccountTotalLockedGold(accounts[1])
       console.info('before', (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10))
       await governanceSlasher.slash(accounts[1], [], [], [])
       console.info('after', (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10))
@@ -139,7 +135,10 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
 
     it('should slash the account', async () => {
-      assertEqualBN(await lockedGold.getAccountTotalLockedGold(accounts[1]), value.minus(penalty))
+      assertEqualBN(
+        await lockedGold.getAccountTotalLockedGold(accounts[1]),
+        valueOfSlashed.minus(penalty)
+      )
     })
   })
 })
@@ -147,21 +146,19 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
-  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
-  const value = new BigNumber('1000000000000000000')
+  let value: BigNumber
 
   before(async () => {
-    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
+    // @ts-ignore
+    await lockedGold.lock({ value: '10000000000000000000000000' })
+    value = await lockedGold.getAccountTotalLockedGold(accounts[0])
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    await accountsInstance.createAccount()
-    // @ts-ignore
-    await lockedGold.lock({ value })
     proposalTransactions = [
       {
         value: 0,

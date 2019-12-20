@@ -613,9 +613,9 @@ contract Validators is
   function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().validatorSignerToAccount(msg.sender);
-    require(!isValidator(account) && !isValidatorGroup(account));
+    require(!isValidator(account) && !isValidatorGroup(account), "already registered");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
-    require(lockedGoldBalance >= groupLockedGoldRequirements.value);
+    require(lockedGoldBalance >= groupLockedGoldRequirements.value, "requirements not met");
     ValidatorGroup storage group = groups[account];
     group.exists = true;
     group.commission = FixidityLib.wrap(commission);

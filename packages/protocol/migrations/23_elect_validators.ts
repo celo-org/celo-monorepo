@@ -12,10 +12,43 @@ import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 
-const Web3 = require('web3')
+import Web3 = require('web3')
+import { TransactionObject } from 'web3/eth/types'
 
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
+}
+
+let isGanache = false
+
+const extraKeys = [
+  '0xefb595a0178eb79a8df953f87c5148402a224cdf725e88c0146727c6aceadccd',
+  '0x83c6d2cc5ddcf9711a6d59b417dc20eb48afd58d45290099e5987e3d768f328f',
+  '0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
+  '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
+  '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
+]
+
+async function sendTransaction<T>(
+  web3: Web3,
+  tx: TransactionObject<T> | null,
+  privateKey: string,
+  txArgs: any
+) {
+  if (isGanache) {
+    const from = privateKeyToAddress(privateKey)
+    // console.info('key', privateKey, 'address', from, 'balance', await web3.eth.getBalance(from))
+    if (tx == null) await web3.eth.sendTransaction({ ...txArgs, from })
+    else {
+      //console.info('sending', tx.encodeABI(), txArgs)
+      // const response =
+      await tx.send({ ...txArgs, from, gasLimit: '10000000' })
+      // @ts-ignore
+      // console.log(response.events)
+    }
+  } else {
+    await sendTransactionWithPrivateKey(web3, tx, privateKey, txArgs)
+  }
 }
 
 async function lockGold(
@@ -26,18 +59,39 @@ async function lockGold(
 ) {
   // @ts-ignore
   const createAccountTx = accounts.contract.methods.createAccount()
-  await sendTransactionWithPrivateKey(web3, createAccountTx, privateKey, {
+  await sendTransaction(web3, createAccountTx, privateKey, {
     to: accounts.address,
   })
 
   // @ts-ignore
   const lockTx = lockedGold.contract.methods.lock()
+  // console.info(value.toString(10), lockedGold.address)
 
-  await sendTransactionWithPrivateKey(web3, lockTx, privateKey, {
+  await sendTransaction(web3, lockTx, privateKey, {
     to: lockedGold.address,
-    value,
+    value: value.toString(10),
   })
 }
+
+function createAccountOrUseFromGanache() {
+  if (isGanache) {
+    const privateKey = extraKeys.pop()
+    return { address: privateKeyToAddress(privateKey), privateKey }
+  } else {
+    return web3.eth.accounts.create()
+  }
+}
+
+/*
+async function lockGoldGanache(
+  accounts: AccountsInstance,
+  lockedGold: LockedGoldInstance,
+  value: BigNumber,
+  privateKey: number
+) {
+  await accounts.createAccount({from: accounts[privateKey]})
+  await lockedGold.lock({from: accounts[privateKey], value: value.toString(10)})
+}*/
 
 async function registerValidatorGroup(
   name: string,
@@ -51,7 +105,7 @@ async function registerValidatorGroup(
   // validator group with, and set the name of the group account to the private key of this account
   // encrypted with the private key of the first validator, so that the group private key
   // can be recovered.
-  const account = web3.eth.accounts.create()
+  const account = createAccountOrUseFromGanache()
 
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.
@@ -63,7 +117,7 @@ async function registerValidatorGroup(
   const v = lockedGoldValue.times(1.01).integerValue()
 
   console.info(`    - send funds ${v} to group address ${account.address}`)
-  await sendTransactionWithPrivateKey(web3, null, privateKey, {
+  await sendTransaction(web3, null, privateKey, {
     to: account.address,
     value: v,
   })
@@ -74,7 +128,7 @@ async function registerValidatorGroup(
   console.info(`    - setName`)
   // @ts-ignore
   const setNameTx = accounts.contract.methods.setName(`${name} ${encodedKey}`)
-  await sendTransactionWithPrivateKey(web3, setNameTx, account.privateKey, {
+  await sendTransaction(web3, setNameTx, account.privateKey, {
     to: accounts.address,
   })
 
@@ -84,7 +138,7 @@ async function registerValidatorGroup(
     toFixed(config.validators.commission).toString()
   )
 
-  await sendTransactionWithPrivateKey(web3, tx, account.privateKey, {
+  await sendTransaction(web3, tx, account.privateKey, {
     to: validators.address,
   })
 
@@ -115,7 +169,7 @@ async function registerValidator(
 
   // @ts-ignore
   const setNameTx = accounts.contract.methods.setName(valName)
-  await sendTransactionWithPrivateKey(web3, setNameTx, validatorPrivateKey, {
+  await sendTransaction(web3, setNameTx, validatorPrivateKey, {
     to: accounts.address,
   })
 
@@ -127,7 +181,7 @@ async function registerValidator(
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(publicKey, blsPublicKey, blsPoP)
 
-  await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
+  await sendTransaction(web3, registerTx, validatorPrivateKey, {
     to: validators.address,
   })
 
@@ -136,7 +190,7 @@ async function registerValidator(
   // @ts-ignore
   const affiliateTx = validators.contract.methods.affiliate(groupAddress)
 
-  await sendTransactionWithPrivateKey(web3, affiliateTx, validatorPrivateKey, {
+  await sendTransaction(web3, affiliateTx, validatorPrivateKey, {
     to: validators.address,
   })
 
@@ -147,40 +201,38 @@ async function registerValidator(
     privateKeyToPublicKey(validatorPrivateKey)
   )
 
-  await sendTransactionWithPrivateKey(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
+  await sendTransaction(web3, registerDataEncryptionKeyTx, validatorPrivateKey, {
     to: accounts.address,
   })
 
-  // Authorize the attestation signer
-  const attestationKeyAddress = privateKeyToAddress(attestationKey)
-  console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
-  const message = web3.utils.soliditySha3({
-    type: 'address',
-    value: privateKeyToAddress(validatorPrivateKey),
-  })
-  const signature = signMessage(message, attestationKey, attestationKeyAddress)
+  if (!isGanache) {
+    // Authorize the attestation signer
+    const attestationKeyAddress = privateKeyToAddress(attestationKey)
+    console.info(`    - authorizeAttestationSigner ${valName}->${attestationKeyAddress}`)
+    const message = web3.utils.soliditySha3({
+      type: 'address',
+      value: privateKeyToAddress(validatorPrivateKey),
+    })
+    const signature = signMessage(message, attestationKey, attestationKeyAddress)
 
-  // @ts-ignore
-  const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
-    attestationKeyAddress,
-    signature.v,
-    signature.r,
-    signature.s
-  )
+    // @ts-ignore
+    const registerAttestationKeyTx = accounts.contract.methods.authorizeAttestationSigner(
+      attestationKeyAddress,
+      signature.v,
+      signature.r,
+      signature.s
+    )
 
-  await sendTransactionWithPrivateKey(web3, registerAttestationKeyTx, validatorPrivateKey, {
-    to: accounts.address,
-  })
+    await sendTransaction(web3, registerAttestationKeyTx, validatorPrivateKey, {
+      to: accounts.address,
+    })
+  }
 
   console.info(`    - done ${valName}`)
   return
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
-  if (networkName === 'development') {
-    return
-  }
-
   const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
     'Accounts',
     artifacts
@@ -200,6 +252,23 @@ module.exports = async (_deployer: any, networkName: string) => {
     'Election',
     artifacts
   )
+
+  if (networkName === 'development') {
+    isGanache = true
+    config.validators.validatorKeys = [
+      '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
+      '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72',
+      '0xdf02719c4df8b9b8ac7f551fcb5d9ef48fa27eef7a66453879f4d8fdc6e78fb1',
+      '0xff12e391b79415e941a94de3bf3a9aee577aed0731e297d5cfa0b8a1e02fa1d0',
+      '0x752dd9cf65e68cfaba7d60225cbdbc1f4729dd5e5507def72815ed0d8abc6249',
+      /*      '0xefb595a0178eb79a8df953f87c5148402a224cdf725e88c0146727c6aceadccd',
+      '0x83c6d2cc5ddcf9711a6d59b417dc20eb48afd58d45290099e5987e3d768f328f',
+      '0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
+      '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
+      '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89', */
+    ]
+    config.validators.attestationKeys = config.validators.validatorKeys
+  }
 
   const valKeys: string[] = config.validators.validatorKeys
   const attestationKeys: string[] = config.validators.attestationKeys
@@ -288,13 +357,13 @@ module.exports = async (_deployer: any, networkName: string) => {
           NULL_ADDRESS,
           groupsWithVotes.length ? groupsWithVotes[0].account.address : NULL_ADDRESS
         )
-        await sendTransactionWithPrivateKey(web3, addTx, group.account.privateKey, {
+        await sendTransaction(web3, addTx, group.account.privateKey, {
           to: validators.address,
         })
       } else {
         // @ts-ignore
         const addTx = validators.contract.methods.addMember(address)
-        await sendTransactionWithPrivateKey(web3, addTx, group.account.privateKey, {
+        await sendTransaction(web3, addTx, group.account.privateKey, {
           to: validators.address,
         })
       }
@@ -318,7 +387,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       lesser,
       greater
     )
-    await sendTransactionWithPrivateKey(web3, voteTx, group.account.privateKey, {
+    await sendTransaction(web3, voteTx, group.account.privateKey, {
       to: election.address,
     })
   }
