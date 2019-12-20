@@ -716,6 +716,7 @@ jobs:
       - run:
           name: Check all results are good
           command: |
+            cd packages/protocol
             `python3 scripts/certora/compareResults.py out.json specs/LockedGoldExpected.json`||`python3 scripts/certora/compareResults.py out.json specs/AccountsExpected.json`
           
 workflows:
