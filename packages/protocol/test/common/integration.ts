@@ -17,6 +17,7 @@ import {
   RegistryInstance,
   ReserveInstance,
   StableTokenInstance,
+  ValidatorsInstance,
 } from 'types'
 
 enum VoteValue {
@@ -42,10 +43,16 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
     await accountsInstance.createAccount()
+    await accountsInstance.createAccount({ from: accounts[1] })
     // @ts-ignore
     await lockedGold.lock({ value })
     // @ts-ignore
     await lockedGold.lock({ value, from: accounts[1] })
+
+    // Try to find out who is a validator?
+    const validators: ValidatorsInstance = await getDeployedProxiedContract('Validators', artifacts)
+    console.info('validators', await validators.getRegisteredValidators())
+
     proposalTransactions = [
       {
         value: 0,
