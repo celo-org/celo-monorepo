@@ -84,7 +84,7 @@ contract UsingPrecompiles {
     (success, result) = GET_VALIDATOR.staticcall(abi.encodePacked(index));
     require(
       success,
-      "UsingPrecompiles :: validatorAddressFromCurrentSet Unsuccessful getting of the validator address for index"
+      "UsingPrecompiles :: validatorAddressFromCurrentSet Unsuccessful getting of the validator address"
     );
     assembly {
       validatorAddress := mload(add(result, 20))
