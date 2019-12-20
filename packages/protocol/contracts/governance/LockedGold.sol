@@ -31,6 +31,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   mapping(address => Balances) private balances;
+  mapping(address => bool) public isSlasher;
+
+  modifier onlySlasher() {
+    require(isSlasher[msg.sender], "Caller must be registered slasher");
+    _;
+  }
+
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -38,6 +45,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
+  event SlasherWhitelistAdded(address slasher);
+  event SlasherWhitelistRemoved(address slasher);
+  event AccountSlashed(address slashed, uint256 penalty, address reporter, uint256 reward);
 
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
@@ -237,6 +247,41 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     list.length = lastIndex;
   }
 
+  /**
+   * @notice Adds `slasher` to whitelist of approved slashing addresses.
+   * @param slasher Address to whitelist.
+   */
+  function addSlasher(address slasher) external onlyOwner {
+    require(slasher != address(0));
+    isSlasher[slasher] = true;
+    emit SlasherWhitelistAdded(slasher);
+  }
+
+  /**
+   * @notice Removes `slasher` from whitelist of approved slashing addresses.
+   * @param slasher Address to remove from whitelist.
+   */
+  function removeSlasher(address slasher) external onlyOwner {
+    require(isSlasher[slasher]);
+    isSlasher[slasher] = false;
+    emit SlasherWhitelistRemoved(slasher);
+  }
+
+  /**
+   * @notice Slashes `account` by reducing its nonvoting locked gold by `penalty`.
+   *         If there is not enough nonvoting locked gold to slash, calls into
+   *         `Election.slashVotes` to slash the remaining gold. Also sends `reward`
+   *         gold to the reporter, and penalty-reward to the Community Fund.
+   * @param account Address of account being slashed.
+   * @param penalty Amount to slash account.
+   * @param reporter Address of account reporting the slasher.
+   * @param reward Reward to give reporter.
+   * @param lessers The groups receiving fewer votes than i'th group, or 0 if the i'th group has
+   *                the fewest votes of any validator group.
+   * @param greaters The groups receiving more votes than the i'th group, or 0 if the i'th group
+   *                 has the most votes of any validator group.
+   * @param indices The indices of the i'th group in `account`'s voting list.
+   */
   function slash(
     address account,
     uint256 penalty,
@@ -245,5 +290,29 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
-  ) external {}
+  ) external onlySlasher {
+    require(
+      getAccountTotalLockedGold(account) >= penalty,
+      "trying to slash more gold than is locked"
+    );
+    require(penalty >= reward, "reward cannot exceed penalty.");
+    {
+      uint256 nonvotingBalance = balances[account].nonvoting;
+      uint256 difference = 0;
+      // If not enough nonvoting, revoke the difference
+      if (nonvotingBalance < penalty) {
+        difference = penalty.sub(nonvotingBalance);
+        require(
+          getElection().forceRevokeVotes(account, difference, lessers, greaters, indices) ==
+            difference
+        );
+      }
+      // forceRevokeVotes does not increment nonvoting account balance, so we can't double count
+      _decrementNonvotingAccountBalance(account, penalty - difference);
+      _incrementNonvotingAccountBalance(reporter, reward);
+    }
+    address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    getGoldToken().transfer(communityFund, penalty.sub(reward));
+    emit AccountSlashed(account, penalty, reporter, reward);
+  }
 }

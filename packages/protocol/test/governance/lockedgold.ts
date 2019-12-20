@@ -4,6 +4,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
@@ -12,6 +13,8 @@ import {
   AccountsInstance,
   LockedGoldContract,
   LockedGoldInstance,
+  ElectionContract,
+  ElectionInstance,
   MockElectionContract,
   MockElectionInstance,
   MockGoldTokenContract,
@@ -26,6 +29,7 @@ import {
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
+const Election: ElectionContract = artifacts.require('Election')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
@@ -45,6 +49,7 @@ contract('LockedGold', (accounts: string[]) => {
   const unlockingPeriod = 3 * DAY
   let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
+  let election: ElectionInstance
   let mockElection: MockElectionInstance
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
@@ -54,6 +59,7 @@ contract('LockedGold', (accounts: string[]) => {
     const mockGoldToken: MockGoldTokenInstance = await MockGoldToken.new()
     accountsInstance = await Accounts.new()
     lockedGold = await LockedGold.new()
+    election = await Election.new()
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
     mockGovernance = await MockGovernance.new()
@@ -409,6 +415,84 @@ contract('LockedGold', (accounts: string[]) => {
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
         await assertRevert(lockedGold.withdraw(index))
+      })
+    })
+  })
+
+  describe('#slash', () => {
+    const value = 1000
+    const group = accounts[1]
+    const reporter = accounts[2]
+
+    beforeEach(async () => {
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+      await lockedGold.lock({ value })
+      await lockedGold.addSlasher(account)
+    })
+
+    describe('when the account is slashed for all of its locked gold', () => {
+      beforeEach(async () => {
+        await lockedGold.slash(
+          account,
+          value,
+          reporter,
+          value / 2,
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0]
+        )
+      })
+
+      it("should reduce account's locked gold balance to 0", async () => {
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
+      })
+
+      it("should increase the reporter's locked gold", async () => {
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), value / 2)
+      })
+
+      it("should increase the community fund's gold", async () => {
+        assertEqualBN(
+          await lockedGold.getAccountNonvotingLockedGold(MockGovernance.address),
+          value / 2
+        )
+      })
+    })
+
+    describe('when the account is removed from `isSlasher`', () => {
+      beforeEach(async () => {
+        await lockedGold.removeSlasher(account)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(
+          lockedGold.slash(account, value, reporter, value / 2, [NULL_ADDRESS], [NULL_ADDRESS], [0])
+        )
+      })
+    })
+
+    describe('when the account has voting gold', () => {
+      beforeEach(async () => {
+        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await lockedGold.incrementNonvotingAccountBalance(account, value)
+        await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+        await lockedGold.slash(
+          account,
+          value,
+          reporter,
+          value / 2,
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0]
+        )
+      })
+
+      it("should reduce account's locked gold balance to 0", async () => {
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
+      })
+
+      it('should decrement voting gold', async () => {
+        assertEqualBN(await election.getTotalVotesByAccount(account), 0)
       })
     })
   })
