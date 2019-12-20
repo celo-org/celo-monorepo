@@ -606,9 +606,10 @@ contract('EpochRewards', (accounts: string[]) => {
         const expectedTargetEpochRewards = fromFixed(targetVotingYieldParams.initial).times(
           activeVotes
         )
-        const expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards.plus(
-          expectedTargetTotalEpochPaymentsInGold
-        )
+        const expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards
+          .plus(expectedTargetTotalEpochPaymentsInGold)
+          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .integerValue(BigNumber.ROUND_FLOOR)
         const expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta)
         const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
         const actualRemainingSupply = expectedTargetRemainingSupply.times(1.1)
