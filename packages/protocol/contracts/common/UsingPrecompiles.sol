@@ -29,38 +29,6 @@ contract UsingPrecompiles {
     require(aDenominator != 0 && bDenominator != 0);
     uint256 returnNumerator;
     uint256 returnDenominator;
-    // assembly {
-    //   let newCallDataPosition := mload(0x40)
-    //   mstore(0x40, add(newCallDataPosition, calldatasize))
-    //   mstore(newCallDataPosition, aNumerator)
-    //   mstore(add(newCallDataPosition, 32), aDenominator)
-    //   mstore(add(newCallDataPosition, 64), bNumerator)
-    //   mstore(add(newCallDataPosition, 96), bDenominator)
-    //   mstore(add(newCallDataPosition, 128), exponent)
-    //   mstore(add(newCallDataPosition, 160), _decimals)
-    //   let success := staticcall(
-    //     1050, // estimated gas cost for this function
-    //     0xfc,
-    //     newCallDataPosition,
-    //     0xc4, // input size, 6 * 32 = 192 bytes
-    //     0,
-    //     0
-    //   )
-
-    //   let returnDataSize := returndatasize
-    //   let returnDataPosition := mload(0x40)
-    //   mstore(0x40, add(returnDataPosition, returnDataSize))
-    //   returndatacopy(returnDataPosition, 0, returnDataSize)
-
-    //   switch success
-    //     case 0 {
-    //       revert(returnDataPosition, returnDataSize)
-    //     }
-    //     default {
-    //       returnNumerator := mload(returnDataPosition)
-    //       returnDenominator := mload(add(returnDataPosition, 32))
-    //     }
-    // }
 
     bool success;
     bytes memory result;
