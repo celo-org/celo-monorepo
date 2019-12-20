@@ -2,10 +2,27 @@
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 
 import { ContractKit, newKit } from '@celo/contractkit'
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { getHooks, GethTestConfig, sleep } from './utils'
+
+/*interface IstanbulAggregatedSeal {
+  bitmap: number,
+  signature: string,
+  round: number,
+}
+
+interface IstanbulExtraData {
+  addedValidators: string[],
+  addedValidatorsPublicKeys: string[]
+  removedValidators: number,
+  seal: IstanbulAggregatedSeal,
+  aggregatedSeal: IstanbulAggregatedSeal,
+  parentAggregatedSeal: string,
+  epochData: string,
+}*/
 
 describe('Slashing tests', function(this: any) {
   this.timeout(0)
@@ -15,7 +32,9 @@ describe('Slashing tests', function(this: any) {
   const gethConfig: GethTestConfig = {
     migrateTo: 18,
     instances: [
-      { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
+      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
+      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
+      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
     ],
   }
   const hooks = getHooks(gethConfig)
@@ -34,9 +53,32 @@ describe('Slashing tests', function(this: any) {
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
   }
 
-  describe('when running a node', () => {
+  const waitForEpochTransition = async (epoch: number) => {
+    let blockNumber: number
+    do {
+      blockNumber = await kit.web3.eth.getBlockNumber()
+      await sleep(0.1)
+    } while (blockNumber % epoch !== 1)
+  }
+
+  describe('when running a network', () => {
     before(async () => {
       await restartGeth()
+    })
+
+    it('should have registered validators', async () => {
+      const contract = await kit._web3Contracts.getValidators()
+      const epoch = new BigNumber(await contract.methods.getEpochSize().call()).toNumber()
+      console.info('Epoch size: ' + epoch)
+      // Wait for an epoch transition so we can activate our vote.
+      // XXX doesn't work?
+      await waitForEpochTransition(epoch)
+      await sleep(5)
+      // Wait for an extra epoch transition to ensure everyone is connected to one another.
+      await waitForEpochTransition(epoch)
+      const validators = await kit.contracts.getValidators()
+      const validatorList = await validators.getRegisteredValidators()
+      assert.equal(true, validatorList.length > 0)
     })
 
     it('should parse blockNumber from test header', async () => {
@@ -53,7 +95,7 @@ describe('Slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const rlpEncodedBlock = rlp.encode(reconstructHeaderArray(kit.web3, block))
+      const rlpEncodedBlock = rlp.encode(headerArray(kit.web3, block))
       const blockNumber = await contract.methods.getBlockNumberFromHeader(rlpEncodedBlock).call()
       assert.equal(blockNumber, current)
     })
@@ -71,7 +113,7 @@ describe('Slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const rlpEncodedBlock = rlp.encode(reconstructHeaderArray(kit.web3, block))
+      const rlpEncodedBlock = rlp.encode(headerArray(kit.web3, block))
       const blockHash = await contract.methods.hashHeader(rlpEncodedBlock).call()
       assert.equal(blockHash, block.hash)
     })
@@ -80,12 +122,22 @@ describe('Slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
+      //const blockIstanbulData = rlp.decode(block.extraData)
+      //const parentAggregatedSeal = blockIstanbulData[5]
+
       const doubleSignedBlock = await kit.web3.eth.getBlock(current)
       doubleSignedBlock.timestamp++
-      const rlpEncodedBlock = rlp.encode(reconstructHeaderArray(kit.web3, block))
-      const rlpEncodedDoubleSignedBlock = rlp.encode(
-        reconstructHeaderArray(kit.web3, doubleSignedBlock)
-      )
+
+      // aggregateSeal = aggregateSeal(validator0.sign(doubleSignedBlock), validator1.sign(doubleSignedBlock))
+      // seal = validatorAddress.sign()
+
+      // doubleSignedBlock.extraData = istanbulExtraDataArray({
+      //   seal,                   // the ECDSA signature by the proposer
+      //   aggregatedSeal,         // the aggregated BLS signature created via IBFT consensus.
+      //   parentAggregatedSeal }) // the aggregated BLS signature for the previous block.
+
+      const rlpEncodedBlock = rlp.encode(headerArray(kit.web3, block))
+      const rlpEncodedDoubleSignedBlock = rlp.encode(headerArray(kit.web3, doubleSignedBlock))
       const blockHash = await contract.methods.hashHeader(rlpEncodedBlock).call()
       const doubleSignedBlockHash = await contract.methods
         .hashHeader(rlpEncodedDoubleSignedBlock)
@@ -94,11 +146,25 @@ describe('Slashing tests', function(this: any) {
       console.info(
         'Double signed block hash (blockNumber  ' + current + '): ' + doubleSignedBlockHash
       )
+      const validators = await kit.contracts.getValidators()
+      const validatorList = await validators.getRegisteredValidators()
+      for (const validator of validatorList) {
+        console.info(validator)
+      }
+      console.info('end')
+
+      // const slasher = await kit.contracts.getDoubleSigningSlasher()
+      // slasher.checkForDoubleSigning(
+      //   signer, // The signer to be slashed.
+      //   index,  // Validator index at the block.
+      //   blockA, // First double signed block.
+      //   blockB, // Second double signed block.
+      //   Block)  // number where double signing occured. Throws if no double signing is detected.
     })
   })
 })
 
-function reconstructHeaderArray(web3: Web3, block: any) {
+function headerArray(web3: Web3, block: any) {
   return [
     block.parentHash,
     block.sha3Uncles,
@@ -117,3 +183,15 @@ function reconstructHeaderArray(web3: Web3, block: any) {
     block.nonce,
   ]
 }
+
+/*function istanbulExtraDataArray(ist: any) {
+  return [
+    ist.addedValidators,
+    ist.addedValidatorsPublicKeys,
+    ist.removedValidators,
+    ist.seal,
+    ist.aggregatedSeal,
+    ist.parentAggregatedSeal,
+    ist.epochData,
+  ]
+}*/
