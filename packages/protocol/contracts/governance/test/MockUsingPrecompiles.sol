@@ -22,7 +22,7 @@ contract MockUsingPrecompiles {
     verifiedSealBitmap[keccak256(abi.encodePacked(header))] = bitmap;
   }
 
-  function getVerifiedSealBitmap(bytes memory header) public view returns (bytes32) {
+  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
     return verifiedSealBitmap[keccak256(abi.encodePacked(header))];
   }
 
@@ -49,7 +49,7 @@ contract MockUsingPrecompiles {
     return (blockNumber + sz - 1) / sz;
   }
 
-  function validatorSignerAddress(uint256 index, uint256 blockNumber)
+  function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
     public
     view
     returns (address)
@@ -61,7 +61,7 @@ contract MockUsingPrecompiles {
     numValidators = num;
   }
 
-  function numberValidators(uint256) public view returns (uint256) {
+  function numberValidatorsInSet(uint256) public view returns (uint256) {
     return numValidators;
   }
 

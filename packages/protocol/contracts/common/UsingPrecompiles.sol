@@ -165,7 +165,7 @@ contract UsingPrecompiles {
   // The validator set used for verification is retrieved based on the parent
   // hash field of the header.
   // If the parent hash is not in the blockchain, verification fails.
-  function getVerifiedSealBitmap(bytes memory header) public view returns (bytes32) {}
+  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {}
 
   // Retrieves the block header from the database and returns the Istanbul seal bitmap.
   function getSealBitmap(uint256 blockNumber) public view returns (bytes32) {}
@@ -175,13 +175,13 @@ contract UsingPrecompiles {
 
   function getEpochSigner(uint256 epoch, uint256 index) public view returns (address) {}
 
-  function validatorSignerAddress(uint256 index, uint256 blockNumber)
+  function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
     public
     view
     returns (address)
   {}
 
-  function numberValidators(uint256 blockNumber) public view returns (uint256) {}
+  function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {}
 
   // RLP decode and retreive the block number from the given header.
   function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {}
