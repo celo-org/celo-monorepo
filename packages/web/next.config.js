@@ -24,6 +24,21 @@ module.exports = withImages(
       }
       if (!isServer) {
         config.resolve.alias['@sentry/node'] = '@sentry/browser'
+
+        const cacheGroups = config.optimization.splitChunks.cacheGroups
+
+        // delete cacheGroups.react
+        cacheGroups.default = false
+
+        cacheGroups.vendors = {
+          minChunks: 5,
+          // enforce: true,
+          name: 'vendors',
+          priority: 20,
+          test: /[\\/](node_modules|packages)[\\/]/,
+        }
+
+        cacheGroups.commons = { name: 'commons', minChunks: 5, priority: 10 }
       }
 
       return config
