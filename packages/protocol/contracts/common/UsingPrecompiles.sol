@@ -75,16 +75,11 @@ contract UsingPrecompiles {
    * @return The current epoch size in blocks.
    */
   function getEpochSize() public view returns (uint256) {
-    uint256 ret;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      let success := staticcall(1000, 0xf8, newCallDataPosition, 0, 0, 0)
-
-      returndatacopy(add(newCallDataPosition, 32), 0, 32)
-      ret := mload(add(newCallDataPosition, 32))
-    }
-    return ret;
+    bytes memory out;
+    bool success;
+    (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked());
+    require(success);
+    return getUint256FromBytes(out, 0);
   }
 
   function getEpochNumber() public view returns (uint256) {
@@ -105,7 +100,8 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
-    return getAddressFromBytes(out, 0);
+    require(success);
+    return address(getUint256FromBytes(out, 0));
   }
 
   /**
@@ -122,7 +118,8 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
-    return getAddressFromBytes(out, 0);
+    require(success);
+    return address(getUint256FromBytes(out, 0));
   }
 
   /**
@@ -133,6 +130,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
+    require(success);
     return getUint256FromBytes(out, 0);
   }
 
@@ -145,6 +143,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
+    require(success);
     return getUint256FromBytes(out, 0);
   }
 
@@ -176,6 +175,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
+    require(success);
     return getUint256FromBytes(out, 0);
   }
 
@@ -188,6 +188,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
+    require(success);
     return getBytes32FromBytes(out, 0);
   }
 
@@ -200,6 +201,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
+    require(success);
     return getBytes32FromBytes(out, 0);
   }
 
@@ -212,22 +214,18 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
+    require(success);
     return getBytes32FromBytes(out, 0);
   }
 
   /**
-   * @notice Converts bytes to address
+   * @notice Converts bytes to uint256.
    * @param bs byte[] data
    * @param start offset into byte data to convert
-   * @return address data
+   * @return uint256 data
    */
-  function getAddressFromBytes(bytes memory bs, uint256 start) internal pure returns (address) {
-    require(bs.length >= start + 32, "slicing out of range");
-    address x;
-    assembly {
-      x := mload(add(bs, add(0x20, start)))
-    }
-    return x;
+  function getUint256FromBytes(bytes memory bs, uint256 start) internal pure returns (uint256) {
+    return uint256(getBytes32FromBytes(bs, start));
   }
 
   /**
@@ -239,21 +237,6 @@ contract UsingPrecompiles {
   function getBytes32FromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
     require(bs.length >= start + 32, "slicing out of range");
     bytes32 x;
-    assembly {
-      x := mload(add(bs, add(0x20, start)))
-    }
-    return x;
-  }
-
-  /**
-   * @notice Converts bytes to uint256.
-   * @param bs byte[] data
-   * @param start offset into byte data to convert
-   * @return uint256 data
-   */
-  function getUint256FromBytes(bytes memory bs, uint256 start) internal pure returns (uint256) {
-    require(bs.length >= start + 32, "slicing out of range");
-    uint256 x;
     assembly {
       x := mload(add(bs, add(0x20, start)))
     }
