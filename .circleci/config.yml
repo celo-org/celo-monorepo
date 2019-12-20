@@ -700,7 +700,6 @@ jobs:
             res1=`python3 scripts/certora/compareResults.py out.json specs/LockedGoldExpected.json`||true
             rc1=$?
             echo Result $res1
-            echo "export CERTORA_RES1=$rc1" >> $BASH_ENV
             echo Success $rc1
       - run:
           name: Build and run - Accounts
@@ -713,14 +712,11 @@ jobs:
             res2=`python3 scripts/certora/compareResults.py out.json specs/AccountsExpected.json`||true
             rc2=$?
             echo Result $res2
-            echo "export CERTORA_RES2=$rc2" >> $BASH_ENV
             echo Success $rc2
       - run:
           name: Check all results are good
           command: |
-            echo ${CERTORA_RES1}
-            echo ${CERTORA_RES2}
-            exit ${CERTORA_RES1}&&${CERTORA_RES2}
+            `python3 scripts/certora/compareResults.py out.json specs/LockedGoldExpected.json`||`python3 scripts/certora/compareResults.py out.json specs/AccountsExpected.json`
           
 workflows:
   version: 2
