@@ -701,6 +701,7 @@ jobs:
             rc1=$?
             echo Result $res1
             echo "export CERTORA_RES1=$rc1" >> $BASH_ENV
+            echo Success $rc1
       - run:
           name: Build and run - Accounts
           command: |
@@ -713,9 +714,12 @@ jobs:
             rc2=$?
             echo Result $res2
             echo "export CERTORA_RES2=$rc2" >> $BASH_ENV
+            echo Success $rc2
       - run:
           name: Check all results are good
           command: |
+            echo ${CERTORA_RES1}
+            echo ${CERTORA_RES2}
             exit ${CERTORA_RES1}&&${CERTORA_RES2}
           
 workflows:
