@@ -203,7 +203,7 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   const valKeys: string[] = config.validators.validatorKeys
   const attestationKeys: string[] = config.validators.attestationKeys
-  const votingBotKeys: string[] = config.election.votingBotKeys
+  // const votingBotKeys: string[] = config.election.votingBotKeys
 
   if (valKeys.length === 0) {
     console.info('  No validators to register')
