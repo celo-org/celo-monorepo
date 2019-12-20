@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   animations: {
     animationDuration: '1.2s',
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
   },

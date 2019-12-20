@@ -1,3 +1,7 @@
+output bootnode_ip_address {
+  value = module.bootnode.ip_address
+}
+
 output tx_node_internal_ip_addresses {
   value = module.tx_node.internal_ip_addresses
 }
