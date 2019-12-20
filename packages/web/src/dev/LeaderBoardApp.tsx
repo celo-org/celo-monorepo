@@ -9,11 +9,9 @@ import LeaderBoard from 'src/dev/LeaderBoard'
 import LeaderBoardError from 'src/dev/LeaderBoardError'
 import { I18nProps, withNamespaces } from 'src/i18n'
 
-const graphqlURI = getConfig().publicRuntimeConfig.LEADERBOARD.uri
-
-const createApolloClient = () => {
+function createApolloClient() {
   return new ApolloClient({
-    uri: graphqlURI,
+    uri: getConfig().publicRuntimeConfig.LEADERBOARD.uri,
     cache: new InMemoryCache(),
     fetch,
   })

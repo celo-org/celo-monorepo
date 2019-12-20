@@ -1,7 +1,7 @@
 import { Countries, PhoneNumberUtils } from '@celo/utils'
 import memoizeOne from 'memoize-one'
 import * as React from 'react'
-import * as Autosuggest from 'react-autosuggest'
+import Autosuggest from 'react-autosuggest'
 import {
   NativeSyntheticEvent,
   StyleSheet,
@@ -327,4 +327,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(NameSpaces.faucet)(withScreenSize<Props>(PhoneInput))
+export default withScreenSize<Props>(withNamespaces(NameSpaces.faucet)(PhoneInput))

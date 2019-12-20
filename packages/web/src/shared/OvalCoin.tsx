@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { Path } from 'src/shared/svg'
+import { G, Path } from 'src/shared/svg'
 import { colors } from 'src/styles'
-import Svg, { G } from 'svgs'
+import Svg from 'svgs'
 
 interface Props {
   color: colors
   size: number
   style?: unknown
   viewBox?: string
-  mixBlendMode?: string // note not all blend modes work in all browsers; 'multiply' seem to be best
+  mixBlendMode?: 'multiply' | 'screen' // note not all blend modes work in all browsers; 'multiply' seem to be best
 }
 
 export default class OvalCoin extends React.PureComponent<Props> {

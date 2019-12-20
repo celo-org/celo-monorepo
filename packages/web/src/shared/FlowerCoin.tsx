@@ -1,5 +1,6 @@
 import * as React from 'react'
-import Svg, { G, Path } from 'svgs'
+import { G, Path } from 'src/shared/svg'
+import Svg from 'svgs'
 
 interface Props {
   size?: number
