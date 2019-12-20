@@ -1,8 +1,8 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { getBlockscoutUrl } from './endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { AccountType, getAddressesFor } from './generate_utils'
-import { getBlockscoutUrl } from './endpoints'
 
 const helmChartPath = '../helm-charts/ethstats'
 
