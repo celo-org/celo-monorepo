@@ -1,12 +1,13 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 
-import { ContractKit, newKit } from '@celo/contractkit'
+import { ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { getHooks, GethTestConfig, sleep } from './utils'
+import { getContext, GethInstanceConfig, initAndStartGeth, waitToFinishSyncing } from './utils'
 
 /*interface IstanbulAggregatedSeal {
   bitmap: number,
@@ -28,6 +29,8 @@ describe('Slashing tests', function(this: any) {
   this.timeout(0)
 
   let kit: ContractKit
+  let accounts: any
+  let validators: any
 
   const gethConfig: GethTestConfig = {
     migrateTo: 18,
@@ -37,6 +40,8 @@ describe('Slashing tests', function(this: any) {
       { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
     ],
   }
+
+  const context: any = getContext(gethConfig)
   const hooks = getHooks(gethConfig)
   before(hooks.before)
   after(hooks.after)
@@ -51,6 +56,8 @@ describe('Slashing tests', function(this: any) {
     await sleep(2)
     kit = newKit('http://localhost:8545')
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
+    validators = await kit._web3Contracts.getValidators()
+    accounts = await kit._web3Contracts.getAccounts()
   }
 
   const waitForEpochTransition = async (epoch: number) => {
@@ -61,23 +68,93 @@ describe('Slashing tests', function(this: any) {
     } while (blockNumber % epoch !== 1)
   }
 
+  const getValidatorGroupMembers = async (blockNumber?: number) => {
+    if (blockNumber) {
+      const [groupAddress] = await validators.methods
+        .getRegisteredValidatorGroups()
+        .call({}, blockNumber)
+      const groupInfo = await validators.methods
+        .getValidatorGroup(groupAddress)
+        .call({}, blockNumber)
+      return groupInfo[0]
+    } else {
+      const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
+      const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
+      return groupInfo[0]
+    }
+  }
+
+  const getValidatorGroupPrivateKey = async () => {
+    console.info('start1')
+    const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
+    console.info('start2 ' + groupAddress)
+    const name = await accounts.methods.getName(groupAddress).call()
+    console.info('start3 ' + name)
+    const encryptedKeystore64 = name.split(' ')[1]
+    const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
+    console.info('start4 ' + name)
+    // The validator group ID is the validator group keystore encrypted with validator 0's
+    // private key.
+    // @ts-ignore
+    const encryptionKey = `0x${gethConfig.instances[0].privateKey}`
+    const decryptedKeystore = kit.web3.eth.accounts.decrypt(encryptedKeystore, encryptionKey)
+    console.info('start5 ' + name)
+    return decryptedKeystore.privateKey
+  }
+
   describe('when running a network', () => {
     before(async () => {
       await restartGeth()
     })
 
     it('should have registered validators', async () => {
-      const contract = await kit._web3Contracts.getValidators()
-      const epoch = new BigNumber(await contract.methods.getEpochSize().call()).toNumber()
+      console.info('helo-1')
+      const groupPrivateKey = await getValidatorGroupPrivateKey()
+      console.info('helo-2')
+      const additionalNodes: GethInstanceConfig[] = [
+        {
+          name: 'validatorGroup',
+          validating: false,
+          syncmode: 'full',
+          port: 30313,
+          wsport: 8555,
+          rpcport: 8557,
+          privateKey: groupPrivateKey.slice(2),
+          peers: [8545],
+        },
+      ]
+      console.info('helo-3')
+      await Promise.all(
+        additionalNodes.map((nodeConfig) =>
+          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig)
+        )
+      )
+      console.info('helo-4')
+
+      const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       console.info('Epoch size: ' + epoch)
+
+      const validatorAccounts = await getValidatorGroupMembers()
+      assert.equal(validatorAccounts.length, 3)
+
       // Wait for an epoch transition so we can activate our vote.
-      // XXX doesn't work?
       await waitForEpochTransition(epoch)
-      await sleep(5)
+
+      // Prepare for slashing.
+      const groupWeb3 = new Web3('ws://localhost:8555')
+      await waitToFinishSyncing(groupWeb3)
+      const groupKit = newKitFromWeb3(groupWeb3)
+      const group: string = (await groupWeb3.eth.getAccounts())[0]
+      const txos = await (await groupKit.contracts.getElection()).activate(group)
+      for (const txo of txos) {
+        await txo.sendAndWaitForReceipt({ from: group })
+      }
+
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(epoch)
-      const validators = await kit.contracts.getValidators()
-      const validatorList = await validators.getRegisteredValidators()
+
+      const validatorsWrapper = await kit.contracts.getValidators()
+      const validatorList = await validatorsWrapper.getRegisteredValidators()
       assert.equal(true, validatorList.length > 0)
     })
 
