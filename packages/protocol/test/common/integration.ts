@@ -17,6 +17,7 @@ import {
   ReserveInstance,
   StableTokenInstance,
 } from 'types'
+import { NULL_ADDRESS } from '@celo/utils/src/address'
 
 enum VoteValue {
   None = 0,
@@ -35,6 +36,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   let value: BigNumber
   let valueOfSlashed: BigNumber
   const penalty = new BigNumber('100')
+  const slashedAccount = accounts[9]
 
   before(async () => {
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
@@ -51,7 +53,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         data: Buffer.from(
           stripHexEncoding(
             // @ts-ignore
-            governanceSlasher.contract.methods.approveSlashing(accounts[1], 100).encodeABI()
+            governanceSlasher.contract.methods.approveSlashing(slashedAccount, 100).encodeABI()
           ),
           'hex'
         ),
@@ -117,26 +119,24 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
 
     it('should execute the proposal', async () => {
-      assertEqualBN(await governanceSlasher.getApprovedSlashing(accounts[1]), penalty)
+      assertEqualBN(await governanceSlasher.getApprovedSlashing(slashedAccount), penalty)
     })
   })
 
   describe('When performing slashing', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
-      valueOfSlashed = await lockedGold.getAccountTotalLockedGold(accounts[1])
-      console.info('before', (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10))
-      await governanceSlasher.slash(accounts[1], [], [], [])
-      console.info('after', (await lockedGold.getAccountTotalLockedGold(accounts[1])).toString(10))
+      valueOfSlashed = await lockedGold.getAccountTotalLockedGold(slashedAccount)
+      await governanceSlasher.slash(slashedAccount, [NULL_ADDRESS], [accounts[8]], [0])
     })
 
     it('should set approved slashing to zero', async () => {
-      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 0)
+      assert.equal((await governanceSlasher.getApprovedSlashing(slashedAccount)).toNumber(), 0)
     })
 
     it('should slash the account', async () => {
       assertEqualBN(
-        await lockedGold.getAccountTotalLockedGold(accounts[1]),
+        await lockedGold.getAccountTotalLockedGold(slashedAccount),
         valueOfSlashed.minus(penalty)
       )
     })
