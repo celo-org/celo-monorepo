@@ -412,7 +412,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch reward, the total rewards to voters, and the total community reward
+   * @return The per validator epoch reward, the total rewards to voters, and the total community
+   * reward
    */
   function calculateTargetEpochRewards() external view returns (uint256, uint256, uint256) {
     if (frozen) {
