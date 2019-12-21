@@ -270,18 +270,12 @@ contract('MultiSig', (accounts: any) => {
 
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
-      assert.equal((await multiSig.required()).toNumber(), 1)
+      assertEqualBN(await multiSig.required(), 1)
     })
 
     it('should not allow an external account to change the requirement', async () => {
       // @ts-ignore
-      const txData = multiSig.contract.methods.changeRequirement(3).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
-      await assertRevert(
-        multiSig.submitTransaction(multiSig.address, 0, txData, {
-          from: accounts[3],
-        })
-      )
+      await assertRevert(multiSig.changeRequirement(3, { from: accounts[3] }))
     })
   })
 
