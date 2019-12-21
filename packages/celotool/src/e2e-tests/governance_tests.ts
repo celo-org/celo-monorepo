@@ -16,6 +16,13 @@ import {
   waitToFinishSyncing,
 } from './utils'
 
+/*
+const header200 = '0xf90298a05a6130deb62bcbc4b7c00d153b76f92535de792f60c4ce08cb413a0e946639f7a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a05a4c93a3c7c4d7a49d0c1d84b0447298eee651c4289df94b1c155ac8ef7e63a5a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000181c88401312d0080845dfdfd63b8a1d883010817846765746888676f312e31302e34856c696e757800000000000000f87fc0c080b84102f735ceaa14af48f4618567f06f9b238a8a4a2dc27fd7a9f816900660911db163ee29817eaf0acf3dccf022e96f90f80cebc100e6ba0c21bc27dd269568b34600c3808080f31fb05746cef050e08810c0b39c5c361fefea8c7b365dcfbf6f9e6c09356219e34b652abb98e242aafc952693f9e15a122d018080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
+*/
+
+const header100 =
+  '0xf90297a0ceb336b8c0ba1a18c999a0dc36032950a16cced987df2b780706838e94646247a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a0de12fd5c5e3718dd35e503d00b149f1416e4158a26e0495b72834a85ef21c234a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001648401312d0080845dfdfcffb8a1d883010817846765746888676f312e31302e34856c696e757800000000000000f87fc0c080b8415f1b8dc0383a7ed3b2ae0166e5ee0ffbb35d2257ba57c9b1d9e34d4de73d9bed7d5be57f5c0f13342c2f3a6f0989ef1d82e79cef681324d7c34f82b8d866371701c3808080f31fb0624973607740c4d424d47f81dd573914b7419f38f02a154f2384a47c2b3ef8593b5297c476f395790a9150fe704810808080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
+
 interface MemberSwapper {
   swap(): Promise<void>
 }
@@ -286,6 +293,56 @@ describe('governance tests', () => {
     assertAlmostEqual(currentSupply.minus(previousSupply), expected)
   }
 
+  describe('test slashing', () => {
+    before(async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      await restart()
+
+      try {
+        const block = await web3.eth.getBlock(123)
+        console.log('header', block)
+
+        const downtimeSlasher = await kit._web3Contracts.getDowntimeSlasher()
+        const elect = await kit._web3Contracts.getElection()
+
+        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
+
+        const hash = await downtimeSlasher.methods.hashHeader(block.raw).call()
+        console.info('hash', hash)
+
+        const signer = await downtimeSlasher.methods.validatorSignerAddressFromSet(2, 100).call()
+        console.info('signer', signer)
+
+        console.info('at block', await web3.eth.getBlockNumber())
+
+        await sleep(20)
+
+        console.info('at block', await web3.eth.getBlockNumber())
+
+        const bitmap = await downtimeSlasher.methods
+          .getVerifiedSealBitmapFromHeader(block.raw)
+          .call({ gas: 1000000 })
+        console.info('bitmap', bitmap)
+      } catch (err) {
+        console.log(err)
+        await sleep(1000)
+      }
+    })
+
+    it('slash for double signing', async () => {
+      const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
+      const header = (await web3.eth.getBlock(100)).raw
+
+      const bitmap = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
+      const hash = await slasher.methods.hashHeader(header).call()
+      console.log(bitmap, hash)
+
+      const signer = await slasher.methods.validatorSignerAddressFromSet(2, 100).call()
+
+      await slasher.methods.slash(signer, 2, header, header100, 0, [], [], [], [], [], [])
+    })
+  })
+
   describe('when the validator set is changing', () => {
     let epoch: number
     const blockNumbers: number[] = []
@@ -349,6 +406,15 @@ describe('governance tests', () => {
       assert.equal(validatorAccounts.length, 5)
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
+
+      const block = await web3.eth.getBlock(123)
+      console.log('header', block)
+
+      const downtimeSlasher = await kit._web3Contracts.getDowntimeSlasher()
+
+      const bitmap = await downtimeSlasher.methods.getVerifiedSealBitmapFromHeader(block.raw).call()
+      const hash = await downtimeSlasher.methods.hashHeader(block.raw).call()
+      console.info('hash', hash, 'bitmap', bitmap)
 
       // Wait for an epoch transition so we can activate our vote.
       await waitForEpochTransition(epoch)
