@@ -65,7 +65,7 @@ contract('MultiSig', (accounts: any) => {
       await assertRevert(multiSig.submitTransaction(NULL_ADDRESS, 0, txData))
     })
 
-    it('should not allow an owner to submit a transaction', async () => {
+    it('should not allow a non-owner to submit a transaction', async () => {
       await assertRevert(
         // @ts-ignore: TODO(mcortesi): fix typings
         multiSig.submitTransaction(multiSig.address, 0, txData, { from: accounts[2] })
@@ -162,13 +162,7 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to add an owner', async () => {
       // @ts-ignore
-      const txData = multiSig.contract.methods.addOwner(accounts[2]).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
-      await assertRevert(
-        multiSig.submitTransaction(multiSig.address, 0, txData, {
-          from: accounts[3],
-        })
-      )
+      await assertRevert(multiSig.addOwner(accounts[2], { from: accounts[3] }))
     })
 
     it('should not allow adding the null address', async () => {
@@ -214,13 +208,7 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to remove an owner', async () => {
       // @ts-ignore
-      const txData = multiSig.contract.methods.removeOwner(accounts[1]).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
-      await assertRevert(
-        multiSig.submitTransaction(multiSig.address, 0, txData, {
-          from: accounts[3],
-        })
-      )
+      await assertRevert(multiSig.removeOwner(accounts[1], { from: accounts[3] }))
     })
   })
 
@@ -245,13 +233,7 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to replace an owner', async () => {
       // @ts-ignore
-      const txData = multiSig.contract.methods.replaceOwner(accounts[1], accounts[2]).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
-      await assertRevert(
-        multiSig.submitTransaction(multiSig.address, 0, txData, {
-          from: accounts[3],
-        })
-      )
+      await assertRevert(multiSig.replaceOwner(accounts[1], accounts[2], { from: accounts[3] }))
     })
 
     it('should not allow an owner to be replaced by the null address', async () => {
