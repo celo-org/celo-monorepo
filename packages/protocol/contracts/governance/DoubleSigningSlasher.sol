@@ -67,7 +67,7 @@ contract DoubleSigningSlasher is SlasherUtil {
    * @notice Returns the minimum number of required signers for a given block number.
    */
   function minQuorumSize(uint256 blockNumber) internal view returns (uint256) {
-    return (2 * numberValidators(blockNumber) + 2) / 3;
+    return (2 * numberValidatorsInSet(blockNumber) + 2) / 3;
   }
 
   /**
@@ -92,13 +92,13 @@ contract DoubleSigningSlasher is SlasherUtil {
       blockNumber == getBlockNumberFromHeader(blockB),
       "Block headers are from different height"
     );
-    require(index < numberValidators(blockNumber), "Bad validator index");
+    require(index < numberValidatorsInSet(blockNumber), "Bad validator index");
     require(
-      signer == validatorSignerAddress(index, blockNumber),
+      signer == validatorSignerAddressFromSet(index, blockNumber),
       "Wasn't a signer with given index"
     );
-    uint256 mapA = uint256(getVerifiedSealBitmap(blockA));
-    uint256 mapB = uint256(getVerifiedSealBitmap(blockB));
+    uint256 mapA = uint256(getVerifiedSealBitmapFromHeader(blockA));
+    uint256 mapB = uint256(getVerifiedSealBitmapFromHeader(blockB));
     require(mapA & (1 << index) != 0, "Didn't sign first block");
     require(mapB & (1 << index) != 0, "Didn't sign second block");
     require(

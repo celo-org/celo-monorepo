@@ -77,10 +77,13 @@ contract DowntimeSlasher is SlasherUtil {
   ) internal view returns (bool) {
     uint256 endBlock = getEndBlock(startBlock);
     require(endBlock < block.number, "end block must be smaller than current block");
-    require(startSignerIndex < numberValidators(startBlock), "Bad validator index at start block");
-    require(endSignerIndex < numberValidators(endBlock), "Bad validator index at end block");
-    address startSigner = validatorSignerAddress(startSignerIndex, startBlock);
-    address endSigner = validatorSignerAddress(endSignerIndex, endBlock);
+    require(
+      startSignerIndex < numberValidatorsInSet(startBlock),
+      "Bad validator index at start block"
+    );
+    require(endSignerIndex < numberValidatorsInSet(endBlock), "Bad validator index at end block");
+    address startSigner = validatorSignerAddressFromSet(startSignerIndex, startBlock);
+    address endSigner = validatorSignerAddressFromSet(endSignerIndex, endBlock);
     require(account == getAccounts().signerToAccount(startSigner), "Wrong start index");
     require(account == getAccounts().signerToAccount(endSigner), "Wrong end index");
     uint256 startEpoch = getEpochNumberOfBlock(startBlock);
