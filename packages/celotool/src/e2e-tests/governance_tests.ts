@@ -672,8 +672,10 @@ describe('governance tests', () => {
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
           // TODO(joshua): Switch this over to communityRewardFraction
-          const expectedInfraReward = new BigNumber(10).pow(18)
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
+          const expectedInfraReward = expectedEpochReward
+            .plus(stableTokenSupplyChange.div(exchangeRate))
+            .div(new BigNumber(3 / 4))
           const exchangeRate = await getStableTokenExchangeRate(blockNumber)
           const expectedGoldTotalSupplyChange = expectedInfraReward
             .plus(expectedEpochReward)
