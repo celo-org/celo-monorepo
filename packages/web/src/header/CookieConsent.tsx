@@ -17,14 +17,14 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
     showConsent: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({
-      showConsent: showVisitorCookieConsent(),
+      showConsent: await showVisitorCookieConsent(),
     })
   }
 
-  onAgree = () => {
-    agree()
+  onAgree = async () => {
+    await agree()
     this.setState({
       showConsent: false,
     })

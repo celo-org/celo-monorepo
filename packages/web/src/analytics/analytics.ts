@@ -1,6 +1,5 @@
 import Cookies from 'js-cookie'
 import getConfig from 'next/config'
-const isInEU = require('@segment/in-eu')
 
 let analytics: {
   track: (key: string, properties?: object, options?: object) => void
@@ -10,17 +9,22 @@ const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
 declare var process: any
 
-export function canTrack(): boolean {
-  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME) || !isInEU()
+export async function canTrack() {
+  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME) || !(await isInEU())
 }
 
-export function showVisitorCookieConsent(): boolean {
-  return isInEU() && !Cookies.get(RESPONDED_TO_CONSENT)
+export async function showVisitorCookieConsent() {
+  const euro = await isInEU()
+  return euro && !Cookies.get(RESPONDED_TO_CONSENT)
 }
 
-const initializeAnalytics = () => {
-  if (process.browser && canTrack()) {
-    const Segment = require('load-segment')
+async function isInEU() {
+  const inEU = await import('@segment/in-eu').then((mod) => mod.default)
+  return inEU()
+}
+async function initializeAnalytics() {
+  if (process.browser && (await canTrack())) {
+    const Segment = await import('load-segment').then((mod) => mod.default)
     const { publicRuntimeConfig } = getConfig()
     analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
   } else {
@@ -32,10 +36,10 @@ const initializeAnalytics = () => {
 
 initializeAnalytics()
 
-export const agree = () => {
+export async function agree() {
   Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, true, { expires: OPTIN_EXPIRE_DAYS })
   Cookies.set(RESPONDED_TO_CONSENT, true, { expires: OPTIN_EXPIRE_DAYS })
-  initializeAnalytics()
+  await initializeAnalytics()
 }
 
 export const disagree = () => {
