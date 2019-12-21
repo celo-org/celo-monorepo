@@ -1,7 +1,7 @@
 import { parse, validate } from 'fast-xml-parser'
 import { Articles } from 'fullstack/ArticleProps'
 import * as htmlToFormattedText from 'html-to-formatted-text'
-import Sentry from '../fullstack/sentry'
+import Sentry from '../server/sentry'
 import abortableFetch from '../src/utils/abortableFetch'
 interface JSONRSS {
   rss: {

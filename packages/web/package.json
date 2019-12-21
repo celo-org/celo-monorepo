@@ -99,6 +99,7 @@
     "nodemon": "^2.0.2",
     "postcss-scss": "^2.0.0",
     "react-native-svg": "^9.13.6",
-    "webpack": "4.41.2"
+    "webpack": "4.41.2",
+    "webpack-visualizer-plugin": "^0.1.11"
   }
 }

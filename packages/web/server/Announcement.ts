@@ -1,5 +1,5 @@
 import getConfig from 'next/config'
-import Sentry from '../fullstack/sentry'
+import Sentry from '../server/sentry'
 import airtableInit from '../server/airtable'
 
 interface Fields {

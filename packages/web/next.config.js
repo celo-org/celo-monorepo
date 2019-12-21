@@ -1,8 +1,8 @@
 const withSass = require('@zeit/next-sass')
 const withImages = require('next-images')
-const webpack = require('webpack')
 const envConfig = require('./env-config')
 const serverEnvConfig = require('./server-env-config')
+const Visualizer = require('webpack-visualizer-plugin')
 
 module.exports = withImages(
   withSass({
@@ -22,23 +22,26 @@ module.exports = withImages(
         ...config.resolve.alias,
         'react-native$': 'react-native-web',
       }
+
+      config.plugins = config.plugins || []
+      config.plugins.push(new Visualizer())
+
       if (!isServer) {
         config.resolve.alias['@sentry/node'] = '@sentry/browser'
 
         const cacheGroups = config.optimization.splitChunks.cacheGroups
 
-        // delete cacheGroups.react
-        cacheGroups.default = false
+        delete cacheGroups.react
 
         cacheGroups.vendors = {
-          minChunks: 5,
-          // enforce: true,
+          enforce: true,
+          minChunks: 8,
           name: 'vendors',
-          priority: 20,
-          test: /[\\/](node_modules|packages)[\\/]/,
+          priority: 5,
+          test: /[\\/](node_modules)[\\/]/,
         }
 
-        cacheGroups.commons = { name: 'commons', minChunks: 5, priority: 10 }
+        cacheGroups.commons = { name: 'commons', minChunks: 12, priority: 10 }
       }
 
       return config

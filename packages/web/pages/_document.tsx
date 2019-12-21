@@ -3,7 +3,7 @@ import * as React from 'react'
 import { AppRegistry, I18nManager } from 'react-native-web'
 import analytics from 'src/analytics/analytics'
 import { setDimensionsForScreen } from 'src/layout/ScreenSize'
-import Sentry from '../fullstack/sentry'
+import { getSentry } from 'src/utils/sentry'
 import { isLocaleRTL } from '../server/i18nSetup'
 // @ts-ignore
 const a = analytics
@@ -40,6 +40,7 @@ export default class MyDocument extends Document<Props> {
     ])
 
     if (context.err) {
+      const Sentry = await getSentry()
       Sentry.captureException(context.err)
     }
 

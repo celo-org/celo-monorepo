@@ -9,7 +9,7 @@ import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
-import Sentry, { initSentry } from '../fullstack/sentry'
+import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
 
 config({ ssrReveal: true })
@@ -25,7 +25,7 @@ class MyApp extends App {
       checkH1Count()
     }
     if (await canTrack()) {
-      initSentry()
+      await initSentry()
     }
   }
 
@@ -39,8 +39,9 @@ class MyApp extends App {
     return this.props.router.asPath.startsWith('/experience')
   }
 
-  componentDidCatch = (error: Error, info: object) => {
-    Sentry.withScope((scope: Sentry.Scope) => {
+  componentDidCatch = async (error: Error, info: object) => {
+    const Sentry = await getSentry()
+    Sentry.withScope((scope) => {
       scope.setExtras(info)
       Sentry.captureException(error)
     })
