@@ -412,11 +412,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch payment and the total rewards to voters.
+   * @return The per validator epoch reward, the total rewards to voters, and the total community reward
    */
-  function calculateTargetEpochPaymentAndRewards() external view returns (uint256, uint256) {
+  function calculateTargetEpochRewards() external view returns (uint256, uint256, uint256) {
     if (frozen) {
-      return (0, 0);
+      return (0, 0, 0);
     }
 
     uint256 targetEpochRewards = getTargetEpochRewards();
@@ -428,13 +428,10 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
       .fromFixed();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
-    uint256 community = FixidityLib
-      .newFixed(targetGoldSupplyIncrease)
-      .multiply(communityRewardFraction)
-      .fromFixed();
     return (
       FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
-      FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed()
+      FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed(),
+      FixidityLib.newFixed(targetGoldSupplyIncrease).multiply(communityRewardFraction).fromFixed()
     );
   }
 }

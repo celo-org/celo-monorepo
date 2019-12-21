@@ -590,7 +590,7 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe('#calculateTargetEpochPaymentAndRewards()', () => {
+  describe('#calculateTargetEpochRewards()', () => {
     describe('when there are active votes, a stable token exchange rate is set and the actual remaining supply is 10% more than the target remaining supply after rewards', () => {
       const activeVotes = 1000000
       const timeDelta = YEAR.times(10)
@@ -625,14 +625,14 @@ contract('EpochRewards', (accounts: string[]) => {
 
       it('should return the target validator epoch payment times the rewards multiplier', async () => {
         const expected = targetValidatorEpochPayment.times(expectedMultiplier)
-        assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[0], expected)
+        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[0], expected)
       })
 
       it('should return the target yield times the number of active votes times the rewards multiplier', async () => {
         const expected = fromFixed(targetVotingYieldParams.initial)
           .times(activeVotes)
           .times(expectedMultiplier)
-        assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[1], expected)
+        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[1], expected)
       })
     })
   })
@@ -642,13 +642,15 @@ contract('EpochRewards', (accounts: string[]) => {
       await epochRewards.freeze()
     })
 
-    it('should make calculateTargetEpochPaymentAndRewards return zeroes', async () => {
+    it('should make calculateTargetEpochRewards return zeroes', async () => {
       const [
         validatorPayment,
         voterRewards,
-      ] = await epochRewards.calculateTargetEpochPaymentAndRewards()
+        communityReward,
+      ] = await epochRewards.calculateTargetEpochRewards()
       assertEqualBN(validatorPayment, 0)
       assertEqualBN(voterRewards, 0)
+      assertEqualBN(communityReward, 0)
     })
   })
 })
