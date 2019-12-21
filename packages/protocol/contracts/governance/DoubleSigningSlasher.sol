@@ -171,6 +171,7 @@ contract DoubleSigningSlasher is SlasherUtil {
     );
     address group = groupMembershipAtBlock(validator, blockNumber, groupMembershipHistoryIndex);
     if (group == address(0)) return; // Should never be true
+    /*
     getLockedGold().slash(
       group,
       slashingIncentives.penalty,
@@ -182,6 +183,7 @@ contract DoubleSigningSlasher is SlasherUtil {
     );
     getValidators().forceDeaffiliateIfValidator(validator);
     getValidators().halveSlashingMultiplier(group);
+    */
   }
 
 }

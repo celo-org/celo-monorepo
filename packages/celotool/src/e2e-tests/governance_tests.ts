@@ -24,8 +24,11 @@ const header200 = '0xf90298a05a6130deb62bcbc4b7c00d153b76f92535de792f60c4ce08cb4
 //const header100 =
 //  '0xf90297a0ceb336b8c0ba1a18c999a0dc36032950a16cced987df2b780706838e94646247a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a0de12fd5c5e3718dd35e503d00b149f1416e4158a26e0495b72834a85ef21c234a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001648401312d0080845dfdfcffb8a1d883010817846765746888676f312e31302e34856c696e757800000000000000f87fc0c080b8415f1b8dc0383a7ed3b2ae0166e5ee0ffbb35d2257ba57c9b1d9e34d4de73d9bed7d5be57f5c0f13342c2f3a6f0989ef1d82e79cef681324d7c34f82b8d866371701c3808080f31fb0624973607740c4d424d47f81dd573914b7419f38f02a154f2384a47c2b3ef8593b5297c476f395790a9150fe704810808080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
 
-const header105 =
-  '0xf902c7a018984b2acd2700e78e11d1ddfe8eaf0ab83f0441b9b963ffcb83e62e58a21915a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a0e40d7ede505dfe84d43af30c72dde4f3d260dba501759191e7576596780ee23ba056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001698401312d0080845dfe3c8bb8d1d883010817846765746888676f312e31302e34856c696e757800000000000000f8afc0c080b8417af95d83992746cad7d660a46f5839922329542747ba700aabea24e227af6121558d24cb8e1b0aa8eabcc990db5c8ab427e2e9a2157ecbb43512e71b84f4598e01f317b0f30b8005b0dbd5889ce01d9943ee110c5ed1d32b8802e37ff14f496f92323855de00680b7557bc2a9398ef0e38a1a20080f31fb086527d2779a6d756e4352f1c040063cd32ee7be1e5351d1a3c3f0b193fad1a29e45792f0c134fbd281c4a2c9f8adf7808080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
+//const header105 =
+//  '0xf902c7a018984b2acd2700e78e11d1ddfe8eaf0ab83f0441b9b963ffcb83e62e58a21915a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a0e40d7ede505dfe84d43af30c72dde4f3d260dba501759191e7576596780ee23ba056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001698401312d0080845dfe3c8bb8d1d883010817846765746888676f312e31302e34856c696e757800000000000000f8afc0c080b8417af95d83992746cad7d660a46f5839922329542747ba700aabea24e227af6121558d24cb8e1b0aa8eabcc990db5c8ab427e2e9a2157ecbb43512e71b84f4598e01f317b0f30b8005b0dbd5889ce01d9943ee110c5ed1d32b8802e37ff14f496f92323855de00680b7557bc2a9398ef0e38a1a20080f31fb086527d2779a6d756e4352f1c040063cd32ee7be1e5351d1a3c3f0b193fad1a29e45792f0c134fbd281c4a2c9f8adf7808080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
+
+const header235 =
+  '0xf902caa0baea1b89062cd3eeb40c225ec574799296f14a2c8d0a6ae3b59ea407147ffc98a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a08320d4a87fe6517cd1480f67a67a3d96afac80095850ddbb20272962767b7af5a065fdfc0fce43dbb6c89bec423ac3d389f6078dbd31dd7102fa41e3dc19f5dd05a04c9df6d886cb188f3949615446a209fbe047d777b97d42682b2f7ff6a3ced924b901000000000000080000000000000000000000000000000000000080000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000002000000000000000000080000400000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000010000400000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000001698401312d0083343e3f845dfea56eb8d1d883010817846765746888676f312e31302e34856c696e757800000000000000f8afc0c080b841d82ad17b0136c65d1dfdd37d1bb514cb3455e58df41fe678bbcfa76b7fdc7ec1450a638e2044799eaf1aaf7ab9ee1efa7c694e436a77d3f6dead9e820d2df8ca00f31bb0ed1341e6aa21a78d42f18795814babbd72f00d80f1ba97451ca5dd02ec0588fe752fc32af6131b1ecbdb5f6753cd550180f31fb09a61ad1003ec5205afeb561f91bd85a3244eb9f15e434f497c14e77ab1706bcf667702c991bb670c2e13c76f1a1689818080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -334,21 +337,35 @@ describe('governance tests', () => {
       this.timeout(0) // Disable test timeout
       try {
         const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
-        const header = (await web3.eth.getBlock(105)).raw
+        await sleep(20)
 
+        const num = await slasher.methods.getBlockNumberFromHeader(header235).call()
+        console.log('number', num)
+
+        const header = (await web3.eth.getBlock(num)).raw
+
+        const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(header235).call()
         const bitmap = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
         const hash = await slasher.methods.hashHeader(header).call()
         console.log(header, bitmap, hash)
 
-        const bitmap105 = await slasher.methods.getVerifiedSealBitmapFromHeader(header105).call()
-        const hash105 = await slasher.methods.hashHeader(header105).call()
-        console.log(bitmap105, hash105)
+        let bmNum1 = new BigNumber(bitmap).toNumber()
+        let bmNum2 = new BigNumber(bitmap2).toNumber()
+        let signerIdx = 0
+        for (let i = 0; i < 5; i++) {
+          if ((bmNum1 & 1) === 1 && (bmNum2 & 1) === 1) break
+          signerIdx++
+          bmNum1 = bmNum1 >> 1
+          bmNum2 = bmNum2 >> 1
+        }
+        console.log('index', signerIdx)
 
-        const signer = await slasher.methods.validatorSignerAddressFromSet(2, 105).call()
+        const valid = await kit._web3Contracts.getValidators()
+
+        const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
         const validator = (await kit.web3.eth.getAccounts())[0]
         await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
         console.log(validator)
-        await sleep(2)
 
         const lockedGold = await kit.contracts.getLockedGold()
         const accounts = await kit.contracts.getAccounts()
@@ -359,21 +376,59 @@ describe('governance tests', () => {
 
         console.log('total', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))
         console.log(
-          'nonvotiig',
+          'nonvoting',
           (await lockedGold.getAccountNonvotingLockedGold(signer)).toString(10)
         )
 
         console.log(
           'BN',
-          await slasher.methods.checkForDoubleSigning(signer, 2, header, header105).call()
+          await slasher.methods.checkForDoubleSigning(signer, signerIdx, header, header235).call()
         )
 
         console.log('locked balance', await web3.eth.getBalance(lockedGold.address))
 
-        console.log('group', await slasher.methods.groupMembershipAtBlock(signer, 105, 0).call())
+        const blockNumber = await web3.eth.getBlockNumber()
+
+        try {
+          console.log(await valid.methods.getHistory(signer).call())
+          console.log('epoch at 235', await slasher.methods.getEpochNumberOfBlock(235).call())
+          console.log('epoch now', await slasher.methods.getEpochNumberOfBlock(blockNumber).call())
+
+          console.log('group 22', await valid.methods.groupMembershipInEpoch(signer, 22, 0).call())
+          console.log('group 23', await valid.methods.groupMembershipInEpoch(signer, 23, 0).call())
+          console.log('group 24', await valid.methods.groupMembershipInEpoch(signer, 24, 0).call())
+
+          console.log('group 22', await valid.methods.groupMembershipInEpoch(signer, 22, 1).call())
+          console.log('group 23', await valid.methods.groupMembershipInEpoch(signer, 23, 1).call())
+          console.log('group 24', await valid.methods.groupMembershipInEpoch(signer, 24, 1).call())
+
+          console.log('group', await slasher.methods.groupMembershipAtBlock(signer, 235, 0).call())
+          console.log(
+            'group now',
+            await slasher.methods.groupMembershipAtBlock(signer, blockNumber, 0).call()
+          )
+          console.log(
+            'group now ???',
+            await slasher.methods.groupMembershipAtBlock(signer, blockNumber, 1).call()
+          )
+        } catch (err) {
+          console.log(err)
+        }
 
         await slasher.methods
-          .slash(signer, 2, header, header105, 0, [], [], [], [NULL_ADDRESS], [NULL_ADDRESS], [0])
+          .slash(
+            signer,
+            signerIdx,
+            header,
+            header235,
+            0,
+            [],
+            [],
+            [],
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0]
+          )
           .send({ from: validator, gas: 5000000 })
 
         console.log('remaining', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))

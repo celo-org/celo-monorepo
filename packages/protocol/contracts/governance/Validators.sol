@@ -1228,4 +1228,17 @@ contract Validators is
     );
     return history.entries[index].group;
   }
+
+  function getHistory(address account) external view returns (address[] memory, uint256[] memory) {
+    MembershipHistory storage history = validators[account].membershipHistory;
+    uint256 num = history.numEntries + history.tail;
+    address[] memory historyGroups = new address[](num);
+    uint256[] memory epochs = new uint256[](num);
+    for (uint256 i = 0; i < num; i++) {
+      historyGroups[i] = history.entries[i].group;
+      epochs[i] = history.entries[i].epochNumber;
+    }
+    return (historyGroups, epochs);
+  }
+
 }
