@@ -1133,7 +1133,7 @@ contract Validators is
   ];
 
   function getCanForceDeaffiliation() public pure returns (bytes32[] memory) {
-    bytes32[] memory res = new bytes32[](2);
+    bytes32[] memory res = new bytes32[](4);
     res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
     res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
     res[2] = GOVERNANCE_SLASHER_REGISTRY_ID;
