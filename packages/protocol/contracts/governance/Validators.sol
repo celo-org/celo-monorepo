@@ -1132,6 +1132,15 @@ contract Validators is
     GOVERNANCE_REGISTRY_ID
   ];
 
+  function getCanForceDeaffiliation() public pure returns (bytes32[] memory) {
+    bytes32[] memory res = new bytes32[](2);
+    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
+    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
+    res[2] = GOVERNANCE_SLASHER_REGISTRY_ID;
+    res[3] = GOVERNANCE_REGISTRY_ID;
+    return res;
+  }
+
   /**
    * @notice Removes a validator from the group for which it is a member.
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
@@ -1139,7 +1148,7 @@ contract Validators is
   function forceDeaffiliateIfValidator(address validatorAccount)
     external
     nonReentrant
-    onlyRegisteredContracts(canForceDeaffiliation)
+    onlyRegisteredContracts(getCanForceDeaffiliation())
   {
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
@@ -1177,6 +1186,17 @@ contract Validators is
     DOUBLE_SIGNING_SLASHER_REGISTRY_ID
   ];
 
+  function getCanHalveSlashingMultiplier() public pure returns (bytes32[] memory) {
+    bytes32[] memory res = new bytes32[](2);
+    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
+    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
+    return res;
+  }
+
+  function debugCheck() public returns (address[] memory) {
+    return check(getCanHalveSlashingMultiplier());
+  }
+
   /**
    * @notice Halves the group's slashing multiplier.
    * @param account The group being slashed.
@@ -1184,7 +1204,7 @@ contract Validators is
   function halveSlashingMultiplier(address account)
     external
     nonReentrant
-    onlyRegisteredContracts(canHalveSlashingMultiplier)
+    onlyRegisteredContracts(getCanHalveSlashingMultiplier())
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];

@@ -181,9 +181,9 @@ contract DoubleSigningSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
-    getValidators().forceDeaffiliateIfValidator(validator);
-    getValidators().halveSlashingMultiplier(group);
     */
+    // getValidators().forceDeaffiliateIfValidator(validator);
+    getValidators().halveSlashingMultiplier(group);
   }
 
 }

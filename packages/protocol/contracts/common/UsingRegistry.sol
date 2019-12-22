@@ -57,10 +57,18 @@ contract UsingRegistry is Ownable {
     _;
   }
 
+  function check(bytes32[] memory identifierHashes) public view returns (address[] memory) {
+    address[] memory res = new address[](identifierHashes.length);
+    for (uint256 i = 0; i < identifierHashes.length; i++) {
+      res[i] = registry.getAddressFor(identifierHashes[i]);
+    }
+    return res;
+  }
+
   modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
     bool registered = false;
     for (uint256 i = 0; i < identifierHashes.length; i++) {
-      if (registry.getAddressForOrDie(identifierHashes[i]) == msg.sender) {
+      if (registry.getAddressFor(identifierHashes[i]) == msg.sender) {
         registered = true;
         break;
       }
@@ -118,5 +126,9 @@ contract UsingRegistry is Ownable {
 
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+  }
+
+  function getSlasher() public view returns (address) {
+    return registry.getAddressForOrDie(DOUBLE_SIGNING_SLASHER_REGISTRY_ID);
   }
 }

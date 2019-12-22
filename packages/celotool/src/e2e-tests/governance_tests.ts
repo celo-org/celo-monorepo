@@ -405,8 +405,11 @@ describe('governance tests', () => {
 
         const blockNumber = await web3.eth.getBlockNumber()
         const history = await valid.methods.getHistory(signer).call()
-        console.log('history', history)
         const historyIndex = history[0].length - 1
+        console.log('history', history, historyIndex)
+
+        console.log(await valid.methods.debugCheck().call())
+        console.log('registry', await slasher.methods.getSlasher().call(), slasher.options.address)
 
         try {
           console.log('epoch at', num, await slasher.methods.getEpochNumberOfBlock(num).call())
@@ -424,11 +427,6 @@ describe('governance tests', () => {
             'group 24',
             await valid.methods.groupMembershipInEpoch(signer, 24, historyIndex).call()
           )
-          /*
-          console.log('group 22', await valid.methods.groupMembershipInEpoch(signer, 22, 1).call())
-          console.log('group 23', await valid.methods.groupMembershipInEpoch(signer, 23, 1).call())
-          console.log('group 24', await valid.methods.groupMembershipInEpoch(signer, 24, 1).call())
-*/
           console.log(
             'group',
             await slasher.methods.groupMembershipAtBlock(signer, num, historyIndex).call()
