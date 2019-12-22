@@ -24,11 +24,9 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
   ) public view returns (address) {
     uint256 epoch = getEpochNumberOfBlock(blockNumber);
     require(epoch != 0, "Cannot slash on epoch 0");
-    /*
     // Use `epoch-1` because the elections were on that epoch
     return
       getValidators().groupMembershipInEpoch(validator, epoch.sub(1), groupMembershipHistoryIndex);
-    */
   }
 
 }

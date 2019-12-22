@@ -28,7 +28,7 @@ const header200 = '0xf90298a05a6130deb62bcbc4b7c00d153b76f92535de792f60c4ce08cb4
 //  '0xf902c7a018984b2acd2700e78e11d1ddfe8eaf0ab83f0441b9b963ffcb83e62e58a21915a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a0e40d7ede505dfe84d43af30c72dde4f3d260dba501759191e7576596780ee23ba056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001698401312d0080845dfe3c8bb8d1d883010817846765746888676f312e31302e34856c696e757800000000000000f8afc0c080b8417af95d83992746cad7d660a46f5839922329542747ba700aabea24e227af6121558d24cb8e1b0aa8eabcc990db5c8ab427e2e9a2157ecbb43512e71b84f4598e01f317b0f30b8005b0dbd5889ce01d9943ee110c5ed1d32b8802e37ff14f496f92323855de00680b7557bc2a9398ef0e38a1a20080f31fb086527d2779a6d756e4352f1c040063cd32ee7be1e5351d1a3c3f0b193fad1a29e45792f0c134fbd281c4a2c9f8adf7808080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
 
 const header235 =
-  '0xf902caa0baea1b89062cd3eeb40c225ec574799296f14a2c8d0a6ae3b59ea407147ffc98a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347942ffe970257d93eae9d6b134f528b93b262c31030a08320d4a87fe6517cd1480f67a67a3d96afac80095850ddbb20272962767b7af5a065fdfc0fce43dbb6c89bec423ac3d389f6078dbd31dd7102fa41e3dc19f5dd05a04c9df6d886cb188f3949615446a209fbe047d777b97d42682b2f7ff6a3ced924b901000000000000080000000000000000000000000000000000000080000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000002000000000000000000080000400000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000010000400000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000001698401312d0083343e3f845dfea56eb8d1d883010817846765746888676f312e31302e34856c696e757800000000000000f8afc0c080b841d82ad17b0136c65d1dfdd37d1bb514cb3455e58df41fe678bbcfa76b7fdc7ec1450a638e2044799eaf1aaf7ab9ee1efa7c694e436a77d3f6dead9e820d2df8ca00f31bb0ed1341e6aa21a78d42f18795814babbd72f00d80f1ba97451ca5dd02ec0588fe752fc32af6131b1ecbdb5f6753cd550180f31fb09a61ad1003ec5205afeb561f91bd85a3244eb9f15e434f497c14e77ab1706bcf667702c991bb670c2e13c76f1a1689818080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
+  '0xf902c8a03b0847c515c2a28558dec84133537a711a0d6e5ca2dc7ba5d3258aefcaaa1adfa01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d493479447e172f6cfb6c7d01c1574fa3e2be7cc73269d95a03d5866c14c2c92f1ad6e1109421d9b8b7451e42e13d1786099b164e633038707a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000181f58401312d0080845dfeb94db8d1d883010817846765746888676f312e31302e34856c696e757800000000000000f8afc0c080b8416a256d1d5fb765443387c825fd1af9150eaa65ecaa15e644b808e88f24413d196f126a3b53a3c865f09a76c9dbfbc1495ad8b1efdc6c381188c0956143dc236900f31bb098124da7d2f1c432c867b4cb9a64973c134d24860f65db4235e9efaf3662fa96e07a83deb6abe147645b1040dfee2d8080f31fb0e99d579abe8a28a1cc67fbe5debec1336f1571277d1aff33d5c51a6678982c18add0ef242102f625046fb1306d07d8008080a063746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365880000000000000000'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -251,6 +251,14 @@ describe('governance tests', () => {
     } while (blockNumber % epoch !== 1)
   }
 
+  const waitUntilBlock = async (bn: number) => {
+    let blockNumber: number
+    do {
+      blockNumber = await web3.eth.getBlockNumber()
+      await sleep(0.1)
+    } while (blockNumber < bn)
+  }
+
   const assertTargetVotingYieldChanged = async (blockNumber: number, expected: BigNumber) => {
     const currentTarget = new BigNumber(
       (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
@@ -308,7 +316,7 @@ describe('governance tests', () => {
 
       try {
         const block = await web3.eth.getBlock(123)
-        console.log('header', block)
+        // console.log('header', block)
 
         const downtimeSlasher = await kit._web3Contracts.getDowntimeSlasher()
         const elect = await kit._web3Contracts.getElection()
@@ -337,14 +345,22 @@ describe('governance tests', () => {
       this.timeout(0) // Disable test timeout
       try {
         const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
-        await sleep(20)
+        const elect = await kit._web3Contracts.getElection()
 
-        const num = await slasher.methods.getBlockNumberFromHeader(header235).call()
+        await waitUntilBlock(250)
+        console.info('at block', await web3.eth.getBlockNumber())
+        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
+
+        const other = header235
+
+        console.log('at 245', (await web3.eth.getBlock(245)).raw)
+
+        const num = await slasher.methods.getBlockNumberFromHeader(other).call()
         console.log('number', num)
 
         const header = (await web3.eth.getBlock(num)).raw
 
-        const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(header235).call()
+        const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
         const bitmap = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
         const hash = await slasher.methods.hashHeader(header).call()
         console.log(header, bitmap, hash)
@@ -382,34 +398,44 @@ describe('governance tests', () => {
 
         console.log(
           'BN',
-          await slasher.methods.checkForDoubleSigning(signer, signerIdx, header, header235).call()
+          await slasher.methods.checkForDoubleSigning(signer, signerIdx, header, other).call()
         )
 
         console.log('locked balance', await web3.eth.getBalance(lockedGold.address))
 
         const blockNumber = await web3.eth.getBlockNumber()
+        const history = await valid.methods.getHistory(signer).call()
+        console.log('history', history)
+        const historyIndex = history[0].length - 1
 
         try {
-          console.log(await valid.methods.getHistory(signer).call())
-          console.log('epoch at 235', await slasher.methods.getEpochNumberOfBlock(235).call())
+          console.log('epoch at', num, await slasher.methods.getEpochNumberOfBlock(num).call())
           console.log('epoch now', await slasher.methods.getEpochNumberOfBlock(blockNumber).call())
 
-          console.log('group 22', await valid.methods.groupMembershipInEpoch(signer, 22, 0).call())
-          console.log('group 23', await valid.methods.groupMembershipInEpoch(signer, 23, 0).call())
-          console.log('group 24', await valid.methods.groupMembershipInEpoch(signer, 24, 0).call())
-
+          console.log(
+            'group 22',
+            await valid.methods.groupMembershipInEpoch(signer, 22, historyIndex).call()
+          )
+          console.log(
+            'group 23',
+            await valid.methods.groupMembershipInEpoch(signer, 23, historyIndex).call()
+          )
+          console.log(
+            'group 24',
+            await valid.methods.groupMembershipInEpoch(signer, 24, historyIndex).call()
+          )
+          /*
           console.log('group 22', await valid.methods.groupMembershipInEpoch(signer, 22, 1).call())
           console.log('group 23', await valid.methods.groupMembershipInEpoch(signer, 23, 1).call())
           console.log('group 24', await valid.methods.groupMembershipInEpoch(signer, 24, 1).call())
-
-          console.log('group', await slasher.methods.groupMembershipAtBlock(signer, 235, 0).call())
+*/
           console.log(
-            'group now',
-            await slasher.methods.groupMembershipAtBlock(signer, blockNumber, 0).call()
+            'group',
+            await slasher.methods.groupMembershipAtBlock(signer, num, historyIndex).call()
           )
           console.log(
-            'group now ???',
-            await slasher.methods.groupMembershipAtBlock(signer, blockNumber, 1).call()
+            'group now',
+            await slasher.methods.groupMembershipAtBlock(signer, blockNumber, historyIndex).call()
           )
         } catch (err) {
           console.log(err)
@@ -420,8 +446,8 @@ describe('governance tests', () => {
             signer,
             signerIdx,
             header,
-            header235,
-            0,
+            other,
+            historyIndex,
             [],
             [],
             [],
