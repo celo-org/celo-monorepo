@@ -2,11 +2,11 @@ import PulsingDot from '@celo/react-components/components/PulsingDot'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { isE2EEnv } from 'src/config'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
@@ -18,7 +18,7 @@ const AnimatedCircle = () => (
   </View>
 )
 
-class VerificationInterstitialScreen extends React.Component<WithNamespaces> {
+class VerificationInterstitialScreen extends React.Component<WithTranslation> {
   static navigationOptions = { header: null }
 
   timeout: number | undefined
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.nuxVerification2)(VerificationInterstitialScreen)
+export default withTranslation(Namespaces.nuxVerification2)(VerificationInterstitialScreen)
