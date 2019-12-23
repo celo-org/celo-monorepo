@@ -24,7 +24,7 @@ export default class Propose extends BaseCommand {
     const proposal = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
     const tx = governance.propose(proposal)
     await displaySendTx('proposeTx', tx, { from: res.flags.from, value: res.flags.deposit })
-    const proposalID = await tx.txo.call()
-    this.log(`ProposalID: ${proposalID}`)
+    // const proposalID = await tx.txo.call()
+    // this.log(`ProposalID: ${proposalID}`)
   }
 }
