@@ -1,10 +1,10 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useCallback } from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateToURI } from 'src/utils/linking'
 
 type Props = WithTranslation

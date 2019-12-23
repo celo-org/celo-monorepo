@@ -7,7 +7,7 @@ import { componentStyles, TOP_BAR_HEIGHT } from '@celo/react-components/styles/s
 import variables from '@celo/react-components/styles/variables'
 import * as _ from 'lodash'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import {
   Animated,
   RefreshControl,
@@ -30,7 +30,7 @@ import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import TransactionsList from 'src/home/TransactionsList'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'

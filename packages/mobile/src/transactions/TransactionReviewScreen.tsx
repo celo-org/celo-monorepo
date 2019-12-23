@@ -1,11 +1,12 @@
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
@@ -92,4 +93,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation()(TransactionReviewScreen)
+export default withTranslation(Namespaces.global)(TransactionReviewScreen)

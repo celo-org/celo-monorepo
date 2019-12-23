@@ -12,7 +12,7 @@ import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { TFunction } from 'i18next'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import {
   ListRenderItemInfo,
   SectionList,
@@ -24,7 +24,7 @@ import {
 } from 'react-native'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import Search from 'src/icons/Search'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'

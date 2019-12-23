@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet } from 'react-native'
 import { WebView } from 'react-native-webview'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 
 const licenseURI = Platform.select({
