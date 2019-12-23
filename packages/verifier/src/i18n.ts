@@ -1,6 +1,7 @@
+import hoistStatics from 'hoist-non-react-statics'
 import i18n, { LanguageDetectorModule } from 'i18next'
 import locales, { Namespaces } from 'locales'
-import { initReactI18next } from 'react-i18next'
+import { initReactI18next, withTranslation as withTranslationI18Next } from 'react-i18next'
 import RNLanguages from 'react-native-languages'
 import logger from 'src/utils/logger'
 
@@ -46,5 +47,10 @@ RNLanguages.addEventListener('change', ({ language }: { language: string }) => {
     .changeLanguage(language)
     .catch((reason: any) => logger.error(TAG, 'Failed to change i18n language', reason))
 })
+
+// Create HOC wrapper that hoists statics
+// https://react.i18next.com/latest/withtranslation-hoc#hoist-non-react-statics
+export const withTranslation = (namespace: Namespaces) => (component: React.ComponentType<any>) =>
+  hoistStatics(withTranslationI18Next(namespace)(component), component)
 
 export default i18n
