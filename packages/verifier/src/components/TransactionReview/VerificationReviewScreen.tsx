@@ -3,9 +3,10 @@ import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import { navigateBack } from '@celo/react-components/services/NavigationService'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { NavigationInjectedProps } from 'react-navigation'
 import VerificationConfirmationCard from 'src/components/TransactionReview/VerificationConfirmationCard'
+import { withTranslation } from 'src/i18n'
 import { getDatetimeDisplayString } from 'src/utils/formatting'
 
 export interface NavigationPropsWrapper {

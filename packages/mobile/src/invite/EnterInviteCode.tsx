@@ -4,7 +4,7 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Clipboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -13,7 +13,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { redeemInvite, skipInvite } from 'src/invite/actions'
 import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
@@ -90,7 +90,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    navigate(Screens.VerificationEducationScreen)
+    navigate(Screens.ImportContacts)
   }
 
   onPressGoToFaucet = () => {
@@ -133,7 +133,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
           keyboardShouldPersistTaps={'always'}
         >
           <View>
-            <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
+            <DevSkipButton nextScreen={Screens.ImportContacts} />
             <Text style={styles.h1} testID={'InviteCodeTitle'}>
               {t('inviteCodeText.title')}
             </Text>

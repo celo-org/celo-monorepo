@@ -1,9 +1,9 @@
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface Props {

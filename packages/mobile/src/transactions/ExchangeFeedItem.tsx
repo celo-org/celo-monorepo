@@ -5,11 +5,11 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeExchangeFragment } from 'src/apollo/types'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import {
@@ -119,9 +119,7 @@ function getDollarAmountProps({
     amountDirection,
     amountColor: colors.celoGreen,
     displayAmount: amount
-      ? `${amountDirection}${localCurrencySymbol +
-          getMoneyDisplayValue(amount) +
-          (localCurrencyCode || '')}`
+      ? `${amountDirection}${localCurrencySymbol + getMoneyDisplayValue(amount)}`
       : '-',
   }
 }

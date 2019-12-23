@@ -2,11 +2,11 @@ import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitch
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { setAnalyticsEnabled } from 'src/app/actions'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 

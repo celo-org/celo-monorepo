@@ -1,7 +1,8 @@
 import locales from '@celo/mobile/locales'
 import { currencyTranslations } from '@celo/utils/src/currencies'
+import hoistStatics from 'hoist-non-react-statics'
 import i18n, { LanguageDetectorModule } from 'i18next'
-import { initReactI18next } from 'react-i18next'
+import { initReactI18next, withTranslation as withTranslationI18Next } from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
 import Logger from 'src/utils/Logger'
 
@@ -91,5 +92,10 @@ RNLocalize.addEventListener('change', () => {
     .changeLanguage(getLanguage())
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 })
+
+// Create HOC wrapper that hoists statics
+// https://react.i18next.com/latest/withtranslation-hoc#hoist-non-react-statics
+export const withTranslation = (namespace: Namespaces) => (component: React.ComponentType<any>) =>
+  hoistStatics(withTranslationI18Next(namespace)(component), component)
 
 export default i18n

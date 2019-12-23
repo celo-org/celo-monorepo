@@ -1,10 +1,10 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { deleteChainDataAndRestartApp, RESTART_APP_I18N_KEY } from 'src/utils/AppRestart'
 
 interface OwnProps {

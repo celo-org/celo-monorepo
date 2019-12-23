@@ -1,11 +1,11 @@
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected, isAppSynced } from 'src/redux/selectors'
 

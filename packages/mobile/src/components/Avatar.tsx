@@ -6,11 +6,11 @@
 
 import { Avatar as BaseAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/reducer'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 

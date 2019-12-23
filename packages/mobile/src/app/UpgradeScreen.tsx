@@ -1,8 +1,8 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateToWalletPlayStorePage } from 'src/utils/linking'
 
 interface OwnProps {

@@ -1,11 +1,11 @@
 import { getErrorMessage } from '@celo/utils/src/displayFormatting'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
-import { WithTranslation, withTranslation } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import ErrorScreen from 'src/app/ErrorScreen'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 
 interface State {
   childError: Error | null
