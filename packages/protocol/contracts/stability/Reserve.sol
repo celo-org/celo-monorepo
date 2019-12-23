@@ -86,12 +86,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     external
     onlyOwner
   {
-    require(symbols.length == weights.length);
+    require(symbols.length == weights.length, "Array length mismatch");
     FixidityLib.Fraction memory sum = FixidityLib.wrap(0);
     for (uint256 i = 0; i < weights.length; i++) {
       sum = sum.add(FixidityLib.wrap(weights[i]));
     }
-    require(sum.equals(FixidityLib.fixed1()));
+    require(sum.equals(FixidityLib.fixed1()), "Sum of asset allocation must be 1");
     assetAllocationSymbols = symbols;
     assetAllocationWeights = weights;
     emit AssetAllocationSet(symbols, weights);
