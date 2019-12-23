@@ -2,10 +2,11 @@
 // behavior by validators. This introduces some non-validator stakers into the
 // network that will judge the validator groups, and vote accordingly.
 import { ContractKit, newKit } from '@celo/contractkit'
+import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { BotsArgv } from 'src/cmds/bots'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { AccountType, generatePrivateKey, privateKeyToAddress } from 'src/lib/generate_utils'
+import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
 import { Argv } from 'yargs'
 
@@ -15,52 +16,54 @@ export const describe = 'for each of the voting bot accounts, vote for the best 
 
 interface SimulateVotingArgv extends BotsArgv {
   celoProvider: string
-  index: number
 }
 
 export const builder = (yargs: Argv) => {
-  return yargs
-    .option('celoProvider', {
-      type: 'string',
-      description: 'The node to use',
-      default: 'http://localhost:8545',
-    })
-    .option('index', {
-      type: 'number',
-      description: 'The index of the voting bot account to use',
-      default: 0,
-    })
+  return yargs.option('celoProvider', {
+    type: 'string',
+    description: 'The node to use',
+    default: 'http://localhost:8545',
+  })
 }
 
 export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
-  console.info('starting voting command')
   try {
-    // Set up contract kit instance and instances of all the contracts we'll need
-    // to interact with
     const mnemonic = fetchEnv(envVar.MNEMONIC)
-    const botKey = ensure0x(generatePrivateKey(mnemonic, AccountType.VOTING_BOT, argv.index))
-    const botAccount = privateKeyToAddress(botKey)
-    console.info(botKey)
-    console.info(botAccount)
+    const numBotAccounts = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
 
-    // TODO: this should not be 1. Pick a real value, maybe have it be an envvar
-    const changeVoteProbability = 1
+    const kit: ContractKit = newKit(argv.celoProvider)
+    const election = await kit.contracts.getElection()
+    const validators = await kit.contracts.getValidators()
 
-    console.info(`Deciding whether ${botAccount} will change their vote...`)
-    if (Math.random() < changeVoteProbability) {
-      console.info(`Yes, ${botAccount} will vote.`)
+    const changeVoteProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_CHANGE_PROBABILITY))
 
-      const kit: ContractKit = newKit(argv.celoProvider)
-      kit.addAccount(botKey)
-      kit.defaultAccount = botAccount
-      const election = await kit.contracts.getElection()
-      const validators = await kit.contracts.getValidators()
+    const allBotKeys = getPrivateKeysFor(AccountType.VOTING_BOT, mnemonic, numBotAccounts)
+    for (const key of allBotKeys) {
+      kit.addAccount(key)
+      const account = ensure0x(getAccountAddressFromPrivateKey(key))
+      try {
+        const activateTxs = await election.activate(account)
+        for (const tx of activateTxs) {
+          await tx.sendAndWaitForReceipt()
+        }
+      } catch (error) {
+        console.error(`Failed to activate pending votes for ${account}`)
+      }
+    }
+
+    const botKeysVotingThisRound = allBotKeys.filter((_) =>
+      changeVoteProbability.isGreaterThan(Math.random())
+    )
+    console.info(`Voting this time: ${botKeysVotingThisRound.length} of ${numBotAccounts}`)
+
+    if (botKeysVotingThisRound.length > 0) {
+      const lockedGold = await kit.contracts.getLockedGold()
 
       console.info('Determining which groups have capacity for more votes')
       const groupCapacities = new Map<string, BigNumber>()
       for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
         const vgv = await election.getValidatorGroupVotes(groupAddress)
-        if (vgv.eligible && vgv.capacity.isGreaterThan(0)) {
+        if (vgv.eligible) {
           groupCapacities.set(groupAddress, vgv.capacity)
         }
       }
@@ -77,36 +80,77 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
             groupScores.set(groupAddress, [val.score])
           }
         } catch (error) {
-          console.info(`failed on this: validators.getValidatorFromSigner(${valSigner})`)
+          console.info(`could not get info for ${valSigner}, skipping...`)
         }
       }
 
-      const randomlySelectedGroup = getWeightedRandomChoice(groupScores)
-      console.info(`Selected this group: ${randomlySelectedGroup}`)
+      const groupWeights = calculateGroupWeightsFromScores(groupScores)
 
-      const voteTx = await election.vote(
-        randomlySelectedGroup,
-        BigNumber.minimum(
-          new BigNumber(75000000000000000000),
-          groupCapacities.get(randomlySelectedGroup)!
-        )
-      )
+      for (const key of botKeysVotingThisRound) {
+        const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
+        console.info(`Voting as: ${botAccount}.`)
 
-      await voteTx.sendAndWaitForReceipt()
-      console.info(`voted!`)
-    } else {
-      console.info(`${botAccount} will skip voting this time.`)
+        kit.defaultAccount = botAccount
+
+        try {
+          // Get this account's amount of locked gold
+          const lockedGoldAmount = await lockedGold.getAccountTotalLockedGold(botAccount)
+          console.info(`locked gold for ${botAccount}: ${lockedGoldAmount.toString()}`)
+
+          if (lockedGoldAmount.isGreaterThan(0)) {
+            // Get group(s) currently voted for
+            const currentVotes = (await election.getVoter(botAccount)).votes
+            const currentGroups = currentVotes.map((v) => v.group)
+            console.info(currentVotes)
+
+            const randomlySelectedGroup = getWeightedRandomChoice(
+              groupWeights,
+              [...groupCapacities.keys()].filter((k) => {
+                const capacity = groupCapacities.get(k)
+                return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
+              })
+            )
+            console.info(`Selected this group: ${randomlySelectedGroup}`)
+
+            // Revoke existing vote(s) if necessary
+            for (const vote of currentVotes) {
+              const revokeTxs = await election.revoke(
+                botAccount,
+                vote.group,
+                vote.pending.plus(vote.active)
+              )
+              for (const tx of revokeTxs) {
+                await tx.sendAndWaitForReceipt()
+              }
+            }
+
+            const groupCapacity = groupCapacities.get(randomlySelectedGroup)!
+            const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
+            const voteTx = await election.vote(randomlySelectedGroup, BigNumber.minimum(voteAmount))
+            await voteTx.sendAndWaitForReceipt()
+            console.info(`Completed vote as ${botAccount}`)
+
+            groupCapacities.set(randomlySelectedGroup, groupCapacity.minus(voteAmount))
+          } else {
+            console.info(`No locked gold exists for ${botAccount}`)
+          }
+        } catch (error) {
+          console.error(`Failed to vote as ${botAccount}`)
+          console.info(error)
+        }
+      }
     }
-    process.exit(0)
   } catch (error) {
     console.error(error)
-    process.exit(1)
+  } finally {
+    process.exit(0)
   }
 }
 
-function getWeightedRandomChoice(groupScores: Map<string, BigNumber[]>): string {
+function calculateGroupWeightsFromScores(
+  groupScores: Map<string, BigNumber[]>
+): Map<string, BigNumber> {
   const groupWeights = new Map<string, BigNumber>()
-  let sumOfWeights = new BigNumber(0)
 
   // Add up the scores for each group's validators and calculate weights
   for (const group of groupScores.keys()) {
@@ -114,25 +158,37 @@ function getWeightedRandomChoice(groupScores: Map<string, BigNumber[]>): string 
     // This shouldn't end up being 0, but handle the edge case and avoid division by 0
     if (scores.length > 0) {
       const avg = scores.reduce((a, b) => a.plus(b), new BigNumber(0)).div(scores.length)
-      const prob = avg.pow(20)
-      sumOfWeights = sumOfWeights.plus(prob)
       groupWeights.set(group, avg.pow(20))
     } else {
       groupWeights.set(group, new BigNumber(0))
     }
   }
 
-  // Sort from highest probability to lowest
-  const sortedGroupKeys = [...groupWeights.keys()].sort((a, b) => {
-    return groupWeights.get(b)!.comparedTo(groupWeights.get(a)!)
-  })
+  return groupWeights
+}
 
-  const choice = sumOfWeights.times(Math.random())
+function getWeightedRandomChoice(
+  groupWeights: Map<string, BigNumber>,
+  groupsToConsider: string[]
+): string {
+  // Filter to groups open to consideration, and sort from highest probability to lowest
+  const sortedGroupKeys = [...groupWeights.keys()]
+    .filter((k) => groupsToConsider.includes(k))
+    .sort((a, b) => {
+      return groupWeights.get(b)!.comparedTo(groupWeights.get(a)!)
+    })
+
+  let weightTotal = new BigNumber(0)
+  for (const key of sortedGroupKeys) {
+    weightTotal = weightTotal.plus(groupWeights.get(key) || 0)
+  }
+
+  const choice = weightTotal.multipliedBy(Math.random())
   let totalSoFar = new BigNumber(0)
 
   for (const key of sortedGroupKeys) {
     totalSoFar = totalSoFar.plus(groupWeights.get(key)!)
-    if (choice.isLessThan(totalSoFar)) {
+    if (totalSoFar.isGreaterThanOrEqualTo(choice)) {
       return key
     }
   }
