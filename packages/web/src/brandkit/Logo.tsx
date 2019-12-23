@@ -4,14 +4,14 @@ import Palette from 'src/brandkit/color/Palette'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import { BACKGROUND_PALETTE } from 'src/brandkit/common/data'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
-import Page from 'src/brandkit/common/Page'
+import Page, { LOGO_PATH } from 'src/brandkit/common/Page'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import TripplePairing from 'src/brandkit/common/TripplePairing'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import LogoExample, { Logos } from 'src/brandkit/logo/LogoExample'
 import LogoWithBackground from 'src/brandkit/logo/LogoWithBackground'
 import { Digital, Print } from 'src/brandkit/logo/Minimums'
-import { H1, H3 } from 'src/fonts/Fonts'
+import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
@@ -22,54 +22,48 @@ import InlineAnchor from 'src/shared/InlineAnchor'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 
-export default React.memo(function Logo() {
-  return (
-    <Page
-      sections={[
-        {
-          id: hashNav.brandLogo.overview,
-          children: <Overview />,
-        },
-        {
-          id: hashNav.brandLogo.space,
-          children: <Clearspace />,
-        },
-        {
-          id: hashNav.brandLogo.backgrounds,
-          children: <Backgrounds />,
-        },
-      ]}
-    />
-  )
-})
+export default React.memo(
+  withNamespaces(NameSpaces.brand)(function Logo({ t }: I18nProps) {
+    return (
+      <Page
+        title={t('logo.title')}
+        metaDescription={'logo.overviewCopy'}
+        path={LOGO_PATH}
+        sections={[
+          { id: hashNav.brandLogo.overview, children: <Overview /> },
+          { id: hashNav.brandLogo.space, children: <Clearspace /> },
+          { id: hashNav.brandLogo.backgrounds, children: <Backgrounds /> },
+        ]}
+      />
+    )
+  })
+)
 
 const Overview = withNamespaces(NameSpaces.brand)(
-  withScreenSize<I18nProps>(function _Overview({ t, screen }: I18nProps & ScreenProps) {
+  withScreenSize(function _Overview({ t, screen }: I18nProps & ScreenProps) {
     const glyphAreaStyle = screen === ScreenSizes.DESKTOP ? styles.pilar : styles.square
     return (
       <View style={styles.container}>
         <View style={styles.gap}>
           <H1 style={standardStyles.elementalMarginBottom}>{t('logo.title')}</H1>
-          <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-            {t('logo.overviewCopy')}
-          </Text>
+          <H4 style={standardStyles.elementalMarginBottom}>{t('logo.overviewCopy')}</H4>
           <Button
             kind={BTN.PRIMARY}
             text={t('logo.overviewBtn')}
             href="/static/assets/CeloLogoPackage.zip"
           />
-          <Text style={[fonts.h5a, standardStyles.blockMarginTop]}>{t('licenseTitle')}</Text>
+          <Text style={[fonts.h5, standardStyles.blockMarginTop]}>{t('licenseTitle')}</Text>
           <Text
             style={[fonts.p, standardStyles.blockMarginBottom, standardStyles.elementalMarginTop]}
           >
-            <Trans i18nKey="logo.license">
+            <Trans ns={NameSpaces.brand} i18nKey="logo.license">
               <InlineAnchor href={menuItems.CODE_OF_CONDUCT.link}>here</InlineAnchor>
             </Trans>
           </Text>
           <View style={[standardStyles.centered, styles.fullScreenLogo]}>
             <LogoLightBg height={100} />
           </View>
-          <Text style={[fonts.h5a, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          <Text style={[fonts.h5, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
             {t('logo.logoTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.logoText')}</Text>
@@ -105,7 +99,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           />
         </View>
         <View style={styles.gap}>
-          <Text style={[fonts.h5a, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
+          <Text style={[fonts.h5, standardStyles.elementalMargin, standardStyles.blockMarginTop]}>
             {t('logo.glyphTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
@@ -154,7 +148,7 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
       </View>
       <Text
         style={[
-          fonts.h5a,
+          fonts.h5,
           styles.gap,
           standardStyles.elementalMargin,
           standardStyles.blockMarginTop,
@@ -184,7 +178,7 @@ const Clearspace = withNamespaces(NameSpaces.brand)(function _ClearSpace({ t }) 
       <View>
         <Text
           style={[
-            fonts.h5a,
+            fonts.h5,
             styles.gap,
             standardStyles.elementalMargin,
             standardStyles.blockMarginTop,
@@ -226,7 +220,7 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(function _Backgrounds({ t }
       </View>
       <Text
         style={[
-          fonts.h5a,
+          fonts.h5,
           styles.gap,
           standardStyles.elementalMargin,
           standardStyles.blockMarginTop,

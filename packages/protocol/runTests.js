@@ -2,7 +2,7 @@ const ganache = require('@celo/ganache-cli')
 const glob = require('glob-fs')({
   gitignore: false,
 })
-const { exec } = require('./lib/test-utils')
+const { exec, waitForPortOpen } = require('./lib/test-utils')
 const minimist = require('minimist')
 const network = require('./truffle-config.js').networks.development
 
@@ -17,7 +17,7 @@ async function startGanache() {
     network_id: network.network_id,
     mnemonic: network.mnemonic,
     gasPrice: network.gasPrice,
-    gasLimit: 10000000,
+    gasLimit: 20000000,
     allowUnlimitedContractSize: true,
   })
 
@@ -51,9 +51,8 @@ async function test() {
   try {
     const closeGanache = await startGanache()
     if (isCI) {
-      // if we are running on circle ci we need to wait for ganache to be up
-      // TODO(mcortesi): improvement: check for open port instead of a fixed wait time.
-      await sleep(60)
+      // If we are running on circle ci we need to wait for ganache to be up.
+      await waitForPortOpen('localhost', 8545, 60)
     }
 
     let testArgs = ['run', 'truffle', 'test']
@@ -71,7 +70,7 @@ async function test() {
       const testFiles = glob.readdirSync(testGlob)
       if (testFiles.length === 0) {
         // tslint:disable-next-line: no-console
-        console.error(`No tests matched with ${argv._}`)
+        console.error(`No test files matched with ${testGlob}`)
         process.exit(1)
       }
       testArgs = testArgs.concat(testFiles)

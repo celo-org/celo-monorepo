@@ -6,7 +6,7 @@ import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
 
-const avatarSize = 40
+const AVATAR_SIZE = 40
 
 interface Props {
   type: TransactionTypes
@@ -34,11 +34,13 @@ export default function TransferFeedIcon(props: Props) {
     }
     case TransactionTypes.RECEIVED: // fallthrough
     case TransactionTypes.SENT: // fallthrough
+    case TransactionTypes.ESCROW_SENT:
+    case TransactionTypes.ESCROW_RECEIVED:
     default: {
       return (
         <ContactCircle
           address={address}
-          size={avatarSize}
+          size={AVATAR_SIZE}
           thumbnailPath={getRecipientThumbnail(recipient)}
         >
           {<Image source={unknownUserIcon} style={styles.image} />}
@@ -50,8 +52,8 @@ export default function TransferFeedIcon(props: Props) {
 
 const styles = StyleSheet.create({
   image: {
-    height: avatarSize,
-    width: avatarSize,
+    height: AVATAR_SIZE,
+    width: AVATAR_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
   },

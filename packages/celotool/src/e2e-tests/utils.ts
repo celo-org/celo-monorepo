@@ -1,3 +1,4 @@
+import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
@@ -55,7 +56,10 @@ export function assertAlmostEqual(
   if (expected.isZero()) {
     assert.equal(actual.toFixed(), expected.toFixed())
   } else {
-    const isCloseTo = actual.plus(delta).gte(expected) || actual.minus(delta).lte(expected)
+    const isCloseTo = actual
+      .minus(expected)
+      .abs()
+      .lte(delta)
     assert(
       isCloseTo,
       `expected ${actual.toString()} to almost equal ${expected.toString()} +/- ${delta.toString()}`
@@ -199,9 +203,9 @@ async function setupTestDir(testDir: string) {
 function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
   const genesis = generateGenesis({
     validators,
-    blockTime: 0,
+    blockTime: 2, // Slow down block times to improve reliability.
     epoch: 10,
-    lookback: 2,
+    lookbackwindow: 2,
     requestTimeout: 3000,
     chainId: NetworkId,
     ...configOverrides,
@@ -245,20 +249,6 @@ export async function killInstance(instance: GethInstanceConfig) {
 export async function addStaticPeers(datadir: string, ports: number[]) {
   const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
-}
-
-async function isPortOpen(host: string, port: number) {
-  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
-}
-
-async function waitForPortOpen(host: string, port: number, seconds: number) {
-  const deadline = Date.now() + seconds * 1000
-  do {
-    if (await isPortOpen(host, port)) {
-      return true
-    }
-  } while (Date.now() < deadline)
-  return false
 }
 
 export function sleep(seconds: number) {

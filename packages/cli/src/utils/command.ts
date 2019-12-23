@@ -1,9 +1,11 @@
 import { ensureHexLeader, stripHexLeader } from '@celo/utils/lib/address'
 import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { URL_REGEX } from '@celo/utils/lib/io'
+import { isE164NumberStrict } from '@celo/utils/lib/phoneNumbers'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
+import BigNumber from 'bignumber.js'
 import { pathExistsSync } from 'fs-extra'
 import Web3 from 'web3'
 
@@ -40,11 +42,27 @@ const parseAddress: ParseFn<string> = (input) => {
   }
 }
 
+const parseWei: ParseFn<BigNumber> = (input) => {
+  try {
+    return new BigNumber(input)
+  } catch (_err) {
+    throw new CLIError(`${input} is not a valid token amount`)
+  }
+}
+
 const parsePath: ParseFn<string> = (input) => {
   if (pathExistsSync(input)) {
     return input
   } else {
     throw new CLIError(`File at "${input}" does not exist`)
+  }
+}
+
+const parsePhoneNumber: ParseFn<string> = (input) => {
+  if (isE164NumberStrict(input)) {
+    return input
+  } else {
+    throw new CLIError(`PhoneNumber "${input}" is not a valid E164 number`)
   }
 }
 
@@ -88,10 +106,20 @@ export const Flags = {
     description: 'BLS Proof-of-Possession',
     helpValue: '0x',
   }),
+  phoneNumber: flags.build({
+    parse: parsePhoneNumber,
+    description: 'Phone Number in E164 Format',
+    helpValue: '+14152223333',
+  }),
   url: flags.build({
     parse: parseUrl,
     description: 'URL',
-    helpValue: 'htttps://www.celo.org',
+    helpValue: 'https://www.celo.org',
+  }),
+  wei: flags.build({
+    parse: parseWei,
+    description: 'Token value without decimals',
+    helpValue: '10000000000000000000000',
   }),
 }
 

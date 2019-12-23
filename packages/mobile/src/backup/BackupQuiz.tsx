@@ -6,7 +6,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as _ from 'lodash'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -16,7 +16,7 @@ import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -41,7 +41,7 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-type Props = WithNamespaces & DispatchProps & NavigationInjectedProps
+type Props = WithTranslation & DispatchProps & NavigationInjectedProps
 
 export class BackupQuiz extends React.Component<Props, State> {
   static navigationOptions = () => ({
@@ -219,7 +219,7 @@ export default componentWithAnalytics(
   connect<{}, DispatchProps, {}, RootState>(
     null,
     { setBackupCompleted, showError }
-  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupQuiz))
+  )(withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz))
 )
 
 const styles = StyleSheet.create({

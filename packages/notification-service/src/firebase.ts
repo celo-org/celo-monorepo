@@ -8,7 +8,6 @@ let database: admin.database.Database
 let registrationsRef: admin.database.Reference
 let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
-let exchangeRatesRef: admin.database.Reference
 
 export interface Registrations {
   [address: string]:
@@ -44,7 +43,6 @@ interface PendingRequests {
 }
 
 interface ExchangeRateObject {
-  pair: string
   exchangeRate: string
   timestamp: number // timestamp in milliseconds
 }
@@ -76,7 +74,6 @@ export function initializeDb() {
   registrationsRef = database.ref('/registrations')
   lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
-  exchangeRatesRef = database.ref('/exchangeRates')
 
   // Attach to the registration ref to keep local registrations mapping up to date
   registrationsRef.on(
@@ -154,13 +151,13 @@ export function writeExchangeRatePair(
   exchangeRate: string,
   timestamp: number
 ) {
+  const pair = `${CURRENCIES[takerToken].code}/${CURRENCIES[makerToken].code}`
   const exchangeRateRecord: ExchangeRateObject = {
-    pair: `${CURRENCIES[takerToken].code}/${CURRENCIES[makerToken].code}`,
     exchangeRate,
     timestamp,
   }
-  exchangeRatesRef.push(exchangeRateRecord)
-  console.debug('Recorded exchange rate ', exchangeRateRecord)
+  database.ref(`/exchangeRates/${pair}`).push(exchangeRateRecord)
+  console.debug(`Recorded exchange rate for ${pair}`, exchangeRateRecord)
 }
 
 export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {

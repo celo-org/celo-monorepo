@@ -1,12 +1,11 @@
 import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { StyleSheet, ViewStyle } from 'react-native'
+import ringPaths from 'src/community/connect/QuarterRingOfVectors'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { Path } from 'src/shared/svg'
 import { baseCoinStyle, colors } from 'src/styles'
 import Svg, { G, Mask } from 'svgs'
-
-import ringPaths from 'src/community/connect/QuarterRingOfVectors'
 
 type Props = ScreenProps
 class QuarterCircle extends React.PureComponent<Props> {
@@ -95,7 +94,7 @@ const styles = StyleSheet.create({
   animationBase: {
     animationFillMode: 'both',
     animationDuration: `${DURATION}ms`,
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'ease-in',
   },
 })

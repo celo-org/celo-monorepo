@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { brandStyles } from 'src/brandkit/common/constants'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Download from 'src/icons/Download'

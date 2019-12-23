@@ -135,8 +135,8 @@ const mockAttestationsWrapperPartlyVerified = {
 }
 
 const mockAccountsWrapper = {
-  getWalletAddress: jest.fn(() => mockAccount),
-  getDataEncryptionKey: jest.fn(() => [mockPublicDEK]),
+  getWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
+  getDataEncryptionKey: jest.fn(() => Promise.resolve(mockPublicDEK)),
 }
 
 describe('Start Verification Saga', () => {

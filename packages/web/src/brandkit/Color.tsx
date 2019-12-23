@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { withNamespaces } from 'react-i18next'
 import { ImageBackground, ImageRequireSource, StyleSheet, Text, View } from 'react-native'
 import Palette from 'src/brandkit/color/Palette'
 import { brandStyles } from 'src/brandkit/common/constants'
@@ -9,26 +8,31 @@ import {
   GRAY_PALETTE,
   PRIMARY_PALETTE,
 } from 'src/brandkit/common/data'
-import Page from 'src/brandkit/common/Page'
+import Page, { COLOR_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
-import { I18nProps, NameSpaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 const { brandColor } = hashNav
 
-export default React.memo(function Color() {
-  return (
-    <Page
-      sections={[
-        { id: brandColor.overview, children: <Overview /> },
-        { id: brandColor.backgrounds, children: <Backgrounds /> },
-      ]}
-    />
-  )
-})
+export default React.memo(
+  withNamespaces(NameSpaces.brand)(function Color({ t }: I18nProps) {
+    return (
+      <Page
+        title={t('color.title')}
+        metaDescription={t('colo.headline')}
+        path={COLOR_PATH}
+        sections={[
+          { id: brandColor.overview, children: <Overview /> },
+          { id: brandColor.backgrounds, children: <Backgrounds /> },
+        ]}
+      />
+    )
+  })
+)
 
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
@@ -53,7 +57,7 @@ const Backgrounds = withNamespaces(NameSpaces.brand)(
       <View>
         <SectionTitle containerStyle={brandStyles.gap}>{t('color.backgroundTitle')}</SectionTitle>
         <Palette text={t('color.backgroundText')} colors={BACKGROUND_PALETTE} />
-        <Text style={[brandStyles.gap, fonts.h5a, standardStyles.elementalMarginBottom]}>
+        <Text style={[brandStyles.gap, fonts.h5, standardStyles.elementalMarginBottom]}>
           {t('color.contrast')}
         </Text>
         <Text style={[brandStyles.gap, fonts.p]}>{t('color.contrastText')}</Text>

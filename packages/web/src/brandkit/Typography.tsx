@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
-import Page from 'src/brandkit/common/Page'
+import Page, { TYPE_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import UseageExamples from 'src/brandkit/typography/UseageExample'
@@ -27,16 +27,21 @@ function getWeight(weight: string | undefined) {
   }
 }
 
-export default React.memo(function Typography() {
-  return (
-    <Page
-      sections={[
-        { id: brandTypography.overview, children: <Overview /> },
-        { id: brandTypography.scale, children: <TypeScale /> },
-      ]}
-    />
-  )
-})
+export default React.memo(
+  withNamespaces(NameSpaces.brand)(function Typography({ t }: I18nProps) {
+    return (
+      <Page
+        title={t('typography.title')}
+        metaDescription={t('typography.headline')}
+        path={TYPE_PATH}
+        sections={[
+          { id: brandTypography.overview, children: <Overview /> },
+          { id: brandTypography.scale, children: <TypeScale /> },
+        ]}
+      />
+    )
+  })
+)
 
 const Overview = withNamespaces(NameSpaces.brand)(
   React.memo(function _Overview({ t }: I18nProps) {
@@ -48,9 +53,9 @@ const Overview = withNamespaces(NameSpaces.brand)(
           style={standardStyles.blockMarginBottom}
         />
         <View style={brandStyles.gap}>
-          <Text style={fonts.h5a}>{t('typography.facesTitle')}</Text>
+          <Text style={fonts.h5}>{t('typography.facesTitle')}</Text>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>
-            <Trans i18nKey={'typography.facesText'}>
+            <Trans ns={NameSpaces.brand} i18nKey={'typography.facesText'}>
               <InlineAnchor href="https://medium.com/celohq/the-why-of-the-celo-coin-part-1-of-3-5e5701805847">
                 philosophy
               </InlineAnchor>
@@ -79,7 +84,7 @@ const TYPEFACES = [
   { font: fonts.h2, name: 'Heading Two', data: fontInfo.h2 },
   { font: fonts.h3, name: 'Heading Three', data: fontInfo.h3 },
   { font: fonts.h4, name: 'Heading Four', data: fontInfo.h4 },
-  { font: fonts.h5a, name: 'Heading Five', data: fontInfo.h5a },
+  { font: fonts.h5, name: 'Heading Five', data: fontInfo.h5 },
   { font: fonts.h6, name: 'Heading Six', data: fontInfo.h6 },
   { font: fonts.p, name: 'Body', data: fontInfo.p },
   { font: fonts.legal, name: 'Small', data: fontInfo.legal },

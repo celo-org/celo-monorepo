@@ -5,8 +5,8 @@ import { contractKit } from 'src/web3/contracts'
 
 export async function getCommentKey(address: string): Promise<Buffer | null> {
   const accountsWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
-
-  const hexString = (await accountsWrapper.getDataEncryptionKey(address)).join()
+  // getDataEncryptionKey actually returns a string instead of an array
+  const hexString = [await accountsWrapper.getDataEncryptionKey(address)].join()
   // No comment key -> empty string returned from getDEK. This is expected for old addresses created before comment encryption change
   return !hexString ? null : hexToBuffer(hexString)
 }
