@@ -3,7 +3,7 @@ import fontStyles, { estimateFontSize } from '@celo/react-components/styles/font
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -12,7 +12,7 @@ import Styles from 'src/components/Styles'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { startBalanceAutorefresh, stopBalanceAutorefresh } from 'src/home/actions'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -35,7 +35,7 @@ interface DispatchProps {
   stopBalanceAutorefresh: typeof stopBalanceAutorefresh
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces & OwnProps
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -180,5 +180,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     { startBalanceAutorefresh, stopBalanceAutorefresh }
-  )(withNamespaces(Namespaces.walletFlow5)(AccountOverview))
+  )(withTranslation(Namespaces.walletFlow5)(AccountOverview))
 )

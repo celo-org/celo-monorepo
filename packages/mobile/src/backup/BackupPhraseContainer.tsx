@@ -3,11 +3,11 @@ import withTextInputPasteAware from '@celo/react-components/components/WithTextI
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import { isValidBackupPhrase, isValidSocialBackupPhrase } from 'src/backup/utils'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
 const PhraseInput = withTextInputPasteAware(TextInput, { top: undefined, right: 12, bottom: 12 })
@@ -31,7 +31,7 @@ type Props = {
   style?: ViewStyle
   onChangeText?: (value: string) => void
   testID?: string
-} & WithNamespaces
+} & WithTranslation
 
 export class BackupPhraseContainer extends React.Component<Props> {
   async componentDidMount() {
@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.backupKeyFlow6)(BackupPhraseContainer)
+export default withTranslation(Namespaces.backupKeyFlow6)(BackupPhraseContainer)

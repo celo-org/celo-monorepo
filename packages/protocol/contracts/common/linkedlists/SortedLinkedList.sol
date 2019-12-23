@@ -29,10 +29,16 @@ library SortedLinkedList {
     bytes32 lesserKey,
     bytes32 greaterKey
   ) public {
-    require(key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key));
-    require((lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 0);
-    require(contains(list, lesserKey) || lesserKey == bytes32(0));
-    require(contains(list, greaterKey) || greaterKey == bytes32(0));
+    require(
+      key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key),
+      "invalid key"
+    );
+    require(
+      (lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 0,
+      "greater and lesser key zero"
+    );
+    require(contains(list, lesserKey) || lesserKey == bytes32(0), "invalid lesser key");
+    require(contains(list, greaterKey) || greaterKey == bytes32(0), "invalid greater key");
     (lesserKey, greaterKey) = getLesserAndGreater(list, value, lesserKey, greaterKey);
     list.list.insert(key, lesserKey, greaterKey);
     list.values[key] = value;
@@ -83,7 +89,7 @@ library SortedLinkedList {
    * @return The keys of the popped elements.
    */
   function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
-    require(n <= list.list.numElements);
+    require(n <= list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     for (uint256 i = 0; i < n; i++) {
       bytes32 key = list.list.head;
@@ -178,7 +184,7 @@ library SortedLinkedList {
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
     } else {
-      require(false);
+      require(false, "get lesser and greater failure");
     }
   }
 
