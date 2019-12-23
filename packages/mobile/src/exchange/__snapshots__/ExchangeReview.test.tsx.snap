@@ -194,7 +194,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                 }
               }
             >
-              0
+              0.00
             </Text>
           </View>
           <View
@@ -285,7 +285,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                 }
               }
             >
-              0
+              0.00
             </Text>
           </View>
           <View
