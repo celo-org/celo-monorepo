@@ -50,7 +50,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    */
   function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
     adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
-    require(adjustmentSpeed.lt(FixidityLib.fixed1()));
+    require(adjustmentSpeed.lt(FixidityLib.fixed1()), "adjustment speed must be smaller than 1");
     emit AdjustmentSpeedSet(_adjustmentSpeed);
   }
 
@@ -60,7 +60,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    */
   function setTargetDensity(uint256 _targetDensity) public onlyOwner {
     targetDensity = FixidityLib.wrap(_targetDensity);
-    require(targetDensity.lt(FixidityLib.fixed1()));
+    require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
     emit TargetDensitySet(_targetDensity);
   }
 

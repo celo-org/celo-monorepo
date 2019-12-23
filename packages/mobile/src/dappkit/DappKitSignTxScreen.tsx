@@ -3,13 +3,13 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { SignTxRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
 import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -30,7 +30,7 @@ interface DispatchProps {
   requestTxSignature: typeof requestTxSignature
 }
 
-type Props = OwnProps & DispatchProps & WithNamespaces
+type Props = OwnProps & DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   requestTxSignature,
@@ -178,4 +178,4 @@ const styles = StyleSheet.create({
 export default connect<null, DispatchProps>(
   null,
   mapDispatchToProps
-)(withNamespaces(Namespaces.dappkit)(DappKitSignTxScreen))
+)(withTranslation(Namespaces.dappkit)(DappKitSignTxScreen))

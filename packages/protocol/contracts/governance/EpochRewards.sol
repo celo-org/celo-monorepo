@@ -142,7 +142,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return True upon success.
    */
   function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
-    require(value != targetVotingGoldFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    require(value != targetVotingGoldFraction.unwrap(), "Target voting gold fraction unchanged");
+    require(
+      value < FixidityLib.fixed1().unwrap(),
+      "Target voting gold fraction cannot be larger than 1"
+    );
     targetVotingGoldFraction = FixidityLib.wrap(value);
     emit TargetVotingGoldFractionSet(value);
     return true;
@@ -162,7 +166,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return True upon success.
    */
   function setTargetValidatorEpochPayment(uint256 value) public onlyOwner returns (bool) {
-    require(value != targetValidatorEpochPayment);
+    require(value != targetValidatorEpochPayment, "Target validator epoch payment unchanged");
     targetValidatorEpochPayment = value;
     emit TargetValidatorEpochPaymentSet(value);
     return true;
@@ -185,7 +189,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
         overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
-        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap()
+        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap(),
+      "Bad rewards multiplier parameters"
     );
     rewardsMultiplierParams = RewardsMultiplierParameters(
       RewardsMultiplierAdjustmentFactors(
@@ -211,7 +216,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
-        adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap()
+        adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap(),
+      "Bad target voting yield parameters"
     );
     targetVotingYieldParams.max = FixidityLib.wrap(max);
     targetVotingYieldParams.adjustmentFactor = FixidityLib.wrap(adjustmentFactor);
@@ -236,7 +242,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       return targetRewards.add(GENESIS_GOLD_SUPPLY);
     } else {
       // TODO(asa): Implement block reward calculation for years 15-30.
-      require(false);
+      require(false, "Implement block reward calculation for years 15-30");
       return 0;
     }
   }
@@ -370,7 +376,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @dev Only called directly by the protocol.
    */
   function updateTargetVotingYield() external onlyWhenNotFrozen {
-    require(msg.sender == address(0));
+    require(msg.sender == address(0), "Only VM can call");
     _updateTargetVotingYield();
   }
 

@@ -17,7 +17,7 @@ async function startGanache() {
     network_id: network.network_id,
     mnemonic: network.mnemonic,
     gasPrice: network.gasPrice,
-    gasLimit: 15000000,
+    gasLimit: 20000000,
     allowUnlimitedContractSize: true,
   })
 

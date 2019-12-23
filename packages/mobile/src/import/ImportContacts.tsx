@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -12,7 +12,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import VerifyAddressBook from 'src/icons/VerifyAddressBook'
 import { denyImportContacts, importContacts } from 'src/identity/actions'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
@@ -35,7 +35,7 @@ interface State {
   isSubmitting: boolean
 }
 
-type Props = WithNamespaces & DispatchProps & StateProps
+type Props = WithTranslation & DispatchProps & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -190,5 +190,6 @@ export default componentWithAnalytics(
       importContacts,
       denyImportContacts,
     }
-  )(withNamespaces(Namespaces.nuxNamePin1)(ImportContacts))
+    // @ts-ignore getDerivedStateFromProps seems to make TS unhappy here
+  )(withTranslation(Namespaces.nuxNamePin1)(ImportContacts))
 )
