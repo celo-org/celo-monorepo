@@ -13,10 +13,10 @@ import {
   identity,
   proxyCall,
   proxySend,
-  toBigNumber,
-  toNumber,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 export interface ValidatorGroupVote {
@@ -72,7 +72,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async electableValidators(): Promise<ElectableValidators> {
     const { min, max } = await this.contract.methods.electableValidators().call()
-    return { min: toBigNumber(min), max: toBigNumber(max) }
+    return { min: valueToBigNumber(min), max: valueToBigNumber(max) }
   }
   /**
    * Returns the current election threshold.
@@ -81,7 +81,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   electabilityThreshold = proxyCall(
     this.contract.methods.getElectabilityThreshold,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
   validatorSignerAddressFromCurrentSet: (index: number) => Promise<Address> = proxyCall(
     this.contract.methods.validatorSignerAddressFromCurrentSet,
@@ -91,7 +91,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   numberValidatorsInCurrentSet = proxyCall(
     this.contract.methods.numberValidatorsInCurrentSet,
     undefined,
-    toNumber
+    valueToInt
   )
 
   /**
@@ -158,8 +158,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
 
     return {
       group,
-      pending: toBigNumber(pending),
-      active: toBigNumber(active),
+      pending: valueToBigNumber(pending),
+      active: valueToBigNumber(active),
     }
   }
 
@@ -184,7 +184,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const groups: string[] = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const isPending = await Promise.all(
       groups.map(async (g) =>
-        toBigNumber(
+        valueToBigNumber(
           await this.contract.methods.getPendingVotesForGroupByAccount(g, account).call()
         ).isGreaterThan(0)
       )
@@ -212,7 +212,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return {
       electableValidators: res[0],
       electabilityThreshold: res[1],
-      maxNumGroupsVotedFor: toBigNumber(res[2]),
+      maxNumGroupsVotedFor: valueToBigNumber(res[2]),
     }
   }
 
@@ -225,8 +225,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return {
       address,
       name,
-      votes: toBigNumber(votes),
-      capacity: toBigNumber(numVotesReceivable).minus(votes),
+      votes: valueToBigNumber(votes),
+      capacity: valueToBigNumber(numVotesReceivable).minus(votes),
       eligible,
     }
   }
