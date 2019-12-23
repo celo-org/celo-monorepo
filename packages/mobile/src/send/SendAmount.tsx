@@ -15,7 +15,7 @@ import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -35,7 +35,7 @@ import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { RecipientVerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
@@ -78,7 +78,7 @@ interface OwnProps {
   navigation: Navigation
 }
 
-type Props = StateProps & DispatchProps & OwnProps & WithNamespaces
+type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
 interface StateProps {
   dollarBalance: string
@@ -401,7 +401,7 @@ export class SendAmount extends React.Component<Props, State> {
             autoFocus={true}
             numberOfDecimals={NUMBER_INPUT_MAX_DECIMALS}
             validator={ValidatorKind.Decimal}
-            lng={this.props.lng}
+            lng={this.props.i18n.language}
           />
           <CommentInput
             title={t('global:for')}
@@ -514,5 +514,5 @@ export default componentWithAnalytics(
       showMessage,
       fetchPhoneAddresses,
     }
-  )(withNamespaces(Namespaces.sendFlow7)(SendAmount))
+  )(withTranslation(Namespaces.sendFlow7)(SendAmount))
 )

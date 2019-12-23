@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { RootState } from 'src/redux/reducers'
@@ -20,7 +20,7 @@ interface StateProps {
   countryCode: string
 }
 
-type Props = OwnProps & StateProps & WithNamespaces
+type Props = OwnProps & StateProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -92,5 +92,5 @@ const style = StyleSheet.create({
 })
 
 export default connect<StateProps>(mapStateToProps)(
-  withNamespaces(Namespaces.profile)(VerificationConfirmationCard)
+  withTranslation(Namespaces.profile)(VerificationConfirmationCard)
 )

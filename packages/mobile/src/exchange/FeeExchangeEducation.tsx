@@ -2,14 +2,14 @@ import CircleButton from '@celo/react-components/components/CircleButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { ringsPlusCircle } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
 
-type Props = WithNamespaces
+type Props = WithTranslation
 
 class FeeExchangeEducation extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
@@ -58,5 +58,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.exchangeFlow9)(FeeExchangeEducation)
+  withTranslation(Namespaces.exchangeFlow9)(FeeExchangeEducation)
 )
