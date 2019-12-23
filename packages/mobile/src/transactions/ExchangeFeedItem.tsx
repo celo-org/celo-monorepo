@@ -119,9 +119,7 @@ function getDollarAmountProps({
     amountDirection,
     amountColor: colors.celoGreen,
     displayAmount: amount
-      ? `${amountDirection}${localCurrencySymbol +
-          getMoneyDisplayValue(amount) +
-          (localCurrencyCode || '')}`
+      ? `${amountDirection}${localCurrencySymbol + getMoneyDisplayValue(amount)}`
       : '-',
   }
 }

@@ -1,7 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { parseInputAmount } from '@celo/utils/src/parsing'
@@ -226,54 +226,44 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         forceInset={{ top: 'never', bottom: 'always' }}
         style={styles.container}
       >
-        <View
-          style={{
-            paddingHorizontal: 16,
-          }}
+        <DisconnectBanner />
+        <KeyboardAwareScrollView
+          keyboardShouldPersistTaps={'always'}
+          contentContainerStyle={styles.contentContainer}
         >
-          <DisconnectBanner />
-          <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
-            <View
-              style={{
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-              }}
-            >
-              <View style={[styles.rowContainer, styles.goldInputRow]}>
-                <View style={{ flexDirection: 'column' }}>
-                  <Text style={[fontStyles.bodyBold, styles.exchangeBodyText]}>
-                    {t('exchangeAmount', { tokenName: this.getInputTokenDisplayText() })}
-                  </Text>
-                  <TouchableOpacity onPress={this.switchInputToken}>
-                    <Text style={[fontStyles.subSmall, { textDecorationLine: 'underline' }]}>
-                      {t('switchTo', { tokenName: this.getOppositeInputTokenDisplayText() })}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <TextInput
-                  autoFocus={true}
-                  keyboardType={'decimal-pad'}
-                  onChangeText={this.onChangeExchangeAmount}
-                  value={this.getInputValue()}
-                  placeholderTextColor={'#BDBDBD'}
-                  placeholder={'0'}
-                  style={[fontStyles.body, styles.currencyInputText]}
-                />
-              </View>
-              <View style={styles.line} />
-              <View style={styles.rowContainer}>
-                <Text style={[fontStyles.body, styles.exchangeBodyText]}>
-                  {t('inputSubtotal', {
-                    goldOrSubtotal: this.isDollarInput() ? t('global:celoGold') : t('subtotal'),
-                    rate: getMoneyDisplayValue(exchangeRateDisplay, CURRENCY_ENUM.DOLLAR, true),
-                  })}
+          <View style={styles.amountInputContainer}>
+            <View>
+              <Text style={styles.exchangeBodyText}>
+                {t('exchangeAmount', { tokenName: this.getInputTokenDisplayText() })}
+              </Text>
+              <TouchableOpacity onPress={this.switchInputToken}>
+                <Text style={[fontStyles.subSmall, { textDecorationLine: 'underline' }]}>
+                  {t('switchTo', { tokenName: this.getOppositeInputTokenDisplayText() })}
                 </Text>
-                <Text style={fontStyles.regular}>{this.getSubtotalDisplayValue()}</Text>
-              </View>
+              </TouchableOpacity>
             </View>
-          </KeyboardAwareScrollView>
-        </View>
-
+            <TextInput
+              autoFocus={true}
+              keyboardType={'decimal-pad'}
+              onChangeText={this.onChangeExchangeAmount}
+              value={this.getInputValue()}
+              placeholderTextColor={'#BDBDBD'}
+              placeholder={'0'}
+              style={styles.currencyInput}
+            />
+          </View>
+          <HorizontalLine />
+          {/* <View style={styles.line} /> */}
+          <View style={styles.subtotalContainer}>
+            <Text style={styles.exchangeBodyText}>
+              {t('inputSubtotal', {
+                goldOrSubtotal: this.isDollarInput() ? t('global:celoGold') : t('subtotal'),
+                rate: getMoneyDisplayValue(exchangeRateDisplay, CURRENCY_ENUM.DOLLAR, true),
+              })}
+            </Text>
+            <Text style={styles.subtotal}>{this.getSubtotalDisplayValue()}</Text>
+          </View>
+        </KeyboardAwareScrollView>
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.goToReview}
@@ -302,21 +292,40 @@ export default componentWithAnalytics(
 )
 
 const styles = StyleSheet.create({
-  line: {
-    borderBottomColor: colors.darkLightest,
-    borderBottomWidth: 1,
-    marginBottom: 16,
-  },
-  exchangeBodyText: { fontSize: 15, lineHeight: 20, fontWeight: '600' },
-  currencyInputText: { fontSize: 24, lineHeight: 39, height: 54 }, // setting height manually b.c. of bug causing text to jump
   container: {
     flex: 1,
-    flexDirection: 'column',
     justifyContent: 'space-between',
   },
-  rowContainer: { flexDirection: 'row', flex: 1, justifyContent: 'space-between' },
-  goldInputRow: {
+  contentContainer: {
+    paddingHorizontal: 16,
+  },
+  amountInputContainer: {
+    flexDirection: 'row',
     marginTop: 38,
     alignItems: 'center',
+  },
+  exchangeBodyText: {
+    ...fontStyles.bodyBold,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '600',
+  },
+  currencyInput: {
+    ...fontStyles.body,
+    marginLeft: 10,
+    flex: 1,
+    textAlign: 'right',
+    fontSize: 24,
+    lineHeight: 39,
+    height: 54, // setting height manually b.c. of bug causing text to jump on Android
+  },
+  subtotalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  subtotal: {
+    ...fontStyles.regular,
+    marginLeft: 10,
   },
 })
