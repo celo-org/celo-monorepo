@@ -30,7 +30,7 @@ import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
-const MAPPING_CHUNK_SIZE = 25
+const MAPPING_CHUNK_SIZE = 50
 const NUM_PARALLEL_REQUESTS = 1
 
 export function* doImportContactsWrapper() {
@@ -195,7 +195,8 @@ const isValidAddress = (address: string) =>
 
 export function* fetchAndStoreAddressMappings(
   attestationsWrapper: AttestationsWrapper,
-  e164Numbers: string[]
+  e164Numbers: string[],
+  incrementSyncProgress = true
 ) {
   try {
     Logger.debug(TAG, `Fetch and store address mapping for ${e164Numbers.length} phone numbers`)
@@ -227,7 +228,9 @@ export function* fetchAndStoreAddressMappings(
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
-    yield put(incrementImportSyncProgress(e164Numbers.length))
+    if (incrementSyncProgress) {
+      yield put(incrementImportSyncProgress(e164Numbers.length))
+    }
   } catch (error) {
     Logger.error(TAG, `Error fetching addresses for chunk: ${e164Numbers}`, error)
     throw new Error('Phone number lookup error')
@@ -246,7 +249,7 @@ export function* fetchPhoneAddresses(action: FetchPhoneAddressesAction) {
     contractKit.contracts,
     contractKit.contracts.getAttestations,
   ])
-  yield call(fetchAndStoreAddressMappings, attestationsWrapper, e164Numbers)
+  yield call(fetchAndStoreAddressMappings, attestationsWrapper, e164Numbers, false)
 }
 
 export enum RecipientVerificationStatus {

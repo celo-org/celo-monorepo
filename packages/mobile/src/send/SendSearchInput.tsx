@@ -3,9 +3,10 @@ import withTextInputLabeling from '@celo/react-components/components/WithTextInp
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors'
 import { isValidAddress } from '@celo/utils/src/address'
-import { TranslationFunction } from 'i18next'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
+import { Namespaces } from 'src/i18n'
 import Search from 'src/icons/Search'
 
 const RecipientSearchInput = withTextInputPasteAware(
@@ -15,19 +16,19 @@ const RecipientSearchInput = withTextInputPasteAware(
 
 interface SendSearchInputProps {
   isPhoneEnabled: boolean
-  onInputChange: (value: string) => void
-  t: TranslationFunction
+  onChangeText: (value: string) => void
 }
 
 // Input field for Send screen
 export function SendSearchInput(props: SendSearchInputProps) {
-  const { isPhoneEnabled, onInputChange, t } = props
+  const { t } = useTranslation(Namespaces.sendFlow7)
+  const { isPhoneEnabled, onChangeText } = props
   const [input, setInput] = React.useState('')
 
-  const handleInputChanged = React.useCallback(
+  const handleChangeText = React.useCallback(
     (value: string) => {
       setInput(value)
-      onInputChange(value)
+      onChangeText(value)
     },
     [setInput]
   )
@@ -37,8 +38,9 @@ export function SendSearchInput(props: SendSearchInputProps) {
       <RecipientSearchInput
         placeholder={isPhoneEnabled ? t('nameOrPhoneNumber') : t('walletAddress')}
         value={input}
-        onChangeText={handleInputChanged}
-        icon={isPhoneEnabled ? <Search /> : <Search />}
+        onChangeText={handleChangeText}
+        icon={isPhoneEnabled ? <Search /> : undefined}
+        title={isPhoneEnabled ? undefined : t('global:to')}
         style={styles.textInput}
         shouldShowClipboard={isValidAddress}
       />

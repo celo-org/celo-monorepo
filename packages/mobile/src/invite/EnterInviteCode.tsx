@@ -90,7 +90,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    navigate(Screens.ImportContacts)
+    navigate(Screens.VerificationEducationScreen)
   }
 
   onPressGoToFaucet = () => {

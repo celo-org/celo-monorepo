@@ -14,15 +14,16 @@ import {
 
 export function ContactSyncBanner() {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const [isVisible, setIsVisible] = React.useState(true)
   const isLoadingContacts = useSelector(isLoadingImportContactsSelector)
   const { total, current } = useSelector(contactMappingProgressSelector)
-  const isSynced = current && total && current === total
+  const [isVisible, setIsVisible] = React.useState(false)
+  const isSynced = current && total && current >= total
 
   // Hide banner after 3 seconds when sync is done
   React.useEffect(
     () => {
       if (!isSynced) {
+        setIsVisible(true)
         return
       }
       const timer = setTimeout(() => {
@@ -33,7 +34,7 @@ export function ContactSyncBanner() {
     [isSynced]
   )
 
-  if (!isVisible) {
+  if (!isLoadingContacts && !isVisible) {
     return null
   }
 
@@ -47,7 +48,7 @@ export function ContactSyncBanner() {
               <Checkmark height={28} width={28} />
             </View>
           ) : (
-            <Error color={colors.errorRed} width={45} />
+            <Error style={styles.errorContainer} color={colors.errorRed} width={45} />
           ))}
       </View>
       <View style={styles.textContainer}>
@@ -78,4 +79,7 @@ const styles = StyleSheet.create({
     width: 25,
   },
   checkmarkContainer: { marginTop: -10 },
+  errorContainer: {
+    marginLeft: -10,
+  },
 })
