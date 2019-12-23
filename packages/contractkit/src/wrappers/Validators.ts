@@ -7,13 +7,13 @@ import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  parseBytes,
   proxyCall,
   proxySend,
-  toBigNumber,
-  toNumber,
+  stringToBytes,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 export interface Validator {
@@ -68,8 +68,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getValidatorLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getValidatorLockedGoldRequirements().call()
     return {
-      value: toBigNumber(res[0]),
-      duration: toBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
 
@@ -80,8 +80,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getGroupLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getGroupLockedGoldRequirements().call()
     return {
-      value: toBigNumber(res[0]),
-      duration: toBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
 
@@ -92,7 +92,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   getAccountLockedGoldRequirement = proxyCall(
     this.contract.methods.getAccountLockedGoldRequirement,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -107,7 +107,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
-      maxGroupSize: toBigNumber(res[2]),
+      maxGroupSize: valueToBigNumber(res[2]),
     }
   }
 
@@ -147,7 +147,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsPublicKey,
-    tupleParser(parseBytes, parseBytes)
+    tupleParser(stringToBytes, stringToBytes)
   )
 
   /**
@@ -243,15 +243,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     this.contract.methods.getMembershipHistory,
     undefined,
     (res) =>
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      zip((epoch, group) => ({ epoch: toNumber(epoch), group } as GroupMembership), res[0], res[1])
+      zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
   )
 
   /** Get the size (amount of members) of a ValidatorGroup */
   getValidatorGroupSize: (group: Address) => Promise<number> = proxyCall(
     this.contract.methods.getGroupNumMembers,
     undefined,
-    toNumber
+    valueToInt
   )
 
   /** Get list of registered validator addresses */
@@ -289,7 +288,20 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    */
-  registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
+
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
+
+  registerValidator: (
+    ecdsaPublicKey: string,
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.registerValidator,
+    tupleParser(stringToBytes, stringToBytes, stringToBytes)
+  )
 
   /**
    * De-registers a validator, removing it from the group for which it is a member.
