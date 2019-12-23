@@ -148,9 +148,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  async signerToAccount(signerAddress: Address) {
+  async signerToAccount(signerAddress: Address, blockNumber?: number) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.signerToAccount(signerAddress)
+    return accounts.signerToAccount(signerAddress, blockNumber)
   }
 
   /**
@@ -227,9 +227,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
-  async getValidatorFromSigner(address: Address): Promise<Validator> {
-    const account = await this.signerToAccount(address)
-    return this.getValidator(account)
+  async getValidatorFromSigner(address: Address, blockNumber?: number): Promise<Validator> {
+    const account = await this.signerToAccount(address, blockNumber)
+    return this.getValidator(account, blockNumber)
   }
 
   /** Get ValidatorGroup information */

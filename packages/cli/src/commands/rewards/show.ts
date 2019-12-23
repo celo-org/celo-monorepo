@@ -1,3 +1,4 @@
+import { Address } from '@celo/contractkit/lib/base'
 import { GroupVoterReward, VoterReward } from '@celo/contractkit/lib/wrappers/Election'
 import { Validator, ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress } from '@celo/utils/lib/address'
@@ -7,6 +8,14 @@ import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
+
+interface ExplainedVoterReward extends VoterReward {
+  validators: Validator[]
+}
+
+interface ExplainedGroupVoterReward extends GroupVoterReward {
+  validators: Validator[]
+}
 
 export default class Show extends BaseCommand {
   static description =
@@ -51,8 +60,8 @@ export default class Show extends BaseCommand {
     }
     await checkBuilder.runChecks()
 
-    let voterRewards: VoterReward[] = []
-    let groupVoterRewards: GroupVoterReward[] = []
+    let voterRewards: ExplainedVoterReward[] = []
+    let groupVoterRewards: ExplainedGroupVoterReward[] = []
     let validatorRewards: ValidatorReward[] = []
     let validatorGroupRewards: ValidatorReward[] = []
 
@@ -62,13 +71,30 @@ export default class Show extends BaseCommand {
       epochNumber <= currentEpoch;
       epochNumber++
     ) {
-      if (!filter) {
-        const epochoGroupVoterRewards = await election.getGroupVoterRewards(epochNumber)
-        groupVoterRewards = groupVoterRewards.concat(epochoGroupVoterRewards)
-      } else if (res.flags.voter) {
-        const address = res.flags.voter
-        const epochVoterRewards = await election.getVoterRewards(address, epochNumber)
-        voterRewards = voterRewards.concat(epochVoterRewards)
+      if (!filter || res.flags.voter) {
+        const electedValidators = await election.getElectedValidators(epochNumber)
+        if (!filter) {
+          const epochGroupVoterRewards = await election.getGroupVoterRewards(epochNumber)
+          groupVoterRewards = groupVoterRewards.concat(
+            epochGroupVoterRewards.map(
+              (e: GroupVoterReward): ExplainedGroupVoterReward => ({
+                ...e,
+                validators: filterValidatorsByGroup(electedValidators, e.group.address),
+              })
+            )
+          )
+        } else if (res.flags.voter) {
+          const address = res.flags.voter
+          const epochVoterRewards = await election.getVoterRewards(address, epochNumber)
+          voterRewards = voterRewards.concat(
+            epochVoterRewards.map(
+              (e: VoterReward): ExplainedVoterReward => ({
+                ...e,
+                validators: filterValidatorsByGroup(electedValidators, e.group.address),
+              })
+            )
+          )
+        }
       }
 
       if (!filter || res.flags.validator || res.flags.group) {
@@ -206,8 +232,12 @@ export default class Show extends BaseCommand {
   }
 }
 
+function filterValidatorsByGroup(validators: Validator[], group: Address) {
+  return validators.filter((v) => eqAddress(v.affiliation || '', group))
+}
+
 function averageValidatorScore(validators: Validator[]): BigNumber {
   return validators
-    .reduce((sumScore: BigNumber, vali: Validator) => sumScore.plus(vali.score), new BigNumber(0))
+    .reduce((sumScore: BigNumber, v: Validator) => sumScore.plus(v.score), new BigNumber(0))
     .dividedBy(validators.length || 1)
 }

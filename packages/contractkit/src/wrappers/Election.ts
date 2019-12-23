@@ -36,7 +36,6 @@ export interface VoterReward {
   address: Address
   addressPayment: BigNumber
   group: ValidatorGroup
-  validators: Validator[]
   epochNumber: number
 }
 
@@ -49,7 +48,6 @@ export interface GroupVote {
 export interface GroupVoterReward {
   group: ValidatorGroup
   groupVoterPayment: BigNumber
-  validators: Validator[]
   epochNumber: number
 }
 
@@ -378,6 +376,19 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   /**
+   * Retrieves the set of validatorsparticipating in BFT at epochNumber.
+   * @param epochNumber The epoch to retrieve the elected validator set at.
+   */
+  async getElectedValidators(epochNumber: number): Promise<Validator[]> {
+    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const signers = await this.getCurrentValidatorSigners(blockNumber)
+    const validators = await this.kit.contracts.getValidators()
+    return concurrentMap(10, signers, (addr) =>
+      validators.getValidatorFromSigner(addr, blockNumber)
+    )
+  }
+
+  /**
    * Retrieves GroupVoterRewards at epochNumber.
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
@@ -391,18 +402,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
       validators.getValidatorGroup(e.returnValues.group, true, blockNumber)
     )
-    const signers = await this.getCurrentValidatorSigners(blockNumber)
-    const electedValidators = await concurrentMap(10, signers, (addr) =>
-      validators.getValidatorFromSigner(addr)
-    )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
         epochNumber,
         group: validatorGroup[index],
         groupVoterPayment: e.returnValues.value,
-        validators: electedValidators.filter((vali) =>
-          eqAddress(vali.affiliation || '', e.returnValues.group)
-        ),
       })
     )
   }
@@ -438,7 +442,6 @@ export class ElectionWrapper extends BaseWrapper<Election> {
         ),
         group: e.group,
         epochNumber: e.epochNumber,
-        validators: e.validators,
       })
     )
   }

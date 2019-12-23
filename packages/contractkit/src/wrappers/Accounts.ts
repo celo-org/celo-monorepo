@@ -88,9 +88,10 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  signerToAccount: (signer: Address) => Promise<Address> = proxyCall(
-    this.contract.methods.signerToAccount
-  )
+  signerToAccount(signer: Address, blockNumber?: number): Promise<Address> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.signerToAccount(signer).call({}, blockNumber)
+  }
 
   /**
    * Check if an account already exists.
