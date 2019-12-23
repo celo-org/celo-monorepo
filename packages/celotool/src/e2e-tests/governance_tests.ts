@@ -139,7 +139,20 @@ describe('governance tests', () => {
     ],
   }
 
+  const gethConfigDown = {
+    migrate: true,
+    instances: [
+      // Validators 0 and 1 are swapped in and out of the group.
+      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
+      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
+      // Validator 2 will authorize a validating key every other epoch.
+      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
+      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
+    ],
+  }
+
   const context: any = getContext(gethConfig)
+  const contextDown: any = getContext(gethConfigDown)
   let web3: any
   let election: any
   let stableToken: any
@@ -161,6 +174,22 @@ describe('governance tests', () => {
 
   const restart = async () => {
     await context.hooks.restart()
+    web3 = new Web3('http://localhost:8545')
+    kit = newKitFromWeb3(web3)
+    console.log(await web3.eth.getAccounts())
+    goldToken = await kit._web3Contracts.getGoldToken()
+    stableToken = await kit._web3Contracts.getStableToken()
+    sortedOracles = await kit._web3Contracts.getSortedOracles()
+    validators = await kit._web3Contracts.getValidators()
+    registry = await kit._web3Contracts.getRegistry()
+    reserve = await kit._web3Contracts.getReserve()
+    election = await kit._web3Contracts.getElection()
+    epochRewards = await kit._web3Contracts.getEpochRewards()
+    accounts = await kit._web3Contracts.getAccounts()
+  }
+
+  const restartWithDowntime = async () => {
+    await contextDown.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
     console.log(await web3.eth.getAccounts())
@@ -309,7 +338,81 @@ describe('governance tests', () => {
     assertAlmostEqual(currentSupply.minus(previousSupply), expected)
   }
 
-  describe.only('test slashing', () => {
+  describe.only('test slashing for double signing', () => {
+    before(async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      await restartWithDowntime()
+
+      try {
+        const elect = await kit._web3Contracts.getElection()
+
+        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
+      } catch (err) {
+        console.log(err)
+        await sleep(1000)
+      }
+    })
+
+    it('slash for downtime signing', async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      try {
+        const slasher = await kit._web3Contracts.getDowntimeSlasher()
+        const elect = await kit._web3Contracts.getElection()
+
+        console.info('at block', await web3.eth.getBlockNumber())
+
+        await waitUntilBlock(250)
+        console.info('at block', await web3.eth.getBlockNumber())
+        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
+
+        for (let i = 240; i < 250; i++) {
+          console.log('block', i, await slasher.methods.getParentSealBitmap(i).call())
+        }
+
+        const signer = await slasher.methods.validatorSignerAddressFromSet(4, 240).call()
+
+        const validator = (await kit.web3.eth.getAccounts())[0]
+        await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+        console.log(validator)
+
+        const lockedGold = await kit.contracts.getLockedGold()
+        const accounts = await kit.contracts.getAccounts()
+
+        console.log('signer to account', await accounts.signerToAccount(signer))
+
+        console.log('incentives', await slasher.methods.slashingIncentives().call())
+
+        console.log('total', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))
+        console.log(
+          'nonvoting',
+          (await lockedGold.getAccountNonvotingLockedGold(signer)).toString(10)
+        )
+
+        console.log('locked balance', await web3.eth.getBalance(lockedGold.address))
+
+        const valid = await kit._web3Contracts.getValidators()
+
+        const history = await valid.methods.getHistory(signer).call()
+        const historyIndex = history[0].length - 1
+        console.log('history', history, historyIndex)
+
+        console.log('registry', await slasher.methods.getSlasher().call(), slasher.options.address)
+
+        console.log('check', await slasher.methods.debugIsDown(signer, 245, 4, 4).call())
+
+        await slasher.methods
+          .slash(signer, 245, 4, 4, historyIndex, [], [], [], [NULL_ADDRESS], [NULL_ADDRESS], [0])
+          .send({ from: validator, gas: 5000000 })
+
+        console.log('remaining', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))
+      } catch (err) {
+        console.log(err)
+        await sleep(1000)
+      }
+    })
+  })
+
+  describe('test slashing for double signing', () => {
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()

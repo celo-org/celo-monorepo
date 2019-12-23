@@ -71,9 +71,9 @@ contract DowntimeSlasher is SlasherUtil {
    */
   function isDown(
     address account,
+    uint256 startBlock,
     uint256 startSignerIndex,
-    uint256 endSignerIndex,
-    uint256 startBlock
+    uint256 endSignerIndex
   ) internal view returns (bool) {
     uint256 endBlock = getEndBlock(startBlock);
     require(endBlock < block.number, "end block must be smaller than current block");
@@ -94,6 +94,38 @@ contract DowntimeSlasher is SlasherUtil {
       if (uint256(getParentSealBitmap(n)) & (1 << signerIndex) != 0) return false;
     }
     return true;
+  }
+
+  function debugIsDown(
+    address account,
+    uint256 startBlock,
+    uint256 startSignerIndex,
+    uint256 endSignerIndex
+  ) public view returns (uint256) {
+    uint256 endBlock = getEndBlock(startBlock);
+    if (!(endBlock < block.number)) return 1;
+    require(endBlock < block.number, "end block must be smaller than current block");
+    if (!(startSignerIndex < numberValidatorsInSet(startBlock))) return 2;
+    require(
+      startSignerIndex < numberValidatorsInSet(startBlock),
+      "Bad validator index at start block"
+    );
+    if (!(endSignerIndex < numberValidatorsInSet(endBlock))) return 3;
+    require(endSignerIndex < numberValidatorsInSet(endBlock), "Bad validator index at end block");
+    address startSigner = validatorSignerAddressFromSet(startSignerIndex, startBlock);
+    address endSigner = validatorSignerAddressFromSet(endSignerIndex, endBlock);
+    if (!(account == getAccounts().signerToAccount(startSigner))) return 4;
+    require(account == getAccounts().signerToAccount(startSigner), "Wrong start index");
+    if (!(account == getAccounts().signerToAccount(endSigner))) return 5;
+    require(account == getAccounts().signerToAccount(endSigner), "Wrong end index");
+    uint256 startEpoch = getEpochNumberOfBlock(startBlock);
+    for (uint256 n = startBlock; n <= endBlock; n++) {
+      uint256 signerIndex = getEpochNumberOfBlock(n) == startEpoch
+        ? startSignerIndex
+        : endSignerIndex;
+      if (uint256(getParentSealBitmap(n)) & (1 << signerIndex) != 0) return n;
+    }
+    return 10000;
   }
 
   /**
@@ -149,7 +181,7 @@ contract DowntimeSlasher is SlasherUtil {
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) public {
-    require(isDown(validator, signerIndex0, signerIndex1, startBlock), "Wasn't down");
+    require(isDown(validator, startBlock, signerIndex0, signerIndex1), "Wasn't down");
     checkIfAlreadySlashed(validator, startBlock);
     getLockedGold().slash(
       validator,
