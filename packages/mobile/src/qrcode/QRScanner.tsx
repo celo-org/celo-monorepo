@@ -4,14 +4,14 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -27,7 +27,7 @@ interface State {
   isScanningEnabled: boolean
 }
 
-type Props = DispatchProps & WithNamespaces & NavigationFocusInjectedProps
+type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps
 
 class QRScanner extends React.Component<Props, State> {
   static navigationOptions = () => ({
@@ -187,11 +187,12 @@ const styles = StyleSheet.create({
 
 export default componentWithAnalytics(
   withNavigationFocus(
+    // @ts-ignore
     connect(
       null,
       {
         handleBarcodeDetected,
       }
-    )(withNamespaces(Namespaces.sendFlow7)(QRScanner))
+    )(withTranslation(Namespaces.sendFlow7)(QRScanner))
   )
 )

@@ -9,7 +9,7 @@ import {
   mineBlocks,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
-import { attestToIdentifier } from '@celo/utils'
+import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
@@ -87,7 +87,7 @@ contract('Attestations', (accounts: string[]) => {
     issuer: string
   ): Promise<[number, string, string]> {
     const privateKey = accountPrivateKeys[accounts.indexOf(issuer)]
-    const { v, r, s } = attestToIdentifier(phoneNumber, account, privateKey)
+    const { v, r, s } = AttestationUtils.attestToIdentifier(phoneNumber, account, privateKey)
     return [v, r, s]
   }
 
@@ -136,7 +136,7 @@ contract('Attestations', (accounts: string[]) => {
     const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
-    random.addTestRandomness(0, '0x00')
+    await random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     await accountsInstance.initialize(registry.address)
@@ -497,10 +497,10 @@ contract('Attestations', (accounts: string[]) => {
           })
 
           it('should no longer list the attestations in getCompletableAttestations', async () => {
-            const [
-              attestationBlockNumbers,
-              _attestationIssuers,
-            ] = await attestations.getCompletableAttestations(phoneHash, caller)
+            const [attestationBlockNumbers] = await attestations.getCompletableAttestations(
+              phoneHash,
+              caller
+            )
 
             assert.lengthOf(attestationBlockNumbers, 0)
           })
@@ -554,12 +554,12 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should increment the number of completed verification requests', async () => {
-      let [numCompleted, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
+      const [numCompleted] = await attestations.getAttestationStats(phoneHash, caller)
       assert.equal(numCompleted.toNumber(), 0)
 
       await attestations.complete(phoneHash, v, r, s)
-      ;[numCompleted, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
-      assert.equal(numCompleted.toNumber(), 1)
+      const [numCompleted2, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
+      assert.equal(numCompleted2.toNumber(), 1)
       assert.equal(numTotal.toNumber(), attestationsRequested)
     })
 
@@ -591,11 +591,8 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should no longer list the attestation in getCompletableAttestationStats', async () => {
       await attestations.complete(phoneHash, v, r, s)
-      const [
-        _attestationBlockNumbers,
-        attestationIssuers,
-      ] = await attestations.getCompletableAttestations(phoneHash, caller)
-      assert.equal(attestationIssuers.indexOf(issuer), -1)
+      const [attestationIssuers] = await attestations.getCompletableAttestations(phoneHash, caller)
+      assert.equal(attestationIssuers.indexOf(new BigNumber(issuer)), -1)
     })
 
     it('should emit the AttestationCompleted event', async () => {
@@ -620,7 +617,7 @@ contract('Attestations', (accounts: string[]) => {
           accountsInstance.authorizeAttestationSigner,
           issuer
         )
-        ;({ v, r, s } = attestToIdentifier(phoneNumber, caller, attestationKey))
+        ;({ v, r, s } = AttestationUtils.attestToIdentifier(phoneNumber, caller, attestationKey))
       })
 
       it('should correctly complete the attestation', async () => {
@@ -635,11 +632,7 @@ contract('Attestations', (accounts: string[]) => {
 
       it('should mark the attestation by the issuer as complete', async () => {
         await attestations.complete(phoneHash, v, r, s)
-        const [status, _blockNumber] = await attestations.getAttestationState(
-          phoneHash,
-          caller,
-          issuer
-        )
+        const [status] = await attestations.getAttestationState(phoneHash, caller, issuer)
         assert.equal(status.toNumber(), 2)
       })
     })

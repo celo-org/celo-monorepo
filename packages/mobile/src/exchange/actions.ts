@@ -8,10 +8,19 @@ export enum Actions {
   EXCHANGE_TOKENS = 'EXCHANGE/EXCHANGE_TOKENS',
 }
 
-export const fetchExchangeRate = (makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) => ({
+export interface FetchExchangeRateAction {
+  type: Actions.FETCH_EXCHANGE_RATE
+  makerToken?: CURRENCY_ENUM
+  makerAmount?: BigNumber
+}
+
+export const fetchExchangeRate = (
+  makerToken?: CURRENCY_ENUM,
+  makerAmount?: BigNumber
+): FetchExchangeRateAction => ({
   type: Actions.FETCH_EXCHANGE_RATE,
-  makerAmount,
   makerToken,
+  makerAmount,
 })
 
 export interface SetExchangeRateAction {

@@ -1,9 +1,7 @@
 {
   "getStarted": "Primeros pasos",
-  "incomingPaymentRequest": "Pedido esperandote",
-  "incomingPaymentRequestWithCount_plural": "{{count}} Pedidos esperandote",
-  "outgoingPaymentRequest": "Pago que tu has pedido",
-  "outgoingPaymentRequestWithCount_plural": "{{count}} Pagos que tu has pedido",
+  "incomingPaymentRequests": "~~Requests from Others",
+  "outgoingPaymentRequests": "~~Payments You’ve Requested",
   "SMSError": "Error al enviar SMS",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
@@ -55,11 +53,7 @@
   "maybeLater": "quizas mas tarde",
   "balanceNeedUpdating": "Saldo necesita actualizarse",
   "refreshBalances": "Actualizar saldos",
-  "reclaimPayment": "Reclamar el Pago",
-  "sendMessage": "Enviar Mensaje",
-  "escrowedPaymentReminderListItemTitle": "Recuérdele a {{mobile #}} que acepte el pago",
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
-  "escrowedPaymentReminderWithCount_plural": "Recordar {{count}} receptores to aceptar el pago",
   "escrowedPaymentReminderSms":
     "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {
@@ -85,5 +79,7 @@
   "feedItemInviteReceivedTitle": "Celo",
   "feedItemInviteReceivedInfo": "$t(inviteFlow11:inviteReceived)",
   "feedItemReceivedTitle_missingSenderDetails": "Pago Recibido",
-  "feedItemSentTitle_missingReceiverDetails": "Pago Enviado"
+  "feedItemReceivedTitle_escrowRecieved": "Escrow Pago Recibido",
+  "feedItemSentTitle_missingReceiverDetails": "Pago Enviado",
+  "feedItemSentTitle_escrowSent": "Escrow Pago Enviado"
 }

@@ -3,9 +3,10 @@ import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import { navigateBack } from '@celo/react-components/services/NavigationService'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { NavigationInjectedProps } from 'react-navigation'
 import VerificationConfirmationCard from 'src/components/TransactionReview/VerificationConfirmationCard'
+import { withTranslation } from 'src/i18n'
 import { getDatetimeDisplayString } from 'src/utils/formatting'
 
 export interface NavigationPropsWrapper {
@@ -18,7 +19,7 @@ export interface ReviewProps {
   phoneNumbers: string[]
 }
 
-type Props = NavigationInjectedProps<NavigationPropsWrapper> & WithNamespaces
+type Props = NavigationInjectedProps<NavigationPropsWrapper> & WithTranslation
 
 export class VerificationReviewScreen extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
@@ -54,4 +55,4 @@ export class VerificationReviewScreen extends React.PureComponent<Props> {
   }
 }
 
-export default withNamespaces(Namespaces.profile)(VerificationReviewScreen)
+export default withTranslation(Namespaces.profile)(VerificationReviewScreen)

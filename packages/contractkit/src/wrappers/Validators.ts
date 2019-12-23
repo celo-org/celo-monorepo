@@ -23,6 +23,7 @@ export interface Validator {
   blsPublicKey: string
   affiliation: string | null
   score: BigNumber
+  signer: Address
 }
 
 export interface ValidatorGroup {
@@ -196,12 +197,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       name,
       address,
-      // @ts-ignore Incorrect type for bytes
-      ecdsaPublicKey: res.ecdsaPublicKey,
-      // @ts-ignore Incorrect type for bytes
-      blsPublicKey: res.blsPublicKey,
+      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
+      blsPublicKey: (res.blsPublicKey as unknown) as string,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
+      signer: res.signer,
     }
   }
 
@@ -211,14 +211,20 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get ValidatorGroup information */
-  async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
+  async getValidatorGroup(
+    address: Address,
+    getAffiliates: boolean = true
+  ): Promise<ValidatorGroup> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
     const accounts = await this.kit.contracts.getAccounts()
     const name = (await accounts.getName(address)) || ''
-    const validators = await this.getRegisteredValidators()
-    const affiliates = validators
-      .filter((v) => v.affiliation === address)
-      .filter((v) => !res[0].includes(v.address))
+    let affiliates: Validator[] = []
+    if (getAffiliates) {
+      const validators = await this.getRegisteredValidators()
+      affiliates = validators
+        .filter((v) => v.affiliation === address)
+        .filter((v) => !res[0].includes(v.address))
+    }
     return {
       name,
       address,
@@ -267,7 +273,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get list of registered validator groups */
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
     const vgAddresses = await this.getRegisteredValidatorGroupsAddresses()
-    return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr)))
+    return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr, false)))
   }
 
   /**
@@ -343,6 +349,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
 
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
+
+  forceDeaffiliateIfValidator = proxySend(
+    this.kit,
+    this.contract.methods.forceDeaffiliateIfValidator
+  )
 
   /**
    * Adds a member to the end of a validator group's list of members.

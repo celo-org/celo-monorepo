@@ -9,7 +9,7 @@ import variables from '@celo/react-components/styles/variables'
 import NetInfo from '@react-native-community/netinfo'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -43,7 +43,7 @@ interface DispatchProps {
   clearMessage: typeof clearMessage
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 interface State {
   networkType: string
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.profile)(
+export default withTranslation(Namespaces.profile)(
   connect(
     mapStateToProps,
     mapDispatchToProps

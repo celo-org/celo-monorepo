@@ -10,9 +10,9 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import { TranslationFunction } from 'i18next'
+import { TFunction } from 'i18next'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import {
   ListRenderItemInfo,
   SectionList,
@@ -24,7 +24,7 @@ import {
 } from 'react-native'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import Search from 'src/icons/Search'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -46,14 +46,15 @@ import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const RecipientSearchInput = withTextInputPasteAware(
-  withTextInputLabeling<TextInputProps>(TextInput)
+  withTextInputLabeling<TextInputProps>(TextInput),
+  { right: 22 }
 )
 
 const goToQrCodeScreen = () => {
   navigate(Screens.QRScanner)
 }
 
-const QRCodeCTA = ({ t }: { t: TranslationFunction }) => (
+const QRCodeCTA = ({ t }: { t: TFunction }) => (
   <TouchableOpacity onPress={goToQrCodeScreen} style={style.qrcodeRow}>
     <View style={style.qrcodeIconLeft}>
       <QRCode />
@@ -88,7 +89,7 @@ interface StateProps {
   recipientCache: NumberToRecipient
 }
 
-type RecipientProps = Props & WithNamespaces & StateProps
+type RecipientProps = Props & WithTranslation & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   addressToE164Number: state.identity.addressToE164Number,
@@ -344,5 +345,5 @@ export default componentWithAnalytics(
   connect(
     mapStateToProps,
     {}
-  )(withNamespaces(Namespaces.sendFlow7)(RecipientPicker))
+  )(withTranslation(Namespaces.sendFlow7)(RecipientPicker))
 )

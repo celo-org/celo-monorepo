@@ -1,5 +1,5 @@
 import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
-import { TranslationFunction } from 'i18next'
+import { TFunction } from 'i18next'
 import * as _ from 'lodash'
 import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
@@ -14,13 +14,17 @@ export function decryptComment(
   type: TransactionTypes
 ) {
   return comment && commentKey && features.USE_COMMENT_ENCRYPTION
-    ? decryptCommentRaw(comment, commentKey, type === TransactionTypes.SENT).comment
+    ? decryptCommentRaw(
+        comment,
+        commentKey,
+        type === TransactionTypes.SENT || type === TransactionTypes.ESCROW_SENT
+      ).comment
     : comment
 }
 
 export function getTransferFeedParams(
   type: TransactionTypes,
-  t: TranslationFunction,
+  t: TFunction,
   invitees: Invitees,
   recipientCache: NumberToRecipient,
   address: string,
@@ -65,6 +69,7 @@ export function getTransferFeedParams(
       })
       break
     }
+
     case TransactionTypes.INVITE_RECEIVED: {
       title = t('feedItemInviteReceivedTitle')
       info = t('feedItemInviteReceivedInfo')
@@ -80,6 +85,10 @@ export function getTransferFeedParams(
         title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
       } else if (type === TransactionTypes.SENT) {
         title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
+      } else if (type === TransactionTypes.ESCROW_SENT) {
+        title = t('feedItemSentTitle', { context: 'escrowSent', address: shortAddr })
+      } else if (type === TransactionTypes.ESCROW_RECEIVED) {
+        title = t('feedItemReceivedTitle', { context: 'escrowRecieved', address: shortAddr })
       } else {
         // Fallback to just using the type
         title = _.capitalize(t(_.camelCase(type)))
