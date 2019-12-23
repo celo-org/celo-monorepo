@@ -61,6 +61,9 @@ export function migrationOverrides() {
       },
       oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
     },
+    election: {
+      votingBotKeys: votingBotKeys(),
+    },
   }
 }
 
