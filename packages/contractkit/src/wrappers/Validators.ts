@@ -214,7 +214,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     // @ts-ignore: Expected 0-1 arguments, but got 2
     const res = await this.contract.methods.getValidator(address).call({}, blockNumber)
     const accounts = await this.kit.contracts.getAccounts()
-    const name = await accounts.getName(address, blockNumber)
+    const name = (await accounts.getName(address, blockNumber)) || ''
 
     return {
       name,
@@ -292,13 +292,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /** Get list of registered validators */
   async getRegisteredValidators(blockNumber?: number): Promise<Validator[]> {
     const vgAddresses = await this.getRegisteredValidatorsAddresses(blockNumber)
-    return Promise.all(vgAddresses.map((addr) => this.getValidator(addr, blockNumber)))
+    return concurrentMap(10, vgAddresses, (addr) => this.getValidator(addr, blockNumber))
   }
 
   /** Get list of registered validator groups */
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
     const vgAddresses = await this.getRegisteredValidatorGroupsAddresses()
-    return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr, false)))
+    return concurrentMap(10, vgAddresses, (addr) => this.getValidatorGroup(addr, false))
   }
 
   /**

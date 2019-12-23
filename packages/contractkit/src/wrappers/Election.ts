@@ -100,7 +100,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * Returns get current validator signers using the precompiles.
    * @return List of current validator signers.
    */
-  getCurrentValidatorSigners = proxyCall(this.contract.methods.getCurrentValidatorSigners)
+  async getCurrentValidatorSigners(blockNumber?: number): Promise<Address[]> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.getCurrentValidatorSigners().call({}, blockNumber)
+  }
+
   /**
    * Returns a list of elected validators with seats allocated to groups via the D'Hondt method.
    * @return The list of elected validators.
@@ -387,7 +391,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
       validators.getValidatorGroup(e.returnValues.group, true, blockNumber)
     )
-    const signers = await this.getCurrentValidatorSigners()
+    const signers = await this.getCurrentValidatorSigners(blockNumber)
     const electedValidators = await concurrentMap(10, signers, (addr) =>
       validators.getValidatorFromSigner(addr)
     )
@@ -411,17 +415,15 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getVoterRewards(address: Address, epochNumber: number): Promise<VoterReward[]> {
     const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
     const voter = await this.getVoter(address, blockNumber)
-    const activeVoterVotes: { [key: string]: BigNumber } = {}
-    const activeGroupVotesQuery: { [key: string]: Promise<BigNumber> } = {}
+    const activeVoterVotes: Record<string, BigNumber> = {}
     for (const vote of voter.votes) {
       const group: string = vote.group.toLowerCase()
       activeVoterVotes[group] = vote.active
-      activeGroupVotesQuery[group] = this.getTotalVotesForGroup(group, blockNumber)
     }
-    const activeGroupVotes: { [key: string]: BigNumber } = await concurrentValuesMap(
+    const activeGroupVotes: Record<string, BigNumber> = await concurrentValuesMap(
       10,
-      activeGroupVotesQuery,
-      (e) => e
+      activeVoterVotes,
+      (_, group: string) => this.getTotalVotesForGroup(group, blockNumber)
     )
 
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)

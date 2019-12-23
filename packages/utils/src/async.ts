@@ -83,16 +83,16 @@ export async function concurrentMap<A, B>(
  * @param x associative array of values
  * @param mapFn mapping function
  */
-export async function concurrentValuesMap(
+export async function concurrentValuesMap<IN extends any, OUT extends any>(
   concurrency: number,
-  x: { [key: string]: any },
-  mapFn: (val: any, idx: number) => Promise<any>
-): Promise<{ [key: string]: any }> {
+  x: Record<string, IN>,
+  mapFn: (val: IN, key: string) => Promise<OUT>
+): Promise<Record<string, OUT>> {
   const xk = Object.keys(x)
-  const xv: any[] = []
+  const xv: IN[] = []
   xk.forEach((k) => xv.push(x[k]))
-  const res = await concurrentMap(concurrency, xv, mapFn)
-  return res.reduce((output, value, index) => {
+  const res = await concurrentMap(concurrency, xv, (val: IN, idx: number) => mapFn(val, xk[idx]))
+  return res.reduce((output: Record<string, OUT>, value: OUT, index: number) => {
     output[xk[index]] = value
     return output
   }, {})
