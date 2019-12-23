@@ -85,8 +85,8 @@ library Proposals {
     }
   }
 
-  function setDescriptionUrl(Proposal storage proposal, string memory descriptionUrl) public {
-    require(bytes(descriptionUrl).length != 0);
+  function setDescriptionUrl(Proposal storage proposal, string memory descriptionUrl) internal {
+    require(bytes(descriptionUrl).length != 0, "Description url must have non-zero length");
     proposal.descriptionUrl = descriptionUrl;
   }
 
