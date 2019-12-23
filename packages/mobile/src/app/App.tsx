@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import { withNamespaces } from 'react-i18next'
+import { withTranslation } from 'react-i18next'
 import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useScreens } from 'react-native-screens'
@@ -31,13 +31,7 @@ YellowBox.ignoreWarnings([
   'Setting a timer', // warns about long setTimeouts which are actually saga timeouts
 ])
 
-const WrappedNavigator = withNamespaces('common', {
-  wait: true,
-  bindI18n: 'languageChanged',
-  bindStore: false,
-  // @ts-ignore
-})(Navigator)
-
+const WrappedNavigator = withTranslation('common')(Navigator)
 WrappedNavigator.displayName = 'WrappedNavigator'
 
 export class App extends React.Component {
