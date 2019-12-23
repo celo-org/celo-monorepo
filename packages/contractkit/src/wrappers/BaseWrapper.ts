@@ -1,3 +1,4 @@
+import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
@@ -8,8 +9,6 @@ import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
-
-export type NumberLike = string | number | BigNumber
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
@@ -22,30 +21,36 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 }
 
-/** Parse string -> BigNumber */
-export function toBigNumber(input: string) {
-  return new BigNumber(input)
-}
+export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
 
-/** Parse string -> int */
-export function toNumber(input: string) {
-  return parseInt(input, 10)
-}
+export const valueToString = (input: BigNumber.Value) => valueToBigNumber(input).toFixed()
 
-export function parseNumber(input: NumberLike) {
-  return new BigNumber(input).toFixed()
-}
+export const valueToInt = (input: BigNumber.Value) =>
+  valueToBigNumber(input)
+    .integerValue()
+    .toNumber()
 
-export function parseBytes(input: string): Array<string | number[]> {
-  return input as any
-}
+export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
+  valueToBigNumber(numerator).div(valueToBigNumber(denominator))
+
+export const stringToBuffer = hexToBuffer
+
+export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
+
+type SolBytes = Array<string | number[]>
+const toBytes = (input: any): SolBytes => input
+const fromBytes = (input: SolBytes): any => input as any
+
+export const stringToBytes = (input: string) => toBytes(ensureLeading0x(input))
+
+export const bufferToBytes = (input: Buffer) => stringToBytes(bufferToString(input))
+
+export const bytesToString = (input: SolBytes): string => fromBytes(input)
 
 type Parser<A, B> = (input: A) => B
 
 /** Identity Parser */
-export function identity<A>(a: A) {
-  return a
-}
+export const identity = <A>(a: A) => a
 
 /**
  * Tuple parser
