@@ -1,9 +1,12 @@
 // This is a more unusual Celotool command. It basically helps you to execute Hotfixes on testnets. Because constructing proposals is difficult to do via a CLI, you should define them here in code. There are two examples below that you can start from.
 
-import { CeloContract, newKit } from '@celo/contractkit'
-import { ProposalBuilder, proposalToHash } from '@celo/contractkit/lib/governance/proposals'
-import { getImplementationOfProxy } from '@celo/contractkit/lib/governance/proxy'
-import { eqAddress, privateKeyToAddress } from '@celo/utils/lib/address'
+import { newKit } from '@celo/contractkit'
+import {
+  ProposalBuilder,
+  proposalToHash,
+  proposalToJSON,
+} from '@celo/contractkit/lib/governance/proposals'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
@@ -46,15 +49,15 @@ export const handler = async (argv: EthstatsArgv) => {
     // }
 
     // Example B: Repoint a Celo Core Contract proxy
-    const validatorsProxyAddress = await kit.registry.addressFor(CeloContract.Validators)
-    const currentValidatorsImplementationAddress = await getImplementationOfProxy(
-      kit.web3,
-      validatorsProxyAddress
-    )
-    const desiredImplementationAddress = '0xd18620a5eBE0235023602bB4d490E1e96703EddD'
-    console.info('Current Implementation Address: ', currentValidatorsImplementationAddress)
+    // const validatorsProxyAddress = await kit.registry.addressFor(CeloContract.Validators)
+    // const currentValidatorsImplementationAddress = await getImplementationOfProxy(
+    //   kit.web3,
+    //   validatorsProxyAddress
+    // )
+    // const desiredImplementationAddress = '0xd18620a5eBE0235023602bB4d490E1e96703EddD'
+    // console.info('Current Implementation Address: ', currentValidatorsImplementationAddress)
 
-    console.info('\nBuild Proposal')
+    // console.info('\nBuild Proposal')
 
     const proposalBuilder = new ProposalBuilder(kit)
 
@@ -68,14 +71,17 @@ export const handler = async (argv: EthstatsArgv) => {
     // })
 
     // Example B
-    proposalBuilder.addProxyRepointingTx(validatorsProxyAddress, desiredImplementationAddress)
+    // proposalBuilder.addProxyRepointingTx(validatorsProxyAddress, desiredImplementationAddress)
 
     const proposal = await proposalBuilder.build()
+    if (proposal.length === 0) {
+      console.error('\nPlease see examples in hotfix.ts and add transactions')
+      process.exit(1)
+    }
     const proposalHash = proposalToHash(kit, proposal)
 
-    // If your proposal is just made of ContractKit methods, you can print it out
-    // console.info('Proposal: ', await proposalToJSON(kit, proposal))
-
+    // If your proposal is just made of Celo Registry contract methods, you can print it out
+    console.info('Proposal: ', await proposalToJSON(kit, proposal))
     console.info(`Proposal Hash: ${proposalHash.toString('hex')}`)
 
     console.info('\nWhitelist the hotfix')
@@ -132,15 +138,15 @@ export const handler = async (argv: EthstatsArgv) => {
     // }
 
     // Example B
-    const newValidatorsImplementationAddress = await getImplementationOfProxy(
-      kit.web3,
-      validatorsProxyAddress
-    )
-    if (!eqAddress(newValidatorsImplementationAddress, desiredImplementationAddress)) {
-      throw new Error(
-        `Expected new implementation address to be ${desiredImplementationAddress}, but was ${newValidatorsImplementationAddress}`
-      )
-    }
+    // const newValidatorsImplementationAddress = await getImplementationOfProxy(
+    //   kit.web3,
+    //   validatorsProxyAddress
+    // )
+    // if (!eqAddress(newValidatorsImplementationAddress, desiredImplementationAddress)) {
+    //   throw new Error(
+    //     `Expected new implementation address to be ${desiredImplementationAddress}, but was ${newValidatorsImplementationAddress}`
+    //   )
+    // }
 
     console.info('Hotfix successfully executed!')
     process.exit(0)
