@@ -243,7 +243,7 @@ export class ContractKit {
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
-    // Inverts protocol/contracts getEpochNumber()
+    // Reverses protocol/contracts getEpochNumber()
     return (epochNumber + 1) * epochSize.toNumber()
   }
 }

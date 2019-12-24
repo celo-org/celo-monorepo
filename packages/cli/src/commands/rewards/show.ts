@@ -67,8 +67,8 @@ export default class Show extends BaseCommand {
 
     // Accumulate the rewards from each epoch
     for (
-      let epochNumber = Math.max(0, currentEpoch - epochs + 1);
-      epochNumber <= currentEpoch;
+      let epochNumber = Math.max(0, currentEpoch - epochs);
+      epochNumber < currentEpoch;
       epochNumber++
     ) {
       if (!filter || res.flags.voter) {
