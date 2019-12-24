@@ -8,12 +8,19 @@ interface Props {
   link: string
   children: React.ReactNode
   isVisible: boolean
+  getRealHeight: (n: number) => void
 }
 
 export class BlueBanner extends React.PureComponent<Props> {
+  ref = React.createRef<View>()
+  componentDidUpdate = () => {
+    this.ref.current.measure((_x, _y, _w, height) => {
+      this.props.getRealHeight(height)
+    })
+  }
   render() {
     return (
-      <View style={[styles.container, styles.slideDown, this.props.isVisible && styles.isVisible]}>
+      <View ref={this.ref} style={[styles.container, this.props.isVisible && styles.isVisible]}>
         <View style={styles.insideContainer}>
           <Text
             accessibilityRole="link"
@@ -36,7 +43,6 @@ export const BANNER_HEIGHT = 50
 
 export const styles = StyleSheet.create({
   container: {
-    // @ts-ignore-next-line
     position: 'fixed',
     top: 0,
     backgroundColor: '#3C9BF4',
@@ -48,11 +54,12 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   slideDown: {
-    transitionProperty: 'height, top',
+    transitionProperty: 'top',
     transitionDuration: '300ms',
   },
   isVisible: {
-    height: BANNER_HEIGHT,
+    minHeight: BANNER_HEIGHT,
+    height: 'contents',
   },
   insideContainer: {
     width: '100%',
@@ -61,7 +68,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: 30,
+    paddingVertical: 5,
   },
   text: {
     color: colors.white,
@@ -82,6 +90,7 @@ interface State {
 
 interface AnnouncementProps {
   onVisibilityChange: (visible: boolean) => void
+  getHeight: (n: number) => void
 }
 
 export default class Announcement extends React.Component<AnnouncementProps, State> {
@@ -108,7 +117,11 @@ export default class Announcement extends React.Component<AnnouncementProps, Sta
 
   render() {
     return (
-      <BlueBanner isVisible={this.state.live} link={this.state.link}>
+      <BlueBanner
+        isVisible={this.state.live}
+        link={this.state.link}
+        getRealHeight={this.props.getHeight}
+      >
         {this.state.text}
       </BlueBanner>
     )

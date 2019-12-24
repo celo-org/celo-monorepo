@@ -38,7 +38,11 @@ export function printValueMapRecursive(valueMap: Record<string, any>) {
 function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string): string {
   const printValue = (v: any): string => {
     if (typeof v === 'object' && v != null) {
-      if (v instanceof BigNumber) return v.toFixed()
+      if (BigNumber.isBigNumber(v)) {
+        const factor = new BigNumber(10).pow(18)
+        const extra = v.isGreaterThan(factor) ? `(~${v.div(factor).decimalPlaces(2)} 10^18)` : ''
+        return `${v.toFixed()} ${extra}`
+      }
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')
     }
     return chalk`${v}`

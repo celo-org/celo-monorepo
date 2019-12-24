@@ -116,9 +116,8 @@ jobs:
             # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
-            yarn build --scope docs
             yarn build --scope @celo/walletkit
-            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit
+            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit --ignore @celo/web
 
       - run:
           name: Check licenses
@@ -173,7 +172,7 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
       - run:
-          name: Creace Android Virtual Device (AVD)
+          name: Create Android Virtual Device (AVD)
           command: |
             avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
             # Copy device configuarion, adv for some reason doesn't
@@ -255,7 +254,7 @@ jobs:
           name: Run test itself
 
           command: |
-            cd ~/src/packages/mobile 
+            cd ~/src/packages/mobile
             # detox sometimes without releasing the terminal and thus making the CI timout
             # 480s = 8 minutes
             timeout 480 yarn test:detox || echo "failed, try again"
@@ -402,19 +401,10 @@ jobs:
       - run:
           name: Generate DevChain
           command: |
-            (cd packages/contractkit && yarn test:prepare)
+            (cd packages/contractkit && yarn test:reset)
       - run:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
-
-      - run:
-          name: Install and test the npm package
-          command: |
-            set -euo pipefail
-            cd packages/contractkit
-            yarn pack
-            cd /tmp
-            npm install ~/app/packages/contractkit/*.tgz
 
   walletkit-test:
     <<: *defaults
@@ -436,15 +426,6 @@ jobs:
             set -euo pipefail
             yarn --cwd=packages/walletkit build alfajoresstaging
             yarn --cwd=packages/walletkit test
-
-      - run:
-          name: Install and test the npm package
-          command: |
-            set -euo pipefail
-            cd packages/walletkit
-            yarn pack
-            cd /tmp
-            npm install ~/app/packages/walletkit/*.tgz
 
   cli-test:
     <<: *defaults
@@ -676,10 +657,6 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - end-to-end-mobile-test:
-          requires:
-            - install_dependencies
-            - mobile-test-build-app
       - lint-checks:
           requires:
             - install_dependencies

@@ -5,24 +5,45 @@ provider "google" {
   zone        = "us-west1-a"
 }
 
+provider "acme" {
+  server_url = "https://acme-v02.api.letsencrypt.org/directory"
+}
+
 # For managing terraform state remotely
 terraform {
   backend "gcs" {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
+  }
+  required_providers {
+    google = "~> 2.16.0"
   }
 }
 
 data "terraform_remote_state" "state" {
   backend = "gcs"
   config = {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
     prefix = "${var.celo_env}/testnet"
   }
 }
 
 locals {
-  firewall_target_tags_bootnode = ["${var.celo_env}-bootnode"]
-  firewall_target_tags_node = ["${var.celo_env}-node"]
+  target_tag_bootnode = "${var.celo_env}-bootnode"
+  # any geth node (tx nodes & validators)
+  target_tag_node = "${var.celo_env}-node"
+
+  target_tag_proxy     = "${var.celo_env}-proxy"
+  target_tag_tx_node   = "${var.celo_env}-tx-node"
+  target_tag_validator = "${var.celo_env}-validator"
+
+  target_tag_ssl = "${var.celo_env}-external-ssl"
+
+  target_tags_all = [
+    local.target_tag_bootnode,
+    local.target_tag_node,
+    local.target_tag_proxy,
+    local.target_tag_ssl
+  ]
 }
 
 data "google_compute_network" "network" {
@@ -33,7 +54,7 @@ resource "google_compute_firewall" "ssh_firewall" {
   name    = "${var.celo_env}-ssh-firewall"
   network = data.google_compute_network.network.name
 
-  target_tags = concat(local.firewall_target_tags_bootnode, local.firewall_target_tags_node)
+  target_tags = local.target_tags_all
 
   allow {
     protocol = "tcp"
@@ -45,7 +66,7 @@ resource "google_compute_firewall" "geth_firewall" {
   name    = "${var.celo_env}-geth-firewall"
   network = data.google_compute_network.network.name
 
-  target_tags = local.firewall_target_tags_node
+  target_tags = [local.target_tag_node]
 
   allow {
     protocol = "tcp"
@@ -62,7 +83,7 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
   name    = "${var.celo_env}-geth-metrics-firewall"
   network = data.google_compute_network.network.name
 
-  target_tags = local.firewall_target_tags_node
+  target_tags = [local.target_tag_node]
 
   # allow all IPs internal to the VPC
   source_ranges = ["10.0.0.0/8"]
@@ -77,7 +98,7 @@ resource "google_compute_firewall" "rpc_firewall" {
   name    = "${var.celo_env}-rpc-firewall"
   network = data.google_compute_network.network.name
 
-  target_tags = local.firewall_target_tags_node
+  target_tags = [local.target_tag_tx_node]
 
   allow {
     protocol = "tcp"
@@ -89,7 +110,7 @@ resource "google_compute_firewall" "bootnode_firewall" {
   name    = "${var.celo_env}-bootnode-firewall"
   network = data.google_compute_network.network.name
 
-  target_tags = local.firewall_target_tags_bootnode
+  target_tags = [local.target_tag_bootnode]
 
   allow {
     protocol = "udp"
@@ -111,58 +132,66 @@ module "bootnode" {
 }
 
 module "tx_node" {
-  source = "./modules/tx-node"
+  source = "./modules/full-node"
   # variables
-  block_time                        = var.block_time
-  bootnode_ip_address               = module.bootnode.ip_address
-  celo_env                          = var.celo_env
-  ethstats_host                     = var.ethstats_host
-  gcloud_secrets_base_path          = var.gcloud_secrets_base_path
-  gcloud_secrets_bucket             = var.gcloud_secrets_bucket
-  gcloud_vm_service_account_email   = var.gcloud_vm_service_account_email
-  genesis_content_base64            = var.genesis_content_base64
+  block_time                            = var.block_time
+  bootnode_ip_address                   = module.bootnode.ip_address
+  celo_env                              = var.celo_env
+  ethstats_host                         = var.ethstats_host
+  gcloud_secrets_base_path              = var.gcloud_secrets_base_path
+  gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
+  gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
+  genesis_content_base64                = var.genesis_content_base64
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
-  geth_exporter_docker_image_tag    = var.geth_exporter_docker_image_tag
-  geth_node_docker_image_repository = var.geth_node_docker_image_repository
-  geth_node_docker_image_tag        = var.geth_node_docker_image_tag
-  geth_verbosity                    = var.geth_verbosity
-  in_memory_discovery_table         = var.in_memory_discovery_table
-  network_id                        = var.network_id
-  network_name                      = data.google_compute_network.network.name
-  tx_node_count                     = var.tx_node_count
-  verification_pool_url             = var.verification_pool_url
+  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_node_docker_image_repository     = var.geth_node_docker_image_repository
+  geth_node_docker_image_tag            = var.geth_node_docker_image_tag
+  geth_verbosity                        = var.geth_verbosity
+  in_memory_discovery_table             = var.in_memory_discovery_table
+  instance_tags                         = [local.target_tag_tx_node]
+  name                                  = "tx-node"
+  network_id                            = var.network_id
+  network_name                          = data.google_compute_network.network.name
+  node_count                            = var.tx_node_count
 }
 
 # used for access by blockscout
 module "tx_node_lb" {
   source = "./modules/tx-node-load-balancer"
   # variables
-  celo_env           = var.celo_env
-  network_name       = data.google_compute_network.network.name
-  tx_node_self_links = module.tx_node.self_links
+  celo_env                        = var.celo_env
+  dns_gcloud_project              = var.dns_gcloud_project
+  dns_zone_name                   = var.dns_zone_name
+  forno_host                      = var.forno_host
+  gcloud_credentials_path         = var.gcloud_credentials_path
+  gcloud_project                  = var.gcloud_project
+  gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
+  letsencrypt_email               = var.letsencrypt_email
+  network_name                    = data.google_compute_network.network.name
+  tx_node_self_links              = module.tx_node.self_links
 }
 
 module "validator" {
   source = "./modules/validator"
   # variables
-  block_time                        = var.block_time
-  bootnode_ip_address               = module.bootnode.ip_address
-  celo_env                          = var.celo_env
-  ethstats_host                     = var.ethstats_host
-  gcloud_secrets_base_path          = var.gcloud_secrets_base_path
-  gcloud_secrets_bucket             = var.gcloud_secrets_bucket
-  gcloud_vm_service_account_email   = var.gcloud_vm_service_account_email
-  genesis_content_base64            = var.genesis_content_base64
+  block_time                            = var.block_time
+  bootnode_ip_address                   = module.bootnode.ip_address
+  celo_env                              = var.celo_env
+  ethstats_host                         = var.ethstats_host
+  gcloud_secrets_base_path              = var.gcloud_secrets_base_path
+  gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
+  gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
+  genesis_content_base64                = var.genesis_content_base64
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
-  geth_exporter_docker_image_tag    = var.geth_exporter_docker_image_tag
-  geth_node_docker_image_repository = var.geth_node_docker_image_repository
-  geth_node_docker_image_tag        = var.geth_node_docker_image_tag
-  geth_verbosity                    = var.geth_verbosity
-  in_memory_discovery_table         = var.in_memory_discovery_table
-  istanbul_request_timeout_ms       = var.istanbul_request_timeout_ms
-  network_id                        = var.network_id
-  network_name                      = data.google_compute_network.network.name
-  tx_node_count                     = var.tx_node_count
-  validator_count                   = var.validator_count
-  verification_pool_url             = var.verification_pool_url
+  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_node_docker_image_repository     = var.geth_node_docker_image_repository
+  geth_node_docker_image_tag            = var.geth_node_docker_image_tag
+  geth_verbosity                        = var.geth_verbosity
+  in_memory_discovery_table             = var.in_memory_discovery_table
+  istanbul_request_timeout_ms           = var.istanbul_request_timeout_ms
+  network_id                            = var.network_id
+  network_name                          = data.google_compute_network.network.name
+  proxied_validator_count               = var.proxied_validator_count
+  tx_node_count                         = var.tx_node_count
+  validator_count                       = var.validator_count
 }

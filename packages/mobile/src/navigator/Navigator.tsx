@@ -13,7 +13,7 @@ import {
 } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
-import CeloLite from 'src/account/CeloLite'
+import DataSaver from 'src/account/DataSaver'
 import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import GoldEducation from 'src/account/GoldEducation'
@@ -50,8 +50,9 @@ import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
+import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeSet from 'src/pincode/PincodeSet'
@@ -182,9 +183,9 @@ const ExchangeStack = createStackNavigator(
   }
 )
 
-const RequestStack = createStackNavigator(
+const IncomingRequestStack = createStackNavigator(
   {
-    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
+    [Screens.IncomingPaymentRequestListScreen]: { screen: IncomingPaymentRequestListScreen },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
   },
   {
@@ -192,7 +193,20 @@ const RequestStack = createStackNavigator(
       header: null,
     },
     ...headerArea,
-    initialRouteName: Screens.PaymentRequestListScreen,
+    initialRouteName: Screens.IncomingPaymentRequestListScreen,
+  }
+)
+
+const OutgoingRequestStack = createStackNavigator(
+  {
+    [Screens.OutgoingPaymentRequestListScreen]: { screen: OutgoingPaymentRequestListScreen },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.OutgoingPaymentRequestListScreen,
   }
 )
 
@@ -236,7 +250,7 @@ const SettingsStack = createStackNavigator(
     [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
-    [Screens.CeloLite]: { screen: CeloLite },
+    [Screens.DataSaver]: { screen: DataSaver },
     [Screens.EditProfile]: { screen: EditProfile },
     [Screens.Profile]: { screen: Profile },
     [Screens.Invite]: { screen: Invite },
@@ -264,9 +278,16 @@ const AppStack = createStackNavigator(
     // Note, WalletHome isn't in this stack because it's part of the tab navigator
     [Screens.TabNavigator]: { screen: TabNavigator },
     [Stacks.SendStack]: { screen: SendStack },
+    // Adding this screen, so it possbile to go back to Home screen from it
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+    // Adding this screen, so it possbile to go back to Home screen from it
+    [Screens.ReclaimPaymentConfirmationScreen]: {
+      screen: ReclaimPaymentConfirmationScreen,
+    },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
-    [Stacks.RequestStack]: { screen: RequestStack },
+    [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
+    [Stacks.OutgoingRequestStack]: { screen: OutgoingRequestStack },
     [Stacks.EscrowStack]: { screen: EscrowStack },
     [Stacks.SettingsStack]: { screen: SettingsStack },
     [Screens.SetClock]: { screen: SetClock },
@@ -274,8 +295,8 @@ const AppStack = createStackNavigator(
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
     [Screens.PhotosEducation]: { screen: PhotosEducation },
     [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.FeeEducation]: { screen: FeeEducation },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation }, // Included so it is possible to go back to Home screen from it
     ...commonScreens,
   },
   {

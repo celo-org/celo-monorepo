@@ -1,8 +1,8 @@
-import airtableInit, { AirRecord } from '../server/airtable'
-
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
 import Sentry from '../fullstack/sentry'
+import airtableInit from '../server/airtable'
+import { abort } from '../src/utils/abortableFetch'
 const TABLE_NAME = 'Community Calendar'
 // Intermediate step Event With all String Values
 interface IncomingEvent {
@@ -57,27 +57,26 @@ export interface RawAirTableEvent {
 }
 
 export default async function getFormattedEvents() {
-  const eventData = await fetchEventsFromAirtable()
+  const eventData = await Promise.race([
+    fetchEventsFromAirtable(),
+    abort('Events from Airtable', 1000),
+  ])
   return splitEvents(normalizeEvents(eventData as RawAirTableEvent[]))
 }
 
-function fetchEventsFromAirtable() {
-  return new Promise((resolve, reject) => {
-    getAirtable()
+async function fetchEventsFromAirtable() {
+  try {
+    const records = await getAirtable()
       .select({
         filterByFormula:
           'OR(Process="Complete", Process="Scheduled", Process="Conference, Speaking", Process="This Week")',
         sort: [{ field: 'Start Date', direction: 'desc' }],
       })
-      .firstPage((error: unknown, records: Array<AirRecord<RawAirTableEvent>>) => {
-        if (error) {
-          Sentry.captureEvent(error)
-          reject(error)
-        } else {
-          resolve(records.map((record) => record.fields))
-        }
-      })
-  })
+      .firstPage()
+    return records.map((record) => record.fields)
+  } catch (error) {
+    Sentry.captureEvent(error)
+  }
 }
 
 function getAirtable() {

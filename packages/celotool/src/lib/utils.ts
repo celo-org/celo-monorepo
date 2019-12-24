@@ -21,7 +21,7 @@ export function execCmd(
 
     const execProcess = exec(
       cmd,
-      { maxBuffer: 1024 * 1000, ...execOptions },
+      { maxBuffer: 1024 * 10000, ...execOptions },
       (err, stdout, stderr) => {
         if (process.env.CELOTOOL_VERBOSE === 'true') {
           console.debug(stdout.toString())
@@ -73,7 +73,7 @@ export function execBackgroundCmd(cmd: string) {
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     console.debug('$ ' + cmd)
   }
-  return exec(cmd, { maxBuffer: 1024 * 1000 }, (err, stdout, stderr) => {
+  return exec(cmd, { maxBuffer: 1024 * 10000 }, (err, stdout, stderr) => {
     if (process.env.CELOTOOL_VERBOSE === 'true') {
       console.debug(stdout)
       console.error(stderr)
@@ -94,14 +94,6 @@ export async function outputIncludes(cmd: string, matchString: string, matchMess
     return true
   }
   return false
-}
-
-export function getVerificationPoolSMSURL(celoEnv: string) {
-  return `https://us-central1-celo-testnet.cloudfunctions.net/handleVerificationRequest${celoEnv}/v0.1/sms/`
-}
-
-export function getVerificationPoolRewardsURL(celoEnv: string) {
-  return `https://us-central1-celo-testnet.cloudfunctions.net/handleVerificationRequest${celoEnv}/v0.1/rewards/`
 }
 
 export async function retrieveTxNodeIpAddress(celoEnv: string, txNodeIndex: number) {

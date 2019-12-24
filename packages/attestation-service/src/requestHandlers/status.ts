@@ -1,23 +1,14 @@
-import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { AddressType, SignatureType } from '@celo/utils/lib/io'
-import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
+import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils/lib/io'
 import express from 'express'
 import * as t from 'io-ts'
+import { kit } from '../db'
+import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
 import { blacklistRegionCodes, configuredSmsProviders } from '../sms'
-import { getAccountAddress, getAttestationKey } from './attestation'
 
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
 export const StatusRequestType = t.type({
   messageToSign: t.union([SignatureType, t.undefined]),
-})
-
-export const StatusResponseType = t.type({
-  status: t.literal('ok'),
-  smsProviders: t.array(t.string),
-  blacklistedRegionCodes: t.array(t.string),
-  accountAddress: AddressType,
-  signature: t.union([SignatureType, t.undefined]),
 })
 
 export type StatusRequest = t.TypeOf<typeof StatusRequestType>
@@ -26,9 +17,8 @@ function produceSignature(message: string | undefined) {
   if (!message) {
     return undefined
   }
-  const key = getAttestationKey()
-  const address = privateKeyToAddress(key)
-  return serializeSignature(signMessage(SIGNATURE_PREFIX + message, key, address))
+
+  return kit.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
 }
 
 export async function handleStatusRequest(
@@ -39,12 +29,12 @@ export async function handleStatusRequest(
   try {
     res
       .json(
-        StatusResponseType.encode({
+        AttestationServiceStatusResponseType.encode({
           status: 'ok',
           smsProviders: configuredSmsProviders(),
           blacklistedRegionCodes: blacklistRegionCodes(),
           accountAddress: getAccountAddress(),
-          signature: produceSignature(statusRequest.messageToSign),
+          signature: await produceSignature(statusRequest.messageToSign),
         })
       )
       .status(200)

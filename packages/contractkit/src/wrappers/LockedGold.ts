@@ -5,12 +5,11 @@ import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  NumberLike,
-  parseNumber,
   proxyCall,
   proxySend,
-  toBigNumber,
   tupleParser,
+  valueToBigNumber,
+  valueToString,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -24,6 +23,7 @@ interface AccountSummary {
   lockedGold: {
     total: BigNumber
     nonvoting: BigNumber
+    requirement: BigNumber
   }
   pendingWithdrawals: PendingWithdrawal[]
 }
@@ -60,19 +60,68 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock.
    */
-  unlock: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
+  unlock: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.unlock,
-    tupleParser(parseNumber)
+    tupleParser(valueToString)
   )
+
+  async getPendingWithdrawalsTotalValue(account: Address) {
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const values = pendingWithdrawals.map((pw: PendingWithdrawal) => pw.value)
+    const reducer = (total: BigNumber, pw: BigNumber) => pw.plus(total)
+    return values.reduce(reducer, new BigNumber(0))
+  }
 
   /**
    * Relocks gold that has been unlocked but not withdrawn.
-   * @param index The index of the pending withdrawal to relock.
+   * @param value The value to relock from pending withdrawals.
    */
-  relock: (index: number) => CeloTransactionObject<void> = proxySend(
+  async relock(
+    account: Address,
+    value: BigNumber.Value
+  ): Promise<Array<CeloTransactionObject<void>>> {
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const totalValue = await this.getPendingWithdrawalsTotalValue(account)
+    if (totalValue.isLessThan(value)) {
+      throw new Error(`Not enough pending withdrawals to relock ${value}`)
+    }
+    // Assert pending withdrawals are sorted by time (increasing), so that we can re-lock starting
+    // with those furthest away from being available (at the end).
+    const throwIfNotSorted = (pw: PendingWithdrawal, i: number) => {
+      if (i > 0 && !pw.time.isGreaterThanOrEqualTo(pendingWithdrawals[i - 1].time)) {
+        throw new Error('Pending withdrawals not sorted by timestamp')
+      }
+    }
+    pendingWithdrawals.forEach(throwIfNotSorted)
+
+    let remainingToRelock = new BigNumber(value)
+    const relockPw = (
+      acc: Array<CeloTransactionObject<void>>,
+      pw: PendingWithdrawal,
+      i: number
+    ) => {
+      const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
+      if (!valueToRelock.isZero()) {
+        remainingToRelock = remainingToRelock.minus(valueToRelock)
+        acc.push(this._relock(i, valueToRelock))
+      }
+      return acc
+    }
+    return pendingWithdrawals.reduceRight(relockPw, []) as Array<CeloTransactionObject<void>>
+  }
+
+  /**
+   * Relocks gold that has been unlocked but not withdrawn.
+   * @param index The index of the pending withdrawal to relock from.
+   * @param value The value to relock from the specified pending withdrawal.
+   */
+  _relock: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.relock
+    this.contract.methods.relock,
+    tupleParser(valueToString, valueToString)
   )
 
   /**
@@ -83,7 +132,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   getAccountTotalLockedGold = proxyCall(
     this.contract.methods.getAccountTotalLockedGold,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -94,7 +143,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   getAccountNonvotingLockedGold = proxyCall(
     this.contract.methods.getAccountNonvotingLockedGold,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -102,18 +151,21 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    */
   async getConfig(): Promise<LockedGoldConfig> {
     return {
-      unlockingPeriod: toBigNumber(await this.contract.methods.unlockingPeriod().call()),
+      unlockingPeriod: valueToBigNumber(await this.contract.methods.unlockingPeriod().call()),
     }
   }
 
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const nonvoting = await this.getAccountNonvotingLockedGold(account)
     const total = await this.getAccountTotalLockedGold(account)
+    const validators = await this.kit.contracts.getValidators()
+    const requirement = await validators.getAccountLockedGoldRequirement(account)
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     return {
       lockedGold: {
         total,
         nonvoting,
+        requirement,
       },
       pendingWithdrawals,
     }
@@ -127,9 +179,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getPendingWithdrawals(account: string) {
     const withdrawals = await this.contract.methods.getPendingWithdrawals(account).call()
     return zip(
-      (time, value) =>
-        // tslint:disable-next-line: no-object-literal-type-assertion
-        ({ time: toBigNumber(time), value: toBigNumber(value) } as PendingWithdrawal),
+      (time, value): PendingWithdrawal => ({
+        time: valueToBigNumber(time),
+        value: valueToBigNumber(value),
+      }),
       withdrawals[1],
       withdrawals[0]
     )

@@ -1,5 +1,7 @@
+import { RehydrateAction } from 'redux-persist'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { AttestationCode, VerificationStatus } from 'src/identity/verification'
+import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
@@ -15,6 +17,9 @@ export interface E164NumberToAddressType {
 
 export interface State {
   attestationCodes: AttestationCode[]
+  // we store acceptedAttestationCodes to tell user if code
+  // was already used even after Actions.RESET_VERIFICATION
+  acceptedAttestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
@@ -26,6 +31,7 @@ export interface State {
 
 const initialState: State = {
   attestationCodes: [],
+  acceptedAttestationCodes: [],
   numCompleteAttestations: 0,
   verificationStatus: 0,
   hasSeenVerificationNux: false,
@@ -35,8 +41,19 @@ const initialState: State = {
   isLoadingImportContacts: false,
 }
 
-export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
+export const reducer = (
+  state: State | undefined = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'identity'),
+        verificationStatus: VerificationStatus.Stopped,
+      }
+    }
     case Actions.RESET_VERIFICATION:
       return {
         ...state,
@@ -58,6 +75,7 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         attestationCodes: [...state.attestationCodes, action.code],
+        acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
@@ -110,5 +128,7 @@ const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
 }
 
 export const attestationCodesSelector = (state: RootState) => state.identity.attestationCodes
+export const acceptedAttestationCodesSelector = (state: RootState) =>
+  state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number

@@ -12,23 +12,33 @@ import Web3 = require('web3')
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
-  tx: TransactionObject<T>,
+  tx: TransactionObject<T> | null,
   privateKey: string,
   txArgs: any
 ) {
   const address = privateKeyToAddress(privateKey)
-  const encodedTxData = tx.encodeABI()
-  const estimatedGas = await tx.estimateGas({
-    ...txArgs,
-    from: address,
-  })
+
+  // Encode data and estimate gas or use default values for a transfer.
+  let encodedTxData: string|undefined
+  let estimatedGas = 21000 // Gas cost of a basic transfer.
+
+  if (tx !== null) {
+    encodedTxData = tx.encodeABI()
+    estimatedGas = await tx.estimateGas({
+      ...txArgs,
+      from: address,
+    })
+  }
+
   const signedTx: any = await signTransaction(
     web3,
     {
       ...txArgs,
       data: encodedTxData,
       from: address,
-      gas: estimatedGas * 10,
+      // make sure to use enough gas but dont overspend
+      // or we will run into "block gas limit exceeded" errors
+      gas: estimatedGas * 2,
     },
     privateKey
   )

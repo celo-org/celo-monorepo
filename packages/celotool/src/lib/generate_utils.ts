@@ -1,3 +1,5 @@
+// @ts-ignore
+import { config } from '@celo/protocol/migrationsConfig'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
@@ -11,7 +13,6 @@ import {
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
-  OG_ACCOUNTS,
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
@@ -29,6 +30,8 @@ export enum AccountType {
   FAUCET = 4,
   ATTESTATION = 5,
   PRICE_ORACLE = 6,
+  PROXY = 7,
+  ATTESTATION_BOT = 8,
 }
 
 export enum ConsensusType {
@@ -39,6 +42,11 @@ export enum ConsensusType {
 export interface Validator {
   address: string
   blsPublicKey: string
+  balance: string
+}
+export interface AccountAndBalance {
+  address: string
+  balance: string
 }
 
 export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
@@ -49,6 +57,8 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'faucet',
   'attestation',
   'price_oracle',
+  'proxy',
+  'attestation_bot',
 ]
 
 export const add0x = (str: string) => {
@@ -71,6 +81,13 @@ export const generatePrivateKey = (mnemonic: string, accountType: AccountType, i
   return newNode.privateKey.toString('hex')
 }
 
+export const generatePublicKey = (mnemonic: string, accountType: AccountType, index: number) => {
+  return privateKeyToPublicKey(generatePrivateKey(mnemonic, accountType, index))
+}
+
+export const generateAddress = (mnemonic: string, accountType: AccountType, index: number) =>
+  privateKeyToAddress(generatePrivateKey(mnemonic, accountType, index))
+
 export const privateKeyToPublicKey = (privateKey: string) => {
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
   const ecPublicKey: string = ecPrivateKey.getPublic('hex')
@@ -85,8 +102,16 @@ export const privateKeyToAddress = (privateKey: string) => {
 export const privateKeyToStrippedAddress = (privateKey: string) =>
   strip0x(privateKeyToAddress(privateKey))
 
-const DEFAULT_BALANCE = '1000000000000000000000000'
-const VALIDATOR_OG_SOURCE = 'og'
+const validatorZeroBalance = fetchEnvOrFallback(
+  envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
+  '103010030000000000000000000'
+) // 103,010,030 CG
+const validatorBalance = fetchEnvOrFallback(
+  envVar.VALIDATOR_GENESIS_BALANCE,
+  '10011000000000000000000'
+) // 10,011 CG
+const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
+const oracleBalance = fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -98,11 +123,12 @@ export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: stri
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const getValidators = (mnemonic: string, n: number) => {
-  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key) => {
+  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
       address: strip0x(privateKeyToAddress(key)),
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
+      balance: i === 0 ? validatorZeroBalance : validatorBalance,
     }
   })
 }
@@ -113,19 +139,50 @@ export const getAddressFromEnv = (accountType: AccountType, n: number) => {
   return privateKeyToAddress(privateKey)
 }
 
+const getFaucetedAccountsFor = (
+  accountType: AccountType,
+  mnemonic: string,
+  n: number,
+  balance: string
+) => {
+  return getStrippedAddressesFor(accountType, mnemonic, n).map((address) => ({
+    address,
+    balance,
+  }))
+}
+
+export const getFaucetedAccounts = (mnemonic: string) => {
+  const numFaucetAccounts = parseInt(fetchEnvOrFallback(envVar.FAUCET_GENESIS_ACCOUNTS, '0'), 10)
+  const faucetAccounts = getFaucetedAccountsFor(
+    AccountType.FAUCET,
+    mnemonic,
+    numFaucetAccounts,
+    faucetBalance
+  )
+
+  const numLoadTestAccounts = parseInt(fetchEnvOrFallback(envVar.LOAD_TEST_CLIENTS, '0'), 10)
+  const loadTestAccounts = getFaucetedAccountsFor(
+    AccountType.LOAD_TESTING_ACCOUNT,
+    mnemonic,
+    numLoadTestAccounts,
+    faucetBalance
+  )
+
+  const oracleAccounts = getFaucetedAccountsFor(
+    AccountType.PRICE_ORACLE,
+    mnemonic,
+    1,
+    oracleBalance
+  )
+
+  return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts]
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
-  const validators =
-    validatorEnv === VALIDATOR_OG_SOURCE
-      ? OG_ACCOUNTS.map((account) => {
-          const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(account.privateKey)
-          return {
-            address: account.address,
-            blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-          }
-        })
-      : getValidators(mnemonic, parseInt(validatorEnv, 10))
+  const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
+  const validators = getValidators(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -140,19 +197,29 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     10
   )
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
+  // allow 12 blocks in prod for the uptime metric
+  const lookbackwindow = parseInt(fetchEnvOrFallback(envVar.LOOKBACK, '12'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  // Assing DEFAULT ammount of gold to 2 faucet accounts
-  const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
-
-  const oracleAddress = getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1)
+  const initialAccounts = getFaucetedAccounts(mnemonic)
+  if (genesisAccountsEnv !== '') {
+    const genesisAccountsPath = path.resolve(monorepoRoot, genesisAccountsEnv)
+    const genesisAccounts = JSON.parse(fs.readFileSync(genesisAccountsPath).toString())
+    for (const addr of genesisAccounts.addresses) {
+      initialAccounts.push({
+        address: addr,
+        balance: genesisAccounts.value,
+      })
+    }
+  }
 
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses.concat(oracleAddress),
+    initialAccounts,
     epoch,
+    lookbackwindow,
     chainId,
     requestTimeout,
     enablePetersburg,
@@ -167,6 +234,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
     '0x' +
     repeat('0', istanbulVanity * 2) +
     rlp
+      // @ts-ignore
       .encode([
         // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
@@ -202,15 +270,17 @@ export const generateGenesis = ({
   initialAccounts: otherAccounts = [],
   blockTime,
   epoch,
+  lookbackwindow,
   chainId,
   requestTimeout,
   enablePetersburg = true,
 }: {
   validators: Validator[]
   consensusType?: ConsensusType
-  initialAccounts?: string[]
+  initialAccounts?: AccountAndBalance[]
   blockTime: number
   epoch: number
+  lookbackwindow: number
   chainId: number
   requestTimeout: number
   enablePetersburg?: boolean
@@ -239,18 +309,19 @@ export const generateGenesis = ({
       period: blockTime,
       requesttimeout: requestTimeout,
       epoch,
+      lookbackwindow,
     }
   }
 
   for (const validator of validators) {
     genesis.alloc[validator.address] = {
-      balance: DEFAULT_BALANCE,
+      balance: validator.balance,
     }
   }
 
-  for (const address of otherAccounts) {
-    genesis.alloc[address] = {
-      balance: DEFAULT_BALANCE,
+  for (const account of otherAccounts) {
+    genesis.alloc[account.address] = {
+      balance: account.balance,
     }
   }
 

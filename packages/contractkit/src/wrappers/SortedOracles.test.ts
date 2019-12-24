@@ -3,6 +3,9 @@ import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
 
+// set timeout to 10 seconds
+jest.setTimeout(10 * 1000)
+
 /*
 TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]
@@ -211,7 +214,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   describe('#reportExpirySeconds', () => {
     it('returns the number of seconds after which a report expires', async () => {
       const result = await sortedOracles.reportExpirySeconds()
-      expect(result).toEqBigNumber(3600)
+      expect(result).toEqBigNumber(600)
     })
   })
 

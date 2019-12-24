@@ -3,6 +3,7 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "../baklava/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -11,7 +12,7 @@ import "../common/UsingPrecompiles.sol";
 /**
  * @title Contract for calculating epoch rewards.
  */
-contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry {
+contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry, Freezable {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -65,6 +66,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 overspendAdjustmentFactor
   );
 
+  event TargetVotingYieldUpdated(uint256 fraction);
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
@@ -82,6 +85,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    */
   function initialize(
     address registryAddress,
+    address _freezer,
     uint256 targetVotingYieldInitial,
     uint256 targetVotingYieldMax,
     uint256 targetVotingYieldAdjustmentFactor,
@@ -92,6 +96,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 _targetValidatorEpochPayment
   ) external initializer {
     _transferOwnership(msg.sender);
+    setFreezer(_freezer);
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
     setRewardsMultiplierParameters(
@@ -127,13 +132,21 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     );
   }
 
+  function setFreezer(address freezer) public onlyOwner {
+    _setFreezer(freezer);
+  }
+
   /**
    * @notice Sets the target voting Gold fraction.
    * @param value The percentage of floating Gold voting to target.
    * @return True upon success.
    */
   function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
-    require(value != targetVotingGoldFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    require(value != targetVotingGoldFraction.unwrap(), "Target voting gold fraction unchanged");
+    require(
+      value < FixidityLib.fixed1().unwrap(),
+      "Target voting gold fraction cannot be larger than 1"
+    );
     targetVotingGoldFraction = FixidityLib.wrap(value);
     emit TargetVotingGoldFractionSet(value);
     return true;
@@ -153,7 +166,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return True upon success.
    */
   function setTargetValidatorEpochPayment(uint256 value) public onlyOwner returns (bool) {
-    require(value != targetValidatorEpochPayment);
+    require(value != targetValidatorEpochPayment, "Target validator epoch payment unchanged");
     targetValidatorEpochPayment = value;
     emit TargetValidatorEpochPaymentSet(value);
     return true;
@@ -176,7 +189,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
         overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
-        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap()
+        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap(),
+      "Bad rewards multiplier parameters"
     );
     rewardsMultiplierParams = RewardsMultiplierParameters(
       RewardsMultiplierAdjustmentFactors(
@@ -202,7 +216,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
-        adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap()
+        adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap(),
+      "Bad target voting yield parameters"
     );
     targetVotingYieldParams.max = FixidityLib.wrap(max);
     targetVotingYieldParams.adjustmentFactor = FixidityLib.wrap(adjustmentFactor);
@@ -227,7 +242,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       return targetRewards.add(GENESIS_GOLD_SUPPLY);
     } else {
       // TODO(asa): Implement block reward calculation for years 15-30.
-      require(false);
+      require(false, "Implement block reward calculation for years 15-30");
       return 0;
     }
   }
@@ -315,10 +330,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
-    // TODO(asa): Ignore custodial accounts.
-    address reserveAddress = registry.getAddressForOrDie(RESERVE_REGISTRY_ID);
-    uint256 liquidGold = getGoldToken().totalSupply().sub(reserveAddress.balance);
-    // TODO(asa): Should this be active votes?
+    uint256 liquidGold = getGoldToken().totalSupply().sub(getReserve().getReserveGoldBalance());
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }
@@ -355,6 +367,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
         targetVotingYieldParams.target = targetVotingYieldParams.max;
       }
     }
+    emit TargetVotingYieldUpdated(targetVotingYieldParams.target.unwrap());
   }
 
   /**
@@ -362,8 +375,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
-  function updateTargetVotingYield() external {
-    require(msg.sender == address(0));
+  function updateTargetVotingYield() external onlyWhenNotFrozen {
+    require(msg.sender == address(0), "Only VM can call");
     _updateTargetVotingYield();
   }
 
@@ -372,6 +385,10 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return The per validator epoch payment and the total rewards to voters.
    */
   function calculateTargetEpochPaymentAndRewards() external view returns (uint256, uint256) {
+    if (frozen) {
+      return (0, 0);
+    }
+
     uint256 targetEpochRewards = getTargetEpochRewards();
     uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
     uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);

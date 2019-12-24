@@ -1,9 +1,7 @@
-import assert = require('assert')
-
-const ethjsutil = require('ethereumjs-util')
-
 import * as Web3Utils from 'web3-utils'
 import { eqAddress, privateKeyToAddress } from './address'
+
+const ethjsutil = require('ethereumjs-util')
 
 // If messages is a hex, the length of it should be the number of bytes
 function messageLength(message: string) {
@@ -46,7 +44,9 @@ export async function addressToPublicKey(
   )
 
   const computedAddr = ethjsutil.pubToAddress(pubKey).toString('hex')
-  assert(eqAddress(computedAddr, signer), 'computed address !== signer')
+  if (!eqAddress(computedAddr, signer)) {
+    throw new Error('computed address !== signer')
+  }
 
   return '0x' + pubKey.toString('hex')
 }
@@ -116,6 +116,15 @@ export function serializeSignature(signature: Signature) {
   return '0x' + serializedV + serializedR + serializedS
 }
 
+export function verifySignature(message: string, signature: string, signer: string) {
+  try {
+    parseSignature(message, signature, signer)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 export function parseSignature(message: string, signature: string, signer: string) {
   return parseSignatureWithoutPrefix(hashMessageWithPrefix(message), signature, signer)
 }
@@ -167,7 +176,7 @@ function isValidSignature(signer: string, message: string, v: number, r: string,
       ethjsutil.toBuffer(s)
     )
     const retrievedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
-    return signer.toLowerCase() === retrievedAddress.toLowerCase()
+    return eqAddress(retrievedAddress, signer)
   } catch (err) {
     return false
   }

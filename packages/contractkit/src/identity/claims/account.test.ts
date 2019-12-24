@@ -4,8 +4,9 @@ import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/addr
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { newKitFromWeb3 } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'
-import { createAccountClaim, MetadataURLGetter } from './account'
-import { SignedClaim, verifyClaim } from './claim'
+import { createAccountClaim } from './account'
+import { Claim } from './claim'
+import { MetadataURLGetter, verifyClaim } from './verify'
 
 testWithGanache('Account claims', (web3) => {
   const kit = newKitFromWeb3(web3)
@@ -52,7 +53,7 @@ testWithGanache('Account claims', (web3) => {
   })
 
   describe('verifying', () => {
-    let signedClaim: SignedClaim
+    let claim: Claim
     let otherMetadata: IdentityMetadataWrapper
     let metadataUrlGetter: MetadataURLGetter
 
@@ -68,10 +69,8 @@ testWithGanache('Account claims', (web3) => {
       IdentityMetadataWrapper.fetchFromURL = () => Promise.resolve(otherMetadata)
 
       const metadata = IdentityMetadataWrapper.fromEmpty(address)
-      signedClaim = await metadata.addClaim(
-        createAccountClaim(otherAddress),
-        NativeSigner(kit.web3.eth.sign, address)
-      )
+      claim = createAccountClaim(otherAddress)
+      await metadata.addClaim(claim, NativeSigner(kit.web3.eth.sign, address))
     })
 
     afterEach(() => {
@@ -84,14 +83,14 @@ testWithGanache('Account claims', (web3) => {
       })
 
       it('indicates that the metadata url could not be retrieved', async () => {
-        const error = await verifyClaim(signedClaim, address, metadataUrlGetter)
+        const error = await verifyClaim(claim, address, metadataUrlGetter)
         expect(error).toContain('could not be retrieved')
       })
     })
 
     describe('when the metadata URL is set, but does not contain the address claim', () => {
       it('indicates that the metadata does not contain the counter claim', async () => {
-        const error = await verifyClaim(signedClaim, address, metadataUrlGetter)
+        const error = await verifyClaim(claim, address, metadataUrlGetter)
         expect(error).toContain('did not claim')
       })
     })
@@ -105,7 +104,7 @@ testWithGanache('Account claims', (web3) => {
       })
 
       it('returns undefined succesfully', async () => {
-        const error = await verifyClaim(signedClaim, address, metadataUrlGetter)
+        const error = await verifyClaim(claim, address, metadataUrlGetter)
         expect(error).toBeUndefined()
       })
     })

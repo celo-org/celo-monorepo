@@ -4,7 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -17,7 +17,7 @@ import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -43,7 +43,7 @@ interface StateProps {
   numberVerified: boolean
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 interface State {
   version: string
@@ -112,8 +112,8 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Analytics, { nextScreen: Screens.Account })
   }
 
-  goToCeloLite() {
-    navigate(Screens.CeloLite, { nextScreen: Screens.Account })
+  goToDataSaver() {
+    navigate(Screens.DataSaver, { nextScreen: Screens.Account })
   }
 
   goToFAQ() {
@@ -173,11 +173,11 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={style.devSettings}>
-          <View style={style.devSettingsItem}>
+          {/* <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>
               <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.resetAppOpenedState}>
               <Text>Reset app opened state</Text>
@@ -238,7 +238,7 @@ export class Account extends React.Component<Props, State> {
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
-            <SettingsItem title={t('celoLite')} onPress={this.goToCeloLite} />
+            <SettingsItem title={t('dataSaver')} onPress={this.goToDataSaver} />
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
             <SettingsItem
               title={t('localCurrencySetting')}
@@ -315,4 +315,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withNamespaces(Namespaces.accountScreen10)(Account))
+)(withTranslation(Namespaces.accountScreen10)(Account))

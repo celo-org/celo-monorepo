@@ -1,0 +1,435 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExchangeReview renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "paddingHorizontal": 16,
+      }
+    }
+  >
+    <RCTScrollView>
+      <View>
+        <View
+          style={
+            Object {
+              "justifyContent": "flex-start",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginTop": 30,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              exchangeAmount
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#42D689",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 24,
+                  "lineHeight": 39,
+                }
+              }
+            >
+              10.000
+            </Text>
+          </View>
+          <View
+            style={
+              Object {
+                "borderStyle": "solid",
+                "borderTopColor": "#EEEEEE",
+                "borderTopWidth": 1,
+                "marginTop": 10,
+                "width": "100%",
+              }
+            }
+          />
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginTop": 20,
+                "marginVertical": 5,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              subtotalAmount
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              $90.90
+            </Text>
+          </View>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginVertical": 5,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                exchangeFee
+              </Text>
+              <View
+                accessible={true}
+                focusable={true}
+                hitSlop={
+                  Object {
+                    "bottom": 10,
+                    "left": 10,
+                    "right": 10,
+                    "top": 10,
+                  }
+                }
+                isTVSelectable={true}
+                nativeBackgroundAndroid={
+                  Object {
+                    "attribute": "selectableItemBackgroundBorderless",
+                    "type": "ThemeAttrAndroid",
+                  }
+                }
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "justifyContent": "flex-end",
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/info.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "height": 12,
+                      "tintColor": "#BDBDBD",
+                      "width": 12,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              0.00
+            </Text>
+          </View>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginVertical": 5,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                securityFee
+              </Text>
+              <View
+                accessible={true}
+                focusable={true}
+                hitSlop={
+                  Object {
+                    "bottom": 10,
+                    "left": 10,
+                    "right": 10,
+                    "top": 10,
+                  }
+                }
+                isTVSelectable={true}
+                nativeBackgroundAndroid={
+                  Object {
+                    "attribute": "selectableItemBackgroundBorderless",
+                    "type": "ThemeAttrAndroid",
+                  }
+                }
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "justifyContent": "flex-end",
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/info.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "height": 12,
+                      "tintColor": "#BDBDBD",
+                      "width": 12,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              0.00
+            </Text>
+          </View>
+          <View
+            style={
+              Object {
+                "borderStyle": "solid",
+                "borderTopColor": "#EEEEEE",
+                "borderTopWidth": 1,
+                "marginTop": 10,
+                "width": "100%",
+              }
+            }
+          />
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginTop": 20,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              sendFlow7:total
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              $90.90
+            </Text>
+          </View>
+        </View>
+      </View>
+    </RCTScrollView>
+  </View>
+  <View
+    style={
+      Object {
+        "borderTopColor": "rgba(0, 0, 0, 0.05)",
+        "borderTopWidth": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderRadius": 3,
+            "flexDirection": "row",
+          },
+          null,
+          null,
+          undefined,
+          Object {
+            "backgroundColor": "#42D689",
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "#FFFFFF",
+                },
+                Object {
+                  "paddingLeft": 5,
+                  "paddingRight": 5,
+                },
+              ]
+            }
+          >
+            buyOrSellGoldAmount
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</SafeAreaView>
+`;
