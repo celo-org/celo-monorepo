@@ -42,7 +42,7 @@ export default class Show extends BaseCommand {
       Boolean(res.flags.voter) || Boolean(res.flags.validator) || Boolean(res.flags.group)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const currentEpoch = await this.kit.getCurrentEpoch()
+    const currentEpoch = (await validators.getEpochNumber()).toNumber()
     const checkBuilder = newCheckBuilder(this)
     const epochs = Math.max(1, res.flags.epochs || 1)
 

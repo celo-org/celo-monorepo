@@ -122,16 +122,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
-   * @notice Returns the current epoch size in blocks.
-   * @return The current epoch size in blocks.
-   */
-  getEpochSize: () => Promise<number> = proxyCall(
-    this.contract.methods.getEpochSize,
-    undefined,
-    toNumber
-  )
-
-  /**
    * Returns the account associated with `signer`.
    * @param signer The address of an account or currently authorized validator signer.
    * @dev Fails if the `signer` is not an account or currently authorized validator.
@@ -462,7 +452,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param epochNumber The epoch to retrieve ValidatorRewards at.
    */
   async getValidatorRewards(epochNumber: number): Promise<ValidatorReward[]> {
-    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
       fromBlock: blockNumber,
       toBlock: blockNumber,

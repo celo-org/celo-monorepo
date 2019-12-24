@@ -118,7 +118,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getTotalVotesForGroup(group: Address, blockNumber?: number): Promise<BigNumber> {
     // @ts-ignore: Expected 0-1 arguments, but got 2
     const votes = await this.contract.methods.getTotalVotesForGroup(group).call({}, blockNumber)
-    return toBigNumber(votes)
+    return valueToBigNumber(votes)
   }
 
   /**
@@ -129,7 +129,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getActiveVotesForGroup(group: Address, blockNumber?: number): Promise<BigNumber> {
     // @ts-ignore: Expected 0-1 arguments, but got 2
     const votes = await this.contract.methods.getActiveVotesForGroup(group).call({}, blockNumber)
-    return toBigNumber(votes)
+    return valueToBigNumber(votes)
   }
 
   /**
@@ -380,7 +380,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve the elected validator set at.
    */
   async getElectedValidators(epochNumber: number): Promise<Validator[]> {
-    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
     const signers = await this.getCurrentValidatorSigners(blockNumber)
     const validators = await this.kit.contracts.getValidators()
     return concurrentMap(10, signers, (addr) =>
@@ -393,7 +393,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
   async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
-    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('EpochRewardsDistributedToVoters', {
       fromBlock: blockNumber,
       toBlock: blockNumber,
@@ -417,7 +417,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve VoterRewards at.
    */
   async getVoterRewards(address: Address, epochNumber: number): Promise<VoterReward[]> {
-    const blockNumber = await this.kit.epochToBlockNumber(epochNumber)
+    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
     const voter = await this.getVoter(address, blockNumber)
     const activeVoterVotes: Record<string, BigNumber> = {}
     for (const vote of voter.votes) {

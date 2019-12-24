@@ -85,6 +85,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   /**
    * Returns the account associated with `signer`.
    * @param signer The address of the account or previously authorized signer.
+   * @param blockNumber Height of result, defaults to tip.
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
