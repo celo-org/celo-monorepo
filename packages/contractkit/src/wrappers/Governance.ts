@@ -521,6 +521,21 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
+   * Returns whether a given hotfix can be passed.
+   * @param hash keccak256 hash of hotfix's associated abi encoded transactions
+   */
+  isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToString))
+
+  /**
+   * Returns the number of validators that whitelisted the hotfix
+   * @param hash keccak256 hash of hotfix's associated abi encoded transactions
+   */
+  hotfixWhitelistValidatorTally = proxyCall(
+    this.contract.methods.hotfixWhitelistValidatorTally,
+    tupleParser(bufferToString)
+  )
+
+  /**
    * Marks the given hotfix whitelisted by `sender`.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
