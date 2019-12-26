@@ -1,4 +1,3 @@
-import { I18nProps } from 'next-i18next'
 import * as React from 'react'
 import {
   Image,
@@ -10,7 +9,7 @@ import {
 } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
-import { NameSpaces, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'

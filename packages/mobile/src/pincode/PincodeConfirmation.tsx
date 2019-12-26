@@ -5,11 +5,11 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
@@ -18,7 +18,7 @@ interface State {
   pin: string
 }
 
-type Props = WithNamespaces & NavigationInjectedProps
+type Props = WithTranslation & NavigationInjectedProps
 
 class PincodeConfirmation extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
@@ -122,4 +122,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.nuxNamePin1)(PincodeConfirmation)
+export default withTranslation(Namespaces.nuxNamePin1)(PincodeConfirmation)

@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -15,7 +15,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { InviteBy, sendInvite } from 'src/invite/actions'
@@ -31,7 +31,7 @@ interface State {
   amountIsValid: boolean
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
+type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
 
 interface StateProps {
   inviteInProgress: boolean
@@ -206,5 +206,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.inviteFlow11)(InviteReview))
+  )(withTranslation(Namespaces.inviteFlow11)(InviteReview))
 )

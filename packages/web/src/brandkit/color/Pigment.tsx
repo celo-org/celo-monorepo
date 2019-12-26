@@ -1,16 +1,15 @@
+import { ColorTranslator } from 'colortranslator'
 import hexRgba from 'hex-rgba'
 import * as React from 'react'
 import { StyleSheet, Text, View, ViewStyle } from 'react-native'
-import { brandStyles, GAP } from 'src/brandkit/common/constants'
+import { brandStyles } from 'src/brandkit/common/constants'
 import CopyIcon from 'src/icons/CopyIcon'
 import Hoverable from 'src/shared/Hoverable'
 import { colors, fonts, standardStyles } from 'src/styles'
 import yiq from 'yiq'
 
-import { ColorTranslator } from 'colortranslator'
-
 function hexToHumanRGB(hex: string) {
-  return hexRgba(hex)
+  return hexRgba(hex, 1)
     .toUpperCase()
     .replace('A(', 'A (')
 }
@@ -77,13 +76,13 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
   return (
     <View style={[standardStyles.elementalMarginBottom, brandStyles.gap, styles.container]}>
       <Hoverable onPress={onCopyHex}>
-        {(isHovering) => (
-          <View style={[styles.box]}>
+        {(isHovering: boolean) => (
+          <View style={styles.box}>
             <View
               style={[
                 standardStyles.centered,
                 styles.pigment,
-                styles.transitions,
+                styles.transitions as ViewStyle,
                 isHovering && styles.pigmentHover,
                 inline,
               ]}
@@ -91,7 +90,7 @@ function Pigment({ hex, name, onCopyHex, justCopied }: Props & ColorData) {
               <View
                 style={[
                   standardStyles.row,
-                  styles.transitions,
+                  styles.transitions as ViewStyle,
                   styles.copy,
                   !justCopied && isHovering && styles.copyHover,
                 ]}
