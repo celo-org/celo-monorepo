@@ -177,7 +177,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
-  function authorizeValidatorSigner(
+  function authorizeValidatorSignerWithPublicKey(
     address signer,
     bytes calldata ecdsaPublicKey,
     uint8 v,
