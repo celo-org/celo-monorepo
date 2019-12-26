@@ -92,7 +92,7 @@ In Ethereum, verifying whether data received from an untrusted full node really 
 
 ### Incentives for Operating Full Nodes
 
-Ethereum, there are few incentives to run a full node that is not mining. Few nodes serve light clients, and this results in a poor experience for mobile wallets.
+In Ethereum, there are few incentives to run a full node that is not mining. Few nodes serve light clients, and this results in a poor experience for mobile wallets.
 
 Celo introduces a scheme that incentivizes users to operate regular nodes. Light clients pay transaction fees to full nodes. Clients include in every transaction the address of a node which, when the transaction is processed, receives the fee. While a full node provides other services for which they receive no specific fee, we expect that failing to service these requests will cause clients to seek other full nodes that do, who will then receive fees when they next make a transaction.
 
