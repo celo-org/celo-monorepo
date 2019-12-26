@@ -34,9 +34,6 @@ contract Governance is
 
   uint256 private constant FIXED_HALF = 500000000000000000000000;
 
-  // TODO(asa): Consider a delay stage.
-  enum ProposalStage { None, Queued, Approval, Referendum, Execution, Expiration }
-
   enum VoteValue { None, Abstain, No, Yes }
 
   struct UpvoteRecord {
@@ -502,6 +499,21 @@ contract Governance is
   }
 
   /**
+   * @notice Returns stage of governance process given proposal is in
+   * @param proposalId The ID of the proposal to query.
+   * @return proposal stage
+   */
+  function getProposalStage(uint256 proposalId) external view returns (Proposals.Stage) {
+    if (proposalId == 0 || proposalId > proposalCount) {
+      return Proposals.Stage.None;
+    } else if (isQueued(proposalId)) {
+      return Proposals.Stage.Queued;
+    } else {
+      return proposals[proposalId].getDequeuedStage(stageDurations);
+    }
+  }
+
+  /**
    * @notice Revokes an upvote on a queued proposal.
    * @param lesser The ID of the proposal that will be just behind the previously upvoted proposal
    *   in the queue.
@@ -892,11 +904,11 @@ contract Governance is
   }
 
   /**
-   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
+   * @notice Returns number of validators from current set which have whitelisted the given hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
+   * @return Whitelist tally
    */
-  function isHotfixPassing(bytes32 hash) public view returns (bool) {
+  function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     for (uint256 idx = 0; idx < n; idx++) {
@@ -909,8 +921,16 @@ contract Governance is
         tally = tally.add(1);
       }
     }
+    return tally;
+  }
 
-    return tally >= byzantineQuorumValidatorsInCurrentSet();
+  /**
+   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
+   */
+  function isHotfixPassing(bytes32 hash) public view returns (bool) {
+    return hotfixWhitelistValidatorTally(hash) >= byzantineQuorumValidatorsInCurrentSet();
   }
 
   /**
@@ -1087,10 +1107,6 @@ contract Governance is
     emit ParticipationBaselineUpdated(participationParameters.baseline.unwrap());
   }
 
-  function getConstitution(address destination, bytes4 functionId) external view returns (uint256) {
-    return _getConstitution(destination, functionId).unwrap();
-  }
-
   /**
    * @notice Returns the constitution for a particular destination and function ID.
    * @param destination The destination address to get the constitution for.
@@ -1098,6 +1114,10 @@ contract Governance is
    *   default.
    * @return The ratio of yes:no votes needed to exceed in order to pass the proposal.
    */
+  function getConstitution(address destination, bytes4 functionId) external view returns (uint256) {
+    return _getConstitution(destination, functionId).unwrap();
+  }
+
   function _getConstitution(address destination, bytes4 functionId)
     internal
     view
