@@ -219,8 +219,8 @@ contract UsingPrecompiles {
 
   /**
    * @notice Verifies the BLS signature on the header and returns the seal bitmap.
-   * The validator set used for verification is retrieved based on the parent hash field of the header.
-   * If the parent hash is not in the blockchain, verification fails.
+   * The validator set used for verification is retrieved based on the parent hash field of the
+   * header.  If the parent hash is not in the blockchain, verification fails.
    * @param header RLP encoded header
    * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
    */
