@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux'
@@ -20,7 +20,7 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-type Props = DispatchProps & WithNamespaces
+type Props = DispatchProps & WithTranslation
 
 class EducationScreen extends React.Component<Props> {
   onSubmit = async () => {
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.education)(
+export default withTranslation(Namespaces.education)(
   connect<null, DispatchProps>(
     null,
     { setEducationCompleted, showError }

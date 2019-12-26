@@ -85,9 +85,6 @@ List registered Validators, their name (if provided), affiliation, uptime score,
 USAGE
   $ celocli validator:list
 
-OPTIONS
-  --no-truncate  Don't truncate fields to fit line
-
 EXAMPLE
   list
 ```
@@ -152,15 +149,19 @@ _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo
 
 ### Status
 
-Show information about whether the validator signer is elected and validating. This command will check that the validator meets the registration requirements, and its signer is currently elected and actively signing blocks.
+Shows the consensus status of a validator. This command will show whether a validator is currently elected, would be elected if an election were to be run right now, and the percentage of blocks signed and number of blocks successfully proposed within a given window.
 
 ```
 USAGE
   $ celocli validator:status
 
 OPTIONS
+  --all                                                   get the status of all registered validators
+
   --lookback=lookback                                     [default: 100] how many blocks to look back for signer
                                                           activity
+
+  --no-truncate                                           Don't truncate fields to fit line
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
 
@@ -168,8 +169,7 @@ OPTIONS
 
 EXAMPLES
   status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631
-  status --signer 0x738337030fAeb1E805253228881d844b5332fB4c
-  status --signer 0x738337030fAeb1E805253228881d844b5332fB4c --lookback 100
+  status --all --lookback 100
 ```
 
 _See code: [packages/cli/src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
