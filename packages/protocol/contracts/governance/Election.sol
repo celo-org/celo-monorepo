@@ -340,19 +340,21 @@ contract Election is
   }
 
   /**
-   * @notice Revokes `value` pending or active votes for `group`. First revokes all pending votes
-   *         and, if `value` haven't been revoked yet, revokes additional active votes.
-   *         Basically calls `revokePending` and `revokeActive` but only resorts groups once.
-   * @param group The validator group to revoke votes from.
-   * @param value The number of votes to revoke.
+   * @notice Decrements `value` pending or active votes for `group` from `account`.
+   *         First revokes all pending votes and then, if `value` votes haven't
+   *         been revoked yet, revokes additional active votes.
+   *         Fundamentally calls `revokePending` and `revokeActive` but only resorts groups once.
+   * @param account The account whose votes to `group` should be decremented.
+   * @param group The validator group to decrement votes from.
+   * @param value The number of votes to decrement and revoke.
    * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
    *               or 0 if that group has the fewest votes of any validator group.
    * @param greater The group receiving more votes than the group for which the vote was revoked,
    *                or 0 if that group has the most votes of any validator group.
    * @param index The index of the group in the account's voting list.
-   * @return uint256 Number of votes successfully revoked, with a max of `value`.
+   * @return uint256 Number of votes successfully decremented and revoked, with a max of `value`.
    */
-  function _revokeVotes(
+  function _decrementVotes(
     address account,
     address group,
     uint256 value,
@@ -390,7 +392,7 @@ contract Election is
    * @param account The address of the account.
    * @return The total number of votes cast by an account.
    */
-  function getTotalVotesByAccount(address account) external view returns (uint256) {
+  function getTotalVotesByAccount(address account) public view returns (uint256) {
     uint256 total = 0;
     address[] memory groups = votes.groupsVotedFor[account];
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
@@ -904,7 +906,9 @@ contract Election is
     return res;
   }
 
-  struct RevokeVotesInfo {
+  // Struct to hold local variables for `forceDecrementVotes`.
+  // Needed to prevent solc error of "stack too deep" from too many local vars.
+  struct DecrementVotesInfo {
     address[] groups;
     uint256 remainingValue;
   }
@@ -920,24 +924,25 @@ contract Election is
    *                the i'th `group` has the most votes of any validator group.
    * @param indices The indices of the i'th group in the account's voting list.
    */
-  function forceRevokeVotes(
+  function forceDecrementVotes(
     address account,
     uint256 value,
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
   ) external nonReentrant onlyRegisteredContract(LOCKED_GOLD_REGISTRY_ID) returns (uint256) {
-    require(value > 0 && value <= this.getTotalVotesByAccount(account));
-    RevokeVotesInfo memory info = RevokeVotesInfo(votes.groupsVotedFor[account], value);
+    require(value > 0 && value <= getTotalVotesByAccount(account));
+    DecrementVotesInfo memory info = DecrementVotesInfo(votes.groupsVotedFor[account], value);
     require(
       info.groups.length == lessers.length &&
         lessers.length == greaters.length &&
         greaters.length == indices.length
     );
     // Iterate in reverse order to hopefully optimize removing pending votes before active votes
+    // And to attempt to preserve `account`'s earliest votes (assuming earliest = prefered)
     for (uint256 i = info.groups.length; i > 0; i = i.sub(1)) {
       info.remainingValue = info.remainingValue.sub(
-        _revokeVotes(
+        _decrementVotes(
           account,
           info.groups[i.sub(1)],
           info.remainingValue,
@@ -947,8 +952,9 @@ contract Election is
         )
       );
       if (info.remainingValue == 0) {
-        return value;
+        break;
       }
     }
+    return value.sub(info.remainingValue);
   }
 }
