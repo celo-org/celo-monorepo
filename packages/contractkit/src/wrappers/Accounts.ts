@@ -85,12 +85,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   /**
    * Returns the account associated with `signer`.
    * @param signer The address of the account or previously authorized signer.
+   * @param blockNumber Height of result, defaults to tip.
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  signerToAccount: (signer: Address) => Promise<Address> = proxyCall(
-    this.contract.methods.signerToAccount
-  )
+  signerToAccount(signer: Address, blockNumber?: number): Promise<Address> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.signerToAccount(signer).call({}, blockNumber)
+  }
 
   /**
    * Check if an account already exists.
@@ -237,8 +239,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   /**
    * Returns the set name for the account
    * @param account Account
+   * @param blockNumber Height of result, defaults to tip.
    */
-  getName = proxyCall(this.contract.methods.getName)
+  async getName(account: Address, blockNumber?: number): Promise<string> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.getName(account).call({}, blockNumber)
+  }
 
   /**
    * Returns the set data encryption key for the account
