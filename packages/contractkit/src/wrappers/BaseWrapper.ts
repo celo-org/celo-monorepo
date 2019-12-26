@@ -2,8 +2,8 @@ import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
-import { TransactionObject, Tx } from 'web3/eth/types'
-import { TransactionReceipt } from 'web3/types'
+import { BlockType, TransactionObject, Tx } from 'web3/eth/types'
+import { EventLog, TransactionReceipt } from 'web3/types'
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
@@ -18,6 +18,19 @@ export abstract class BaseWrapper<T extends Contract> {
   get address(): string {
     // TODO fix typings
     return (this.contract as any)._address
+  }
+
+  /** Contract getPastEvents */
+  protected getPastEvents(
+    event: string,
+    options?: {
+      filter?: object
+      fromBlock?: BlockType
+      toBlock?: BlockType
+      topics?: string[]
+    }
+  ): Promise<EventLog[]> {
+    return this.contract.getPastEvents(event, options)
   }
 }
 
