@@ -110,7 +110,7 @@ resource "google_compute_target_https_proxy" "external" {
 
 resource "google_compute_url_map" "external" {
   name            = "${local.name_prefix}-external-url-map"
-  default_service = "${google_compute_backend_service.external.self_link}"
+  default_service = google_compute_backend_service.external.self_link
 
   host_rule {
     hosts        = [var.forno_host]
@@ -119,7 +119,7 @@ resource "google_compute_url_map" "external" {
 
   path_matcher {
     name            = "allpaths"
-    default_service = "${google_compute_backend_service.external.self_link}"
+    default_service = google_compute_backend_service.external.self_link
   }
 }
 
@@ -154,12 +154,12 @@ resource "google_dns_record_set" "external" {
 
   rrdatas = [google_compute_global_address.external.address]
 
-  project = "celo-testnet"
+  project = var.dns_gcloud_project
 }
 
 data "google_dns_managed_zone" "external" {
   name = var.dns_zone_name
-  project = "celo-testnet"
+  project = var.dns_gcloud_project
 }
 
 # SSL certificate from Let's Encrypt:
@@ -188,7 +188,7 @@ resource "google_compute_instance" "external_ssl" {
     format("%s/ssl-startup.sh", path.module), {
       cert_prefix : "${local.name_prefix}-forno-",
       forno_host : var.forno_host,
-      gcloud_project : "celo-testnet",
+      gcloud_project : var.dns_gcloud_project,
       letsencrypt_email : var.letsencrypt_email,
       target_https_proxy_name : local.target_https_proxy_name
     }

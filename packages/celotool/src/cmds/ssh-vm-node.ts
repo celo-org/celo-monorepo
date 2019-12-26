@@ -40,6 +40,7 @@ export const handler = async (argv: SshVmNodeArgv) => {
   let instanceName
   if (nodeTypesWithRandomSuffixes.includes(argv.nodeType)) {
     instanceName = await getNodeVmNameWithRandomSuffix(
+      project,
       argv.celoEnv,
       argv.nodeType,
       argv.nodeIndex || 0
@@ -54,15 +55,20 @@ export const handler = async (argv: SshVmNodeArgv) => {
   console.info(getSshCommand(project, zone, instanceName))
 }
 
-function getSshCommand(gcloudProject: string, gcloudZone: string, instanceName: string) {
+export function getSshCommand(gcloudProject: string, gcloudZone: string, instanceName: string) {
   return `gcloud beta compute --project '${gcloudProject}' ssh --zone '${gcloudZone}' ${instanceName} --tunnel-through-iap`
 }
 
 // Some VM names have a randomly generated suffix. This returns the full name
 // of the instance given only the celoEnv and index.
-async function getNodeVmNameWithRandomSuffix(celoEnv: string, nodeType: string, index: number) {
+async function getNodeVmNameWithRandomSuffix(
+  gcloudProject: string,
+  celoEnv: string,
+  nodeType: string,
+  index: number
+) {
   const [nodeName] = await execCmd(
-    `gcloud compute instances list --filter="NAME ~ ${celoEnv}-${nodeType}-${index}-.*" --format get\\(NAME\\)`
+    `gcloud compute instances list --project '${gcloudProject}' --filter="NAME ~ ${celoEnv}-${nodeType}-${index}-.*" --format get\\(NAME\\)`
   )
   return nodeName.trim()
 }

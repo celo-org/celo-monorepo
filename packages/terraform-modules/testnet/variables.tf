@@ -8,6 +8,11 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable dns_gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project where Cloud DNS is"
+}
+
 variable dns_zone_name {
   type        = string
   description = "Name of the DNS zone for the domain used for the forno setup"
