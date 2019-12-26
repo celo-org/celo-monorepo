@@ -45,9 +45,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
-  event SlasherWhitelistAdded(address slasher);
-  event SlasherWhitelistRemoved(address slasher);
-  event AccountSlashed(address slashed, uint256 penalty, address reporter, uint256 reward);
+  event SlasherWhitelistAdded(address indexed slasher);
+  event SlasherWhitelistRemoved(address indexed slasher);
+  event AccountSlashed(
+    address indexed slashed,
+    uint256 penalty,
+    address indexed reporter,
+    uint256 reward
+  );
 
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
@@ -253,7 +258,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param slasher Address to whitelist.
    */
   function addSlasher(address slasher) external onlyOwner {
-    require(slasher != address(0));
+    require(slasher != address(0) && !isSlasher[address], "Invalid address to `addSlasher`.");
     isSlasher[slasher] = true;
     emit SlasherWhitelistAdded(slasher);
   }
