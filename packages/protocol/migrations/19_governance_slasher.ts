@@ -20,6 +20,6 @@ module.exports = deploymentForCoreContract<GovernanceSlasherInstance>(
       'LockedGold',
       artifacts
     )
-    lockedGold.addSlasher(slasher.address)
+    await lockedGold.addSlasher(slasher.address)
   }
 )

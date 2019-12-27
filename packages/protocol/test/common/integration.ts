@@ -6,6 +6,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
@@ -18,7 +19,6 @@ import {
   ReserveInstance,
   StableTokenInstance,
 } from 'types'
-import { zip, linkedListChanges } from '@celo/utils/lib/collections'
 
 enum VoteValue {
   None = 0,
@@ -61,7 +61,9 @@ async function slashingOfGroups(
     const slashedVotes = votes.lt(difference) ? votes : difference
     res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })
     difference = difference.minus(slashedVotes)
-    if (difference.eq(new BigNumber(0))) break
+    if (difference.eq(new BigNumber(0))) {
+      break
+    }
   }
   return res
 }

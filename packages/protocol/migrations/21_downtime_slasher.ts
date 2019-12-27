@@ -25,6 +25,6 @@ module.exports = deploymentForCoreContract<DowntimeSlasherInstance>(
       'LockedGold',
       artifacts
     )
-    lockedGold.addSlasher(slasher.address)
+    await lockedGold.addSlasher(slasher.address)
   }
 )

@@ -35,8 +35,9 @@ async function sendTransaction<T>(
 ) {
   if (isGanache) {
     const from = privateKeyToAddress(privateKey)
-    if (tx == null) await web3.eth.sendTransaction({ ...txArgs, from })
-    else {
+    if (tx == null) {
+      await web3.eth.sendTransaction({ ...txArgs, from })
+    } else {
       await tx.send({ ...txArgs, from, gasLimit: '10000000' })
     }
   } else {

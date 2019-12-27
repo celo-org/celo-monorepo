@@ -24,6 +24,6 @@ module.exports = deploymentForCoreContract<DoubleSigningSlasherInstance>(
       'LockedGold',
       artifacts
     )
-    lockedGold.addSlasher(slasher.address)
+    await lockedGold.addSlasher(slasher.address)
   }
 )
