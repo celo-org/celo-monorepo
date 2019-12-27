@@ -26,6 +26,8 @@ interface Competitor {
 interface State {
   width: number
   isExpanded: boolean
+  isTotallyExpanded: boolean
+  expansions: number
 }
 
 const PRECISION = 100
@@ -65,6 +67,8 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
   state: State = {
     width: 0,
     isExpanded: false,
+    isTotallyExpanded: false,
+    expansions: 0,
   }
 
   onLayout = (event: LayoutChangeEvent) => {
@@ -72,13 +76,25 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
     this.setState({ width })
   }
 
-  onToggleExpanse = () => {
-    this.setState((state) => ({ isExpanded: !state.isExpanded }))
+  onShowMore = () => {
+    this.setState((state, props) => ({
+      isExpanded: true,
+      isTotallyExpanded: props.leaders.length < (state.expansions + 1) * EXPANDED_MAX,
+      expansions: state.expansions + 1,
+    }))
+  }
+
+  onCollapse = () => {
+    this.setState({
+      isExpanded: false,
+      isTotallyExpanded: false,
+      expansions: 0,
+    })
   }
 
   render() {
     const { t, leaders, screen, isLoading } = this.props
-    const { isExpanded } = this.state
+    const { isExpanded, isTotallyExpanded, expansions } = this.state
     const showExpandButton = leaders.length >= INITIAL_MAX + 1
 
     const leadersWithBTUs = leaders.map((leader) => ({
@@ -90,8 +106,10 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
       return null
     }
 
-    const realMax = leaders.length > EXPANDED_MAX ? EXPANDED_MAX : leaders.length
-    const sortedLeaders = leadersWithBTUs.sort(sorter).slice(0, isExpanded ? realMax : INITIAL_MAX)
+    const maxToShow = EXPANDED_MAX * expansions
+    const realMax = leaders.length > maxToShow ? maxToShow : leaders.length
+    const length = isExpanded ? realMax : INITIAL_MAX
+    const sortedLeaders = leadersWithBTUs.sort(sorter).slice(0, length)
     const maxPoints = round(sortedLeaders[0].points * 1.1, PRECISION)
     const width = this.state.width
     return (
@@ -121,20 +139,36 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
           </Fade>
           {showExpandButton && (
             <Fade delay={DELAY_MS}>
-              <View style={[styles.buttonExpand, standardStyles.elementalMarginTop]}>
-                <Button
-                  text={isExpanded ? t('collapseLeaderboard') : t('expandLeaderboard')}
-                  kind={BTN.TERTIARY}
-                  iconRight={
-                    <Chevron
-                      direction={isExpanded ? Direction.up : Direction.down}
-                      size={12}
-                      color={colors.primary}
-                    />
-                  }
-                  size={SIZE.normal}
-                  onPress={this.onToggleExpanse}
-                />
+              <View
+                style={[
+                  styles.buttonExpand,
+                  standardStyles.elementalMarginTop,
+                  standardStyles.row,
+                  standardStyles.centered,
+                ]}
+              >
+                {!isTotallyExpanded && (
+                  <Button
+                    text={t('expandLeaderboard')}
+                    kind={BTN.TERTIARY}
+                    iconRight={
+                      <Chevron direction={Direction.down} size={12} color={colors.primary} />
+                    }
+                    size={SIZE.normal}
+                    onPress={this.onShowMore}
+                  />
+                )}
+                {isExpanded && (
+                  <Button
+                    text={t('collapseLeaderboard')}
+                    kind={BTN.TERTIARY}
+                    iconRight={
+                      <Chevron direction={Direction.up} size={12} color={colors.primary} />
+                    }
+                    size={SIZE.normal}
+                    onPress={this.onCollapse}
+                  />
+                )}
               </View>
             </Fade>
           )}
