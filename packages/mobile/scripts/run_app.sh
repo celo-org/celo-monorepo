@@ -63,8 +63,8 @@ sed -i.bak "s/DEV_RESTORE_NAV_STATE_ON_RELOAD=.*/DEV_RESTORE_NAV_STATE_ON_RELOAD
 # Set Firebase settings in google service config files
 ANDROID_GSERVICES_PATH="./android/app/src/debug/google-services.json"
 IOS_GSERVICES_PATH="./ios/GoogleService-Info.plist"
-sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $ANDROID_GSERVICES_PATH
-sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $IOS_GSERVICES_PATH
+sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $ANDROID_GSERVICES_PATH || true
+sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $IOS_GSERVICES_PATH || true
 
 # Cleanup artifacts from in-place sed replacement on BSD based systems (macOS)
 rm -f $ENV_FILENAME.bak
@@ -98,7 +98,7 @@ if [ $PLATFORM = "android" ]; then
 
   if [ $MACHINE = "Mac" ]; then
     echo "Starting packager in new terminal"
-    RN_START_CMD="cd `pwd`;yarn react-native start"
+    RN_START_CMD="cd `pwd` && (yarn react-native start || yarn react-native start)"
     OSASCRIPT_CMD="tell application \"Terminal\" to do script \"$RN_START_CMD\""
     echo "FULLCMD: $OSASCRIPT_CMD"
     osascript -e "$OSASCRIPT_CMD"

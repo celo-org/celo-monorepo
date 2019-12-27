@@ -109,6 +109,8 @@ const Navigation = React.memo(function _Navigation({
                   : styles.verticalMenuItem,
               ]}
             >
+              {/*
+              // @ts-ignore */}
               <Button
                 href={item.link}
                 text={t(item.name)}

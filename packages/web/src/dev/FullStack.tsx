@@ -256,7 +256,6 @@ const styles = StyleSheet.create({
   container: { overflow: 'hidden', flexWrap: 'wrap' },
   tabletContainer: { justifyContent: 'flex-end' },
   sticky: {
-    // @ts-ignore
     position: 'fixed',
     top: HEADER_HEIGHT,
     zIndex: 10,
@@ -276,4 +275,5 @@ const styles = StyleSheet.create({
     transitionProperty: 'opacity',
     transitionDuration: '100ms',
   },
+  base: {},
 })

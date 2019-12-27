@@ -2,7 +2,7 @@ import LanguageSelectUI from '@celo/react-components/components/LanguageSelectUI
 import { navigate } from '@celo/react-components/services/NavigationService'
 import logo from 'assets/celo-logo.png'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import VerifierAnalytics from 'src/analytics/CeloAnalytics'
@@ -12,6 +12,8 @@ import i18n from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/logger'
+
+const TAG = 'components/NUX/LanguageScreen'
 
 interface State {
   selectedAnswer: string
@@ -29,7 +31,7 @@ interface ScreenProp {
   nextScreen: string
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps<ScreenProp>
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps<ScreenProp>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -46,8 +48,10 @@ class LanguageScreen extends React.Component<Props, State> {
   }
 
   onSelectAnswer = (language: string, code: string) => {
-    Logger.info('LanguageScreen', `Langauge set to ${language} -> ${code}`)
-    i18n.changeLanguage(code)
+    Logger.info(TAG, `Langauge set to ${language} -> ${code}`)
+    i18n
+      .changeLanguage(code)
+      .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
     this.props.setLanguage(code)
     this.setState({ selectedAnswer: code })
     this.trackSelected(code)
@@ -61,7 +65,7 @@ class LanguageScreen extends React.Component<Props, State> {
   }
 
   onSubmit = () => {
-    Logger.info('LanguageScreen', 'submitted')
+    Logger.info(TAG, 'submitted')
     this.props.setLanguage(this.state.selectedAnswer)
     this.trackSubmission()
     navigate(this.nextScreen())
@@ -97,7 +101,7 @@ class LanguageScreen extends React.Component<Props, State> {
   }
 }
 
-export default withNamespaces()(
+export default withTranslation()(
   connect<StateProps, DispatchProps>(
     mapStateToProps,
     { setLanguage }
