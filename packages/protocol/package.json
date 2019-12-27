@@ -11,7 +11,7 @@
     "lint": "yarn run lint:ts && yarn run lint:sol",
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
     "pretest": "yarn run build",
-    "test": "node runTests.js",
+    "test": "rm test/**/*.js ; node runTests.js",
     "test:coverage": "yarn run test --coverage",
     "gas": "yarn run test:local --gas",
     "build:ts": "rm -f migrations/*.js* && tsc -b",
