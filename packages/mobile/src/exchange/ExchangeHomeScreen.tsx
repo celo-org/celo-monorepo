@@ -3,7 +3,7 @@ import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -13,7 +13,7 @@ import { fetchExchangeRate } from 'src/exchange/actions'
 import Activity from 'src/exchange/Activity'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -30,7 +30,7 @@ interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, CURRENCY_ENUM.DOLLAR),
@@ -111,7 +111,7 @@ export default componentWithAnalytics(
     {
       fetchExchangeRate,
     }
-  )(withNamespaces(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
+  )(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 )
 
 const styles = StyleSheet.create({

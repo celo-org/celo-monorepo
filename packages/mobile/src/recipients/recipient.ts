@@ -200,12 +200,12 @@ type FuzzyRecipient = Recipient | PreparedRecipient
 const SCORE_THRESHOLD = -6000
 
 const fuzzysortOptions = {
-  keys: ['displayName', 'e164PhoneNumber'],
+  keys: ['displayName', 'e164PhoneNumber', 'address'],
   threshold: SCORE_THRESHOLD,
 }
 
 const fuzzysortPreparedOptions = {
-  keys: ['displayPrepared', 'phonePrepared'],
+  keys: ['displayPrepared', 'phonePrepared', 'addressPrepared'],
   threshold: SCORE_THRESHOLD,
 }
 
@@ -262,6 +262,7 @@ export const filterRecipientFactory = (recipients: Recipient[], shouldSort?: boo
     ...r,
     displayPrepared: fuzzysort.prepare(r.displayName),
     phonePrepared: r.e164PhoneNumber ? fuzzysort.prepare(r.e164PhoneNumber) : undefined,
+    addressPrepared: r.address ? fuzzysort.prepare(r.address) : undefined,
   }))
 
   return (query: string) => {

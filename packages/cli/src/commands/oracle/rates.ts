@@ -26,9 +26,13 @@ export default class GetRates extends BaseCommand {
     const sortedOracles = await this.kit.contracts.getSortedOracles()
 
     const rates = await sortedOracles.getRates(res.args.token)
-    cli.table(rates, {
-      address: {},
-      rate: { get: (r) => r.rate.toNumber() },
-    })
+    cli.table(
+      rates,
+      {
+        address: {},
+        rate: { get: (r) => r.rate.toNumber() },
+      },
+      { 'no-truncate': !res.flags.truncate }
+    )
   }
 }

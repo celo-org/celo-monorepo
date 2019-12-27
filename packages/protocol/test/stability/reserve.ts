@@ -414,7 +414,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe.only('#setAssetAllocations', () => {
+  describe('#setAssetAllocations', () => {
     const newAssetAllocationSymbols = [
       web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
       web3.utils.padRight(web3.utils.utf8ToHex('BTC'), 64),

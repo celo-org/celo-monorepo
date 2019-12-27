@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron from 'src/icons/chevron'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { parseDate, printDuration } from 'src/shared/PlaceDate'
 import { colors, fonts, standardStyles } from 'src/styles'
@@ -107,12 +107,26 @@ class EventLink extends React.PureComponent<EventLinkProps> {
   render() {
     const { link, recap, isPastEvent, t, isMobile } = this.props
     if (link && !isPastEvent && !isMobile) {
-      // @ts-ignore
-      return <Button text={t('events.eventPage')} kind={BTN.NAKED} href={link} target="_external" />
+      return (
+        <Button
+          size={SIZE.normal}
+          text={t('events.eventPage')}
+          kind={BTN.NAKED}
+          href={link}
+          target="_external"
+        />
+      )
     }
     if (recap && recap.length) {
-      // @ts-ignore
-      return <Button text={t('events.recap')} kind={BTN.NAKED} href={recap} target="_external" />
+      return (
+        <Button
+          size={SIZE.normal}
+          text={t('events.recap')}
+          kind={BTN.NAKED}
+          href={recap}
+          target="_external"
+        />
+      )
     }
     return null
   }

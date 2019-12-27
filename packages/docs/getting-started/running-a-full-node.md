@@ -74,10 +74,10 @@ The genesis block is the first block in the chain, and is specific to each netwo
 docker run -v $PWD:/root/.celo --rm $CELO_IMAGE init /celo/genesis.json
 ```
 
-In order to allow the node to sync with the network, give it the address of existing nodes in the network:
+In order to allow the node to sync with the network, get the enode URLs of the bootnodes:
 
 ```bash
-docker run -v $PWD:/root/.celo --rm --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+export BOOTNODE_ENODES=`docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes`
 ```
 
 ## Start the node
@@ -85,7 +85,7 @@ docker run -v $PWD:/root/.celo --rm --entrypoint cp $CELO_IMAGE /celo/static-nod
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-docker run --name celo-fullnode -d --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS
+docker run --name celo-fullnode -d --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --bootnodes $BOOTNODE_ENODES
 ```
 
 You'll start seeing some output. There may be some errors or warnings that are ignorable. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
