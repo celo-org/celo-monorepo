@@ -37,9 +37,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   bytes32[] public assetAllocationSymbols;
   uint256[] public assetAllocationWeights;
 
-  uint256 private lastSpendingDay;
-  FixidityLib.Fraction public spendingRatio;
-  uint256 private spendingLimit;
+  uint256 public lastSpendingDay;
+  uint256 public spendingLimit;
+  FixidityLib.Fraction private spendingRatio;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
