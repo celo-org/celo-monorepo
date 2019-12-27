@@ -57,14 +57,6 @@ contract UsingRegistry is Ownable {
     _;
   }
 
-  function check(bytes32[] memory identifierHashes) public view returns (address[] memory) {
-    address[] memory res = new address[](identifierHashes.length);
-    for (uint256 i = 0; i < identifierHashes.length; i++) {
-      res[i] = registry.getAddressFor(identifierHashes[i]);
-    }
-    return res;
-  }
-
   modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
     bool registered = false;
     for (uint256 i = 0; i < identifierHashes.length; i++) {

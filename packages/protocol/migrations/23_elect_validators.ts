@@ -22,8 +22,6 @@ function serializeKeystore(keystore: any) {
 let isGanache = false
 
 const extraKeys = [
-  /*  '0xefb595a0178eb79a8df953f87c5148402a224cdf725e88c0146727c6aceadccd',
-  '0x83c6d2cc5ddcf9711a6d59b417dc20eb48afd58d45290099e5987e3d768f328f', */
   '0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
   '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
   '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
@@ -37,14 +35,9 @@ async function sendTransaction<T>(
 ) {
   if (isGanache) {
     const from = privateKeyToAddress(privateKey)
-    // console.info('key', privateKey, 'address', from, 'balance', await web3.eth.getBalance(from))
     if (tx == null) await web3.eth.sendTransaction({ ...txArgs, from })
     else {
-      //console.info('sending', tx.encodeABI(), txArgs)
-      // const response =
       await tx.send({ ...txArgs, from, gasLimit: '10000000' })
-      // @ts-ignore
-      // console.log(response.events)
     }
   } else {
     await sendTransactionWithPrivateKey(web3, tx, privateKey, txArgs)
@@ -65,7 +58,6 @@ async function lockGold(
 
   // @ts-ignore
   const lockTx = lockedGold.contract.methods.lock()
-  // console.info(value.toString(10), lockedGold.address)
 
   await sendTransaction(web3, lockTx, privateKey, {
     to: lockedGold.address,
@@ -81,17 +73,6 @@ function createAccountOrUseFromGanache() {
     return web3.eth.accounts.create()
   }
 }
-
-/*
-async function lockGoldGanache(
-  accounts: AccountsInstance,
-  lockedGold: LockedGoldInstance,
-  value: BigNumber,
-  privateKey: number
-) {
-  await accounts.createAccount({from: accounts[privateKey]})
-  await lockedGold.lock({from: accounts[privateKey], value: value.toString(10)})
-}*/
 
 async function registerValidatorGroup(
   name: string,
@@ -263,9 +244,6 @@ module.exports = async (_deployer: any, networkName: string) => {
       '0x752dd9cf65e68cfaba7d60225cbdbc1f4729dd5e5507def72815ed0d8abc6249',
       '0xefb595a0178eb79a8df953f87c5148402a224cdf725e88c0146727c6aceadccd',
       '0x83c6d2cc5ddcf9711a6d59b417dc20eb48afd58d45290099e5987e3d768f328f',
-      /*'0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
-      '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
-      '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89', */
     ]
     config.validators.attestationKeys = config.validators.validatorKeys
   }

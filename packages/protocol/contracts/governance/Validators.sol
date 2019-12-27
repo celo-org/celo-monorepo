@@ -1125,14 +1125,7 @@ contract Validators is
     return true;
   }
 
-  bytes32[] canForceDeaffiliation = [
-    DOWNTIME_SLASHER_REGISTRY_ID,
-    DOUBLE_SIGNING_SLASHER_REGISTRY_ID,
-    GOVERNANCE_SLASHER_REGISTRY_ID,
-    GOVERNANCE_REGISTRY_ID
-  ];
-
-  function getCanForceDeaffiliation() public pure returns (bytes32[] memory) {
+  function getCanForceDeaffiliation() internal pure returns (bytes32[] memory) {
     bytes32[] memory res = new bytes32[](4);
     res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
     res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
@@ -1181,20 +1174,11 @@ contract Validators is
     group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
-  bytes32[] canHalveSlashingMultiplier = [
-    DOWNTIME_SLASHER_REGISTRY_ID,
-    DOUBLE_SIGNING_SLASHER_REGISTRY_ID
-  ];
-
-  function getCanHalveSlashingMultiplier() public pure returns (bytes32[] memory) {
+  function getCanHalveSlashingMultiplier() internal pure returns (bytes32[] memory) {
     bytes32[] memory res = new bytes32[](2);
     res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
     res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
     return res;
-  }
-
-  function debugCheck() public returns (address[] memory) {
-    return check(getCanHalveSlashingMultiplier());
   }
 
   /**
