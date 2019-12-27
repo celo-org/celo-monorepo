@@ -1,4 +1,4 @@
-import { ensureHexLeader, stripHexLeader } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { URL_REGEX } from '@celo/utils/lib/io'
 import { isE164NumberStrict } from '@celo/utils/lib/phoneNumbers'
@@ -13,14 +13,14 @@ const parseBytes = (input: string, length: number, msg: string) => {
   // Check that the string is hex and and has byte length of `length`.
   const expectedLength = input.startsWith('0x') ? length * 2 + 2 : length * 2
   if (Web3.utils.isHex(input) && input.length === expectedLength) {
-    return ensureHexLeader(input)
+    return ensureLeading0x(input)
   } else {
     throw new CLIError(msg)
   }
 }
 
 const parseEcdsaPublicKey: ParseFn<string> = (input) => {
-  const stripped = stripHexLeader(input)
+  const stripped = trimLeading0x(input)
   // ECDSA public keys may be passed as 65 byte values. When this happens, we drop the first byte.
   if (stripped.length === 65 * 2) {
     return parseBytes(stripped.slice(2), 64, `${input} is not an ECDSA public key`)

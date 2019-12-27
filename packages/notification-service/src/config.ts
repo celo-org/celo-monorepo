@@ -47,17 +47,19 @@ export enum NotificationTypes {
 const en = require('../locales/en.json')
 const es = require('../locales/es.json')
 
-i18next.init({
-  lng: DEFAULT_LOCALE,
-  resources: {
-    en: {
-      translation: en,
+i18next
+  .init({
+    lng: DEFAULT_LOCALE,
+    resources: {
+      en: {
+        translation: en,
+      },
+      es: {
+        translation: es,
+      },
     },
-    es: {
-      translation: es,
+    fallbackLng: {
+      default: ['en'],
     },
-  },
-  fallbackLng: {
-    default: ['en'],
-  },
-})
+  })
+  .catch((reason: any) => console.error('Config', 'Failed init i18n', reason))
