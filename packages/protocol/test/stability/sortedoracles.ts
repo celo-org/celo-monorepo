@@ -25,7 +25,7 @@ contract('SortedOracles', (accounts: string[]) => {
 
   beforeEach(async () => {
     sortedOracles = await SortedOracles.new()
-    await sortedOracles.initialize(aReportExpiry)
+    await sortedOracles.initialize(aReportExpiry, 0)
   })
 
   describe('#initialize()', () => {
@@ -39,7 +39,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(sortedOracles.initialize(aReportExpiry))
+      await assertRevert(sortedOracles.initialize(aReportExpiry, 0))
     })
   })
 
