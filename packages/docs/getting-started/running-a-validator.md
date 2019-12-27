@@ -634,7 +634,7 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 
 ## Registering Metadata
 
-We are using [Metadata]()(../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. For us to complete the process, we have to make two claims:
+We are using [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. For us to complete the process, we have to make two claims:
 
 1.  Under which URL users can request attestations from
 2.  Which accounts belong together for the purpose of the leaderboard
