@@ -86,33 +86,25 @@ contract DoubleSigningSlasher is SlasherUtil {
     bytes memory blockA,
     bytes memory blockB
   ) public view returns (uint256) {
-    if (!(hashHeader(blockA) != hashHeader(blockB))) return 1;
     require(hashHeader(blockA) != hashHeader(blockB), "Block hashes have to be different");
     uint256 blockNumber = getBlockNumberFromHeader(blockA);
-    if (!(blockNumber == getBlockNumberFromHeader(blockB))) return 2;
     require(
       blockNumber == getBlockNumberFromHeader(blockB),
       "Block headers are from different height"
     );
-    if (!(index < numberValidatorsInSet(blockNumber))) return 3;
     require(index < numberValidatorsInSet(blockNumber), "Bad validator index");
-    if (!(signer == validatorSignerAddressFromSet(index, blockNumber))) return 4;
     require(
       signer == validatorSignerAddressFromSet(index, blockNumber),
       "Wasn't a signer with given index"
     );
     uint256 mapA = uint256(getVerifiedSealBitmapFromHeader(blockA));
     uint256 mapB = uint256(getVerifiedSealBitmapFromHeader(blockB));
-    if (!(mapA & (1 << index) != 0)) return 5;
     require(mapA & (1 << index) != 0, "Didn't sign first block");
-    if (!(mapB & (1 << index) != 0)) return 6;
     require(mapB & (1 << index) != 0, "Didn't sign second block");
-    if (!(countSetBits(mapA) >= minQuorumSize(blockNumber))) return 7;
     require(
       countSetBits(mapA) >= minQuorumSize(blockNumber),
       "Not enough signers in the first block"
     );
-    if (!(countSetBits(mapB) >= minQuorumSize(blockNumber))) return 8;
     require(
       countSetBits(mapB) >= minQuorumSize(blockNumber),
       "Not enough signers in the second block"

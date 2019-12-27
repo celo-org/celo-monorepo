@@ -1,10 +1,12 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { NULL_ADDRESS } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
+import * as rlp from 'rlp'
 import Web3 from 'web3'
 import {
   assertAlmostEqual,
@@ -15,10 +17,29 @@ import {
   sleep,
   waitToFinishSyncing,
 } from './utils'
-import { NULL_ADDRESS } from '@celo/utils/lib/address'
 
 interface MemberSwapper {
   swap(): Promise<void>
+}
+
+function headerFromBlock(web3: Web3, block: any) {
+  return rlp.encode([
+    block.parentHash,
+    block.sha3Uncles,
+    block.miner,
+    block.stateRoot,
+    block.transactionsRoot,
+    block.receiptsRoot,
+    block.logsBloom,
+    web3.utils.toHex(block.difficulty),
+    block.number,
+    block.gasLimit,
+    block.gasUsed,
+    block.timestamp,
+    block.extraData,
+    block.mixHash,
+    block.nonce,
+  ])
 }
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
@@ -163,7 +184,6 @@ describe('governance tests', () => {
     await context.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
-    console.log(await web3.eth.getAccounts())
     goldToken = await kit._web3Contracts.getGoldToken()
     stableToken = await kit._web3Contracts.getStableToken()
     sortedOracles = await kit._web3Contracts.getSortedOracles()
@@ -179,7 +199,6 @@ describe('governance tests', () => {
     await contextDown.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
-    console.log(await web3.eth.getAccounts())
     goldToken = await kit._web3Contracts.getGoldToken()
     stableToken = await kit._web3Contracts.getStableToken()
     sortedOracles = await kit._web3Contracts.getSortedOracles()
@@ -331,94 +350,43 @@ describe('governance tests', () => {
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restartWithDowntime()
-
-      try {
-        const elect = await kit._web3Contracts.getElection()
-
-        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
-      } catch (err) {
-        console.log(err)
-        await sleep(1000)
-      }
     })
 
     it('slash for downtime', async function(this: any) {
       this.timeout(0) // Disable test timeout
-      try {
-        const slasher = await kit._web3Contracts.getDowntimeSlasher()
-        const elect = await kit._web3Contracts.getElection()
+      const slasher = await kit._web3Contracts.getDowntimeSlasher()
+      const blockNumber = await web3.eth.getBlockNumber()
+      await waitUntilBlock(blockNumber + 20)
+      doubleSigningBlock = await web3.eth.getBlock(blockNumber + 15)
 
-        const blockNumber = await web3.eth.getBlockNumber()
+      const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber + 12).call()
 
-        console.info('at block', blockNumber)
+      const validator = (await kit.web3.eth.getAccounts())[0]
+      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const lockedGold = await kit.contracts.getLockedGold()
 
-        await waitUntilBlock(blockNumber + 20)
-        console.info('at block', await web3.eth.getBlockNumber())
-        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
+      const validatorsContract = await kit._web3Contracts.getValidators()
+      const history = await validatorsContract.methods.getHistory(signer).call()
+      const historyIndex = history[0].length - 1
 
-        doubleSigningBlock = await web3.eth.getBlock(blockNumber + 15)
-
-        for (let i = blockNumber; i < blockNumber + 1; i++) {
-          console.log('block', i, await slasher.methods.getParentSealBitmap(i).call())
-        }
-
-        const signer = await slasher.methods
-          .validatorSignerAddressFromSet(4, blockNumber + 12)
-          .call()
-
-        const validator = (await kit.web3.eth.getAccounts())[0]
-        await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
-        console.log(validator)
-
-        const lockedGold = await kit.contracts.getLockedGold()
-        const accounts = await kit.contracts.getAccounts()
-
-        console.log('signer to account', await accounts.signerToAccount(signer))
-
-        console.log('incentives', await slasher.methods.slashingIncentives().call())
-
-        console.log('total', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))
-        console.log(
-          'nonvoting',
-          (await lockedGold.getAccountNonvotingLockedGold(signer)).toString(10)
+      await slasher.methods
+        .slash(
+          signer,
+          blockNumber + 12,
+          4,
+          4,
+          historyIndex,
+          [],
+          [],
+          [],
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0]
         )
+        .send({ from: validator, gas: 5000000 })
 
-        console.log('locked balance', await web3.eth.getBalance(lockedGold.address))
-
-        const valid = await kit._web3Contracts.getValidators()
-
-        const history = await valid.methods.getHistory(signer).call()
-        const historyIndex = history[0].length - 1
-        console.log('history', history, historyIndex)
-
-        console.log('registry', await slasher.methods.getSlasher().call(), slasher.options.address)
-
-        console.log(
-          'check',
-          await slasher.methods.debugIsDown(signer, blockNumber + 12, 4, 4).call()
-        )
-
-        await slasher.methods
-          .slash(
-            signer,
-            blockNumber + 12,
-            4,
-            4,
-            historyIndex,
-            [],
-            [],
-            [],
-            [NULL_ADDRESS],
-            [NULL_ADDRESS],
-            [0]
-          )
-          .send({ from: validator, gas: 5000000 })
-
-        console.log('remaining', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))
-      } catch (err) {
-        console.log(err)
-        await sleep(1000)
-      }
+      const balance = await lockedGold.getAccountTotalLockedGold(signer)
+      assert.equal(balance.toString(10), '9000000000000000000000')
     })
   })
 
@@ -426,153 +394,64 @@ describe('governance tests', () => {
     before(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
-
-      try {
-        const block = await web3.eth.getBlock(123)
-        // console.log('header', block)
-
-        const downtimeSlasher = await kit._web3Contracts.getDowntimeSlasher()
-        const elect = await kit._web3Contracts.getElection()
-
-        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
-
-        const hash = await downtimeSlasher.methods.hashHeader(block.raw).call()
-        console.info('hash', hash)
-
-        const signer = await downtimeSlasher.methods.validatorSignerAddressFromSet(2, 100).call()
-        console.info('signer', signer)
-
-        console.info('at block', await web3.eth.getBlockNumber())
-
-        const bitmap = await downtimeSlasher.methods
-          .getVerifiedSealBitmapFromHeader(block.raw)
-          .call({ gas: 1000000 })
-        console.info('bitmap', bitmap)
-      } catch (err) {
-        console.log(err)
-        await sleep(1000)
-      }
     })
 
     it('slash for double signing', async function(this: any) {
       this.timeout(0) // Disable test timeout
-      try {
-        const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
-        const elect = await kit._web3Contracts.getElection()
+      const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
 
-        await waitUntilBlock(doubleSigningBlock.number)
-        console.info('at block', await web3.eth.getBlockNumber())
-        console.log('signers', await elect.methods.getCurrentValidatorSigners().call())
+      await waitUntilBlock(doubleSigningBlock.number)
 
-        const other = doubleSigningBlock.raw
+      const other = headerFromBlock(web3, doubleSigningBlock)
+      // console.log(doubleSigningBlock.raw, other)
 
-        console.log('at 245', (await web3.eth.getBlock(245)).raw)
+      const num = await slasher.methods.getBlockNumberFromHeader(other).call()
 
-        const num = await slasher.methods.getBlockNumberFromHeader(other).call()
-        console.log('number', num)
+      const header = headerFromBlock(web3, await web3.eth.getBlock(num))
+      // console.log((await web3.eth.getBlock(num)).raw, header)
 
-        const header = (await web3.eth.getBlock(num)).raw
+      const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
+      const bitmap = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
 
-        const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
-        const bitmap = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
-        const hash = await slasher.methods.hashHeader(header).call()
-        console.log(header, bitmap, hash)
-
-        let bmNum1 = new BigNumber(bitmap).toNumber()
-        let bmNum2 = new BigNumber(bitmap2).toNumber()
-        let signerIdx = 0
-        for (let i = 0; i < 5; i++) {
-          if ((bmNum1 & 1) === 1 && (bmNum2 & 1) === 1) break
-          signerIdx++
-          bmNum1 = bmNum1 >> 1
-          bmNum2 = bmNum2 >> 1
+      let bmNum1 = new BigNumber(bitmap).toNumber()
+      let bmNum2 = new BigNumber(bitmap2).toNumber()
+      let signerIdx = 1
+      for (let i = 1; i < 5; i++) {
+        if ((bmNum1 & 1) === 1 && (bmNum2 & 1) === 1) {
+          break
         }
-        console.log('index', signerIdx)
-
-        const valid = await kit._web3Contracts.getValidators()
-
-        const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
-        const validator = (await kit.web3.eth.getAccounts())[0]
-        await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
-        console.log(validator)
-
-        const lockedGold = await kit.contracts.getLockedGold()
-        const accounts = await kit.contracts.getAccounts()
-
-        console.log('signer to account', await accounts.signerToAccount(signer))
-
-        console.log('incentives', await slasher.methods.slashingIncentives().call())
-
-        console.log('total', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))
-        console.log(
-          'nonvoting',
-          (await lockedGold.getAccountNonvotingLockedGold(signer)).toString(10)
-        )
-
-        console.log(
-          'BN',
-          await slasher.methods.checkForDoubleSigning(signer, signerIdx, header, other).call()
-        )
-
-        console.log('locked balance', await web3.eth.getBalance(lockedGold.address))
-
-        const blockNumber = await web3.eth.getBlockNumber()
-        const history = await valid.methods.getHistory(signer).call()
-        const historyIndex = history[0].length - 1
-        console.log('history', history, historyIndex)
-
-        console.log(await valid.methods.debugCheck().call())
-        console.log('registry', await slasher.methods.getSlasher().call(), slasher.options.address)
-
-        try {
-          console.log('epoch at', num, await slasher.methods.getEpochNumberOfBlock(num).call())
-          console.log('epoch now', await slasher.methods.getEpochNumberOfBlock(blockNumber).call())
-
-          console.log(
-            'group 22',
-            await valid.methods.groupMembershipInEpoch(signer, 22, historyIndex).call()
-          )
-          console.log(
-            'group 23',
-            await valid.methods.groupMembershipInEpoch(signer, 23, historyIndex).call()
-          )
-          console.log(
-            'group 24',
-            await valid.methods.groupMembershipInEpoch(signer, 24, historyIndex).call()
-          )
-          console.log(
-            'group',
-            await slasher.methods.groupMembershipAtBlock(signer, num, historyIndex).call()
-          )
-          console.log(
-            'group now',
-            await slasher.methods.groupMembershipAtBlock(signer, blockNumber, historyIndex).call()
-          )
-        } catch (err) {
-          console.log(err)
-        }
-
-        await slasher.methods
-          .slash(
-            signer,
-            signerIdx,
-            header,
-            other,
-            historyIndex,
-            [],
-            [],
-            [],
-            [NULL_ADDRESS],
-            [NULL_ADDRESS],
-            [0]
-          )
-          .send({ from: validator, gas: 5000000 })
-
-        console.log('remaining', (await lockedGold.getAccountTotalLockedGold(signer)).toString(10))
-      } catch (err) {
-        console.log(err)
-        await sleep(1000)
+        signerIdx++
+        bmNum1 = bmNum1 >> 1
+        bmNum2 = bmNum2 >> 1
       }
+
+      const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
+      const validator = (await kit.web3.eth.getAccounts())[0]
+      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+
+      const lockedGold = await kit.contracts.getLockedGold()
+      const validatorsContract = await kit._web3Contracts.getValidators()
+      const history = await validatorsContract.methods.getHistory(signer).call()
+      const historyIndex = history[0].length - 1
+
+      await slasher.methods
+        .slash(
+          signer,
+          signerIdx,
+          header,
+          other,
+          historyIndex,
+          [],
+          [],
+          [],
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0]
+        )
+        .send({ from: validator, gas: 5000000 })
+
+      const balance = await lockedGold.getAccountTotalLockedGold(signer)
+      assert.equal(balance.toString(10), '9000000000000000000000')
     })
   })
 
