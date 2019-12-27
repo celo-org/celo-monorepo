@@ -4,12 +4,12 @@ import {
   BaseWrapper,
   CeloTransactionObject,
   identity,
-  NumberLike,
-  parseNumber,
   proxyCall,
   proxySend,
-  toBigNumber,
   tupleParser,
+  valueToBigNumber,
+  valueToFrac,
+  valueToString,
 } from './BaseWrapper'
 
 export interface ExchangeConfig {
@@ -28,25 +28,25 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * Query spread parameter
    * @returns Current spread charged on exchanges
    */
-  spread = proxyCall(this.contract.methods.spread, undefined, toBigNumber)
+  spread = proxyCall(this.contract.methods.spread, undefined, valueToBigNumber)
   /**
    * Query reserve fraction parameter
    * @returns Current fraction to commit to the gold bucket
    */
-  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
+  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, valueToBigNumber)
   /**
    * Query update frequency parameter
    * @returns The time period that needs to elapse between bucket
    * updates
    */
-  updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
+  updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, valueToBigNumber)
   /**
    * Query minimum reports parameter
    * @returns The minimum number of fresh reports that need to be
    * present in the oracle to update buckets
    * commit to the gold bucket
    */
-  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
+  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, valueToBigNumber)
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
@@ -54,10 +54,13 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  getBuyTokenAmount: (sellAmount: NumberLike, sellGold: boolean) => Promise<BigNumber> = proxyCall(
+  getBuyTokenAmount: (
+    sellAmount: BigNumber.Value,
+    sellGold: boolean
+  ) => Promise<BigNumber> = proxyCall(
     this.contract.methods.getBuyTokenAmount,
-    tupleParser(parseNumber, identity),
-    toBigNumber
+    tupleParser(valueToString, identity),
+    valueToBigNumber
   )
 
   /**
@@ -67,10 +70,13 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding sellToken amount.
    */
-  getSellTokenAmount: (buyAmount: NumberLike, sellGold: boolean) => Promise<BigNumber> = proxyCall(
+  getSellTokenAmount: (
+    buyAmount: BigNumber.Value,
+    sellGold: boolean
+  ) => Promise<BigNumber> = proxyCall(
     this.contract.methods.getSellTokenAmount,
-    tupleParser(parseNumber, identity),
-    toBigNumber
+    tupleParser(valueToString, identity),
+    valueToBigNumber
   )
 
   /**
@@ -83,7 +89,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     this.contract.methods.getBuyAndSellBuckets,
     undefined,
     (callRes: { 0: string; 1: string }) =>
-      [toBigNumber(callRes[0]), toBigNumber(callRes[1])] as [BigNumber, BigNumber]
+      [valueToBigNumber(callRes[0]), valueToBigNumber(callRes[1])] as [BigNumber, BigNumber]
   )
 
   /**
@@ -96,13 +102,13 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @return The amount of buyToken that was transfered
    */
   exchange: (
-    sellAmount: NumberLike,
-    minBuyAmount: NumberLike,
+    sellAmount: BigNumber.Value,
+    minBuyAmount: BigNumber.Value,
     sellGold: boolean
   ) => CeloTransactionObject<string> = proxySend(
     this.kit,
     this.contract.methods.exchange,
-    tupleParser(parseNumber, parseNumber, identity)
+    tupleParser(valueToString, valueToString, identity)
   )
 
   /**
@@ -112,7 +118,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param minUsdAmount The minimum amount of cUsd the user has to receive for this
    * transaction to succeed
    */
-  sellGold = (amount: NumberLike, minUSDAmount: NumberLike) =>
+  sellGold = (amount: BigNumber.Value, minUSDAmount: BigNumber.Value) =>
     this.exchange(amount, minUSDAmount, true)
 
   /**
@@ -122,7 +128,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param minGoldAmount The minimum amount of cGold the user has to receive for this
    * transaction to succeed
    */
-  sellDollar = (amount: NumberLike, minGoldAmount: NumberLike) =>
+  sellDollar = (amount: BigNumber.Value, minGoldAmount: BigNumber.Value) =>
     this.exchange(amount, minGoldAmount, false)
 
   /**
@@ -130,14 +136,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellAmount The amount of cUsd the user is selling to the exchange
    * @return The corresponding cGold amount.
    */
-  quoteUsdSell = (sellAmount: NumberLike) => this.getBuyTokenAmount(sellAmount, false)
+  quoteUsdSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, false)
 
   /**
    * Returns the amount of cUsd a user would get for sellAmount of cGold
    * @param sellAmount The amount of cGold the user is selling to the exchange
    * @return The corresponding cUsd amount.
    */
-  quoteGoldSell = (sellAmount: NumberLike) => this.getBuyTokenAmount(sellAmount, true)
+  quoteGoldSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, true)
 
   /**
    * Returns the amount of cGold a user would need to exchange to receive buyAmount of
@@ -145,7 +151,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param buyAmount The amount of cUsd the user would like to purchase.
    * @return The corresponding cGold amount.
    */
-  quoteUsdBuy = (buyAmount: NumberLike) => this.getSellTokenAmount(buyAmount, false)
+  quoteUsdBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
 
   /**
    * Returns the amount of cUsd a user would need to exchange to receive buyAmount of
@@ -153,7 +159,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param buyAmount The amount of cGold the user would like to purchase.
    * @return The corresponding cUsd amount.
    */
-  quoteGoldBuy = (buyAmount: NumberLike) => this.getSellTokenAmount(buyAmount, true)
+  quoteGoldBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, true)
 
   /**
    * @dev Returns the current configuration of the exchange contract
@@ -179,9 +185,9 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The exchange rate (number of sellTokens received for one buyToken).
    */
-  async getExchangeRate(buyAmount: NumberLike, sellGold: boolean): Promise<BigNumber> {
+  async getExchangeRate(buyAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
     const takerAmount = await this.getBuyTokenAmount(buyAmount, sellGold)
-    return new BigNumber(buyAmount).dividedBy(takerAmount) // Number of sellTokens received for one buyToken
+    return valueToFrac(buyAmount, takerAmount) // Number of sellTokens received for one buyToken
   }
 
   /**
@@ -189,12 +195,12 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param buyAmount The amount of cUsd in wei to estimate the exchange rate at
    * @return The exchange rate (number of cGold received for one cUsd)
    */
-  getUsdExchangeRate = (buyAmount: NumberLike) => this.getExchangeRate(buyAmount, false)
+  getUsdExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, false)
 
   /**
    * Returns the exchange rate for cGold estimated at the buyAmount
    * @param buyAmount The amount of cGold in wei to estimate the exchange rate at
    * @return The exchange rate (number of cUsd received for one cGold)
    */
-  getGoldExchangeRate = (buyAmount: NumberLike) => this.getExchangeRate(buyAmount, true)
+  getGoldExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, true)
 }

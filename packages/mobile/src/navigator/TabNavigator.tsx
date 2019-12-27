@@ -2,13 +2,13 @@ import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
 import { connect } from 'react-redux'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import GoldTabIcon from 'src/icons/GoldTab'
 import PaymentsIcon from 'src/icons/PaymentsIcon'
 import WalletIcon from 'src/icons/Wallet'
@@ -61,14 +61,14 @@ const mapLanguageStateToProps = (state: RootState): LanguageProps => {
   }
 }
 
-type MenuTextProps = WithNamespaces & {
+type MenuTextProps = WithTranslation & {
   transKey: string
   tintColor: string
   testID: string
 } & LanguageProps
 
 const MenuText = connect<LanguageProps, {}, {}, RootState>(mapLanguageStateToProps)(
-  withNamespaces(Namespaces.global)(
+  withTranslation(Namespaces.global)(
     ({ transKey, tintColor, testID, t, language }: MenuTextProps) => {
       return (
         <Text style={[styles.label, { color: tintColor }]} testID={testID}>

@@ -3,11 +3,11 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
-import { TranslationFunction } from 'i18next'
+import { TFunction } from 'i18next'
 import { Namespaces } from 'locales'
 import * as React from 'react'
 import { Query } from 'react-apollo'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { createMessagePhoneMapping, setTotalEarnings, setTotalMessages } from 'src/app/actions'
@@ -24,7 +24,7 @@ interface DispatchProps {
   setTotalMessages: typeof setTotalMessages
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   setTotalEarnings,
@@ -69,7 +69,7 @@ interface RewardTransaction {
   value: number
 }
 
-const renderEmptyFeed = (isVerifying: boolean, t: TranslationFunction) => {
+const renderEmptyFeed = (isVerifying: boolean, t: TFunction) => {
   if (isVerifying) {
     return (
       <View style={styles.container}>
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.profile)(
+export default withTranslation(Namespaces.profile)(
   connect(
     null,
     mapDispatchToProps

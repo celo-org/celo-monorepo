@@ -1,13 +1,13 @@
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { listItemRenderer } from 'src/escrow/EscrowedPaymentListScreen'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
@@ -17,7 +17,7 @@ interface OwnProps {
   payments: EscrowedPayment[]
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
   onReview = () => {
@@ -63,4 +63,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)
+export default withTranslation(Namespaces.walletFlow5)(EscrowedPaymentReminderSummaryNotification)

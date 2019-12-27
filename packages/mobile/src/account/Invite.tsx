@@ -1,6 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps, withNavigation } from 'react-navigation'
@@ -11,7 +11,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
@@ -51,7 +51,7 @@ const mapDispatchToProps = {
   importContacts,
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: defaultCountryCodeSelector(state),
@@ -143,5 +143,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Invite)))
+  )(withTranslation(Namespaces.sendFlow7)(withNavigation(Invite)))
 )

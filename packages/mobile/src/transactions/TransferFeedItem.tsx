@@ -4,11 +4,11 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
 import {
@@ -28,7 +28,7 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 const TAG = 'transactions/TransferFeedItem.tsx'
 
 type Props = (HomeTransferFragment | TransferStandby) &
-  WithNamespaces & {
+  WithTranslation & {
     type: TransactionTypes
     status?: TransactionStatus
     invitees: Invitees
@@ -285,4 +285,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.walletFlow5)(React.memo(TransferFeedItem))
+export default withTranslation(Namespaces.walletFlow5)(React.memo(TransferFeedItem))

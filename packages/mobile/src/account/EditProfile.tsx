@@ -3,13 +3,13 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { setName } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -23,7 +23,7 @@ interface DispatchProps {
   setName: typeof setName
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -94,4 +94,4 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
   {
     setName,
   }
-)(withNamespaces(Namespaces.accountScreen10)(EditProfile))
+)(withTranslation(Namespaces.accountScreen10)(EditProfile))
