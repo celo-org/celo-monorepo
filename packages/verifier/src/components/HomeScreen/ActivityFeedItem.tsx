@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles, { fontFamily } from '@celo/react-components/styles/fonts'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { Trans, WithNamespaces, withNamespaces } from 'react-i18next'
+import { Trans, WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { MessagePhoneMapping } from 'src/app/reducer'
@@ -24,7 +24,7 @@ interface OwnProps {
   txComment: string
 }
 
-export type Props = StateProps & OwnProps & WithNamespaces
+export type Props = StateProps & OwnProps & WithTranslation
 
 const mapStateToProps = (state: RootState) => ({
   messagePhoneMapping: state.app.messagePhoneMapping,
@@ -123,6 +123,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.profile)(
+export default withTranslation(Namespaces.profile)(
   connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(ActivityFeedItem)
 )

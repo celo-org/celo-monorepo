@@ -11,6 +11,7 @@ export default class ElectionRun extends BaseCommand {
   }
 
   async run() {
+    const res = this.parse(ElectionRun)
     cli.action.start('Running mock election')
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
@@ -19,6 +20,6 @@ export default class ElectionRun extends BaseCommand {
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
     cli.action.stop()
-    cli.table(validatorList, validatorTable)
+    cli.table(validatorList, validatorTable, { 'no-truncate': !res.flags.truncate })
   }
 }

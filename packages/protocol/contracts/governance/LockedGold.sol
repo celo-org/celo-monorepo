@@ -60,7 +60,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The unlocking period in seconds.
    */
   function setUnlockingPeriod(uint256 value) external onlyOwner {
-    require(value != unlockingPeriod);
+    require(value != unlockingPeriod, "Unlocking period not changed");
     unlockingPeriod = value;
     emit UnlockingPeriodSet(value);
   }
@@ -127,15 +127,16 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount of gold to unlock.
    */
   function unlock(uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
     Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
-    require(!getGovernance().isVoting(msg.sender));
+    require(!getGovernance().isVoting(msg.sender), "Account locked");
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 ||
-        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value),
+      "Trying to unlock too much gold"
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -149,11 +150,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The value to relock from the specified pending withdrawal.
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
     Balances storage account = balances[msg.sender];
-    require(index < account.pendingWithdrawals.length);
+    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-    require(value <= pendingWithdrawal.value);
+    require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
     if (value == pendingWithdrawal.value) {
       deletePendingWithdrawal(account.pendingWithdrawals, index);
     } else {
@@ -168,14 +169,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
     Balances storage account = balances[msg.sender];
-    require(index < account.pendingWithdrawals.length);
+    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-    require(now >= pendingWithdrawal.timestamp);
+    require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
-    require(getGoldToken().transfer(msg.sender, value));
+    require(getGoldToken().transfer(msg.sender, value), "Transfer failed");
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -225,7 +226,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     view
     returns (uint256[] memory, uint256[] memory)
   {
-    require(getAccounts().isAccount(account));
+    require(getAccounts().isAccount(account), "Unknown account");
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);

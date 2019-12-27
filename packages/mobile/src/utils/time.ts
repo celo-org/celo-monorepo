@@ -3,7 +3,7 @@ const momentTimezone = require('moment-timezone')
 import differenceInYears from 'date-fns/esm/differenceInYears'
 import format from 'date-fns/esm/format'
 import { enUS, es } from 'date-fns/locale'
-import { i18n as i18nType, TranslationFunction } from 'i18next'
+import { i18n as i18nType, TFunction } from 'i18next'
 import * as _ from 'lodash'
 import clockSync from 'react-native-clock-sync'
 import i18n from 'src/i18n'
@@ -258,11 +258,7 @@ export const formatFeedDate = (timestamp: number, i18next: i18nType) => {
   return quickFormat(timestamp, i18next, 'MMM d')
 }
 
-export const getDatetimeDisplayString = (
-  timestamp: number,
-  t: TranslationFunction,
-  i18next: i18nType
-) => {
+export const getDatetimeDisplayString = (timestamp: number, t: TFunction, i18next: i18nType) => {
   const timeFormatted = formatFeedTime(timestamp, i18next)
   const dateFormatted = formatFeedDate(timestamp, i18next)
   return `${dateFormatted} ${t('global:at')} ${timeFormatted}`
