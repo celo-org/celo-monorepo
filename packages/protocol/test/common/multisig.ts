@@ -179,7 +179,9 @@ contract('MultiSig', (accounts: any) => {
       })
       const txId = txEvent.args.transactionId
       // @ts-ignore: TODO(mcortesi): fix typings
-      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
+      const events = (await multiSig.confirmTransaction(txId, { from: accounts[1] })).logs
+      assert.equal(events.length, 2)
+      assert.equal(events[1].event, 'ExecutionFailure')
     })
   })
 
@@ -250,7 +252,9 @@ contract('MultiSig', (accounts: any) => {
       })
       const txId = txEvent.args.transactionId
       // @ts-ignore: TODO(mcortesi): fix typings
-      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
+      const events = (await multiSig.confirmTransaction(txId, { from: accounts[1] })).logs
+      assert.equal(events.length, 2)
+      assert.equal(events[1].event, 'ExecutionFailure')
     })
   })
 
