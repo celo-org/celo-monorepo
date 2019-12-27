@@ -1,5 +1,3 @@
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
-import { upperFirst } from 'lodash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -8,6 +6,8 @@ import {
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { upperFirst } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
@@ -243,7 +243,7 @@ contract('Accounts', (accounts: string[]) => {
 
     describe('when the account has been created', () => {
       beforeEach(async () => {
-        accountsInstance.createAccount()
+        await accountsInstance.createAccount()
       })
 
       it('should set the walletAddress', async () => {
@@ -279,7 +279,7 @@ contract('Accounts', (accounts: string[]) => {
 
     describe('when the account has been created', () => {
       beforeEach(async () => {
-        accountsInstance.createAccount()
+        await accountsInstance.createAccount()
       })
 
       it('should set the metadataURL', async () => {
@@ -304,9 +304,9 @@ contract('Accounts', (accounts: string[]) => {
     it('returns multiple metadata URLs', async () => {
       const randomStrings = accounts.map((_) => web3.utils.randomHex(20).slice(2))
       await Promise.all(
-        accounts.map(async (account, i) => {
-          await accountsInstance.createAccount({ from: account })
-          await accountsInstance.setMetadataURL(randomStrings[i], { from: account })
+        accounts.map(async (mappedAccount, i) => {
+          await accountsInstance.createAccount({ from: mappedAccount })
+          await accountsInstance.setMetadataURL(randomStrings[i], { from: mappedAccount })
         })
       )
       const [stringLengths, data] = await accountsInstance.batchGetMetadataURL(accounts)
@@ -329,7 +329,7 @@ contract('Accounts', (accounts: string[]) => {
 
     describe('when the account has been created', () => {
       beforeEach(async () => {
-        accountsInstance.createAccount()
+        await accountsInstance.createAccount()
       })
 
       it('should set the name', async () => {

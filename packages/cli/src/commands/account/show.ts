@@ -1,5 +1,5 @@
 import { BaseCommand } from '../../base'
-import { printValueMap } from '../../utils/cli'
+import { printValueMapRecursive } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
 export default class Show extends BaseCommand {
@@ -18,6 +18,6 @@ export default class Show extends BaseCommand {
     const { args } = this.parse(Show)
 
     const accounts = await this.kit.contracts.getAccounts()
-    printValueMap(await accounts.getAccountSummary(args.address))
+    printValueMapRecursive(await accounts.getAccountSummary(args.address))
   }
 }

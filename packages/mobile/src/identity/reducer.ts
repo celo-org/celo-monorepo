@@ -1,5 +1,7 @@
+import { RehydrateAction } from 'redux-persist'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { AttestationCode, VerificationStatus } from 'src/identity/verification'
+import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
@@ -39,8 +41,19 @@ const initialState: State = {
   isLoadingImportContacts: false,
 }
 
-export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
+export const reducer = (
+  state: State | undefined = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'identity'),
+        verificationStatus: VerificationStatus.Stopped,
+      }
+    }
     case Actions.RESET_VERIFICATION:
       return {
         ...state,

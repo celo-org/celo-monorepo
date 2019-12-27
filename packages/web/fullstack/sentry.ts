@@ -9,6 +9,9 @@ export function initSentry() {
   Sentry.init({
     dsn: `https://${config.KEY}@sentry.io/${config.PROJECT}`,
     environment: publicRuntimeConfig.ENV,
+    ignoreErrors: [
+      "The fetching process for the media resource was aborted by the user agent at the user's request.",
+    ],
   })
 }
 

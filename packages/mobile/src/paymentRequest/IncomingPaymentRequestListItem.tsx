@@ -1,23 +1,22 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { PaymentRequestStatus } from 'src/account'
+import { WithTranslation } from 'react-i18next'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import { PaymentRequestStatus } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
-import { Namespaces } from 'src/i18n'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { Namespaces, withTranslation } from 'src/i18n'
+import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import NotificationAmount from 'src/paymentRequest/NotificationAmount'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { multiplyByWei } from 'src/utils/formatting'
+import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -28,7 +27,9 @@ interface OwnProps {
   updatePaymentRequestStatus: typeof updatePaymentRequestStatus
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
+
+const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
@@ -51,7 +52,6 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
     this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.COMPLETED)
     Logger.showMessage(this.props.t('requestPaid'))
     CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
-    this.onFinalized()
   }
 
   onPaymentDecline = () => {
@@ -59,69 +59,61 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
     this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.DECLINED)
     Logger.showMessage(this.props.t('requestDeclined'))
     CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
-    this.onFinalized()
-  }
-
-  onFinalized = () => {
-    navigate(Screens.IncomingPaymentRequestListScreen)
   }
 
   getCTA = () => {
     return [
       {
-        text: this.props.t('pay'),
+        text: this.props.t('global:pay'),
         onPress: this.onPay,
       },
       {
-        text: this.props.t('decline'),
+        text: this.props.t('global:decline'),
         onPress: this.onPaymentDecline,
       },
     ]
   }
 
-  isDisplayingNumber = () => {
-    return this.props.requester.displayId !== this.props.requester.displayName
-  }
-
   render() {
-    const { requester } = this.props
+    const { requester, t } = this.props
     return (
-      <TouchableOpacity onPress={this.onPay}>
+      <View style={styles.container}>
         <BaseNotification
           icon={
             <ContactCircle
-              size={30}
+              size={AVATAR_SIZE}
               address={requester.address}
               name={requester.displayName}
               thumbnailPath={getRecipientThumbnail(requester)}
-            />
+            >
+              <Image source={unknownUserIcon} style={styles.unknownUser} />
+            </ContactCircle>
           }
-          title={requester.displayName}
+          title={t('incomingPaymentRequestNotificationTitle', {
+            name: requester.displayName,
+            amount:
+              CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
+          })}
           ctas={this.getCTA()}
-          roundedBorders={false}
-          callout={<NotificationAmount amount={multiplyByWei(this.props.amount)} />}
+          onPress={this.onPay}
         >
-          <View>
-            {this.isDisplayingNumber() && (
-              <Text style={[fontStyles.subSmall, styles.phoneNumber]}>
-                {this.props.requester.displayId}
-              </Text>
-            )}
-            <Text style={[fontStyles.subSmall, styles.comment]}>{this.props.comment}</Text>
-          </View>
+          <Text style={fontStyles.bodySmall}>{this.props.comment || t('defaultComment')}</Text>
         </BaseNotification>
-      </TouchableOpacity>
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  comment: {
-    paddingTop: variables.contentPadding,
+  container: {
+    marginBottom: 16,
   },
-  phoneNumber: {
-    color: colors.dark,
+  unknownUser: {
+    height: AVATAR_SIZE,
+    width: AVATAR_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })
 
-export default withNamespaces(Namespaces.global)(IncomingPaymentRequestListItem)
+export default withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem)

@@ -105,7 +105,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param n The number of expired reports to remove, at most (deterministic upper gas bound).
    */
   function removeExpiredReports(address token, uint256 n) external {
-    require(token != address(0) && n < timestamps[token].getNumElements());
+    require(
+      token != address(0) && n < timestamps[token].getNumElements(),
+      "token addr null or trying to remove too many reports"
+    );
     for (uint256 i = 0; i < n; i++) {
       address oldest = timestamps[token].getTail();
       uint256 timestamp = timestamps[token].getValue(oldest);

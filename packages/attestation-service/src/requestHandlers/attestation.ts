@@ -1,13 +1,12 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
-import { attestationMessageToSign } from '@celo/utils'
-import { toChecksumAddress } from '@celo/utils/lib/address'
+import { AttestationUtils } from '@celo/utils'
 import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
-import { isValidAddress } from 'ethereumjs-util'
 import express from 'express'
 import * as t from 'io-ts'
 import { Transaction } from 'sequelize'
 import { existingAttestationRequestRecord, getAttestationTable, kit, sequelize } from '../db'
+import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { respondWithError, Response } from '../request'
@@ -26,30 +25,6 @@ export const AttestationRequestType = t.type({
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
-
-export function getAttestationSignerAddress() {
-  if (
-    process.env.ATTESTATION_SIGNER_ADDRESS === undefined ||
-    !isValidAddress(process.env.ATTESTATION_SIGNER_ADDRESS)
-  ) {
-    console.error('Did not specify valid ATTESTATION_SIGNER_ADDRESS')
-    throw new Error('Did not specify valid ATTESTATION_SIGNER_ADDRESS')
-  }
-
-  return process.env.ATTESTATION_SIGNER_ADDRESS
-}
-
-export function getAccountAddress() {
-  if (
-    process.env.CELO_VALIDATOR_ADDRESS === undefined ||
-    !isValidAddress(process.env.CELO_VALIDATOR_ADDRESS)
-  ) {
-    console.error('Did not specify valid CELO_VALIDATOR_ADDRESS')
-    throw new Error('Did not specify valid CELO_VALIDATOR_ADDRESS')
-  }
-
-  return toChecksumAddress(process.env.CELO_VALIDATOR_ADDRESS)
-}
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -144,7 +119,7 @@ class AttestationRequestHandler {
   }
 
   signAttestation() {
-    const message = attestationMessageToSign(
+    const message = AttestationUtils.getAttestationMessageToSignFromIdentifier(
       this.attestationRequest.phoneNumber,
       this.attestationRequest.account
     )

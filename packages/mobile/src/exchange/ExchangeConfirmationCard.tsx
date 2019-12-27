@@ -2,20 +2,19 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import ExchangeRate from 'src/exchange/ExchangeRate'
-import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import {
   useDollarsToLocalAmount,
   useLocalCurrencyCode,
   useLocalCurrencySymbol,
 } from 'src/localCurrency/hooks'
-import FeeIcon from 'src/send/FeeIcon'
 import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -29,7 +28,7 @@ export interface ExchangeConfirmationCardProps {
   newGoldBalance?: BigNumber
 }
 
-type Props = ExchangeConfirmationCardProps & WithNamespaces
+type Props = ExchangeConfirmationCardProps & WithTranslation
 
 const getTakerToken = (props: Props) => {
   return props.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
@@ -130,7 +129,7 @@ export function ExchangeConfirmationCard(props: Props) {
       <View style={styles.feeContainer}>
         <LineItemRow
           currencySymbol={takerToken}
-          amount={fee}
+          amount={fee || '0.00'}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
         />
@@ -138,7 +137,7 @@ export function ExchangeConfirmationCard(props: Props) {
           currencySymbol={takerToken}
           amount={'0.01'}
           title={t('exchangeFee')}
-          titleIcon={<FeeExchangeIcon />}
+          titleIcon={<FeeIcon isExchange={true} />}
         />
       </View>
 
@@ -151,11 +150,10 @@ export function ExchangeConfirmationCard(props: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 300,
-    flex: 1,
     borderWidth: 1,
     borderColor: colors.darkLightest,
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   feeContainer: {
     marginBottom: 10,
@@ -186,9 +184,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleContainer: {
-    paddingTop: 30,
-    paddingBottom: 20,
-    flex: 1,
+    paddingTop: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -206,4 +202,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.exchangeFlow9)(ExchangeConfirmationCard)
+export default withTranslation(Namespaces.exchangeFlow9)(ExchangeConfirmationCard)

@@ -1,4 +1,4 @@
-import Document, { Head, Main, NextScript } from 'next/document'
+import Document, { DocumentContext, Head, Main, NextScript } from 'next/document'
 import * as React from 'react'
 import { AppRegistry, I18nManager } from 'react-native-web'
 import analytics from 'src/analytics/analytics'
@@ -8,18 +8,20 @@ import { isLocaleRTL } from '../server/i18nSetup'
 // @ts-ignore
 const a = analytics
 
-interface NextInitalProps {
-  pathname: string
-  query: any
-  asPath: string
-  req?: any
-  res?: object
-  err?: object
-  renderPage: () => any
+interface NextReq {
+  locale: string
 }
 
-export default class MyDocument extends Document {
-  static async getInitialProps(context: NextInitalProps) {
+interface Props {
+  locale: string
+}
+
+interface PropContext {
+  req: DocumentContext['req'] & NextReq
+}
+
+export default class MyDocument extends Document<Props> {
+  static async getInitialProps(context: DocumentContext & PropContext) {
     const locale = context.req.locale
     const userAgent = context.req.headers['user-agent']
     setDimensionsForScreen(userAgent)
@@ -34,7 +36,6 @@ export default class MyDocument extends Document {
     const page = context.renderPage()
     const styles = React.Children.toArray([
       // <style key={'normalize-style'} dangerouslySetInnerHTML={{ __html: normalizeNextElements }} />,
-      page.styles,
       getStyleElement(),
     ])
 
@@ -46,16 +47,22 @@ export default class MyDocument extends Document {
   }
 
   render() {
-    // @ts-ignore
-    const { locale, pathname } = this.props
+    const { locale } = this.props
     return (
       <html lang={locale} style={{ height: '100%', width: '100%' }}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" href={'/static/normalize.css'} />
 
-          <link rel="preconnect" href="https://use.typekit.net" />
-          <link rel="stylesheet" href="https://use.typekit.net/dki6jkb.css" />
+          <link
+            rel="stylesheet"
+            href="https://indestructibletype.com/fonts/Jost.css"
+            type="text/css"
+          />
+          <link
+            href="https://fonts.googleapis.com/css?family=EB+Garamond:400,500,500i,700&display=swap"
+            rel="stylesheet"
+          />
 
           <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
         </Head>

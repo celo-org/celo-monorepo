@@ -1,6 +1,7 @@
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')
+const lodash = require('lodash')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
@@ -13,7 +14,7 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
-    gasForNonGoldCurrencies: 166000,
+    gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
@@ -25,12 +26,12 @@ const DefaultConfig = {
     minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
-    electabilityThreshold: 1 / 100,
+    electabilityThreshold: 1 / 1000,
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 6 / 100,
-      max: 20 / 100,
+      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      max: 0.0005, // (x + 1) ^ 365 = 1.20
       adjustmentFactor: 1 / 365,
     },
     rewardsMultiplierParameters: {
@@ -111,13 +112,16 @@ const DefaultConfig = {
     },
     membershipHistoryLength: 60,
     maxGroupSize: '5',
+    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30, // 30 Days
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
     attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
-    votesRatioOfLastVsFirstGroup: 2.0,
+    groupLockedGold: {
+      value: '22000000000000000000000', // 22k gold per group
+    },
   },
 }
 
@@ -149,18 +153,17 @@ const linkedLibraries = {
 }
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['migration_override', 'build_directory'],
   default: {
     build_directory: path.join(__dirname, 'build'),
   },
+  string: ['migration_override', 'build_directory'],
 })
 
-const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-const config = {}
+const config = DefaultConfig
 
-for (const key of Object.keys(DefaultConfig)) {
-  config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
-}
+const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
+// use lodash merge to deeply override defaults
+lodash.merge(config, migrationOverride)
 
 module.exports = {
   build_directory: argv.build_directory,

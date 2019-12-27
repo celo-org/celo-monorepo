@@ -3,230 +3,213 @@
 exports[`OutgoingPaymentRequestListItem renders correctly 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "padding": 16,
-        "width": "100%",
-      },
-      false,
-    ]
+    Object {
+      "marginBottom": 16,
+    }
   }
 >
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "flexDirection": "column",
-        "paddingRight": 16,
-      }
-    }
-  >
+  <View>
     <View
       style={
         Array [
           Object {
-            "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
             "flexDirection": "row",
-            "justifyContent": "center",
+            "justifyContent": "space-between",
+            "padding": 16,
+            "width": "100%",
           },
-          undefined,
+          Object {
+            "elevation": 2,
+            "shadowColor": "black",
+            "shadowOffset": Object {
+              "height": 1,
+              "width": 0,
+            },
+            "shadowOpacity": 0.3,
+            "shadowRadius": 1.6,
+          },
         ]
       }
     >
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "justifyContent": "center",
-            },
-            Object {
-              "backgroundColor": "#7AD6FE",
-              "borderRadius": 15,
-              "height": 30,
-              "width": 30,
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "paddingRight": 16,
+          }
         }
       >
-        <Text
+        <View
           style={
             Array [
               Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
               },
-              Object {
-                "fontSize": 15,
-              },
+              undefined,
             ]
           }
         >
-          5
-        </Text>
-      </View>
-    </View>
-  </View>
-  <View
-    style={
-      Object {
-        "flex": 1,
-        "justifyContent": "space-between",
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Bold",
-          "fontSize": 14,
-          "lineHeight": 18,
-        }
-      }
-    >
-      5126608970
-    </Text>
-    <View>
-      <View
-        style={
-          Object {
-            "justifyContent": "space-between",
-            "minHeight": 70,
-          }
-        }
-      >
-        <View>
-          <Text
+          <View
             style={
               Array [
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 20,
+                  "alignItems": "center",
+                  "justifyContent": "center",
                 },
                 Object {
-                  "paddingTop": 16,
+                  "backgroundColor": "#7AD6FE",
+                  "borderRadius": 20,
+                  "height": 40,
+                  "width": 40,
                 },
               ]
             }
           >
-            Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
-          </Text>
-        </View>
-        <View
-          style={
-            Object {
-              "flexDirection": "row",
-              "marginTop": 15,
-            }
-          }
-        >
-          <View
-            accessible={true}
-            focusable={true}
-            isTVSelectable={true}
-            nativeBackgroundAndroid={
-              Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                }
               }
-            }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
-            <Text
               style={
-                Array [
-                  Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
-                    "paddingEnd": 15,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                }
               }
-            >
-              remind
-            </Text>
-          </View>
-          <View
-            accessible={true}
-            focusable={true}
-            isTVSelectable={true}
-            nativeBackgroundAndroid={
-              Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
-              }
-            }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
-                    "paddingEnd": 15,
-                  },
-                ]
-              }
-            >
-              cancel
-            </Text>
+            />
           </View>
         </View>
       </View>
-    </View>
-  </View>
-  <View
-    style={
-      Object {
-        "paddingLeft": 16,
-      }
-    }
-  >
-    <View>
-      <Text
+      <View
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#81868B",
-            },
-          ]
+          Object {
+            "flex": 1,
+            "justifyContent": "space-between",
+          }
         }
       >
-        $24
-      </Text>
+        <Text
+          style={
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          outgoingPaymentRequestNotificationTitle
+        </Text>
+        <View
+          style={
+            Object {
+              "justifyContent": "space-between",
+              "minHeight": 60,
+              "paddingTop": 8,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
+            Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
+          </Text>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingEnd": 15,
+                    },
+                  ]
+                }
+              >
+                global:remind
+              </Text>
+            </View>
+            <View
+              accessible={true}
+              focusable={true}
+              isTVSelectable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingEnd": 15,
+                    },
+                  ]
+                }
+              >
+                global:cancel
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
     </View>
   </View>
 </View>

@@ -1,4 +1,5 @@
 {
+  "at": "a",
   "yourClockIsBroke": "La fecha y hora de tu teléfono son incorrectos",
   "adjustYourClock":
     "Ajusta tu reloj para leer la hora automáticamente y vuelva a intentarlo. Si el problema persiste, puede que sea necesario reiniciar la aplicación",
@@ -38,6 +39,7 @@
   "startEarning": "Comenzar a ganar",
   "backToWallet": "Volver a el Monedero",
   "exchangeForGold": "Cambiar a Oro",
+  "missingFullName": "El nombre no puede estar vacío",
   "invalidPhone": "Número de teléfono inválido",
   "cantSelectInvalidPhone": "No se puede seleccionar el contacto: número de teléfono no válido",
   "needMoreFundsToSend": "Necesita más fondos para enviar el pago",
@@ -61,6 +63,7 @@
   "decline": "Disminución",
   "to": "Para",
   "for": "Por",
+  "reclaim": "Reclaim",
   "celoGold": "Celo Oro",
   "celoDollars": "{{CeloDollars}}",
   "oops": "¡Uy!",
@@ -101,5 +104,8 @@
   "localCurrencyTitle": "Seleccione el tipo de moneda",
   "or": "o",
   "accepted": "Aceptado",
-  "processing": "Procesando"
+  "processing": "Procesando",
+  "moreWithCount": "~~+{{count }} more",
+  "unknown": "~~Unknown",
+  "emptyList": "~~Empty list"
 }

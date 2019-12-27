@@ -431,7 +431,7 @@ contract('SortedOracles', (accounts: string[]) => {
       )
 
       beforeEach(async () => {
-        sortedOracles.addOracle(aToken, anotherOracle)
+        await sortedOracles.addOracle(aToken, anotherOracle)
         await sortedOracles.report(aToken, anotherOracleNumerator, 1, NULL_ADDRESS, NULL_ADDRESS, {
           from: anotherOracle,
         })

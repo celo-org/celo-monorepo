@@ -217,14 +217,14 @@ contract('GasPriceMinimum', (accounts: string[]) => {
         gasPriceMinFloor,
         previousGasPriceMinimum,
         density,
-        targetDensity,
-        adjustmentSpeed
+        _targetDensity,
+        _adjustmentSpeed
       ) => {
         const one = new BigNumber(1)
         const newGasPriceMinimum = previousGasPriceMinimum
           .times(
             one.plus(
-              fromFixed(adjustmentSpeed).times(fromFixed(density).minus(fromFixed(targetDensity)))
+              fromFixed(_adjustmentSpeed).times(fromFixed(density).minus(fromFixed(_targetDensity)))
             )
           )
           .plus(one)

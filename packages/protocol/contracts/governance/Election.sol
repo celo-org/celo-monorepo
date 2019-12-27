@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IElection.sol";
+import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
@@ -110,6 +111,8 @@ contract Election is
 
   event ValidatorGroupVoteRevoked(address indexed account, address indexed group, uint256 value);
 
+  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
@@ -140,8 +143,12 @@ contract Election is
    * @return True upon success.
    */
   function setElectableValidators(uint256 min, uint256 max) public onlyOwner returns (bool) {
-    require(0 < min && min <= max);
-    require(min != electableValidators.min || max != electableValidators.max);
+    require(0 < min, "Minimum electable validators cannot be zero");
+    require(min <= max, "Maximum electable validators cannot be smaller than minimum");
+    require(
+      min != electableValidators.min || max != electableValidators.max,
+      "Electable validators not changed"
+    );
     electableValidators = ElectableValidators(min, max);
     emit ElectableValidatorsSet(min, max);
     return true;
@@ -161,7 +168,7 @@ contract Election is
    * @return True upon success.
    */
   function setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) public onlyOwner returns (bool) {
-    require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor);
+    require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor, "Max groups voted for not changed");
     maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);
     return true;
@@ -206,9 +213,9 @@ contract Election is
     nonReentrant
     returns (bool)
   {
-    require(votes.total.eligible.contains(group));
-    require(0 < value);
-    require(canReceiveVotes(group, value), "Unable to receive votes");
+    require(votes.total.eligible.contains(group), "Group not eligible");
+    require(0 < value, "Vote value cannot be zero");
+    require(canReceiveVotes(group, value), "Group cannot receive votes");
     address account = getAccounts().voteSignerToAccount(msg.sender);
 
     // Add group to the groups voted for by the account.
@@ -218,7 +225,7 @@ contract Election is
       alreadyVotedForGroup = alreadyVotedForGroup || groups[i] == group;
     }
     if (!alreadyVotedForGroup) {
-      require(groups.length < maxNumGroupsVotedFor);
+      require(groups.length < maxNumGroupsVotedFor, "Voted for too many groups");
       groups.push(group);
     }
 
@@ -238,9 +245,9 @@ contract Election is
   function activate(address group) external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    require(pendingVote.epoch < getEpochNumber());
+    require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;
-    require(value > 0);
+    require(value > 0, "Vote value cannot be zero");
     decrementPendingVotes(group, account, value);
     incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
@@ -278,9 +285,13 @@ contract Election is
     address greater,
     uint256 index
   ) external nonReentrant returns (bool) {
-    require(group != address(0));
+    require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
-    require(0 < value && value <= getPendingVotesForGroupByAccount(group, account));
+    require(0 < value, "Vote value cannot be zero");
+    require(
+      value <= getPendingVotesForGroupByAccount(group, account),
+      "Vote value larger than pending votes"
+    );
     decrementPendingVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
     getLockedGold().incrementNonvotingAccountBalance(account, value);
@@ -311,9 +322,13 @@ contract Election is
     uint256 index
   ) external nonReentrant returns (bool) {
     // TODO(asa): Dedup with revokePending.
-    require(group != address(0));
+    require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
-    require(0 < value && value <= getActiveVotesForGroupByAccount(group, account));
+    require(0 < value, "Vote value cannot be zero");
+    require(
+      value <= getActiveVotesForGroupByAccount(group, account),
+      "Vote value larger than active votes"
+    );
     decrementActiveVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
     getLockedGold().incrementNonvotingAccountBalance(account, value);
@@ -398,6 +413,15 @@ contract Election is
   }
 
   /**
+   * @notice Returns the active votes made for `group`.
+   * @param group The address of the validator group.
+   * @return The active votes made for `group`.
+   */
+  function getActiveVotesForGroup(address group) public view returns (uint256) {
+    return votes.active.forGroup[group].total;
+  }
+
+  /**
    * @notice Returns whether or not a group is eligible to receive votes.
    * @return Whether or not a group is eligible to receive votes.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
@@ -410,21 +434,38 @@ contract Election is
    * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
    * @param group The group to calculate epoch rewards for.
    * @param totalEpochRewards The total amount of rewards going to all voters.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
    * @return The amount of rewards that voters for `group` are due at the end of an epoch.
    * @dev Eligible groups that have received their maximum number of votes cannot receive more.
    */
-  function getGroupEpochRewards(address group, uint256 totalEpochRewards)
-    external
-    view
-    returns (uint256)
-  {
-    // The group must meet the balance requirements in order for their voters to receive epoch
-    // rewards.
-    if (getValidators().meetsAccountLockedGoldRequirements(group) && votes.active.total > 0) {
-      return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
-    } else {
+  function getGroupEpochRewards(
+    address group,
+    uint256 totalEpochRewards,
+    uint256[] calldata uptimes
+  ) external view returns (uint256) {
+    IValidators validators = getValidators();
+    // The group must meet the balance requirements for their voters to receive epoch rewards.
+    if (!validators.meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
       return 0;
     }
+
+    FixidityLib.Fraction memory votePortion = FixidityLib.newFixedFraction(
+      votes.active.forGroup[group].total,
+      votes.active.total
+    );
+    FixidityLib.Fraction memory score = FixidityLib.wrap(
+      validators.calculateGroupEpochScore(uptimes)
+    );
+    FixidityLib.Fraction memory slashingMultiplier = FixidityLib.wrap(
+      validators.getValidatorGroupSlashingMultiplier(group)
+    );
+    return
+      FixidityLib
+        .newFixed(totalEpochRewards)
+        .multiply(votePortion)
+        .multiply(score)
+        .multiply(slashingMultiplier)
+        .fromFixed();
   }
 
   /**
@@ -438,7 +479,7 @@ contract Election is
   function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
     external
   {
-    require(msg.sender == address(0));
+    require(msg.sender == address(0), "Only VM can call");
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -459,6 +500,7 @@ contract Election is
 
     votes.active.forGroup[group].total = votes.active.forGroup[group].total.add(value);
     votes.active.total = votes.active.total.add(value);
+    emit EpochRewardsDistributedToVoters(group, value);
   }
 
   /**
@@ -632,7 +674,7 @@ contract Election is
    */
   function deleteElement(address[] storage list, address element, uint256 index) private {
     // TODO(asa): Move this to a library to be shared.
-    require(index < list.length && list[index] == element);
+    require(index < list.length && list[index] == element, "Bad index");
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
     list.length = lastIndex;
@@ -752,7 +794,7 @@ contract Election is
         break;
       }
     }
-    require(totalNumMembersElected >= electableValidators.min);
+    require(totalNumMembersElected >= electableValidators.min, "Not enough elected groups");
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
@@ -811,7 +853,7 @@ contract Election is
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
     for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorAddressFromCurrentSet(idx);
+      res[idx] = validatorSignerAddressFromCurrentSet(idx);
     }
     return res;
   }

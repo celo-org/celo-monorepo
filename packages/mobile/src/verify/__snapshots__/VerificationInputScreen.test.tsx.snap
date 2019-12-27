@@ -14,9 +14,6 @@ exports[`VerificationInputScreen renders correctly 1`] = `
     style={
       Object {
         "left": 5,
-        "position": "absolute",
-        "top": 20,
-        "zIndex": 10,
       }
     }
   >
@@ -102,7 +99,6 @@ exports[`VerificationInputScreen renders correctly 1`] = `
           Object {
             "alignItems": "center",
             "marginBottom": 10,
-            "marginTop": 30,
           }
         }
       >
