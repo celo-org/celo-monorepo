@@ -66,7 +66,10 @@ library Proposals {
     address proposer,
     uint256 deposit
   ) public {
-    require(values.length == destinations.length && destinations.length == dataLengths.length);
+    require(
+      values.length == destinations.length && destinations.length == dataLengths.length,
+      "Array length mismatch"
+    );
     uint256 transactionCount = values.length;
 
     proposal.proposer = proposer;
@@ -101,7 +104,10 @@ library Proposals {
     address proposer,
     uint256 deposit
   ) internal view returns (Proposal memory) {
-    require(values.length == destinations.length && destinations.length == dataLengths.length);
+    require(
+      values.length == destinations.length && destinations.length == dataLengths.length,
+      "Array length mismatch"
+    );
     uint256 transactionCount = values.length;
 
     Proposal memory proposal;
@@ -183,7 +189,8 @@ library Proposals {
           transactions[i].value,
           transactions[i].data.length,
           transactions[i].data
-        )
+        ),
+        "Proposal execution failed"
       );
     }
   }
@@ -276,7 +283,7 @@ library Proposals {
     view
     returns (uint256, address, bytes memory)
   {
-    require(index < proposal.transactions.length);
+    require(index < proposal.transactions.length, "getTransaction: bad index");
     Transaction storage transaction = proposal.transactions[index];
     return (transaction.value, transaction.destination, transaction.data);
   }

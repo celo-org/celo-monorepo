@@ -5,13 +5,13 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Avatar from 'src/components/Avatar'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import {
   useDollarsToLocalAmount,
@@ -49,7 +49,7 @@ function TransferReviewCard({
   fee,
   isLoadingFee,
   feeError,
-}: OwnProps & WithNamespaces) {
+}: OwnProps & WithTranslation) {
   const localCurrencyCode = useLocalCurrencyCode()
   const localValue = useDollarsToLocalAmount(value)
   const exchangeRate = new BigNumber(useExchangeRate() as number)
@@ -147,4 +147,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.sendFlow7)(TransferReviewCard)
+export default withTranslation(Namespaces.sendFlow7)(TransferReviewCard)
