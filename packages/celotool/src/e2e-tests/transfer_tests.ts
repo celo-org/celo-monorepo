@@ -660,7 +660,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 75303,
+              expectedGas: 75325,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
             })
