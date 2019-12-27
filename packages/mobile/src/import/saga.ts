@@ -1,4 +1,4 @@
-import { ensureHexLeader } from '@celo/utils/src/address'
+import { ensureLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { validateMnemonic } from 'bip39'
 import { mnemonicToSeedHex } from 'react-native-bip39'
@@ -44,7 +44,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
 
     if (!useEmptyWallet) {
       Logger.debug(TAG + '@importBackupPhraseSaga', 'Checking account balance')
-      const backupAccount = web3.eth.accounts.privateKeyToAccount(ensureHexLeader(privateKey))
+      const backupAccount = web3.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey))
         .address
 
       const dollarBalance: BigNumber = yield call(
