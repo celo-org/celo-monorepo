@@ -242,7 +242,8 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @notice Removes an oracle value and updates the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
-   * @dev This can be used to delete elements for oracles that have been removed. However, a > 1 elements reports list should alwas be maintained
+   * @dev This can be used to delete elements for oracles that have been removed.
+   * However, a > 1 elements reports list should alwas be maintained
    */
   function removeReport(address token, address oracle) private {
     if (numTimestamps(token) == 1 && reportExists(token, oracle)) return;
