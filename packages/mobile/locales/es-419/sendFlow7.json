@@ -38,7 +38,7 @@
   "inviteFriends": "Invitar a amigos",
   "noResultsFor": "Sin resultados para",
   "noContacts": "No se encontraron contactos",
-  "searchForSomeone": "Busque a alguien según el nombre o el número de teléfono",
+  "searchForSomeone": "Busque a alguien según el nombre, el número de teléfono, o el dirección",
   "nameOrPhoneNumber": "Nombre o número de teléfono",
   "pending": "Pendiente",
   "sentPayment": "Enviar pago",
@@ -71,5 +71,22 @@
   "askForContactsPermissionAction": "Accede a tus contactos",
   "newAccountBalance": "Nuevo saldo de cuenta: ",
   "estimatingFee": "Estimando tarifa ",
-  "estimatedFee": "Tarifa estimada: "
+  "estimatedFee": "Tarifa estimada: ",
+  "verificationCta": {
+    "header": "¿Enviar a un amigo?",
+    "body":
+      "Verifique su teléfono y sincronice sus contactos para enviarlos rápidamente a sus amigos.",
+    "cta": "Iniciar verificación"
+  },
+  "importContactsCta": {
+    "header": "Importar contactos",
+    "body":
+      "Habilite Contactos en la Configuración de su teléfono para encontrar a sus amigos por nombre.",
+    "cta": "Configuraciones"
+  },
+  "contactSyncProgress": {
+    "header": "Sincronización de Contactos",
+    "progress": "{{current}} de {{total}}",
+    "importing": "Importar..."
+  }
 }

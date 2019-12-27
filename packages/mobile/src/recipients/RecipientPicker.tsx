@@ -1,16 +1,9 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHead from '@celo/react-components/components/SectionHead'
-import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
-import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
-import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
-import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
-import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import { TFunction } from 'i18next'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import {
@@ -19,16 +12,11 @@ import {
   SectionListData,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
-import Search from 'src/icons/Search'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -40,32 +28,8 @@ import {
 import RecipientItem from 'src/recipients/RecipientItem'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
-import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
-
-const RecipientSearchInput = withTextInputPasteAware(
-  withTextInputLabeling<TextInputProps>(TextInput),
-  { right: 22 }
-)
-
-const goToQrCodeScreen = () => {
-  navigate(Screens.QRScanner)
-}
-
-const QRCodeCTA = ({ t }: { t: TFunction }) => (
-  <TouchableOpacity onPress={goToQrCodeScreen} style={style.qrcodeRow}>
-    <View style={style.qrcodeIconLeft}>
-      <QRCode />
-    </View>
-    <View style={style.qrcodeTextContainer}>
-      <Text style={[fontStyles.bodySmallSemiBold, style.qrcodeText]}> {t('scanCode')} </Text>
-      <Text style={[fontStyles.bodySmall, style.qrcodeText]}>{t('toSentOrRequestPayment')}</Text>
-    </View>
-    <ForwardChevron height={15} />
-  </TouchableOpacity>
-)
 
 interface Section {
   key: string
@@ -74,14 +38,11 @@ interface Section {
 
 interface Props {
   testID?: string
-  showQRCode: boolean
   searchQuery: string
   sections: Section[]
   defaultCountryCode: string
-  hasAcceptedContactPermission: boolean
+  listHeaderComponent?: React.ComponentType<any>
   onSelectRecipient(recipient: Recipient): void
-  onSearchQueryChanged(searchQuery: string): void
-  onPermissionsAccepted(): void
 }
 
 interface StateProps {
@@ -123,17 +84,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
   renderItemSeparator = () => <View style={style.separator} />
 
-  renderFooter = () => (
-    <>
-      {this.renderItemSeparator()}
-      <Text style={[fontStyles.subSmall, style.footer]}>{this.props.t('searchFriends')}</Text>
-    </>
-  )
-
-  renderEmptyView = (
-    addressToE164Number: AddressToE164NumberType,
-    recipientCache: NumberToRecipient
-  ) => {
+  renderEmptyView = () => {
     const parsedNumber = parsePhoneNumber(this.props.searchQuery, this.props.defaultCountryCode)
     if (parsedNumber) {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
@@ -182,30 +133,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     )
   }
 
-  renderRequestContactPermission = () => {
-    return (
-      <>
-        {!this.props.hasAcceptedContactPermission && (
-          <Button
-            text={this.props.t('askForContactsPermissionAction')}
-            style={style.button}
-            onPress={this.requestContactsPermission}
-            standard={true}
-            type={BtnTypes.SECONDARY}
-          />
-        )}
-      </>
-    )
-  }
-
-  requestContactsPermission = async () => {
-    const granted = await requestContactsPermission()
-
-    if (granted) {
-      this.props.onPermissionsAccepted()
-    }
-  }
-
   renderSendToAddress = () => {
     const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
     const existingContact = getRecipientFromAddress(
@@ -238,33 +165,21 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   render() {
-    const { sections, t, addressToE164Number, recipientCache } = this.props
-    const showFooter = sections.length > 0
+    const { sections, listHeaderComponent } = this.props
 
     return (
       <View style={style.body} testID={this.props.testID}>
-        <DisconnectBanner />
-        <RecipientSearchInput
-          placeholder={t('nameOrPhoneNumber')}
-          value={this.props.searchQuery}
-          onChangeText={this.props.onSearchQueryChanged}
-          icon={<Search />}
-          style={style.textInput}
-          shouldShowClipboard={isValidAddress}
-        />
-        {this.props.showQRCode && <QRCodeCTA t={t} />}
         <SectionList
           renderItem={this.renderItem}
           renderSectionHeader={this.renderSectionHeader}
           sections={sections}
           ItemSeparatorComponent={this.renderItemSeparator}
-          ListFooterComponent={showFooter ? this.renderFooter : undefined}
-          ListEmptyComponent={this.renderEmptyView(addressToE164Number, recipientCache)}
+          ListHeaderComponent={listHeaderComponent}
+          ListEmptyComponent={this.renderEmptyView()}
           keyExtractor={this.keyExtractor}
           initialNumToRender={30}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="always"
         />
-        {this.renderRequestContactPermission()}
         <KeyboardSpacer />
       </View>
     )
@@ -274,17 +189,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 const style = StyleSheet.create({
   body: {
     flex: 1,
-  },
-  button: {
-    marginTop: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
-  textInput: {
-    alignSelf: 'center',
-    color: colors.dark,
-    height: 54,
-    marginHorizontal: 8,
   },
   separator: {
     backgroundColor: colors.darkLightest,
@@ -313,37 +217,9 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     textAlign: 'center',
   },
-  qrcodeRow: {
-    padding: 5,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 5,
-    marginHorizontal: 10,
-  },
-  qrcodeIconLeft: {
-    borderWidth: 1,
-    borderRadius: 15,
-    borderColor: colors.celoGreen,
-    padding: 4,
-  },
-  qrcodeTextContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    textAlignVertical: 'center',
-    padding: 3,
-  },
-  qrcodeText: {
-    alignSelf: 'center',
-    lineHeight: 30,
-  },
 })
 
-export default componentWithAnalytics(
-  connect(
-    mapStateToProps,
-    {}
-  )(withTranslation(Namespaces.sendFlow7)(RecipientPicker))
-)
+export default connect(
+  mapStateToProps,
+  {}
+)(withTranslation(Namespaces.sendFlow7)(RecipientPicker))
