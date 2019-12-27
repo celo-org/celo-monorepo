@@ -42,6 +42,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 private spendingLimit;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
+  event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address token);
   event TokenRemoved(address token, uint256 index);
   event SpenderAdded(address spender);
@@ -62,14 +63,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param registryAddress The address of the registry contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    */
-  function initialize(address registryAddress, uint256 _tobinTaxStalenessThreshold)
-    external
-    initializer
-  {
+  function initialize(
+    address registryAddress,
+    uint256 _tobinTaxStalenessThreshold,
+    uint256 _spendingRatio
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
-    spendingRatio = FixidityLib.fixed1();
+    setDailySpendingRatio(_spendingRatio);
   }
 
   /**
@@ -88,6 +90,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function setDailySpendingRatio(uint256 ratio) public onlyOwner {
     spendingRatio = FixidityLib.wrap(ratio);
+    require(spendingRatio.lte(FixidityLib.fixed1()), "spending ratio cannot be larger than 1");
+    emit DailySpendingRatioSet(ratio);
   }
 
   /**
@@ -227,7 +231,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
-      uint256 balance = getGoldToken().balanceOf(address(this));
+      uint256 balance = getReserveGoldBalance();
       lastSpendingDay = currentDay;
       spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
     }
