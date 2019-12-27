@@ -60,9 +60,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     _;
   }
 
-  function initialize(uint256 _reportExpirySeconds) external initializer {
+  function initialize(uint256 _reportExpirySeconds, uint256 _maxChangeRate) external initializer {
     _transferOwnership(msg.sender);
     reportExpirySeconds = _reportExpirySeconds;
+    setMaxMedianChangeRatePerSecond(_maxChangeRate);
   }
 
   /**
@@ -221,9 +222,12 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
   function recomputeRate(address token) internal {
     uint256 originalMedian = limitedMedianRate[token];
     uint256 newMedian = rates[token].getMedianValue();
-    if (limitedMedianRateTimestamp[token] != 0 && maxMedianChangeRatePerSecond.unwrap() != 0) {
-      uint256 td = now.sub(limitedMedianRateTimestamp[token]);
-      if (td > 365 days) td = 365 days;
+    uint256 td = now.sub(limitedMedianRateTimestamp[token]);
+    if (
+      limitedMedianRateTimestamp[token] != 0 &&
+      maxMedianChangeRatePerSecond.unwrap() != 0 &&
+      td < 365 days
+    ) {
       FixidityLib.Fraction memory maxChangeRate = fractionMulExp(
         FixidityLib.fixed1(),
         maxMedianChangeRatePerSecond.add(FixidityLib.fixed1()),

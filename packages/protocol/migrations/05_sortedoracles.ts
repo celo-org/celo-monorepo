@@ -8,5 +8,5 @@ module.exports = deploymentForCoreContract<SortedOraclesInstance>(
   web3,
   artifacts,
   CeloContractName.SortedOracles,
-  async () => [config.oracles.reportExpiry]
+  async () => [config.oracles.reportExpiry, config.oracles.maxChangeRatePerSecond]
 )

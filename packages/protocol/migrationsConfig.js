@@ -73,6 +73,7 @@ const DefaultConfig = {
   },
   oracles: {
     reportExpiry: 10 * 60, // 10 minutes
+    maxChangeRatePerSecond: 0, // not checked
   },
   random: {
     randomnessBlockRetentionWindow: (60 * 60) / 5, // 1 hour to match attestationExpiryBlocks
