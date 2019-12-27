@@ -16,25 +16,24 @@ export function ContactSyncBanner() {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const isLoadingContacts = useSelector(isLoadingImportContactsSelector)
   const { total, current } = useSelector(contactMappingProgressSelector)
-  const [isVisible, setIsVisible] = React.useState(false)
+  const [hasSynced, setHasSynced] = React.useState(false)
   const isSynced = current && total && current >= total
 
   // Hide banner after 3 seconds when sync is done
   React.useEffect(
     () => {
       if (!isSynced) {
-        setIsVisible(true)
         return
       }
       const timer = setTimeout(() => {
-        setIsVisible(false)
+        setHasSynced(true)
       }, 3000)
       return () => clearTimeout(timer)
     },
     [isSynced]
   )
 
-  if (!isLoadingContacts && !isVisible) {
+  if (!isLoadingContacts && (hasSynced || !total)) {
     return null
   }
 
@@ -54,7 +53,9 @@ export function ContactSyncBanner() {
       <View style={styles.textContainer}>
         <Text style={fontStyles.bodySmallSemiBold}>{t('contactSyncProgress.header')}</Text>
         <Text style={fontStyles.bodySmall}>
-          {t('contactSyncProgress.progress', { current, total })}
+          {total
+            ? t('contactSyncProgress.progress', { current, total })
+            : t('contactSyncProgress.importing')}
         </Text>
       </View>
     </View>

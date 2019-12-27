@@ -63,6 +63,10 @@ export const reducer = (
         ...getRehydratePayload(action, 'identity'),
         verificationStatus: VerificationStatus.Stopped,
         isLoadingImportContacts: false,
+        contactMappingProgress: {
+          current: 0,
+          total: 0,
+        },
       }
     }
     case Actions.RESET_VERIFICATION:

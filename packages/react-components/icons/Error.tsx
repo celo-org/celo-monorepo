@@ -18,7 +18,7 @@ export default class Error extends React.PureComponent<Props> {
 
   render() {
     return (
-      <View style={this.props.style}>
+      <View style={this.props.style} testID={'ErrorIcon'}>
         <Svg
           width={this.props.width}
           height={this.props.width}

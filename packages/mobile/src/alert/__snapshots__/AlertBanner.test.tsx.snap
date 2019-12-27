@@ -42,6 +42,7 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
           "marginHorizontal": 5,
         }
       }
+      testID="ErrorIcon"
     >
       <svg
         fill="none"

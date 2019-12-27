@@ -83,7 +83,8 @@
     "cta": "Settings"
   },
   "contactSyncProgress": {
-    "header": "Syncing Contacts",
-    "progress": "{{current}} of {{total}}"
+    "header": "Sincronización de Contactos",
+    "progress": "{{current}} de {{total}}",
+    "importing": "Importar..."
   }
 }

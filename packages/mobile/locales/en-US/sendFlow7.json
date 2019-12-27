@@ -84,6 +84,7 @@
   },
   "contactSyncProgress": {
     "header": "Syncing Contacts",
-    "progress": "{{current}} of {{total}}"
+    "progress": "{{current}} of {{total}}",
+    "importing": "Importing..."
   }
 }
