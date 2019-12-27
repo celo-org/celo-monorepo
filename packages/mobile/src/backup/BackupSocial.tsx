@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -17,7 +17,7 @@ import BackupPhraseContainer, {
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic, splitMnemonic } from 'src/backup/utils'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -40,7 +40,7 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-type Props = WithNamespaces & StateProps & DispatchProps
+type Props = WithTranslation & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -185,5 +185,5 @@ export default componentWithAnalytics(
       setSocialBackupCompleted,
       showError,
     }
-  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupSocial))
+  )(withTranslation(Namespaces.backupKeyFlow6)(BackupSocial))
 )

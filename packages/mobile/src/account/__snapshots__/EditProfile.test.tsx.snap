@@ -60,7 +60,7 @@ exports[`renders the EditProfile Component 1`] = `
           }
         }
         underlineColorAndroid="transparent"
-        value="Test"
+        value="John Doe"
       />
       <View
         style={

@@ -2,10 +2,10 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { getExchangeRateDisplayValue } from 'src/utils/formatting'
 
 interface ExchangeRateProps {
@@ -14,7 +14,7 @@ interface ExchangeRateProps {
   rate: BigNumber
 }
 
-type Props = ExchangeRateProps & WithNamespaces
+type Props = ExchangeRateProps & WithTranslation
 
 export class ExchangeRate extends React.PureComponent<Props> {
   render() {
@@ -60,4 +60,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.exchangeFlow9)(ExchangeRate)
+export default withTranslation(Namespaces.exchangeFlow9)(ExchangeRate)

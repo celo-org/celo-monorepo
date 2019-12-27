@@ -2,7 +2,7 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -11,7 +11,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow, navigatePinProtected } from 'src/app/actions'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
@@ -31,7 +31,7 @@ interface NavigationProps {
   incomingFromBackupFlow: boolean
 }
 
-type Props = WithNamespaces & StateProps & DispatchProps & NavigationInjectedProps<NavigationProps>
+type Props = WithTranslation & StateProps & DispatchProps & NavigationInjectedProps<NavigationProps>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -133,5 +133,5 @@ export default componentWithAnalytics(
       exitBackupFlow,
       navigatePinProtected,
     }
-  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupSocialIntro))
+  )(withTranslation(Namespaces.backupKeyFlow6)(BackupSocialIntro))
 )

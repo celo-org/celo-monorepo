@@ -147,7 +147,6 @@ class TextAnimation extends React.PureComponent<Props, State> {
 
     const fadeOut: ViewStyle = this.props.playing
       ? {
-          // @ts-ignore
           animationDuration: animations[word].duration,
           animationKeyframes: animations[word].out,
         }
@@ -155,7 +154,6 @@ class TextAnimation extends React.PureComponent<Props, State> {
 
     const fadeIn: ViewStyle = this.props.playing
       ? {
-          // @ts-ignore
           animationDuration: animations[word].duration,
           animationKeyframes: animations[word].in,
         }
