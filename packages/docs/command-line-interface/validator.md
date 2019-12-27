@@ -85,9 +85,6 @@ List registered Validators, their name (if provided), affiliation, uptime score,
 USAGE
   $ celocli validator:list
 
-OPTIONS
-  --no-truncate  Don't truncate fields to fit line
-
 EXAMPLE
   list
 ```
