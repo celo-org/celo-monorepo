@@ -615,7 +615,7 @@ describe('governance tests', () => {
       }
 
       const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken)
+        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken, 20)
       }
 
       const assertReserveBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
