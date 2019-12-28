@@ -67,6 +67,23 @@ export function assertAlmostEqual(
   }
 }
 
+// TODO(joshua): Pick a good percentage that works and is acceptably close
+export function assertAlmostEqualPct(actual: BigNumber, expected: BigNumber, pct: number = 1) {
+  if (expected.isZero()) {
+    assert.equal(actual.toFixed(), expected.toFixed())
+  } else {
+    const isCloseTo = expected
+      .div(actual)
+      .minus(1)
+      .abs()
+      .lte(new BigNumber(pct).div(new BigNumber(100)))
+    assert(
+      isCloseTo,
+      `expected ${actual.toString()} (actual) to almost equal ${expected.toString()} with +/- ${pct.toString()}% of the actual value.`
+    )
+  }
+}
+
 export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
   try {
     fs.unlinkSync(logsFilepath)
