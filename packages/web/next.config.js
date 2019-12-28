@@ -11,8 +11,12 @@ module.exports = withImages(
       localIdentName: '[local]___[hash:base64:5]',
     },
     cssModules: true,
+    experimental: {
+      granularChunks: true,
+    },
     publicRuntimeConfig: envConfig,
     serverRuntimeConfig: serverEnvConfig,
+
     // options: {buildId, dev, isServer, defaultLoaders, webpack}   https://nextjs.org/docs#customizing-webpack-config
     webpack: (config, { dev, isServer }) => {
       config.node = {
@@ -28,20 +32,6 @@ module.exports = withImages(
 
       if (!isServer) {
         config.resolve.alias['@sentry/node'] = '@sentry/browser'
-
-        const cacheGroups = config.optimization.splitChunks.cacheGroups
-
-        delete cacheGroups.react
-
-        cacheGroups.vendors = {
-          enforce: true,
-          minChunks: 8,
-          name: 'vendors',
-          priority: 5,
-          test: /[\\/](node_modules)[\\/]/,
-        }
-
-        cacheGroups.commons = { name: 'commons', minChunks: 12, priority: 10 }
       }
 
       return config
