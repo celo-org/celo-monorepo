@@ -676,14 +676,17 @@ describe('governance tests', () => {
           // TODO(joshua): Switch this over to communityRewardFraction
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const exchangeRate = await getStableTokenExchangeRate(blockNumber)
+          // infra = community_reward_fraction * supply_increase
+          // (x / (1 - x)) * increase. (increase include rewards multiplier?)
           const expectedInfraReward = expectedEpochReward
             .plus(stableTokenSupplyChange.div(exchangeRate))
-            .div(new BigNumber(3 / 4))
+            .times(new BigNumber(1 / 3))
           const expectedGoldTotalSupplyChange = expectedInfraReward
             .plus(expectedEpochReward)
             .plus(stableTokenSupplyChange.div(exchangeRate))
           await assertVotesChanged(blockNumber, expectedEpochReward)
           await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
+          // This is the problem. About 20% off the expected value
           await assertGovernanceBalanceChanged(
             blockNumber,
             expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
