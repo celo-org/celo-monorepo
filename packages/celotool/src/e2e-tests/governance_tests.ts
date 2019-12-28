@@ -8,6 +8,7 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import {
   assertAlmostEqual,
+  assertAlmostEqualPct,
   getContext,
   GethInstanceConfig,
   importGenesis,
@@ -205,7 +206,8 @@ describe('governance tests', () => {
     address: string,
     blockNumber: number,
     expected: BigNumber,
-    token: any
+    token: any,
+    pct: number = 0.1
   ) => {
     const currentBalance = new BigNumber(
       await token.methods.balanceOf(address).call({}, blockNumber)
@@ -215,7 +217,7 @@ describe('governance tests', () => {
     )
     assert.isFalse(currentBalance.isNaN())
     assert.isFalse(previousBalance.isNaN())
-    assertAlmostEqual(currentBalance.minus(previousBalance), expected)
+    assertAlmostEqualPct(currentBalance.minus(previousBalance), expected, pct)
   }
 
   const waitForBlock = async (blockNumber: number) => {
