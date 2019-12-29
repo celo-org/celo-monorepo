@@ -37,7 +37,6 @@ export default class Withdraw extends BaseCommand {
         `Vested instance has a different beneficiary`,
         async () => (await vestingInstance.getBeneficiary()) === res.flags.from
       )
-      .isAccount(vestingInstance.address)
       .runChecks()
 
     await displaySendTx('withdraw', vestingInstance.withdraw(), {

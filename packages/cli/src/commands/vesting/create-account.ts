@@ -23,7 +23,7 @@ export default class CreateAccount extends BaseCommand {
     const vestingInstance = await vestingFactory.getVestedAt(res.flags.from)
 
     await newCheckBuilder(this)
-      .isAccount(vestingInstance.address)
+      .isNotAccount(vestingInstance.address)
       .addCheck(
         `No vested instance found under the given beneficiary ${res.flags.from}`,
         () => vestingInstance.address !== NULL_ADDRESS

@@ -12,7 +12,7 @@ export default class VestingInfo extends BaseCommand {
     beneficiary: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
   }
 
-  static examples = ['vesting-info --beneficiary 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
+  static examples = ['info --beneficiary 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
 
   async run() {
     // tslint:disable-next-line

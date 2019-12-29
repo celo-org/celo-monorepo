@@ -33,14 +33,18 @@ export default class AuthorizeVoter extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const vestingFactory = await this.kit.contracts.getVestingFactory()
     const vestingInstance = await vestingFactory.getVestedAt(this.kit.defaultAccount)
-    if (vestingInstance.address === NULL_ADDRESS) {
-      console.error(`No vested instance found under the given beneficiary`)
-      return
-    }
-    if ((await vestingInstance.getBeneficiary()) !== res.flags.from) {
-      console.error(`Vested instance has a different beneficiary`)
-      return
-    }
+
+    await newCheckBuilder(this)
+      .isAccount(vestingInstance.address)
+      .addCheck(
+        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        () => vestingInstance.address !== NULL_ADDRESS
+      )
+      .addCheck(
+        `Vested instance has a different beneficiary`,
+        async () => (await vestingInstance.getBeneficiary()) === res.flags.from
+      )
+      .runChecks()
 
     const accounts = await this.kit.contracts.getAccounts()
     const sig = accounts.parseSignatureOfAddress(
@@ -49,11 +53,7 @@ export default class AuthorizeVoter extends BaseCommand {
       res.flags.pop
     )
 
-    await newCheckBuilder(this)
-      .isAccount(vestingInstance.address)
-      .runChecks()
-
     const tx = await vestingInstance.authorizeVoteSigner(res.flags.signer, sig)
-    await displaySendTx('authorizeTx', tx, { from: await vestingInstance.getBeneficiary() })
+    await displaySendTx('authorizeVoterTx', tx, { from: await vestingInstance.getBeneficiary() })
   }
 }

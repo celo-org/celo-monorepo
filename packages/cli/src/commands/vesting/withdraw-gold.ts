@@ -6,7 +6,7 @@ import { Flags } from '../../utils/command'
 
 export default class WithdrawGold extends BaseCommand {
   static description =
-    'Withdraw unlocked gold whose unlocking period has passed through the vesting instance.'
+    'Withdraw any pending withdrawals created via "vesting:unlock-gold" that have become available through the vesting instance.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -32,7 +32,6 @@ export default class WithdrawGold extends BaseCommand {
         `Vested instance has a different beneficiary`,
         async () => (await vestingInstance.getBeneficiary()) === flags.from
       )
-      .isAccount(vestingInstance.address)
       .runChecks()
 
     const currentTime = Math.round(new Date().getTime() / 1000)
