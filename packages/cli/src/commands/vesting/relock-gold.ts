@@ -1,54 +1,68 @@
+import { NULL_ADDRESS } from '@celo/contractkit'
+import { Address } from '@celo/utils/lib/address'
+import { flags } from '@oclif/command'
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { LockedGoldArgs } from '../../utils/lockedgold'
 
-export default class Withdraw extends BaseCommand {
-  static description = 'Withdraw unlocked gold whose unlocking period has passed.'
+export default class RelockGold extends BaseCommand {
+  static description =
+    'ReLocks already pending withdrawals for Celo Gold through a vesting instance.'
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true }),
+    from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
+    value: flags.string({ ...LockedGoldArgs.valueArg, required: true }),
   }
 
-  static examples = ['withdraw --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
+  static args = []
+
+  static examples = [
+    'relock-gold --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 10000000000000000000000',
+  ]
 
   async run() {
-    // tslint:disable-next-line
-    const { flags } = this.parse(Withdraw)
-    this.kit.defaultAccount = flags.from
-    const lockedgold = await this.kit.contracts.getLockedGold()
+    const res = this.parse(RelockGold)
+    const address: Address = res.flags.from
+
+    this.kit.defaultAccount = address
+    const value = new BigNumber(res.flags.value)
+
+    const vestingFactory = await this.kit.contracts.getVestingFactory()
+    const vestingInstance = await vestingFactory.getVestedAt(res.flags.from)
 
     await newCheckBuilder(this)
-      .isAccount(flags.from)
+      .addCheck(`Value [${value.toFixed()}] is not > 0`, () => value.gt(0))
+      .addCheck(
+        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        () => vestingInstance.address !== NULL_ADDRESS
+      )
+      .addCheck(
+        `Vested instance has a different beneficiary`,
+        async () => (await vestingInstance.getBeneficiary()) === res.flags.from
+      )
+      .isAccount(vestingInstance.address)
       .runChecks()
 
-    const currentTime = Math.round(new Date().getTime() / 1000)
-    while (true) {
-      let madeWithdrawal = false
-      const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
-      for (let i = 0; i < pendingWithdrawals.length; i++) {
-        const pendingWithdrawal = pendingWithdrawals[i]
-        if (pendingWithdrawal.time.isLessThan(currentTime)) {
-          console.log(
-            `Found available pending withdrawal of value ${pendingWithdrawal.value.toString()}, withdrawing`
-          )
-          await displaySendTx('withdraw', lockedgold.withdraw(i))
-          madeWithdrawal = true
-          break
-        }
-      }
-      if (!madeWithdrawal) {
-        break
-      }
-    }
-    const remainingPendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
-    for (const pendingWithdrawal of remainingPendingWithdrawals) {
-      console.log(
-        `Pending withdrawal of value ${pendingWithdrawal.value.toString()} available for withdrawal in ${pendingWithdrawal.time
-          .minus(currentTime)
-          .toString()} seconds.`
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const pendingWithdrawalsValue = await lockedGold.getPendingWithdrawalsTotalValue(
+      vestingInstance.address
+    )
+    const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
+
+    await newCheckBuilder(this)
+      .addCheck(
+        `The relockable value ${value.toString()} must be less or equal to the pending withdrawals value ${pendingWithdrawalsValue.toString()}`,
+        async () => value.lte(pendingWithdrawalsValue)
       )
+      .runChecks()
+
+    const txos = await vestingInstance.relockGold(vestingInstance.address, relockValue)
+    for (const txo of txos) {
+      await displaySendTx('relock', txo, { from: await vestingInstance.getBeneficiary() })
     }
   }
 }

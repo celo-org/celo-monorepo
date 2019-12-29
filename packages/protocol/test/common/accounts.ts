@@ -1,5 +1,3 @@
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
-import { upperFirst } from 'lodash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -8,6 +6,8 @@ import {
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { upperFirst } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,

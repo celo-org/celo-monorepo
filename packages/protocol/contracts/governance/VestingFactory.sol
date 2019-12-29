@@ -10,14 +10,14 @@ import "../common/UsingRegistry.sol";
 
 contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
   // mapping between beneficiary addresses and associated vesting contracts (schedules)
-  mapping(address => address) public hasVestedAt;
+  mapping(address => address) public vestings;
 
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
   }
 
-  event NewVestingInstanceCreated(address atAddress);
+  event NewVestingInstanceCreated(address indexed beneficiary, address atAddress);
 
   /**
    * @notice Factory function for creating a new vesting contract instance
@@ -44,7 +44,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
     address vestingRevoker,
     address vestingRefundDestination,
     address registryAddress
-  ) external returns (address) {
+  ) external onlyOwner returns (address) {
     require(
       getGoldToken().balanceOf(address(this)) >= vestingAmount,
       "factory balance is unsufficient to create a new vesting"
@@ -64,9 +64,9 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
         registryAddress
       )
     );
-    hasVestedAt[vestingBeneficiary] = newVestingInstance;
-    getGoldToken().transfer(hasVestedAt[vestingBeneficiary], vestingAmount);
-    emit NewVestingInstanceCreated(newVestingInstance);
+    vestings[vestingBeneficiary] = newVestingInstance;
+    getGoldToken().transfer(vestings[vestingBeneficiary], vestingAmount);
+    emit NewVestingInstanceCreated(vestingBeneficiary, newVestingInstance);
     return newVestingInstance;
   }
 }

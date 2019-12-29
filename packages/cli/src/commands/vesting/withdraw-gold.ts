@@ -5,11 +5,12 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class WithdrawGold extends BaseCommand {
-  static description = 'Withdraw unlocked gold whose unlocking period has passed.'
+  static description =
+    'Withdraw unlocked gold whose unlocking period has passed through the vesting instance.'
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Beneficiary of the vesting ' }),
+    from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
   }
 
   static examples = ['withdraw-gold --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
@@ -20,37 +21,33 @@ export default class WithdrawGold extends BaseCommand {
     this.kit.defaultAccount = flags.from
     const lockedgold = await this.kit.contracts.getLockedGold()
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingFactoryInstance = await vestingFactory.getVestedAt(flags.from)
-    if (vestingFactoryInstance.address === NULL_ADDRESS) {
-      console.error(`No vested instance found under the given beneficiary`)
-      return
-    }
-    if ((await vestingFactoryInstance.getBeneficiary()) !== flags.from) {
-      console.error(`Vested instance has a different beneficiary`)
-      return
-    }
+    const vestingInstance = await vestingFactory.getVestedAt(flags.from)
 
     await newCheckBuilder(this)
-      .isAccount(vestingFactoryInstance.address)
-      .runChecks()
-
-    await newCheckBuilder(this)
-      .isAccount(flags.from)
+      .addCheck(
+        `No vested instance found under the given beneficiary ${flags.from}`,
+        () => vestingInstance.address !== NULL_ADDRESS
+      )
+      .addCheck(
+        `Vested instance has a different beneficiary`,
+        async () => (await vestingInstance.getBeneficiary()) === flags.from
+      )
+      .isAccount(vestingInstance.address)
       .runChecks()
 
     const currentTime = Math.round(new Date().getTime() / 1000)
     while (true) {
       let madeWithdrawal = false
-      const pendingWithdrawals = await lockedgold.getPendingWithdrawals(
-        vestingFactoryInstance.address
-      )
+      const pendingWithdrawals = await lockedgold.getPendingWithdrawals(vestingInstance.address)
       for (let i = 0; i < pendingWithdrawals.length; i++) {
         const pendingWithdrawal = pendingWithdrawals[i]
         if (pendingWithdrawal.time.isLessThan(currentTime)) {
           console.log(
             `Found available pending withdrawal of value ${pendingWithdrawal.value.toString()}, withdrawing`
           )
-          await displaySendTx('withdrawLockedGoldTx', vestingFactoryInstance.withdrawLockedGold(i))
+          await displaySendTx('withdrawLockedGoldTx', vestingInstance.withdrawLockedGold(i), {
+            from: await vestingInstance.getBeneficiary(),
+          })
           madeWithdrawal = true
           break
         }
@@ -60,7 +57,7 @@ export default class WithdrawGold extends BaseCommand {
       }
     }
     const remainingPendingWithdrawals = await lockedgold.getPendingWithdrawals(
-      vestingFactoryInstance.address
+      vestingInstance.address
     )
     for (const pendingWithdrawal of remainingPendingWithdrawals) {
       console.log(

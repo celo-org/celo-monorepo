@@ -9,7 +9,7 @@ export default class CreateAccount extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Beneficiary of the vesting ' }),
+    from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
   }
 
   static args = []
@@ -20,22 +20,22 @@ export default class CreateAccount extends BaseCommand {
     const res = this.parse(CreateAccount)
     this.kit.defaultAccount = res.flags.from
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingFactoryInstance = await vestingFactory.getVestedAt(res.flags.from)
-    if (vestingFactoryInstance.address === NULL_ADDRESS) {
-      console.error(`No vested instance found under the given beneficiary`)
-      return
-    }
-    if ((await vestingFactoryInstance.getBeneficiary()) !== res.flags.from) {
-      console.error(`Vested instance has a different beneficiary`)
-      return
-    }
+    const vestingInstance = await vestingFactory.getVestedAt(res.flags.from)
 
     await newCheckBuilder(this)
-      .isAccount(res.flags.from)
+      .isAccount(vestingInstance.address)
+      .addCheck(
+        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        () => vestingInstance.address !== NULL_ADDRESS
+      )
+      .addCheck(
+        `Vested instance has a different beneficiary`,
+        async () => (await vestingInstance.getBeneficiary()) === res.flags.from
+      )
       .runChecks()
 
     let tx: any
-    tx = await vestingFactoryInstance.createAccount()
-    await displaySendTx('createaccountTx', tx)
+    tx = await vestingInstance.createAccount()
+    await displaySendTx('createaccountTx', tx, { from: await vestingInstance.getBeneficiary() })
   }
 }

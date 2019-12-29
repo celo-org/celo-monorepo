@@ -8,25 +8,13 @@ import "./interfaces/IVestingInstance.sol";
 import "../common/UsingRegistry.sol";
 
 contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
-  modifier onlyRevoker() {
-    require(msg.sender == revoker, "sender must be the vesting revoker");
-    _;
-  }
-
-  modifier onlyBeneficiary() {
-    require(msg.sender == beneficiary, "sender must be the vesting beneficiary");
-    _;
-  }
-
   using SafeMath for uint256;
 
-  struct VestingScheme {
+  struct VestingSchedule {
     // total that is to be vested
     uint256 vestingAmount;
     // amount that is to be vested per period
     uint256 vestAmountPerPeriod;
-    // number of vesting periods
-    uint256 vestingPeriods;
     // durations in secs. of one period
     uint256 vestingPeriodSec;
     // timestamp for the starting point of the vesting. Timestamps are expressed in UNIX time, the same units as block.timestamp.
@@ -35,10 +23,10 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     uint256 vestingCliffStartTime;
   }
 
-  // beneficiary of the amount
+  // beneficiary of the Celo Gold to be vested in this contract
   address public beneficiary;
 
-  // indicates how much of the vested amount has been withdrawn (i.e. withdrawn)
+  // indicates how much of the vested amount has been withdrawn
   uint256 public currentlyWithdrawn;
 
   // indicates if the vesting has been revoked. false by default
@@ -61,10 +49,20 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   address public refundDestination;
 
   // a public struct hosting the vesting scheme params
-  VestingScheme public vestingScheme;
+  VestingSchedule public vestingSchedule;
 
   event WithdrawalPaused(uint256 pausePeriod, uint256 pauseTimestamp);
   event VestingRevoked(uint256 revokeTimestamp);
+
+  modifier onlyRevoker() {
+    require(msg.sender == revoker, "sender must be the vesting revoker");
+    _;
+  }
+
+  modifier onlyBeneficiary() {
+    require(msg.sender == beneficiary, "sender must be the vesting beneficiary");
+    _;
+  }
 
   /**
    * @notice A constructor for initialising a new instance of a Vesting Schedule contract
@@ -91,8 +89,6 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     address vestingRefundDestination,
     address registryAddress
   ) public {
-    // perform checks on the input data
-    require(registryAddress != address(0), "registry address must not be the zero address");
     require(vestingAmount > 0, "Vesting amount must be positive");
     require(vestingBeneficiary != address(0), "Beneficiary is the zero address");
     require(vestingRefundDestination != address(0), "Refund destination is the zero address");
@@ -103,22 +99,22 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
       "Vesting amount per period is greater than the total vesting amount"
     );
     require(
+      vestingAmount.div(vestAmountPerPeriod) >= 1,
+      "There must be more than 1 vesting periods"
+    );
+    require(
       vestingStartTime.add(vestingCliff) > block.timestamp,
       "Vesting end time is before current time"
     );
 
-    // set the registry address
     setRegistry(registryAddress);
 
-    // init the vesting scheme
-    vestingScheme.vestingPeriods = vestingAmount.div(vestAmountPerPeriod);
-    vestingScheme.vestingAmount = vestingAmount;
-    vestingScheme.vestAmountPerPeriod = vestAmountPerPeriod;
-    vestingScheme.vestingPeriodSec = vestingPeriodSec;
-    vestingScheme.vestingCliffStartTime = vestingStartTime.add(vestingCliff);
-    vestingScheme.vestingStartTime = vestingStartTime;
+    vestingSchedule.vestingAmount = vestingAmount;
+    vestingSchedule.vestAmountPerPeriod = vestAmountPerPeriod;
+    vestingSchedule.vestingPeriodSec = vestingPeriodSec;
+    vestingSchedule.vestingCliffStartTime = vestingStartTime.add(vestingCliff);
+    vestingSchedule.vestingStartTime = vestingStartTime;
 
-    // init the state vars
     beneficiary = vestingBeneficiary;
     revocable = vestingRevocable;
     refundDestination = vestingRefundDestination;
@@ -148,7 +144,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     require(revocable, "Revoking is not allowed");
     require(!revoked, "Vesting already revoked");
     revokeTime = revokeTimestamp > block.timestamp ? revokeTimestamp : block.timestamp;
-    uint256 balance = getGoldToken().balanceOf(address(this));
+    uint256 balance = getVestingInstanceTotalBalance();
     uint256 withdrawableAmount = getWithdrawableAmountAtTimestamp(revokeTime);
     uint256 refundAmount = balance.sub(withdrawableAmount);
     revoked = true;
@@ -175,43 +171,51 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
 
   /**
    * @dev Calculates the amount that has already vested but hasn't been withdrawn yet.
-   * @param timestamp the timestamp at which the calculate the withdrawable amount
+   * @param timestamp the timestamp at which to calculate the withdrawable amount
    * @return The withdrawable amount at the timestamp
    * @dev Function is also made public in order to be called for informational purpose
    */
   function getWithdrawableAmountAtTimestamp(uint256 timestamp) public view returns (uint256) {
-    return calculateFreeAmountAtTimestamp(timestamp).sub(currentlyWithdrawn);
+    return calculateVestedAmountAtTimestamp(timestamp).sub(currentlyWithdrawn);
+  }
+
+  /**
+   * @notice Calculates both non-locked and locked gold balance parts and returns their sum as the total balance of the vesting instance
+   * @return The total vesting instance balance
+   */
+  function getVestingInstanceTotalBalance() public view returns (uint256) {
+    uint256 nonLockedBalance = getGoldToken().balanceOf(address(this));
+    uint256 lockedBalance = getLockedGold().getAccountTotalLockedGold(address(this));
+    return nonLockedBalance.add(lockedBalance);
   }
 
   /**
    * @dev Calculates the amount that has already vested.
-   * @param timestamp the timestamp at which the calculate the already vested amount
+   * @param timestamp the timestamp at which to calculate the already vested amount
    */
-  function calculateFreeAmountAtTimestamp(uint256 timestamp) private view returns (uint256) {
-    uint256 currentBalance = getGoldToken().balanceOf(address(this));
+  function calculateVestedAmountAtTimestamp(uint256 timestamp) private view returns (uint256) {
+    uint256 currentBalance = getVestingInstanceTotalBalance();
     uint256 totalBalance = currentBalance.add(currentlyWithdrawn);
+    uint256 vestingPeriods = vestingSchedule.vestingAmount.div(vestingSchedule.vestAmountPerPeriod);
 
-    if (timestamp < vestingScheme.vestingCliffStartTime) {
+    if (timestamp < vestingSchedule.vestingCliffStartTime) {
       return 0;
     }
     if (
       timestamp >=
-      vestingScheme.vestingStartTime.add(
-        vestingScheme.vestingPeriods.mul(vestingScheme.vestingPeriodSec)
-      ) ||
+      vestingSchedule.vestingStartTime.add(vestingPeriods.mul(vestingSchedule.vestingPeriodSec)) ||
       revoked
     ) {
       return totalBalance;
     }
 
-    uint256 vestingCurveGradient = (timestamp.sub(vestingScheme.vestingStartTime)).div(
-      vestingScheme.vestingPeriods
-    );
-    return (totalBalance.mul(vestingCurveGradient)).div(vestingScheme.vestingPeriodSec);
+    uint256 timeSinceStart = timestamp.sub(vestingSchedule.vestingStartTime);
+    uint256 timeToEnd = vestingPeriods.mul(vestingSchedule.vestingPeriodSec);
+    return totalBalance.mul(timeSinceStart).div(timeToEnd);
   }
 
   /**
-   * @notice A wrapper func for the lock gold method
+   * @notice A wrapper function for the lock gold method
    * @param value the value of gold to be locked
    * @dev To be called only by the beneficiary of the vesting
    */
@@ -225,7 +229,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice A wrapper func for the unlock gold method function
+   * @notice A wrapper function for the unlock gold method function
    * @param value the value of gold to be unlocked for the vesting instance
    * @dev To be called only by the beneficiary of the vesting
    */
@@ -234,7 +238,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice A wrapper func for the relock locked gold method function
+   * @notice A wrapper function for the relock locked gold method function
    * @param index the index of the pending locked gold withdrawal
    * @param value the value of gold to be relocked for the vesting instance
    * @dev To be called only by the beneficiary of the vesting.
@@ -244,7 +248,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice A wrapper func for the withdraw locked gold method function
+   * @notice A wrapper function for the withdraw locked gold method function
    * @param index the index of the pending locked gold withdrawal
    * @dev To be called only by the beneficiary of the vesting. The amount shall be withdrawn back to the vesting instance
    */
@@ -253,7 +257,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice A wrapper func for the authorize vote signer account method
+   * @notice A wrapper function for the authorize vote signer account method
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
@@ -266,57 +270,6 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     onlyBeneficiary
   {
     getAccounts().authorizeVoteSigner(signer, v, r, s);
-  }
-
-  /**
-   * @notice A wrapper func for the authorize validator signer account method
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev To be called only by the beneficiary of the vesting.
-   */
-  function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyBeneficiary
-  {
-    getAccounts().authorizeValidatorSigner(signer, v, r, s);
-  }
-
-  /**
-   * @notice A wrapper func for the authorize validator signer account method
-   * @param signer The address of the signing key to authorize.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev To be called only by the beneficiary of the vesting.
-   */
-  function authorizeValidatorSignerPubKey(
-    address signer,
-    bytes calldata ecdsaPublicKey,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external nonReentrant onlyBeneficiary {
-    getAccounts().authorizeValidatorSigner(signer, ecdsaPublicKey, v, r, s);
-  }
-
-  /**
-   * @notice A wrapper func for the authorize attestation signer account method
-   * @param signer The address of the signing key to authorize.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev To be called only by the beneficiary of the vesting.
-   */
-  function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyBeneficiary
-  {
-    getAccounts().authorizeAttestationSigner(signer, v, r, s);
   }
 
   /**

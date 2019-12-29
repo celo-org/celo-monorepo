@@ -1,11 +1,9 @@
-import {
-  hashMessageWithPrefix,
-  Signature,
-  signedMessageToPublicKey,
-} from '@celo/utils/lib/signatureUtils'
+import { Signature } from '@celo/utils/lib/signatureUtils'
+import { toFixed } from '@celo/utils/src/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { VestingInstance } from '../generated/types/VestingInstance'
+import { PendingWithdrawal } from '../wrappers/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -19,7 +17,7 @@ import {
   tupleParser,
 } from './BaseWrapper'
 
-interface VestingScheme {
+export interface VestingScheme {
   vestingAmount: BigNumber
   vestingAmountPerPeriod: BigNumber
   vestingPeriods: number
@@ -37,14 +35,19 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * @return A VestingScheme.
    */
   async getVestingScheme(): Promise<VestingScheme> {
-    const vestingScheme = await this.contract.methods.vestingScheme().call()
+    const vestingSchedule = await this.contract.methods.vestingSchedule().call()
+    const vestingPeriods = toFixed(
+      toBigNumber(vestingSchedule.vestingAmount).div(
+        toBigNumber(vestingSchedule.vestAmountPerPeriod)
+      )
+    )
     return {
-      vestingAmount: toBigNumber(vestingScheme.vestingAmount),
-      vestingAmountPerPeriod: toBigNumber(vestingScheme.vestAmountPerPeriod),
-      vestingPeriods: toNumber(vestingScheme.vestingPeriods),
-      vestingPeriodSec: toNumber(vestingScheme.vestingPeriodSec),
-      vestingStartTime: toNumber(vestingScheme.vestingStartTime),
-      vestingCliffStartTime: toNumber(vestingScheme.vestingCliffStartTime),
+      vestingAmount: toBigNumber(vestingSchedule.vestingAmount),
+      vestingAmountPerPeriod: toBigNumber(vestingSchedule.vestAmountPerPeriod),
+      vestingPeriods: toNumber(vestingPeriods.toString()),
+      vestingPeriodSec: toNumber(vestingSchedule.vestingPeriodSec),
+      vestingStartTime: toNumber(vestingSchedule.vestingStartTime),
+      vestingCliffStartTime: toNumber(vestingSchedule.vestingCliffStartTime),
     }
   }
 
@@ -84,13 +87,13 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
 
   /**
    * Indicates if the vesting is revocable or not
-   * @return A boolean indicating revocable vesting (true) or none-revocable(false).
+   * @return A boolean indicating revocable vesting (true) or non-revocable(false).
    */
   isRevokable: () => Promise<boolean> = proxyCall(this.contract.methods.revocable)
 
   /**
    * Indicates if the vesting is revoked or not
-   * @return A boolean indicating revoked vesting (true) or none-revoked(false).
+   * @return A boolean indicating revoked vesting (true) or non-revoked(false).
    */
   isRevoked: () => Promise<boolean> = proxyCall(this.contract.methods.revoked)
 
@@ -118,6 +121,16 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   )
 
   /**
+   * Returns the total vesting instance balance (locked and non-locked gold)
+   * @return the total vesting instance balance (locked and non-locked gold)
+   */
+  getVestingInstanceTotalBalance: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getVestingInstanceTotalBalance,
+    undefined,
+    toBigNumber
+  )
+
+  /**
    * Pause a vesting instance
    * @param pausePeriod The duration of the pause period in seconds
    * @return A CeloTransactionObject
@@ -136,8 +149,8 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   }
 
   /**
-   * Unlocks gold that becomes withdrawable after the unlocking period.
-   * @param value The amount of gold to unlock.
+   * Locks gold to be used for voting.
+   * @param value The amount of gold to lock.
    */
   lockGold: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
@@ -155,14 +168,64 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
     tupleParser(parseNumber)
   )
 
+  async getPendingWithdrawalsTotalValue(account: Address) {
+    const lockedGoldContract = await this.kit.contracts.getLockedGold()
+    const pendingWithdrawals = await lockedGoldContract.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const values = pendingWithdrawals.map((pw: PendingWithdrawal) => pw.value)
+    const reducer = (total: BigNumber, pw: BigNumber) => pw.plus(total)
+    return values.reduce(reducer, new BigNumber(0))
+  }
+
   /**
    * Relocks gold that has been unlocked but not withdrawn.
-   * @param index The index of the pending withdrawal to relock.
-   * @param value The value to relock.
+   * @param value The value to relock from pending withdrawals.
    */
-  relockGold: (index: number, value: string | number) => CeloTransactionObject<void> = proxySend(
+  async relockGold(
+    account: Address,
+    value: NumberLike
+  ): Promise<Array<CeloTransactionObject<void>>> {
+    const lockedGoldContract = await this.kit.contracts.getLockedGold()
+    const pendingWithdrawals = await lockedGoldContract.getPendingWithdrawals(account)
+    // Ensure there are enough pending withdrawals to relock.
+    const totalValue = await this.getPendingWithdrawalsTotalValue(account)
+    if (totalValue.isLessThan(value)) {
+      throw new Error(`Not enough pending withdrawals to relock ${value}`)
+    }
+    // Assert pending withdrawals are sorted by time (increasing), so that we can re-lock starting
+    // with those furthest away from being available (at the end).
+    const throwIfNotSorted = (pw: PendingWithdrawal, i: number) => {
+      if (i > 0 && !pw.time.isGreaterThanOrEqualTo(pendingWithdrawals[i - 1].time)) {
+        throw new Error('Pending withdrawals not sorted by timestamp')
+      }
+    }
+    pendingWithdrawals.forEach(throwIfNotSorted)
+
+    let remainingToRelock = new BigNumber(value)
+    const relockPw = (
+      acc: Array<CeloTransactionObject<void>>,
+      pw: PendingWithdrawal,
+      i: number
+    ) => {
+      const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
+      if (!valueToRelock.isZero()) {
+        remainingToRelock = remainingToRelock.minus(valueToRelock)
+        acc.push(this._relock(i, valueToRelock))
+      }
+      return acc
+    }
+    return pendingWithdrawals.reduceRight(relockPw, []) as Array<CeloTransactionObject<void>>
+  }
+
+  /**
+   * Relocks gold that has been unlocked but not withdrawn.
+   * @param index The index of the pending withdrawal to relock from.
+   * @param value The value to relock from the specified pending withdrawal.
+   */
+  _relock: (index: number, value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.relockGold
+    this.contract.methods.relockGold,
+    tupleParser(parseNumber, parseNumber)
   )
 
   /**
@@ -175,7 +238,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   )
 
   /**
-   * Withdraws a gold that has been unlocked after the unlocking period has passed.
+   * Withdraws gold that has been vested by the contract.
    */
   withdraw: () => CeloTransactionObject<void> = proxySend(this.kit, this.contract.methods.withdraw)
 
@@ -220,27 +283,6 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   )
 
   /**
-   * Authorize an attestation signing key on behalf of this account to another address.
-   * @param signer The address of the signing key to authorize.
-   * @param proofOfSigningKeyPossession The account address signed by the signer address.
-   * @return A CeloTransactionObject
-   */
-  async authorizeAttestationSigner(
-    signer: Address,
-    proofOfSigningKeyPossession: Signature
-  ): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeAttestationSigner(
-        signer,
-        proofOfSigningKeyPossession.v,
-        proofOfSigningKeyPossession.r,
-        proofOfSigningKeyPossession.s
-      )
-    )
-  }
-
-  /**
    * Authorizes an address to sign votes on behalf of the account.
    * @param signer The address of the vote signing key to authorize.
    * @param proofOfSigningKeyPossession The account address signed by the signer address.
@@ -259,50 +301,5 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
         proofOfSigningKeyPossession.s
       )
     )
-  }
-
-  /**
-   * Authorizes an address to sign consensus messages on behalf of the account.
-   * @param signer The address of the signing key to authorize.
-   * @param proofOfSigningKeyPossession The account address signed by the signer address.
-   * @return A CeloTransactionObject
-   */
-  async authorizeValidatorSigner(
-    signer: Address,
-    proofOfSigningKeyPossession: Signature
-  ): Promise<CeloTransactionObject<void>> {
-    const validators = await this.kit.contracts.getValidators()
-    const account = this.kit.defaultAccount || (await this.kit.web3.eth.getAccounts())[0]
-    if (await validators.isValidator(account)) {
-      const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
-      const prefixedMsg = hashMessageWithPrefix(message)
-      const pubKey = signedMessageToPublicKey(
-        prefixedMsg,
-        proofOfSigningKeyPossession.v,
-        proofOfSigningKeyPossession.r,
-        proofOfSigningKeyPossession.s
-      )
-      return toTransactionObject(
-        this.kit,
-        this.contract.methods.authorizeValidatorSignerPubKey(
-          signer,
-          // @ts-ignore Typescript does not support overloading.
-          pubKey,
-          proofOfSigningKeyPossession.v,
-          proofOfSigningKeyPossession.r,
-          proofOfSigningKeyPossession.s
-        )
-      )
-    } else {
-      return toTransactionObject(
-        this.kit,
-        this.contract.methods.authorizeValidatorSigner(
-          signer,
-          proofOfSigningKeyPossession.v,
-          proofOfSigningKeyPossession.r,
-          proofOfSigningKeyPossession.s
-        )
-      )
-    }
   }
 }

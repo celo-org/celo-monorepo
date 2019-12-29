@@ -20,7 +20,7 @@ export interface VotingDetails {
   weight: BigNumber
 }
 
-interface AccountSummary {
+export interface AccountSummary {
   lockedGold: {
     total: BigNumber
     nonvoting: BigNumber
@@ -29,7 +29,7 @@ interface AccountSummary {
   pendingWithdrawals: PendingWithdrawal[]
 }
 
-interface PendingWithdrawal {
+export interface PendingWithdrawal {
   time: BigNumber
   value: BigNumber
 }

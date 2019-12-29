@@ -10,43 +10,44 @@ export default class Revoke extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Revoker of the vesting ' }),
-    beneficiary: Flags.address({ required: true, description: 'Beneficiary of the vesting ' }),
-    timestamp: flags.string({
+    from: Flags.address({ required: true, description: 'Revoker of the vesting' }),
+    beneficiary: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
+    timestamp: flags.integer({
       required: true,
-      description: 'The timestamp at which to revoke the vesting ',
+      description: 'The timestamp in seconds at which to revoke the vesting',
     }),
   }
 
   static args = []
 
   static examples = [
-    'pause --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --beneficiary 0x5409ED021D9299bf6814279A6A1411A7e866A631 --pauseduration 300',
+    'revoke --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --beneficiary 0x5409ED021D9299bf6814279A6A1411A7e866A631 --timestamp 1577630534',
   ]
 
   async run() {
     const res = this.parse(Revoke)
     this.kit.defaultAccount = res.flags.from
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingFactoryInstance = await vestingFactory.getVestedAt(res.flags.beneficiary)
-    if (vestingFactoryInstance.address === NULL_ADDRESS) {
-      console.error(`No vested instance found under the given beneficiary`)
-      return
-    }
-    if ((await vestingFactoryInstance.getRevoker()) !== res.flags.from) {
-      console.error(`Vested instance has a different revoker`)
-      return
-    }
+    const vestingInstance = await vestingFactory.getVestedAt(res.flags.beneficiary)
 
     await newCheckBuilder(this)
-      .isAccount(res.flags.from)
+      .addCheck(
+        `Revoke timestamp ${res.flags.timestamp} must be in the future and not in the past`,
+        async () =>
+          res.flags.timestamp > 0 &&
+          res.flags.timestamp >= (await this.kit.web3.eth.getBlock('latest')).timestamp
+      )
+      .addCheck(
+        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        () => vestingInstance.address !== NULL_ADDRESS
+      )
+      .addCheck(
+        `Vested instance has a different revoker`,
+        async () => (await vestingInstance.getRevoker()) === res.flags.from
+      )
       .runChecks()
 
-    await newCheckBuilder(this)
-      .isAccount(vestingFactoryInstance.address)
-      .runChecks()
-
-    const tx = await vestingFactoryInstance.revokeVesting(res.flags.timestamp)
-    await displaySendTx('revokeVestingTx', tx)
+    const tx = await vestingInstance.revokeVesting(res.flags.timestamp)
+    await displaySendTx('revokeVestingTx', tx, { from: await vestingInstance.getRevoker() })
   }
 }

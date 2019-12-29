@@ -51,7 +51,7 @@ export class VestingFactoryWrapper extends BaseWrapper<VestingFactory> {
    * @return The vesting instance contract
    */
   async getVestedAt(account: string) {
-    const vestingInstanceAddress: string = await this.contract.methods.hasVestedAt(account).call()
+    const vestingInstanceAddress: string = await this.contract.methods.vestings(account).call()
     return new VestingInstanceWrapper(
       this.kit,
       newVestingInstance(this.kit.web3, vestingInstanceAddress)

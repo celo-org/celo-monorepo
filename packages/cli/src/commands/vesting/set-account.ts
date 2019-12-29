@@ -7,14 +7,14 @@ import { Flags } from '../../utils/command'
 
 export default class SetAccount extends BaseCommand {
   static description =
-    'Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol why keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.'
+    'Set account properties to the vesting instance account such as name, wallet address, data encryption key and metadata url'
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Beneficiary of the vesting ' }),
+    from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
     property: flags.string({
       char: 'p',
-      options: ['name', 'walletaddress', 'dataenckey', 'metaurl'],
+      options: ['name', 'walletaddress', 'dataencyptionkey', 'metaurl'],
       description: 'Property type to set',
       required: true,
     }),
@@ -34,37 +34,33 @@ export default class SetAccount extends BaseCommand {
     const res = this.parse(SetAccount)
     this.kit.defaultAccount = res.flags.from
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingFactoryInstance = await vestingFactory.getVestedAt(res.flags.from)
-    if (vestingFactoryInstance.address === NULL_ADDRESS) {
-      console.error(`No vested instance found under the given beneficiary`)
-      return
-    }
-    if ((await vestingFactoryInstance.getBeneficiary()) !== res.flags.from) {
-      console.error(`Vested instance has a different beneficiary`)
-      return
-    }
+    const vestingInstance = await vestingFactory.getVestedAt(res.flags.from)
 
     await newCheckBuilder(this)
-      .isAccount(res.flags.from)
-      .runChecks()
-
-    await newCheckBuilder(this)
-      .isAccount(vestingFactoryInstance.address)
+      .isAccount(vestingInstance.address)
+      .addCheck(
+        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        () => vestingInstance.address !== NULL_ADDRESS
+      )
+      .addCheck(
+        `Vested instance has a different beneficiary`,
+        async () => (await vestingInstance.getBeneficiary()) === res.flags.from
+      )
       .runChecks()
 
     let tx: any
     if (res.flags.property === 'name') {
-      tx = await vestingFactoryInstance.setAccountName(res.flags.value)
+      tx = await vestingInstance.setAccountName(res.flags.value)
     } else if (res.flags.property === 'walletaddress') {
-      tx = await vestingFactoryInstance.setAccountWalletAddress(res.flags.value)
-    } else if (res.flags.property === 'dataenckey') {
-      // tx = await vestingFactoryInstance.setAccountDataEncryptionKey(res.flags.value)
+      tx = await vestingInstance.setAccountWalletAddress(res.flags.value)
+    } else if (res.flags.property === 'dataencyptionkey') {
+      tx = await vestingInstance.setAccountDataEncryptionKey(res.flags.value)
     } else if (res.flags.property === 'metaurl') {
-      tx = await vestingFactoryInstance.setAccountMetadataURL(res.flags.value)
+      tx = await vestingInstance.setAccountMetadataURL(res.flags.value)
     } else {
       this.error(`Invalid property provided`)
       return
     }
-    await displaySendTx('setaccountTx', tx)
+    await displaySendTx('setaccountTx', tx, { from: await vestingInstance.getBeneficiary() })
   }
 }

@@ -9,12 +9,17 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class UnlockGold extends BaseCommand {
-  static description = 'Locks Celo Gold to be used in governance and validator elections.'
+  static description =
+    'Unlocks Celo Gold owned by the vesting instance, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "vesting:withdraw-gold".'
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Beneficiary of the vesting ' }),
-    value: flags.string({ ...LockedGoldArgs.valueArg, required: true }),
+    from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
+    value: flags.string({
+      ...LockedGoldArgs.valueArg,
+      required: true,
+      description: 'Value of Celo Gold to unlock through the vesting instance',
+    }),
   }
 
   static args = []
@@ -31,25 +36,23 @@ export default class UnlockGold extends BaseCommand {
     const value = new BigNumber(res.flags.value)
 
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingFactoryInstance = await vestingFactory.getVestedAt(res.flags.from)
-    if (vestingFactoryInstance.address === NULL_ADDRESS) {
-      console.error(`No vested instance found under the given beneficiary`)
-      return
-    }
-    if ((await vestingFactoryInstance.getRevoker()) !== res.flags.from) {
-      console.error(`Vested instance has a different revoker`)
-      return
-    }
+    const vestingInstance = await vestingFactory.getVestedAt(res.flags.from)
 
     await newCheckBuilder(this)
       .addCheck(`Value [${value.toFixed()}] is not > 0`, () => value.gt(0))
-      .isAccount(address)
+      .addCheck(
+        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        () => vestingInstance.address !== NULL_ADDRESS
+      )
+      .addCheck(
+        `Vested instance has a different beneficiary`,
+        async () => (await vestingInstance.getBeneficiary()) === res.flags.from
+      )
+      .isAccount(vestingInstance.address)
       .runChecks()
 
-    await newCheckBuilder(this)
-      .isAccount(vestingFactoryInstance.address)
-      .runChecks()
-
-    await displaySendTx('unlock', vestingFactoryInstance.unlockGold(res.flags.value))
+    await displaySendTx('unlock', vestingInstance.unlockGold(value), {
+      from: await vestingInstance.getBeneficiary(),
+    })
   }
 }
