@@ -40,7 +40,7 @@ export async function initializeKit() {
           }
         }
       } else {
-        throw new Error('Node is not syncing')
+        throw new Error('Node is still syncing')
       }
     } catch (error) {
       rootLogger.error(
