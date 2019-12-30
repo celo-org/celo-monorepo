@@ -402,18 +402,20 @@ describe('governance tests', () => {
       await waitUntilBlock(doubleSigningBlock.number)
 
       const other = headerFromBlock(web3, doubleSigningBlock)
-      // console.log(doubleSigningBlock.raw, other)
 
       const num = await slasher.methods.getBlockNumberFromHeader(other).call()
 
       const header = headerFromBlock(web3, await web3.eth.getBlock(num))
-      // console.log((await web3.eth.getBlock(num)).raw, header)
 
       const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
-      const bitmap = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
+      const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
 
-      let bmNum1 = new BigNumber(bitmap).toNumber()
+      console.log('bitmaps', bitmap1, bitmap2)
+
+      let bmNum1 = new BigNumber(bitmap1).toNumber()
       let bmNum2 = new BigNumber(bitmap2).toNumber()
+      bmNum1 = bmNum1 >> 1
+      bmNum2 = bmNum2 >> 1
       let signerIdx = 1
       for (let i = 1; i < 5; i++) {
         if ((bmNum1 & 1) === 1 && (bmNum2 & 1) === 1) {
@@ -432,6 +434,12 @@ describe('governance tests', () => {
       const validatorsContract = await kit._web3Contracts.getValidators()
       const history = await validatorsContract.methods.getHistory(signer).call()
       const historyIndex = history[0].length - 1
+
+      console.log(
+        'debug',
+        signerIdx,
+        await slasher.methods.debug(signer, signerIdx, header, other).call()
+      )
 
       await slasher.methods
         .slash(
