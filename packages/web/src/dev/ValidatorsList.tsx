@@ -22,7 +22,7 @@ const validatorGroupsMock = new Array(10).fill(0).map((_, i) => ({
   address: fakeAddress(),
   votes: Math.random() * 10,
   gold: Math.random() * 100,
-  usd: Math.random() * 1000,
+  usd: Math.random() * 1300,
   uptime: 99.9,
   validators: new Array(3).fill(0).map((_, j) => ({
     name: `Validator ${i}.${j}`,
@@ -30,7 +30,7 @@ const validatorGroupsMock = new Array(10).fill(0).map((_, i) => ({
     online: Math.random() > 0.2,
     address: fakeAddress(),
     gold: Math.random() * 100,
-    usd: Math.random() * 1000,
+    usd: Math.random() * 1300,
     uptime: 99.9,
   })),
 }))
@@ -46,6 +46,10 @@ class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
 
   cutAddress(address: string) {
     return address.toUpperCase().replace(/^0x([a-f0-9]{4}).+([a-f0-9]{4})$/i, '0x$1...$2')
+  }
+
+  formatNumber(n: number, decimals: number = Infinity) {
+    return n.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   }
 
   expand(expanded: number) {
@@ -111,8 +115,8 @@ class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
                     <span className={css.copy}>copy</span>
                   </td>
                   <td className={css['table__cell--center']}>{group.votes.toFixed(2)}%</td>
-                  <td className={css['table__cell--center']}>{group.usd.toFixed(2)}</td>
-                  <td className={css['table__cell--center']}>{group.gold.toFixed(2)}</td>
+                  <td className={css['table__cell--center']}>{this.formatNumber(group.usd, 2)}</td>
+                  <td className={css['table__cell--center']}>{this.formatNumber(group.gold, 2)}</td>
                   <td className={css['table__cell--center']}>{group.uptime.toFixed(1)}%</td>
                 </tr>
                 {i === expanded && (
@@ -163,10 +167,10 @@ class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
                                   <span className={css.copy}>copy</span>
                                 </td>
                                 <td className={css['table__cell--center']}>
-                                  {validator.usd.toFixed(2)}
+                                  {this.formatNumber(validator.usd, 2)}
                                 </td>
                                 <td className={css['table__cell--center']}>
-                                  {validator.gold.toFixed(2)}
+                                  {this.formatNumber(validator.gold, 2)}
                                 </td>
                                 <td className={css['table__cell--center']}>
                                   {validator.uptime.toFixed(1)}%
