@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { H1 } from 'src/fonts/Fonts'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Clipboard } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
@@ -50,6 +50,10 @@ class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
 
   formatNumber(n: number, decimals: number = Infinity) {
     return n.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
+
+  copyAddress(address: string) {
+    Clipboard.setString(address)
   }
 
   expand(expanded: number) {
@@ -112,7 +116,9 @@ class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
                   </td>
                   <td>
                     {this.cutAddress(group.address)}
-                    <span className={css.copy}>copy</span>
+                    <span className={css.copy} onClick={() => this.copyAddress(group.address)}>
+                      copy
+                    </span>
                   </td>
                   <td className={css['table__cell--center']}>{group.votes.toFixed(2)}%</td>
                   <td className={css['table__cell--center']}>{this.formatNumber(group.usd, 2)}</td>
@@ -164,7 +170,12 @@ class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
                                 </td>
                                 <td>
                                   {this.cutAddress(validator.address)}
-                                  <span className={css.copy}>copy</span>
+                                  <span
+                                    className={css.copy}
+                                    onClick={() => this.copyAddress(validator.address)}
+                                  >
+                                    copy
+                                  </span>
                                 </td>
                                 <td className={css['table__cell--center']}>
                                   {this.formatNumber(validator.usd, 2)}
