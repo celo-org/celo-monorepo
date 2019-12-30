@@ -7,15 +7,6 @@ import "./SlasherUtil.sol";
 contract DoubleSigningSlasher is SlasherUtil {
   using SafeMath for uint256;
 
-  struct SlashingIncentives {
-    // Value of LockedGold to slash from the account.
-    uint256 penalty;
-    // Value of LockedGold to send to the observer.
-    uint256 reward;
-  }
-
-  SlashingIncentives public slashingIncentives;
-
   // For each signer address, check if a block header has already been slashed
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
@@ -34,18 +25,6 @@ contract DoubleSigningSlasher is SlasherUtil {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setSlashingIncentives(_penalty, _reward);
-  }
-
-  /**
-   * @notice Sets slashing incentives.
-   * @param penalty Penalty for the slashed signer.
-   * @param reward Reward that the observer gets.
-   */
-  function setSlashingIncentives(uint256 penalty, uint256 reward) public onlyOwner {
-    require(penalty > reward, "Penalty has to be larger than reward");
-    slashingIncentives.penalty = penalty;
-    slashingIncentives.reward = reward;
-    emit SlashingIncentivesSet(penalty, reward);
   }
 
   /**
@@ -76,20 +55,20 @@ contract DoubleSigningSlasher is SlasherUtil {
    * quorum of signatures, and that `signer` was part of the quorum.
    * @param signer The signer to be slashed.
    * @param index Validator index at the block.
-   * @param blockA First double signed block.
-   * @param blockB Second double signed block.
+   * @param headerA First double signed block.
+   * @param headerB Second double signed block.
    * @return Block number where double signing occured. Throws if no double signing is detected.
    */
   function checkForDoubleSigning(
     address signer,
     uint256 index,
-    bytes memory blockA,
-    bytes memory blockB
+    bytes memory headerA,
+    bytes memory headerB
   ) public view returns (uint256) {
-    require(hashHeader(blockA) != hashHeader(blockB), "Block hashes have to be different");
-    uint256 blockNumber = getBlockNumberFromHeader(blockA);
+    require(hashHeader(headerA) != hashHeader(headerB), "Block hashes have to be different");
+    uint256 blockNumber = getBlockNumberFromHeader(headerA);
     require(
-      blockNumber == getBlockNumberFromHeader(blockB),
+      blockNumber == getBlockNumberFromHeader(headerB),
       "Block headers are from different height"
     );
     require(index < numberValidatorsInSet(blockNumber), "Bad validator index");
@@ -97,8 +76,8 @@ contract DoubleSigningSlasher is SlasherUtil {
       signer == validatorSignerAddressFromSet(index, blockNumber),
       "Wasn't a signer with given index"
     );
-    uint256 mapA = uint256(getVerifiedSealBitmapFromHeader(blockA));
-    uint256 mapB = uint256(getVerifiedSealBitmapFromHeader(blockB));
+    uint256 mapA = uint256(getVerifiedSealBitmapFromHeader(headerA));
+    uint256 mapB = uint256(getVerifiedSealBitmapFromHeader(headerB));
     require(mapA & (1 << index) != 0, "Didn't sign first block");
     require(mapB & (1 << index) != 0, "Didn't sign second block");
     require(
@@ -110,6 +89,12 @@ contract DoubleSigningSlasher is SlasherUtil {
       "Not enough signers in the second block"
     );
     return blockNumber;
+  }
+
+  function checkIfAlreadySlashed(address signer, bytes memory header) internal {
+    bytes32 bhash = hashHeader(header);
+    require(!isSlashed[signer][bhash], "Already slashed");
+    isSlashed[signer][bhash] = true;
   }
 
   /**
@@ -146,34 +131,22 @@ contract DoubleSigningSlasher is SlasherUtil {
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) public {
-    require(!isSlashed[signer][hashHeader(headerA)], "Already slashed");
-    require(!isSlashed[signer][hashHeader(headerB)], "Already slashed");
+    checkIfAlreadySlashed(signer, headerA);
+    checkIfAlreadySlashed(signer, headerB);
     uint256 blockNumber = checkForDoubleSigning(signer, index, headerA, headerB);
-    isSlashed[signer][hashHeader(headerA)] = true;
-    isSlashed[signer][hashHeader(headerB)] = true;
     address validator = getAccounts().signerToAccount(signer);
-    getLockedGold().slash(
+    performSlashing(
       validator,
-      slashingIncentives.penalty,
       msg.sender,
-      slashingIncentives.reward,
+      blockNumber,
+      groupMembershipHistoryIndex,
       validatorElectionLessers,
       validatorElectionGreaters,
-      validatorElectionIndices
-    );
-    address group = groupMembershipAtBlock(validator, blockNumber, groupMembershipHistoryIndex);
-    if (group == address(0)) return; // Should never be true
-    getLockedGold().slash(
-      group,
-      slashingIncentives.penalty,
-      msg.sender,
-      slashingIncentives.reward,
+      validatorElectionIndices,
       groupElectionLessers,
       groupElectionGreaters,
       groupElectionIndices
     );
-    getValidators().forceDeaffiliateIfValidator(validator);
-    getValidators().halveSlashingMultiplier(group);
   }
 
 }

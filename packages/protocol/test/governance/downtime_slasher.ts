@@ -149,120 +149,30 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       await slasher.setParentSealBitmap(blockNumber + 2, bitmap2)
       await slasher.setNumberValidators(2)
     })
-    it('fails if epoch signer is wrong', async () => {
-      await assertRevert(
-        slasher.slash(
-          accounts[4],
-          startBlock,
-          validatorIndex,
-          validatorIndex,
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
-      )
-    })
     it('fails if they were signed', async () => {
       await assertRevert(
-        slasher.slash(
-          validator,
-          blockNumber,
-          validatorIndex,
-          validatorIndex,
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
+        slasher.slash(blockNumber, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
       )
     })
     it('decrements gold when success', async () => {
-      await slasher.slash(
-        validator,
-        startBlock,
-        validatorIndex,
-        validatorIndex,
-        0,
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-      )
+      await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
       const balance = await mockLockedGold.accountTotalLockedGold(validator)
       assert.equal(balance.toNumber(), 40000)
     })
     it('also slashes group', async () => {
-      await slasher.slash(
-        validator,
-        startBlock,
-        validatorIndex,
-        validatorIndex,
-        0,
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-      )
+      await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
       const balance = await mockLockedGold.accountTotalLockedGold(group)
       assert.equal(balance.toNumber(), 40000)
     })
     it('cannot be slashed twice', async () => {
-      await slasher.slash(
-        validator,
-        startBlock,
-        validatorIndex,
-        validatorIndex,
-        0,
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-      )
+      await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
       await assertRevert(
-        slasher.slash(
-          validator,
-          startBlock + 1,
-          validatorIndex,
-          validatorIndex,
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
+        slasher.slash(startBlock + 1, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
       )
     })
     it('but can be slashed later on', async () => {
+      await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
       await slasher.slash(
-        validator,
-        startBlock,
-        validatorIndex,
-        validatorIndex,
-        0,
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-      )
-      await slasher.slash(
-        validator,
         startBlock + 20,
         validatorIndex,
         validatorIndex,
