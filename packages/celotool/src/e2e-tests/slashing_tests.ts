@@ -94,7 +94,8 @@ describe('slashing tests', function(this: any) {
   }
 
   describe('when running a network', () => {
-    before(async () => {
+    before(async function(this: any) {
+      this.timeout(0) // Disable test timeout
       await restartWithDowntime()
     })
 
