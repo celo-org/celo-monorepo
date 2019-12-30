@@ -1999,27 +1999,32 @@ contract('Governance', (accounts: string[]) => {
       await accountsInstance.createAccount({ from: validatorAccount1 })
       await accountsInstance.createAccount({ from: validatorAccount2 })
 
-      // authorize validator signers
+      const pubkey1 = await addressToPublicKey(validatorSigner1, web3.eth.sign)
+      const pubkey2 = await addressToPublicKey(validatorSigner2, web3.eth.sign)
+
       const sig1 = await getParsedSignatureOfAddress(web3, validatorAccount1, validatorSigner1)
       const sig2 = await getParsedSignatureOfAddress(web3, validatorAccount2, validatorSigner2)
 
+      // @ts-ignore bytes type
+      await mockValidators.updateEcdsaPublicKey(NULL_ADDRESS, NULL_ADDRESS, '0x0')
+
       await accountsInstance.authorizeValidatorSignerWithPublicKey(
         validatorSigner1,
-        // @ts-ignore bytes
-        await addressToPublicKey(validatorSigner1, web3.eth.sign),
         sig1.v,
         sig1.r,
         sig1.s,
+        // @ts-ignore bytes
+        pubkey1,
         { from: validatorAccount1 }
       )
 
       await accountsInstance.authorizeValidatorSignerWithPublicKey(
         validatorSigner2,
-        // @ts-ignore bytes
-        await addressToPublicKey(validatorSigner2, web3.eth.sign),
         sig2.v,
         sig2.r,
         sig2.s,
+        // @ts-ignore bytes
+        pubkey2,
         { from: validatorAccount2 }
       )
     })

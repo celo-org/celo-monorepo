@@ -179,10 +179,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function authorizeValidatorSignerWithPublicKey(
     address signer,
-    bytes calldata ecdsaPublicKey,
     uint8 v,
     bytes32 r,
-    bytes32 s
+    bytes32 s,
+    bytes calldata ecdsaPublicKey
   ) external nonReentrant {
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);

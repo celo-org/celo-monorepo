@@ -198,12 +198,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
       return toTransactionObject(
         this.kit,
-        this.contract.methods.authorizeValidatorSigner(
+        this.contract.methods.authorizeValidatorSignerWithPublicKey(
           signer,
+          // @ts-ignore bytes type
           pubKey,
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
-          // @ts-ignore Typescript does not support overloading.
           proofOfSigningKeyPossession.s
         )
       )
