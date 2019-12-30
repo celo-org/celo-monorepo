@@ -89,6 +89,10 @@ $palette: (
     th {
       border-bottom: 1px solid c(white);
     }
+
+    & + tr td {
+      padding-top: 26px;
+    }
   }
 
   &__cell {
@@ -113,6 +117,10 @@ $palette: (
       }
     }
 
+    &--title-padding {
+      padding-left: 16px + 20px + 24px !important;
+    }
+
     &--clickable {
       cursor: pointer;
     }
@@ -133,9 +141,11 @@ $palette: (
       padding: 6px 5px;
       text-transform: uppercase;
     }
+
+    & + tr td,
     td {
       font-family: EB Garamond, eb-garamond, Garamond, serif;
-      padding: 10px 5px;
+      padding: 10px 5px !important;
     }
   }
 
