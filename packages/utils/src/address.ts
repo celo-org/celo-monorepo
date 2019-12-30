@@ -30,3 +30,5 @@ export const isValidPrivateKey = (privateKey: string) =>
   privateKey.startsWith('0x') && isValidPrivate(hexToBuffer(privateKey))
 
 export { isValidAddress, isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'
+
+export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'

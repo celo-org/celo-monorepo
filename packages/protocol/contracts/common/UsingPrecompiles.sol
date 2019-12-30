@@ -1,7 +1,10 @@
 pragma solidity ^0.5.3;
 
-// TODO(asa): Limit assembly usage by using X.staticcall instead.
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 contract UsingPrecompiles {
+  using SafeMath for uint256;
+
   address constant TRANSFER = address(0xff - 2);
   address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
@@ -82,13 +85,22 @@ contract UsingPrecompiles {
     return getUint256FromBytes(out, 0);
   }
 
+  /**
+   * @notice Returns the epoch number at a block.
+   * @param blockNumber Block number where epoch number is calculated.
+   * @return Epoch number.
+   */
+  function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
+    uint256 sz = getEpochSize();
+    return blockNumber.sub(1) / sz;
+  }
+
+  /**
+   * @notice Returns the epoch number at a block.
+   * @return Current epoch number.
+   */
   function getEpochNumber() public view returns (uint256) {
-    uint256 epochSize = getEpochSize();
-    uint256 epochNumber = block.number / epochSize;
-    if (block.number % epochSize == 0) {
-      epochNumber = epochNumber - 1;
-    }
-    return epochNumber;
+    return getEpochNumberOfBlock(block.number);
   }
 
   /**
@@ -206,7 +218,9 @@ contract UsingPrecompiles {
   }
 
   /**
-   * @notice Verifies the given header and returns the seal bitmap is successful.
+   * @notice Verifies the BLS signature on the header and returns the seal bitmap.
+   * The validator set used for verification is retrieved based on the parent hash field of the
+   * header.  If the parent hash is not in the blockchain, verification fails.
    * @param header RLP encoded header
    * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
    */
