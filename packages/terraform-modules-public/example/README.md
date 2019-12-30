@@ -8,9 +8,15 @@ The file [variables.tf](./variables.tf) contains most of the parameters used by 
 
 Most of the parameters are safe to go with the default value. You can configure the replica count for each service, but a good starting point would be 1 validator, 1 proxy, and 1 attestation service. Each validator service has an attached proxy service.
 
-## Validator accounts
+## Ethereum accounts
 
-Using the [celocli](https://www.npmjs.com/package/@celo/celocli), run the next command to get credentials for the needed account:
+The terraform module uses as input the different account parameters: public address, public key (that also corresponds to the enode address), and the private key. These accounts are submitted as an array variable, and you have to include inputs as much as instances of that service you are deploying. Although you can specify different number or validators and attestation service, makes more sense to deploy the same number of instances for both services. The number of proxy instances will be coupled always with the number of validator instances.
+
+These accounts are imported as json keystore files in the nodes that need them using the `password` parameter configured in the variables.
+
+It is important to check and get used to the [validator documentation](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator). The addresses submitted here should corresponds `CELO_VALIDATOR_ADDRESS` and `ATTESTATION_SIGNER_ADDRESS` from that documentation, and have to be associated to your validator addresses with `celocli` following that documentation.
+
+Using the [celocli](https://www.npmjs.com/package/@celo/celocli), run the next command to get credentials for the needed accounts:
 
 ```bash
 $ celocli account:new
@@ -28,7 +34,7 @@ You have to generate an account for each instance of each component you want to 
 
 The passwords referred in the variables will be used to import the accounts in the geth deployed (i.e.: The passwords have not to exist previously). They will keep your account safe if somebody access to the keystore file or if you want to unlock the account.
 
-## Validator accounts
+## Running terraform
 
 Once you have configured the variables with your accounts and parameters, proceed executing Terraform (gcloud cli must be correctly configured):
 
