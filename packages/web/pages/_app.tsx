@@ -1,4 +1,4 @@
-import App, { Container } from 'next/app'
+import App from 'next/app'
 import getConfig from 'next/config'
 import * as React from 'react'
 import { View } from 'react-native'
@@ -29,10 +29,14 @@ class MyApp extends App {
     }
   }
 
-  // there are a few pages we dont want the header on for artistic reasons
-  // currently this is just the animation demo pages
+  // there are a few pages we dont want the header on
+  // currently this is just the animation demo pages and brand kit
   skipHeader() {
-    return this.props.router.asPath.startsWith('/animation')
+    return this.props.router.asPath.startsWith('/animation') || this.isBrand()
+  }
+
+  isBrand = () => {
+    return this.props.router.asPath.startsWith('/experience')
   }
 
   componentDidCatch = (error: Error, info: object) => {
@@ -45,17 +49,15 @@ class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <Container>
-        <ScreenSizeProvider>
-          {this.skipHeader() || <Header />}
-          <Component {...pageProps} />
-          {this.skipHeader() || (
-            <View>
-              <Footer />
-            </View>
-          )}
-        </ScreenSizeProvider>
-      </Container>
+      <ScreenSizeProvider>
+        {this.skipHeader() || <Header />}
+        <Component {...pageProps} />
+        {this.skipHeader() || (
+          <View>
+            <Footer />
+          </View>
+        )}
+      </ScreenSizeProvider>
     )
   }
 }
@@ -76,5 +78,5 @@ function checkH1Count() {
 function hashScroller(id: string) {
   const element = document.getElementById(id.replace('#', ''))
 
-  scrollIntoView(element, { time: 200, align: { top: 0.2, topOffset: HEADER_HEIGHT } })
+  scrollIntoView(element, { time: 100, align: { top: 0, topOffset: HEADER_HEIGHT + 100 } })
 }

@@ -1,4 +1,5 @@
 {
+  "at": "at",
   "yourClockIsBroke": "Your phone date and time is inaccurate",
   "adjustYourClock":
     "Adjust your clock to read time automatically and try again. If the issue persists, you may need to restart the application",
@@ -38,7 +39,8 @@
   "startEarning": "Start Earning",
   "backToWallet": "Back to Wallet",
   "exchangeForGold": "Exchange for Gold",
-  "invalidPhone": "Invalid Phone Number",
+  "missingFullName": "Name cannot be empty",
+  "invalidPhone": "Invalid phone number",
   "cantSelectInvalidPhone": "Cannot select contact: invalid phone number",
   "needMoreFundsToSend": "Need more funds to send payment",
   "invalidAmount": "Invalid amount",
@@ -61,6 +63,7 @@
   "decline": "Decline",
   "to": "To",
   "for": "For",
+  "reclaim": "Reclaim",
   "celoGold": "Celo Gold",
   "celoDollars": "{{CeloDollars}}",
   "oops": "Oops!",
@@ -100,5 +103,8 @@
   "localCurrencyTitle": "Select Currency",
   "or": "or",
   "accepted": "Accepted",
-  "processing": "Processing"
+  "processing": "Processing",
+  "moreWithCount": "+{{count }} more",
+  "unknown": "Unknown",
+  "emptyList": "Empty list"
 }

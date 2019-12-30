@@ -9,6 +9,8 @@ const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_over
 
 const SOLC_VERSION = '0.5.8'
 const ALFAJORES_NETWORKID = 44785
+const BAKLAVA_NETWORKID = 121119
+const BAKLAVASTAGING_NETWORKID = 31416
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -19,7 +21,7 @@ const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
 const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
 const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 
-const gasLimit = 10000000
+const gasLimit = 20000000
 
 const defaultConfig = {
   host: '127.0.0.1',
@@ -132,6 +134,14 @@ const networks = {
   pilotstaging: {
     ...defaultConfig,
     from: PILOTSTAGING_FROM,
+  },
+  baklava: {
+    ...defaultConfig,
+    network_id: BAKLAVA_NETWORKID,
+  },
+  baklavastaging: {
+    ...defaultConfig,
+    network_id: BAKLAVASTAGING_NETWORKID,
   },
 }
 // If an override was provided, apply it.

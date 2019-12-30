@@ -26,32 +26,20 @@ spec:
       - name: ethstats
         image: {{ .Values.ethstats.image.repository }}:{{ .Values.ethstats.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: TRUSTED_ADDRESSES
+          value: {{ .Values.ethstats.trusted_addresses }}
+        - name: BANNED_ADDRESSES
+          value: {{ .Values.ethstats.banned_addresses }}
+        - name: RESERVED_ADDRESSES
+          value: {{ .Values.ethstats.reserved_addresses }}
         command:
         - /bin/sh
         - -c
         args:
         - |
-          cat <<'EOF' > /celostats-server/lib/utils/config.js
-          var trusted = [
-            {{- range .Values.ethstats.trusted_addresses }}
-            {{- if . }}
-            "{{lower . }}",
-            {{- end }}
-            {{- end }}
-          ]
-          var banned = [
-            {{- range .Values.ethstats.banned_addresses }}
-            {{- if . }}
-            "{{lower . }}",
-            {{- end }}
-            {{- end }}
-          ]
-          module.exports = {
-            trusted:  trusted,
-            banned:   banned,
-            reserved: []
-          };
-          EOF
+          sed -i "s%###NETWORK_NAME###%{{ .Values.ethstats.network_name }}%g" /celostats-server/dist/js/netstats.min.js
+          sed -i "s%###BLOCKSCOUT_URL###%{{ .Values.ethstats.blockscout_url }}%g" /celostats-server/dist/js/netstats.min.js
           npm start
         ports:
         - name: http
