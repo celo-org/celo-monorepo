@@ -23,6 +23,8 @@ import { showError } from 'src/alert/actions'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
+import { Actions as ExchangeActions, updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
+import { exchangeHistorySelector, ExchangeRate } from 'src/exchange/reducer'
 import {
   Actions,
   firebaseAuthorized,
@@ -41,6 +43,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'firebase/saga'
 const REQUEST_DB = 'pendingRequests'
+const EXCHANGE_RATES = 'exchangeRates'
 const REQUESTEE_ADDRESS = 'requesteeAddress'
 const REQUESTER_ADDRESS = 'requesterAddress'
 const VALUE = 'value'
@@ -217,6 +220,41 @@ export function* watchWritePaymentRequest() {
   yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, paymentRequestWriter)
 }
 
+export function* syncCeloGoldExchangeRateHistory() {
+  yield call(waitForFirebaseAuth)
+  const history = yield select(exchangeHistorySelector)
+  const latestExchangeRate = history.celoGoldExchangeRates[history.celoGoldExchangeRates.length - 1]
+
+  const exchangeRatesPromise = new Promise((resolve, reject) => {
+    firebase
+      .database()
+      .ref(`${EXCHANGE_RATES}/cGLD/cUSD`)
+      .orderByChild('timestamp')
+      // timestamp + 1 cause .startAt is inclusive
+      .startAt(latestExchangeRate ? latestExchangeRate.timestamp + 1 : 0)
+      .once('value', (snapshot) => {
+        const result: ExchangeRate[] = []
+        snapshot.forEach((childSnapshot) => {
+          result.push(childSnapshot.val())
+          return false
+        })
+        resolve(result)
+      })
+  })
+
+  const exchangeRates = yield exchangeRatesPromise
+  if (exchangeRates.length) {
+    yield put(updateCeloGoldExchangeRateHistory(exchangeRates))
+  }
+}
+
+export function* watchCeloGoldExchangeRateHistory() {
+  yield takeEvery(
+    ExchangeActions.SYNC_CELO_GOLD_EXCHANGE_RATE_HISTORY,
+    syncCeloGoldExchangeRateHistory
+  )
+}
+
 export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
@@ -225,4 +263,5 @@ export function* firebaseSaga() {
   yield spawn(watchPaymentRequestStatusUpdates)
   yield spawn(watchPaymentRequestNotifiedUpdates)
   yield spawn(watchWritePaymentRequest)
+  yield spawn(watchCeloGoldExchangeRateHistory)
 }

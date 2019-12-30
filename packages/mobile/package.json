@@ -83,6 +83,7 @@
     "react-native-android-open-settings": "^1.3.0",
     "react-native-bip39": "git://github.com/celo-org/react-native-bip39#8d00738",
     "react-native-camera": "^3.7.1",
+    "react-native-chart-kit": "^4.3.0",
     "react-native-clock-sync": "^1.0.0",
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
     "react-native-confirm-device-credentials": "git://github.com/celo-org/react-native-confirm-device-credentials#436afa9",

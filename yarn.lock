@@ -25730,6 +25730,11 @@ path@^0.12.7:
     process "^0.11.1"
     util "^0.10.3"
 
+paths-js@^0.4.10:
+  version "0.4.10"
+  resolved "https://registry.yarnpkg.com/paths-js/-/paths-js-0.4.10.tgz#a3575f409b4a36f8aa795ba4d051989021be58c7"
+  integrity sha512-JZoqlRSHtx+bc+xKI9o4bropEbqZBF4ZfYImiB1T9RYpHB73h5I8XZ7FfSBbHbBMtdD1c04ujjAPH8wUuu4+Gw==
+
 pathval@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.0.tgz#b942e6d4bde653005ef6b71361def8727d0645e0"
@@ -26030,6 +26035,11 @@ pnp-webpack-plugin@1.5.0:
   integrity sha512-jd9olUr9D7do+RN8Wspzhpxhgp1n6Vd0NtQ4SFkmIACZoEL1nkyAdW9Ygrinjec0vgDcWjscFQQ1gDW8rsfKTg==
   dependencies:
     ts-pnp "^1.1.2"
+
+point-in-polygon@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/point-in-polygon/-/point-in-polygon-1.0.1.tgz#d59b64e8fee41c49458aac82b56718c5957b2af7"
+  integrity sha1-1Ztk6P7kHElFiqyCtWcYxZV7Kvc=
 
 pop-iterate@^1.0.1:
   version "1.0.1"
@@ -27675,6 +27685,15 @@ react-native-camera@^3.7.1:
   integrity sha512-+xyWmq0/jGomkctSnmJXZwWy7mHCCfj2NUsrDOnbbpZaOaQG9a646NZzBabxQQfBy38ZyfQm5Q4nxh3AEddfrQ==
   dependencies:
     prop-types "^15.6.2"
+
+react-native-chart-kit@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-chart-kit/-/react-native-chart-kit-4.3.0.tgz#9cf21ff497f3bb8f9d093d71ed555a822b4054a8"
+  integrity sha512-mVi0jT2bbKJOpmyqdn2+kGiInU+7P+ebi2ddQWm/Vfwbmd0InyPi7wj3F5UN9Ymr2tYQxuqpOJtHKmn1bT3/5w==
+  dependencies:
+    lodash "^4.17.13"
+    paths-js "^0.4.10"
+    point-in-polygon "^1.0.1"
 
 react-native-clock-sync@^1.0.0:
   version "1.0.0"

@@ -67,6 +67,7 @@ export function* checkWeb3SyncProgress() {
       } else {
         // isSyncing returns a syncProgress object when it's still syncing, false otherwise
         syncProgress = yield call(web3.eth.isSyncing)
+        console.log(syncProgress)
       }
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {

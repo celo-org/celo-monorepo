@@ -8,10 +8,10 @@ import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import AccountOverview from 'src/components/AccountOverview'
-import { fetchExchangeRate } from 'src/exchange/actions'
+import { fetchExchangeRate, syncCeloGoldExchangeRateHistory } from 'src/exchange/actions'
 import Activity from 'src/exchange/Activity'
-import ExchangeRate from 'src/exchange/ExchangeRate'
+import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
+import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
@@ -28,6 +28,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
+  syncCeloGoldExchangeRateHistory: typeof syncCeloGoldExchangeRateHistory
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -41,6 +42,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class ExchangeHomeScreen extends React.Component<Props> {
   componentDidMount() {
     this.props.fetchExchangeRate()
+    this.props.syncCeloGoldExchangeRateHistory()
   }
 
   goToBuyGold = () => {
@@ -62,21 +64,19 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t, exchangeRate } = this.props
+    const { t } = this.props
 
     return (
       <SafeAreaView style={styles.background}>
         <ScrollContainer
-          heading={t('exchange')}
+          heading={t('global:gold')}
           testID="ExchangeScrollView"
           stickyHeaderIndices={[2]}
         >
           <DisconnectBanner />
           <View>
-            <AccountOverview testID="ExchangeAccountOverview" />
-            <View style={styles.lowerTop}>
-              <ExchangeRate rate={exchangeRate} makerToken={CURRENCY_ENUM.DOLLAR} />
-            </View>
+            <CeloGoldOverview testID="ExchangeAccountOverview" />
+            <CeloGoldHistoryChart />
             <View style={styles.buttonContainer}>
               <Button
                 text={t('buy')}
@@ -106,9 +106,13 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    fetchExchangeRate,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    {
+      fetchExchangeRate,
+      syncCeloGoldExchangeRateHistory,
+    }
+  )(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 )
 
 const styles = StyleSheet.create({
