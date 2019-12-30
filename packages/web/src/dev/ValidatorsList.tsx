@@ -1,0 +1,220 @@
+import * as React from 'react'
+import { H1 } from 'src/fonts/Fonts'
+import { StyleSheet, View } from 'react-native'
+import { I18nProps, withNamespaces } from 'src/i18n'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { colors, standardStyles, textStyles } from 'src/styles'
+import Arrow from 'src/icons/Arrow'
+import css from 'src/dev/ValidatorsList.scss'
+
+const fakeAddress = () =>
+  '0x' +
+  Number(Math.floor(Math.random() * 9 ** 10 + 7 ** 10))
+    .toString(16)
+    .repeat(5)
+
+const validatorGroupsMock = new Array(10).fill(0).map((_, i) => ({
+  name: `Validator Group #${i}`,
+  description:
+    'Validator description lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commo.',
+  elected: Math.floor(Math.random() * 15),
+  online: Math.floor(Math.random() * 5),
+  address: fakeAddress(),
+  votes: Math.random() * 10,
+  gold: Math.random() * 100,
+  usd: Math.random() * 1000,
+  uptime: 99.9,
+  validators: new Array(3).fill(0).map((_, j) => ({
+    name: `Validator ${i}.${j}`,
+    elected: Math.random() > 0.2,
+    online: Math.random() > 0.2,
+    address: fakeAddress(),
+    gold: Math.random() * 100,
+    usd: Math.random() * 1000,
+    uptime: 99.9,
+  })),
+}))
+
+export interface State {
+  expanded?: number
+}
+
+class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
+  state = {
+    expanded: undefined,
+  }
+
+  cutAddress(address: string) {
+    return address.toUpperCase().replace(/^0x([a-f0-9]{4}).+([a-f0-9]{4})$/i, '0x$1...$2')
+  }
+
+  expand(expanded: number) {
+    if (this.state.expanded === expanded) {
+      this.setState({ expanded: undefined })
+    } else {
+      this.setState({ expanded })
+    }
+  }
+
+  render() {
+    const { expanded } = this.state
+    return (
+      <View style={styles.cover}>
+        <View style={styles.container}>
+          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet]}>Test</H1>
+          <table className={css['table']}>
+            <tr className={css['table__heading']}>
+              <th>Name</th>
+              <th className={css['table__cell--center']}>Elected</th>
+              <th className={css['table__cell--center']}>Online</th>
+              <th>Address</th>
+              <th className={css['table__cell--center']}>Votes received</th>
+              <th className={css['table__cell--center']}>CUSD</th>
+              <th className={css['table__cell--center']}>CGLD</th>
+              <th className={css['table__cell--center']}>Uptime</th>
+            </tr>
+            {validatorGroupsMock.map(
+              (
+                {
+                  name,
+                  elected,
+                  online,
+                  address,
+                  votes,
+                  gold,
+                  usd,
+                  uptime,
+                  description,
+                  validators,
+                },
+                i
+              ) => (
+                <>
+                  <tr key={i}>
+                    <td
+                      onClick={() => this.expand(i)}
+                      className={[css['table__cell--title'], css['table__cell--clickable']].join(
+                        ' '
+                      )}
+                    >
+                      {/* TODO(Pedro): Use correct arrow */}
+                      <span className={css['table__cell--title-arrow']}>
+                        <Arrow color={colors.placeholderDarkMode} size={16} />
+                      </span>
+                      {name}
+                    </td>
+                    <td
+                      className={[
+                        css[`table__cell--${elected ? '' : 'error-'}hightlight`],
+                        css['table__cell--center'],
+                      ].join(' ')}
+                    >
+                      {elected}
+                    </td>
+                    <td
+                      className={[
+                        css[`table__cell--${online ? '' : 'error-'}hightlight`],
+                        css['table__cell--center'],
+                      ].join(' ')}
+                    >
+                      {online}
+                    </td>
+                    <td>
+                      {this.cutAddress(address)}
+                      <span className={css.copy}>copy</span>
+                    </td>
+                    <td className={css['table__cell--center']}>{votes.toFixed(2)}%</td>
+                    <td className={css['table__cell--center']}>{usd.toFixed(2)}</td>
+                    <td className={css['table__cell--center']}>{gold.toFixed(2)}</td>
+                    <td className={css['table__cell--center']}>{uptime.toFixed(1)}%</td>
+                  </tr>
+                  {i === expanded && (
+                    <tr>
+                      <td colSpan={8}>
+                        <div className={css['validator-list-expansion']}>
+                          <div className={css['validator-list-expansion__description']}>
+                            {description}
+                          </div>
+                          {validators && (
+                            <table
+                              className={[
+                                css['table'],
+                                css['table--secondary'],
+                                css['validator-list-expansion__table'],
+                              ].join(' ')}
+                            >
+                              <tr className={css['table__heading']}>
+                                <th>Name</th>
+                                <th className={css['table__cell--center']}>Elected</th>
+                                <th className={css['table__cell--center']}>Online</th>
+                                <th>Address</th>
+                                <th className={css['table__cell--center']}>CUSD</th>
+                                <th className={css['table__cell--center']}>CGLD</th>
+                                <th className={css['table__cell--center']}>Uptime</th>
+                              </tr>
+                              {validators.map((validator, j) => (
+                                <tr key={`${i}.${j}`}>
+                                  <td className={css['table__cell--title']}>{validator.name}</td>
+                                  <td className={css['table__cell--center']}>
+                                    <span
+                                      className={[
+                                        css['circle'],
+                                        css[`circle--${validator.elected ? 'ok' : 'error'}`],
+                                      ].join(' ')}
+                                    />
+                                  </td>
+                                  <td className={css['table__cell--center']}>
+                                    <span
+                                      className={[
+                                        css['circle'],
+                                        css[`circle--${validator.online ? 'ok' : 'error'}`],
+                                      ].join(' ')}
+                                    />
+                                  </td>
+                                  <td>
+                                    {this.cutAddress(validator.address)}
+                                    <span className={css.copy}>copy</span>
+                                  </td>
+                                  <td className={css['table__cell--center']}>
+                                    {validator.usd.toFixed(2)}
+                                  </td>
+                                  <td className={css['table__cell--center']}>
+                                    {validator.gold.toFixed(2)}
+                                  </td>
+                                  <td className={css['table__cell--center']}>
+                                    {validator.uptime.toFixed(1)}%
+                                  </td>
+                                </tr>
+                              ))}
+                            </table>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              )
+            )}
+          </table>
+        </View>
+      </View>
+    )
+  }
+}
+
+export default withNamespaces('dev')(ValidatorsListApp)
+
+const styles = StyleSheet.create({
+  container: {
+    // marginTop: HEADER_HEIGHT,
+  },
+  content: {
+    paddingBottom: 10,
+  },
+  cover: {
+    marginTop: HEADER_HEIGHT,
+    backgroundColor: colors.dark,
+    maxWidth: '100vw',
+    overflow: 'hidden',
+  },
+})

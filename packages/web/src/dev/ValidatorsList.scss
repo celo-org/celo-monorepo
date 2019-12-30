@@ -1,0 +1,220 @@
+// TODO: Move to files
+// START // Colors
+$palette: (
+  white: #ffffff,
+  light: #e5e5e5,
+  gray: #dddddd,
+  screenGray: #545c64,
+  placeholderGray: #d1d5d8,
+  placeholderDarkMode: #838486,
+  secondary: #81868b,
+  dark: #2e3338,
+  gold: #fbcc5c,
+  goldSelect: rgba(251, 204, 92, 0.4),
+  goldSubtle: rgba(251, 204, 92, 0.2),
+  primary: #35d07f,
+  primaryPress: #0fb972,
+  primaryHover: #4cdd91,
+  inactive: rgba(69, 214, 138, 0.7),
+  orange: #ffb765,
+  error: #ff7f6d,
+  red: #fb7c6d,
+  purple: #bf97ff,
+  deepBlue: #3488ec,
+  lightBlue: #73ddff,
+  cyan: #3dbfff,
+  turquoise: #29edff,
+  greenScreen: #0cda6e,
+  purpleScreen: #924eff,
+  redScreen: #ff6553,
+  blueScreen: #52b6ff,
+  // added faintGray: #f8f9f9,
+  faintPurple: #efe5ff,
+  faintGold: #fef2d6,
+  faintRed: #fededa,
+  faintCyan: #dcf6ff,
+  lightGray: #edeeef,
+  grayHeavy: #abadaf,
+  black: #000,
+) !default;
+
+/**
+ * Get color function
+ *
+ * @param  {text} $color-name
+ * @return {color}
+ */
+@function get-color($name) {
+  @if not map-has-key($palette, $name) {
+    @warn ('[get-color] Color "' + $name + '" not found');
+  }
+  @return map-get($palette, $name);
+}
+
+/**
+ * Get color function
+ *
+ * @param  {text} $color-name
+ * @return {color}
+ */
+@function c($name) {
+  @return get-color($name);
+}
+// END OF // Colors
+
+// START // Table (component)
+@mixin table() {
+  color: c(white);
+  border-spacing: 0;
+  width: 100%;
+  max-width: 960px;
+  margin: auto;
+
+  th {
+    font-family: EB Garamond, eb-garamond, Garamond, serif;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 20px;
+    padding: 24px 5px;
+  }
+  td {
+    font-family: Jost, futura-pt, futura, sans-serif;
+    padding: 12px 5px;
+  }
+
+  &__heading {
+    text-align: left;
+
+    tr,
+    th {
+      border-bottom: 1px solid c(white);
+    }
+  }
+
+  &__cell {
+    &--hightlight {
+      color: c(primary);
+    }
+    &--error-hightlight {
+      color: c(error);
+    }
+
+    &--title {
+      text-decoration: underline;
+      white-space: nowrap;
+      font-weight: 500;
+
+      &-arrow {
+        display: inline-block;
+        margin-left: 16px;
+        margin-right: 24px;
+        width: 20px;
+        text-align: center;
+      }
+    }
+
+    &--clickable {
+      cursor: pointer;
+    }
+
+    &--center {
+      text-align: center;
+    }
+    &--left {
+      text-align: center;
+    }
+  }
+
+  &--secondary {
+    th {
+      font-family: Jost, futura-pt, futura, sans-serif;
+      opacity: 0.4;
+      font-size: 12px;
+      padding: 6px 5px;
+      text-transform: uppercase;
+    }
+    td {
+      font-family: EB Garamond, eb-garamond, Garamond, serif;
+      padding: 10px 5px;
+    }
+  }
+
+  &--secondary &__heading {
+    text-align: left;
+
+    tr,
+    th {
+      border-bottom-color: transparent;
+    }
+  }
+}
+
+.table {
+  @include table;
+}
+// END OF // Table (component)
+
+// START // Circle (component)
+@mixin circle() {
+  $size: 8px;
+
+  display: inline-block;
+  width: $size;
+  height: $size;
+  border-radius: #{$size / 2};
+
+  &--ok {
+    background: c(primary);
+  }
+  &--warn {
+    background: c(orange);
+  }
+  &--error {
+    background: c(error);
+  }
+}
+
+.circle {
+  @include circle;
+}
+// END OF // Circle (component)
+
+// START // Validator List (view)
+.copy {
+  text-transform: uppercase;
+  opacity: 0.4;
+  font-family: Jost, futura-pt, futura, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  position: relative;
+  top: -0.5px;
+  margin-left: 7px;
+  cursor: pointer;
+}
+
+.validator-list-expansion {
+  display: flex;
+
+  &__description,
+  &__table {
+    margin-top: 0;
+  }
+
+  &__description {
+    width: 230px;
+    margin-right: 36px;
+    margin-left: 16px + 20px + 24px;
+    opacity: 0.4;
+    font-family: EB Garamond, eb-garamond, Garamond, serif;
+    font-size: 16px;
+  }
+
+  &__table {
+    flex: 1;
+
+    th {
+      padding-top: 0;
+    }
+  }
+}
+// END OF // Validator List (view)
