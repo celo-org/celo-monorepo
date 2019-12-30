@@ -55,8 +55,8 @@ contract DoubleSigningSlasher is SlasherUtil {
    * quorum of signatures, and that `signer` was part of the quorum.
    * @param signer The signer to be slashed.
    * @param index Validator index at the block.
-   * @param headerA First double signed block.
-   * @param headerB Second double signed block.
+   * @param headerA First double signed block header.
+   * @param headerB Second double signed block header.
    * @return Block number where double signing occured. Throws if no double signing is detected.
    */
   function checkForDoubleSigning(
@@ -108,8 +108,8 @@ contract DoubleSigningSlasher is SlasherUtil {
    * Finally, stores that hash(signer, blockNumber) has been slashed.
    * @param signer The signer to be slashed.
    * @param index Validator index at the block.
-   * @param headerA First double signed block.
-   * @param headerB Second double signed block.
+   * @param headerA First double signed block header.
+   * @param headerB Second double signed block header.
    * @param groupMembershipHistoryIndex Group membership index from where the group should be found.
    * @param validatorElectionLessers Lesser pointers for validator slashing.
    * @param validatorElectionGreaters Greater pointers for validator slashing.
