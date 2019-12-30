@@ -92,7 +92,7 @@ contract UsingPrecompiles {
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
     uint256 sz = getEpochSize();
-    return (blockNumber.add(sz).sub(1) / sz) - 1;
+    return blockNumber.sub(1) / sz;
   }
 
   /**
