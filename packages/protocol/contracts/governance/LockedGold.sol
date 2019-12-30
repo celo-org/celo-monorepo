@@ -305,7 +305,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       if (nonvotingBalance < penalty) {
         difference = penalty.sub(nonvotingBalance);
         require(
-          getElection().forceRevokeVotes(account, difference, lessers, greaters, indices) ==
+          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
             difference
         );
       }
