@@ -296,7 +296,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return The number of oracle report timestamps for `token`.
    */
-  function numTimestamps(address token) external view returns (uint256) {
+  function numTimestamps(address token) public view returns (uint256) {
     return timestamps[token].getNumElements();
   }
 
@@ -336,8 +336,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
+   * However, a > 1 elements reports list should alwas be maintained
    */
   function removeReport(address token, address oracle) private {
+    if (numTimestamps(token) == 1 && reportExists(token, oracle)) return;
     rates[token].remove(oracle);
     timestamps[token].remove(oracle);
     emit OracleReportRemoved(token, oracle);
