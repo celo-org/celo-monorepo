@@ -1213,7 +1213,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#forceRevokeVotes', () => {
+  describe('#forceDecrementVotes', () => {
     const voter = accounts[0]
     const group = accounts[1]
     const value = 1000
@@ -1237,7 +1237,7 @@ contract('Election', (accounts: string[]) => {
           const slashedValue = value
           const remaining = value - slashedValue
           beforeEach(async () => {
-            await election.forceRevokeVotes(
+            await election.forceDecrementVotes(
               voter,
               slashedValue,
               [NULL_ADDRESS],
@@ -1277,7 +1277,7 @@ contract('Election', (accounts: string[]) => {
           const slashedValue = value
           const remaining = value - slashedValue
           beforeEach(async () => {
-            await election.forceRevokeVotes(
+            await election.forceDecrementVotes(
               voter,
               slashedValue,
               [NULL_ADDRESS],
@@ -1331,7 +1331,7 @@ contract('Election', (accounts: string[]) => {
           const remaining = value - slashedValue
 
           beforeEach(async () => {
-            await election.forceRevokeVotes(
+            await election.forceDecrementVotes(
               voter,
               slashedValue,
               [group2, NULL_ADDRESS],
@@ -1379,7 +1379,7 @@ contract('Election', (accounts: string[]) => {
         await election.vote(group, value / 2, NULL_ADDRESS, group2)
       })
 
-      describe('when both groups have both passive and active votes', async () => {
+      describe('when both groups have both pending and active votes', async () => {
         beforeEach(async () => {
           await mineBlocks(EPOCH, web3)
           await election.activate(group)
@@ -1390,11 +1390,11 @@ contract('Election', (accounts: string[]) => {
           await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
         })
 
-        describe("when we slash 1 more vote than group 1's passive vote total", async () => {
+        describe("when we slash 1 more vote than group 1's pending vote total", async () => {
           const slashedValue = value / 2 + 1
           const remaining = value - slashedValue
           beforeEach(async () => {
-            await election.forceRevokeVotes(
+            await election.forceDecrementVotes(
               voter,
               slashedValue,
               [NULL_ADDRESS, NULL_ADDRESS],
@@ -1436,7 +1436,7 @@ contract('Election', (accounts: string[]) => {
           const group2PendingRemaining = value2 / 2 - 1
           const group2ActiveRemaining = value2 / 2
           beforeEach(async () => {
-            await election.forceRevokeVotes(
+            await election.forceDecrementVotes(
               voter,
               slashedValue,
               [group, NULL_ADDRESS],
@@ -1503,7 +1503,7 @@ contract('Election', (accounts: string[]) => {
           await election.activate(group2)
           initialGroupOrdering = (await election.getTotalVotesForEligibleValidatorGroups())[0]
           await registry.setAddressFor(CeloContractName.LockedGold, accounts[2])
-          await election.forceRevokeVotes(
+          await election.forceDecrementVotes(
             voter,
             slashedValue,
             [group, NULL_ADDRESS],
@@ -1529,11 +1529,11 @@ contract('Election', (accounts: string[]) => {
         })
       })
 
-      describe('when `forceRevokeVotes` is called with malformed inputs', () => {
+      describe('when `forceDecrementVotes` is called with malformed inputs', () => {
         describe('when called to slash more value than groups have', () => {
           it('should revert', async () => {
             await assertRevert(
-              election.forceRevokeVotes(
+              election.forceDecrementVotes(
                 voter,
                 value + value2 + 1,
                 [group, NULL_ADDRESS],
@@ -1550,7 +1550,7 @@ contract('Election', (accounts: string[]) => {
             const slashedValue = value
             // `group` should be listed as a lesser for index 0 (group2's lesser)
             await assertRevert(
-              election.forceRevokeVotes(
+              election.forceDecrementVotes(
                 voter,
                 slashedValue,
                 [NULL_ADDRESS, NULL_ADDRESS],
@@ -1566,7 +1566,7 @@ contract('Election', (accounts: string[]) => {
           it('should revert', async () => {
             const slashedValue = value
             await assertRevert(
-              election.forceRevokeVotes(
+              election.forceDecrementVotes(
                 voter,
                 slashedValue,
                 [group, NULL_ADDRESS],
@@ -1581,7 +1581,7 @@ contract('Election', (accounts: string[]) => {
         describe('when called from an address other than the locked gold contract', () => {
           it('should revert', async () => {
             await assertRevert(
-              election.forceRevokeVotes(
+              election.forceDecrementVotes(
                 voter,
                 value,
                 [group, NULL_ADDRESS],
