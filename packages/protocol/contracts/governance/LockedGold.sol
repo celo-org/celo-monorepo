@@ -258,7 +258,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param slasher Address to whitelist.
    */
   function addSlasher(address slasher) external onlyOwner {
-    require(slasher != address(0) && !isSlasher[address], "Invalid address to `addSlasher`.");
+    require(slasher != address(0) && !isSlasher[slasher], "Invalid address to `addSlasher`.");
     isSlasher[slasher] = true;
     emit SlasherWhitelistAdded(slasher);
   }
@@ -268,7 +268,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param slasher Address to remove from whitelist.
    */
   function removeSlasher(address slasher) external onlyOwner {
-    require(isSlasher[slasher]);
+    require(isSlasher[slasher], "Address must be valid slasher.");
     isSlasher[slasher] = false;
     emit SlasherWhitelistRemoved(slasher);
   }
@@ -309,15 +309,18 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       if (nonvotingBalance < penalty) {
         difference = penalty.sub(nonvotingBalance);
         require(
-          getElection().forceRevokeVotes(account, difference, lessers, greaters, indices) ==
-            difference
+          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
+            difference,
+          "Cannot revoke enough voting gold."
         );
       }
-      // forceRevokeVotes does not increment nonvoting account balance, so we can't double count
-      _decrementNonvotingAccountBalance(account, penalty - difference);
+      // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
+      _decrementNonvotingAccountBalance(account, penalty.sub(difference));
       _incrementNonvotingAccountBalance(reporter, reward);
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    // address payable addr3 = address(uint160(communityFund));
+    // addr3.transfer(penalty.sub(reward));
     getGoldToken().transfer(communityFund, penalty.sub(reward));
     emit AccountSlashed(account, penalty, reporter, reward);
   }

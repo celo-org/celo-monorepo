@@ -419,7 +419,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
-  describe('#slash', () => {
+  describe.only('#slash', () => {
     const value = 1000
     const group = accounts[1]
     const reporter = accounts[2]
@@ -432,15 +432,28 @@ contract('LockedGold', (accounts: string[]) => {
 
     describe('when the account is slashed for all of its locked gold', () => {
       beforeEach(async () => {
-        await lockedGold.slash(
-          account,
-          value,
-          reporter,
-          value / 2,
-          [NULL_ADDRESS],
-          [NULL_ADDRESS],
-          [0]
-        )
+        console.log(accounts[9])
+        console.log(await web3.eth.getBalance(accounts[9]))
+        console.log(lockedGold.address)
+        await web3.eth.sendTransaction({
+          from: accounts[9],
+          to: election.address,
+          value: '1000',
+        })
+        // web3.eth.sendTransaction({
+        //   from: accounts[9],
+        //   to: lockedGold.address,
+        //   value: value.toString(),
+        // }).on('error', console.error);
+        // await lockedGold.slash(
+        //   account,
+        //   value,
+        //   reporter,
+        //   value / 2,
+        //   [NULL_ADDRESS],
+        //   [NULL_ADDRESS],
+        //   [0]
+        // )
       })
 
       it("should reduce account's locked gold balance to 0", async () => {
@@ -452,10 +465,12 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it("should increase the community fund's gold", async () => {
-        assertEqualBN(
-          await lockedGold.getAccountNonvotingLockedGold(MockGovernance.address),
-          value / 2
-        )
+        // assertEqualBN(
+        console.log('HERE')
+        console.log(web3.eth.getBalance(mockGovernance.address))
+        // await lockedGold.getAccountNonvotingLockedGold(MockGovernance.address),
+        // value / 2
+        // )
       })
     })
 
@@ -475,16 +490,16 @@ contract('LockedGold', (accounts: string[]) => {
       beforeEach(async () => {
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await lockedGold.incrementNonvotingAccountBalance(account, value)
-        await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
-        await lockedGold.slash(
-          account,
-          value,
-          reporter,
-          value / 2,
-          [NULL_ADDRESS],
-          [NULL_ADDRESS],
-          [0]
-        )
+        // await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+        // await lockedGold.slash(
+        //   account,
+        //   value,
+        //   reporter,
+        //   value / 2,
+        //   [NULL_ADDRESS],
+        //   [NULL_ADDRESS],
+        //   [0]
+        // )
       })
 
       it("should reduce account's locked gold balance to 0", async () => {
