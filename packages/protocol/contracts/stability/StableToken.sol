@@ -78,7 +78,7 @@ contract StableToken is
     FixidityLib.Fraction memory updatedInflationFactor;
     uint256 lastUpdated;
 
-    (updatedInflationFactor, lastUpdated) = getUpdatedInflationFactor();
+    (updatedInflationFactor, lastUpdated, ) = getUpdatedInflationFactor();
 
     if (lastUpdated != inflationState.factorLastUpdated) {
       inflationState.factor = updatedInflationFactor;
@@ -132,21 +132,30 @@ contract StableToken is
    * @param rate new rate.
    * @param updatePeriod how often inflationFactor is updated.
    */
-  function setInflationParameters(uint256 rate, uint256 updatePeriod)
-    external
-    onlyOwner
-    updateInflationFactor
-  {
+  function setInflationParameters(uint256 rate, uint256 updatePeriod) external onlyOwner {
+    /* solhint-disable not-rely-on-time */
     require(rate != 0, "Must provide a non-zero inflation rate.");
+
+    uint256 completePeriodsDuration;
+    (inflationState.factor, , completePeriodsDuration) = getUpdatedInflationFactor();
+
+    uint256 nextPeriod = now.sub(inflationState.factorLastUpdated).sub(completePeriodsDuration);
+    FixidityLib.Fraction memory percentageNextPeriod = FixidityLib.newFixedFraction(
+      nextPeriod,
+      inflationState.updatePeriod
+    );
+    require(percentageNextPeriod.isProperFraction());
+
+    inflationState.factor = inflationState.factor.multiply(
+      percentageNextPeriod.multiply(inflationState.rate)
+    );
+    inflationState.factorLastUpdated = now;
+    emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
+
     inflationState.rate = FixidityLib.wrap(rate);
     inflationState.updatePeriod = updatePeriod;
-
-    emit InflationParametersUpdated(
-      rate,
-      updatePeriod,
-      // solhint-disable-next-line not-rely-on-time
-      now
-    );
+    emit InflationParametersUpdated(rate, updatePeriod, now);
+    /* solhint-enable not-rely-on-time */
   }
 
   /**
@@ -359,7 +368,7 @@ contract StableToken is
   function valueToUnits(uint256 value) external view returns (uint256) {
     FixidityLib.Fraction memory updatedInflationFactor;
 
-    (updatedInflationFactor, ) = getUpdatedInflationFactor();
+    (updatedInflationFactor, , ) = getUpdatedInflationFactor();
     return _valueToUnits(updatedInflationFactor, value);
   }
 
@@ -371,7 +380,7 @@ contract StableToken is
   function unitsToValue(uint256 units) public view returns (uint256) {
     FixidityLib.Fraction memory updatedInflationFactor;
 
-    (updatedInflationFactor, ) = getUpdatedInflationFactor();
+    (updatedInflationFactor, , ) = getUpdatedInflationFactor();
 
     // We're ok using FixidityLib.divide here because updatedInflationFactor is
     // not going to surpass maxFixedDivisor any time soon.
@@ -400,18 +409,21 @@ contract StableToken is
    * @notice Computes the up-to-date inflation factor.
    * @return current inflation factor.
    * @return lastUpdated time when the returned inflation factor went into effect.
+   * @return completePeriodsDuration updatePeriod * completePeriodsToApplyInflation
    */
-  function getUpdatedInflationFactor() private view returns (FixidityLib.Fraction memory, uint256) {
+  function getUpdatedInflationFactor()
+    private
+    view
+    returns (FixidityLib.Fraction memory, uint256, uint256)
+  {
     /* solhint-disable not-rely-on-time */
     if (now < inflationState.factorLastUpdated.add(inflationState.updatePeriod)) {
-      return (inflationState.factor, inflationState.factorLastUpdated);
+      return (inflationState.factor, inflationState.factorLastUpdated, 0);
     }
 
     uint256 numerator;
     uint256 denominator;
 
-    // TODO: handle retroactive updates given decreases to updatePeriod:
-    // https://github.com/celo-org/celo-monorepo/issues/3929
     uint256 timesToApplyInflation = now.sub(inflationState.factorLastUpdated).div(
       inflationState.updatePeriod
     );
@@ -428,17 +440,17 @@ contract StableToken is
     // This should never happen. If something went wrong updating the
     // inflation factor, keep the previous factor
     if (numerator == 0 || denominator == 0) {
-      return (inflationState.factor, inflationState.factorLastUpdated);
+      return (inflationState.factor, inflationState.factorLastUpdated, 0);
     }
 
     FixidityLib.Fraction memory currentInflationFactor = FixidityLib.wrap(numerator).divide(
       FixidityLib.wrap(denominator)
     );
-    uint256 lastUpdated = inflationState.factorLastUpdated.add(
-      inflationState.updatePeriod.mul(timesToApplyInflation)
-    );
 
-    return (currentInflationFactor, lastUpdated);
+    uint256 completePeriodsDuration = inflationState.updatePeriod.mul(timesToApplyInflation);
+    uint256 lastUpdated = inflationState.factorLastUpdated.add(completePeriodsDuration);
+
+    return (currentInflationFactor, lastUpdated, completePeriodsDuration);
     /* solhint-enable not-rely-on-time */
   }
 
