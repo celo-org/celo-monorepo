@@ -27,7 +27,7 @@ contract MockUsingPrecompiles {
 
   function calcEpoch(uint256 blockNumber) internal pure returns (uint256) {
     uint256 sz = 100;
-    return (blockNumber + sz - 1) / sz;
+    return (blockNumber - 1) / sz;
   }
 
   function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)

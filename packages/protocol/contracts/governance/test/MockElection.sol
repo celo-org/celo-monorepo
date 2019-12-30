@@ -48,7 +48,7 @@ contract MockElection is IElection {
     return electedValidators;
   }
 
-  function forceRevokeVotes(
+  function forceDecrementVotes(
     address,
     uint256 value,
     address[] calldata,

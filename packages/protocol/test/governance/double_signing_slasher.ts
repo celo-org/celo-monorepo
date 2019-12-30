@@ -102,7 +102,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   })
 
   describe('#slash()', () => {
-    const blockNumber = 100
+    const blockNumber = 110
     const validatorIndex = 5
     const headerA = ['0x12', '0x12', '0x12']
     const headerB = ['0x13', '0x13', '0x13']
