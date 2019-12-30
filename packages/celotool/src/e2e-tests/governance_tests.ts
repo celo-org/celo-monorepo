@@ -285,7 +285,8 @@ describe('governance tests', () => {
     const previousSupply = new BigNumber(
       await goldToken.methods.totalSupply().call({}, blockNumber - 1)
     )
-    assertAlmostEqual(currentSupply.minus(previousSupply), expected)
+    console.info(`Asserting the gold token supply changed by ${expected}`)
+    assertAlmostEqualPct(currentSupply.minus(previousSupply), expected)
   }
 
   describe('when the validator set is changing', () => {
@@ -599,7 +600,8 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
-        assertAlmostEqual(currentVotes.minus(previousVotes), expected)
+        console.info(`Asserting votes changed by expected: ${expected}`)
+        assertAlmostEqualPct(currentVotes.minus(previousVotes), expected)
       }
 
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
@@ -611,26 +613,32 @@ describe('governance tests', () => {
       }
 
       const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
+        console.info(`Asserting locked gold balance changed by expected: ${expected}`)
         await assertBalanceChanged(lockedGold.options.address, blockNumber, expected, goldToken)
       }
 
       const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken, 20)
+        console.info(`Asserting governance gold balance changed by expected: ${expected}`)
+        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken, 2)
       }
 
       const assertReserveBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
+        console.info(`Asserting reserve gold balance changed by expected: ${expected}`)
         await assertBalanceChanged(reserve.options.address, blockNumber, expected, goldToken)
       }
 
       const assertVotesUnchanged = async (blockNumber: number) => {
+        console.info(`Asserting votes are unchanged`)
         await assertVotesChanged(blockNumber, new BigNumber(0))
       }
 
       const assertLockedGoldBalanceUnchanged = async (blockNumber: number) => {
+        console.info(`Asserting locked gold balance is unchanged`)
         await assertLockedGoldBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const assertReserveBalanceUnchanged = async (blockNumber: number) => {
+        console.info(`Asserting reserve gold balance is unchanged`)
         await assertReserveBalanceChanged(blockNumber, new BigNumber(0))
       }
 
@@ -659,6 +667,9 @@ describe('governance tests', () => {
           const activeVotes = new BigNumber(
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
           )
+          const targetRewards = await epochRewards.methods.calculateTargetEpochRewards().call({}, blockNumber - 1)
+          const totalVoterRewards = new BigNumber(targetRewards[1])
+          const totalCommunityReward =  new BigNumber(targetRewards[2])
           assert.isFalse(activeVotes.isZero())
           const targetVotingYield = new BigNumber(
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
@@ -684,6 +695,10 @@ describe('governance tests', () => {
           const expectedGoldTotalSupplyChange = expectedInfraReward
             .plus(expectedEpochReward)
             .plus(stableTokenSupplyChange.div(exchangeRate))
+          console.info(`totalVoterRewards: ${totalVoterRewards}. community reward: ${totalCommunityReward}`)
+          assertAlmostEqualPct(expectedEpochReward, totalVoterRewards)
+          assertAlmostEqualPct(expectedInfraReward, totalCommunityReward)
+          console.info("Asserting test calc'd amounts equal to contract amounts is done")
           await assertVotesChanged(blockNumber, expectedEpochReward)
           await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
           // This is the problem. About 20% off the expected value
