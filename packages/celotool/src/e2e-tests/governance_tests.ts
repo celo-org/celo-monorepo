@@ -410,8 +410,6 @@ describe('governance tests', () => {
       const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
       const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
 
-      console.log('bitmaps', bitmap1, bitmap2)
-
       let bmNum1 = new BigNumber(bitmap1).toNumber()
       let bmNum2 = new BigNumber(bitmap2).toNumber()
       bmNum1 = bmNum1 >> 1
@@ -434,12 +432,6 @@ describe('governance tests', () => {
       const validatorsContract = await kit._web3Contracts.getValidators()
       const history = await validatorsContract.methods.getHistory(signer).call()
       const historyIndex = history[0].length - 1
-
-      console.log(
-        'debug',
-        signerIdx,
-        await slasher.methods.debug(signer, signerIdx, header, other).call()
-      )
 
       await slasher.methods
         .slash(
