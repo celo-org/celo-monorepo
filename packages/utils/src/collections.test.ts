@@ -1,12 +1,12 @@
 import BigNumber from 'bignumber.js'
 import { NULL_ADDRESS } from './address'
-import { Item, linkedListChange, linkedListChanges } from './collections'
+import { AddressListItem, linkedListChange, linkedListChanges } from './collections'
 
 describe('Collection', () => {
   describe('linkedListChange', () => {
     it('singleton list', () => {
-      const lst: Item[] = [{ address: 'address 1', value: new BigNumber(2) }]
-      const change: Item = { address: 'address 1', value: new BigNumber(20) }
+      const lst: AddressListItem[] = [{ address: 'address 1', value: new BigNumber(2) }]
+      const change: AddressListItem = { address: 'address 1', value: new BigNumber(20) }
       const expected = {
         lesser: NULL_ADDRESS,
         greater: NULL_ADDRESS,
@@ -14,13 +14,13 @@ describe('Collection', () => {
       expect(linkedListChange(lst, change)).toMatchObject(expected)
     })
     it('becoming greatest', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(4) },
         { address: 'address 2', value: new BigNumber(4) },
         { address: 'address 3', value: new BigNumber(3) },
         { address: 'address 4', value: new BigNumber(2) },
       ]
-      const change: Item = { address: 'address 3', value: new BigNumber(20) }
+      const change: AddressListItem = { address: 'address 3', value: new BigNumber(20) }
       const expected = {
         lesser: 'address 1',
         greater: NULL_ADDRESS,
@@ -28,14 +28,14 @@ describe('Collection', () => {
       expect(linkedListChange(lst, change)).toMatchObject(expected)
     })
     it('becoming smallest', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(4) },
         { address: 'address 2', value: new BigNumber(4) },
         { address: 'address 3', value: new BigNumber(3) },
         { address: 'address 4', value: new BigNumber(2) },
         { address: 'address 5', value: new BigNumber(2) },
       ]
-      const change: Item = { address: 'address 3', value: new BigNumber(1) }
+      const change: AddressListItem = { address: 'address 3', value: new BigNumber(1) }
       const expected = {
         lesser: NULL_ADDRESS,
         greater: 'address 5',
@@ -43,7 +43,7 @@ describe('Collection', () => {
       expect(linkedListChange(lst, change)).toMatchObject(expected)
     })
     it('change order', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(7) },
         { address: 'address 2', value: new BigNumber(5) },
         { address: 'address 3', value: new BigNumber(4) },
@@ -52,7 +52,7 @@ describe('Collection', () => {
         { address: 'address 6', value: new BigNumber(2) },
         { address: 'address 7', value: new BigNumber(1) },
       ]
-      const change: Item = { address: 'address 3', value: new BigNumber(2) }
+      const change: AddressListItem = { address: 'address 3', value: new BigNumber(2) }
       const expected = {
         greater: 'address 6',
         lesser: 'address 7',
@@ -62,8 +62,8 @@ describe('Collection', () => {
   })
   describe('linkedListChanges', () => {
     it('singleton list', () => {
-      const lst: Item[] = [{ address: 'address 1', value: new BigNumber(2) }]
-      const changes: Item[] = [{ address: 'address 1', value: new BigNumber(20) }]
+      const lst: AddressListItem[] = [{ address: 'address 1', value: new BigNumber(2) }]
+      const changes: AddressListItem[] = [{ address: 'address 1', value: new BigNumber(20) }]
       const expected = {
         lessers: ['0x0000000000000000000000000000000000000000'],
         greaters: ['0x0000000000000000000000000000000000000000'],
@@ -71,13 +71,13 @@ describe('Collection', () => {
       expect(linkedListChanges(lst, changes)).toMatchObject(expected)
     })
     it('becoming greatest', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(4) },
         { address: 'address 2', value: new BigNumber(4) },
         { address: 'address 3', value: new BigNumber(3) },
         { address: 'address 4', value: new BigNumber(2) },
       ]
-      const changes: Item[] = [{ address: 'address 3', value: new BigNumber(20) }]
+      const changes: AddressListItem[] = [{ address: 'address 3', value: new BigNumber(20) }]
       const expected = {
         lessers: ['address 1'],
         greaters: ['0x0000000000000000000000000000000000000000'],
@@ -85,14 +85,14 @@ describe('Collection', () => {
       expect(linkedListChanges(lst, changes)).toMatchObject(expected)
     })
     it('becoming smallest', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(4) },
         { address: 'address 2', value: new BigNumber(4) },
         { address: 'address 3', value: new BigNumber(3) },
         { address: 'address 4', value: new BigNumber(2) },
         { address: 'address 5', value: new BigNumber(2) },
       ]
-      const changes: Item[] = [{ address: 'address 3', value: new BigNumber(1) }]
+      const changes: AddressListItem[] = [{ address: 'address 3', value: new BigNumber(1) }]
       const expected = {
         lessers: ['0x0000000000000000000000000000000000000000'],
         greaters: ['address 5'],
@@ -100,7 +100,7 @@ describe('Collection', () => {
       expect(linkedListChanges(lst, changes)).toMatchObject(expected)
     })
     it('change order', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(7) },
         { address: 'address 2', value: new BigNumber(5) },
         { address: 'address 3', value: new BigNumber(4) },
@@ -109,7 +109,7 @@ describe('Collection', () => {
         { address: 'address 6', value: new BigNumber(2) },
         { address: 'address 7', value: new BigNumber(1) },
       ]
-      const changes: Item[] = [{ address: 'address 3', value: new BigNumber(2) }]
+      const changes: AddressListItem[] = [{ address: 'address 3', value: new BigNumber(2) }]
       const expected = {
         greaters: ['address 6'],
         lessers: ['address 7'],
@@ -117,7 +117,7 @@ describe('Collection', () => {
       expect(linkedListChanges(lst, changes)).toMatchObject(expected)
     })
     it('change order, become smallest', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(7) },
         { address: 'address 2', value: new BigNumber(5) },
         { address: 'address 3', value: new BigNumber(4) },
@@ -126,7 +126,7 @@ describe('Collection', () => {
         { address: 'address 6', value: new BigNumber(2) },
         { address: 'address 7', value: new BigNumber(1) },
       ]
-      const changes: Item[] = [
+      const changes: AddressListItem[] = [
         { address: 'address 3', value: new BigNumber(2) },
         { address: 'address 2', value: new BigNumber(0) },
       ]
@@ -137,7 +137,7 @@ describe('Collection', () => {
       expect(linkedListChanges(lst, changes)).toMatchObject(expected)
     })
     it('change order, become largest', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(7) },
         { address: 'address 2', value: new BigNumber(5) },
         { address: 'address 3', value: new BigNumber(4) },
@@ -146,7 +146,7 @@ describe('Collection', () => {
         { address: 'address 6', value: new BigNumber(2) },
         { address: 'address 7', value: new BigNumber(1) },
       ]
-      const changes: Item[] = [
+      const changes: AddressListItem[] = [
         { address: 'address 3', value: new BigNumber(2) },
         { address: 'address 2', value: new BigNumber(8) },
       ]
@@ -157,7 +157,7 @@ describe('Collection', () => {
       expect(linkedListChanges(lst, changes)).toMatchObject(expected)
     })
     it('change order, then replace with another', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(7) },
         { address: 'address 2', value: new BigNumber(5) },
         { address: 'address 3', value: new BigNumber(4) },
@@ -166,7 +166,7 @@ describe('Collection', () => {
         { address: 'address 6', value: new BigNumber(2) },
         { address: 'address 7', value: new BigNumber(1) },
       ]
-      const changes: Item[] = [
+      const changes: AddressListItem[] = [
         { address: 'address 3', value: new BigNumber(2) },
         { address: 'address 2', value: new BigNumber(2) },
       ]
@@ -177,7 +177,7 @@ describe('Collection', () => {
       expect(linkedListChanges(lst, changes)).toMatchObject(expected)
     })
     it('change order, then replace with another again', () => {
-      const lst: Item[] = [
+      const lst: AddressListItem[] = [
         { address: 'address 1', value: new BigNumber(17) },
         { address: 'address 2', value: new BigNumber(15) },
         { address: 'address 3', value: new BigNumber(14) },
@@ -186,7 +186,7 @@ describe('Collection', () => {
         { address: 'address 6', value: new BigNumber(11) },
         { address: 'address 7', value: new BigNumber(0) },
       ]
-      const changes: Item[] = [
+      const changes: AddressListItem[] = [
         { address: 'address 3', value: new BigNumber(2) },
         { address: 'address 2', value: new BigNumber(1) },
         { address: 'address 4', value: new BigNumber(3) },

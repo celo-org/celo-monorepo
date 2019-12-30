@@ -2,7 +2,6 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-// TODO(asa): Limit assembly usage by using X.staticcall instead.
 contract UsingPrecompiles {
   using SafeMath for uint256;
 
@@ -219,7 +218,9 @@ contract UsingPrecompiles {
   }
 
   /**
-   * @notice Verifies the given header and returns the seal bitmap is successful.
+   * @notice Verifies the BLS signature on the header and returns the seal bitmap.
+   * The validator set used for verification is retrieved based on the parent hash field of the
+   * header.  If the parent hash is not in the blockchain, verification fails.
    * @param header RLP encoded header
    * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
    */
