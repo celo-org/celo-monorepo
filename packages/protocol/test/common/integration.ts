@@ -42,6 +42,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
     await accountsInstance.createAccount()
+    await accountsInstance.createAccount({ from: accounts[1] })
     // @ts-ignore
     await lockedGold.lock({ value })
     // @ts-ignore
