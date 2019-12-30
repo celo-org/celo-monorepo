@@ -254,7 +254,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param slasher Address to whitelist.
    */
   function addSlasher(address slasher) external onlyOwner {
-    require(slasher != address(0));
+    require(slasher != address(0), "cannot add null address as slasher");
     isSlasher[slasher] = true;
     emit SlasherWhitelistAdded(slasher);
   }
@@ -264,7 +264,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param slasher Address to remove from whitelist.
    */
   function removeSlasher(address slasher) external onlyOwner {
-    require(isSlasher[slasher]);
+    require(isSlasher[slasher], "not a slasher");
     isSlasher[slasher] = false;
     emit SlasherWhitelistRemoved(slasher);
   }
@@ -306,7 +306,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
         difference = penalty.sub(nonvotingBalance);
         require(
           getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
-            difference
+            difference,
+          "cannot force decrement"
         );
       }
       // forceRevokeVotes does not increment nonvoting account balance, so we can't double count

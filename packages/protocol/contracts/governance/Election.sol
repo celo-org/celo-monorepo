@@ -362,7 +362,8 @@ contract Election is
     address greater,
     uint256 index
   ) internal returns (uint256) {
-    require(group != address(0) && 0 < value);
+    require(group != address(0), "group zero");
+    require(0 < value, "value zero");
     uint256 remainingValue = value;
     uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
     if (pendingVotes > 0) {
@@ -931,12 +932,14 @@ contract Election is
     address[] calldata greaters,
     uint256[] calldata indices
   ) external nonReentrant onlyRegisteredContract(LOCKED_GOLD_REGISTRY_ID) returns (uint256) {
-    require(value > 0 && value <= getTotalVotesByAccount(account));
+    require(value > 0, "tried to decrement zero votes");
+    require(value <= getTotalVotesByAccount(account), "not enough votes");
     DecrementVotesInfo memory info = DecrementVotesInfo(votes.groupsVotedFor[account], value);
     require(
       info.groups.length == lessers.length &&
         lessers.length == greaters.length &&
-        greaters.length == indices.length
+        greaters.length == indices.length,
+      "indices must correspond to voted groups"
     );
     // Iterate in reverse order to hopefully optimize removing pending votes before active votes
     // And to attempt to preserve `account`'s earliest votes (assuming earliest = prefered)

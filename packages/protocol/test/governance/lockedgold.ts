@@ -7,6 +7,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -54,9 +55,10 @@ contract('LockedGold', (accounts: string[]) => {
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
+  let mockGoldToken: MockGoldTokenInstance
 
   beforeEach(async () => {
-    const mockGoldToken: MockGoldTokenInstance = await MockGoldToken.new()
+    mockGoldToken = await MockGoldToken.new()
     accountsInstance = await Accounts.new()
     lockedGold = await LockedGold.new()
     election = await Election.new()
@@ -69,7 +71,9 @@ contract('LockedGold', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
+    await election.initialize(registry.address, '4', '6', '3', toFixed(1 / 100))
     await accountsInstance.createAccount()
   })
 
@@ -452,10 +456,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it("should increase the community fund's gold", async () => {
-        assertEqualBN(
-          await lockedGold.getAccountNonvotingLockedGold(MockGovernance.address),
-          value / 2
-        )
+        assertEqualBN(await mockGoldToken.balanceOf(mockGovernance.address), value / 2)
       })
     })
 
@@ -473,8 +474,10 @@ contract('LockedGold', (accounts: string[]) => {
 
     describe('when the account has voting gold', () => {
       beforeEach(async () => {
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await registry.setAddressFor(CeloContractName.Election, election.address)
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
-        await lockedGold.incrementNonvotingAccountBalance(account, value)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
         await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
         await lockedGold.slash(
           account,

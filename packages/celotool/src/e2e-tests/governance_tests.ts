@@ -407,8 +407,8 @@ describe('governance tests', () => {
 
       const header = headerFromBlock(web3, await web3.eth.getBlock(num))
 
-      const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
       const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
+      const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
 
       console.log('bitmaps', bitmap1, bitmap2)
 
