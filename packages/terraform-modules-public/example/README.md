@@ -22,7 +22,7 @@ publicKey: 041e9f487477b7d9f5c5818a1337601f05b790267ffc052aa98b49bea88a920bb2667
 accountAddress: 0x2A809BeE654AAe41794838291390BC75BEd100BB
 ```
 
-In the example, `0x2A809BeE654AAe41794838291390BC75BEd100BB` would be an account address, `d497b2c97f5cd276c09e53b80ee5300ff37bbf6c6e9b814d908d2ab654e56137` a private key, and the `publicKey` (`041e9f487477b7d9f5c5818a1337601f05b790267ffc052aa98b49bea88a920bb2667aea5c99b47718da9198645669d6fa3643e547b9e2e1d386c4d9ee300db0cd`) corresponds to the enode address.
+In the example, `0x2A809BeE654AAe41794838291390BC75BEd100BB` would be an account address, `d497b2c97f5cd276c09e53b80ee5300ff37bbf6c6e9b814d908d2ab654e56137` a private key, and the `publicKey` removing the two first characters (`1e9f487477b7d9f5c5818a1337601f05b790267ffc052aa98b49bea88a920bb2667aea5c99b47718da9198645669d6fa3643e547b9e2e1d386c4d9ee300db0cd` in the example) corresponds to the enode address.
 
 You have to generate an account for each instance of each component you want to deploy. Please save this credentials securely so you can recover or access your account when you need.
 
