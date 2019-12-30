@@ -7,8 +7,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
 import Web3 from 'web3'
-import { GethTestConfig, sleep } from './utils'
-import { getContext } from './utils'
+import { getContext, GethTestConfig, sleep } from './utils'
 
 function headerArray(web3: Web3, block: any) {
   return [
@@ -28,6 +27,10 @@ function headerArray(web3: Web3, block: any) {
     block.mixHash,
     block.nonce,
   ]
+}
+
+function headerFromBlock(web3: Web3, block: any) {
+  return rlp.encode(headerArray(web3, block))
 }
 
 describe('slashing tests', function(this: any) {
@@ -72,12 +75,14 @@ describe('slashing tests', function(this: any) {
     await context.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
+    await sleep(1)
   }
 
   const restartWithDowntime = async () => {
     await contextDown.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
+    await sleep(1)
   }
 
   const waitUntilBlock = async (bn: number) => {
@@ -90,7 +95,7 @@ describe('slashing tests', function(this: any) {
 
   describe('when running a network', () => {
     before(async () => {
-      await restart()
+      await restartWithDowntime()
     })
 
     it('should parse blockNumber from test header', async () => {

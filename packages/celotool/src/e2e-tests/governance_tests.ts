@@ -1,12 +1,10 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { NULL_ADDRESS } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import * as rlp from 'rlp'
 import Web3 from 'web3'
 import {
   assertAlmostEqual,
@@ -20,26 +18,6 @@ import {
 
 interface MemberSwapper {
   swap(): Promise<void>
-}
-
-function headerFromBlock(web3: Web3, block: any) {
-  return rlp.encode([
-    block.parentHash,
-    block.sha3Uncles,
-    block.miner,
-    block.stateRoot,
-    block.transactionsRoot,
-    block.receiptsRoot,
-    block.logsBloom,
-    web3.utils.toHex(block.difficulty),
-    block.number,
-    block.gasLimit,
-    block.gasUsed,
-    block.timestamp,
-    block.extraData,
-    block.mixHash,
-    block.nonce,
-  ])
 }
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
@@ -147,20 +125,7 @@ describe('governance tests', () => {
     ],
   }
 
-  const gethConfigDown = {
-    migrate: true,
-    instances: [
-      // Validators 0 and 1 are swapped in and out of the group.
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      // Validator 2 will authorize a validating key every other epoch.
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-    ],
-  }
-
   const context: any = getContext(gethConfig)
-  const contextDown: any = getContext(gethConfigDown)
   let web3: any
   let election: any
   let stableToken: any
@@ -182,21 +147,6 @@ describe('governance tests', () => {
 
   const restart = async () => {
     await context.hooks.restart()
-    web3 = new Web3('http://localhost:8545')
-    kit = newKitFromWeb3(web3)
-    goldToken = await kit._web3Contracts.getGoldToken()
-    stableToken = await kit._web3Contracts.getStableToken()
-    sortedOracles = await kit._web3Contracts.getSortedOracles()
-    validators = await kit._web3Contracts.getValidators()
-    registry = await kit._web3Contracts.getRegistry()
-    reserve = await kit._web3Contracts.getReserve()
-    election = await kit._web3Contracts.getElection()
-    epochRewards = await kit._web3Contracts.getEpochRewards()
-    accounts = await kit._web3Contracts.getAccounts()
-  }
-
-  const restartWithDowntime = async () => {
-    await contextDown.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
     goldToken = await kit._web3Contracts.getGoldToken()
@@ -284,14 +234,6 @@ describe('governance tests', () => {
       blockNumber = await web3.eth.getBlockNumber()
       await sleep(0.1)
     } while (blockNumber % epoch !== 1)
-  }
-
-  const waitUntilBlock = async (bn: number) => {
-    let blockNumber: number
-    do {
-      blockNumber = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (blockNumber < bn)
   }
 
   const assertTargetVotingYieldChanged = async (blockNumber: number, expected: BigNumber) => {
