@@ -371,7 +371,6 @@ describe('governance tests', () => {
 
       await slasher.methods
         .slash(
-          signer,
           blockNumber + 12,
           4,
           4,
