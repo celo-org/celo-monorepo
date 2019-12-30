@@ -5,6 +5,7 @@ import {
   assertSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import BN = require('bn.js')
 import {
@@ -35,6 +36,7 @@ contract('Reserve', (accounts: string[]) => {
   const nonOwner: string = accounts[1]
   const spender: string = accounts[2]
   const aTobinTaxStalenessThreshold: number = 600
+  const aDailySpendingRatio: string = '1000000000000000000000000'
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   beforeEach(async () => {
     reserve = await Reserve.new()
@@ -43,7 +45,7 @@ contract('Reserve', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
-    await reserve.initialize(registry.address, aTobinTaxStalenessThreshold)
+    await reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
   })
 
   describe('#initialize()', () => {
@@ -63,7 +65,29 @@ contract('Reserve', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(reserve.initialize(registry.address, aTobinTaxStalenessThreshold))
+      await assertRevert(
+        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+      )
+    })
+  })
+
+  describe('#setDailySpendingRatio()', async () => {
+    it('should allow owner to set the ratio', async () => {
+      await reserve.setDailySpendingRatio(123)
+      assert.equal(123, (await reserve.getDailySpendingRatio()).toNumber())
+    })
+    it('should emit corresponding event', async () => {
+      const response = await reserve.setDailySpendingRatio(123)
+      const events = response.logs
+      assert.equal(events.length, 1)
+      assert.equal(events[0].event, 'DailySpendingRatioSet')
+      assert.equal(events[0].args.ratio.toNumber(), 123)
+    })
+    it('should not allow other users to set the ratio', async () => {
+      await assertRevert(reserve.setDailySpendingRatio(123, { from: nonOwner }))
+    })
+    it('should not be allowed to set it larger than 100%', async () => {
+      await assertRevert(reserve.setDailySpendingRatio(toFixed(1.3)))
     })
   })
 
@@ -152,18 +176,33 @@ contract('Reserve', (accounts: string[]) => {
   })
 
   describe('#transferGold()', () => {
-    const aValue = 10
+    const aValue = 10000
     beforeEach(async () => {
-      await web3.eth.sendTransaction({
-        from: accounts[0],
-        to: reserve.address,
-        value: aValue,
-      })
+      await mockGoldToken.setBalanceOf(reserve.address, aValue)
+      await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
       await reserve.addSpender(spender)
     })
 
     it('should allow a spender to call transferGold', async () => {
       await reserve.transferGold(nonOwner, aValue, { from: spender })
+    })
+
+    it('should not allow a spender to transfer more than daily ratio', async () => {
+      await reserve.setDailySpendingRatio(toFixed(0.2))
+      await assertRevert(reserve.transferGold(nonOwner, aValue / 2, { from: spender }))
+    })
+
+    it('daily spending accumulates', async () => {
+      await reserve.setDailySpendingRatio(toFixed(0.15))
+      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await assertRevert(reserve.transferGold(nonOwner, aValue * 0.1, { from: spender }))
+    })
+
+    it('daily spending limit should be reset after 24 hours', async () => {
+      await reserve.setDailySpendingRatio(toFixed(0.15))
+      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
     })
 
     it('should not allow a removed spender to call transferGold', async () => {
