@@ -63,7 +63,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 module "celo_cluster" {
-  source             = "/Users/jcortejoso/Projects/Celo/celo-monorepo/packages/terraform-modules-public/testnet"
+  source             = "../testnet"
   network_depends_on = [google_compute_network.celo_network]
 
   gcloud_project = var.google["project"]
