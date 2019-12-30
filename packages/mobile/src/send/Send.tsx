@@ -1,9 +1,9 @@
+import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -14,6 +14,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import ContactPermission from 'src/icons/ContactPermission'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
@@ -30,7 +31,13 @@ import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
-import { checkContactsPermission } from 'src/utils/permissions'
+import { ContactSyncBanner } from 'src/send/ContactSyncBanner'
+import { QRCodeIcon } from 'src/send/QRCodeIcon'
+import { SendCallToAction } from 'src/send/SendCallToAction'
+import { SendSearchInput } from 'src/send/SendSearchInput'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { navigateToPhoneSettings } from 'src/utils/linking'
+import { requestContactsPermission } from 'src/utils/permissions'
 
 const SEARCH_THROTTLE_TIME = 50
 const defaultRecipientPhoneNumber = '+10000000000'
@@ -51,16 +58,16 @@ interface Section {
 }
 
 interface State {
-  loading: boolean
   searchQuery: string
   allFiltered: Recipient[]
   recentFiltered: Recipient[]
-  hasGivenPermission: boolean
+  hasGivenContactPermission: boolean
 }
 
 interface StateProps {
   defaultCountryCode: string
   e164PhoneNumber: string
+  numberVerified: boolean
   devModeActive: boolean
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   recentRecipients: Recipient[]
@@ -80,6 +87,7 @@ type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedPr
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: state.account.defaultCountryCode,
   e164PhoneNumber: state.account.e164PhoneNumber,
+  numberVerified: state.app.numberVerified,
   devModeActive: state.account.devModeActive || false,
   e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
   recentRecipients: state.account.devModeActive
@@ -102,6 +110,7 @@ class Send extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithCancelButton,
     headerTitle: i18n.t('sendFlow7:sendOrRequest'),
+    headerRight: <QRCodeIcon />,
   })
 
   throttledSearch: (searchQuery: string) => void
@@ -112,11 +121,10 @@ class Send extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      loading: true,
       searchQuery: '',
       allFiltered: [],
       recentFiltered: [],
-      hasGivenPermission: true,
+      hasGivenContactPermission: true,
     }
 
     this.allRecipientsFilter = filterRecipientFactory(this.props.allRecipients)
@@ -134,13 +142,11 @@ class Send extends React.Component<Props, State> {
     const { recentRecipients, allRecipients } = this.props
 
     this.setState({
-      loading: false,
       recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
       allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
     })
 
-    const hasGivenPermission = await checkContactsPermission()
-    this.setState({ hasGivenPermission })
+    await this.tryImportContacts()
 
     // Trigger a fee estimation so it'll likely be finished and cached
     // when SendAmount screen is shown
@@ -155,10 +161,26 @@ class Send extends React.Component<Props, State> {
       allRecipients !== prevPops.allRecipients
     ) {
       this.setState({
-        loading: false,
         recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
         allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
       })
+    }
+  }
+
+  tryImportContacts = async () => {
+    const { numberVerified, allRecipients } = this.props
+
+    // Only import contacts if number is verified and
+    // recip cache is empty so we haven't already
+    if (!numberVerified || allRecipients.length) {
+      return
+    }
+
+    const hasGivenContactPermission = await requestContactsPermission()
+    this.setState({ hasGivenContactPermission })
+
+    if (hasGivenContactPermission) {
+      this.props.importContacts()
     }
   }
 
@@ -195,8 +217,16 @@ class Send extends React.Component<Props, State> {
     this.props.importContacts()
     this.setState({
       searchQuery: '',
-      hasGivenPermission: true,
+      hasGivenContactPermission: true,
     })
+  }
+
+  onPressStartVerification = () => {
+    navigate(Screens.VerificationEducationScreen)
+  }
+
+  onPressContactsSettings = () => {
+    navigateToPhoneSettings()
   }
 
   buildSections = (): Section[] => {
@@ -210,30 +240,52 @@ class Send extends React.Component<Props, State> {
     return sections
   }
 
+  renderListHeader = () => {
+    const { t, numberVerified } = this.props
+    const { hasGivenContactPermission } = this.state
+
+    return (
+      <>
+        {!numberVerified && (
+          <SendCallToAction
+            icon={<VerifyPhone height={49} />}
+            header={t('verificationCta.header')}
+            body={t('verificationCta.body')}
+            cta={t('verificationCta.cta')}
+            onPressCta={this.onPressStartVerification}
+          />
+        )}
+        {numberVerified &&
+          !hasGivenContactPermission && (
+            <SendCallToAction
+              icon={<ContactPermission />}
+              header={t('importContactsCta.header')}
+              body={t('importContactsCta.body')}
+              cta={t('importContactsCta.cta')}
+              onPressCta={this.onPressContactsSettings}
+            />
+          )}
+        <ContactSyncBanner />
+      </>
+    )
+  }
+
   render() {
-    const { t, defaultCountryCode } = this.props
-    const { loading, searchQuery } = this.state
+    const { defaultCountryCode, numberVerified } = this.props
+    const { searchQuery } = this.state
 
     return (
       <SafeAreaView style={style.body}>
-        {loading ? (
-          <View style={style.container}>
-            <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
-            <Text style={[fontStyles.bodySecondary]}>{t('loadingContacts')}</Text>
-          </View>
-        ) : (
-          <RecipientPicker
-            testID={'RecipientPicker'}
-            sections={this.buildSections()}
-            searchQuery={searchQuery}
-            defaultCountryCode={defaultCountryCode}
-            hasAcceptedContactPermission={this.state.hasGivenPermission}
-            onSelectRecipient={this.onSelectRecipient}
-            onSearchQueryChanged={this.onSearchQueryChanged}
-            showQRCode={true}
-            onPermissionsAccepted={this.onPermissionsAccepted}
-          />
-        )}
+        <DisconnectBanner />
+        <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
+        <RecipientPicker
+          testID={'RecipientPicker'}
+          sections={this.buildSections()}
+          searchQuery={searchQuery}
+          defaultCountryCode={defaultCountryCode}
+          listHeaderComponent={this.renderListHeader}
+          onSelectRecipient={this.onSelectRecipient}
+        />
       </SafeAreaView>
     )
   }
