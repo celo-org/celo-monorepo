@@ -114,5 +114,4 @@ module "celo_cluster" {
   attestation_service_twilio_messaging_service_sid = var.attestation_service_credentials["twilio_messaging_service_sid"]
   attestation_service_twilio_auth_token            = var.attestation_service_credentials["twilio_auth_token"]
   attestation_service_twilio_blacklist             = var.attestation_service_credentials["twilio_blacklist"]
-  // attestation_service_celo_provider                = "https://baklava-forno.celo-testnet.org/"
 }

@@ -61,14 +61,12 @@ GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_i
 
 ACCOUNT_ADDRESS=${validator_account_address}
 echo "Address: $ACCOUNT_ADDRESS"
-echo "Private Key: ${validator_private_key}"
-
 
 echo "Proxy enode address: ${proxy_enode}"
 echo "Proxy internal ip address: ${proxy_internal_ip}"
 echo "Proxy external ip address: ${proxy_external_ip}"
-PROXY_INTERNAL_ENODE="enode://${proxy_enode}@${proxy_internal_ip}:30503"
-PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30503"
+PROXY_INTERNAL_ENODE="enode://${proxy_enode}@${proxy_internal_ip}:30303"
+PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30303"
 
 PROXY_URL="$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
 echo "Proxy URL: $PROXY_URL"
@@ -81,7 +79,6 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 # Load configuration to files
 echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
-echo -n '${static_nodes_base64}' | base64 -d > $DATA_DIR/static-nodes.json
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${validator_private_key}' > $DATA_DIR/pkey

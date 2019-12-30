@@ -238,7 +238,3 @@ module "attestation-service" {
   twilio_auth_token                           = var.attestation_service_twilio_auth_token
   twilio_blacklist                            = var.attestation_service_twilio_blacklist
 }
-
-// module "accounts" {
-//   source = "./modules/accounts"
-// }

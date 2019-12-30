@@ -18,11 +18,6 @@ variable gcloud_project {
   description = "Name of the Google Cloud project to use"
 }
 
-// variable genesis_content_base64 {
-//   type        = string
-//   description = "Content of the genesis file encoded in base64"
-// }
-
 variable instance_types {
   description = "The instance type for each component"
   type        = map(string)

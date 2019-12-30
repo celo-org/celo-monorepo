@@ -71,5 +71,5 @@ variable tx_node_count {
 
 variable static_nodes_base64 {
   type        = string
-  description = "Content of the genesis file encoded in base64"
+  description = "Content of the static_nodes.json file encoded in base64"
 }
