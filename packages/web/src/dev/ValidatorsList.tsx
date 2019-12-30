@@ -69,8 +69,10 @@ class ValidatorsListApp extends React.PureComponent<I18nProps, State> {
     return (
       <View style={styles.cover}>
         <View style={styles.container}>
-          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet]}>Test</H1>
-          <table className={css['table']}>
+          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
+            Validator Explorer
+          </H1>
+          <table className={[css['table'], css['main-table']].join(' ')}>
             <tr className={css['table__heading']}>
               <th className={css['table__cell--title-padding']}>Name</th>
               <th className={css['table__cell--center']}>Elected</th>
