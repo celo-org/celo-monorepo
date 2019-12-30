@@ -7,7 +7,7 @@ interface IElection {
   function markGroupIneligible(address) external;
   function markGroupEligible(address, address, address) external;
   function electValidatorSigners() external view returns (address[] memory);
-  function forceRevokeVotes(
+  function forceDecrementVotes(
     address,
     uint256,
     address[] calldata,
