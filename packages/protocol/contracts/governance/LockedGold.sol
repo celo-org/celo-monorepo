@@ -319,9 +319,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       _incrementNonvotingAccountBalance(reporter, reward);
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
-    // address payable addr3 = address(uint160(communityFund));
-    // addr3.transfer(penalty.sub(reward));
-    getGoldToken().transfer(communityFund, penalty.sub(reward));
+    address payable communityFundPayable = address(uint160(communityFund));
+    communityFundPayable.transfer(penalty.sub(reward));
     emit AccountSlashed(account, penalty, reporter, reward);
   }
 }
