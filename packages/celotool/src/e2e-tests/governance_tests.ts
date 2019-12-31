@@ -682,9 +682,7 @@ describe('governance tests', () => {
             .div(exchangeRate)
           // Calculate the expected voting reward
           const targetVotingYield = new BigNumber(
-            (await epochRewards.methods
-              .getTargetVotingYieldParameters()
-              .call({}, blockNumber - 1))[0]
+            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )
           assert.isFalse(targetVotingYield.isZero())
           const expectedEpochReward = activeVotes
