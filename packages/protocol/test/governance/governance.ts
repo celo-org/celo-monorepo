@@ -12,7 +12,6 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
-import { addressToPublicKey } from '@celo/utils/src/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import {
@@ -135,6 +134,7 @@ contract('Governance', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount()
     await mockLockedGold.setAccountTotalLockedGold(account, weight)
     await mockLockedGold.setTotalLockedGold(weight)
@@ -1980,8 +1980,8 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#hotfixWhitelistValidatorTally', () => {
-    const hotfixHash = '0x0123456abcdefg'
+  describe('#hotfixWhitelistValidatorTally', () => {
+    const hotfixHash = '0x' + keccak256('celo bug fix').toString('hex')
 
     const validatorAccount1 = accounts[2]
     const validatorAccount2 = accounts[3]
@@ -1990,43 +1990,25 @@ contract('Governance', (accounts: string[]) => {
     const validatorSigner2 = accounts[5]
 
     beforeEach(async () => {
-      await governance.addValidator(validatorAccount1)
-      await governance.addValidator(validatorAccount2)
-
-      await mockValidators.setValidator(validatorAccount1)
-      await mockValidators.setValidator(validatorAccount2)
-
       await accountsInstance.createAccount({ from: validatorAccount1 })
       await accountsInstance.createAccount({ from: validatorAccount2 })
-
-      const pubkey1 = await addressToPublicKey(validatorSigner1, web3.eth.sign)
-      const pubkey2 = await addressToPublicKey(validatorSigner2, web3.eth.sign)
 
       const sig1 = await getParsedSignatureOfAddress(web3, validatorAccount1, validatorSigner1)
       const sig2 = await getParsedSignatureOfAddress(web3, validatorAccount2, validatorSigner2)
 
-      // @ts-ignore bytes type
-      await mockValidators.updateEcdsaPublicKey(NULL_ADDRESS, NULL_ADDRESS, '0x0')
+      await accountsInstance.authorizeValidatorSigner(validatorSigner1, sig1.v, sig1.r, sig1.s, {
+        from: validatorAccount1,
+      })
+      await accountsInstance.authorizeValidatorSigner(validatorSigner2, sig2.v, sig2.r, sig2.s, {
+        from: validatorAccount2,
+      })
 
-      await accountsInstance.authorizeValidatorSignerWithPublicKey(
-        validatorSigner1,
-        sig1.v,
-        sig1.r,
-        sig1.s,
-        // @ts-ignore bytes
-        pubkey1,
-        { from: validatorAccount1 }
-      )
+      await mockValidators.setValidator(validatorAccount1)
+      await mockValidators.setValidator(validatorAccount2)
 
-      await accountsInstance.authorizeValidatorSignerWithPublicKey(
-        validatorSigner2,
-        sig2.v,
-        sig2.r,
-        sig2.s,
-        // @ts-ignore bytes
-        pubkey2,
-        { from: validatorAccount2 }
-      )
+      // add signers for mock precompile
+      await governance.addValidator(validatorSigner1)
+      await governance.addValidator(validatorSigner2)
     })
 
     it('should count validators that have whitelisted', async () => {
