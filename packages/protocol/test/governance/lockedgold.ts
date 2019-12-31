@@ -422,20 +422,36 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
-  describe.only('#slash', () => {
+  describe('#slash', () => {
     const value = 1000
-    const penalty = value
-    const reward = value / 2
     const group = accounts[1]
     const reporter = accounts[3]
 
     beforeEach(async () => {
+      election = await ElectionTest.new()
+      await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)
+      await election.initialize(
+        registry.address,
+        new BigNumber(4),
+        new BigNumber(6),
+        new BigNumber(3),
+        toFixed(1 / 100)
+      )
+      await mockValidators.setMembers(group, [accounts[9]])
+      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+      await registry.setAddressFor(CeloContractName.Election, election.address)
+      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+      await mockValidators.setNumRegisteredValidators(1)
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await lockedGold.lock({ value })
       await lockedGold.addSlasher(accounts[2])
     })
 
     describe('when the account is slashed for all of its locked gold', () => {
+      const penalty = value
+      const reward = value / 2
+
       beforeEach(async () => {
         await lockedGold.slash(
           account,
@@ -465,52 +481,35 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     describe('when the account is removed from `isSlasher`', () => {
+      const penalty = value
+      const reward = value / 2
       beforeEach(async () => {
         await lockedGold.removeSlasher(accounts[2])
       })
 
       it('should revert', async () => {
         await assertRevert(
-          lockedGold.slash(account, value, reporter, value / 2, [NULL_ADDRESS], [NULL_ADDRESS], [0])
+          lockedGold.slash(account, penalty, reporter, reward, [NULL_ADDRESS], [NULL_ADDRESS], [0])
         )
       })
     })
 
     describe('when the account has half voting and half nonvoting gold', () => {
+      const voting = value / 2
+      const nonVoting = value - voting
       beforeEach(async () => {
-        // TOOD(lucas): figure out how to vote in here
-        election = await ElectionTest.new()
-        const electableValidators = {
-          min: new BigNumber(4),
-          max: new BigNumber(6),
-        }
-        const maxNumGroupsVotedFor = new BigNumber(3)
-        const electabilityThreshold = toFixed(1 / 100)
-        await election.initialize(
-          registry.address,
-          electableValidators.min,
-          electableValidators.max,
-          maxNumGroupsVotedFor,
-          electabilityThreshold
-        )
-        await mockValidators.setMembers(group, [accounts[9]])
-        await registry.setAddressFor(CeloContractName.Election, election.address)
-        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
-        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
-        await registry.setAddressFor(CeloContractName.Election, accounts[0])
-        await lockedGold.incrementNonvotingAccountBalance(account, value)
-        await registry.setAddressFor(CeloContractName.Election, election.address)
-        await mockValidators.setNumRegisteredValidators(1)
-        await election.vote(group, 1, NULL_ADDRESS, NULL_ADDRESS)
+        await election.vote(group, voting, NULL_ADDRESS, NULL_ADDRESS)
       })
 
       describe('when the account is slashed for only its nonvoting balance', () => {
+        const penalty = nonVoting
+        const reward = penalty / 2
         beforeEach(async () => {
           await lockedGold.slash(
             account,
-            penalty / 2,
+            penalty,
             reporter,
-            reward / 2,
+            reward,
             [NULL_ADDRESS],
             [NULL_ADDRESS],
             [0],
@@ -521,26 +520,29 @@ contract('LockedGold', (accounts: string[]) => {
         it("should reduce account's nonvoting locked gold balance", async () => {
           assertEqualBN(
             await lockedGold.getAccountNonvotingLockedGold(account),
-            value / 2 - penalty / 2
+            nonVoting - penalty
           )
         })
 
         it('should leave the voting locked gold', async () => {
           assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value - penalty)
-          assertEqualBN(await election.getTotalVotesByAccount(account), value / 2)
+          assertEqualBN(await election.getTotalVotesByAccount(account), voting)
         })
 
         it("should increase the reporter's locked gold", async () => {
-          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward / 2)
-          assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward / 2)
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
         })
 
         it("should increase the community fund's gold", async () => {
-          assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty / 2 - reward / 2)
+          assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
         })
       })
 
       describe('when the account is slashed for its whole balance', () => {
+        const penalty = value
+        const reward = penalty / 2
+
         beforeEach(async () => {
           await lockedGold.slash(
             account,
