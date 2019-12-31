@@ -691,7 +691,7 @@ describe('governance tests', () => {
 
           // infra: (x / (1 - x)) * predicted supply increase * rewards mult
           const communityRewardFrac = new BigNumber(
-            await election.methods.getCommunityRewardFraction.call({}, blockNumber)
+            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber)
           )
           const expectedInfraReward = expectedEpochReward
             .plus(maxPotentialValidatorReward)
