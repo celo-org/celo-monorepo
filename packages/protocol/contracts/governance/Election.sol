@@ -357,7 +357,7 @@ contract Election is
   function _decrementVotes(
     address account,
     address group,
-    uint256 value,
+    uint256 maxValue,
     address lesser,
     address greater,
     uint256 index
