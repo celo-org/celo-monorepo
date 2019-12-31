@@ -200,11 +200,11 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
         this.kit,
         this.contract.methods.authorizeValidatorSignerWithPublicKey(
           signer,
-          // @ts-ignore bytes type
-          pubKey,
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
-          proofOfSigningKeyPossession.s
+          proofOfSigningKeyPossession.s,
+          // @ts-ignore bytes type
+          pubKey
         )
       )
     } else {

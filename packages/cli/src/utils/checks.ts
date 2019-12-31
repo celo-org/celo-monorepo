@@ -2,6 +2,7 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/src/wrappers/Governance'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -78,10 +79,42 @@ class CheckBuilder {
     }
   }
 
+  withGovernance<A>(f: (accounts: GovernanceWrapper) => A): () => Promise<Resolve<A>> {
+    return async () => {
+      const governance = await this.kit.contracts.getGovernance()
+      return f(governance) as Resolve<A>
+    }
+  }
+
   addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
     this.checks.push(check(name, predicate, errorMessage))
     return this
   }
+
+  isApprover = (account: Address) =>
+    this.addCheck(
+      `${account} is approver address`,
+      this.withGovernance(async (g) => (await g.getApprover()) === account)
+    )
+
+  proposalExists = (proposalID: string) =>
+    this.addCheck(
+      `${proposalID} is an existing proposal`,
+      this.withGovernance((g) => g.proposalExists(proposalID))
+    )
+
+  proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
+    this.addCheck(
+      `${proposalID} is in stage ${stage}`,
+      this.withGovernance(async (g) => {
+        const actual = await g.getProposalStage(proposalID)
+        if (actual === 'Queued' && stage === 'Approval') {
+          return true
+        } else {
+          return actual === stage
+        }
+      })
+    )
 
   canSign = (account: Address) =>
     this.addCheck('Account can sign', async () => {
