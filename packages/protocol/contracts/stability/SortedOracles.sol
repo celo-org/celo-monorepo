@@ -82,7 +82,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
    */
   function setMaxMedianChangeRatePerSecond(uint256 rate) public onlyOwner returns (bool) {
     maxMedianChangeRatePerSecond = FixidityLib.wrap(rate);
-    require(rate < 5000000000000000000, "Rate must be smaller than 0.000005");
+    require(rate < 500000000000000000000, "Rate must be smaller than 0.0005");
     emit MaxMedianChangeRatePerSecondSet(rate);
     return true;
   }
@@ -226,7 +226,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingPrecompil
     if (
       limitedMedianRateTimestamp[token] != 0 &&
       maxMedianChangeRatePerSecond.unwrap() != 0 &&
-      td < 365 days
+      td < 1 days
     ) {
       FixidityLib.Fraction memory maxChangeRate = fractionMulExp(
         FixidityLib.fixed1(),
