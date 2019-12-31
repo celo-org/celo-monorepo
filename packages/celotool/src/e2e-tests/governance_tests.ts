@@ -667,38 +667,67 @@ describe('governance tests', () => {
           const activeVotes = new BigNumber(
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
           )
-          const targetRewards = await epochRewards.methods.calculateTargetEpochRewards().call({}, blockNumber - 1)
-          const totalVoterRewards = new BigNumber(targetRewards[1])
-          const totalCommunityReward =  new BigNumber(targetRewards[2])
           assert.isFalse(activeVotes.isZero())
-          const targetVotingYield = new BigNumber(
-            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
-          )
-          assert.isFalse(targetVotingYield.isZero())
+
+          const targetRewards = await epochRewards.methods
+            .calculateTargetEpochRewards()
+            .call({}, blockNumber - 1)
+          // Use direct rewards w/out multiplier???
+          const perValidatorReward = new BigNumber(targetRewards[0])
+          const validatorSetSize = await election.methods
+            .numberValidatorsInCurrentSet()
+            .call({}, blockNumber - 1)
+
           // We need to calculate the rewards multiplier for the previous block, before
           // the rewards actually are awarded.
           const rewardsMultiplier = new BigNumber(
             await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
           )
           assert.isFalse(rewardsMultiplier.isZero())
+
+          const exchangeRate = await getStableTokenExchangeRate(blockNumber)
+          // Not max b/c we find infra reward base w/out reward mult
+          const maxPotentialValidatorReward = perValidatorReward
+            .times(validatorSetSize)
+            .div(exchangeRate)
+
+          const totalVoterRewards = new BigNumber(targetRewards[1])
+          const totalCommunityReward = new BigNumber(targetRewards[2])
+          // TODO: prev or current block block here?
+          const targetVotingYield = new BigNumber(
+            (await epochRewards.methods
+              .getTargetVotingYieldParameters()
+              .call({}, blockNumber - 1))[0]
+          )
+          assert.isFalse(targetVotingYield.isZero())
+          // TODO: cut
+          const communityRewardPct = new BigNumber(
+            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber - 1)
+          )
+          assertAlmostEqualPct(new BigNumber(1 / 4), fromFixed(communityRewardPct))
+
           const expectedEpochReward = activeVotes
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
           // TODO(joshua): Switch this over to communityRewardFraction
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
-          const exchangeRate = await getStableTokenExchangeRate(blockNumber)
           // infra = community_reward_fraction * supply_increase
           // (x / (1 - x)) * increase. (increase include rewards multiplier?)
+          // factor out rewards multiplier
           const expectedInfraReward = expectedEpochReward
-            .plus(stableTokenSupplyChange.div(exchangeRate))
+            .plus(maxPotentialValidatorReward)
             .times(new BigNumber(1 / 3))
           const expectedGoldTotalSupplyChange = expectedInfraReward
             .plus(expectedEpochReward)
             .plus(stableTokenSupplyChange.div(exchangeRate))
-          console.info(`totalVoterRewards: ${totalVoterRewards}. community reward: ${totalCommunityReward}`)
+          console.info(
+            `maxPoteValidatorReward: ${maxPotentialValidatorReward}, totalVoterRewards: ${totalVoterRewards}. community reward: ${totalCommunityReward}`
+          )
           assertAlmostEqualPct(expectedEpochReward, totalVoterRewards)
+          console.info('Voter rewards good, now checking infra reward')
           assertAlmostEqualPct(expectedInfraReward, totalCommunityReward)
           console.info("Asserting test calc'd amounts equal to contract amounts is done")
+
           await assertVotesChanged(blockNumber, expectedEpochReward)
           await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
           // This is the problem. About 20% off the expected value
