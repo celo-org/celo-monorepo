@@ -285,7 +285,6 @@ describe('governance tests', () => {
     const previousSupply = new BigNumber(
       await goldToken.methods.totalSupply().call({}, blockNumber - 1)
     )
-    console.info(`Asserting the gold token supply changed by ${expected}`)
     assertAlmostEqualPct(currentSupply.minus(previousSupply), expected)
   }
 
@@ -600,7 +599,6 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
-        console.info(`Asserting votes changed by expected: ${expected}`)
         assertAlmostEqualPct(currentVotes.minus(previousVotes), expected)
       }
 
@@ -613,32 +611,26 @@ describe('governance tests', () => {
       }
 
       const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        console.info(`Asserting locked gold balance changed by expected: ${expected}`)
         await assertBalanceChanged(lockedGold.options.address, blockNumber, expected, goldToken)
       }
 
       const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        console.info(`Asserting governance gold balance changed by expected: ${expected}`)
         await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken, 2)
       }
 
       const assertReserveBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        console.info(`Asserting reserve gold balance changed by expected: ${expected}`)
         await assertBalanceChanged(reserve.options.address, blockNumber, expected, goldToken)
       }
 
       const assertVotesUnchanged = async (blockNumber: number) => {
-        console.info(`Asserting votes are unchanged`)
         await assertVotesChanged(blockNumber, new BigNumber(0))
       }
 
       const assertLockedGoldBalanceUnchanged = async (blockNumber: number) => {
-        console.info(`Asserting locked gold balance is unchanged`)
         await assertLockedGoldBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const assertReserveBalanceUnchanged = async (blockNumber: number) => {
-        console.info(`Asserting reserve gold balance is unchanged`)
         await assertReserveBalanceChanged(blockNumber, new BigNumber(0))
       }
 
@@ -720,13 +712,8 @@ describe('governance tests', () => {
           const expectedGoldTotalSupplyChange = expectedInfraReward
             .plus(expectedEpochReward)
             .plus(stableTokenSupplyChange.div(exchangeRate))
-          console.info(
-            `maxPoteValidatorReward: ${maxPotentialValidatorReward}, totalVoterRewards: ${totalVoterRewards}. community reward: ${totalCommunityReward}`
-          )
           assertAlmostEqualPct(expectedEpochReward, totalVoterRewards)
-          console.info('Voter rewards good, now checking infra reward')
           assertAlmostEqualPct(expectedInfraReward, totalCommunityReward)
-          console.info("Asserting test calc'd amounts equal to contract amounts is done")
 
           await assertVotesChanged(blockNumber, expectedEpochReward)
           await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
