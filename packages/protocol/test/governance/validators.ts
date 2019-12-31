@@ -2183,6 +2183,7 @@ contract('Validators', (accounts: string[]) => {
       beforeEach(async () => {
         await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
         await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
+        await registry.setAddressFor(CeloContractName.GovernanceSlasher, accounts[5])
         await registry.setAddressFor(CeloContractName.Governance, accounts[4])
       })
 
