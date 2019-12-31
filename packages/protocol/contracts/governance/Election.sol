@@ -346,7 +346,7 @@ contract Election is
    *         Fundamentally calls `revokePending` and `revokeActive` but only resorts groups once.
    * @param account The account whose votes to `group` should be decremented.
    * @param group The validator group to decrement votes from.
-   * @param value The number of votes to decrement and revoke.
+   * @param maxValue The maxinum number of votes to decrement and revoke.
    * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
    *               or 0 if that group has the fewest votes of any validator group.
    * @param greater The group receiving more votes than the group for which the vote was revoked,
@@ -362,8 +362,7 @@ contract Election is
     address greater,
     uint256 index
   ) internal returns (uint256) {
-    require(group != address(0) && 0 < value);
-    uint256 remainingValue = value;
+    uint256 remainingValue = maxValue;
     uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
     if (pendingVotes > 0) {
       uint256 decrementValue = Math.min(remainingValue, pendingVotes);
@@ -376,7 +375,7 @@ contract Election is
       decrementActiveVotes(group, account, decrementValue);
       remainingValue = remainingValue.sub(decrementValue);
     }
-    uint256 decrementedValue = value.sub(remainingValue);
+    uint256 decrementedValue = maxValue.sub(remainingValue);
     if (decrementedValue > 0) {
       decrementTotalVotes(group, decrementedValue, lesser, greater);
       emit ValidatorGroupVoteRevoked(account, group, decrementedValue);
@@ -392,7 +391,7 @@ contract Election is
    * @param account The address of the account.
    * @return The total number of votes cast by an account.
    */
-  function getTotalVotesByAccount(address account) public view returns (uint256) {
+  function getTotalVotesByAccount(address account) external view returns (uint256) {
     uint256 total = 0;
     address[] memory groups = votes.groupsVotedFor[account];
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
@@ -917,12 +916,13 @@ contract Election is
    * @notice Reduces the total amount of `account`'s voting gold by `value` by
    *         iterating over all groups voted for by account.
    * @param account Address to revoke votes from.
-   * @param value Amount of votes to revoke.
+   * @param value Maximum amount of votes to revoke.
    * @param lessers The groups receiving fewer votes than the i'th `group`, or 0 if
    *                the i'th `group` has the fewest votes of any validator group.
    * @param greaters The groups receivier more votes than the i'th `group`, or 0 if
    *                the i'th `group` has the most votes of any validator group.
    * @param indices The indices of the i'th group in the account's voting list.
+   * @return Number of votes successfully decremented.
    */
   function forceDecrementVotes(
     address account,
@@ -931,12 +931,13 @@ contract Election is
     address[] calldata greaters,
     uint256[] calldata indices
   ) external nonReentrant onlyRegisteredContract(LOCKED_GOLD_REGISTRY_ID) returns (uint256) {
-    require(value > 0 && value <= getTotalVotesByAccount(account));
+    require(value > 0, "Decrement value must be greater than 0.");
     DecrementVotesInfo memory info = DecrementVotesInfo(votes.groupsVotedFor[account], value);
     require(
-      info.groups.length == lessers.length &&
+      lessers.length <= info.groups.length &&
         lessers.length == greaters.length &&
-        greaters.length == indices.length
+        greaters.length == indices.length,
+      "Input lengths must be correspond."
     );
     // Iterate in reverse order to hopefully optimize removing pending votes before active votes
     // And to attempt to preserve `account`'s earliest votes (assuming earliest = prefered)
@@ -955,6 +956,7 @@ contract Election is
         break;
       }
     }
+    require(info.remainingValue == 0, "Failure to decrement all votes.");
     return value.sub(info.remainingValue);
   }
 }
