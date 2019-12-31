@@ -689,11 +689,14 @@ describe('governance tests', () => {
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
 
-          // TODO(joshua): Switch this over to communityRewardFraction
           // infra: (x / (1 - x)) * predicted supply increase * rewards mult
+          const communityRewardFrac = new BigNumber(
+            await election.methods.getCommunityRewardFraction.call({}, blockNumber)
+          )
           const expectedInfraReward = expectedEpochReward
             .plus(maxPotentialValidatorReward)
-            .times(new BigNumber(1 / 3))
+            .times(fromFixed(communityRewardFrac))
+            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
 
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const expectedGoldTotalSupplyChange = expectedInfraReward
