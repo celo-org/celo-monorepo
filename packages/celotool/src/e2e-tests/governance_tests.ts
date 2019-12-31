@@ -8,7 +8,6 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import {
   assertAlmostEqual,
-  assertAlmostEqualPct,
   getContext,
   GethInstanceConfig,
   importGenesis,
@@ -206,8 +205,7 @@ describe('governance tests', () => {
     address: string,
     blockNumber: number,
     expected: BigNumber,
-    token: any,
-    pct: number = 0.1
+    token: any
   ) => {
     const currentBalance = new BigNumber(
       await token.methods.balanceOf(address).call({}, blockNumber)
@@ -217,7 +215,7 @@ describe('governance tests', () => {
     )
     assert.isFalse(currentBalance.isNaN())
     assert.isFalse(previousBalance.isNaN())
-    assertAlmostEqualPct(currentBalance.minus(previousBalance), expected, pct)
+    assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
   const waitForBlock = async (blockNumber: number) => {
@@ -285,7 +283,7 @@ describe('governance tests', () => {
     const previousSupply = new BigNumber(
       await goldToken.methods.totalSupply().call({}, blockNumber - 1)
     )
-    assertAlmostEqualPct(currentSupply.minus(previousSupply), expected)
+    assertAlmostEqual(currentSupply.minus(previousSupply), expected)
   }
 
   describe('when the validator set is changing', () => {
@@ -599,7 +597,7 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
-        assertAlmostEqualPct(currentVotes.minus(previousVotes), expected)
+        assertAlmostEqual(currentVotes.minus(previousVotes), expected)
       }
 
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
@@ -615,7 +613,7 @@ describe('governance tests', () => {
       }
 
       const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
-        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken, 2)
+        await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken)
       }
 
       const assertReserveBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -696,7 +694,7 @@ describe('governance tests', () => {
           const communityRewardPct = new BigNumber(
             await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber - 1)
           )
-          assertAlmostEqualPct(new BigNumber(1 / 4), fromFixed(communityRewardPct))
+          assertAlmostEqual(new BigNumber(1 / 4), fromFixed(communityRewardPct))
 
           const expectedEpochReward = activeVotes
             .times(fromFixed(targetVotingYield))
@@ -712,8 +710,8 @@ describe('governance tests', () => {
           const expectedGoldTotalSupplyChange = expectedInfraReward
             .plus(expectedEpochReward)
             .plus(stableTokenSupplyChange.div(exchangeRate))
-          assertAlmostEqualPct(expectedEpochReward, totalVoterRewards)
-          assertAlmostEqualPct(expectedInfraReward, totalCommunityReward)
+          assertAlmostEqual(expectedEpochReward, totalVoterRewards)
+          assertAlmostEqual(expectedInfraReward, totalCommunityReward)
 
           await assertVotesChanged(blockNumber, expectedEpochReward)
           await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
