@@ -7,7 +7,6 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
-import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
@@ -910,24 +909,16 @@ contract Governance is
   function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
-
-    IAccounts accounts = getAccounts();
     for (uint256 idx = 0; idx < n; idx++) {
       address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
-      bool whitelisted = isHotfixWhitelistedBy(hash, validatorSigner);
-
-      if (!whitelisted) {
-        // short circuit evaluate validator account key
-        address validatorAccount = accounts.validatorSignerToAccount(validatorSigner);
-        whitelisted = isHotfixWhitelistedBy(hash, validatorAccount);
-      }
-
-      if (whitelisted) {
-        // if validator signer OR account whitelisted hash
+      address validatorAccount = getAccounts().validatorSignerToAccount(validatorSigner);
+      if (
+        isHotfixWhitelistedBy(hash, validatorSigner) ||
+        isHotfixWhitelistedBy(hash, validatorAccount)
+      ) {
         tally = tally.add(1);
       }
     }
-
     return tally;
   }
 
