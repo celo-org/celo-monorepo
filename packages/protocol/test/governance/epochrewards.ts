@@ -596,6 +596,7 @@ contract('EpochRewards', (accounts: string[]) => {
       const timeDelta = YEAR.times(10)
       const numberValidators = 100
       let expectedMultiplier: BigNumber
+      let expectedTargetGoldSupplyIncrease: BigNumber
       beforeEach(async () => {
         await epochRewards.setNumberValidatorsInCurrentSet(numberValidators)
         await mockElection.setActiveVotes(activeVotes)
@@ -606,7 +607,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const expectedTargetEpochRewards = fromFixed(targetVotingYieldParams.initial).times(
           activeVotes
         )
-        const expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards
+        expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards
           .plus(expectedTargetTotalEpochPaymentsInGold)
           .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
           .integerValue(BigNumber.ROUND_FLOOR)
@@ -633,6 +634,24 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(activeVotes)
           .times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochRewards())[1], expected)
+      })
+      it('should return the correct amount for the community reward', async () => {
+        const validatorReward = targetValidatorEpochPayment
+          .times(numberValidators)
+          .div(exchangeRate)
+        const votingReward = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
+        const expected = validatorReward
+          .plus(votingReward)
+          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .times(fromFixed(communityRewardFraction))
+          .times(expectedMultiplier)
+          // Kinda hacky, but it works. Probably something with order of ops/
+          // rounding with fixed point math
+          .integerValue(BigNumber.ROUND_FLOOR)
+        assertEqualBN(
+          (await epochRewards.calculateTargetEpochRewards())[2],
+          expected.integerValue(BigNumber.ROUND_CEIL)
+        )
       })
     })
   })

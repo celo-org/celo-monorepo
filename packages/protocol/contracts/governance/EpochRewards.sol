@@ -432,7 +432,12 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     return (
       FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
       FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed(),
-      FixidityLib.newFixed(targetGoldSupplyIncrease).multiply(communityRewardFraction).fromFixed()
+      // TODO: Should this be multiplied by the rewards multiplier?
+      FixidityLib
+        .newFixed(targetGoldSupplyIncrease)
+        .multiply(communityRewardFraction)
+        .multiply(rewardsMultiplier)
+        .fromFixed()
     );
   }
 }
