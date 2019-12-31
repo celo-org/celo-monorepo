@@ -3,6 +3,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  matchAny,
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -207,23 +208,37 @@ contract('StableToken', (accounts: string[]) => {
     it('should update parameters', async () => {
       const newUpdatePeriod = SECONDS_IN_A_WEEK + 5
       await stableToken.setInflationParameters(inflationRate, newUpdatePeriod)
+      const setParameterTime = (await web3.eth.getBlock('latest')).timestamp
       const [rate, , updatePeriod, lastUpdated] = await stableToken.getInflationParameters()
       assert.isTrue(rate.eq(inflationRate))
       assert.equal(updatePeriod.toNumber(), newUpdatePeriod)
-      assert.equal(lastUpdated.toNumber(), initializationTime)
+      assert.equal(lastUpdated.toNumber(), setParameterTime)
     })
 
     it('should emit an InflationParametersUpdated event', async () => {
       const newUpdatePeriod = SECONDS_IN_A_WEEK + 5
       const res = await stableToken.setInflationParameters(inflationRate, newUpdatePeriod)
       const latestBlock = await web3.eth.getBlock('latest')
-      // TODO(yorke): res.logs[0] == InflationFactorUpdated
 
       assertLogMatches2(res.logs[1], {
         event: 'InflationParametersUpdated',
         args: {
           rate: inflationRate,
           updatePeriod: newUpdatePeriod,
+          lastUpdated: latestBlock.timestamp,
+        },
+      })
+    })
+
+    it('should emit an InflationFactorUpdated event', async () => {
+      const newUpdatePeriod = SECONDS_IN_A_WEEK + 5
+      const res = await stableToken.setInflationParameters(inflationRate, newUpdatePeriod)
+      const latestBlock = await web3.eth.getBlock('latest')
+
+      assertLogMatches2(res.logs[0], {
+        event: 'InflationFactorUpdated',
+        args: {
+          factor: matchAny,
           lastUpdated: latestBlock.timestamp,
         },
       })
