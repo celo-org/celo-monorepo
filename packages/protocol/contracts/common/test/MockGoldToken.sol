@@ -13,8 +13,7 @@ contract MockGoldToken {
     totalSupply = value;
   }
 
-  function transfer(address a, uint256 v) external returns (bool) {
-    balances[a] = v;
+  function transfer(address, uint256) external pure returns (bool) {
     return true;
   }
 

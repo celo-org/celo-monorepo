@@ -91,45 +91,6 @@ contract DoubleSigningSlasher is SlasherUtil {
     return blockNumber;
   }
 
-  function debug(address signer, uint256 index, bytes memory headerA, bytes memory headerB)
-    public
-    view
-    returns (uint256)
-  {
-    if (hashHeader(headerA) == hashHeader(headerB)) return 1;
-    require(hashHeader(headerA) != hashHeader(headerB), "Block hashes have to be different");
-    uint256 blockNumber = getBlockNumberFromHeader(headerA);
-    if (blockNumber != getBlockNumberFromHeader(headerB)) return 2;
-    require(
-      blockNumber == getBlockNumberFromHeader(headerB),
-      "Block headers are from different height"
-    );
-    if (!(index < numberValidatorsInSet(blockNumber))) return 3;
-    require(index < numberValidatorsInSet(blockNumber), "Bad validator index");
-    if (!(signer == validatorSignerAddressFromSet(index, blockNumber))) return 4;
-    require(
-      signer == validatorSignerAddressFromSet(index, blockNumber),
-      "Wasn't a signer with given index"
-    );
-    uint256 mapA = uint256(getVerifiedSealBitmapFromHeader(headerA));
-    uint256 mapB = uint256(getVerifiedSealBitmapFromHeader(headerB));
-    if (!(mapA & (1 << index) != 0)) return 5;
-    require(mapA & (1 << index) != 0, "Didn't sign first block");
-    if (!(mapB & (1 << index) != 0)) return 6;
-    require(mapB & (1 << index) != 0, "Didn't sign second block");
-    if (!(countSetBits(mapA) >= minQuorumSize(blockNumber))) return 7;
-    require(
-      countSetBits(mapA) >= minQuorumSize(blockNumber),
-      "Not enough signers in the first block"
-    );
-    if (!(countSetBits(mapB) >= minQuorumSize(blockNumber))) return 8;
-    require(
-      countSetBits(mapB) >= minQuorumSize(blockNumber),
-      "Not enough signers in the second block"
-    );
-    return blockNumber;
-  }
-
   function checkIfAlreadySlashed(address signer, bytes memory header) internal {
     bytes32 bhash = hashHeader(header);
     require(!isSlashed[signer][bhash], "Already slashed");

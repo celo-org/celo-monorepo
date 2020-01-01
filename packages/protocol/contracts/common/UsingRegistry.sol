@@ -134,7 +134,4 @@ contract UsingRegistry is Ownable {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 
-  function getSlasher() public view returns (address) {
-    return registry.getAddressForOrDie(DOUBLE_SIGNING_SLASHER_REGISTRY_ID);
-  }
 }
