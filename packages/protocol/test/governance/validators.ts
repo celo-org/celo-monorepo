@@ -568,7 +568,6 @@ contract('Validators', (accounts: string[]) => {
             blsPoP
           )
           const blockNumber = await web3.eth.getBlockNumber()
-          console.log('block', blockNumber)
           validatorRegistrationEpochNumber = blockEpoch(blockNumber)
         })
 
