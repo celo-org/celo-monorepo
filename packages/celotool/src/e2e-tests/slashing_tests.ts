@@ -223,7 +223,7 @@ describe('slashing tests', function(this: any) {
 
       const lockedGold = await kit.contracts.getLockedGold()
       const validatorsContract = await kit._web3Contracts.getValidators()
-      const history = await validatorsContract.methods.getHistory(signer).call()
+      const history = await validatorsContract.methods.getMembershipHistory(signer).call()
       const historyIndex = history[0].length - 1
 
       await slasher.methods
