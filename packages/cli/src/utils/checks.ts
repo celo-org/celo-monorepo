@@ -106,14 +106,19 @@ class CheckBuilder {
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
     this.addCheck(
       `${proposalID} is in stage ${stage}`,
-      this.withGovernance(async (g) => {
-        const actual = await g.getProposalStage(proposalID)
-        if (actual === 'Queued' && stage === 'Approval') {
-          return true
-        } else {
-          return actual === stage
-        }
-      })
+      this.withGovernance(async (g) => (await g.getProposalStage(proposalID)) === stage)
+    )
+
+  proposalIsPassing = (proposalID: string) =>
+    this.addCheck(
+      `Proposal ${proposalID} is passing corresponding constitutional quorum`,
+      this.withGovernance((g) => g.isProposalPassing(proposalID))
+    )
+
+  hotfixIsPassing = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix ${hash} is whitelisted by quorum of validators`,
+      this.withGovernance((g) => g.isHotfixPassing(hash))
     )
 
   canSign = (account: Address) =>
@@ -201,6 +206,14 @@ class CheckBuilder {
       })
     )
 
+  isVoteSignerOrAccount = () =>
+    this.addCheck(
+      `${this.signer!} is vote signer or registered account`,
+      this.withAccounts(async (accs) => {
+        return accs.voteSignerToAccount(this.signer!).then(() => true, () => false)
+      })
+    )
+
   isAccount = (address: Address) =>
     this.addCheck(
       `${address} is a registered Account`,
@@ -217,6 +230,12 @@ class CheckBuilder {
         .then((balance) => balance.gte(value))
     )
   }
+
+  exceedsProposalMinDeposit = (deposit: BigNumber) =>
+    this.addCheck(
+      `Deposit is greater than or equal to governance proposal minDeposit`,
+      this.withGovernance(async (g) => deposit.gte(await g.minDeposit()))
+    )
 
   hasEnoughLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
