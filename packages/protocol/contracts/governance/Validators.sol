@@ -1152,12 +1152,14 @@ contract Validators is
     return true;
   }
 
-  bytes32[] canForceDeaffiliation = [
-    DOWNTIME_SLASHER_REGISTRY_ID,
-    DOUBLE_SIGNING_SLASHER_REGISTRY_ID,
-    GOVERNANCE_SLASHER_REGISTRY_ID,
-    GOVERNANCE_REGISTRY_ID
-  ];
+  function getCanForceDeaffiliation() internal pure returns (bytes32[] memory) {
+    bytes32[] memory res = new bytes32[](4);
+    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
+    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
+    res[2] = GOVERNANCE_SLASHER_REGISTRY_ID;
+    res[3] = GOVERNANCE_REGISTRY_ID;
+    return res;
+  }
 
   /**
    * @notice Removes a validator from the group for which it is a member.
@@ -1166,7 +1168,7 @@ contract Validators is
   function forceDeaffiliateIfValidator(address validatorAccount)
     external
     nonReentrant
-    onlyRegisteredContracts(canForceDeaffiliation)
+    onlyRegisteredContracts(getCanForceDeaffiliation())
   {
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
@@ -1199,10 +1201,12 @@ contract Validators is
     group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
-  bytes32[] canHalveSlashingMultiplier = [
-    DOWNTIME_SLASHER_REGISTRY_ID,
-    DOUBLE_SIGNING_SLASHER_REGISTRY_ID
-  ];
+  function getCanHalveSlashingMultiplier() internal pure returns (bytes32[] memory) {
+    bytes32[] memory res = new bytes32[](2);
+    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
+    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
+    return res;
+  }
 
   /**
    * @notice Halves the group's slashing multiplier.
@@ -1211,7 +1215,7 @@ contract Validators is
   function halveSlashingMultiplier(address account)
     external
     nonReentrant
-    onlyRegisteredContracts(canHalveSlashingMultiplier)
+    onlyRegisteredContracts(getCanHalveSlashingMultiplier())
   {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -1256,4 +1260,17 @@ contract Validators is
     );
     return history.entries[index].group;
   }
+
+  function getHistory(address account) external view returns (address[] memory, uint256[] memory) {
+    MembershipHistory storage history = validators[account].membershipHistory;
+    uint256 num = history.numEntries + history.tail;
+    address[] memory historyGroups = new address[](num);
+    uint256[] memory epochs = new uint256[](num);
+    for (uint256 i = 0; i < num; i++) {
+      historyGroups[i] = history.entries[i].group;
+      epochs[i] = history.entries[i].epochNumber;
+    }
+    return (historyGroups, epochs);
+  }
+
 }
