@@ -333,7 +333,7 @@ contract Validators is
   function getMembershipHistory(address account)
     external
     view
-    returns (uint256[] memory, address[] memory, uint256)
+    returns (uint256[] memory, address[] memory, uint256, uint256)
   {
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256[] memory epochs = new uint256[](history.numEntries);
@@ -343,7 +343,7 @@ contract Validators is
       epochs[i] = history.entries[index].epochNumber;
       membershipGroups[i] = history.entries[index].group;
     }
-    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp);
+    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp, history.tail);
   }
 
   /**
@@ -1259,18 +1259,6 @@ contract Validators is
       "provided index does not match provided epochNumber at index in history."
     );
     return history.entries[index].group;
-  }
-
-  function getHistory(address account) external view returns (address[] memory, uint256[] memory) {
-    MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 num = history.numEntries + history.tail;
-    address[] memory historyGroups = new address[](num);
-    uint256[] memory epochs = new uint256[](num);
-    for (uint256 i = 0; i < num; i++) {
-      historyGroups[i] = history.entries[i].group;
-      epochs[i] = history.entries[i].epochNumber;
-    }
-    return (historyGroups, epochs);
   }
 
 }
