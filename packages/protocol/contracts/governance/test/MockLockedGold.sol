@@ -19,6 +19,7 @@ contract MockLockedGold is ILockedGold {
   mapping(address => uint256) public nonvotingAccountBalance;
   mapping(address => address) public authorizedValidators;
   mapping(address => address) public authorizedBy;
+  mapping(address => bool) public isSlasher;
   uint256 private totalLockedGold;
 
   function incrementNonvotingAccountBalance(address account, uint256 value) external {
@@ -53,5 +54,13 @@ contract MockLockedGold is ILockedGold {
     uint256[] calldata
   ) external {
     accountTotalLockedGold[account] = accountTotalLockedGold[account].sub(penalty);
+  }
+
+  function addSlasher(address slasher) external {
+    isSlasher[slasher] = true;
+  }
+
+  function removeSlasher(address slasher) external {
+    isSlasher[slasher] = false;
   }
 }

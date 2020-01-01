@@ -147,6 +147,11 @@ contract Validators is
     _;
   }
 
+  modifier onlySlasher() {
+    require(getLockedGold().isSlasher(msg.sender), "Caller must be registered slasher");
+    _;
+  }
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
@@ -1152,22 +1157,11 @@ contract Validators is
     return true;
   }
 
-  bytes32[] canForceDeaffiliation = [
-    DOWNTIME_SLASHER_REGISTRY_ID,
-    DOUBLE_SIGNING_SLASHER_REGISTRY_ID,
-    GOVERNANCE_SLASHER_REGISTRY_ID,
-    GOVERNANCE_REGISTRY_ID
-  ];
-
   /**
    * @notice Removes a validator from the group for which it is a member.
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
-  function forceDeaffiliateIfValidator(address validatorAccount)
-    external
-    nonReentrant
-    onlyRegisteredContracts(canForceDeaffiliation)
-  {
+  function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -1199,20 +1193,11 @@ contract Validators is
     group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
-  bytes32[] canHalveSlashingMultiplier = [
-    DOWNTIME_SLASHER_REGISTRY_ID,
-    DOUBLE_SIGNING_SLASHER_REGISTRY_ID
-  ];
-
   /**
    * @notice Halves the group's slashing multiplier.
    * @param account The group being slashed.
    */
-  function halveSlashingMultiplier(address account)
-    external
-    nonReentrant
-    onlyRegisteredContracts(canHalveSlashingMultiplier)
-  {
+  function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));

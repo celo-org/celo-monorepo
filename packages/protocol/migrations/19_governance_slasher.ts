@@ -16,6 +16,7 @@ module.exports = deploymentForCoreContract<GovernanceSlasherInstance>(
   CeloContractName.GovernanceSlasher,
   initializeArgs,
   async (slasher: GovernanceSlasherInstance) => {
+    console.log('Adding GovernanceSlasher contract as slasher.')
     const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
       'LockedGold',
       artifacts
