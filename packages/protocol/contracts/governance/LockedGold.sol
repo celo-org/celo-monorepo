@@ -302,6 +302,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   ) external onlySlasher {
     uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
     require(maxSlash >= reward, "reward cannot exceed penalty.");
+    // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
     {
       uint256 nonvotingBalance = balances[account].nonvoting;
       uint256 difference = 0;
