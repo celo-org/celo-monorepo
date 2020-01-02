@@ -11,7 +11,9 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
+import { zip } from '@celo/utils/src/collections'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import {
@@ -1983,56 +1985,47 @@ contract('Governance', (accounts: string[]) => {
   describe('#hotfixWhitelistValidatorTally', () => {
     const hotfixHash = '0x' + keccak256('celo bug fix').toString('hex')
 
-    const validatorAccount1 = accounts[2]
-    const validatorAccount2 = accounts[3]
-
-    const validatorSigner1 = accounts[4]
-    const validatorSigner2 = accounts[5]
+    const validators = zip(
+      (_account, signer) => ({ account: _account, signer }),
+      accounts.slice(2, 6),
+      accounts.slice(6, 10)
+    )
 
     beforeEach(async () => {
-      await accountsInstance.createAccount({ from: validatorAccount1 })
-      await accountsInstance.createAccount({ from: validatorAccount2 })
-
-      const sig1 = await getParsedSignatureOfAddress(web3, validatorAccount1, validatorSigner1)
-      const sig2 = await getParsedSignatureOfAddress(web3, validatorAccount2, validatorSigner2)
-
-      await accountsInstance.authorizeValidatorSigner(validatorSigner1, sig1.v, sig1.r, sig1.s, {
-        from: validatorAccount1,
+      await concurrentMap(5, validators, async (validator) => {
+        await accountsInstance.createAccount({ from: validator.account })
+        const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
+        await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
+          from: validator.account,
+        })
+        await mockValidators.setValidator(validator.account)
+        // add signers for mock precompile
+        await governance.addValidator(validator.signer)
       })
-      await accountsInstance.authorizeValidatorSigner(validatorSigner2, sig2.v, sig2.r, sig2.s, {
-        from: validatorAccount2,
-      })
-
-      await mockValidators.setValidator(validatorAccount1)
-      await mockValidators.setValidator(validatorAccount2)
-
-      // add signers for mock precompile
-      await governance.addValidator(validatorSigner1)
-      await governance.addValidator(validatorSigner2)
     })
 
-    it('should count validators that have whitelisted', async () => {
-      await governance.whitelistHotfix(hotfixHash, { from: validatorAccount1 })
-      await governance.whitelistHotfix(hotfixHash, { from: validatorAccount2 })
+    const whitelistFrom = (t: keyof typeof validators[0]) =>
+      concurrentMap(5, validators, (v) => governance.whitelistHotfix(hotfixHash, { from: v[t] }))
 
+    const checkTally = async () => {
       const tally = await governance.hotfixWhitelistValidatorTally(hotfixHash)
-      assert.equal(tally.toNumber(), 2)
+      assert.equal(tally.toNumber(), validators.length)
+    }
+
+    it('should count validator accounts that have whitelisted', async () => {
+      await whitelistFrom('account')
+      await checkTally()
     })
 
-    it('should count authorized validator signer accounts that have whitelisted', async () => {
-      await governance.whitelistHotfix(hotfixHash, { from: validatorSigner1 })
-      await governance.whitelistHotfix(hotfixHash, { from: validatorSigner2 })
-
-      const tally = await governance.hotfixWhitelistValidatorTally(hotfixHash)
-      assert.equal(tally.toNumber(), 2)
+    it('should count authorized validator signers that have whitelisted', async () => {
+      await whitelistFrom('signer')
+      await checkTally()
     })
 
-    it('should not double count validator and authorized signer account', async () => {
-      await governance.whitelistHotfix(hotfixHash, { from: validatorAccount1 })
-      await governance.whitelistHotfix(hotfixHash, { from: validatorSigner1 })
-
-      const tally = await governance.hotfixWhitelistValidatorTally(hotfixHash)
-      assert.equal(tally.toNumber(), 1)
+    it('should not double count validator account and authorized signer accounts', async () => {
+      await whitelistFrom('signer')
+      await whitelistFrom('account')
+      await checkTally()
     })
   })
 
