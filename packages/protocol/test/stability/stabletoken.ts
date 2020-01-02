@@ -1,5 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  assertFloatEquality,
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
@@ -7,7 +8,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { fixed1, fromFixed, mulprecision, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import { RegistryInstance, StableTokenInstance } from 'types'
@@ -242,6 +243,22 @@ contract('StableToken', (accounts: string[]) => {
           lastUpdated: latestBlock.timestamp,
         },
       })
+    })
+
+    it('updates factor and lastUpdated with incomplete periods', async () => {
+      const initialRate = toFixed(14 / 13)
+      await stableToken.setInflationParameters(initialRate, SECONDS_IN_A_WEEK)
+      await timeTravel(SECONDS_IN_A_WEEK * 3.25, web3)
+      await stableToken.setInflationParameters(toFixed(1), SECONDS_IN_A_WEEK)
+      const setParameterTime = (await web3.eth.getBlock('latest')).timestamp
+      const [, factor, , lastUpdated] = await stableToken.getInflationParameters()
+      assert.equal(lastUpdated, setParameterTime)
+      const pctNextPeriod = toFixed(0.25)
+      const incompleteRate = fixed1.minus(pctNextPeriod).plus(multiply(initialRate, pctNextPeriod))
+      const completeFactor = toFixed(fromFixed(initialRate).pow(3))
+      const expFactor = multiply(completeFactor, incompleteRate)
+      // TODO: investigate smaller epsilon
+      assertFloatEquality(factor, expFactor, 'unexpected factor', mulprecision)
     })
 
     it('updates inflationFactor when out of date', async () => {

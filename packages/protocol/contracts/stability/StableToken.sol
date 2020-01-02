@@ -418,13 +418,16 @@ contract StableToken is
       return (inflationState.factor, inflationState.factorLastUpdated);
     }
 
-    uint256 numerator;
-    uint256 denominator;
-
     uint256 timesToApplyInflation = now.sub(inflationState.factorLastUpdated).div(
       inflationState.updatePeriod
     );
 
+    if (timesToApplyInflation == 0) {
+      return (inflationState.factor, inflationState.factorLastUpdated);
+    }
+
+    uint256 numerator;
+    uint256 denominator;
     (numerator, denominator) = fractionMulExp(
       inflationState.factor.unwrap(),
       FixidityLib.fixed1().unwrap(),
