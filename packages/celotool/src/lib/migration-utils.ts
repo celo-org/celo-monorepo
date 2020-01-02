@@ -25,14 +25,6 @@ export function validatorKeys() {
   ).map(ensure0x)
 }
 
-function votingBotKeys() {
-  return getPrivateKeysFor(
-    AccountType.VOTING_BOT,
-    fetchEnv(envVar.MNEMONIC),
-    parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
-  ).map(ensure0x)
-}
-
 function getAttestationKeys() {
   return getPrivateKeysFor(
     AccountType.ATTESTATION,
@@ -60,9 +52,6 @@ export function migrationOverrides() {
         values: initialAddresses.map(() => initialBalance),
       },
       oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
-    },
-    election: {
-      votingBotKeys: votingBotKeys(),
     },
   }
 }
