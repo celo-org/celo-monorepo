@@ -251,7 +251,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
-    describe.only('when there are balance requirements', () => {
+    describe('when there are balance requirements', () => {
       const balanceRequirement = 10
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
