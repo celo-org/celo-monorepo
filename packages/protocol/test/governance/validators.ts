@@ -74,6 +74,10 @@ const DAY = 24 * HOUR
 // Hard coded in ganache.
 const EPOCH = 100
 
+function blockEpoch(blockNumber) {
+  return Math.floor((blockNumber - 1) / EPOCH)
+}
+
 contract('Validators', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: ValidatorsTestInstance
@@ -565,7 +569,7 @@ contract('Validators', (accounts: string[]) => {
             blsPoP
           )
           const blockNumber = await web3.eth.getBlockNumber()
-          validatorRegistrationEpochNumber = Math.floor(blockNumber / EPOCH)
+          validatorRegistrationEpochNumber = blockEpoch(blockNumber)
         })
 
         it('should mark the account as a validator', async () => {
@@ -819,7 +823,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the account has a registered validator', () => {
       beforeEach(async () => {
         await registerValidator(validator)
-        registrationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+        registrationEpoch = blockEpoch(await web3.eth.getBlockNumber())
       })
       describe('when affiliating with a registered validator group', () => {
         beforeEach(async () => {
@@ -900,9 +904,9 @@ contract('Validators', (accounts: string[]) => {
                   await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
                     from: group,
                   })
-                  additionEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+                  additionEpoch = blockEpoch(await web3.eth.getBlockNumber())
                   resp = await validators.affiliate(otherGroup)
-                  affiliationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+                  affiliationEpoch = blockEpoch(await web3.eth.getBlockNumber())
                 })
 
                 it('should remove the validator from the group membership list', async () => {
@@ -1000,7 +1004,7 @@ contract('Validators', (accounts: string[]) => {
     let registrationEpoch: number
     beforeEach(async () => {
       await registerValidator(validator)
-      registrationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+      registrationEpoch = blockEpoch(await web3.eth.getBlockNumber())
       await registerValidatorGroup(group)
       await validators.affiliate(group)
     })
@@ -1030,9 +1034,9 @@ contract('Validators', (accounts: string[]) => {
       let resp: any
       beforeEach(async () => {
         await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
-        additionEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+        additionEpoch = blockEpoch(await web3.eth.getBlockNumber())
         resp = await validators.deaffiliate()
-        deaffiliationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+        deaffiliationEpoch = blockEpoch(await web3.eth.getBlockNumber())
       })
 
       it('should remove the validator from the group membership list', async () => {
@@ -1412,7 +1416,7 @@ contract('Validators', (accounts: string[]) => {
         let registrationEpoch: number
         beforeEach(async () => {
           await registerValidator(validator)
-          registrationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+          registrationEpoch = blockEpoch(await web3.eth.getBlockNumber())
           await validators.affiliate(group, { from: validator })
         })
 
@@ -1421,7 +1425,7 @@ contract('Validators', (accounts: string[]) => {
             let additionEpoch: number
             beforeEach(async () => {
               resp = await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
-              additionEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+              additionEpoch = blockEpoch(await web3.eth.getBlockNumber())
             })
 
             it('should add the member to the list of members', async () => {
@@ -1602,7 +1606,7 @@ contract('Validators', (accounts: string[]) => {
         await validators.getMembershipHistory(validator)
       )
       const latestBlock = await web3.eth.getBlock('latest')
-      const expectedEpoch = new BigNumber(Math.floor(latestBlock.number / EPOCH))
+      const expectedEpoch = new BigNumber(blockEpoch(latestBlock.number))
 
       // Depending on test timing, we may or may not span an epoch boundary between registration
       // and removal.
@@ -1892,7 +1896,7 @@ contract('Validators', (accounts: string[]) => {
     beforeEach(async () => {
       await registerValidator(validator)
       const blockNumber = await web3.eth.getBlockNumber()
-      validatorRegistrationEpochNumber = Math.floor(blockNumber / EPOCH)
+      validatorRegistrationEpochNumber = blockEpoch(blockNumber)
       for (const group of groups) {
         await registerValidatorGroup(group)
       }
@@ -1906,7 +1910,7 @@ contract('Validators', (accounts: string[]) => {
         const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
         for (let i = 0; i < numTests; i++) {
           const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const epochNumber = blockEpoch(blockNumber)
           const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
@@ -1945,7 +1949,7 @@ contract('Validators', (accounts: string[]) => {
         const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
           const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const epochNumber = blockEpoch(blockNumber)
           const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
@@ -1981,7 +1985,7 @@ contract('Validators', (accounts: string[]) => {
       it('should always return the correct membership for the last epoch', async () => {
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
           const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const epochNumber = blockEpoch(blockNumber)
           const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
@@ -2083,7 +2087,7 @@ contract('Validators', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
       // Fast-forward to the next epoch, so that the getMembershipInLastEpoch(validator) == group
       const blockNumber = await web3.eth.getBlockNumber()
-      const epochNumber = Math.floor(blockNumber / EPOCH)
+      const epochNumber = blockEpoch(blockNumber)
       await mineBlocks((epochNumber + 1) * EPOCH - blockNumber, web3)
     })
 
@@ -2238,7 +2242,7 @@ contract('Validators', (accounts: string[]) => {
         // Start at 1 since we can't start with deaffiliate
         for (let i = 1; i < totalEpochs; i++) {
           const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const epochNumber = blockEpoch(blockNumber)
           const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
@@ -2300,7 +2304,7 @@ contract('Validators', (accounts: string[]) => {
 
         it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
           const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const epochNumber = blockEpoch(blockNumber)
           await assertRevert(
             validators.groupMembershipInEpoch(validator, epochNumber + 1, contractIndex)
           )
@@ -2308,7 +2312,7 @@ contract('Validators', (accounts: string[]) => {
 
         it('should revert when provided index is greater than greatest index on chain', async () => {
           const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
+          const epochNumber = blockEpoch(blockNumber)
           await assertRevert(
             validators.groupMembershipInEpoch(validator, epochNumber, contractIndex + 1)
           )
