@@ -20,6 +20,7 @@ module.exports = deploymentForCoreContract<DoubleSigningSlasherInstance>(
   CeloContractName.DoubleSigningSlasher,
   initializeArgs,
   async (slasher: DoubleSigningSlasherInstance) => {
+    console.info('Adding DoubleSigningSlasher contract as slasher.')
     const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
       'LockedGold',
       artifacts
