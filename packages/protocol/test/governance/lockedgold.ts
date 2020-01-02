@@ -576,6 +576,39 @@ contract('LockedGold', (accounts: string[]) => {
           assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
         })
       })
+
+      describe('when the account is slashed for more than its whole balance', () => {
+        const penalty = value * 2
+        const reward = value / 2
+
+        beforeEach(async () => {
+          await lockedGold.slash(
+            account,
+            penalty,
+            reporter,
+            reward,
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0],
+            { from: accounts[2] }
+          )
+        })
+
+        it('should slash the whole accounts balance', async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), 0)
+          assertEqualBN(await election.getTotalVotesByAccount(account), 0)
+        })
+
+        it('should still send the `reporter` `reward` gold', async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
+        })
+
+        it("should only send the community fund value based on `account`'s total balance", async () => {
+          assert.equal(await web3.eth.getBalance(mockGovernance.address), value - reward)
+        })
+      })
     })
   })
 })
