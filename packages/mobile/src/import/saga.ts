@@ -37,7 +37,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       return
     }
 
-    const privateKey = mnemonicToSeedHex(phrase)
+    const privateKey = yield mnemonicToSeedHex(phrase)
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
