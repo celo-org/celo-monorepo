@@ -32,6 +32,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.environment }}-voting-bot-secrets
                   key: mnemonic
-          volumes:
-          - name: data
-            emptyDir: {}
+            - name: VOTING_BOT_CHANGE_PROBABILITY
+              value: {{ .Values.voteChangeProbability | quote }}
+            - name: VOTING_BOTS
+              value: {{ .Values.votingBotCount | quote }}
+          restartPolicy: Never
