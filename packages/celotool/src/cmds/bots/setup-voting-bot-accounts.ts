@@ -30,41 +30,47 @@ export const handler = async function setupVotingBotAccounts(argv: SetupVotingBo
     const kit: ContractKit = newKit(argv.celoProvider)
     const goldToken = await kit.contracts.getGoldToken()
     const lockedGold = await kit.contracts.getLockedGold()
+    const accounts = await kit.contracts.getAccounts()
+
+    const botsWithoutGold: string[] = []
 
     const botKeys = getPrivateKeysFor(AccountType.VOTING_BOT, mnemonic, numBotAccounts)
-
-    const botsWithoutGold = []
     for (const key of botKeys) {
       const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
       kit.addAccount(key)
       kit.defaultAccount = botAccount
 
       try {
+        const goldBalance = await goldToken.balanceOf(botAccount)
+        if (goldBalance.isZero()) {
+          botsWithoutGold.push(botAccount)
+          continue
+        }
+        if (!(await accounts.isAccount(botAccount))) {
+          const registerTx = await accounts.createAccount()
+          await registerTx.sendAndWaitForReceipt()
+        }
+
         const botLockedGold = await lockedGold.getAccountTotalLockedGold(botAccount)
         if (botLockedGold.isEqualTo(0)) {
-          const goldBalance = await goldToken.balanceOf(botAccount)
+          const tx = await lockedGold.lock()
+          const amountToLock = goldBalance.multipliedBy(0.99).toFixed(0)
 
-          if (goldBalance.isGreaterThan(0)) {
-            const tx = await lockedGold.lock()
-            const amountToLock = goldBalance.multipliedBy(0.99)
-
-            // TODO: figure out why this completely does not work :(
-            await tx.sendAndWaitForReceipt({
-              to: lockedGold.address,
-              value: amountToLock.toFixed(),
-            })
-            console.info(`Locked gold for ${botAccount}`)
-          } else {
-            botsWithoutGold.push(botAccount)
-          }
+          await tx.sendAndWaitForReceipt({
+            to: lockedGold.address,
+            value: amountToLock,
+            from: botAccount,
+          })
+          console.info(`Locked gold for ${botAccount}`)
         } else {
           console.info(`Bot ${botAccount} already has locked gold`)
         }
       } catch (error) {
         console.error(`Failed to confirm or do setup for ${botAccount}`)
+        console.error(error.toString())
       }
     }
-    console.info(`These bot accounts have no gold: ${botsWithoutGold}`)
+    console.info(`These bot accounts have no gold, and need to be fauceted: ${botsWithoutGold}`)
   } catch (error) {
     console.error(error)
   }

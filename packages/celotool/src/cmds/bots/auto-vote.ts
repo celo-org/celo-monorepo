@@ -10,7 +10,7 @@ import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
 import { Argv } from 'yargs'
 
-export const command = 'voting'
+export const command = 'auto-vote'
 
 export const describe = 'for each of the voting bot accounts, vote for the best groups available'
 
@@ -42,6 +42,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
       kit.addAccount(key)
       const account = ensure0x(getAccountAddressFromPrivateKey(key))
       try {
+        console.info(`activating votes for ${account}`)
         const activateTxs = await election.activate(account)
         for (const tx of activateTxs) {
           await tx.sendAndWaitForReceipt()
@@ -101,7 +102,6 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
             // Get group(s) currently voted for
             const currentVotes = (await election.getVoter(botAccount)).votes
             const currentGroups = currentVotes.map((v) => v.group)
-            console.info(currentVotes)
 
             const randomlySelectedGroup = getWeightedRandomChoice(
               groupWeights,

@@ -25,7 +25,7 @@ spec:
               - |
                 CELOTOOL="/celo-monorepo/packages/celotool/bin/celtooljs.sh";
 
-                $CELOTOOL bots voting-bot --celoProvider https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
+                $CELOTOOL bots auto-vote --celoProvider https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
             env:
             - name: MNEMONIC
               valueFrom:
