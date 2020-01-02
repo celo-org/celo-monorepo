@@ -1,8 +1,27 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertContainSubset, assertEqualBN, assertRevert, mineBlocks, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import {
+  assertContainSubset,
+  assertEqualBN,
+  assertRevert,
+  mineBlocks,
+  NULL_ADDRESS,
+} from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { AccountsContract, AccountsInstance, ElectionTestContract, ElectionTestInstance, MockLockedGoldContract, MockLockedGoldInstance, MockRandomContract, MockRandomInstance, MockValidatorsContract, MockValidatorsInstance, RegistryContract, RegistryInstance } from 'types'
+import {
+  AccountsContract,
+  AccountsInstance,
+  ElectionTestContract,
+  ElectionTestInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
+} from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
@@ -1574,46 +1593,5 @@ contract('Election', (accounts: string[]) => {
         })
       })
     })
-
-    // describe('when the voter has active votes', () => {
-    //     await mineBlocks(EPOCH, web3)
-    //     await election.activate(group)
-    //   })
-
-    //   describe('when the revoked value is less than the pending votes', () => {
-    //     const index = 0
-    //     const revokedValue = value - 1
-    //     const remaining = value - revokedValue
-    //     let resp: any
-    //     beforeEach(async () => {
-    //       resp = await election.revokePending(
-    //         group,
-    //         revokedValue,
-    //         NULL_ADDRESS,
-    //         NULL_ADDRESS,
-    //         index
-    //       )
-    //     })
-
-    //     it("should decrement the account's pending votes for the group", async () => {
-    //       assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), remaining)
-    //     })
-
-    //   describe('when the revoked value is less than the active votes', () => {
-    //     const index = 0
-    //     const revokedValue = value - 1
-    //     const remaining = value - revokedValue
-    //     let resp: any
-    //     beforeEach(async () => {
-    //       resp = await election.revokeActive(group, revokedValue, NULL_ADDRESS, NULL_ADDRESS, index)
-    //     })
-
-    //     it("should decrement the account's active votes for the group", async () => {
-    //       assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), remaining)
-    //     })
-
-    //     it("should decrement the account's total votes for the group", async () => {
-    //       assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
-    //     })
   })
 })
