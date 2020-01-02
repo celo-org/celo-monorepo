@@ -31,7 +31,6 @@ import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import TransactionsList from 'src/home/TransactionsList'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
@@ -65,7 +64,6 @@ interface DispatchProps {
   setLoading: typeof setLoading
   showMessage: typeof showMessage
   hideAlert: typeof hideAlert
-  importContacts: typeof importContacts
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -78,7 +76,6 @@ const mapDispatchToProps = {
   setLoading,
   showMessage,
   hideAlert,
-  importContacts,
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -138,7 +135,6 @@ export class WalletHome extends React.Component<Props> {
   componentDidMount() {
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
-    this.importContactsIfNeeded()
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
     }
@@ -163,14 +159,6 @@ export class WalletHome extends React.Component<Props> {
       null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )
-  }
-
-  importContactsIfNeeded = () => {
-    // If we haven't already imported the contacts and populated the recip cache
-    if (!Object.keys(this.props.recipientCache).length) {
-      // Add a slight delay so contact importing doesn't make wallet home feel slugglish at first
-      setTimeout(() => this.props.importContacts(), 2000)
-    }
   }
 
   onPressQrCode = () => {
