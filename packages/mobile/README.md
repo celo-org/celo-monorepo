@@ -193,6 +193,13 @@ The service that route SMS messages to the app needs to be configured to [append
 We're using [GraphQL Code Generator][graphql code generator] to properly type
 GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-types` to update the typings in the `typings` directory.
 
+## Generating SMS_RETRIEVER_HASH_CODE
+
+In order to read texts automatically on Android devices, we need to generate a bundle specific hash code to send in the text message. This depends on both the bundle id and the signing certificate. Since we use Google Play signing, we need to download the certificate.
+
+1.  Go to the play console for the relevant app, Release management > App signing, and download the App signing certificate.
+2.  Use this script to generate the hash code: https://github.com/michalbrz/sms-retriever-hash-generator
+
 ## How we handle Geth crashes in wallet app on Android
 
 Our Celo app has three types of codes.
