@@ -37,7 +37,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   bytes32[] public assetAllocationSymbols;
   uint256[] public assetAllocationWeights;
 
+  uint256 public lastSpendingDay;
+  uint256 public spendingLimit;
+  FixidityLib.Fraction private spendingRatio;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
+  event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address token);
   event TokenRemoved(address token, uint256 index);
   event SpenderAdded(address spender);
@@ -58,13 +63,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param registryAddress The address of the registry contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    */
-  function initialize(address registryAddress, uint256 _tobinTaxStalenessThreshold)
-    external
-    initializer
-  {
+  function initialize(
+    address registryAddress,
+    uint256 _tobinTaxStalenessThreshold,
+    uint256 _spendingRatio
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
+    setDailySpendingRatio(_spendingRatio);
   }
 
   /**
@@ -78,6 +85,24 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
+   * @notice Set the ratio of reserve that is spendable per day.
+   * @param ratio Spending ratio as unwrapped Fraction.
+   */
+  function setDailySpendingRatio(uint256 ratio) public onlyOwner {
+    spendingRatio = FixidityLib.wrap(ratio);
+    require(spendingRatio.lte(FixidityLib.fixed1()), "spending ratio cannot be larger than 1");
+    emit DailySpendingRatioSet(ratio);
+  }
+
+  /**
+   * @notice Get daily spending ratio.
+   * @return Spending ratio as unwrapped Fraction.
+   */
+  function getDailySpendingRatio() public view onlyOwner returns (uint256) {
+    return spendingRatio.unwrap();
+  }
+
+  /**
    * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo assets.
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
@@ -86,12 +111,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     external
     onlyOwner
   {
-    require(symbols.length == weights.length);
+    require(symbols.length == weights.length, "Array length mismatch");
     FixidityLib.Fraction memory sum = FixidityLib.wrap(0);
     for (uint256 i = 0; i < weights.length; i++) {
       sum = sum.add(FixidityLib.wrap(weights[i]));
     }
-    require(sum.equals(FixidityLib.fixed1()));
+    require(sum.equals(FixidityLib.fixed1()), "Sum of asset allocation must be 1");
     assetAllocationSymbols = symbols;
     assetAllocationWeights = weights;
     emit AssetAllocationSet(symbols, weights);
@@ -204,6 +229,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
+    uint256 currentDay = now / 1 days;
+    if (currentDay > lastSpendingDay) {
+      uint256 balance = getReserveGoldBalance();
+      lastSpendingDay = currentDay;
+      spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
+    }
+    require(spendingLimit >= value, "Exceeding spending limit");
+    spendingLimit = spendingLimit.sub(value);
     require(getGoldToken().transfer(to, value), "transfer of gold token failed");
     return true;
   }

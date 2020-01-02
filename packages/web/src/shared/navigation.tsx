@@ -15,7 +15,6 @@ export default function Navigation({ link, text, selected, onPress }: Props) {
   return (
     <View style={styles.linkWrapper}>
       <Button
-        // @ts-ignore
         style={[textStyles.medium, !selected && styles.notSelected]}
         kind={BTN.NAV}
         href={link}

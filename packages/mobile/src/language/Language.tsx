@@ -1,7 +1,7 @@
 import { RootState } from '@celo/mobile/src/redux/reducers'
 import LanguageSelectUI from '@celo/react-components/components/LanguageSelectUI'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -9,7 +9,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import logo from 'src/images/celo-logo.png'
 import { Screens } from 'src/navigator/Screens'
 
@@ -25,7 +25,7 @@ interface NavigationProps {
   nextScreen: Screens
 }
 
-type Props = DispatchProps & NavigationInjectedProps<NavigationProps> & WithNamespaces
+type Props = DispatchProps & NavigationInjectedProps<NavigationProps> & WithTranslation
 
 export class Language extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -70,5 +70,5 @@ export default componentWithAnalytics(
   connect<any, DispatchProps, {}, RootState>(
     null,
     { setLanguage }
-  )(withNamespaces(Namespaces.accountScreen10)(Language))
+  )(withTranslation(Namespaces.accountScreen10)(Language))
 )

@@ -7,7 +7,7 @@ import * as yargs from 'yargs'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 
-const gasLimit = 15000000
+const gasLimit = 20000000
 
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
 

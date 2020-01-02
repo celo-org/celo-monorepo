@@ -12,6 +12,12 @@ export abstract class LocalCommand extends Command {
   static flags = {
     logLevel: flags.string({ char: 'l', hidden: true }),
     help: flags.help({ char: 'h', hidden: true }),
+    truncate: flags.boolean({
+      default: true,
+      hidden: true,
+      allowNo: true,
+      description: 'Truncate fields to fit line',
+    }),
   }
 
   // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output

@@ -41,7 +41,6 @@ export enum Screens {
   ImportWalletEmpty = 'ImportWalletEmpty',
   Invite = 'Invite',
   InviteReview = 'InviteReview',
-  ImportContacts = 'ImportContacts',
   JoinCelo = 'JoinCelo',
   Language = 'Language',
   Licenses = 'Licenses',

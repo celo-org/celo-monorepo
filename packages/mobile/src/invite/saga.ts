@@ -1,4 +1,4 @@
-import { stripHexLeader } from '@celo/utils/src/address'
+import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -293,7 +293,7 @@ function* addTempAccountToWallet(inviteCode: string) {
     } else {
       // Import account into the local geth node
       // @ts-ignore
-      tempAccount = yield call(web3.eth.personal.importRawKey, stripHexLeader(inviteCode), TEMP_PW)
+      tempAccount = yield call(web3.eth.personal.importRawKey, trimLeading0x(inviteCode), TEMP_PW)
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {

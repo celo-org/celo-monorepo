@@ -12,6 +12,7 @@ import {
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceInstance,
+  GovernanceSlasherInstance,
   LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
@@ -24,6 +25,120 @@ enum VoteValue {
   No,
   Yes,
 }
+
+contract('Integration: Governance slashing', (accounts: string[]) => {
+  const proposalId = 1
+  const dequeuedIndex = 0
+  let accountsInstance: AccountsInstance
+  let lockedGold: LockedGoldInstance
+  let governance: GovernanceInstance
+  let governanceSlasher: GovernanceSlasherInstance
+  let proposalTransactions: any
+  const value = new BigNumber('1000000000000000000')
+
+  before(async () => {
+    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
+    lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
+    governance = await getDeployedProxiedContract('Governance', artifacts)
+    governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
+    await accountsInstance.createAccount()
+    await accountsInstance.createAccount({ from: accounts[1] })
+    // @ts-ignore
+    await lockedGold.lock({ value })
+    // @ts-ignore
+    await lockedGold.lock({ value, from: accounts[1] })
+    proposalTransactions = [
+      {
+        value: 0,
+        destination: governanceSlasher.address,
+        data: Buffer.from(
+          stripHexEncoding(
+            // @ts-ignore
+            governanceSlasher.contract.methods.approveSlashing(accounts[1], 100).encodeABI()
+          ),
+          'hex'
+        ),
+      },
+    ]
+  })
+
+  describe('When making a governance proposal', () => {
+    before(async () => {
+      await governance.propose(
+        proposalTransactions.map((x: any) => x.value),
+        proposalTransactions.map((x: any) => x.destination),
+        // @ts-ignore
+        Buffer.concat(proposalTransactions.map((x: any) => x.data)),
+        proposalTransactions.map((x: any) => x.data.length),
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
+      )
+    })
+
+    it('should increment the proposal count', async () => {
+      assert.equal((await governance.proposalCount()).toNumber(), proposalId)
+    })
+  })
+
+  describe('When upvoting that proposal', () => {
+    before(async () => {
+      await governance.upvote(proposalId, 0, 0)
+    })
+
+    it('should increase the number of upvotes for the proposal', async () => {
+      assertEqualBN(await governance.getUpvotes(proposalId), value)
+    })
+  })
+
+  describe('When approving that proposal', () => {
+    before(async () => {
+      await timeTravel(config.governance.dequeueFrequency, web3)
+      await governance.approve(proposalId, dequeuedIndex)
+    })
+
+    it('should set the proposal to approved', async () => {
+      assert.isTrue(await governance.isApproved(proposalId))
+    })
+  })
+
+  describe('When voting on that proposal', () => {
+    before(async () => {
+      await timeTravel(config.governance.approvalStageDuration, web3)
+      await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
+    })
+
+    it('should increment the vote totals', async () => {
+      const [yes, ,] = await governance.getVoteTotals(proposalId)
+      assertEqualBN(yes, value)
+    })
+  })
+
+  describe('When executing that proposal', () => {
+    before(async () => {
+      await timeTravel(config.governance.referendumStageDuration, web3)
+      await governance.execute(proposalId, dequeuedIndex)
+    })
+
+    it('should execute the proposal', async () => {
+      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 100)
+    })
+  })
+
+  describe('When performing slashing', () => {
+    before(async () => {
+      await timeTravel(config.governance.referendumStageDuration, web3)
+      await governanceSlasher.slash(accounts[1], [], [], [])
+    })
+
+    it('should set approved slashing to zero', async () => {
+      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 0)
+    })
+
+    it('should slash the account', async () => {
+      // slashing not yet implemented in LockedGold
+    })
+  })
+})
 
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
