@@ -14,8 +14,10 @@ export async function canTrack() {
 }
 
 export async function showVisitorCookieConsent() {
-  const euro = await isInEU()
-  return euro && !Cookies.get(RESPONDED_TO_CONSENT)
+  if (!Cookies.get(RESPONDED_TO_CONSENT)) {
+    return isInEU()
+  }
+  return false
 }
 
 async function isInEU() {
