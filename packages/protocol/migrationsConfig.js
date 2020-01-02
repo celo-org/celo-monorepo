@@ -22,6 +22,15 @@ const DefaultConfig = {
     },
     blockGasLimit: 20000000,
   },
+  doubleSigningSlasher: {
+    reward: '10000000000000000000', // 10 cGLD
+    penalty: '1000000000000000000000', // 1000 cGLD
+  },
+  downtimeSlasher: {
+    reward: '10000000000000000000', // 10 cGLD
+    penalty: '1000000000000000000000', // 1000 cGLD
+    slashableDowntime: 5,
+  },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
@@ -51,7 +60,7 @@ const DefaultConfig = {
     minimumReports: 1,
   },
   gasPriceMinimum: {
-    initialMinimum: 10000,
+    minimumFloor: 1000000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
   },
@@ -83,6 +92,7 @@ const DefaultConfig = {
   reserve: {
     goldBalance: 100000000,
     tobinTaxStalenessThreshold: 60 * 60, // 1 hour
+    dailySpendingRatio: '1000000000000000000000000', // 100%
   },
   stableToken: {
     decimals: 18,

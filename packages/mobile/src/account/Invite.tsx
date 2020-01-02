@@ -1,9 +1,11 @@
+import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
+import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps, withNavigation } from 'react-navigation'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -12,6 +14,8 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import ContactPermission from 'src/icons/ContactPermission'
+import Search from 'src/icons/Search'
 import { importContacts } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
@@ -21,11 +25,15 @@ import { filterRecipients, NumberToRecipient, Recipient } from 'src/recipients/r
 import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { checkContactsPermission } from 'src/utils/permissions'
+import { SendCallToAction } from 'src/send/SendCallToAction'
+import { navigateToPhoneSettings } from 'src/utils/linking'
+import { requestContactsPermission } from 'src/utils/permissions'
+
+const InviteSearchInput = withTextInputLabeling<TextInputProps>(TextInput)
 
 interface State {
   searchQuery: string
-  hasGivenPermission: boolean
+  hasGivenContactPermission: boolean
 }
 
 interface Section {
@@ -65,19 +73,30 @@ class Invite extends React.Component<Props, State> {
     headerTitle: i18n.t('sendFlow7:invite'),
   })
 
-  state: State = { searchQuery: '', hasGivenPermission: true }
+  state: State = { searchQuery: '', hasGivenContactPermission: true }
 
   async componentDidMount() {
-    const granted = await checkContactsPermission()
-    this.setState({ hasGivenPermission: granted })
+    await this.tryImportContacts()
   }
 
-  updateToField = (value: string) => {
-    this.setState({ searchQuery: value })
+  tryImportContacts = async () => {
+    const { recipientCache } = this.props
+
+    // If we've imported already
+    if (Object.keys(recipientCache).length) {
+      return
+    }
+
+    const hasGivenContactPermission = await requestContactsPermission()
+    this.setState({ hasGivenContactPermission })
+
+    if (hasGivenContactPermission) {
+      this.props.importContacts()
+    }
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
-    this.updateToField(searchQuery)
+    this.setState({ searchQuery })
   }
 
   onSelectRecipient = (recipient: Recipient) => {
@@ -88,6 +107,10 @@ class Invite extends React.Component<Props, State> {
     } else {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
     }
+  }
+
+  onPressContactsSettings = () => {
+    navigateToPhoneSettings()
   }
 
   buildSections = (): Section[] => {
@@ -108,24 +131,43 @@ class Invite extends React.Component<Props, State> {
       }))
       .filter((section) => section.data.length > 0)
   }
+  renderListHeader = () => {
+    const { t } = this.props
+    const { hasGivenContactPermission } = this.state
 
-  onPermissionsAccepted = async () => {
-    this.props.importContacts()
-    this.setState({ hasGivenPermission: true })
+    if (hasGivenContactPermission) {
+      return null
+    }
+
+    return (
+      <SendCallToAction
+        icon={<ContactPermission />}
+        header={t('importContactsCta.header')}
+        body={t('importContactsCta.body')}
+        cta={t('importContactsCta.cta')}
+        onPressCta={this.onPressContactsSettings}
+      />
+    )
   }
 
   render() {
     return (
       <SafeAreaView style={style.container}>
+        <View style={style.textInputContainer}>
+          <InviteSearchInput
+            value={this.state.searchQuery}
+            onChangeText={this.onSearchQueryChanged}
+            icon={<Search />}
+            placeholder={this.props.t('nameOrPhoneNumber')}
+          />
+        </View>
         <RecipientPicker
+          testID={'RecipientPicker'}
           sections={this.buildSections()}
           searchQuery={this.state.searchQuery}
           defaultCountryCode={this.props.defaultCountryCode}
-          hasAcceptedContactPermission={this.state.hasGivenPermission}
           onSelectRecipient={this.onSelectRecipient}
-          onSearchQueryChanged={this.onSearchQueryChanged}
-          showQRCode={false}
-          onPermissionsAccepted={this.onPermissionsAccepted}
+          listHeaderComponent={this.renderListHeader}
         />
       </SafeAreaView>
     )
@@ -137,11 +179,16 @@ const style = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  textInputContainer: {
+    paddingBottom: 5,
+    borderBottomColor: colors.listBorder,
+    borderBottomWidth: 1,
+  },
 })
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(withNavigation(Invite)))
+  )(withTranslation(Namespaces.sendFlow7)(Invite))
 )
