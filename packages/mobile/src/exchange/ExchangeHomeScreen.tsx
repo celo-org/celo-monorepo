@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import BigNumber from 'bignumber.js'
@@ -76,6 +77,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
           <DisconnectBanner />
           <View>
             <CeloGoldOverview testID="ExchangeAccountOverview" />
+            <ItemSeparator />
             <CeloGoldHistoryChart />
             <View style={styles.buttonContainer}>
               <Button
