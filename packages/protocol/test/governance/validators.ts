@@ -2185,10 +2185,16 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the sender is one of the whitelisted slashing addresses', () => {
-      it('should succeed', async () => {
+      it('should succeed when the account is manually added', async () => {
         await validators.forceDeaffiliateIfValidator(validator, { from: accounts[3] })
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
         assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
+      })
+    })
+
+    describe('when the sender is not an approved address', () => {
+      it('should revert', async () => {
+        await assertRevert(validators.forceDeaffiliateIfValidator(validator))
       })
     })
   })
