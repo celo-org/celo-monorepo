@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This tests that the geth node will exit if its version is too low
+# Slashing tests
 
 # For testing a particular branch of Geth repo (usually, on Circle CI)
 # Usage: ci_test_exit.sh checkout <branch_of_geth_repo_to_test>

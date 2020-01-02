@@ -391,7 +391,7 @@ contract Election is
    * @param account The address of the account.
    * @return The total number of votes cast by an account.
    */
-  function getTotalVotesByAccount(address account) public view returns (uint256) {
+  function getTotalVotesByAccount(address account) external view returns (uint256) {
     uint256 total = 0;
     address[] memory groups = votes.groupsVotedFor[account];
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {

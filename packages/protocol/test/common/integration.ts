@@ -38,6 +38,7 @@ async function getGroups(election: ElectionInstance) {
   )
 }
 
+// Returns how much voting gold will be decremented from the groups voted by an account
 async function slashingOfGroups(
   account: string,
   penalty: BigNumber,

@@ -79,7 +79,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(msg.value > 0, "no value");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
-    //    emit GoldLocked(msg.sender, totalNonvoting);
   }
 
   /**

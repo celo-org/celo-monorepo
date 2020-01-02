@@ -21,6 +21,7 @@ function serializeKeystore(keystore: any) {
 
 let isGanache = false
 
+// Ganache private keys for accounts 7-9, used for group keys
 const extraKeys = [
   '0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
   '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
