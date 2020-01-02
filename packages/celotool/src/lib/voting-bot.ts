@@ -3,7 +3,7 @@ import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_de
 
 const helmChartPath = '../helm-charts/voting-bot'
 
-export async function installHelmChart(celoEnv: string) {
+export async function installHelmChart(cteloEnv: string) {
   const params = await helmParameters(celoEnv)
   return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, params)
 }

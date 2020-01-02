@@ -1,7 +1,7 @@
-import yargs = require('yargs')
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart } from 'src/lib/voting-bot'
+import yargs from 'yargs'
 
 export const command = 'voting-bot'
 export const describe = 'deploy voting-bot'
