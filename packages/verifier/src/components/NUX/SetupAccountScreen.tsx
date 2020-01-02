@@ -6,7 +6,7 @@ import colors from '@celo/react-components/styles/colors'
 import fonts from '@celo/react-components/styles/fonts'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -46,7 +46,10 @@ interface DispatchProps {
   clearError: typeof clearError
 }
 
-type Props = WithNamespaces & DispatchProps & StateProps & NavigationInjectedProps<NavigationParams>
+type Props = WithTranslation &
+  DispatchProps &
+  StateProps &
+  NavigationInjectedProps<NavigationParams>
 
 const mapDispatchToProps = {
   setE164Number,
@@ -271,7 +274,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.setupAccount)(
+export default withTranslation(Namespaces.setupAccount)(
   connect<null, DispatchProps>(
     null,
     mapDispatchToProps

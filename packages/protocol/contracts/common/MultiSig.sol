@@ -88,7 +88,8 @@ contract MultiSig is Initializable {
 
   modifier validRequirement(uint256 ownerCount, uint256 _required) {
     require(
-      ownerCount <= MAX_OWNER_COUNT && _required <= ownerCount && _required != 0 && ownerCount != 0
+      ownerCount <= MAX_OWNER_COUNT && _required <= ownerCount && _required != 0 && ownerCount != 0,
+      "invalid requirement"
     );
     _;
   }
@@ -155,6 +156,7 @@ contract MultiSig is Initializable {
     external
     onlyWallet
     ownerExists(owner)
+    notNull(newOwner)
     ownerDoesNotExist(newOwner)
   {
     for (uint256 i = 0; i < owners.length - 1; i++)

@@ -4,7 +4,7 @@ import VerificationTexts from '@celo/react-components/icons/VerificationTexts'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -12,7 +12,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import CancelButton from 'src/components/CancelButton'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, startVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/verification'
@@ -34,7 +34,7 @@ interface DispatchProps {
   cancelVerification: typeof cancelVerification
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   startVerification,
@@ -156,5 +156,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxVerification2)(VerificationLoadingScreen))
+  )(withTranslation(Namespaces.nuxVerification2)(VerificationLoadingScreen))
 )

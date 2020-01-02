@@ -11,149 +11,56 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
   style={
     Object {
       "flex": 1,
-      "flexDirection": "column",
       "justifyContent": "space-between",
     }
   }
 >
-  <View
-    style={
+  <RCTScrollView
+    contentContainerStyle={
       Object {
         "paddingHorizontal": 16,
       }
     }
+    keyboardShouldPersistTaps="always"
   >
-    <RCTScrollView
-      keyboardShouldPersistTaps="always"
-    >
-      <View>
-        <View
-          style={
-            Object {
-              "flexDirection": "column",
-              "justifyContent": "flex-start",
-            }
+    <View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "marginTop": 38,
           }
-        >
-          <View
+        }
+      >
+        <View>
+          <Text
             style={
-              Array [
-                Object {
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                },
-                Object {
-                  "alignItems": "center",
-                  "marginTop": 38,
-                },
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Bold",
+                "fontSize": 15,
+                "fontWeight": "600",
+                "lineHeight": 20,
+              }
             }
           >
-            <View
-              style={
-                Object {
-                  "flexDirection": "column",
-                }
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
-                      "fontSize": 16,
-                      "lineHeight": 24,
-                    },
-                    Object {
-                      "fontSize": 15,
-                      "fontWeight": "600",
-                      "lineHeight": 20,
-                    },
-                  ]
-                }
-              >
-                exchangeAmount
-              </Text>
-              <View
-                accessible={true}
-                focusable={true}
-                isTVSelectable={true}
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                style={
-                  Object {
-                    "opacity": 1,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      },
-                      Object {
-                        "textDecorationLine": "underline",
-                      },
-                    ]
-                  }
-                >
-                  switchTo
-                </Text>
-              </View>
-            </View>
-            <TextInput
-              allowFontScaling={true}
-              autoFocus={true}
-              keyboardType="decimal-pad"
-              onChangeText={[Function]}
-              placeholder="0"
-              placeholderTextColor="#BDBDBD"
-              rejectResponderTermination={true}
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                  },
-                  Object {
-                    "fontSize": 24,
-                    "height": 54,
-                    "lineHeight": 39,
-                  },
-                ]
-              }
-              underlineColorAndroid="transparent"
-              value=""
-            />
-          </View>
+            exchangeAmount
+          </Text>
           <View
+            accessible={true}
+            focusable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
-                "borderBottomColor": "#EEEEEE",
-                "borderBottomWidth": 1,
-                "marginBottom": 16,
-              }
-            }
-          />
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "opacity": 1,
               }
             }
           >
@@ -161,35 +68,91 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#2E3338",
+                    "color": "#81868B",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                  },
-                  Object {
-                    "fontSize": 15,
-                    "fontWeight": "600",
+                    "fontSize": 14,
                     "lineHeight": 20,
                   },
+                  Object {
+                    "textDecorationLine": "underline",
+                  },
                 ]
               }
             >
-              inputSubtotal
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-Regular",
-                }
-              }
-            >
-              $0.00
+              switchTo
             </Text>
           </View>
         </View>
+        <TextInput
+          allowFontScaling={true}
+          autoFocus={true}
+          keyboardType="decimal-pad"
+          onChangeText={[Function]}
+          placeholder="0"
+          placeholderTextColor="#BDBDBD"
+          rejectResponderTermination={true}
+          style={
+            Object {
+              "color": "#2E3338",
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "fontSize": 24,
+              "height": 54,
+              "lineHeight": 39,
+              "marginLeft": 10,
+              "textAlign": "right",
+            }
+          }
+          underlineColorAndroid="transparent"
+          value=""
+        />
       </View>
-    </RCTScrollView>
-  </View>
+      <View
+        style={
+          Object {
+            "borderStyle": "solid",
+            "borderTopColor": "#EEEEEE",
+            "borderTopWidth": 1,
+            "marginTop": 10,
+            "width": "100%",
+          }
+        }
+      />
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginTop": 16,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Bold",
+              "fontSize": 15,
+              "fontWeight": "600",
+              "lineHeight": 20,
+            }
+          }
+        >
+          inputSubtotal
+        </Text>
+        <Text
+          style={
+            Object {
+              "fontFamily": "Hind-Regular",
+              "marginLeft": 10,
+            }
+          }
+        >
+          $0.00
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
   <View
     style={
       Object {

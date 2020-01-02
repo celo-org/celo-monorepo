@@ -1,16 +1,16 @@
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface Props {
   fee: BigNumber
 }
 
-const Fee = ({ fee, t }: Props & WithNamespaces) => (
+const Fee = ({ fee, t }: Props & WithTranslation) => (
   <View>
     <View style={style.row}>
       <Text style={[fontStyles.bodySecondary]}>{t('fee') + ' '}</Text>
@@ -27,4 +27,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.sendFlow7)(Fee)
+export default withTranslation(Namespaces.sendFlow7)(Fee)

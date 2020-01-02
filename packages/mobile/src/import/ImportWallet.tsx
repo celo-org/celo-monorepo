@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Image, Keyboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationEvents, NavigationInjectedProps } from 'react-navigation'
@@ -23,7 +23,7 @@ import {
   isValidBackupPhrase,
 } from 'src/backup/utils'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { backupIcon } from 'src/images/Images'
 import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -44,7 +44,7 @@ interface StateProps {
   isImportingWallet: boolean
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -181,4 +181,4 @@ export default connect<StateProps, DispatchProps, any, RootState>(
     importBackupPhrase,
     hideAlert,
   }
-)(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))
+)(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWallet))
