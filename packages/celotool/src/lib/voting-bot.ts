@@ -1,11 +1,14 @@
 import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { installGenericHelmChart } from 'src/lib/helm_deploy'
+import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 
 const helmChartPath = '../helm-charts/voting-bot'
 
 export async function installHelmChart(celoEnv: string) {
   const params = await helmParameters(celoEnv)
   return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, params)
+}
+export async function removeHelmRelease(celoEnv: string) {
+  await removeGenericHelmChart(releaseName(celoEnv))
 }
 
 function helmParameters(celoEnv: string) {
