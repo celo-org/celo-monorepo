@@ -14,5 +14,4 @@ interface ILockedGold {
     address[] calldata greaters,
     uint256[] calldata indices
   ) external;
-  function isSlasher(address) external view returns (bool);
 }
