@@ -255,16 +255,15 @@ class Send extends React.Component<Props, State> {
             onPressCta={this.onPressStartVerification}
           />
         )}
-        {numberVerified &&
-          !hasGivenContactPermission && (
-            <SendCallToAction
-              icon={<ContactPermission />}
-              header={t('importContactsCta.header')}
-              body={t('importContactsCta.body')}
-              cta={t('importContactsCta.cta')}
-              onPressCta={this.onPressContactsSettings}
-            />
-          )}
+        {numberVerified && !hasGivenContactPermission && (
+          <SendCallToAction
+            icon={<ContactPermission />}
+            header={t('importContactsCta.header')}
+            body={t('importContactsCta.body')}
+            cta={t('importContactsCta.cta')}
+            onPressCta={this.onPressContactsSettings}
+          />
+        )}
         <ContactSyncBanner />
       </>
     )
