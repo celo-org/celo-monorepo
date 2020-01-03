@@ -14,9 +14,9 @@ import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
-const LayersIllo = dynamic((import('src/dev/LayersIllo') as unknown) as Promise<
-  React.ComponentType<LayerIlloProps>
->)
+const LayersIllo = dynamic(
+  (import('src/dev/LayersIllo') as unknown) as Promise<React.ComponentType<LayerIlloProps>>
+)
 
 enum Levels {
   apps,

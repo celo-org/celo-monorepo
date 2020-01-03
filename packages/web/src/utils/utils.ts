@@ -72,9 +72,11 @@ async function multiPartCheck() {
     getNetworkDownloadSpeed(),
   ])
   const averageSped =
-    multiPart.map((speeds) => speeds.mbps).reduce((previous, current) => {
-      return Number(previous) + Number(current)
-    }, 0) / 3
+    multiPart
+      .map((speeds) => speeds.mbps)
+      .reduce((previous, current) => {
+        return Number(previous) + Number(current)
+      }, 0) / 3
 
   return isFast(averageSped)
 }

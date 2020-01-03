@@ -63,7 +63,8 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
                 src="https://storage.googleapis.com/celo_whitepapers/about-video.mp4"
                 type="video/mp4"
               />
-            )}}
+            )}
+            }
             <Image
               resizeMode="cover"
               source={{ uri: '/static/AboutPreview.jpg' }}
