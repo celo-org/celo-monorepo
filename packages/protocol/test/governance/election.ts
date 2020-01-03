@@ -837,7 +837,10 @@ contract('Election', (accounts: string[]) => {
     const voter3 = { address: accounts[2], weight: 30 }
     totalLockedGold = voter1.weight + voter2.weight + voter3.weight
     const assertSameAddresses = (actual: string[], expected: string[]) => {
-      assert.sameMembers(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
+      assert.sameMembers(
+        actual.map((x) => x.toLowerCase()),
+        expected.map((x) => x.toLowerCase())
+      )
     }
 
     const setRandomness = async (hash: string) =>

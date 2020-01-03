@@ -59,9 +59,7 @@ console.log(
   errors
     .map(
       (err) =>
-        chalk`{red ${err.from}} => {red ${err.to}}. expected: {blue ${err.expected}} got: {green ${
-          err.got
-        }}`
+        chalk`{red ${err.from}} => {red ${err.to}}. expected: {blue ${err.expected}} got: {green ${err.got}}`
     )
     .join('\n')
 )
