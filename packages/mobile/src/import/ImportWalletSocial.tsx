@@ -178,10 +178,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    importBackupPhrase,
-    hideAlert,
-  }
-)(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWalletSocial))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  importBackupPhrase,
+  hideAlert,
+})(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWalletSocial))

@@ -33,12 +33,14 @@ export async function upgradeHelmChart(
   blockscoutDBConnectionName: string
 ) {
   console.info(`Upgrading helm release ${celoEnv}-blockscout`)
-  const params = (await helmParameters(
-    celoEnv,
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName
-  )).join(' ')
+  const params = (
+    await helmParameters(
+      celoEnv,
+      blockscoutDBUsername,
+      blockscoutDBPassword,
+      blockscoutDBConnectionName
+    )
+  ).join(' ')
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     await execCmdWithExitOnFailure(
       `helm upgrade --debug --dry-run ${celoEnv}-blockscout ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
