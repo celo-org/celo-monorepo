@@ -8,12 +8,12 @@ import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Avatar from 'src/components/Avatar'
 import { FAQ_LINK } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import {
   useDollarsToLocalAmount,
@@ -38,7 +38,7 @@ export interface TransferConfirmationCardProps {
   recipient?: Recipient
 }
 
-type Props = TransferConfirmationCardProps & WithNamespaces
+type Props = TransferConfirmationCardProps & WithTranslation
 
 // Bordered content placed in a ReviewFrame
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
@@ -190,4 +190,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.sendFlow7)(TransferConfirmationCard)
+export default withTranslation(Namespaces.sendFlow7)(TransferConfirmationCard)

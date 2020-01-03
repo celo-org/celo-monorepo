@@ -457,9 +457,7 @@ function* revealAndCompleteAttestation(
   )
   if (!response.ok) {
     throw new Error(
-      `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${
-        response.status
-      }`
+      `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
     )
   }
 

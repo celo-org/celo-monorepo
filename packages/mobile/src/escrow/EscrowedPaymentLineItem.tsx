@@ -1,6 +1,6 @@
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { Trans, withNamespaces, WithNamespaces } from 'react-i18next'
+import { Trans, WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -11,7 +11,7 @@ interface Props {
   payment: EscrowedPayment
 }
 
-function EscrowedPaymentLineItem(props: Props & WithNamespaces) {
+function EscrowedPaymentLineItem(props: Props & WithTranslation) {
   const { amount, recipientPhone } = props.payment
   return (
     <Text numberOfLines={1} ellipsizeMode="middle" style={styles.oneLine}>
@@ -44,4 +44,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.inviteFlow11)(EscrowedPaymentLineItem)
+export default withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentLineItem)

@@ -113,13 +113,15 @@ export class CodeOfConduct extends React.Component<I18nProps> {
                   text="Geek Feminism Anti-Harassment Policy"
                   kind={BTN.INLINE}
                   target={'_new'}
-                />, and the{' '}
+                />
+                , and the{' '}
                 <Button
                   href={'https://www.contributor-covenant.org/version/1/4/code-of-conduct.html'}
                   text="Contributor Covenant"
                   kind={BTN.INLINE}
                   target={'_new'}
-                />.
+                />
+                .
               </Trans>
             }
           />

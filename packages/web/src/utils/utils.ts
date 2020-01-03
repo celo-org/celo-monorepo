@@ -72,9 +72,11 @@ async function multiPartCheck() {
     getNetworkDownloadSpeed(),
   ])
   const averageSped =
-    multiPart.map((speeds) => speeds.mbps).reduce((previous, current) => {
-      return Number(previous) + Number(current)
-    }, 0) / 3
+    multiPart
+      .map((speeds) => speeds.mbps)
+      .reduce((previous, current) => {
+        return Number(previous) + Number(current)
+      }, 0) / 3
 
   return isFast(averageSped)
 }
@@ -93,6 +95,5 @@ type MemoryGB = 0.25 | 0.5 | 1 | 2 | 4 | 8
 
 export function getDeviceMemory(): MemoryGB {
   // only available on chrome / android browser assume 4 if we dont know
-  // @ts-ignore
-  return navigator.deviceMemory || 4
+  return (navigator.deviceMemory as MemoryGB) || 4
 }

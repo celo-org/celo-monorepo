@@ -25,7 +25,7 @@
       "La verificación del número telefónico de Celo consiste en asociar su billetera de Celo con su teléfono.",
     "section1Header": "¿Tengo que completar este paso?",
     "section1Body":
-      "La verificación no es obligatoria. Cuando la completa, las personas de la red de Celo le podrán enviar valores usando su número telefónico. De lo contrario, deberán usar códigos QR o direcciones.",
+      "La verificación no es obligatoria.  Sin verificar, solo es posible enviar y recibir valor utilizando códigos QR o direcciones.",
     "section2Header": "Seguridad y privacidad",
     "section2Body":
       "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
