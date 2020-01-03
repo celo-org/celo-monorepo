@@ -4,7 +4,6 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { BotsArgv } from 'src/cmds/bots'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
@@ -14,7 +13,7 @@ export const command = 'auto-vote'
 
 export const describe = 'for each of the voting bot accounts, vote for the best groups available'
 
-interface SimulateVotingArgv extends BotsArgv {
+interface SimulateVotingArgv {
   celoProvider: string
 }
 
@@ -38,21 +37,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     const changeVoteProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_CHANGE_PROBABILITY))
 
     const allBotKeys = getPrivateKeysFor(AccountType.VOTING_BOT, mnemonic, numBotAccounts)
-    for (const key of allBotKeys) {
-      kit.addAccount(key)
-      const account = ensure0x(getAccountAddressFromPrivateKey(key))
-      if (!(await election.hasActivatablePendingVotes(account))) {
-        try {
-          console.info(`activating votes for ${account}`)
-          const activateTxs = await election.activate(account)
-          for (const tx of activateTxs) {
-            await tx.sendAndWaitForReceipt({ from: account })
-          }
-        } catch (error) {
-          console.error(`Failed to activate pending votes for ${account}`)
-        }
-      }
-    }
+    await activatePendingVotes(kit, allBotKeys)
 
     const botKeysVotingThisRound = allBotKeys.filter((_) =>
       changeVoteProbability.isGreaterThan(Math.random())
@@ -71,71 +56,53 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         }
       }
 
-      console.info('Collecting the scores of elected validators to determine group scores')
-      const groupScores = new Map<string, BigNumber[]>()
-      for (const valSigner of await election.getCurrentValidatorSigners()) {
-        try {
-          const val = await validators.getValidatorFromSigner(valSigner)
-          const groupAddress = val.affiliation!
-          if (groupScores.has(groupAddress)) {
-            groupScores.get(groupAddress)!.push(val.score)
-          } else {
-            groupScores.set(groupAddress, [val.score])
-          }
-        } catch (error) {
-          console.info(`could not get info for ${valSigner}, skipping...`)
-        }
-      }
-
-      const groupWeights = calculateGroupWeightsFromScores(groupScores)
+      console.info('Calculating weights of groups based on the scores of elected validators')
+      const groupWeights = await calculateGroupWeights(kit)
 
       for (const key of botKeysVotingThisRound) {
         const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
-        console.info(`Voting as: ${botAccount}.`)
 
+        kit.addAccount(key)
         kit.defaultAccount = botAccount
 
+        console.info(`Voting as: ${botAccount}.`)
         try {
-          // Get this account's amount of locked gold
           const lockedGoldAmount = await lockedGold.getAccountTotalLockedGold(botAccount)
-          console.info(`locked gold for ${botAccount}: ${lockedGoldAmount.toString()}`)
-
-          if (lockedGoldAmount.isGreaterThan(0)) {
-            // Get group(s) currently voted for
-            const currentVotes = (await election.getVoter(botAccount)).votes
-            const currentGroups = currentVotes.map((v) => v.group)
-
-            const randomlySelectedGroup = getWeightedRandomChoice(
-              groupWeights,
-              [...groupCapacities.keys()].filter((k) => {
-                const capacity = groupCapacities.get(k)
-                return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
-              })
-            )
-            console.info(`Selected this group: ${randomlySelectedGroup}`)
-
-            // Revoke existing vote(s) if necessary
-            for (const vote of currentVotes) {
-              const revokeTxs = await election.revoke(
-                botAccount,
-                vote.group,
-                vote.pending.plus(vote.active)
-              )
-              for (const tx of revokeTxs) {
-                await tx.sendAndWaitForReceipt()
-              }
-            }
-
-            const groupCapacity = groupCapacities.get(randomlySelectedGroup)!
-            const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
-            const voteTx = await election.vote(randomlySelectedGroup, BigNumber.minimum(voteAmount))
-            await voteTx.sendAndWaitForReceipt()
-            console.info(`Completed vote as ${botAccount}`)
-
-            groupCapacities.set(randomlySelectedGroup, groupCapacity.minus(voteAmount))
-          } else {
-            console.info(`No locked gold exists for ${botAccount}`)
+          if (lockedGoldAmount.isZero()) {
+            console.info(`No locked gold exists for ${botAccount}, skipping...`)
+            continue
           }
+
+          const currentVotes = (await election.getVoter(botAccount)).votes
+          const currentGroups = currentVotes.map((v) => v.group)
+
+          const randomlySelectedGroup = getWeightedRandomChoice(
+            groupWeights,
+            [...groupCapacities.keys()].filter((k) => {
+              const capacity = groupCapacities.get(k)
+              return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
+            })
+          )
+
+          // Revoke existing vote(s) if any
+          for (const vote of currentVotes) {
+            const revokeTxs = await election.revoke(
+              botAccount,
+              vote.group,
+              vote.pending.plus(vote.active)
+            )
+            for (const tx of revokeTxs) {
+              await tx.sendAndWaitForReceipt({ from: botAccount })
+            }
+          }
+
+          const groupCapacity = groupCapacities.get(randomlySelectedGroup)!
+          const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
+          const voteTx = await election.vote(randomlySelectedGroup, BigNumber.minimum(voteAmount))
+          await voteTx.sendAndWaitForReceipt({ from: botAccount })
+          console.info(`Completed voting as ${botAccount}`)
+
+          groupCapacities.set(randomlySelectedGroup, groupCapacity.minus(voteAmount))
         } catch (error) {
           console.error(`Failed to vote as ${botAccount}`)
           console.info(error)
@@ -149,9 +116,25 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
   }
 }
 
-function calculateGroupWeightsFromScores(
-  groupScores: Map<string, BigNumber[]>
-): Map<string, BigNumber> {
+async function calculateGroupWeights(kit: ContractKit): Promise<Map<string, BigNumber>> {
+  const election = await kit.contracts.getElection()
+  const validators = await kit.contracts.getValidators()
+
+  const groupScores = new Map<string, BigNumber[]>()
+  for (const valSigner of await election.getCurrentValidatorSigners()) {
+    try {
+      const val = await validators.getValidatorFromSigner(valSigner)
+      const groupAddress = val.affiliation!
+      if (groupScores.has(groupAddress)) {
+        groupScores.get(groupAddress)!.push(val.score)
+      } else {
+        groupScores.set(groupAddress, [val.score])
+      }
+    } catch (error) {
+      console.info(`could not get info for ${valSigner}, skipping...`)
+    }
+  }
+
   const groupWeights = new Map<string, BigNumber>()
 
   // Add up the scores for each group's validators and calculate weights
@@ -198,4 +181,24 @@ function getWeightedRandomChoice(
   // sorted groups is always going to be higher than the value for `choice`.
   // This is here to handle unknown edge-cases and to make Typescript happy
   throw Error('An unexpected error occured when choosing a group via weighted random choice')
+}
+
+async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promise<void> {
+  const election = await kit.contracts.getElection()
+
+  for (const key of botKeys) {
+    kit.addAccount(key)
+    const account = ensure0x(getAccountAddressFromPrivateKey(key))
+    if (!(await election.hasActivatablePendingVotes(account))) {
+      try {
+        console.info(`activating votes for ${account}`)
+        const activateTxs = await election.activate(account)
+        for (const tx of activateTxs) {
+          await tx.sendAndWaitForReceipt({ from: account })
+        }
+      } catch (error) {
+        console.error(`Failed to activate pending votes for ${account}`)
+      }
+    }
+  }
 }
