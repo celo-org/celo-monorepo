@@ -1,5 +1,10 @@
+import { ContractKit, newKit } from '@celo/contractkit'
+import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
+import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
+import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import { ensure0x } from 'src/lib/utils'
 
 const helmChartPath = '../helm-charts/voting-bot'
 
@@ -9,6 +14,51 @@ export async function installHelmChart(celoEnv: string) {
 }
 export async function removeHelmRelease(celoEnv: string) {
   await removeGenericHelmChart(releaseName(celoEnv))
+}
+
+export async function setupVotingBotAccounts(celoEnv: string) {
+  const celoProvider = getFornoUrl(celoEnv)
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const numBotAccounts = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
+
+  const kit: ContractKit = newKit(celoProvider)
+  const goldToken = await kit.contracts.getGoldToken()
+  const lockedGold = await kit.contracts.getLockedGold()
+  const accounts = await kit.contracts.getAccounts()
+
+  const botsWithoutGold: string[] = []
+
+  for (const key of getPrivateKeysFor(AccountType.VOTING_BOT, mnemonic, numBotAccounts)) {
+    const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
+    const goldBalance = await goldToken.balanceOf(botAccount)
+    if (goldBalance.isZero()) {
+      botsWithoutGold.push(botAccount)
+      continue
+    }
+
+    kit.addAccount(key)
+
+    if (!(await accounts.isAccount(botAccount))) {
+      const registerTx = await accounts.createAccount()
+      await registerTx.sendAndWaitForReceipt({ from: botAccount })
+    }
+
+    if ((await lockedGold.getAccountTotalLockedGold(botAccount)).isEqualTo(0)) {
+      const tx = await lockedGold.lock()
+      const amountToLock = goldBalance.multipliedBy(0.99).toFixed(0)
+
+      await tx.sendAndWaitForReceipt({
+        to: lockedGold.address,
+        value: amountToLock,
+        from: botAccount,
+      })
+      console.info(`Locked gold for ${botAccount}`)
+    }
+  }
+  if (botsWithoutGold.length > 0) {
+    throw new Error(`These bot accounts have no gold. Faucet them, and retry: ${botsWithoutGold}`)
+  }
+  console.info('Finished/confirmed setup of voting bot accounts')
 }
 
 function helmParameters(celoEnv: string) {
