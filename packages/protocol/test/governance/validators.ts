@@ -65,6 +65,7 @@ const parseMembershipHistory = (membershipHistory: any) => {
     epochs: membershipHistory[0],
     groups: membershipHistory[1],
     lastRemovedFromGroupTimestamp: membershipHistory[2],
+    tail: membershipHistory[3],
   }
 }
 

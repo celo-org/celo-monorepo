@@ -19,9 +19,9 @@ import OvalCoin from 'src/shared/OvalCoin'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
-const CookieConsent = dynamic((import('src/header/CookieConsent') as unknown) as Promise<
-  React.ComponentType
->)
+const CookieConsent = dynamic(
+  (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
+)
 
 const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 const DARK_PAGES = new Set([
@@ -281,21 +281,20 @@ export class Header extends React.PureComponent<Props, State> {
           </View>
         </View>
 
-        {!this.state.showDesktopMenu &&
-          !this.state.menuFaded && (
-            <View style={[styles.hamburger]}>
-              <div
-                className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
-                  this.state.mobileMenuActive ? cssStyles['is-active'] : ''
-                }`}
-                onClick={this.clickHamburger}
-              >
-                <div className={cssStyles['hamburger-box']}>
-                  <div className={cssStyles['hamburger-inner']} />
-                </div>
+        {!this.state.showDesktopMenu && !this.state.menuFaded && (
+          <View style={[styles.hamburger]}>
+            <div
+              className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
+                this.state.mobileMenuActive ? cssStyles['is-active'] : ''
+              }`}
+              onClick={this.clickHamburger}
+            >
+              <div className={cssStyles['hamburger-box']}>
+                <div className={cssStyles['hamburger-inner']} />
               </div>
-            </View>
-          )}
+            </div>
+          </View>
+        )}
       </View>
     )
   }
@@ -402,12 +401,6 @@ const styles = StyleSheet.create({
   },
   logoLeftVisible: {
     display: 'flex',
-  },
-  medium: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    paddingLeft: 10,
   },
 })
 

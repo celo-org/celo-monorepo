@@ -177,8 +177,8 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
-    mapStateToProps,
-    { startBalanceAutorefresh, stopBalanceAutorefresh }
-  )(withTranslation(Namespaces.walletFlow5)(AccountOverview))
+  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+    startBalanceAutorefresh,
+    stopBalanceAutorefresh,
+  })(withTranslation(Namespaces.walletFlow5)(AccountOverview))
 )
