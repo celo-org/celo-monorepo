@@ -38,7 +38,9 @@ export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gr
 3.  Compile the project and start the bundler with
 
     ```bash
-    yarn run dev
+    yarn run dev:android
+    OR
+    yarn run dev:ios
     ```
 
     This will build the app in a device (physical or emulated) and open a

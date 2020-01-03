@@ -64,10 +64,7 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
   i18n.t('walletFlow5:escrowedPaymentReminder')
 )
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    updatePaymentRequestStatus,
-    fetchPhoneAddresses,
-  }
-)(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  updatePaymentRequestStatus,
+  fetchPhoneAddresses,
+})(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))

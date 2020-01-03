@@ -1064,7 +1064,10 @@ contract('Governance', (accounts: string[]) => {
         await governance.upvote(proposalId, 0, 0)
         assert.isFalse(await governance.isQueued(proposalId))
         const [proposalIds] = await governance.getQueue()
-        assert.notInclude(proposalIds.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          proposalIds.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should emit the ProposalExpired event', async () => {
@@ -1432,7 +1435,10 @@ contract('Governance', (accounts: string[]) => {
       it('should remove the proposal ID from dequeued', async () => {
         await governance.approve(proposalId, index)
         const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          dequeued.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should add the index to empty indices', async () => {
@@ -1606,7 +1612,10 @@ contract('Governance', (accounts: string[]) => {
       it('should remove the proposal ID from dequeued', async () => {
         await governance.vote(proposalId, index, value)
         const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          dequeued.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should add the index to empty indices', async () => {
@@ -1906,7 +1915,10 @@ contract('Governance', (accounts: string[]) => {
       it('should remove the proposal ID from dequeued', async () => {
         await governance.execute(proposalId, index)
         const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          dequeued.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should add the index to empty indices', async () => {

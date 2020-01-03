@@ -216,10 +216,9 @@ export class BackupQuiz extends React.Component<Props, State> {
 }
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps, {}, RootState>(
-    null,
-    { setBackupCompleted, showError }
-  )(withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz))
+  connect<{}, DispatchProps, {}, RootState>(null, { setBackupCompleted, showError })(
+    withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz)
+  )
 )
 
 const styles = StyleSheet.create({
