@@ -127,11 +127,8 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      exitBackupFlow,
-      navigatePinProtected,
-    }
-  )(withTranslation(Namespaces.backupKeyFlow6)(BackupSocialIntro))
+  connect<{}, DispatchProps, {}, RootState>(mapStateToProps, {
+    exitBackupFlow,
+    navigatePinProtected,
+  })(withTranslation(Namespaces.backupKeyFlow6)(BackupSocialIntro))
 )

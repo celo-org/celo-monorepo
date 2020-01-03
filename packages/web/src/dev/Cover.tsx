@@ -55,7 +55,8 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
             <Trans ns={NameSpaces.dev} i18nKey={'purposeText'}>
               <Text href={CeloLinks.discourse} style={styles.colorEmphasis}>
                 2 million Celo Gold in rewards.
-              </Text>*
+              </Text>
+              *
             </Trans>
           </H4>
           <Text style={[fonts.p, textStyles.invert]}>
