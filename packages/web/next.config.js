@@ -2,7 +2,6 @@ const withSass = require('@zeit/next-sass')
 const withImages = require('next-images')
 const envConfig = require('./env-config')
 const serverEnvConfig = require('./server-env-config')
-const Visualizer = require('webpack-visualizer-plugin')
 
 module.exports = withImages(
   withSass({
@@ -26,9 +25,6 @@ module.exports = withImages(
         ...config.resolve.alias,
         'react-native$': 'react-native-web',
       }
-
-      config.plugins = config.plugins || []
-      config.plugins.push(new Visualizer())
 
       if (!isServer) {
         config.resolve.alias['@sentry/node'] = '@sentry/browser'

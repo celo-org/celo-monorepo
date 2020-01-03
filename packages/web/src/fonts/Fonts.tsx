@@ -113,7 +113,7 @@ interface TextChildren {
 
 export function Ul(props: ViewProps & ViewChildren) {
   return (
-    <View style={[styles.ul, props.style]} accessibilityRole={'list'}>
+    <View style={StyleSheet.flatten([styles.ul, props.style])} accessibilityRole={'list'}>
       {props.children}
     </View>
   )
