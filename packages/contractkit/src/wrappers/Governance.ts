@@ -80,8 +80,9 @@ export interface Votes {
   [VoteValue.Abstain]: BigNumber
 }
 
+export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
+
 export interface HotfixRecord {
-  hash: Buffer
   approved: boolean
   executed: boolean
   preparedEpoch: BigNumber
@@ -183,7 +184,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
-  static toParams = (proposal: Proposal): ProposalParams => {
+  static proposalToParams = (proposal: Proposal): ProposalParams => {
     const data = proposal.map((tx) => stringToBuffer(tx.input))
     return [
       proposal.map((tx) => tx.value),
@@ -192,6 +193,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       data.map((inp) => inp.length),
     ]
   }
+
+  static hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams =>
+    GovernanceWrapper.proposalToParams(proposal).concat([bufferToString(salt)]) as any
 
   /**
    * Returns whether a given proposal is approved.
@@ -259,7 +263,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Submits a new governance proposal.
    * @param proposal Governance proposal
    */
-  propose = proxySend(this.kit, this.contract.methods.propose, GovernanceWrapper.toParams)
+  propose = proxySend(this.kit, this.contract.methods.propose, GovernanceWrapper.proposalToParams)
 
   /**
    * Returns whether a governance proposal exists with the given ID.
@@ -503,7 +507,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getHotfixRecord(hash: Buffer): Promise<HotfixRecord> {
     const res = await this.contract.methods.getHotfixRecord(bufferToString(hash)).call()
     return {
-      hash,
       approved: res[0],
       executed: res[1],
       preparedEpoch: valueToBigNumber(res[2]),
@@ -569,11 +572,12 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Executes a given sequence of transactions if the corresponding hash is prepared and approved.
    * @param hotfix Governance hotfix proposal
+   * @param salt Secret which guarantees uniqueness of hash
    * @notice keccak256 hash of abi encoded transactions computed on-chain
    */
   executeHotfix = proxySend(
     this.kit,
     this.contract.methods.executeHotfix,
-    GovernanceWrapper.toParams
+    GovernanceWrapper.hotfixToParams
   )
 }
