@@ -270,8 +270,5 @@ const styles = StyleSheet.create({
 })
 
 export default withTranslation(Namespaces.profile)(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(HomeScreen)
+  connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 )

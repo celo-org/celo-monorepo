@@ -157,8 +157,8 @@ export function TransferFeedItem(props: Props) {
     type === TransactionTypes.NETWORK_FEE
       ? getNetworkFeeDisplayValue(props.value)
       : showLocalCurrency && localCurrencyCode
-        ? getMoneyDisplayValue(localValue || 0)
-        : getMoneyDisplayValue(props.value)
+      ? getMoneyDisplayValue(localValue || 0)
+      : getMoneyDisplayValue(props.value)
 
   const { title, info, recipient } = getTransferFeedParams(
     type,

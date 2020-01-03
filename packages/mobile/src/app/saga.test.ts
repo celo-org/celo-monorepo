@@ -62,14 +62,20 @@ describe('App saga', () => {
 
   it('Version Deprecated', async () => {
     await expectSaga(checkAppDeprecation)
-      .provide([[call(waitForRehydrate), null], [call(isAppVersionDeprecated), true]])
+      .provide([
+        [call(waitForRehydrate), null],
+        [call(isAppVersionDeprecated), true],
+      ])
       .run()
     expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
   })
 
   it('Version Not Deprecated', async () => {
     await expectSaga(checkAppDeprecation)
-      .provide([[call(waitForRehydrate), null], [call(isAppVersionDeprecated), false]])
+      .provide([
+        [call(waitForRehydrate), null],
+        [call(isAppVersionDeprecated), false],
+      ])
       .run()
     expect(navigate).not.toHaveBeenCalled()
   })

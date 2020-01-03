@@ -40,7 +40,10 @@ describe(watchQrCodeDetections, () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: mockQrCodeData }
 
     await expectSaga(watchQrCodeDetections)
-      .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
+      .provide([
+        [select(addressToE164NumberSelector), {}],
+        [select(recipientCacheSelector), {}],
+      ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
@@ -58,7 +61,10 @@ describe(watchQrCodeDetections, () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: mockQrCodeData.replace(mockName, '') }
 
     await expectSaga(watchQrCodeDetections)
-      .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
+      .provide([
+        [select(addressToE164NumberSelector), {}],
+        [select(recipientCacheSelector), {}],
+      ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
@@ -79,7 +85,10 @@ describe(watchQrCodeDetections, () => {
     }
 
     await expectSaga(watchQrCodeDetections)
-      .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
+      .provide([
+        [select(addressToE164NumberSelector), {}],
+        [select(recipientCacheSelector), {}],
+      ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
@@ -98,7 +107,10 @@ describe(watchQrCodeDetections, () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: INVALID_QR }
 
     await expectSaga(watchQrCodeDetections)
-      .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
+      .provide([
+        [select(addressToE164NumberSelector), {}],
+        [select(recipientCacheSelector), {}],
+      ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
@@ -110,7 +122,10 @@ describe(watchQrCodeDetections, () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: INVALID_QR_NO_ADDRESS }
 
     await expectSaga(watchQrCodeDetections)
-      .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
+      .provide([
+        [select(addressToE164NumberSelector), {}],
+        [select(recipientCacheSelector), {}],
+      ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
@@ -123,7 +138,10 @@ describe(watchQrCodeDetections, () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: INVALID_QR_ADDRESS }
 
     await expectSaga(watchQrCodeDetections)
-      .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
+      .provide([
+        [select(addressToE164NumberSelector), {}],
+        [select(recipientCacheSelector), {}],
+      ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       .silentRun()
