@@ -147,7 +147,10 @@ describe('Start Verification Saga', () => {
   })
   it('tracks failure', async () => {
     await expectSaga(startVerification)
-      .provide([[call(getConnectedAccount), null], [call(doVerificationFlow), false]])
+      .provide([
+        [call(getConnectedAccount), null],
+        [call(doVerificationFlow), false],
+      ])
       .run()
     expect(MockedAnalytics.track.mock.calls.length).toBe(1)
     expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_failed)
@@ -168,7 +171,10 @@ describe('Start Verification Saga', () => {
 
   it('stops when the user cancels', async () => {
     await expectSaga(startVerification)
-      .provide([[call(getConnectedAccount), null], [call(doVerificationFlow), sleep(1500)]])
+      .provide([
+        [call(getConnectedAccount), null],
+        [call(doVerificationFlow), sleep(1500)],
+      ])
       .dispatch(cancelVerification())
       .run(2000)
     expect(MockedAnalytics.track.mock.calls.length).toBe(1)

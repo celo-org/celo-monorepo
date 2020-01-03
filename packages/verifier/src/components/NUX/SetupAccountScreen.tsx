@@ -275,8 +275,5 @@ const styles = StyleSheet.create({
 })
 
 export default withTranslation(Namespaces.setupAccount)(
-  connect<null, DispatchProps>(
-    null,
-    mapDispatchToProps
-  )(SetupAccountScreen)
+  connect<null, DispatchProps>(null, mapDispatchToProps)(SetupAccountScreen)
 )

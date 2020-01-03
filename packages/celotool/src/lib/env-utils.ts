@@ -177,9 +177,7 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 export async function doCheckOrPromptIfStagingOrProduction() {
   if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      `You are about to apply a possibly irreversible action on a production env: ${
-        process.env.CELOTOOL_CELOENV
-      }. Are you sure?`
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }

@@ -108,10 +108,7 @@ export class TransactionsList extends React.PureComponent<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      removeStandbyTransaction,
-    }
-  )(withTranslation(Namespaces.walletFlow5)(TransactionsList))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    removeStandbyTransaction,
+  })(withTranslation(Namespaces.walletFlow5)(TransactionsList))
 )

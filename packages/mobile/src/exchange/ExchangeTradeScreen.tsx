@@ -281,14 +281,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 }
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      fetchExchangeRate,
-      showError,
-      hideAlert,
-    }
-  )(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    fetchExchangeRate,
+    showError,
+    hideAlert,
+  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 )
 
 const styles = StyleSheet.create({

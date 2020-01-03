@@ -135,12 +135,9 @@ const styles = StyleSheet.create({
   },
 })
 
-const WrappedNavigator = connect<NavigatorStateProps, DispatchProps>(
-  mapStateToProps,
-  {
-    setLanguage,
-  }
-)(Navigator)
+const WrappedNavigator = connect<NavigatorStateProps, DispatchProps>(mapStateToProps, {
+  setLanguage,
+})(Navigator)
 
 class App extends React.Component<{}, {}> {
   componentDidMount() {

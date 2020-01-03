@@ -70,9 +70,7 @@ function* initializeFirebase() {
     const app = firebase.app()
     Logger.info(
       TAG,
-      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${
-        app.options.databaseURL
-      }`
+      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${app.options.databaseURL}`
     )
     yield call(initializeAuth, firebase, address)
     yield put(firebaseAuthorized())
