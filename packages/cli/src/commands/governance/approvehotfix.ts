@@ -19,14 +19,15 @@ export default class ApproveHotfix extends BaseCommand {
   async run() {
     const res = this.parse(ApproveHotfix)
     const account = res.flags.from
+    const hash = toBuffer(res.flags.hash) as Buffer
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
 
     await newCheckBuilder(this)
       .isApprover(account)
+      .hotfixNotExecuted(hash)
       .runChecks()
 
-    const hash = toBuffer(res.flags.hash) as Buffer
     await displaySendTx('approveTx', governance.approveHotfix(hash))
   }
 }

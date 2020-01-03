@@ -26,6 +26,7 @@ export default class PrepareHotfix extends BaseCommand {
 
     await newCheckBuilder(this, account)
       .hotfixIsPassing(hash)
+      .hotfixNotExecuted(hash)
       .addCheck(`Hotfix ${hash} not already prepared for current epoch`, async () => {
         const { preparedEpoch } = await governance.getHotfixRecord(hash)
         const validators = await this.kit.contracts.getValidators()

@@ -28,13 +28,13 @@ export default class ExecuteHotfix extends BaseCommand {
 
     await newCheckBuilder(this, account)
       .hotfixIsPassing(hash)
+      .hotfixNotExecuted(hash)
       .addCheck(`Hotfix ${hash} is prepared for current epoch`, async () => {
         const validators = await this.kit.contracts.getValidators()
         const currentEpoch = await validators.getEpochNumber()
         return record.preparedEpoch.eq(currentEpoch)
       })
       .addCheck(`Hotfix ${hash} is approved`, () => record.approved)
-      .addCheck(`Hotfix ${hash} not already executed`, () => record.executed)
       .runChecks()
 
     await displaySendTx('executeHotfixTx', governance.executeHotfix(hotfix))

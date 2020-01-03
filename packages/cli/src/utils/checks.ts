@@ -121,6 +121,12 @@ class CheckBuilder {
       this.withGovernance((g) => g.isHotfixPassing(hash))
     )
 
+  hotfixNotExecuted = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix ${hash} is not already executed`,
+      this.withGovernance(async (g) => !(await g.getHotfixRecord(hash)).executed)
+    )
+
   canSign = (account: Address) =>
     this.addCheck('Account can sign', async () => {
       try {

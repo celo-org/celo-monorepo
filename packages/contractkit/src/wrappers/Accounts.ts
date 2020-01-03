@@ -12,9 +12,11 @@ import { Address } from '../base'
 import { Accounts } from '../generated/types/Accounts'
 import {
   BaseWrapper,
+  bytesToString,
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  stringToBytes,
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
@@ -129,8 +131,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       },
       metadataURL: ret[4],
       wallet: ret[5],
-      // @ts-ignore Incorrect bytes type.
-      dataEncryptionKey: ret[6],
+      dataEncryptionKey: bytesToString(ret[6]),
     }
   }
 
@@ -203,8 +204,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
           proofOfSigningKeyPossession.s,
-          // @ts-ignore bytes type
-          pubKey
+          stringToBytes(pubKey)
         )
       )
     } else {
