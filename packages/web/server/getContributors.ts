@@ -1,9 +1,8 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
+import { Contributor } from '../src/about/Contributor'
 import airtableInit from './airtable'
 import { cache } from './cache'
-
-import { Contributor } from '../src/about/Contributor'
 
 interface Fields extends FieldSet {
   'Full Name': string
@@ -32,8 +31,10 @@ async function fetchContributors() {
     })
 }
 
-function getAirtable(sheet: string): Table<Fields> {
-  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_ANNOUNCEMENT_ID)(sheet)
+function getAirtable(sheet: string) {
+  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_ANNOUNCEMENT_ID)(sheet) as Table<
+    Fields
+  >
 }
 
 const IS_APROVED = 'Approved=1'

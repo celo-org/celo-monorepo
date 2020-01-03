@@ -126,7 +126,7 @@ const Portrait = React.memo(function _Portrait({
             )}
           </View>
 
-          <Text style={[fonts.p]}>
+          <Text style={fonts.p}>
             {company} – {team}
           </Text>
         </View>
@@ -139,7 +139,7 @@ const PHOTO_BACKGROUND = '#E5E2DD'
 
 // @ts-ignore
 const styles = StyleSheet.create({
-  purposeText: { fontSize: 26, lineHeight: 28 },
+  purposeText: { fontSize: 26, lineHeight: 28, minHeight: 60 },
   container: {
     flex: 1,
     flexDirection: 'column',
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   photoList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     minHeight: '50vh',
   },
