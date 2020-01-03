@@ -105,29 +105,27 @@ class BackupIntroduction extends React.Component<Props> {
               <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.1')}</Text>
             </>
           )}
-          {backupCompleted &&
-            !socialBackupCompleted && (
-              <>
-                <Text style={styles.body}>
-                  {t('backupKeyIntro.2')}
-                  <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
-                </Text>
-                <Text style={styles.body}>{t('backupKeyIntro.4')}</Text>
-              </>
-            )}
-          {backupCompleted &&
-            socialBackupCompleted && (
-              <>
-                <Text style={styles.body}>
-                  {t('backupKeyIntro.2')}
-                  <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
-                </Text>
-                <Text style={styles.body}>
-                  {t('backupKeyIntro.5')}
-                  <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.6')}</Text>
-                </Text>
-              </>
-            )}
+          {backupCompleted && !socialBackupCompleted && (
+            <>
+              <Text style={styles.body}>
+                {t('backupKeyIntro.2')}
+                <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
+              </Text>
+              <Text style={styles.body}>{t('backupKeyIntro.4')}</Text>
+            </>
+          )}
+          {backupCompleted && socialBackupCompleted && (
+            <>
+              <Text style={styles.body}>
+                {t('backupKeyIntro.2')}
+                <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
+              </Text>
+              <Text style={styles.body}>
+                {t('backupKeyIntro.5')}
+                <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.6')}</Text>
+              </Text>
+            </>
+          )}
         </ScrollView>
         {doingPinVerification && (
           <ActivityIndicator size="large" color={colors.celoGreen} style={styles.loader} />
@@ -141,53 +139,50 @@ class BackupIntroduction extends React.Component<Props> {
                 standard={false}
                 type={BtnTypes.PRIMARY}
               />
-              {backupTooLate &&
-                !backupDelayedTime && (
-                  <Button
-                    onPress={this.onPressDelay}
-                    text={t('delayBackup')}
-                    standard={false}
-                    type={BtnTypes.SECONDARY}
-                  />
-                )}
+              {backupTooLate && !backupDelayedTime && (
+                <Button
+                  onPress={this.onPressDelay}
+                  text={t('delayBackup')}
+                  standard={false}
+                  type={BtnTypes.SECONDARY}
+                />
+              )}
             </>
           )}
 
-          {backupCompleted &&
-            !socialBackupCompleted && (
-              <>
-                <Button
-                  onPress={this.onPressSetupSocialBackup}
-                  text={t('setUpSocialBackup')}
-                  standard={false}
-                  type={BtnTypes.PRIMARY}
-                />
-                <Button
-                  onPress={this.onPressViewBackupKey}
-                  text={t('viewBackupKey')}
-                  standard={false}
-                  type={BtnTypes.SECONDARY}
-                />
-              </>
-            )}
+          {backupCompleted && !socialBackupCompleted && (
+            <>
+              <Button
+                onPress={this.onPressSetupSocialBackup}
+                text={t('setUpSocialBackup')}
+                standard={false}
+                type={BtnTypes.PRIMARY}
+              />
+              <Button
+                onPress={this.onPressViewBackupKey}
+                text={t('viewBackupKey')}
+                standard={false}
+                type={BtnTypes.SECONDARY}
+              />
+            </>
+          )}
 
-          {backupCompleted &&
-            socialBackupCompleted && (
-              <>
-                <Button
-                  onPress={this.onPressBackup}
-                  text={t('viewBackupKey')}
-                  standard={false}
-                  type={BtnTypes.SECONDARY}
-                />
-                <Button
-                  onPress={this.onPressViewSocialBackup}
-                  text={t('viewSafeguards')}
-                  standard={false}
-                  type={BtnTypes.SECONDARY}
-                />
-              </>
-            )}
+          {backupCompleted && socialBackupCompleted && (
+            <>
+              <Button
+                onPress={this.onPressBackup}
+                text={t('viewBackupKey')}
+                standard={false}
+                type={BtnTypes.SECONDARY}
+              />
+              <Button
+                onPress={this.onPressViewSocialBackup}
+                text={t('viewSafeguards')}
+                standard={false}
+                type={BtnTypes.SECONDARY}
+              />
+            </>
+          )}
         </View>
       </SafeAreaView>
     )
@@ -226,13 +221,10 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      setBackupDelayed,
-      enterBackupFlow,
-      exitBackupFlow,
-      navigatePinProtected,
-    }
-  )(withTranslation(Namespaces.backupKeyFlow6)(BackupIntroduction))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    setBackupDelayed,
+    enterBackupFlow,
+    exitBackupFlow,
+    navigatePinProtected,
+  })(withTranslation(Namespaces.backupKeyFlow6)(BackupIntroduction))
 )

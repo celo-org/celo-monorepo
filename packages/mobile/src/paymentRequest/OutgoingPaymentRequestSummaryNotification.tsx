@@ -100,10 +100,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    updatePaymentRequestStatus,
-    updatePaymentRequestNotified,
-  }
-)(withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  updatePaymentRequestStatus,
+  updatePaymentRequestNotified,
+})(withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))
