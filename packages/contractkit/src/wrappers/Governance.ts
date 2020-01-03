@@ -54,6 +54,16 @@ export type ProposalParams = Parameters<Governance['methods']['propose']>
 export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
+export const proposalToParams = (proposal: Proposal): ProposalParams => {
+  const data = proposal.map((tx) => stringToBuffer(tx.input))
+  return [
+    proposal.map((tx) => tx.value),
+    proposal.map((tx) => tx.to),
+    bufferToBytes(Buffer.concat(data)),
+    data.map((inp) => inp.length),
+  ]
+}
+
 export interface ProposalRecord {
   stage: ProposalStage
   metadata: ProposalMetadata
@@ -81,6 +91,10 @@ export interface Votes {
 }
 
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
+export const hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams => {
+  const p = proposalToParams(proposal)
+  return [p[0], p[1], p[2], p[3], bufferToString(salt)]
+}
 
 export interface HotfixRecord {
   approved: boolean
@@ -184,19 +198,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
-  static proposalToParams = (proposal: Proposal): ProposalParams => {
-    const data = proposal.map((tx) => stringToBuffer(tx.input))
-    return [
-      proposal.map((tx) => tx.value),
-      proposal.map((tx) => tx.to),
-      bufferToBytes(Buffer.concat(data)),
-      data.map((inp) => inp.length),
-    ]
-  }
-
-  static hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams =>
-    GovernanceWrapper.proposalToParams(proposal).concat([bufferToString(salt)]) as any
-
   /**
    * Returns whether a given proposal is approved.
    * @param proposalID Governance proposal UUID
@@ -263,7 +264,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Submits a new governance proposal.
    * @param proposal Governance proposal
    */
-  propose = proxySend(this.kit, this.contract.methods.propose, GovernanceWrapper.proposalToParams)
+  propose = proxySend(this.kit, this.contract.methods.propose, proposalToParams)
 
   /**
    * Returns whether a governance proposal exists with the given ID.
@@ -575,9 +576,5 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param salt Secret which guarantees uniqueness of hash
    * @notice keccak256 hash of abi encoded transactions computed on-chain
    */
-  executeHotfix = proxySend(
-    this.kit,
-    this.contract.methods.executeHotfix,
-    GovernanceWrapper.hotfixToParams
-  )
+  executeHotfix = proxySend(this.kit, this.contract.methods.executeHotfix, hotfixToParams)
 }

@@ -5,19 +5,17 @@ import { Transaction, TransactionObject } from 'web3/eth/types'
 import { CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
+import { ABI as GovernanceABI } from '../generated/Governance'
 import { ContractKit } from '../kit'
+import { getAbiTypes } from '../utils/web3-utils'
 import { CeloTransactionObject, valueToString } from '../wrappers/BaseWrapper'
-import { GovernanceWrapper, Proposal, ProposalTransaction } from '../wrappers/Governance'
+import { hotfixToParams, Proposal, ProposalTransaction } from '../wrappers/Governance'
 import { setImplementationOnProxy } from './proxy'
 
-export const PROPOSE_PARAM_ABI_TYPES = ['uint256[]', 'address[]', 'bytes', 'uint256[]']
-export const HOTFIX_PARAM_ABI_TYPES = PROPOSE_PARAM_ABI_TYPES.concat(['bytes32']) // salt
+export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
 export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  kit.web3.eth.abi.encodeParameters(
-    HOTFIX_PARAM_ABI_TYPES,
-    GovernanceWrapper.hotfixToParams(proposal, salt)
-  )
+  kit.web3.eth.abi.encodeParameters(HOTFIX_PARAM_ABI_TYPES, hotfixToParams(proposal, salt))
 
 export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
   keccak256(hotfixToEncodedParams(kit, proposal, salt)) as Buffer
