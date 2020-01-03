@@ -98,7 +98,7 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, register-metadata, run-fullnode, status, print-env, get-cooking. Default: pull,accounts,run-validator,run-proxy,status"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, register-metadata, run-fullnode, status, print-env, get-cooking, stop-validating. Default: pull,accounts,run-validator,run-proxy,status"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: $HOME/.celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
@@ -230,6 +230,29 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     echo -e "The Validator should be starting. You can attach to it running 'screen -r -S celo-validator'\n"
     
 fi
+
+
+if [[ $COMMAND == *"stop-validating"* ]]; then
+
+    echo -e "* Let's stop of validate ..."
+
+    if [ -z ${CELO_VALIDATOR_ADDRESS+x} ]; then echo "CELO_VALIDATOR_ADDRESS is unset"; exit 1; fi
+    if [ -z ${CELO_VALIDATOR_GROUP_ADDRESS+x} ]; then echo "CELO_VALIDATOR_GROUP_ADDRESS is unset"; exit 1; fi
+
+    
+    echo -e "\tDe-registering Validator $CELO_VALIDATOR_ADDRESS"
+    $CELOCLI validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
+    $CELOCLI validator:deregister --from $CELO_VALIDATOR_ADDRESS
+    
+    $CELOCLI election:revoke --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+    $CELOCLI election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+
+    echo -e "\tDeregister validator group:"
+    $CELOCLI validatorgroup:deregister --from $CELO_VALIDATOR_GROUP_ADDRESS
+    
+    docker stop celo-validator celo-proxy
+fi
+
 
 if [[ $COMMAND == *"run-attestation"* ]]; then
 
