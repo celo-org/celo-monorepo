@@ -1,4 +1,5 @@
 import { ContractKit, newKit } from '@celo/contractkit'
+import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
@@ -17,11 +18,11 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 export async function setupVotingBotAccounts(celoEnv: string) {
-  const celoProvider = getFornoUrl(celoEnv)
+  const fornoUrl = getFornoUrl(celoEnv)
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const numBotAccounts = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
 
-  const kit: ContractKit = newKit(celoProvider)
+  const kit: ContractKit = newKit(fornoUrl)
   const goldToken = await kit.contracts.getGoldToken()
   const lockedGold = await kit.contracts.getLockedGold()
   const accounts = await kit.contracts.getAccounts()
@@ -59,6 +60,11 @@ export async function setupVotingBotAccounts(celoEnv: string) {
     throw new Error(`These bot accounts have no gold. Faucet them, and retry: ${botsWithoutGold}`)
   }
   console.info('Finished/confirmed setup of voting bot accounts')
+
+  if (kit.web3.currentProvider instanceof CeloProvider) {
+    const celoProvider = kit.web3.currentProvider as CeloProvider
+    celoProvider.stop()
+  }
 }
 
 function helmParameters(celoEnv: string) {

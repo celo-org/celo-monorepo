@@ -14,7 +14,4 @@ export const handler = async (argv: InitialArgv) => {
   await switchToClusterFromEnv()
   await setupVotingBotAccounts(argv.celoEnv)
   await installHelmChart(argv.celoEnv)
-
-  // This is needed to stop setupVotingBotAccounts from hanging
-  process.exit(0)
 }
