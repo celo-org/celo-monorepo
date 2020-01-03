@@ -89,11 +89,8 @@ OutgoingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
   i18n.t('walletFlow5:outgoingPaymentRequests')
 )
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    updatePaymentRequestStatus,
-    updatePaymentRequestNotified,
-    fetchPhoneAddresses,
-  }
-)(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  updatePaymentRequestStatus,
+  updatePaymentRequestNotified,
+  fetchPhoneAddresses,
+})(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))
