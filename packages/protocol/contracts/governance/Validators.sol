@@ -338,7 +338,7 @@ contract Validators is
   function getMembershipHistory(address account)
     external
     view
-    returns (uint256[] memory, address[] memory, uint256)
+    returns (uint256[] memory, address[] memory, uint256, uint256)
   {
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256[] memory epochs = new uint256[](history.numEntries);
@@ -348,7 +348,7 @@ contract Validators is
       epochs[i] = history.entries[index].epochNumber;
       membershipGroups[i] = history.entries[index].group;
     }
-    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp);
+    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp, history.tail);
   }
 
   /**
@@ -1157,11 +1157,25 @@ contract Validators is
     return true;
   }
 
+  function getCanForceDeaffiliation() internal pure returns (bytes32[] memory) {
+    bytes32[] memory res = new bytes32[](4);
+    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
+    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
+    res[2] = GOVERNANCE_SLASHER_REGISTRY_ID;
+    res[3] = GOVERNANCE_REGISTRY_ID;
+    return res;
+  }
+
   /**
    * @notice Removes a validator from the group for which it is a member.
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
-  function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
+  // function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
+  function forceDeaffiliateIfValidator(address validatorAccount)
+    external
+    nonReentrant
+    onlyRegisteredContracts(getCanForceDeaffiliation())
+  {
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -1193,11 +1207,23 @@ contract Validators is
     group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
+  function getCanHalveSlashingMultiplier() internal pure returns (bytes32[] memory) {
+    bytes32[] memory res = new bytes32[](2);
+    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
+    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
+    return res;
+  }
+
   /**
    * @notice Halves the group's slashing multiplier.
    * @param account The group being slashed.
    */
-  function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
+  // function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
+  function halveSlashingMultiplier(address account)
+    external
+    nonReentrant
+    onlyRegisteredContracts(getCanHalveSlashingMultiplier())
+  {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
@@ -1241,4 +1267,5 @@ contract Validators is
     );
     return history.entries[index].group;
   }
+
 }
