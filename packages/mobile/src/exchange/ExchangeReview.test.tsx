@@ -2,10 +2,10 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { ExchangeReview } from 'src/exchange/ExchangeReview'
+import ExchangeReview from 'src/exchange/ExchangeReview'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { createMockNavigationProp, createMockStore, getMockI18nProps } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -25,7 +25,7 @@ const store = createMockStore({
   },
 })
 
-describe(ExchangeReview, () => {
+describe('ExchangeReview', () => {
   it('renders correctly', () => {
     const navigation = createMockNavigationProp({
       makerToken: CURRENCY_ENUM.GOLD,
@@ -43,7 +43,6 @@ describe(ExchangeReview, () => {
           fetchExchangeRate={jest.fn()}
           exchangeRatePair={exchangeRatePair}
           exchangeTokens={jest.fn()}
-          {...getMockI18nProps()}
         />
       </Provider>
     )

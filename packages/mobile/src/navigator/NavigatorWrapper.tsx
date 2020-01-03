@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import * as React from 'react'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { createAppContainer, NavigationState } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -43,7 +44,7 @@ interface DispatchProps {
   setTopLevelNavigator: typeof setTopLevelNavigator
 }
 
-type Props = DispatchProps
+type Props = DispatchProps & WithTranslation
 
 const AppContainer = createAppContainer(Navigator)
 

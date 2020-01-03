@@ -251,7 +251,7 @@ function ringStyle({ color, playing, duration, lightBackground, stillMode }: Rin
 
 const styles = StyleSheet.create({
   animatedBase: {
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'ease-in',
     willChange: 'fill',
   },

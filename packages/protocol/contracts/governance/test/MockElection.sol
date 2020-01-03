@@ -47,4 +47,15 @@ contract MockElection is IElection {
   function electValidatorSigners() external view returns (address[] memory) {
     return electedValidators;
   }
+
+  function forceDecrementVotes(
+    address,
+    uint256 value,
+    address[] calldata,
+    address[] calldata,
+    uint256[] calldata
+  ) external returns (uint256) {
+    this.setActiveVotes(this.getActiveVotes() - value);
+    return value;
+  }
 }

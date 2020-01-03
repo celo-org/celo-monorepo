@@ -103,5 +103,7 @@ const styles = StyleSheet.create({
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
-  { devModeTriggerClicked }
+  {
+    devModeTriggerClicked,
+  }
 )(DevSkipButton)

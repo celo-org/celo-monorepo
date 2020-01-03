@@ -2,9 +2,9 @@ import BigNumber from 'bignumber.js'
 import { values } from 'lodash'
 import sleep from 'sleep-promise'
 import Web3 from 'web3'
+import { TransactionReceipt } from 'web3-eth'
 import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
-import { TransactionReceipt } from 'web3/types'
 import * as ContractList from '../contracts/index'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
 import { GoldToken } from '../types/GoldToken'
@@ -61,49 +61,52 @@ export async function sendTransaction(
     })}`
   )
 
-  return tx
-    .send({
-      ...txParams,
-      gas: estGas.toString(),
-      // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected feeCurrency.
-      gasPrice: '0',
-    })
-    .on('transactionHash', (hash: string) => {
-      Logger.debug(`${tag}/Tx hash received for ${name}`, hash)
-      if (onTransactionHash) {
-        onTransactionHash(hash)
-      }
-    })
-    .on('receipt', (receipt: TransactionReceipt) => {
-      Logger.debug(`contract-utils@sendTransaction`, `${tag}/Tx receipt received for ${name}`)
-      if (onReceipt) {
-        onReceipt(receipt)
-      }
-    })
-    .on('confirmation', (confirmationNumber: number, receipt: TransactionReceipt) => {
-      // Web3 calls this 24 times. We won't log them all
-      if (confirmationNumber === 0 || confirmationNumber === 24) {
-        Logger.debug(
+  return (
+    tx
+      .send({
+        ...txParams,
+        gas: estGas.toString(),
+        // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
+        // the suggested price in the selected feeCurrency.
+        gasPrice: '0',
+      })
+      .on('transactionHash', (hash: string) => {
+        Logger.debug(`${tag}/Tx hash received for ${name}`, hash)
+        if (onTransactionHash) {
+          onTransactionHash(hash)
+        }
+      })
+      // @ts-ignore
+      .on('receipt', (receipt: TransactionReceipt) => {
+        Logger.debug(`contract-utils@sendTransaction`, `${tag}/Tx receipt received for ${name}`)
+        if (onReceipt) {
+          onReceipt(receipt)
+        }
+      })
+      .on('confirmation', (confirmationNumber: number, receipt: TransactionReceipt) => {
+        // Web3 calls this 24 times. We won't log them all
+        if (confirmationNumber === 0 || confirmationNumber === 24) {
+          Logger.debug(
+            `contract-utils@sendTransaction`,
+            `${tag}/Tx confirmation number ${confirmationNumber} received for ${name}`
+          )
+        }
+        if (onConfirmation) {
+          onConfirmation(confirmationNumber, receipt)
+        }
+      })
+      .on('error', (error: any) => {
+        Logger.error(
           `contract-utils@sendTransaction`,
-          `${tag}/Tx confirmation number ${confirmationNumber} received for ${name}`
+          `${tag}/Tx transaction failed for ${name}, error: ${error}`
         )
-      }
-      if (onConfirmation) {
-        onConfirmation(confirmationNumber, receipt)
-      }
-    })
-    .on('error', (error: any) => {
-      Logger.error(
-        `contract-utils@sendTransaction`,
-        `${tag}/Tx transaction failed for ${name}, error: ${error}`
-      )
-      if (onError) {
-        onError(error)
-      }
-      // When the error is thrown in here, it is not possible to catch the error
-      // at all.
-    })
+        if (onError) {
+          onError(error)
+        }
+        // When the error is thrown in here, it is not possible to catch the error
+        // at all.
+      })
+  )
 }
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
@@ -304,6 +307,7 @@ export async function sendTransactionAsync<T>(
       // the suggested price in the selected feeCurrency.
       gasPrice: '0',
     })
+      // @ts-ignore
       .on('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {
@@ -501,7 +505,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         Logger.debug(tag, `Unexpected error ignored: ${e.message}`)
       }
       const signedTxn = await web3.eth.signTransaction(celoTx)
-      recievedTxHash = web3.utils.sha3(signedTxn.raw)
+      recievedTxHash = web3.utils.sha3(signedTxn.raw) as string
       Logger.info(tag, `Locally calculated recievedTxHash is ${recievedTxHash}`)
       logger(TransactionHashReceived(recievedTxHash))
       if (resolvers.transactionHash) {
