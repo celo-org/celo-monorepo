@@ -23,7 +23,7 @@ spec:
               - bash
               - "-c"
               - |
-                CELOTOOL="/celo-monorepo/packages/celotool/bin/celtooljs.sh";
+                CELOTOOL="/celo-monorepo/packages/celotool/bin/celotooljs.sh";
 
                 $CELOTOOL bots auto-vote --celoProvider https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
             env:

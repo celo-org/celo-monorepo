@@ -41,14 +41,16 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     for (const key of allBotKeys) {
       kit.addAccount(key)
       const account = ensure0x(getAccountAddressFromPrivateKey(key))
-      try {
-        console.info(`activating votes for ${account}`)
-        const activateTxs = await election.activate(account)
-        for (const tx of activateTxs) {
-          await tx.sendAndWaitForReceipt()
+      if (!(await election.hasActivatablePendingVotes(account))) {
+        try {
+          console.info(`activating votes for ${account}`)
+          const activateTxs = await election.activate(account)
+          for (const tx of activateTxs) {
+            await tx.sendAndWaitForReceipt({ from: account })
+          }
+        } catch (error) {
+          console.error(`Failed to activate pending votes for ${account}`)
         }
-      } catch (error) {
-        console.error(`Failed to activate pending votes for ${account}`)
       }
     }
 
