@@ -1,5 +1,5 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
+import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/contractkit/src/utils/web3-utils'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { DEFAULT_FORNO_URL } from 'src/config'
