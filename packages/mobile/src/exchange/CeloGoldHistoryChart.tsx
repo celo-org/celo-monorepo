@@ -1,27 +1,32 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import BigNumber from 'bignumber.js'
 import _ from 'lodash'
-import React, { useCallback, useState } from 'react'
-import { Dimensions, StyleSheet, Text, View } from 'react-native'
-import { LineChart } from 'react-native-chart-kit'
-import { connect } from 'react-redux'
-import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  useExchangeRate,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+  ActivityIndicator,
+  Dimensions,
+  LayoutChangeEvent,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
+import { LineChart } from 'react-native-chart-kit'
+import { connect, useDispatch } from 'react-redux'
+import { syncCeloGoldExchangeRateHistory } from 'src/exchange/actions'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 
-import { Circle, Line, Text as SvgText } from 'react-native-svg'
+import { Circle, G, Line, Text as SvgText } from 'react-native-svg'
+import { useGoldToDollarAmount } from 'src/exchange/hooks'
 import { exchangeHistorySelector } from 'src/exchange/reducer'
-import { CURRENCY_ENUM } from 'src/geth/consts'
 import { RootState } from 'src/redux/reducers'
-import useSelector from 'src/redux/useSelector'
-import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 
-const CHART_POINTS_NUMBER = 30
+const CHART_POINTS_NUMBER = 60
+const CHART_WIDTH = Dimensions.get('window').width - variables.contentPadding * 2
+const CHART_HEIGHT = 180
 
 const styles = StyleSheet.create({
   container: {
@@ -47,6 +52,24 @@ const styles = StyleSheet.create({
     ...fontStyles.semiBold,
     color: colors.celoGreen,
   },
+  loader: {
+    width: CHART_WIDTH + 32,
+    height: CHART_HEIGHT + 130,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rangePeriod: {
+    textAlign: 'center',
+    fontSize: 16,
+    paddingBottom: 4,
+    color: colors.gray,
+  },
+  chartStyle: {
+    paddingRight: 0,
+    paddingTop: 32,
+    marginTop: -32,
+    paddingBottom: 16,
+  },
 })
 
 interface StateProps {
@@ -59,51 +82,128 @@ const mapStateToProps = (state: RootState): StateProps => ({
   exchangeHistory: exchangeHistorySelector(state),
 })
 
-function CeloGoldHistoryChart({ exchangeHistory }: Props) {
-  const drawValueOnChart = useCallback(
-    (position: 'top' | 'bottom', x: number, y: number, value: string) => {
-      if (position === 'top') {
-        y = y - 16
-      } else if (position === 'bottom') {
-        y = y + 25 // 16 + 14/2
-      }
-      return (
-        <SvgText fill="black" fontSize="14" x={x} y={y} textAnchor="middle">
-          {value}
-        </SvgText>
-      )
-    },
-    [Math.random()]
-  )
-  const [range] = useState(30 * 24 * 60 * 60 * 1000) // 30 days
-  const exchangeRatePair = useSelector((state) => state.exchange.exchangeRatePair)
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
-  const exchangeRate = getRateForMakerToken(
-    exchangeRatePair,
-    CURRENCY_ENUM.DOLLAR,
-    CURRENCY_ENUM.GOLD
-  )
-  const isRateValid = !exchangeRate.isZero() && exchangeRate.isFinite()
-  const dollarRateValue = getTakerAmount(1, exchangeRate)
-  const localExchangeRate = useExchangeRate()
-  const localRateValue = convertDollarsToLocalAmount(dollarRateValue, localExchangeRate)
-  let localRateFormattedValue =
-    localRateValue || dollarRateValue === null
-      ? getMoneyDisplayValue(localRateValue || 0)
-      : getMoneyDisplayValue(dollarRateValue || 0)
-  if (localCurrencySymbol) {
-    localRateFormattedValue = localCurrencySymbol + localRateFormattedValue
-  } else if (localCurrencyCode) {
-    localRateFormattedValue = localRateFormattedValue + ' ' + localCurrencyCode
+function ChartAwareSvgText({
+  position,
+  x,
+  y,
+  value,
+}: {
+  position: 'top' | 'bottom'
+  x: number
+  y: number
+  value: string
+}) {
+  if (position === 'top') {
+    y = y - 16
+  } else if (position === 'bottom') {
+    y = y + 25
   }
+  const [realX, setRealX] = useState(x)
+  const onLayout = useCallback(
+    ({
+      nativeEvent: {
+        layout: { width },
+      },
+    }: LayoutChangeEvent) => {
+      if (x - width / 2 < 0) {
+        setRealX(width / 2)
+      }
+      if (x + width / 2 > CHART_WIDTH) {
+        setRealX(CHART_WIDTH - width / 2)
+      }
+    },
+    [x]
+  )
+  return (
+    <SvgText onLayout={onLayout} fill="black" fontSize="14" x={realX} y={y} textAnchor="middle">
+      {value}
+    </SvgText>
+  )
+}
 
+function renderDotOnChart(chartData: Array<{ amount: number | BigNumber; displayValue: string }>) {
+  let lowestRateIdx = 0,
+    highestRateIdx = 0
+  chartData.forEach((rate, idx) => {
+    if (rate.amount > chartData[highestRateIdx].amount) {
+      highestRateIdx = idx
+    }
+    if (rate.amount < chartData[lowestRateIdx].amount) {
+      lowestRateIdx = idx
+    }
+  })
+  return ({ x, y, index }: { x: number; y: number; index: number }) => {
+    switch (index) {
+      case chartData.length - 1:
+        return (
+          <G key={index}>
+            <Circle cx={x} cy={y} r="5" fill={'black'} />
+            <Line x1={0} y1={y} x2={x} y2={y} stroke={colors.listBorder} strokeWidth="1" />
+          </G>
+        )
+
+      case highestRateIdx:
+        return (
+          <ChartAwareSvgText
+            x={x}
+            y={y}
+            key={index}
+            value={chartData[highestRateIdx].displayValue}
+            position={'top'}
+          />
+        )
+
+      case lowestRateIdx:
+        return (
+          <ChartAwareSvgText
+            x={x}
+            y={y}
+            key={index}
+            value={chartData[lowestRateIdx].displayValue}
+            position={'bottom'}
+          />
+        )
+
+      default:
+        return null
+    }
+  }
+}
+
+function Loader() {
+  return (
+    <View style={styles.loader}>
+      <ActivityIndicator size="large" color={colors.celoGreen} />
+    </View>
+  )
+}
+
+function CeloGoldHistoryChart({ exchangeHistory }: Props) {
+  const dispatch = useDispatch()
   const calculateGroup = useCallback((er) => {
     return Math.floor(er.timestamp / (range / CHART_POINTS_NUMBER))
   }, [])
 
-  if (!isRateValid || !exchangeHistory.celoGoldExchangeRates.length || exchangeHistory.isLoading) {
-    return <Text>Loading...</Text>
+  const localCurrencyCode = useLocalCurrencyCode()
+  const displayLocalCurrency = useCallback(
+    (amount: BigNumber.Value) =>
+      getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true),
+    [localCurrencyCode]
+  )
+  const goldToDollars = useCallback(useGoldToDollarAmount, [])
+  const dollarsToLocal = useCallback(useDollarsToLocalAmount, [])
+
+  const [range] = useState(30 * 24 * 60 * 60 * 1000) // 30 days
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(syncCeloGoldExchangeRateHistory())
+    }, 600000) // Sync history every 10 minutes
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+  if (!exchangeHistory.celoGoldExchangeRates.length || exchangeHistory.isLoading) {
+    return <Loader />
   }
 
   const groupedExchangeHistory = _.groupBy(exchangeHistory.celoGoldExchangeRates, calculateGroup)
@@ -116,25 +216,31 @@ function CeloGoldHistoryChart({ exchangeHistory }: Props) {
     -1
   ).map((i) => {
     const group = groupedExchangeHistory[latestGroup - i + 1]
-    return group ? _.meanBy(group, (er) => parseFloat(er.exchangeRate)) : 0
-  })
-  // chartData.push(parseFloat(dollarRateValue.toString()))
-  console.log(chartData)
-  console.log(parseFloat(dollarRateValue.toString()))
-  let lowestRateIdx = 0,
-    highestRateIdx = 0
-  chartData.forEach((rate, idx) => {
-    if (rate > chartData[highestRateIdx]) {
-      highestRateIdx = idx
-    }
-    if (rate < chartData[lowestRateIdx]) {
-      lowestRateIdx = idx
+    const localAmount = dollarsToLocal(
+      group ? _.meanBy(group, (er) => parseFloat(er.exchangeRate)) : 0
+    )
+    return {
+      amount: localAmount ? localAmount : 0,
+      displayValue: localAmount ? displayLocalCurrency(localAmount) : '',
     }
   })
 
-  const rateChange = dollarRateValue.minus(chartData[0])
-  const rateChangeInPercentage = dollarRateValue.div(chartData[0]).minus(1)
-  const chartWidth = Dimensions.get('window').width - variables.contentPadding * 2
+  const currentGoldRateInLocalCurrency = dollarsToLocal(goldToDollars(1))
+  const oldestGoldRateInLocalCurrency = chartData[0].amount
+  if (oldestGoldRateInLocalCurrency == null || currentGoldRateInLocalCurrency == null) {
+    return <Loader />
+  }
+  // We need displayValue to show min/max on the chart. In case the
+  // current value is min/max we do not need to show it once again,
+  // therefor displayValue = ''
+  chartData.push({ amount: currentGoldRateInLocalCurrency, displayValue: '' })
+  const rateChange = currentGoldRateInLocalCurrency.minus(oldestGoldRateInLocalCurrency)
+  const rateChangeInPercentage = currentGoldRateInLocalCurrency
+    .div(oldestGoldRateInLocalCurrency)
+    .minus(1)
+    .multipliedBy(100)
+  const renderDot = renderDotOnChart(chartData)
+
   return (
     <View style={styles.container}>
       <View style={styles.goldPrice}>
@@ -142,94 +248,50 @@ function CeloGoldHistoryChart({ exchangeHistory }: Props) {
           <Text style={styles.goldPriceTitle}>Gold Price</Text>
         </View>
         <View style={styles.goldPriceValues}>
-          <Text style={styles.goldPriceCurrentValue}>{localRateFormattedValue}</Text>
+          <Text style={styles.goldPriceCurrentValue}>
+            {displayLocalCurrency(currentGoldRateInLocalCurrency)}
+          </Text>
           <Text style={styles.goldPriceChange}>
-            {rateChange.toFixed(2)} ({rateChangeInPercentage.toFixed(2)}%)
+            {rateChange.gt(0) ? '▴' : '▾'} {rateChange.toFixed(2)} ({rateChangeInPercentage.toFixed(
+              2
+            )}%)
           </Text>
         </View>
       </View>
+      {/*
+          // @ts-ignore */}
       <LineChart
         data={{
           labels: [],
           datasets: [
             {
-              data: chartData,
+              data: chartData.map((el) => el.amount),
             },
           ],
         }}
-        width={chartWidth} // from react-native
-        height={220}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
         chartConfig={{
           backgroundGradientFrom: colors.background,
           backgroundGradientTo: colors.background,
           color: (opacity = 1) => `rgba(0, 0, 0)`,
           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
           propsForDots: {
             r: '0',
             strokeWidth: '0',
           },
         }}
         bezier={true}
-        style={{
-          // paddingRight: 48,
-          paddingTop: 32,
-          paddingBottom: 32,
-        }}
+        style={styles.chartStyle}
         withDots={true}
         withShadow={false}
         withInnerLines={false}
         withOuterLines={false}
         withVerticalLabels={false}
         withHorizontalLabels={false}
-        renderDotContent={({ x, y, index }) => {
-          switch (index) {
-            case chartData.length - 1:
-              return (
-                <>
-                  <Circle cx={x} cy={y} r="5" fill={colors.celoGreen} />
-                  <Line x1={0} y1={y} x2={x} y2={y} stroke={colors.listBorder} strokeWidth="1" />
-                </>
-              )
-
-            case highestRateIdx:
-              console.log(chartData[highestRateIdx])
-              return (
-                <>
-                  <Circle cx={x} cy={y} r="4" fill={`rgba(0, 0, 0)`} />
-                  {drawValueOnChart(
-                    'top',
-                    x,
-                    y,
-                    convertDollarsToLocalAmount(
-                      chartData[highestRateIdx],
-                      localExchangeRate
-                    ).toFixed(4)
-                  )}
-                </>
-              )
-            case lowestRateIdx:
-              return (
-                <>
-                  <Circle cx={x} cy={y} r="4" fill={`rgba(0, 0, 0)`} />
-                  {drawValueOnChart(
-                    'bottom',
-                    x,
-                    y,
-                    convertDollarsToLocalAmount(
-                      chartData[lowestRateIdx],
-                      localExchangeRate
-                    ).toFixed(4)
-                  )}
-                </>
-              )
-            default:
-              return null
-          }
-        }}
+        renderDotContent={renderDot}
       />
+      <Text style={styles.rangePeriod}>30d</Text>
     </View>
   )
 }

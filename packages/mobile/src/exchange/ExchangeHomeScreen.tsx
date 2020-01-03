@@ -79,6 +79,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
             <CeloGoldOverview testID="ExchangeAccountOverview" />
             <ItemSeparator />
             <CeloGoldHistoryChart />
+            <ItemSeparator />
             <View style={styles.buttonContainer}>
               <Button
                 text={t('buy')}
