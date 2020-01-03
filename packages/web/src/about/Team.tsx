@@ -135,23 +135,14 @@ const Portrait = React.memo(function _Portrait({
   )
 })
 
-const PHOTO_BACKGROUND = '#E5E2DD'
-
 // @ts-ignore
 const styles = StyleSheet.create({
   purposeText: { fontSize: 26, lineHeight: 28, minHeight: 60 },
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
   photoListAuxMobile: {
     justifyContent: 'flex-start',
     minHeight: '80vh',
   },
   photoListAuxTablet: { justifyContent: 'space-around' },
-  imageBackground: { backgroundColor: PHOTO_BACKGROUND, marginBottom: 20 },
   photo: {
     height: '100%',
     width: '100%',
