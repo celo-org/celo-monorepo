@@ -71,22 +71,21 @@ function PaymentRequestReviewCard({
         {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
         <HorizontalLine />
         <View style={style.feeContainer}>
-          {!!localCurrencyCode &&
-            localValue && (
-              <>
-                <LineItemRow
-                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={getMoneyDisplayValue(value)}
-                  title={t('amountInCelloDollars')}
-                />
-                <Text style={style.localValueHint}>
-                  {t('localValueHint', {
-                    localValue: getMoneyDisplayValue(localValue),
-                    localCurrencyCode,
-                  })}
-                </Text>
-              </>
-            )}
+          {!!localCurrencyCode && localValue && (
+            <>
+              <LineItemRow
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={getMoneyDisplayValue(value)}
+                title={t('amountInCelloDollars')}
+              />
+              <Text style={style.localValueHint}>
+                {t('localValueHint', {
+                  localValue: getMoneyDisplayValue(localValue),
+                  localCurrencyCode,
+                })}
+              </Text>
+            </>
+          )}
           <LineItemRow
             currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
             amount={getMoneyDisplayValue(value.plus(dollarBalance))}

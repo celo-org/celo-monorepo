@@ -71,22 +71,21 @@ function TransferReviewCard({
         {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
         <HorizontalLine />
         <View style={style.feeContainer}>
-          {!!localCurrencyCode &&
-            localValue && (
-              <>
-                <LineItemRow
-                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={getMoneyDisplayValue(value)}
-                  title={t('amountInCelloDollars')}
-                />
-                <Text style={style.localValueHint}>
-                  {t('localValueHint', {
-                    localValue: getMoneyDisplayValue(exchangeRate),
-                    localCurrencyCode,
-                  })}
-                </Text>
-              </>
-            )}
+          {!!localCurrencyCode && localValue && (
+            <>
+              <LineItemRow
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={getMoneyDisplayValue(value)}
+                title={t('amountInCelloDollars')}
+              />
+              <Text style={style.localValueHint}>
+                {t('localValueHint', {
+                  localValue: getMoneyDisplayValue(exchangeRate),
+                  localCurrencyCode,
+                })}
+              </Text>
+            </>
+          )}
           {type === TransactionTypes.INVITE_SENT && (
             <LineItemRow
               currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}

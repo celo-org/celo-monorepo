@@ -188,11 +188,8 @@ const styles = StyleSheet.create({
 export default componentWithAnalytics(
   withNavigationFocus(
     // @ts-ignore
-    connect(
-      null,
-      {
-        handleBarcodeDetected,
-      }
-    )(withTranslation(Namespaces.sendFlow7)(QRScanner))
+    connect(null, {
+      handleBarcodeDetected,
+    })(withTranslation(Namespaces.sendFlow7)(QRScanner))
   )
 )

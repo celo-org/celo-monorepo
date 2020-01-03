@@ -32,10 +32,9 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
   }
 
   async function addMember(member: string) {
-    return (await (await kit.contracts.getValidators()).addMember(
-      group,
-      member
-    )).sendAndWaitForReceipt({ from: group })
+    return (
+      await (await kit.contracts.getValidators()).addMember(group, member)
+    ).sendAndWaitForReceipt({ from: group })
   }
 
   async function getGroupMembers() {
