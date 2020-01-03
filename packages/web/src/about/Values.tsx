@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Testris from 'src/about/Tetris'
+import Tetris from 'src/about/Tetris'
 import FullCircle from 'src/community/connect/FullCircle'
 import { H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -20,7 +20,7 @@ function Values({ t, screen }: I18nProps & ScreenProps) {
               isMobile ? styles.tetrisMobile : styles.tetrisDesktop,
             ]}
           >
-            <Testris />
+            <Tetris />
           </View>
           <H4>{t('value1Title')}</H4>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('value1Text')}</Text>
