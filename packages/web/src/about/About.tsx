@@ -108,7 +108,6 @@ export class About extends React.Component<Props & I18nProps> {
               text={t('learnMore')}
             />
           </BookLayout>
-
           <Team randomSeed={randomSeed} />
           <Backers />
           <PressMedia />
