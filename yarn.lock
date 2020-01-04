@@ -2674,6 +2674,14 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
+"@celo/react-native-fast-crypto@^1.8.2":
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/@celo/react-native-fast-crypto/-/react-native-fast-crypto-1.8.2.tgz#7563e73a47c9ce22407e0ceb4d6406078872795f"
+  integrity sha512-yb8TNnfVU6dWEWc2x8oNyF4mIzerXcS/Gv6ETRi5lM8bz1RyJUrX87mxTPhDJp0vdwtX0bnXRBjycgpPEPSPAA==
+  dependencies:
+    buffer "^5.0.8"
+    rfc4648 "^1.0.0"
+
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
@@ -9762,6 +9770,14 @@ buffer@^5.0.5, buffer@^5.0.6:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.1.0.tgz#c913e43678c7cb7c8bd16afbcddb6c5505e8f9fe"
   integrity sha512-YkIRgwsZwJWTnyQrsBTWefizHh+8GYj3kbL1BTiAQ/9pwpino0G7B2gp5tx/FUBqUlvtxV85KNR3mwfAtv15Yw==
+  dependencies:
+    base64-js "^1.0.2"
+    ieee754 "^1.1.4"
+
+buffer@^5.0.8:
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.4.3.tgz#3fbc9c69eb713d323e3fc1a895eee0710c072115"
+  integrity sha512-zvj65TkFeIt3i6aj5bIvJDzjjQQGs4o/sNoezg1F1kYap9Nu2jcUdpwzRSJTHMMzG0H7bZkn4rNQpImhuxWX2A==
   dependencies:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
@@ -27631,12 +27647,13 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@git://github.com/celo-org/react-native-bip39#1488fa1":
+"react-native-bip39@git://github.com/celo-org/react-native-bip39#8d00738":
   version "2.2.0"
-  resolved "git://github.com/celo-org/react-native-bip39#1488fa18a482809732b3c50ec989d56d5c539a6b"
+  resolved "git://github.com/celo-org/react-native-bip39#8d007387fc8bcc18a2d0e2344ec986a0c6f15834"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"
+    react-native-fast-crypto "^1.8.1"
     react-native-secure-randombytes "^2.2.3"
     unorm "^1.3.3"
 
@@ -27705,6 +27722,14 @@ react-native-exit-app@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/react-native-exit-app/-/react-native-exit-app-1.1.0.tgz#5ec082152974240e2d6a93f1608efb49a4385f21"
   integrity sha512-Spne19zfMfJvnUTX909EHUqWMk69rATtLJq9XMBGpNSHhx0M7v5yetx2Z87egBhLOqQm+CWfD/oxWzDG8rbIQA==
+
+react-native-fast-crypto@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/react-native-fast-crypto/-/react-native-fast-crypto-1.8.1.tgz#9b59d7eb4bcb19f99c62695df9ea4f683bb1e52c"
+  integrity sha512-5Cym09wcYSDXS7+QFg5oWGuW4rz2DyaU09YTeGxn3Qc+rqc01VQ5T6ruW4dWv7bIULtyBcJ2ovTkXTtbsDl3uA==
+  dependencies:
+    buffer "^5.0.8"
+    rfc4648 "^1.0.0"
 
 react-native-firebase@5.5.6, react-native-firebase@^5.5.6:
   version "5.5.6"
@@ -29286,6 +29311,11 @@ retry@^0.10.0, retry@~0.10.0, retry@~0.10.1:
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/retry/-/retry-0.10.1.tgz#e76388d217992c252750241d3d3956fed98d8ff4"
   integrity sha1-52OI0heZLCUnUCQdPTlW/tmNj/Q=
+
+rfc4648@^1.0.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.3.0.tgz#2a69c76f05bc0e388feab933672de9b492af95f1"
+  integrity sha512-x36K12jOflpm1V8QjPq3I+pt7Z1xzeZIjiC8J2Oxd7bE1efTrOG241DTYVJByP/SxR9jl1t7iZqYxDX864jgBQ==
 
 right-align@^0.1.1:
   version "0.1.3"
