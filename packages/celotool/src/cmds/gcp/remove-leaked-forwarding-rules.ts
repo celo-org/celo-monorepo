@@ -44,9 +44,7 @@ export const handler = async (argv: Argv) => {
 
       try {
         await execCmd(
-          `gcloud compute target-pools get-health ${target} --region=${zone} --format=json --project=${
-            argv.project
-          }`,
+          `gcloud compute target-pools get-health ${target} --region=${zone} --format=json --project=${argv.project}`,
           {},
           true
         )

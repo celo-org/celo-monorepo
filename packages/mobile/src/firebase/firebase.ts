@@ -195,10 +195,12 @@ export async function isAppVersionDeprecated() {
   Logger.info(TAG, 'Checking version info')
   const version = DeviceInfo.getVersion()
 
-  const versionsInfo = (await firebase
-    .database()
-    .ref('versions')
-    .once('value')).val()
+  const versionsInfo = (
+    await firebase
+      .database()
+      .ref('versions')
+      .once('value')
+  ).val()
   if (!versionsInfo || !versionsInfo.minVersion) {
     return false
   }

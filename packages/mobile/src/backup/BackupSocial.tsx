@@ -179,11 +179,8 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      setSocialBackupCompleted,
-      showError,
-    }
-  )(withTranslation(Namespaces.backupKeyFlow6)(BackupSocial))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    setSocialBackupCompleted,
+    showError,
+  })(withTranslation(Namespaces.backupKeyFlow6)(BackupSocial))
 )

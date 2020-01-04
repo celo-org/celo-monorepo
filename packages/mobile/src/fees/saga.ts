@@ -1,5 +1,4 @@
 import { CURRENCY_ENUM } from '@celo/utils/src'
-import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, CallEffect, put, select, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -59,7 +58,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
           call(
             getInviteTxGas,
             account,
-            getStableTokenContract,
+            CURRENCY_ENUM.DOLLAR,
             placeholderSendTx.amount,
             placeholderSendTx.comment
           )

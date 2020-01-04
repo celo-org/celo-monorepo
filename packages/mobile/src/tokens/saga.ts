@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { CeloContract, CeloTransactionObject } from '@celo/contractkit'
 import { retryAsync } from '@celo/utils/src/async'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
@@ -111,15 +111,7 @@ export async function createTransaction(
   transferAction: BasicTokenTransfer
 ) {
   const { recipientAddress, amount, comment } = transferAction
-  let contract
-  switch (currency) {
-    case CURRENCY_ENUM.DOLLAR:
-      contract = await contractKit.contracts.getStableToken()
-      break
-    case CURRENCY_ENUM.GOLD:
-      contract = await contractKit.contracts.getGoldToken()
-      break
-  }
+  const contract = await getTokenContract(currency)
 
   const decimals = await contract.decimals()
   const decimalBigNum = new BigNumber(decimals)
@@ -190,5 +182,14 @@ export function tokenTransferFactory({
         }
       }
     }
+  }
+}
+
+export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
+  switch (currency) {
+    case CURRENCY_ENUM.GOLD:
+      return contractKit.registry.addressFor(CeloContract.GoldToken)
+    case CURRENCY_ENUM.DOLLAR:
+      return contractKit.registry.addressFor(CeloContract.StableToken)
   }
 }

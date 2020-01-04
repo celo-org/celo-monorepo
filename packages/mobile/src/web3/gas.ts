@@ -1,6 +1,6 @@
-import { CeloContract } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils'
 import BigNumber from 'bignumber.js'
+import { getCurrencyAddress } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
 import { contractKit } from 'src/web3/contracts'
 
@@ -31,15 +31,7 @@ export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
 
 async function fetchGasPrice(currency: CURRENCY_ENUM) {
   const gasPriceMinimum = await contractKit.contracts.getGasPriceMinimum()
-  let address
-  switch (currency) {
-    case CURRENCY_ENUM.GOLD:
-      address = await contractKit.registry.addressFor(CeloContract.GoldToken)
-      break
-    case CURRENCY_ENUM.DOLLAR:
-      address = await contractKit.registry.addressFor(CeloContract.StableToken)
-      break
-  }
+  const address = await getCurrencyAddress(currency)
   const latestGasPrice = gasPriceMinimum.getGasPriceMinimum(address)
   Logger.debug(
     TAG,

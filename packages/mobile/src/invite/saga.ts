@@ -1,6 +1,6 @@
 import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
+import { getEscrowContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -50,12 +50,12 @@ const INVITE_FEE = '0.2'
 
 export async function getInviteTxGas(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  currency: CURRENCY_ENUM,
   amount: string,
   comment: string
 ) {
   const escrowContract = await getEscrowContract(web3)
-  return getSendTxGas(account, contractGetter, {
+  return getSendTxGas(account, currency, {
     amount,
     comment,
     recipientAddress: escrowContract._address,
@@ -64,11 +64,11 @@ export async function getInviteTxGas(
 
 export async function getInviteFee(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  currency: CURRENCY_ENUM,
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, contractGetter, amount, comment)
+  const gas = await getInviteTxGas(account, currency, amount, comment)
   return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
 }
 
@@ -319,7 +319,7 @@ export function* withdrawFundsFromTempAccount(
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx = yield call(createTransaction, getStableTokenContract, {
+  const tx = yield call(createTransaction, CURRENCY_ENUM.DOLLAR, {
     recipientAddress: newAccount,
     comment: SENTINEL_INVITE_COMMENT,
     // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
