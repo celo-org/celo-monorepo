@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, CallEffect, put, select, takeLatest } from 'redux-saga/effects'
@@ -69,7 +70,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
         feeInWei = yield call(
           getOrSetFee,
           FeeType.SEND,
-          call(getSendTxGas, account, getStableTokenContract, placeholderSendTx)
+          call(getSendTxGas, account, CURRENCY_ENUM.DOLLAR, placeholderSendTx)
         )
         break
       case FeeType.EXCHANGE:
