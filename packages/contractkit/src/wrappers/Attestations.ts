@@ -75,9 +75,11 @@ function parseGetCompletableAttestations(response: GetCompletableAttestationsRes
     (response[3] as unknown) as string
   )
 
-  return zip3(response[0].map(valueToInt), response[1], metadataURLs).map(
-    ([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL })
-  )
+  return zip3(
+    response[0].map(valueToInt),
+    response[1],
+    metadataURLs
+  ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
 }
 
 const stringIdentity = (x: string) => x

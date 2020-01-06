@@ -28,13 +28,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.celo.verifier.PushNotificationToSMSService;
 import org.celo.verifier.SMSLog;
 
@@ -52,8 +52,7 @@ public class RNVerifierServiceModule extends ReactContextBaseJavaModule {
    * Task that's scheduled to ping google every n seconds. This is done to keep
    * The network connection open.
    * */
-  class PingServerTask
-    implements Runnable {
+  class PingServerTask implements Runnable {
 
     private boolean isReachable(String addr, int openPort, int timeOutMillis) {
       try {

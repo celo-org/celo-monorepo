@@ -98,8 +98,5 @@ const styles = StyleSheet.create({
 })
 
 export default withTranslation(Namespaces.education)(
-  connect<null, DispatchProps>(
-    null,
-    { setEducationCompleted, showError }
-  )(EducationScreen)
+  connect<null, DispatchProps>(null, { setEducationCompleted, showError })(EducationScreen)
 )

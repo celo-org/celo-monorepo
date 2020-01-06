@@ -170,8 +170,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    { showError, hideAlert }
-  )(withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, { showError, hideAlert })(
+    withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase)
+  )
 )

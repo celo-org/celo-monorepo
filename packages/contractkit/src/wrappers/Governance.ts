@@ -372,7 +372,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     if (!queue) {
       queue = await this.getQueue()
     }
-    return { index: this.getIndex(proposalID, queue.map((record) => record.proposalID)), queue }
+    return {
+      index: this.getIndex(
+        proposalID,
+        queue.map((record) => record.proposalID)
+      ),
+      queue,
+    }
   }
 
   private async lesserAndGreater(proposalID: BigNumber.Value, _queue?: UpvoteRecord[]) {

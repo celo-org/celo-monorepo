@@ -132,9 +132,11 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
       if (getExternalIP) {
         address = txAddresses[index]
       } else {
-        address = (await execCmd(
-          `kubectl get service/${namespace}-service-${index} --namespace ${namespace} -o jsonpath='{.spec.clusterIP}'`
-        ))[0]
+        address = (
+          await execCmd(
+            `kubectl get service/${namespace}-service-${index} --namespace ${namespace} -o jsonpath='{.spec.clusterIP}'`
+          )
+        )[0]
         if (address.length === 0) {
           console.error('IP address is empty for transaction node')
           throw new Error('IP address is empty for transaction node')
