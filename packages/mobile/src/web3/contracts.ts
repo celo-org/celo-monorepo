@@ -102,5 +102,6 @@ export function addLocalAccount(web3Instance: Web3, privateKey: string) {
   if (!privateKey) {
     throw new Error(`privateKey is ${privateKey}`)
   }
+  // @ts-ignore - web3 versions
   web3utilsAddLocalAccount(web3Instance, privateKey)
 }

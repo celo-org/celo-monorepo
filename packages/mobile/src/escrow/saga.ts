@@ -157,10 +157,10 @@ function* withdrawFromEscrow() {
     const s = `0x${signature.slice(64, 128)}`
     const v = web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
 
-    const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
+    const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
 
-    yield call(sendTransaction, withdrawTx, account, TAG, txID)
+    yield call(sendTransaction, withdrawTx.txo, account, TAG, txID)
 
     yield put(fetchDollarBalance())
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
