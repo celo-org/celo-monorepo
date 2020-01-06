@@ -109,13 +109,10 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      fetchExchangeRate,
-      syncCeloGoldExchangeRateHistory,
-    }
-  )(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    fetchExchangeRate,
+    syncCeloGoldExchangeRateHistory,
+  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 )
 
 const styles = StyleSheet.create({

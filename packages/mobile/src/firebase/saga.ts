@@ -240,6 +240,7 @@ export function* syncCeloGoldExchangeRateHistory() {
         })
         resolve(result)
       })
+      .catch(reject)
   })
 
   const exchangeRates = yield exchangeRatesPromise
