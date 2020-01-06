@@ -1,4 +1,4 @@
-import App, { Container } from 'next/app'
+import App from 'next/app'
 import getConfig from 'next/config'
 import * as React from 'react'
 import { View } from 'react-native'
@@ -49,17 +49,15 @@ class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <Container>
-        <ScreenSizeProvider>
-          {this.skipHeader() || <Header />}
-          <Component {...pageProps} />
-          {this.skipHeader() || (
-            <View>
-              <Footer />
-            </View>
-          )}
-        </ScreenSizeProvider>
-      </Container>
+      <ScreenSizeProvider>
+        {this.skipHeader() || <Header />}
+        <Component {...pageProps} />
+        {this.skipHeader() || (
+          <View>
+            <Footer />
+          </View>
+        )}
+      </ScreenSizeProvider>
     )
   }
 }

@@ -98,11 +98,9 @@ async function main({
     const validatorPrivateKey = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, key).pop()
 
     proxyEnode = getEnodeAddress(
-      privateKeyToPublicKey(getPrivateKeysFor(
-        AccountType.PROXY,
-        mnemonic,
-        proxyKey
-      ).pop() as string),
+      privateKeyToPublicKey(
+        getPrivateKeysFor(AccountType.PROXY, mnemonic, proxyKey).pop() as string
+      ),
       '127.0.0.1',
       instance.port
     )

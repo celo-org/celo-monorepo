@@ -177,7 +177,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @param amount The amount to increase counter by
    */
   function increaseSupply(uint256 amount) external onlyVm {
-    totalSupply_ += amount;
+    totalSupply_ = totalSupply_.add(amount);
   }
 
   /**

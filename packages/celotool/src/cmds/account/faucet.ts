@@ -87,9 +87,7 @@ export const handler = async (argv: FaucetArgv) => {
           (argv.dollar !== 0 && !(await stableToken.balanceOf(address)).isZero())
         ) {
           console.error(
-            `Unable to faucet ${address} on ${
-              argv.celoEnv
-            }: --checkzero specified, but balance is non-zero`
+            `Unable to faucet ${address} on ${argv.celoEnv}: --checkzero specified, but balance is non-zero`
           )
           process.exit(1)
         }

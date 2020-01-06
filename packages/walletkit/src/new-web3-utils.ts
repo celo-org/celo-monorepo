@@ -33,7 +33,7 @@ export function addLocalAccount(web3: Web3, privateKey: string) {
       celoProvider
     )
   } else {
-    providerEngine = createNewProviderWithLocalAccount(existingProvider, celoProvider)
+    providerEngine = createNewProviderWithLocalAccount(existingProvider as Provider, celoProvider)
     web3.setProvider(providerEngine)
   }
 

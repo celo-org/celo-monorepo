@@ -8,28 +8,25 @@ interface Fields {
   link: string
 }
 
-interface QueryError {
-  message: string
-  error: number
+interface Record {
+  id: string
+  fields: Fields
 }
 
-export default function latestAnnouncements(): Promise<Fields[]> {
-  return new Promise((resolve, reject) => {
-    getAirtable()
+export default async function latestAnnouncements(): Promise<Fields[]> {
+  try {
+    const records = (await getAirtable()
       .select({
         maxRecords: 1,
         filterByFormula: IS_LIVE,
         sort: [{ field: 'order', direction: 'desc' }],
       })
-      .firstPage((err: QueryError, records: Airtable.Response<Fields>) => {
-        if (err) {
-          Sentry.captureEvent(err)
-          reject(err)
-          return
-        }
-        resolve(records.map((record) => record.fields))
-      })
-  })
+      .firstPage()) as Record[]
+
+    return records.map((record) => record.fields)
+  } catch (err) {
+    Sentry.captureEvent(err)
+  }
 }
 
 function getAirtable() {

@@ -152,7 +152,7 @@ inner surprise invest`
   })
 
   // See packages/cli/src/utils/key_generator.test.ts for a similar test in the cli
-  it('should generate an expected private key for a mnemonic', () => {
+  it('should generate an expected private key for a mnemonic', async () => {
     // 10 random mnemonic
     const mnemonics = [
       'language quiz proud sample canoe trend topic upper coil rack choice engage noodle panda mutual grab shallow thrive forget trophy pull pool mask height',
@@ -181,7 +181,7 @@ inner surprise invest`
     expect(mnemonics.length).toEqual(expectedPrivateKeys.length)
     for (let i = 0; i < mnemonics.length; i++) {
       expect(validateMnemonic(mnemonics[i])).toBeTruthy()
-      const actualPrivateKey = mnemonicToSeedHex(mnemonics[i])
+      const actualPrivateKey = await mnemonicToSeedHex(mnemonics[i])
       expect(actualPrivateKey).toEqual(expectedPrivateKeys[i])
     }
   })

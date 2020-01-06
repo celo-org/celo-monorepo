@@ -47,7 +47,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
 
     return (
       <View style={styles.container}>
-        <Text style={[fonts.p, styles.infoMessageText, styles.infoMessageTextFirstBlock]}>
+        <Text style={[fonts.p, styles.infoMessageText]}>
           <Text style={styles.infoMessageTextPrefix}>{t('weUseCookies')} </Text>
           {t('weUseCookiesReasons')}
         </Text>

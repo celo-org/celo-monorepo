@@ -73,7 +73,7 @@ async function fetchTx(
   console.info(
     `${parsedTransaction.callDetails.contract}#${
       parsedTransaction.callDetails.function
-    }(${JSON.stringify(parsedTransaction.callDetails.parameters)}) ${parsedTransaction.tx.hash}`
+    }(${JSON.stringify(parsedTransaction.callDetails.paramMap)}) ${parsedTransaction.tx.hash}`
   )
 
   if (receipt.logs) {
