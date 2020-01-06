@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Privacy from './privacy'
+import HomePage from '../../pages/index'
 
-describe('Privacy', () => {
+describe('HomePage', () => {
   it('renders', () => {
-    const tree = renderer.create(<Privacy />).toJSON()
+    const tree = renderer.create(<HomePage />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

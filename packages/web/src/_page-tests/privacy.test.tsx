@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Terms from './terms'
+import Privacy from '../../pages/privacy'
 
-describe('Terms', () => {
+describe('Privacy', () => {
   it('renders', () => {
-    const tree = renderer.create(<Terms />).toJSON()
+    const tree = renderer.create(<Privacy />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

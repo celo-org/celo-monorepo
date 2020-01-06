@@ -1,11 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
+import Faucet from '../../../pages/build/faucet'
 
-import Typography from './typography'
-
-describe('Experience/Typography', () => {
+describe('Faucet', () => {
   it('renders', () => {
-    const tree = renderer.create(<Typography />).toJSON()
+    const tree = renderer.create(<Faucet />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

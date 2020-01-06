@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import PastEventsPage from './past-events'
+import BuildPage from '../../../pages/build/index'
 
-describe('PastEventsPage', () => {
+describe('BuildPage', () => {
   it('renders', () => {
-    const tree = renderer.create(<PastEventsPage />).toJSON()
+    const tree = renderer.create(<BuildPage />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

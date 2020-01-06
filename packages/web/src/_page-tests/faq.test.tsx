@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Community from './community'
+import FAQ from '../../pages/faq'
 
-describe('Community', () => {
+describe('FAQ', () => {
   it('renders', () => {
-    const tree = renderer.create(<Community />).toJSON()
+    const tree = renderer.create(<FAQ />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import JoinJobsPage from './jobs'
+import JoinJobsPage from '../../pages/jobs'
 
 export interface LeverJob {
   id: string

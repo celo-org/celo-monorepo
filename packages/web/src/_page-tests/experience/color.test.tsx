@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Color from './color'
+import Color from '../../../pages/experience/brand/color'
 
 describe('Experience/Color', () => {
   it('renders', () => {

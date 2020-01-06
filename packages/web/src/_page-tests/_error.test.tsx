@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import UserAgreement from './user-agreement'
+import Error from '../../pages/_error'
 
-describe('UserAgreement', () => {
+describe('Error', () => {
   it('renders', () => {
-    const tree = renderer.create(<UserAgreement />).toJSON()
+    const tree = renderer.create(<Error statusCode={404} />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

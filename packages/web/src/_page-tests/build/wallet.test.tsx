@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Error from './_error'
+import Wallet from '../../../pages/build/wallet'
 
-describe('Error', () => {
+describe('Wallet', () => {
   it('renders', () => {
-    const tree = renderer.create(<Error statusCode={404} />).toJSON()
+    const tree = renderer.create(<Wallet />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

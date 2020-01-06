@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import CodeOfConduct from './code-of-conduct'
+import About from '../../pages/about-us'
 
-describe('CodeOfConduct', () => {
+describe('About', () => {
   it('renders', () => {
-    const tree = renderer.create(<CodeOfConduct />).toJSON()
+    const tree = renderer.create(<About randomSeed={100} />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })
