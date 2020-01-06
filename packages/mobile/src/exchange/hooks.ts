@@ -14,7 +14,7 @@ export function useExchangeRate() {
 
 export function useGoldToDollarAmount(amount: number | string | BigNumber | null) {
   const exchangeRate = useExchangeRate()
-  const isRateValid = !exchangeRate.isZero() && exchangeRate.isFinite()
+  const isRateValid = exchangeRate && !exchangeRate.isZero() && exchangeRate.isFinite()
   if (!isRateValid) {
     return null
   }

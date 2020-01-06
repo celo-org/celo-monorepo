@@ -6,8 +6,6 @@ import React, { useCallback } from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useGoldToDollarAmount } from 'src/exchange/hooks'
-import { ExchangeRatePair } from 'src/exchange/reducer'
-import { startBalanceAutorefresh, stopBalanceAutorefresh } from 'src/home/actions'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -15,26 +13,13 @@ import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency
 import useSelector from 'src/redux/useSelector'
 import { getLocalCurrencyDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
-interface StateProps {
-  exchangeRatePair: ExchangeRatePair | null
-  goldEducationCompleted: boolean
-  stableEducationCompleted: boolean
-  goldBalance: string | null
-  dollarBalance: string | null
-}
-
 interface OwnProps {
   testID: string
 }
 
-interface DispatchProps {
-  startBalanceAutorefresh: typeof startBalanceAutorefresh
-  stopBalanceAutorefresh: typeof stopBalanceAutorefresh
-}
+type Props = WithTranslation & OwnProps
 
-type Props = StateProps & DispatchProps & WithTranslation & OwnProps
-
-export function CeloGoldOverview({ t }: Props) {
+export function CeloGoldOverview({ t, testID }: Props) {
   useBalanceAutoRefresh()
   const localCurrencyCode = useLocalCurrencyCode()
   const displayLocalCurrency = useCallback(
@@ -50,7 +35,7 @@ export function CeloGoldOverview({ t }: Props) {
   const localValue = dollarsToLocal(goldToDollars(goldBalance))
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={testID}>
       <Text style={styles.title}>{t('celoGold')}</Text>
       <Text style={styles.balance}>
         {goldBalance && (

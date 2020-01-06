@@ -20,7 +20,6 @@ export interface State {
     isLoading: boolean
     celoGoldExchangeRates: ExchangeRate[]
     lastTimeUpdated: number
-    serverUpdateIntervalInSec: number
   }
 }
 
@@ -30,7 +29,6 @@ const initialState = {
     isLoading: false,
     celoGoldExchangeRates: [],
     lastTimeUpdated: 0,
-    serverUpdateIntervalInSec: 30 * 60, // 30 min
   },
 }
 

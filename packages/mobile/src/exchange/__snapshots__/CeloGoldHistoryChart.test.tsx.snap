@@ -1,0 +1,1191 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders properly 1`] = `
+<View
+  style={
+    Object {
+      "paddingHorizontal": 16,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingTop": 16,
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 20,
+            "lineHeight": 28,
+          }
+        }
+      >
+        Gold Price
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "flex-end",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "fontSize": 24,
+          }
+        }
+      >
+        $13.30
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 24,
+          }
+        }
+      >
+        ▴
+         
+        13.30
+         (
+        Infinity
+        %)
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "marginTop": -32,
+        "paddingBottom": 16,
+        "paddingRight": 0,
+        "paddingTop": 32,
+      }
+    }
+  >
+    <svg
+      height={196}
+      width={718}
+    >
+      <rect
+        fill="url(#backgroundGradient)"
+        height={180}
+        rx={0}
+        ry={0}
+        width="100%"
+      />
+      <g
+        x="0"
+        y={0}
+      >
+        <defs>
+          <linearGradient
+            id="backgroundGradient"
+            x1="0"
+            x2={718}
+            y1={180}
+            y2={0}
+          >
+            <stop
+              offset="0"
+              stopColor="#FFFFFF"
+              stopOpacity={1}
+            />
+            <stop
+              offset="1"
+              stopColor="#FFFFFF"
+              stopOpacity={1}
+            />
+          </linearGradient>
+          <linearGradient
+            id="fillShadowGradient"
+            x1={0}
+            x2={0}
+            y1={0}
+            y2={180}
+          >
+            <stop
+              offset="0"
+              stopColor="rgba(0, 0, 0)"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="rgba(0, 0, 0)"
+              stopOpacity="0"
+            />
+          </linearGradient>
+        </defs>
+        <g />
+        <g />
+        <g />
+        <g />
+        <g>
+          <path
+            d="M0,167 Q 2.75, 167, 5.5, 167 Q 8.25, 167, 11, 167 Q 14, 167, 17, 167 Q 20, 167, 23, 167 Q 26, 167, 29, 167 Q 32, 167, 35, 167 Q 38, 167, 41, 167 Q 44, 167, 47, 167 Q 50, 167, 53, 167 Q 56, 167, 59, 167 Q 62, 167, 65, 167 Q 68, 167, 71, 167 Q 74, 167, 77, 167 Q 80, 167, 83, 167 Q 86, 167, 89, 167 Q 92, 167, 95, 167 Q 98, 167, 101, 167 Q 104, 167, 107, 167 Q 110, 167, 113, 167 Q 116, 167, 119, 167 Q 122, 167, 125, 167 Q 128, 167, 131, 167 Q 134, 167, 137, 167 Q 140, 167, 143, 167 Q 146, 167, 149, 167 Q 152, 167, 155, 167 Q 158, 167, 161, 167 Q 164, 167, 167, 167 Q 170, 167, 173, 167 Q 176, 167, 179, 167 Q 182, 167, 185, 167 Q 188, 167, 191, 167 Q 194, 167, 197, 167 Q 200, 167, 203, 167 Q 206, 167, 209, 167 Q 212, 167, 215, 167 Q 218, 167, 221, 167 Q 224, 167, 227, 167 Q 230, 167, 233, 167 Q 236, 167, 239, 167 Q 242, 167, 245, 167 Q 248, 167, 251, 167 Q 254, 167, 257, 167 Q 260, 167, 263, 167 Q 266, 167, 269, 167 Q 272, 167, 275, 167 Q 278, 167, 281, 167 Q 284, 167, 287, 167 Q 290, 167, 293, 167 Q 296, 167, 299, 167 Q 302, 167, 305, 167 Q 308, 167, 311, 167 Q 314, 167, 317, 167 Q 320, 167, 323, 167 Q 326, 167, 329, 167 Q 332, 167, 335, 167 Q 338, 167, 341, 167 Q 344, 167, 347, 167 Q 350, 167, 353, 167 Q 356, 167, 359, 167 Q 361.75, 167, 364.5, 167 Q 367.25, 167, 370, 167 Q 373, 167, 376, 167 Q 379, 167, 382, 167 Q 385, 167, 388, 167 Q 391, 167, 394, 167 Q 397, 167, 400, 167 Q 403, 167, 406, 167 Q 409, 167, 412, 167 Q 415, 167, 418, 167 Q 421, 167, 424, 167 Q 427, 167, 430, 167 Q 433, 167, 436, 167 Q 439, 167, 442, 167 Q 445, 167, 448, 167 Q 451, 167, 454, 167 Q 457, 167, 460, 167 Q 463, 167, 466, 167 Q 469, 167, 472, 167 Q 475, 167, 478, 167 Q 481, 167, 484, 167 Q 487, 167, 490, 167 Q 493, 167, 496, 167 Q 499, 167, 502, 167 Q 505, 167, 508, 167 Q 511, 167, 514, 167 Q 517, 167, 520, 167 Q 523, 167, 526, 167 Q 529, 167, 532, 167 Q 535, 167, 538, 167 Q 541, 167, 544, 167 Q 547, 167, 550, 167 Q 553, 167, 556, 167 Q 559, 167, 562, 167 Q 565, 167, 568, 167 Q 571, 167, 574, 167 Q 577, 167, 580, 167 Q 583, 167, 586, 167 Q 589, 167, 592, 167 Q 595, 167, 598, 167 Q 601, 167, 604, 167 Q 607, 167, 610, 167 Q 613, 167, 616, 167 Q 619, 167, 622, 167 Q 625, 167, 628, 167 Q 631, 167, 634, 167 Q 637, 167, 640, 167 Q 643, 167, 646, 167 Q 649, 167, 652, 167 Q 655, 167, 658, 167 Q 661, 167, 664, 167 Q 667, 167, 670, 167 Q 673, 167, 676, 167 Q 679, 167, 682, 167 Q 685, 167, 688, 160 Q 691, 153, 694, 153 Q 697, 153, 700, 92.5 Q 703, 32, 706, 32"
+            fill="none"
+            stroke="rgba(0, 0, 0)"
+            strokeWidth={3}
+          />
+        </g>
+        <g />
+        <g>
+          <circle
+            cx={0}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={0}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <text
+            fill="black"
+            fontSize="14"
+            onLayout={[Function]}
+            textAnchor="middle"
+            x={0}
+            y={192}
+          >
+            
+          </text>
+          <circle
+            cx={11.966666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={11.966666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={23.933333333333334}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={23.933333333333334}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={35.9}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={35.9}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={47.86666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={47.86666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={59.833333333333336}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={59.833333333333336}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={71.8}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={71.8}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={83.76666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={83.76666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={95.73333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={95.73333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={107.7}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={107.7}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={119.66666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={119.66666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={131.63333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={131.63333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={143.6}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={143.6}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={155.56666666666666}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={155.56666666666666}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={167.53333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={167.53333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={179.5}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={179.5}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={191.46666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={191.46666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={203.43333333333334}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={203.43333333333334}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={215.4}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={215.4}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={227.36666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={227.36666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={239.33333333333334}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={239.33333333333334}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={251.3}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={251.3}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={263.26666666666665}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={263.26666666666665}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={275.23333333333335}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={275.23333333333335}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={287.2}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={287.2}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={299.1666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={299.1666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={311.1333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={311.1333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={323.1}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={323.1}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={335.06666666666666}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={335.06666666666666}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={347.03333333333336}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={347.03333333333336}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={359}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={359}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={370.96666666666664}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={370.96666666666664}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={382.93333333333334}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={382.93333333333334}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={394.9}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={394.9}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={406.8666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={406.8666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={418.8333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={418.8333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={430.8}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={430.8}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={442.76666666666665}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={442.76666666666665}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={454.73333333333335}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={454.73333333333335}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={466.7}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={466.7}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={478.6666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={478.6666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={490.6333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={490.6333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={502.6}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={502.6}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={514.5666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={514.5666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={526.5333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={526.5333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={538.5}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={538.5}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={550.4666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={550.4666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={562.4333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={562.4333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={574.4}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={574.4}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={586.3666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={586.3666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={598.3333333333334}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={598.3333333333334}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={610.3}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={610.3}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={622.2666666666667}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={622.2666666666667}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={634.2333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={634.2333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={646.2}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={646.2}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={658.1666666666666}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={658.1666666666666}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={670.1333333333333}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={670.1333333333333}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={682.1}
+            cy={167}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={682.1}
+            cy={167}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={694.0666666666667}
+            cy={153.72500000000002}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={694.0666666666667}
+            cy={153.72500000000002}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <circle
+            cx={706.0333333333333}
+            cy={32}
+            fill="rgba(0, 0, 0)"
+            onPress={[Function]}
+            r="0"
+            strokeWidth="0"
+          />
+          <circle
+            cx={706.0333333333333}
+            cy={32}
+            fill="#fff"
+            fillOpacity={0}
+            onPress={[Function]}
+            r="14"
+          />
+          <g>
+            <circle
+              cx={706.0333333333333}
+              cy={32}
+              fill="black"
+              r="5"
+            />
+            <line
+              stroke="rgba(134, 138, 141, 0.15)"
+              strokeWidth="1"
+              x1={0}
+              x2={706.0333333333333}
+              y1={32}
+              y2={32}
+            />
+          </g>
+        </g>
+        <g />
+      </g>
+    </svg>
+  </View>
+  <Text
+    style={
+      Object {
+        "color": "rgba(0, 0, 0, .4)",
+        "fontSize": 16,
+        "paddingBottom": 4,
+        "textAlign": "center",
+      }
+    }
+  >
+    timeframes.30d
+  </Text>
+</View>
+`;
+
+exports[`renders while update is in progress 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "height": 310,
+      "justifyContent": "center",
+      "width": 750,
+    }
+  }
+>
+  <ActivityIndicator
+    animating={true}
+    color="#42D689"
+    hidesWhenStopped={true}
+    size="large"
+  />
+</View>
+`;
+
+exports[`renders without history 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "height": 310,
+      "justifyContent": "center",
+      "width": 750,
+    }
+  }
+>
+  <ActivityIndicator
+    animating={true}
+    color="#42D689"
+    hidesWhenStopped={true}
+    size="large"
+  />
+</View>
+`;

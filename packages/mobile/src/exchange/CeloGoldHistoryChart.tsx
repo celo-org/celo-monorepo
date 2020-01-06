@@ -4,6 +4,7 @@ import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
 import React, { useCallback, useEffect, useState } from 'react'
+import { WithTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
   Dimensions,
@@ -13,16 +14,17 @@ import {
   View,
 } from 'react-native'
 import { LineChart } from 'react-native-chart-kit'
-import { connect, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { syncCeloGoldExchangeRateHistory } from 'src/exchange/actions'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import useSelector from 'src/redux/useSelector'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 
 import { Circle, G, Line, Text as SvgText } from 'react-native-svg'
 import { useGoldToDollarAmount } from 'src/exchange/hooks'
 import { exchangeHistorySelector } from 'src/exchange/reducer'
-import { RootState } from 'src/redux/reducers'
 
 const CHART_POINTS_NUMBER = 60
 const CHART_WIDTH = Dimensions.get('window').width - variables.contentPadding * 2
@@ -58,7 +60,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rangePeriod: {
+  timeframe: {
     textAlign: 'center',
     fontSize: 16,
     paddingBottom: 4,
@@ -72,50 +74,55 @@ const styles = StyleSheet.create({
   },
 })
 
-interface StateProps {
-  exchangeHistory: any
+interface OwnProps {
+  testID: string
 }
 
-type Props = StateProps
+type Props = WithTranslation & OwnProps
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  exchangeHistory: exchangeHistorySelector(state),
-})
-
+// ChartAwareSvgText draws text on the chart with avareness of its edges.
+// Example: we want to draw some text at {x:10,y:10}(coordinates of the center).
+// The text width is 33px and if draw it right away it will be cuted by the chart edges.
+// The component will adjust coordinates to {x: (textWidthInPixels/2), y: 10}
 function ChartAwareSvgText({
   position,
   x,
   y,
   value,
+  chartWidth,
 }: {
   position: 'top' | 'bottom'
   x: number
   y: number
   value: string
+  chartWidth: number
 }) {
   if (position === 'top') {
     y = y - 16
   } else if (position === 'bottom') {
     y = y + 25
   }
-  const [realX, setRealX] = useState(x)
+  const [adjustedX, setAdjustedX] = useState(x)
   const onLayout = useCallback(
     ({
       nativeEvent: {
         layout: { width },
       },
     }: LayoutChangeEvent) => {
-      if (x - width / 2 < 0) {
-        setRealX(width / 2)
-      }
-      if (x + width / 2 > CHART_WIDTH) {
-        setRealX(CHART_WIDTH - width / 2)
+      if (width !== chartWidth) {
+        if (x - width / 2 < 0) {
+          setAdjustedX(width / 2)
+        }
+        if (x + width / 2 > chartWidth) {
+          setAdjustedX(chartWidth - width / 2)
+        }
       }
     },
     [x]
   )
+
   return (
-    <SvgText onLayout={onLayout} fill="black" fontSize="14" x={realX} y={y} textAnchor="middle">
+    <SvgText onLayout={onLayout} fill="black" fontSize="14" x={adjustedX} y={y} textAnchor="middle">
       {value}
     </SvgText>
   )
@@ -150,6 +157,7 @@ function renderDotOnChart(chartData: Array<{ amount: number | BigNumber; display
             key={index}
             value={chartData[highestRateIdx].displayValue}
             position={'top'}
+            chartWidth={CHART_WIDTH}
           />
         )
 
@@ -161,6 +169,7 @@ function renderDotOnChart(chartData: Array<{ amount: number | BigNumber; display
             key={index}
             value={chartData[lowestRateIdx].displayValue}
             position={'bottom'}
+            chartWidth={CHART_WIDTH}
           />
         )
 
@@ -178,7 +187,7 @@ function Loader() {
   )
 }
 
-function CeloGoldHistoryChart({ exchangeHistory }: Props) {
+function CeloGoldHistoryChart({ t, testID }: Props) {
   const dispatch = useDispatch()
   const calculateGroup = useCallback((er) => {
     return Math.floor(er.timestamp / (range / CHART_POINTS_NUMBER))
@@ -202,6 +211,9 @@ function CeloGoldHistoryChart({ exchangeHistory }: Props) {
       clearInterval(interval)
     }
   }, [])
+
+  const exchangeHistory = useSelector(exchangeHistorySelector)
+
   if (!exchangeHistory.celoGoldExchangeRates.length || exchangeHistory.isLoading) {
     return <Loader />
   }
@@ -252,14 +264,13 @@ function CeloGoldHistoryChart({ exchangeHistory }: Props) {
             {displayLocalCurrency(currentGoldRateInLocalCurrency)}
           </Text>
           <Text style={styles.goldPriceChange}>
-            {rateChange.gt(0) ? '▴' : '▾'} {rateChange.toFixed(2)} ({rateChangeInPercentage.toFixed(
-              2
-            )}%)
+            {rateChange.gt(0) ? '▴' : '▾'} {rateChange.toFixed(2)} (
+            {rateChangeInPercentage.toFixed(2)}%)
           </Text>
         </View>
       </View>
-      {/*
-          // @ts-ignore */}
+      {/* this is needed, because chartConfig.propsForDots is missing in propTypes atm
+      // @ts-ignore */}
       <LineChart
         data={{
           labels: [],
@@ -291,8 +302,8 @@ function CeloGoldHistoryChart({ exchangeHistory }: Props) {
         withHorizontalLabels={false}
         renderDotContent={renderDot}
       />
-      <Text style={styles.rangePeriod}>30d</Text>
+      <Text style={styles.timeframe}>{t('timeframes.30d')}</Text>
     </View>
   )
 }
-export default connect(mapStateToProps)(CeloGoldHistoryChart)
+export default withTranslation(Namespaces.global)(CeloGoldHistoryChart)
