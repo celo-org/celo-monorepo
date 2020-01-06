@@ -505,14 +505,11 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
-    mapStateToProps,
-    {
-      fetchDollarBalance,
-      showError,
-      hideAlert,
-      showMessage,
-      fetchPhoneAddresses,
-    }
-  )(withTranslation(Namespaces.sendFlow7)(SendAmount))
+  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+    fetchDollarBalance,
+    showError,
+    hideAlert,
+    showMessage,
+    fetchPhoneAddresses,
+  })(withTranslation(Namespaces.sendFlow7)(SendAmount))
 )

@@ -236,9 +236,9 @@ export function getExampleNumber(
   useOnlyZeroes: boolean = true,
   isInternational: boolean = false
 ) {
-  const examplePhone = phoneUtil.getExampleNumber(getRegionCodeFromCountryCode(
-    regionCode
-  ) as string)
+  const examplePhone = phoneUtil.getExampleNumber(
+    getRegionCodeFromCountryCode(regionCode) as string
+  )
 
   if (!examplePhone) {
     return

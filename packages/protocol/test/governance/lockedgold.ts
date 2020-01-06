@@ -422,7 +422,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
-  describe.only('#slash', () => {
+  describe('#slash', () => {
     const value = 1000
     const group = accounts[1]
     const reporter = accounts[3]
