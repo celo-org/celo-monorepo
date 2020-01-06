@@ -281,6 +281,32 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   /*
    * Internal functions
    */
+
+  /**
+   * @notice Computes the current reserve gold to stable token ratio
+   * @return A fixed point ratio cast as a uint256
+   */
+  function calculateReserveRatio() public view returns (uint256) {
+    address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
+    ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
+    uint256 reserveGoldBalance = getReserveGoldBalance();
+    uint256 stableTokensValueInGold = 0;
+
+    for (uint256 i = 0; i < _tokens.length; i++) {
+      uint256 stableAmount;
+      uint256 goldAmount;
+      (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
+      uint256 stableTokenSupply = IERC20Token(_tokens[i]).totalSupply();
+      uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
+      stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
+    }
+    return
+      FixidityLib
+        .newFixed(reserveGoldBalance)
+        .divide(FixidityLib.newFixed(stableTokensValueInGold))
+        .unwrap();
+  }
+
   /**
    * @notice Computes a tobin tax based on the reserve ratio.
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
