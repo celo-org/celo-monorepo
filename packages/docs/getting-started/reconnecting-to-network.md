@@ -78,7 +78,6 @@ rm -rf geth* && rm static-nodes.json
 ```bash
 # On your Attestation machine
 cd celo-attestations-node
-cd celo-accounts-node
 rm -rf geth* && rm static-nodes.json
 ```
 
