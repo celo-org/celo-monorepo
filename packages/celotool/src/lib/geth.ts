@@ -904,9 +904,10 @@ export async function startGeth(
 
   if (
     instance.gethRunConfig.genesisConfig &&
-    instance.gethRunConfig.genesisConfig.blockTime !== null
+    instance.gethRunConfig.genesisConfig.blockTime !== undefined &&
+    instance.gethRunConfig.genesisConfig.blockTime >= 0
   ) {
-    blocktime = instance.gethRunConfig.genesisConfig.blockTime as number
+    blocktime = instance.gethRunConfig.genesisConfig.blockTime
   }
 
   const gethArgs = [
