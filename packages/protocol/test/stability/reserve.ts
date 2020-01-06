@@ -5,7 +5,7 @@ import {
   assertSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import BN = require('bn.js')
 import {
@@ -523,6 +523,39 @@ contract('Reserve', (accounts: string[]) => {
       )
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
       assert.equal(assetAllocationWeights.length, 0)
+    })
+  })
+
+  describe('#getReserveRatio', () => {
+    let mockStableToken: MockStableTokenInstance
+    let reserveGoldBalance: BigNumber
+    const exchangeRate = 10
+
+    beforeEach(async () => {
+      mockStableToken = await MockStableToken.new()
+      await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
+      await mockSortedOracles.setMedianRate(
+        mockStableToken.address,
+        sortedOraclesDenominator.times(exchangeRate)
+      )
+      await reserve.addToken(mockStableToken.address)
+      reserveGoldBalance = new BigNumber(10).pow(19)
+      await web3.eth.sendTransaction({
+        from: accounts[0],
+        to: reserve.address,
+        value: reserveGoldBalance,
+      })
+    })
+    it('should return the correct ratio', async () => {
+      const stableTokenSupply = new BigNumber(10).pow(21)
+      await mockStableToken.setTotalSupply(stableTokenSupply)
+      // TODO: convert to gold
+      console.info(reserveGoldBalance.div(stableTokenSupply))
+      const ratio = new BigNumber(await reserve.calculateReserveRatio())
+      assert(
+        fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenSupply.div(exchangeRate))),
+        'reserve ratio should be correct'
+      )
     })
   })
 })
