@@ -20,7 +20,7 @@
     },
     "strict": false,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
+    "noEmit": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true
