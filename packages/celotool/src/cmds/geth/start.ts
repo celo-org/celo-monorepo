@@ -130,7 +130,7 @@ export const handler = async (argv: StartArgv) => {
     network,
     instances: [],
     genesisConfig: {
-      blockTime: 5,
+      blockTime: 1,
     },
   }
 
