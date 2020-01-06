@@ -26,6 +26,8 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
+  event TotalSupplySet(uint256 totalSupply);
+
   /**
    * Only VM would be able to set the caller address to 0x0 unless someone
    * really has the private key for 0x0
@@ -40,7 +42,16 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    */
   // solhint-disable-next-line no-empty-blocks
   function initialize() external initializer {
-    totalSupply_ = 0;
+    setInitialTotalSupply(0);
+  }
+
+  /**
+   * @notice Sets the token initial supply
+   * @param _totalSupply new token initial supply.
+   */
+  function setInitialTotalSupply(uint256 _totalSupply) private {
+    totalSupply_ = _totalSupply;
+    emit TotalSupplySet(_totalSupply);
   }
 
   /**

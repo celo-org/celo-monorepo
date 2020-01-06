@@ -20,6 +20,7 @@ contract MultiSig is Initializable {
   event OwnerAddition(address indexed owner);
   event OwnerRemoval(address indexed owner);
   event RequirementChange(uint256 required);
+  event RequirementSet(uint256 required);
 
   /*
    *  Constants
@@ -109,6 +110,15 @@ contract MultiSig is Initializable {
     initializer
     validRequirement(_owners.length, _required)
   {
+    setInitialOwners(_owners);
+    setInitialRequired(_required);
+  }
+
+  /**
+   * @notice Sets the initial owners of the wallet.
+   * @param _owners List of initial owners.
+   */
+  function setInitialOwners(address[] memory _owners) private {
     for (uint256 i = 0; i < _owners.length; i++) {
       require(
         !isOwner[_owners[i]] && _owners[i] != address(0),
@@ -117,7 +127,16 @@ contract MultiSig is Initializable {
       isOwner[_owners[i]] = true;
     }
     owners = _owners;
+  }
+
+  /**
+   * @notice Sets the required number of tx confirmations.
+   * @param _required The number of required tx confirmations.
+   */
+  function setInitialRequired(uint256 _required) private {
+    require(_required > 0, "Required confirmations must be greater than zero");
     required = _required;
+    emit RequirementSet(_required);
   }
 
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.

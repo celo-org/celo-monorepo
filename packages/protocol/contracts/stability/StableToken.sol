@@ -35,6 +35,14 @@ contract StableToken is
 
   event TransferComment(string comment);
 
+  event TotalSupplySet(address sender, uint256 totalSupply);
+
+  event TokenNameSet(address sender, string name);
+
+  event TokenSymbolSet(address sender, string symbol);
+
+  event TokenDecimalslSet(address sender, uint8 decimals);
+
   string internal name_;
   string internal symbol_;
   uint8 internal decimals_;
@@ -109,22 +117,78 @@ contract StableToken is
     require(inflationRate != 0, "Must provide a non-zero inflation rate.");
 
     _transferOwnership(msg.sender);
-    totalSupply_ = 0;
-    name_ = _name;
-    symbol_ = _symbol;
-    decimals_ = _decimals;
-
-    inflationState.rate = FixidityLib.wrap(inflationRate);
-    inflationState.factor = FixidityLib.fixed1();
-    inflationState.updatePeriod = inflationFactorUpdatePeriod;
-    // solhint-disable-next-line not-rely-on-time
-    inflationState.factorLastUpdated = now;
+    setTotalSupply(0);
+    setName(_name);
+    setSymbol(_symbol);
+    setDecimals(_decimals);
+    setInitialInflationParameters(inflationRate, inflationFactorUpdatePeriod);
 
     require(initialBalanceAddresses.length == initialBalanceValues.length);
     for (uint256 i = 0; i < initialBalanceAddresses.length; i = i.add(1)) {
       require(_mint(initialBalanceAddresses[i], initialBalanceValues[i]));
     }
     setRegistry(registryAddress);
+  }
+
+  /**
+   * @notice Setter for the total supply.
+   * @param totalSupply The total supply to set.
+   */
+  function setTotalSupply(uint256 totalSupply) public {
+    totalSupply_ = totalSupply;
+    emit TotalSupplySet(msg.sender, totalSupply);
+  }
+
+  /**
+   * @notice Setter for the name of the token.
+   * @param name The name to set.
+   */
+  function setName(string memory name) public {
+    name_ = name;
+    emit TokenNameSet(msg.sender, name);
+  }
+
+  /**
+   * @notice Setter for the symbol of the token.
+   * @param symbol The symbol to set.
+   */
+  function setSymbol(string memory symbol) public {
+    symbol_ = symbol;
+    emit TokenSymbolSet(msg.sender, symbol);
+  }
+
+  /**
+   * @notice Setter for the decimals of the token.
+   * @param decimals The decimals to set.
+   */
+  function setDecimals(uint8 decimals) public {
+    decimals_ = decimals;
+    emit TokenDecimalslSet(msg.sender, decimals);
+  }
+
+  /**
+   * @notice Sets initial inflation Parameters.
+   * @param inflationRate new rate.
+   * @param inflationFactorUpdatePeriod how often inflationFactor is updated.
+   */
+  function setInitialInflationParameters(uint256 inflationRate, uint256 inflationFactorUpdatePeriod)
+    private
+  {
+    require(inflationRate != 0, "Must provide a non-zero inflation rate.");
+    inflationState.rate = FixidityLib.wrap(inflationRate);
+    inflationState.updatePeriod = inflationFactorUpdatePeriod;
+
+    emit InflationParametersUpdated(
+      inflationRate,
+      inflationFactorUpdatePeriod,
+      // solhint-disable-next-line not-rely-on-time
+      now
+    );
+
+    inflationState.factor = FixidityLib.fixed1();
+    inflationState.factorLastUpdated = now;
+
+    emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
   }
 
   /**

@@ -98,9 +98,13 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       oracleAddress
     )
 
+    const reportedValue = toBigNumber(numerator.toString())
+      .dividedBy(toBigNumber(denominator.toString()))
+      .multipliedBy(await this.getInternalDenominator())
+
     return toTransactionObject(
       this.kit,
-      this.contract.methods.report(tokenAddress, numerator, denominator, lesserKey, greaterKey),
+      this.contract.methods.report(tokenAddress, reportedValue, lesserKey, greaterKey),
       { from: oracleAddress }
     )
   }
@@ -158,7 +162,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async getInternalDenominator(): Promise<BigNumber> {
-    return toBigNumber(await this.contract.methods.DENOMINATOR().call())
+    return toBigNumber(await this.contract.methods.getDenominator().call())
   }
 
   private async findLesserAndGreaterKeys(

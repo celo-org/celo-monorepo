@@ -8,6 +8,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import BigNumber from 'bignumber.js'
 import {
   FeeCurrencyWhitelistInstance,
   ReserveInstance,
@@ -55,10 +56,12 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     if (!(await sortedOracles.isOracle(stableToken.address, minerAddress))) {
       await sortedOracles.addOracle(stableToken.address, minerAddress)
     }
+
     await sortedOracles.report(
       stableToken.address,
-      config.stableToken.goldPrice,
-      1,
+      new BigNumber(config.stableToken.goldPrice / 1).multipliedBy(
+        await sortedOracles.getDenominator()
+      ),
       NULL_ADDRESS,
       NULL_ADDRESS
     )

@@ -64,6 +64,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 underspendAdjustmentFactor,
     uint256 overspendAdjustmentFactor
   );
+  event StartTimeSet(uint256 startTime);
+  event TargetVotingYield(uint256 targetVotingYield);
 
   /**
    * @notice Initializes critical variables.
@@ -101,8 +103,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     );
     setTargetVotingGoldFraction(_targetVotingGoldFraction);
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
-    targetVotingYieldParams.target = FixidityLib.wrap(targetVotingYieldInitial);
-    startTime = now;
+    setTargetVotingYield(targetVotingYieldInitial);
+    setStartTime(block.timestamp);
   }
 
   /**
@@ -156,6 +158,29 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     require(value != targetValidatorEpochPayment);
     targetValidatorEpochPayment = value;
     emit TargetValidatorEpochPaymentSet(value);
+    return true;
+  }
+
+  /**
+   * @notice Sets the target voting yield for validators.
+   * @param _targetVotingYield The value of the target voting yield.
+   * @return True upon success.
+   */
+  function setTargetVotingYield(uint256 _targetVotingYield) public onlyOwner returns (bool) {
+    targetVotingYieldParams.target = FixidityLib.wrap(_targetVotingYield);
+    emit TargetVotingYield(_targetVotingYield);
+    return true;
+  }
+
+  /**
+   * @notice Sets the start time.
+   * @param _startTime The time in unix.
+   * @return True upon success.
+   */
+  function setStartTime(uint256 _startTime) public onlyOwner returns (bool) {
+    require(_startTime >= block.timestamp, "The start time must not be in the past");
+    startTime = _startTime;
+    emit StartTimeSet(_startTime);
     return true;
   }
 
