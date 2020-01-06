@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Terms from '../../pages/terms'
+import Terms from 'pages/terms'
 
 describe('Terms', () => {
   it('renders', () => {

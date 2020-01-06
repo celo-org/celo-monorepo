@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Privacy from '../../pages/privacy'
+import Privacy from 'pages/privacy'
 
 describe('Privacy', () => {
   it('renders', () => {

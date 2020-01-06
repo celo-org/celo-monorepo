@@ -11,6 +11,7 @@ module.exports = {
   setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
   moduleNameMapper: {
     '\\.(png|jpg|jpeg)$': '<rootDir>/__mocks__/ImageStub.ts',
+    'pages/(.*)$': '<rootDir>/pages/$1',
     'src/(.*)$': '<rootDir>/src/$1',
   },
   preset: 'react-native-web',
