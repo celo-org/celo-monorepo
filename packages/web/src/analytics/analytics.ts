@@ -4,6 +4,9 @@ import getConfig from 'next/config'
 let analytics: {
   track: (key: string, properties?: object, options?: object) => void
 }
+
+let analyticsStarted = false
+
 const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
 const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
@@ -24,8 +27,8 @@ async function isInEU() {
   const inEU = await import('@segment/in-eu').then((mod) => mod.default)
   return inEU()
 }
-async function initializeAnalytics() {
-  if (process.browser && (await canTrack())) {
+export async function initializeAnalytics() {
+  if (process.browser && !analyticsStarted && (await canTrack())) {
     const Segment = await import('load-segment').then((mod) => mod.default)
     const { publicRuntimeConfig } = getConfig()
     analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
@@ -34,9 +37,8 @@ async function initializeAnalytics() {
       track: () => null,
     }
   }
+  analyticsStarted = true
 }
-
-initializeAnalytics()
 
 export async function agree() {
   Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, true, { expires: OPTIN_EXPIRE_DAYS })

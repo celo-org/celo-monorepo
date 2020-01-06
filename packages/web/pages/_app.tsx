@@ -4,7 +4,7 @@ import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
 import scrollIntoView from 'scroll-into-view'
-import { canTrack } from 'src/analytics/analytics'
+import { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
@@ -24,6 +24,7 @@ class MyApp extends App {
     if (getConfig().publicRuntimeConfig.FLAGS.ENV === 'development') {
       checkH1Count()
     }
+    await initializeAnalytics()
     if (await canTrack()) {
       await initSentry()
     }
