@@ -285,7 +285,7 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
         chartConfig={{
           backgroundGradientFrom: colors.background,
           backgroundGradientTo: colors.background,
-          color: (opacity = 1) => `rgba(0, 0, 0)`,
+          color: () => `rgba(0, 0, 0)`,
           labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           propsForDots: {
             r: '0',
@@ -306,4 +306,5 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
     </View>
   )
 }
+
 export default withTranslation(Namespaces.global)(CeloGoldHistoryChart)
