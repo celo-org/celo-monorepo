@@ -6,6 +6,7 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
+const verbose = false
 
 describe('sync tests', function(this: any) {
   this.timeout(0)
@@ -72,7 +73,7 @@ describe('sync tests', function(this: any) {
       rpcport: 8553,
       peers: ['8545'],
     }
-    await initAndStartGeth(hooks.gethBinaryPath, fullInstance, true)
+    await initAndStartGeth(hooks.gethBinaryPath, fullInstance, verbose)
     const web3 = new Web3('http://localhost:8553')
     await waitToFinishSyncing(web3)
   })
@@ -94,7 +95,7 @@ describe('sync tests', function(this: any) {
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
           peers: ['8553'],
         }
-        await initAndStartGeth(hooks.gethBinaryPath, syncInstance, true)
+        await initAndStartGeth(hooks.gethBinaryPath, syncInstance, verbose)
       })
 
       afterEach(() => killInstance(syncInstance))
@@ -105,9 +106,9 @@ describe('sync tests', function(this: any) {
         const syncWeb3 = new Web3(`http://localhost:8555`)
         await waitToFinishSyncing(syncWeb3)
         // Give the validators time to create more blocks.
-        await sleep(20, true)
+        await sleep(20, verbose)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
-        await sleep(20, true)
+        await sleep(20, verbose)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
         assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.
@@ -129,8 +130,8 @@ describe('sync tests', function(this: any) {
       this.timeout(0)
       const instance: GethInstanceConfig = gethConfig.instances[0]
       await killInstance(instance)
-      await initAndStartGeth(hooks.gethBinaryPath, { ...instance, peers: ['8547'] }, true)
-      await sleep(120, true) // wait for round change / resync
+      await initAndStartGeth(hooks.gethBinaryPath, { ...instance, peers: ['8547'] }, verbose)
+      await sleep(120, verbose) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
       for (let i = 0; i < gethConfig.instances.length; i++) {
