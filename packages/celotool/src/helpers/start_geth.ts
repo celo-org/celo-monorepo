@@ -1,11 +1,10 @@
 #!/usr/bin/env ts-node
 
 import program from 'commander'
-
 import { migrateContracts } from '../e2e-tests/utils'
-
 import { AccountType, getPrivateKeysFor, getValidatorsInformation } from '../lib/generate_utils'
-import { GethRunConfig, runGethNodes } from '../lib/geth'
+import { runGethNodes } from '../lib/geth'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 
 program
   .option('-g, --geth-repo <path>', 'Geth repo path')

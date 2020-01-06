@@ -8,7 +8,9 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import { GethInstanceConfig, GethRunConfig, importGenesis, initAndStartGeth } from '../lib/geth'
+import { importGenesis, initAndStartGeth } from '../lib/geth'
+import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
 
 interface MemberSwapper {
@@ -165,6 +167,7 @@ describe('governance tests', () => {
   ]
 
   const context: any = getContext(gethConfig)
+
   let web3: any
   let election: any
   let stableToken: any
@@ -836,14 +839,13 @@ describe('governance tests', () => {
   })
 
   describe('when rewards distribution is frozen', () => {
-    before(restart)
-
     let epoch: number
     let blockFrozen: number
     let latestBlock: number
 
     before(async function(this: any) {
       this.timeout(0)
+      await restart()
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
       await epochRewards.methods.freeze().send({ from: validator })

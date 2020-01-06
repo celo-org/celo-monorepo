@@ -16,8 +16,6 @@ import {
   checkoutGethRepo,
   connectValidatorPeers,
   getEnodeAddress,
-  GethInstanceConfig,
-  GethRunConfig,
   initAndStartGeth,
   resetDataDir,
   restoreDatadir,
@@ -26,6 +24,8 @@ import {
   startGeth,
   writeGenesis,
 } from '../lib/geth'
+import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))

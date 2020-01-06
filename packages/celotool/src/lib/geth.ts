@@ -26,53 +26,10 @@ import {
 import { retrieveIPAddress } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
+import { GethRunConfig } from './interfaces/geth-run-config'
+import { GethInstanceConfig } from './interfaces/geth-instance-config'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
-
-export interface GethRunConfig {
-  // migration
-  migrate?: boolean
-  migrateTo?: number
-  migrationOverrides?: any
-  keepData?: boolean
-  // ??
-  useBootnode?: boolean
-  // genesis config
-  genesisConfig?: any
-  // network
-  network: string
-  networkId: number
-  // where to run
-  runPath: string
-  verbosity?: number
-  gethRepoPath: string
-  // running instances
-  instances: GethInstanceConfig[]
-}
-
-export interface GethInstanceConfig {
-  gethRunConfig: GethRunConfig
-  name: string
-  validating?: boolean
-  validatingGasPrice?: number
-  syncmode: string
-  port: number
-  proxyport?: number
-  rpcport?: number
-  wsport?: number
-  lightserv?: boolean
-  privateKey?: string
-  etherbase?: string
-  peers?: string[]
-  proxies?: Array<string[2]>
-  pid?: number
-  isProxied?: boolean
-  isProxy?: boolean
-  bootnodeEnode?: string
-  proxy?: string
-  proxiedValidatorAddress?: string
-  ethstats?: string
-}
 
 const DEFAULT_TRANSFER_AMOUNT = new BigNumber('0.00000000000001')
 const LOAD_TEST_TRANSFER_WEI = new BigNumber(10000)
@@ -820,7 +777,7 @@ export async function init(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('init geth')
+    console.log(`init geth with genesis at ${genesisPath}`)
   }
 
   await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: !verbose })
@@ -942,6 +899,15 @@ export async function startGeth(
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
+  const verbosity = instance.gethRunConfig.verbosity ? instance.gethRunConfig.verbosity : '3'
+  let blocktime: number = 1
+
+  if (
+    instance.gethRunConfig.genesisConfig &&
+    instance.gethRunConfig.genesisConfig.blockTime !== null
+  ) {
+    blocktime = instance.gethRunConfig.genesisConfig.blockTime as number
+  }
 
   const gethArgs = [
     '--datadir',
@@ -954,7 +920,7 @@ export async function startGeth(
     '--rpcvhosts=*',
     '--networkid',
     instance.gethRunConfig.networkId.toString(),
-    `--verbosity=${instance.gethRunConfig.verbosity ? instance.gethRunConfig.verbosity : '3'}`,
+    `--verbosity=${verbosity}`,
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
     '--nat',
@@ -996,6 +962,8 @@ export async function startGeth(
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
     }
 
+    gethArgs.push(`--istanbul.blockperiod`, blocktime.toString())
+
     if (isProxied) {
       gethArgs.push('--proxy.proxied')
     }
@@ -1026,7 +994,7 @@ export async function startGeth(
     gethArgs.push(`--ethstats=${instance.name}@${ethstats}`, '--etherbase=0')
   }
 
-  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, true)
+  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
   instance.pid = gethProcess.pid
 
   gethProcess.on('error', (err) => {
@@ -1064,9 +1032,8 @@ export async function startGeth(
 export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig) {
   const genesis: string = generateGenesis({
     validators,
-    blockTime: 0,
     epoch: 10,
-    lookback: 2,
+    lookbackwindow: 2,
     requestTimeout: 3000,
     chainId: gethConfig.networkId,
     ...gethConfig.genesisConfig,

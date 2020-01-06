@@ -6,7 +6,9 @@ import fs from 'fs'
 import { findAPortNotInUse } from 'portscanner'
 
 import { AccountType, getPrivateKeysFor, privateKeyToPublicKey } from '../lib/generate_utils'
-import { getEnodeAddress, GethInstanceConfig, GethRunConfig, initAndStartGeth } from '../lib/geth'
+import { getEnodeAddress, initAndStartGeth } from '../lib/geth'
+import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 
 program
   .option('-g, --geth-repo <path>', 'Geth repo path')

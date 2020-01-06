@@ -1,5 +1,4 @@
 // @ts-ignore
-import { config } from '@celo/protocol/migrationsConfig'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
@@ -20,6 +19,8 @@ import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
+import { GenesisConfig } from './interfaces/genesis-config'
+
 const ec = new EC('secp256k1')
 
 export enum AccountType {
@@ -44,6 +45,7 @@ export interface Validator {
   blsPublicKey: string
   balance: string
 }
+
 export interface AccountAndBalance {
   address: string
   balance: string
@@ -276,17 +278,7 @@ export const generateGenesis = ({
   chainId,
   requestTimeout,
   enablePetersburg = true,
-}: {
-  validators: Validator[]
-  consensusType?: ConsensusType
-  initialAccounts?: AccountAndBalance[]
-  blockTime: number
-  epoch: number
-  lookbackwindow: number
-  chainId: number
-  requestTimeout: number
-  enablePetersburg?: boolean
-}): string => {
+}: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
@@ -303,7 +295,9 @@ export const generateGenesis = ({
   } else if (consensusType === ConsensusType.ISTANBUL) {
     genesis.mixHash = ISTANBUL_MIX_HASH
     genesis.difficulty = '0x1'
-    genesis.extraData = generateIstanbulExtraData(validators)
+    if (validators) {
+      genesis.extraData = generateIstanbulExtraData(validators)
+    }
     genesis.config.istanbul = {
       // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
       // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
@@ -315,9 +309,11 @@ export const generateGenesis = ({
     }
   }
 
-  for (const validator of validators) {
-    genesis.alloc[validator.address] = {
-      balance: validator.balance,
+  if (validators) {
+    for (const validator of validators) {
+      genesis.alloc[validator.address] = {
+        balance: validator.balance,
+      }
     }
   }
 
@@ -332,13 +328,16 @@ export const generateGenesis = ({
     monorepoRoot,
     'packages/protocol/build/contracts/Proxy.json'
   )
-  for (const contract of contracts) {
-    genesis.alloc[contract] = {
-      code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
-      storage: {
-        [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
-      },
-      balance: '0',
+
+  if (validators) {
+    for (const contract of contracts) {
+      genesis.alloc[contract] = {
+        code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
+        storage: {
+          [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
+        },
+        balance: '0',
+      }
     }
   }
 

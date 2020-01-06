@@ -1,7 +1,9 @@
-import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
+
+import { addCeloGethMiddleware } from 'src/lib/utils'
 import { AccountType, getPrivateKeysFor, getValidatorsInformation } from '../../lib/generate_utils'
-import { GethRunConfig, runGethNodes } from '../../lib/geth'
+import { runGethNodes } from '../../lib/geth'
+import { GethRunConfig } from '../../lib/interfaces/geth-run-config'
 import { GethArgv } from '../geth'
 
 export const command = 'start'
@@ -127,6 +129,9 @@ export const handler = async (argv: StartArgv) => {
     networkId,
     network,
     instances: [],
+    genesisConfig: {
+      blockTime: 5,
+    },
   }
 
   for (let x = 0; x < numNodes; x++) {

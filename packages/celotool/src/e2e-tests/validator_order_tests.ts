@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import Web3 from 'web3'
-import { GethRunConfig } from '../lib/geth'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, sleep } from './utils'
 
 const VALIDATORS = 10
