@@ -1,5 +1,5 @@
-import { GethInstanceConfig } from './geth-instance-config'
 import { GenesisConfig } from './genesis-config'
+import { GethInstanceConfig } from './geth-instance-config'
 
 export interface GethRunConfig {
   // migration
