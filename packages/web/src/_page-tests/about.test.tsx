@@ -1,6 +1,6 @@
+import About from 'pages/about'
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import About from 'pages/about'
 
 describe('About', () => {
   it('renders', () => {
