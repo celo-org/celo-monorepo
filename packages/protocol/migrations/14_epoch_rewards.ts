@@ -25,5 +25,8 @@ module.exports = deploymentForCoreContract<EpochRewardsInstance>(
   web3,
   artifacts,
   CeloContractName.EpochRewards,
-  initializeArgs
+  initializeArgs,
+  async (epochRewards: EpochRewardsInstance) => {
+    await epochRewards.freeze()
+  }
 )
