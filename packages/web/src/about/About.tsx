@@ -8,7 +8,7 @@ import CeloValues from 'src/about/Values'
 import VideoCover from 'src/about/VideoCover'
 import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
-import { I18nProps, Trans, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -55,16 +55,17 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('MeaningTile')} endBlock={true}>
             <H1 style={standardStyles.elementalMarginBottom}>
               <Trans
+                ns={NameSpaces.brand}
                 t={
                   t // @ts-ignore
                 }
                 i18nKey={'MeaningText'}
                 values={{ phonetic: '/ˈtselo/' }}
-                components={[
+                children={
                   <Text key={1} style={textStyles.italic}>
                     "/ˈtselo/"
-                  </Text>,
-                ]}
+                  </Text>
+                }
               />
             </H1>
             <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('MeaningCopy')}</Text>
@@ -73,9 +74,10 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('ValuesTitle')}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               <Trans
+                ns={NameSpaces.brand}
                 i18nKey={'ValuesCopy'}
                 values={{ celoCLabs: 'Celo\u00a0– C\u00a0Labs' }}
-                components={[<Strong key="0">M</Strong>]}
+                children={<Strong key="0">M</Strong>}
               />
             </Text>
           </BookLayout>
@@ -84,12 +86,13 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('SacredEconTitle')} startBlock={true}>
             <Text style={[fonts.p, standardStyles.blockMarginBottomTablet]}>
               <Trans
+                ns={NameSpaces.brand}
                 i18nKey="SacredEconText"
-                components={[
+                children={
                   <InlineAnchor key="sacred" href="http://sacred-economics.com/film/">
                     Sacred Econ
-                  </InlineAnchor>,
-                ]}
+                  </InlineAnchor>
+                }
               />
             </Text>
             <Button

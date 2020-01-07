@@ -1,6 +1,5 @@
 const withSass = require('@zeit/next-sass')
 const withImages = require('next-images')
-const webpack = require('webpack')
 const envConfig = require('./env-config')
 const serverEnvConfig = require('./server-env-config')
 
@@ -25,6 +24,11 @@ module.exports = withImages(
       if (!isServer) {
         config.resolve.alias['@sentry/node'] = '@sentry/browser'
       }
+
+      config.module.rules.push({
+        loader: 'ignore-loader',
+        test: /\.test.ts$/,
+      })
 
       return config
     },
