@@ -39,6 +39,7 @@ export enum envVar {
   ETHSTATS_DOCKER_IMAGE_TAG = 'ETHSTATS_DOCKER_IMAGE_TAG',
   ETHSTATS_TRUSTED_ADDRESSES = 'ETHSTATS_TRUSTED_ADDRESSES',
   ETHSTATS_BANNED_ADDRESSES = 'ETHSTATS_BANNED_ADDRESSES',
+  ETHSTATS_RESERVED_ADDRESSES = 'ETHSTATS_RESERVED_ADDRESSES',
   FAUCET_GENESIS_ACCOUNTS = 'FAUCET_GENESIS_ACCOUNTS',
   FAUCET_GENESIS_BALANCE = 'FAUCET_GENESIS_BALANCE',
   ORACLE_GENESIS_BALANCE = 'ORACLE_GENESIS_BALANCE',
@@ -176,9 +177,7 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 export async function doCheckOrPromptIfStagingOrProduction() {
   if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      `You are about to apply a possibly irreversible action on a production env: ${
-        process.env.CELOTOOL_CELOENV
-      }. Are you sure?`
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }

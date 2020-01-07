@@ -77,11 +77,11 @@ public class SMSStatusBroadcastReceiver extends BroadcastReceiver {
             Log.e(
               TAG,
               "Error marking message " +
-                messageId +
-                " as sent: " +
-                error.getMessage() +
-                " : " +
-                error.getDetails()
+              messageId +
+              " as sent: " +
+              error.getMessage() +
+              " : " +
+              error.getDetails()
             );
           }
         }

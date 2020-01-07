@@ -1,17 +1,17 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 
 type Props = {
   eventName?: CustomEventNames
   onCancel?: () => void
-} & WithNamespaces
+} & WithTranslation
 
 class CancelButton extends React.PureComponent<Props> {
   cancel = () => {
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.global)(CancelButton)
+export default withTranslation(Namespaces.global)(CancelButton)

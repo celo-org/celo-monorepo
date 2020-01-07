@@ -40,7 +40,6 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
-import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
@@ -105,6 +104,15 @@ export const commonScreens = {
   [Screens.Debug]: { screen: Debug },
 }
 
+const verificationScreens = {
+  [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
+  [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
+  [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
+  [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
+  [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
+  [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
+}
+
 const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
@@ -115,13 +123,7 @@ const NuxStack = createStackNavigator(
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
     [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
-    [Screens.ImportContacts]: { screen: ImportContacts },
-    [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
-    [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
-    [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
-    [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
-    [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
-    [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
+    ...verificationScreens,
     ...commonScreens,
   },
   {
@@ -136,6 +138,7 @@ const NuxStack = createStackNavigator(
 const SendStack = createStackNavigator(
   {
     [Screens.Send]: { screen: Send },
+    ...verificationScreens,
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
@@ -257,12 +260,7 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
-    [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
-    [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
-    [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
-    [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
-    [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
-    [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
+    ...verificationScreens,
   },
   {
     navigationOptions: {

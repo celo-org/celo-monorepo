@@ -152,7 +152,7 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const privateKey = mnemonicToSeedHex(mnemonic)
+    const privateKey = yield call(mnemonicToSeedHex, mnemonic)
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }

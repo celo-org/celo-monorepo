@@ -13,7 +13,7 @@ describe('JoinCeloScreen', () => {
     const store = createMockStore()
     const tree = renderer.create(
       <Provider store={store}>
-        <JoinCelo {...getMockI18nProps()} />
+        <JoinCelo />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
