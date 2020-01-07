@@ -1,6 +1,10 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
-import { newLogExplorer, ParsedBlock } from '@celo/contractkit/lib/explorer/log-explorer'
+import {
+  newBlockExplorer,
+  ParsedBlock,
+  ParsedTx,
+} from '@celo/contractkit/lib/explorer/block-explorer'
+import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'

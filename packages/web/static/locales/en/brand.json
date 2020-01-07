@@ -5,7 +5,7 @@
       "The Celo Brand Kit includes resources to visually represent Celo and the mission of prosperity for all. The kit offers instructions and assets for community contributors to appropriately communicate Celo brand affiliation. By using the Celo brand consistently, we can connect in our shared purpose.",
     "useageTitle": "How to use this guide?",
     "useageText":
-      "Shared norms and behaviors are the foundation of a beautiful community. By choosing to use these assets, you become a representative of Celo. Support the effort responsibly and uphold <0>Celo’s Code of Conduct.</0>"
+      "Shared norms and behaviors are the foundation of a beautiful community. Support the effort responsibly and uphold <0>Celo’s Code of Conduct.</0>"
   },
   "logo": {
     "title": "Logo",
@@ -43,7 +43,7 @@
   "color": {
     "title": "Color",
     "headline":
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget dignissim justo. Integer ac sodales dolor, quis aliquet nisi. Donec eget mattis neque, eu ultricies diam.",
+      "The Celo color palette consistes of primary brand colors, accent colors, and grays.",
     "primaries": "Primary Brand Colors",
     "primariesText":
       "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to cGLD like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",

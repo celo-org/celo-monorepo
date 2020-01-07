@@ -1,12 +1,12 @@
 import React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
   AddressToE164NumberType,
@@ -46,7 +46,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   addressToE164Number: state.identity.addressToE164Number,
 })
 
-type Props = NavigationInjectedProps & WithNamespaces & StateProps & DispatchProps
+type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
 
 export const listItemRenderer = (params: {
   recipientCache: NumberToRecipient
@@ -89,11 +89,8 @@ OutgoingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
   i18n.t('walletFlow5:outgoingPaymentRequests')
 )
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    updatePaymentRequestStatus,
-    updatePaymentRequestNotified,
-    fetchPhoneAddresses,
-  }
-)(withNamespaces(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  updatePaymentRequestStatus,
+  updatePaymentRequestNotified,
+  fetchPhoneAddresses,
+})(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))

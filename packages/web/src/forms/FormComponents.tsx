@@ -171,7 +171,7 @@ interface LabelProps {
   hasError: boolean
   value: string
   label: string
-  onInput: () => void
+  onInput: (x?: unknown) => void
 }
 
 export function LabeledInput({ name, multiline, hasError, value, onInput, label }: LabelProps) {

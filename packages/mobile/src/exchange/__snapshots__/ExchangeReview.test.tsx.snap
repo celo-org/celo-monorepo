@@ -349,7 +349,7 @@ exports[`ExchangeReview renders correctly 1`] = `
 >>>>>>> master
               }
             >
-              0
+              0.00
             </Text>
           </View>
           <View
@@ -489,7 +489,7 @@ exports[`ExchangeReview renders correctly 1`] = `
 >>>>>>> master
               }
             >
-              0
+              0.00
             </Text>
           </View>
           <View

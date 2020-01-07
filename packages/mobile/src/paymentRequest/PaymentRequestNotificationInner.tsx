@@ -1,6 +1,6 @@
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { Trans, withNamespaces, WithNamespaces } from 'react-i18next'
+import { Trans, WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
@@ -13,7 +13,7 @@ interface Props {
   requesterRecipient: Recipient | null
 }
 
-function PaymentRequestNotificationInner(props: Props & WithNamespaces) {
+function PaymentRequestNotificationInner(props: Props & WithTranslation) {
   const { requesterE164Number, amount, requesterRecipient } = props
   const displayName = (requesterRecipient && requesterRecipient.displayName) || requesterE164Number
   return (
@@ -38,4 +38,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.paymentRequestFlow)(PaymentRequestNotificationInner)
+export default withTranslation(Namespaces.paymentRequestFlow)(PaymentRequestNotificationInner)

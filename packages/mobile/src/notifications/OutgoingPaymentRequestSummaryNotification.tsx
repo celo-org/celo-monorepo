@@ -3,13 +3,13 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import {
   addressToE164NumberSelector,
   AddressToE164NumberType,
@@ -28,7 +28,7 @@ interface OwnProps {
   requests: PaymentRequest[]
 }
 
-type Props = OwnProps & WithNamespaces & StateProps
+type Props = OwnProps & WithTranslation & StateProps
 
 interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
@@ -141,5 +141,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification)
+  withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification)
 )
