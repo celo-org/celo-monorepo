@@ -61,7 +61,6 @@ resource "google_compute_instance" "validator" {
       proxy_enode : var.proxy_enodes[count.index],
       proxy_internal_ip : var.proxy_internal_ips[count.index],
       proxy_external_ip : var.proxy_external_ips[count.index],
-      static_nodes_base64 : var.static_nodes_base64,
       reset_geth_data : var.reset_geth_data
     }
   )

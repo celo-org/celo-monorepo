@@ -109,11 +109,6 @@ variable proxy_external_ips {
   description = "Array list with the proxy external addresses"
 }
 
-variable static_nodes_base64 {
-  type        = string
-  description = "Content of the static_nodes.json file encoded in base64"
-}
-
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"

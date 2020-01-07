@@ -211,7 +211,6 @@ module "validator" {
   proxy_enodes                = var.proxy_enodes
   proxy_internal_ips          = module.proxy.internal_ip_addresses
   proxy_external_ips          = module.proxy.external_ip_addresses
-  static_nodes_base64         = base64encode(data.http.static-nodes.body)
 }
 
 module "attestation-service" {
