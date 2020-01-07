@@ -13,7 +13,6 @@ import {
 } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { Cell, Spans } from 'src/layout/GridRow'
-
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 export function ErrorMessage({ allErrors, field, t }) {
@@ -158,7 +157,7 @@ export class TextInput extends React.Component<TextInputProps & TextInputAuxProp
 
   render() {
     const { style, focusStyle, ...props } = this.props
-    const currentStyle = this.state.focused ? [style, focusStyle] : style
+    const currentStyle = this.state.focused ? StyleSheet.flatten([style, focusStyle]) : style
     return (
       <RNTextInput {...props} onFocus={this.onFocus} onBlur={this.onBlur} style={currentStyle} />
     )
