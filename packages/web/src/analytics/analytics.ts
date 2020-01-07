@@ -29,6 +29,7 @@ async function isInEU() {
 }
 export async function initializeAnalytics() {
   if (process.browser && !analyticsStarted && (await canTrack())) {
+    analyticsStarted = true
     const Segment = await import('load-segment').then((mod) => mod.default)
     const { publicRuntimeConfig } = getConfig()
     analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
@@ -37,7 +38,6 @@ export async function initializeAnalytics() {
       track: () => null,
     }
   }
-  analyticsStarted = true
 }
 
 export async function agree() {
