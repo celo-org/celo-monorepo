@@ -567,13 +567,14 @@ contract Attestations is
     uint256 currentIndex = 0;
     address validator;
     address issuer;
+    IAccounts accounts = getAccounts();
 
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorSignerAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = getAccounts().validatorSignerToAccount(validator);
+      issuer = accounts.validatorSignerToAccount(validator);
 
-      if (!getAccounts().hasAuthorizedAttestationSigner(issuer)) {
+      if (!accounts.hasAuthorizedAttestationSigner(issuer)) {
         continue;
       }
 
