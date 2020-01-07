@@ -117,17 +117,18 @@ const Portrait = React.memo(function _Portrait({
           >
             {purpose}
           </Text>
-          <View style={[standardStyles.row, standardStyles.elementalMarginTop]}>
+          <View style={standardStyles.row}>
             <Text style={[fonts.p, textStyles.heavy, styles.name]}>{name}</Text>
             {url && (
-              <a href={url}>
+              <a href={externalize(url)} target="_blank">
                 <External size={12} color={colors.dark} />
               </a>
             )}
           </View>
 
           <Text style={fonts.p}>
-            {company} – {team}
+            {company.trim()}
+            {team && `, ${team.trim()}`}
           </Text>
         </View>
       </Responsive>
@@ -135,14 +136,23 @@ const Portrait = React.memo(function _Portrait({
   )
 })
 
+function externalize(url: string) {
+  try {
+    const uri = new URL(url)
+    return uri.href
+  } catch {
+    return `//${url}`
+  }
+}
+
 // @ts-ignore
 const styles = StyleSheet.create({
   purposeText: { fontSize: 26, lineHeight: 28, minHeight: 60 },
   photoListAuxMobile: {
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     minHeight: '80vh',
   },
-  photoListAuxTablet: { justifyContent: 'space-around' },
+  photoListAuxTablet: { justifyContent: 'flex-start' },
   photo: {
     height: '100%',
     width: '100%',
@@ -154,27 +164,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     minHeight: '50vh',
   },
   person: {
     flexDirection: 'column',
     margin: 5,
-    marginBottom: 30,
-    width: '80vw',
+    marginBottom: 50,
+    width: '90vw',
     minWidth: 200,
     maxWidth: 300,
   },
   mediumPerson: {
     flexDirection: 'column',
-    marginBottom: 30,
-    width: 245,
+    marginBottom: 50,
+    width: 260,
     paddingHorizontal: 10,
   },
   largePerson: {
     flexDirection: 'column',
-    marginBottom: 30,
+    marginBottom: 50,
     width: 275,
+    marginRight: 40,
   },
 })
 
