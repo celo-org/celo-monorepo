@@ -13,6 +13,7 @@ interface StartArgv extends GethArgv {
   networkId: string
   syncMode: string
   mining: boolean
+  blockTime: number
   nodekeyhex: string
   minerGasPrice: number
   port: number
@@ -91,6 +92,11 @@ export const builder = (argv: yargs.Argv) => {
       type: 'string',
       description: 'address of the ethstats server',
     })
+    .option('blockTime', {
+      type: 'number',
+      description: 'Block Time',
+      default: 1,
+    })
 }
 
 export const handler = async (argv: StartArgv) => {
@@ -101,6 +107,7 @@ export const handler = async (argv: StartArgv) => {
   const datadir = argv.dataDir
   const networkId = parseInt(argv.networkId, 10)
   const syncMode = argv.syncMode
+  const blockTime = argv.blockTime
 
   const port = argv.port
   const rpcport = argv.rpcport
@@ -108,16 +115,16 @@ export const handler = async (argv: StartArgv) => {
 
   const mining = argv.mining
   const minerGasPrice = argv.minerGasPrice
+  const network = 'local'
+  const numNodes = argv.amount
 
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
 
-  const numNodes = argv.amount
   const purge = argv.purge
   const withProxy = argv.withProxy
 
-  const network = 'local'
-  const ethstats = argv.ethstats || undefined
+  const ethstats = argv.ethstats
 
   console.info(`sync mode is ${syncMode}`)
 
@@ -130,7 +137,7 @@ export const handler = async (argv: StartArgv) => {
     network,
     instances: [],
     genesisConfig: {
-      blockTime: 1,
+      blockTime,
     },
   }
 
