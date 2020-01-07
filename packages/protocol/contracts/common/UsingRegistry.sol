@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
 import "./interfaces/IAccounts.sol";
+import "./interfaces/IFeeCurrencyWhitelist.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
@@ -12,7 +13,10 @@ import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
+import "../identity/interfaces/IAttestations.sol";
 
+import "../stability/interfaces/IExchange.sol";
+import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
@@ -27,13 +31,20 @@ contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
+  bytes32 constant DOWNTIME_SLASHER_REGISTRY_ID = keccak256(abi.encodePacked("DowntimeSlasher"));
+  bytes32 constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID = keccak256(
+    abi.encodePacked("DoubleSigningSlasher")
+  );
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
-  bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
+  bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
   );
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
+  bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
+    abi.encodePacked("GovernanceSlasher")
+  );
   bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
@@ -49,11 +60,26 @@ contract UsingRegistry is Ownable {
     _;
   }
 
+  modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
+    bool registered = false;
+    for (uint256 i = 0; i < identifierHashes.length; i++) {
+      if (registry.getAddressForOrDie(identifierHashes[i]) == msg.sender) {
+        registered = true;
+        break;
+      }
+    }
+    // TODO(lucas): remove once DowntimeSlasher is implemented.
+    bool isCLabsValZero = (msg.sender == address(0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D));
+    require(registered || isCLabsValZero, "only registered contracts");
+    _;
+  }
+
   /**
    * @notice Updates the address pointing to a Registry contract.
    * @param registryAddress The address of a registry contract for routing to other contracts.
    */
   function setRegistry(address registryAddress) public onlyOwner {
+    require(registryAddress != address(0), "Cannot register the null address");
     registry = IRegistry(registryAddress);
     emit RegistrySet(registryAddress);
   }
@@ -62,8 +88,20 @@ contract UsingRegistry is Ownable {
     return IAccounts(registry.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
   }
 
+  function getAttestations() internal view returns (IAttestations) {
+    return IAttestations(registry.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID));
+  }
+
   function getElection() internal view returns (IElection) {
     return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
+  }
+
+  function getExchange() internal view returns (IExchange) {
+    return IExchange(registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID));
+  }
+
+  function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
+    return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
   }
 
   function getGoldToken() internal view returns (IERC20Token) {
@@ -80,6 +118,10 @@ contract UsingRegistry is Ownable {
 
   function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+  }
+
+  function getReserve() internal view returns (IReserve) {
+    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {

@@ -189,6 +189,10 @@ export const v4Schema = {
     acceptedAttestationCodes: [],
     verificationStatus: 0,
     hasSeenVerificationNux: false,
+    contactMappingProgress: {
+      current: 0,
+      total: 0,
+    },
   },
   account: {
     name: 'John Doe',
@@ -209,6 +213,7 @@ export const v4Schema = {
     backupCompleted: false,
     socialBackupCompleted: false,
     backupDelayedTime: 0,
+    dismissedGetVerified: false,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     pincodeType: PincodeType.Unset,

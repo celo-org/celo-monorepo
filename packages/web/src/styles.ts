@@ -87,8 +87,8 @@ export const fontInfo: Record<string, TextStyle> = {
   },
   h3Mobile: {
     fontFamily: typeFaces.futura,
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 24,
+    lineHeight: 32,
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
@@ -102,23 +102,14 @@ export const fontInfo: Record<string, TextStyle> = {
   h4Mobile: {
     fontFamily: typeFaces.garamond,
     textRendering: 'geometricPrecision',
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 24,
+    lineHeight: 32,
     color: colors.dark,
   },
-  h5a: {
-    fontFamily: typeFaces.futura,
-    fontSize: 20,
-    lineHeight: 24,
-    fontWeight: '500',
-    color: colors.dark,
-    textRendering: 'geometricPrecision',
-  },
-  // deprecated replaced with h6
   h5: {
     fontFamily: typeFaces.futura,
-    fontSize: 16,
-    lineHeight: 18,
+    fontSize: 20,
+    lineHeight: 24,
     fontWeight: '500',
     color: colors.dark,
     textRendering: 'geometricPrecision',
@@ -126,8 +117,8 @@ export const fontInfo: Record<string, TextStyle> = {
   h6: {
     fontFamily: typeFaces.futura,
     fontSize: 16,
-    lineHeight: 20,
-    fontWeight: '400',
+    lineHeight: 18,
+    fontWeight: '500',
     color: colors.dark,
     textRendering: 'geometricPrecision',
   },
@@ -368,4 +359,9 @@ export const standardStyles = StyleSheet.create({
 export const baseCoinStyle = {
   stroke: colors.screenGray,
   mixBlendMode: 'screen',
+}
+
+export const baseCoinStyleLight = {
+  stroke: colors.gray,
+  mixBlendMode: 'multiply',
 }

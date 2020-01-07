@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Pigment, { ColorData } from 'src/brandkit/color/Pigment'
 import { GAP } from 'src/brandkit/common/constants'
@@ -13,7 +14,7 @@ export default function Palette({ text, title, colors }: Props) {
   return (
     <View style={standardStyles.blockMarginBottom}>
       {title && (
-        <Text style={[fonts.h5a, styles.gap, standardStyles.elementalMarginBottom]}>{title}</Text>
+        <Text style={[fonts.h5, styles.gap, standardStyles.elementalMarginBottom]}>{title}</Text>
       )}
       <Text style={[fonts.p, standardStyles.elementalMarginBottom, styles.gap]}>{text}</Text>
       <View style={styles.swatch}>

@@ -16,9 +16,8 @@ import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
-import { initGethSaga } from 'src/geth/saga'
+import { initGethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
@@ -129,6 +128,11 @@ export function* waitForWeb3Sync() {
   }
 }
 
+export function* waitWeb3LastBlock() {
+  yield call(waitForGethConnectivity)
+  yield call(waitForWeb3Sync)
+}
+
 export function* getOrCreateAccount() {
   const account = yield select(currentAccountSelector)
   if (account) {
@@ -148,7 +152,7 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const privateKey = mnemonicToSeedHex(mnemonic)
+    const privateKey = yield call(mnemonicToSeedHex, mnemonic)
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
@@ -353,7 +357,7 @@ export function* unlockAccount(account: string) {
 // Wait for geth to be connected and account ready
 export function* getConnectedAccount() {
   yield call(waitWeb3LastBlock)
-  const account: string = yield getAccount()
+  const account: string = yield call(getAccount)
   return account
 }
 
@@ -501,4 +505,5 @@ export function* watchZeroSyncMode() {
 
 export function* web3Saga() {
   yield spawn(watchZeroSyncMode)
+  yield spawn(waitWeb3LastBlock)
 }

@@ -32,10 +32,9 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
   }
 
   async function addMember(member: string) {
-    return (await (await kit.contracts.getValidators()).addMember(
-      group,
-      member
-    )).sendAndWaitForReceipt({ from: group })
+    return (
+      await (await kit.contracts.getValidators()).addMember(group, member)
+    ).sendAndWaitForReceipt({ from: group })
   }
 
   async function getGroupMembers() {
@@ -352,6 +351,7 @@ describe('governance tests', () => {
 
       // Wait for an epoch transition so we can activate our vote.
       await waitForEpochTransition(epoch)
+      await sleep(5)
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(epoch)
 
@@ -602,6 +602,7 @@ describe('governance tests', () => {
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
       const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
         const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
+        // @ts-ignore - TODO: remove when web3 upgrade completed
         const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
         return new BigNumber(gpm).times(new BigNumber(gas))
       }
@@ -659,11 +660,13 @@ describe('governance tests', () => {
           const targetVotingYield = new BigNumber(
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )
+          assert.isFalse(targetVotingYield.isZero())
           // We need to calculate the rewards multiplier for the previous block, before
           // the rewards actually are awarded.
           const rewardsMultiplier = new BigNumber(
             await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
           )
+          assert.isFalse(rewardsMultiplier.isZero())
           const expectedEpochReward = activeVotes
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
@@ -716,25 +719,36 @@ describe('governance tests', () => {
     })
 
     it('should have emitted the correct events when paying epoch rewards', async () => {
-      const currentBlock = await web3.eth.getBlockNumber()
-      const epochRewardsEvents = await epochRewards.getPastEvents('TargetVotingYieldUpdated', {
-        fromBlock: currentBlock - 10,
-        currentBlock,
-      })
-      const validatorRewardsEvents = await validators.getPastEvents(
-        'ValidatorEpochPaymentDistributed',
-        { fromBlock: currentBlock - 10, currentBlock }
-      )
-      const electionRewardsEvents = await election.getPastEvents(
-        'EpochRewardsDistributedToVoters',
-        { fromBlock: currentBlock - 10, currentBlock }
-      )
-      assert(epochRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
-      assert(validatorRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
-      assert(electionRewardsEvents.every((a: any) => a.blockNumber % 10 === 0))
-      assert(epochRewardsEvents.length > 0)
-      assert(validatorRewardsEvents.length > 0)
-      assert(electionRewardsEvents.length > 0)
+      const currentBlock = (await web3.eth.getBlock('latest')).number
+      const events = [
+        {
+          contract: epochRewards,
+          name: 'TargetVotingYieldUpdated',
+        },
+        {
+          contract: validators,
+          name: 'ValidatorEpochPaymentDistributed',
+        },
+        {
+          contract: validators,
+          name: 'ValidatorScoreUpdated',
+        },
+        {
+          contract: election,
+          name: 'EpochRewardsDistributedToVoters',
+        },
+      ]
+      for (const event of events) {
+        const eventLogs = await event.contract.getPastEvents(event.name, {
+          fromBlock: currentBlock - 10,
+          currentBlock,
+        })
+        assert(
+          eventLogs.every((a: any) => a.blockNumber % 10 === 0),
+          `every ${event.name} event occured on the last block of the epoch`
+        )
+        assert(eventLogs.length > 0, `at least one ${event.name} event occured`)
+      }
     })
   })
 

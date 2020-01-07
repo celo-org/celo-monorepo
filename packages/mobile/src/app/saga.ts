@@ -43,7 +43,6 @@ interface PersistedStateProps {
   redeemComplete: boolean
   account: string | null
   hasSeenVerificationNux: boolean
-  askedContactsPermission: boolean
 }
 
 const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null => {
@@ -57,7 +56,6 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
     redeemComplete: state.invite.redeemComplete,
     account: state.web3.account,
     hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
-    askedContactsPermission: state.identity.askedContactsPermission,
   }
 }
 
@@ -103,7 +101,6 @@ export function* navigateToProperScreen() {
     redeemComplete,
     account,
     hasSeenVerificationNux,
-    askedContactsPermission,
   } = mappedState
 
   if (language) {
@@ -125,8 +122,6 @@ export function* navigateToProperScreen() {
     navigate(Screens.PincodeEducation)
   } else if (!redeemComplete && !account) {
     navigate(Screens.EnterInviteCode)
-  } else if (!askedContactsPermission) {
-    navigate(Screens.ImportContacts)
   } else if (!hasSeenVerificationNux) {
     navigate(Screens.VerificationEducationScreen)
   } else {

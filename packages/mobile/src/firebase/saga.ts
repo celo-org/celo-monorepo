@@ -13,15 +13,12 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import {
-  PaymentRequest,
-  PaymentRequestStatus,
   updateIncomingPaymentRequests,
-  updateOutgoingPaymentRequests,
-} from 'src/account'
-import {
   UpdateIncomingPaymentRequestsAction,
+  updateOutgoingPaymentRequests,
   UpdateOutgoingPaymentRequestsAction,
 } from 'src/account/actions'
+import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -73,9 +70,7 @@ function* initializeFirebase() {
     const app = firebase.app()
     Logger.info(
       TAG,
-      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${
-        app.options.databaseURL
-      }`
+      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${app.options.databaseURL}`
     )
     yield call(initializeAuth, firebase, address)
     yield put(firebaseAuthorized())

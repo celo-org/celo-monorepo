@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
@@ -41,7 +42,11 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
           <EventsChannel isDarkMode={false} />
         </View>
         <View>
-          <Image source={{ uri: require('src/dev/devNews.png') }} style={styles.emailLogo} />
+          <Image
+            resizeMode="contain"
+            source={{ uri: require('src/dev/devNews.png') }}
+            style={styles.emailLogo}
+          />
           <View style={styles.form}>
             <H3 style={styles.formTitle}>{t('stayConnected')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>

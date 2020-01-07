@@ -49,7 +49,7 @@ export class Activity extends React.Component<Props> {
               loading={loading}
               error={error}
               data={data}
-              standbyTransactionFilter={filterToExchangeTxs}
+              transactionFilter={filterToExchangeTxs}
             />
           )
         }}
@@ -58,9 +58,6 @@ export class Activity extends React.Component<Props> {
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    resetStandbyTransactions,
-  }
-)(Activity)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  resetStandbyTransactions,
+})(Activity)

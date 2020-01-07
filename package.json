@@ -35,9 +35,6 @@
       "packages/*"
     ],
     "nohoist": [
-      "@celo/web/@timkendrick/monaco-editor",
-      "@celo/web/@types/react-i18next",
-      "@celo/web/next-i18next",
       "**/openzeppelin-solidity"
     ]
   },
@@ -52,16 +49,16 @@
     "jest-snapshot": "^24.9.0",
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
-    "prettier": "1.13.5",
-    "prettier-plugin-java": "^0.4.0",
-    "prettier-plugin-solidity": "1.0.0-alpha.34",
-    "pretty-quick": "^1.11.1",
+    "prettier": "1.19.1",
+    "prettier-plugin-java": "^0.6.0",
+    "prettier-plugin-solidity": "1.0.0-alpha.35",
+    "pretty-quick": "^2.0.1",
     "solc": "0.5.8",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.20.0",
-    "typescript": "^3.5.3",
+    "typescript": "^3.7.3",
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {
@@ -76,6 +73,9 @@
     "**/deep-extend": "^0.5.1",
     "**/extend": "^3.0.2",
     "**/cross-fetch": "^3.0.2",
-    "sha3": "1.2.3"
+    "sha3": "1.2.3",
+    "bignumber.js": "9.0.0",
+    "prettier": "^1.19.1",
+    "@types/prettier": "^1.19.0"
   }
 }

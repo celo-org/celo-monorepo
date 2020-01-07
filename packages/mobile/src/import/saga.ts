@@ -1,9 +1,9 @@
-import { ensureHexLeader } from '@celo/utils/src/address'
+import { ensureLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { validateMnemonic } from 'bip39'
 import { mnemonicToSeedHex } from 'react-native-bip39'
 import { call, put, spawn, takeLeading } from 'redux-saga/effects'
-import { setBackupCompleted } from 'src/account'
+import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -18,12 +18,11 @@ import {
 import { redeemInviteSuccess } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { assignAccountFromPrivateKey } from 'src/web3/saga'
+import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'import/saga'
 
@@ -38,14 +37,14 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       return
     }
 
-    const privateKey = mnemonicToSeedHex(phrase)
+    const privateKey = yield call(mnemonicToSeedHex, phrase)
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
 
     if (!useEmptyWallet) {
       Logger.debug(TAG + '@importBackupPhraseSaga', 'Checking account balance')
-      const backupAccount = web3.eth.accounts.privateKeyToAccount(ensureHexLeader(privateKey))
+      const backupAccount = web3.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey))
         .address
 
       const dollarBalance: BigNumber = yield call(
@@ -75,7 +74,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     // Set redeem invite complete so user isn't brought back into nux flow
     yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
-    navigate(Screens.ImportContacts)
+    navigate(Screens.VerificationEducationScreen)
     yield put(importBackupPhraseSuccess())
   } catch (error) {
     Logger.error(TAG + '@importBackupPhraseSaga', 'Error importing backup phrase', error)

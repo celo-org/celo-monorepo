@@ -47,6 +47,7 @@ export interface BlockscoutTransaction {
 export class BlockscoutAPI extends RESTDataSource {
   tokenAddressMapping: { [key: string]: string } | undefined
   attestationsAddress: string | undefined
+  escrowAddress: string | undefined
   constructor() {
     super()
     this.baseURL = BLOCKSCOUT_API
@@ -64,13 +65,14 @@ export class BlockscoutAPI extends RESTDataSource {
   }
 
   async ensureTokenAddresses() {
-    if (this.tokenAddressMapping && this.attestationsAddress) {
+    if (this.tokenAddressMapping && this.attestationsAddress && this.escrowAddress) {
       // Already got addresses
       return
     } else {
       const addresses = await getContractAddresses()
       this.attestationsAddress = addresses.attestationsAddress
       this.tokenAddressMapping = addresses.tokenAddressMapping
+      this.escrowAddress = addresses.escrowAddress
     }
   }
 
@@ -97,6 +99,14 @@ export class BlockscoutAPI extends RESTDataSource {
       return this.attestationsAddress
     } else {
       throw new Error('Cannot find attestation address')
+    }
+  }
+
+  getEscrowAddress() {
+    if (this.escrowAddress) {
+      return this.escrowAddress
+    } else {
+      throw new Error('Cannot find escrow address')
     }
   }
 
@@ -157,7 +167,8 @@ export class BlockscoutAPI extends RESTDataSource {
           userAddress,
           eventToAddress,
           eventFromAddress,
-          this.getAttestationAddress()
+          this.getAttestationAddress(),
+          this.getEscrowAddress()
         )
         events.push({
           type,
@@ -173,9 +184,7 @@ export class BlockscoutAPI extends RESTDataSource {
     })
 
     console.info(
-      `[Celo] getFeedEvents address=${args.address} startblock=${args.startblock} endblock=${
-        args.endblock
-      } rawTransactionCount=${rawTransactions.length} eventCount=${events.length}`
+      `[Celo] getFeedEvents address=${args.address} startblock=${args.startblock} endblock=${args.endblock} rawTransactionCount=${rawTransactions.length} eventCount=${events.length}`
     )
     return events.sort((a, b) => b.timestamp - a.timestamp)
   }
@@ -201,9 +210,7 @@ export class BlockscoutAPI extends RESTDataSource {
       })
     }
     console.info(
-      `[Celo] getFeedRewards address=${args.address} startblock=${args.startblock} endblock=${
-        args.endblock
-      } rawTransactionCount=${rawTransactions.length} rewardsCount=${rewards.length}`
+      `[Celo] getFeedRewards address=${args.address} startblock=${args.startblock} endblock=${args.endblock} rawTransactionCount=${rawTransactions.length} rewardsCount=${rewards.length}`
     )
     return rewards.sort((a, b) => b.timestamp - a.timestamp)
   }
@@ -213,7 +220,8 @@ function resolveTransferEventType(
   userAddress: string,
   eventToAddress: string,
   eventFromAddress: string,
-  attestationsAddress: string
+  attestationsAddress: string,
+  escrowAddress: string
 ): [EventTypes, string] {
   if (eventToAddress === userAddress && eventFromAddress === FAUCET_ADDRESS) {
     return [EventTypes.FAUCET, FAUCET_ADDRESS]
@@ -224,8 +232,14 @@ function resolveTransferEventType(
   if (eventToAddress === userAddress && eventFromAddress === VERIFICATION_REWARDS_ADDRESS) {
     return [EventTypes.VERIFICATION_REWARD, VERIFICATION_REWARDS_ADDRESS]
   }
+  if (eventToAddress === userAddress && eventFromAddress === escrowAddress) {
+    return [EventTypes.ESCROW_RECEIVED, eventFromAddress]
+  }
   if (eventToAddress === userAddress) {
     return [EventTypes.RECEIVED, eventFromAddress]
+  }
+  if (eventFromAddress === userAddress && eventToAddress === escrowAddress) {
+    return [EventTypes.ESCROW_SENT, eventToAddress]
   }
   if (eventFromAddress === userAddress) {
     return [EventTypes.SENT, eventToAddress]

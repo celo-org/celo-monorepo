@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ROUTE_TO_TITLE } from 'src/brandkit/common/Page'
 import Sidebar, { Page } from 'src/brandkit/common/Sidebar'
 import Triangle, { Direction } from 'src/shared/Triangle'
 import { colors, fonts, standardStyles } from 'src/styles'
-
-import { ROUTE_TO_TITLE } from 'src/brandkit/common/Page'
 
 interface Props {
   pages: Page[]
@@ -41,7 +40,7 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
       <View style={styles.container}>
         <TouchableOpacity onPress={this.toggleMenu}>
           <View style={[standardStyles.row, styles.bar]}>
-            <Text style={fonts.h5}>{pageTitleFromRoute(pathname)}</Text>
+            <Text style={fonts.h6}>{pageTitleFromRoute(pathname)}</Text>
             <Triangle direction={this.state.isOpen ? Direction.up : Direction.down} />
           </View>
         </TouchableOpacity>

@@ -2,6 +2,7 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
@@ -82,6 +83,18 @@ class CheckBuilder {
     return this
   }
 
+  canSign = (account: Address) =>
+    this.addCheck('Account can sign', async () => {
+      try {
+        const message = 'test'
+        const signature = await this.kit.web3.eth.sign(message, account)
+        return verifySignature(message, signature, account)
+      } catch (error) {
+        console.error(error)
+        return false
+      }
+    })
+
   canSignValidatorTxs = () =>
     this.addCheck(
       'Signer can sign Validator Txs',
@@ -106,7 +119,10 @@ class CheckBuilder {
     )
 
   isValidator = (account: Address) =>
-    this.addCheck(`${account} is Validator`, this.withValidators((v) => v.isValidator(account)))
+    this.addCheck(
+      `${account} is Validator`,
+      this.withValidators((v) => v.isValidator(account))
+    )
 
   isValidatorGroup = (account: Address) =>
     this.addCheck(
@@ -142,13 +158,13 @@ class CheckBuilder {
 
   isNotAccount = (address: Address) =>
     this.addCheck(
-      `${address} is not an Account`,
+      `${address} is not a registered Account`,
       this.withAccounts((accs) => negate(accs.isAccount(address)))
     )
 
   isSignerOrAccount = () =>
     this.addCheck(
-      `${this.signer!} is Signer or Account`,
+      `${this.signer!} is Signer or registered Account`,
       this.withAccounts(async (accs) => {
         const res = (await accs.isAccount(this.signer!)) || (await accs.isSigner(this.signer!))
         return res

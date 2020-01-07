@@ -1,4 +1,3 @@
-// import { confirmAction } from './utils'
 import { config } from 'dotenv'
 import { existsSync } from 'fs'
 import path from 'path'
@@ -34,14 +33,17 @@ export enum envVar {
   CLUSTER_DOMAIN_NAME = 'CLUSTER_DOMAIN_NAME',
   ENV_TYPE = 'ENV_TYPE',
   EPOCH = 'EPOCH',
+  FAUCET_CUSD_WEI = 'FAUCET_CUSD_WEI',
   LOOKBACK = 'LOOKBACK',
   ETHSTATS_DOCKER_IMAGE_REPOSITORY = 'ETHSTATS_DOCKER_IMAGE_REPOSITORY',
   ETHSTATS_DOCKER_IMAGE_TAG = 'ETHSTATS_DOCKER_IMAGE_TAG',
   ETHSTATS_TRUSTED_ADDRESSES = 'ETHSTATS_TRUSTED_ADDRESSES',
   ETHSTATS_BANNED_ADDRESSES = 'ETHSTATS_BANNED_ADDRESSES',
+  ETHSTATS_RESERVED_ADDRESSES = 'ETHSTATS_RESERVED_ADDRESSES',
   FAUCET_GENESIS_ACCOUNTS = 'FAUCET_GENESIS_ACCOUNTS',
   FAUCET_GENESIS_BALANCE = 'FAUCET_GENESIS_BALANCE',
   ORACLE_GENESIS_BALANCE = 'ORACLE_GENESIS_BALANCE',
+  GENESIS_ACCOUNTS = 'GENESIS_ACCOUNTS',
   GETH_ACCOUNT_SECRET = 'GETH_ACCOUNT_SECRET',
   GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY = 'GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY',
   GETH_BOOTNODE_DOCKER_IMAGE_TAG = 'GETH_BOOTNODE_DOCKER_IMAGE_TAG',
@@ -61,6 +63,12 @@ export enum envVar {
   IN_MEMORY_DISCOVERY_TABLE = 'IN_MEMORY_DISCOVERY_TABLE',
   KUBERNETES_CLUSTER_NAME = 'KUBERNETES_CLUSTER_NAME',
   KUBERNETES_CLUSTER_ZONE = 'KUBERNETES_CLUSTER_ZONE',
+  LEADERBOARD_DOCKER_IMAGE_REPOSITORY = 'LEADERBOARD_DOCKER_IMAGE_REPOSITORY',
+  LEADERBOARD_DOCKER_IMAGE_TAG = 'LEADERBOARD_DOCKER_IMAGE_TAG',
+  LEADERBOARD_SHEET = 'LEADERBOARD_SHEET',
+  LOAD_TEST_CLIENTS = 'LOAD_TEST_CLIENTS',
+  LOAD_TEST_GENESIS_BALANCE = 'LOAD_TEST_GENESIS_BALANCE',
+  LOAD_TEST_TX_DELAY_MS = 'LOAD_TEST_TX_DELAY_MS',
   MNEMONIC = 'MNEMONIC',
   MOBILE_WALLET_PLAYSTORE_LINK = 'MOBILE_WALLET_PLAYSTORE_LINK',
   NETWORK_ID = 'NETWORK_ID',
@@ -71,6 +79,7 @@ export enum envVar {
   ORACLE_DOCKER_IMAGE_TAG = 'ORACLE_DOCKER_IMAGE_TAG',
   PROMTOSD_EXPORT_INTERVAL = 'PROMTOSD_EXPORT_INTERVAL',
   PROMTOSD_SCRAPE_INTERVAL = 'PROMTOSD_SCRAPE_INTERVAL',
+  PROXIED_VALIDATORS = 'PROXIED_VALIDATORS',
   SMS_RETRIEVER_HASH_CODE = 'SMS_RETRIEVER_HASH_CODE',
   STACKDRIVER_MONITORING_DASHBOARD = 'STACKDRIVER_MONITORING_DASHBOARD',
   STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX = 'STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX',
@@ -168,9 +177,7 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 export async function doCheckOrPromptIfStagingOrProduction() {
   if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      `You are about to apply a possibly irreversible action on a production env: ${
-        process.env.CELOTOOL_CELOENV
-      }. Are you sure?`
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }
@@ -214,4 +221,18 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
 
 export function isVmBased() {
   return fetchEnv(envVar.VM_BASED) === 'true'
+}
+
+export function failIfNotVmBased() {
+  if (!isVmBased()) {
+    console.error('The celo env is not intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
+}
+
+export function failIfVmBased() {
+  if (isVmBased()) {
+    console.error('The celo env is intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
 }

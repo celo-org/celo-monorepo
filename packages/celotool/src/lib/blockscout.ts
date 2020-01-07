@@ -1,7 +1,7 @@
 import { fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
 import { execCmdWithExitOnFailure } from './utils'
-import { getTxNodeLoadBalancerIP } from './vm-testnet-utils'
+import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
 export async function installHelmChart(
   celoEnv: string,
@@ -33,12 +33,14 @@ export async function upgradeHelmChart(
   blockscoutDBConnectionName: string
 ) {
   console.info(`Upgrading helm release ${celoEnv}-blockscout`)
-  const params = (await helmParameters(
-    celoEnv,
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName
-  )).join(' ')
+  const params = (
+    await helmParameters(
+      celoEnv,
+      blockscoutDBUsername,
+      blockscoutDBPassword,
+      blockscoutDBConnectionName
+    )
+  ).join(' ')
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     await execCmdWithExitOnFailure(
       `helm upgrade --debug --dry-run ${celoEnv}-blockscout ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
@@ -69,7 +71,7 @@ async function helmParameters(
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
   ]
   if (isVmBased()) {
-    const txNodeLbIp = getTxNodeLoadBalancerIP(celoEnv)
+    const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   }

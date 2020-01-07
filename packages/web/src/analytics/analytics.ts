@@ -3,7 +3,7 @@ import getConfig from 'next/config'
 const isInEU = require('@segment/in-eu')
 
 let analytics: {
-  track: (key: string, properties: object, options: object) => void
+  track: (key: string, properties?: object, options?: object) => void
 }
 const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
 const RESPONDED_TO_CONSENT = '__responded_to_consent__'

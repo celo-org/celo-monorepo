@@ -8,8 +8,8 @@ export const menuItems = {
     link: '/applications',
   },
   ABOUT_US: {
-    name: 'About Us',
-    link: '/about-us',
+    name: 'About',
+    link: '/about',
   },
   BUILD: {
     name: 'Build',
@@ -100,6 +100,7 @@ export const hashNav = {
     applications: 'applications',
     contracts: 'contracts',
     blockchain: 'blockchain',
+    leaderboard: 'leaderboard',
   },
   connect: {
     tenets: 'tenets',

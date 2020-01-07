@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -12,17 +13,6 @@ import "../common/UsingRegistry.sol";
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;
-
-  struct Authorizations {
-    // The address that is authorized to vote on behalf of the account.
-    // The account can vote as well, whether or not an authorized voter has been specified.
-    address voting;
-    // The address that is authorized to validate on behalf of the account.
-    // The account can manage the validator, whether or not an authorized validator has been
-    // specified. However if an authorized validator has been specified, only that key may actually
-    // participate in consensus.
-    address validating;
-  }
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
@@ -41,19 +31,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  struct Account {
-    bool exists;
-    // Each account may authorize additional keys to use for voting or valdiating.
-    // These keys may not be keys of other accounts, and may not be authorized by any other
-    // account for any purpose.
-    Authorizations authorizations;
-    Balances balances;
+  mapping(address => Balances) private balances;
+  mapping(address => bool) public isSlasher;
+
+  modifier onlySlasher() {
+    require(isSlasher[msg.sender], "Caller must be registered slasher");
+    _;
   }
 
-  mapping(address => Account) private accounts;
-  // Maps voting and validating keys to the account that provided the authorization.
-  // Authorized addresses may not be reused.
-  mapping(address => address) private authorizedBy;
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -61,6 +46,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
+  event SlasherWhitelistAdded(address indexed slasher);
+  event SlasherWhitelistRemoved(address indexed slasher);
+  event AccountSlashed(
+    address indexed slashed,
+    uint256 penalty,
+    address indexed reporter,
+    uint256 reward
+  );
 
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
@@ -73,7 +66,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The unlocking period in seconds.
    */
   function setUnlockingPeriod(uint256 value) external onlyOwner {
-    require(value != unlockingPeriod);
+    require(value != unlockingPeriod, "Unlocking period not changed");
     unlockingPeriod = value;
     emit UnlockingPeriodSet(value);
   }
@@ -120,7 +113,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to increment.
    */
   function _incrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.add(value);
+    balances[account].nonvoting = balances[account].nonvoting.add(value);
     totalNonvoting = totalNonvoting.add(value);
   }
 
@@ -130,7 +123,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount by which to decrement.
    */
   function _decrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.sub(value);
+    balances[account].nonvoting = balances[account].nonvoting.sub(value);
     totalNonvoting = totalNonvoting.sub(value);
   }
 
@@ -139,19 +132,20 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount of gold to unlock.
    */
   function unlock(uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
-    Account storage account = accounts[msg.sender];
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
+    Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
-    require(!getGovernance().isVoting(msg.sender));
+    require(!getGovernance().isVoting(msg.sender), "Account locked");
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 ||
-        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value),
+      "Trying to unlock too much gold"
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
-    account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));
+    account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
   }
 
@@ -161,13 +155,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The value to relock from the specified pending withdrawal.
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
-    Account storage account = accounts[msg.sender];
-    require(index < account.balances.pendingWithdrawals.length);
-    PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
-    require(value <= pendingWithdrawal.value);
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
+    Balances storage account = balances[msg.sender];
+    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
+    PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
+    require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
     if (value == pendingWithdrawal.value) {
-      deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
+      deletePendingWithdrawal(account.pendingWithdrawals, index);
     } else {
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
@@ -180,14 +174,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
-    Account storage account = accounts[msg.sender];
-    require(index < account.balances.pendingWithdrawals.length);
-    PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
-    require(now >= pendingWithdrawal.timestamp);
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
+    Balances storage account = balances[msg.sender];
+    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
+    PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
+    require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
-    deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
-    require(getGoldToken().transfer(msg.sender, value));
+    deletePendingWithdrawal(account.pendingWithdrawals, index);
+    require(getGoldToken().transfer(msg.sender, value), "Transfer failed");
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -214,7 +208,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The total amount of locked gold for an account.
    */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
-    uint256 total = accounts[account].balances.nonvoting;
+    uint256 total = balances[account].nonvoting;
     return total.add(getElection().getTotalVotesByAccount(account));
   }
 
@@ -224,7 +218,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The total amount of non-voting locked gold for an account.
    */
   function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
-    return accounts[account].balances.nonvoting;
+    return balances[account].nonvoting;
   }
 
   /**
@@ -237,14 +231,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     view
     returns (uint256[] memory, uint256[] memory)
   {
-    require(getAccounts().isAccount(account));
-    uint256 length = accounts[account].balances.pendingWithdrawals.length;
+    require(getAccounts().isAccount(account), "Unknown account");
+    uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
     for (uint256 i = 0; i < length; i++) {
-      PendingWithdrawal memory pendingWithdrawal = (
-        accounts[account].balances.pendingWithdrawals[i]
-      );
+      PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;
     }
@@ -260,5 +252,76 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
     list.length = lastIndex;
+  }
+
+  /**
+   * @notice Adds `slasher` to whitelist of approved slashing addresses.
+   * @param slasher Address to whitelist.
+   */
+  function addSlasher(address slasher) external onlyOwner {
+    require(slasher != address(0) && !isSlasher[slasher], "Invalid address to `addSlasher`.");
+    isSlasher[slasher] = true;
+    emit SlasherWhitelistAdded(slasher);
+  }
+
+  /**
+   * @notice Removes `slasher` from whitelist of approved slashing addresses.
+   * @param slasher Address to remove from whitelist.
+   */
+  function removeSlasher(address slasher) external onlyOwner {
+    require(isSlasher[slasher], "Address must be valid slasher.");
+    isSlasher[slasher] = false;
+    emit SlasherWhitelistRemoved(slasher);
+  }
+
+  /**
+   * @notice Slashes `account` by reducing its nonvoting locked gold by `penalty`.
+   *         If there is not enough nonvoting locked gold to slash, calls into
+   *         `Election.slashVotes` to slash the remaining gold. If `account` does not have
+   *         `penalty` worth of locked gold, slashes `account`'s total locked gold.
+   *         Also sends `reward` gold to the reporter, and penalty-reward to the Community Fund.
+   * @param account Address of account being slashed.
+   * @param penalty Amount to slash account.
+   * @param reporter Address of account reporting the slasher.
+   * @param reward Reward to give reporter.
+   * @param lessers The groups receiving fewer votes than i'th group, or 0 if the i'th group has
+   *                the fewest votes of any validator group.
+   * @param greaters The groups receiving more votes than the i'th group, or 0 if the i'th group
+   *                 has the most votes of any validator group.
+   * @param indices The indices of the i'th group in `account`'s voting list.
+   * @dev Fails if `reward` is greater than `account`'s total locked gold.
+   */
+  function slash(
+    address account,
+    uint256 penalty,
+    address reporter,
+    uint256 reward,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external onlySlasher {
+    uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
+    require(maxSlash >= reward, "reward cannot exceed penalty.");
+    // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
+    {
+      uint256 nonvotingBalance = balances[account].nonvoting;
+      uint256 difference = 0;
+      // If not enough nonvoting, revoke the difference
+      if (nonvotingBalance < maxSlash) {
+        difference = maxSlash.sub(nonvotingBalance);
+        require(
+          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
+            difference,
+          "Cannot revoke enough voting gold."
+        );
+      }
+      // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
+      _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
+      _incrementNonvotingAccountBalance(reporter, reward);
+    }
+    address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    address payable communityFundPayable = address(uint160(communityFund));
+    communityFundPayable.transfer(maxSlash.sub(reward));
+    emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }

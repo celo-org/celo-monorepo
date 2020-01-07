@@ -5,17 +5,24 @@ provider "google" {
   zone        = "us-west1-a"
 }
 
+provider "acme" {
+  server_url = "https://acme-v02.api.letsencrypt.org/directory"
+}
+
 # For managing terraform state remotely
 terraform {
   backend "gcs" {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
+  }
+  required_providers {
+    google = "~> 2.16.0"
   }
 }
 
 data "terraform_remote_state" "state" {
   backend = "gcs"
   config = {
-    bucket = "celo_tf_state"
+    bucket = "celo_tf_state_prod"
     prefix = "${var.celo_env}/testnet"
   }
 }
@@ -23,13 +30,19 @@ data "terraform_remote_state" "state" {
 locals {
   target_tag_bootnode = "${var.celo_env}-bootnode"
   # any geth node (tx nodes & validators)
-  target_tag_node      = "${var.celo_env}-node"
+  target_tag_node = "${var.celo_env}-node"
+
+  target_tag_proxy     = "${var.celo_env}-proxy"
   target_tag_tx_node   = "${var.celo_env}-tx-node"
   target_tag_validator = "${var.celo_env}-validator"
 
+  target_tag_ssl = "${var.celo_env}-external-ssl"
+
   target_tags_all = [
     local.target_tag_bootnode,
-    local.target_tag_node
+    local.target_tag_node,
+    local.target_tag_proxy,
+    local.target_tag_ssl
   ]
 }
 
@@ -119,7 +132,7 @@ module "bootnode" {
 }
 
 module "tx_node" {
-  source = "./modules/tx-node"
+  source = "./modules/full-node"
   # variables
   block_time                            = var.block_time
   bootnode_ip_address                   = module.bootnode.ip_address
@@ -135,18 +148,27 @@ module "tx_node" {
   geth_node_docker_image_tag            = var.geth_node_docker_image_tag
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
+  instance_tags                         = [local.target_tag_tx_node]
+  name                                  = "tx-node"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
-  tx_node_count                         = var.tx_node_count
+  node_count                            = var.tx_node_count
 }
 
 # used for access by blockscout
 module "tx_node_lb" {
   source = "./modules/tx-node-load-balancer"
   # variables
-  celo_env           = var.celo_env
-  network_name       = data.google_compute_network.network.name
-  tx_node_self_links = module.tx_node.self_links
+  celo_env                        = var.celo_env
+  dns_gcloud_project              = var.dns_gcloud_project
+  dns_zone_name                   = var.dns_zone_name
+  forno_host                      = var.forno_host
+  gcloud_credentials_path         = var.gcloud_credentials_path
+  gcloud_project                  = var.gcloud_project
+  gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
+  letsencrypt_email               = var.letsencrypt_email
+  network_name                    = data.google_compute_network.network.name
+  tx_node_self_links              = module.tx_node.self_links
 }
 
 module "validator" {
@@ -169,6 +191,7 @@ module "validator" {
   istanbul_request_timeout_ms           = var.istanbul_request_timeout_ms
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
+  proxied_validator_count               = var.proxied_validator_count
   tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
 }
