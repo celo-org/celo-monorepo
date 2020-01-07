@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import LottieBase from 'src/animate/LottieBase'
 import { colors } from 'src/styles'
@@ -13,7 +13,7 @@ const DATA = {
   [colors.dark]: require('src/shared/darkSpinner.json'),
 }
 
-export default memo(function Spinner(props: Props) {
+export default React.memo(function Spinner(props: Props) {
   return (
     <View style={styles[props.size]}>
       <LottieBase data={DATA[props.color]} />

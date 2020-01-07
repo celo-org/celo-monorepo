@@ -30,6 +30,11 @@ module.exports = withImages(
         config.resolve.alias['@sentry/node'] = '@sentry/browser'
       }
 
+      config.module.rules.push({
+        loader: 'ignore-loader',
+        test: /\.test.ts$/,
+      })
+
       return config
     },
   })
