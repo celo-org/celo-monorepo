@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     marginBottom: 50,
     width: 275,
-    marginRight: 40,
+    marginRight: 75,
   },
 })
 
