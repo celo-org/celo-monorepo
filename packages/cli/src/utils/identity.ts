@@ -95,8 +95,8 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
     const status = verifiable
       ? await verifyClaim(claim, metadata.data.meta.address, metadataURLGetter)
       : validatable
-        ? await validateClaim(claim, metadata.data.meta.address, kit)
-        : 'N/A'
+      ? await validateClaim(claim, metadata.data.meta.address, kit)
+      : 'N/A'
     let extra = ''
     switch (claim.type) {
       case ClaimTypes.ATTESTATION_SERVICE_URL:
@@ -123,10 +123,10 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
           ? `Could not verify: ${status}`
           : 'Verified!'
         : validatable
-          ? status
-            ? `Invalid: ${status}`
-            : `Valid!`
-          : 'N/A',
+        ? status
+          ? `Invalid: ${status}`
+          : `Valid!`
+        : 'N/A',
       createdAt: moment.unix(claim.timestamp).fromNow(),
     }
   })

@@ -149,7 +149,5 @@ describe('lever', () => {
 })
 
 function pretty(job: LeverJob) {
-  return `${job.text} -- ${job.categories.location} -- ${job.categories.team} -- ${
-    job.categories.commitment
-  }`
+  return `${job.text} -- ${job.categories.location} -- ${job.categories.team} -- ${job.categories.commitment}`
 }

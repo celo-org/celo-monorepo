@@ -14,6 +14,8 @@ export enum Actions {
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   FETCH_PHONE_ADDRESSES = 'IDENTITY/FETCH_PHONE_ADDRESSES',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
+  UPDATE_IMPORT_SYNC_PROGRESS = 'IDENTITY/UPDATE_IMPORT_SYNC_PROGRESS',
+  INCREMENT_IMPORT_SYNC_PROGRESS = 'IDENTITY/INCREMENT_IMPORT_SYNC_PROGRESS',
   END_IMPORT_CONTACTS = 'IDENTITY/END_IMPORT_CONTACTS',
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
 }
@@ -75,6 +77,17 @@ export interface ImportContactsAction {
   type: Actions.IMPORT_CONTACTS
 }
 
+export interface UpdateImportSyncProgress {
+  type: Actions.UPDATE_IMPORT_SYNC_PROGRESS
+  current: number
+  total: number
+}
+
+export interface IncrementImportSyncProgress {
+  type: Actions.INCREMENT_IMPORT_SYNC_PROGRESS
+  increment: number
+}
+
 export interface EndImportContactsAction {
   type: Actions.END_IMPORT_CONTACTS
   success: boolean
@@ -95,6 +108,8 @@ export type ActionTypes =
   | CompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
   | ImportContactsAction
+  | UpdateImportSyncProgress
+  | IncrementImportSyncProgress
   | EndImportContactsAction
   | DenyImportContactsAction
 
@@ -161,6 +176,20 @@ export const updateE164PhoneNumberAddresses = (
 
 export const importContacts = (): ImportContactsAction => ({
   type: Actions.IMPORT_CONTACTS,
+})
+
+export const updateImportSyncProgress = (
+  current: number,
+  total: number
+): UpdateImportSyncProgress => ({
+  type: Actions.UPDATE_IMPORT_SYNC_PROGRESS,
+  current,
+  total,
+})
+
+export const incrementImportSyncProgress = (increment: number): IncrementImportSyncProgress => ({
+  type: Actions.INCREMENT_IMPORT_SYNC_PROGRESS,
+  increment,
 })
 
 export const endImportContacts = (success: boolean): EndImportContactsAction => ({

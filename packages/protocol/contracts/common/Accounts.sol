@@ -84,7 +84,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @return True if account creation succeeded.
    */
   function createAccount() public returns (bool) {
-    require(isNotAccount(msg.sender) && isNotAuthorizedSigner(msg.sender));
+    require(isNotAccount(msg.sender) && isNotAuthorizedSigner(msg.sender), "Account exists");
     Account storage account = accounts[msg.sender];
     account.exists = true;
     emit AccountCreated(msg.sender);
@@ -96,7 +96,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param name The name to set.
    */
   function setName(string memory name) public {
-    require(isAccount(msg.sender));
+    require(isAccount(msg.sender), "Unknown account");
     accounts[msg.sender].name = name;
     emit AccountNameSet(msg.sender, name);
   }
@@ -106,7 +106,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param walletAddress The wallet address to set for the account
    */
   function setWalletAddress(address walletAddress) public {
-    require(isAccount(msg.sender));
+    require(isAccount(msg.sender), "Unknown account");
     accounts[msg.sender].walletAddress = walletAddress;
     emit AccountWalletAddressSet(msg.sender, walletAddress);
   }
@@ -126,7 +126,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param metadataURL The URL to access the metadata.
    */
   function setMetadataURL(string calldata metadataURL) external {
-    require(isAccount(msg.sender));
+    require(isAccount(msg.sender), "Unknown account");
     accounts[msg.sender].metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
   }
@@ -164,7 +164,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);
     account.signers.validator = signer;
-    require(!getValidators().isValidator(msg.sender));
+    require(!getValidators().isValidator(msg.sender), "Cannot authorize validator signer");
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
 
@@ -187,7 +187,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);
     account.signers.validator = signer;
-    require(getValidators().updateEcdsaPublicKey(msg.sender, signer, ecdsaPublicKey));
+    require(
+      getValidators().updateEcdsaPublicKey(msg.sender, signer, ecdsaPublicKey),
+      "Failed to update ECDSA public key"
+    );
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
 
@@ -215,10 +218,13 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   function attestationSignerToAccount(address signer) external view returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].signers.attestation == signer);
+      require(
+        accounts[authorizingAccount].signers.attestation == signer,
+        "not active authorized attestation signer"
+      );
       return authorizingAccount;
     } else {
-      require(isAccount(signer));
+      require(isAccount(signer), "not an account");
       return signer;
     }
   }
@@ -232,10 +238,13 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   function validatorSignerToAccount(address signer) public view returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].signers.validator == signer);
+      require(
+        accounts[authorizingAccount].signers.validator == signer,
+        "not active authorized validator signer"
+      );
       return authorizingAccount;
     } else {
-      require(isAccount(signer));
+      require(isAccount(signer), "not an account");
       return signer;
     }
   }
@@ -249,10 +258,13 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   function voteSignerToAccount(address signer) external view returns (address) {
     address authorizingAccount = authorizedBy[signer];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].signers.vote == signer);
+      require(
+        accounts[authorizingAccount].signers.vote == signer,
+        "not active authorized vote signer"
+      );
       return authorizingAccount;
     } else {
-      require(isAccount(signer));
+      require(isAccount(signer), "not an account");
       return signer;
     }
   }
@@ -268,7 +280,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     if (authorizingAccount != address(0)) {
       return authorizingAccount;
     } else {
-      require(isAccount(signer));
+      require(isAccount(signer), "Not an account");
       return signer;
     }
   }
@@ -279,7 +291,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @return The address with which the account can sign votes.
    */
   function getVoteSigner(address account) public view returns (address) {
-    require(isAccount(account));
+    require(isAccount(account), "Unknown account");
     address signer = accounts[account].signers.vote;
     return signer == address(0) ? account : signer;
   }
@@ -290,7 +302,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @return The address with which the account can register a validator or group.
    */
   function getValidatorSigner(address account) public view returns (address) {
-    require(isAccount(account));
+    require(isAccount(account), "Unknown account");
     address signer = accounts[account].signers.validator;
     return signer == address(0) ? account : signer;
   }
@@ -301,7 +313,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @return The address with which the account can sign attestations.
    */
   function getAttestationSigner(address account) public view returns (address) {
-    require(isAccount(account));
+    require(isAccount(account), "Unknown account");
     address signer = accounts[account].signers.attestation;
     return signer == address(0) ? account : signer;
   }
@@ -419,10 +431,14 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
   function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private {
-    require(isAccount(msg.sender) && isNotAccount(authorized) && isNotAuthorizedSigner(authorized));
+    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
+      "delegate or account exists"
+    );
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == authorized);
+    require(signer == authorized, "Invalid signature");
 
     authorizedBy[authorized] = msg.sender;
   }

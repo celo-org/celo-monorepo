@@ -3,7 +3,7 @@ import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -18,7 +18,7 @@ import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmatio
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
@@ -57,7 +57,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithNamespaces
+type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
 
 class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
@@ -177,5 +177,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.sendFlow7)(ReclaimPaymentConfirmationScreen))
+  )(withTranslation(Namespaces.sendFlow7)(ReclaimPaymentConfirmationScreen))
 )

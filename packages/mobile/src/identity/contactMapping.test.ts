@@ -7,7 +7,7 @@ import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/redu
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
-import { doImportContacts } from 'src/identity/contactMapping'
+import { doImportContactsWrapper } from 'src/identity/contactMapping'
 import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
@@ -49,7 +49,7 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
-    await expectSaga(doImportContacts)
+    await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), mockContactList],
@@ -86,7 +86,7 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
-    await expectSaga(doImportContacts)
+    await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), mockContactList],

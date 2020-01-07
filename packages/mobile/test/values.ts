@@ -129,7 +129,10 @@ export const mockContactWithPhone: MinimalContact = {
 export const mockContactWithPhone2: MinimalContact = {
   recordID: '2',
   displayName: 'Bob Bobson',
-  phoneNumbers: [{ label: 'home', number: mockE164Number }, { label: 'mobile', number: '100200' }],
+  phoneNumbers: [
+    { label: 'home', number: mockE164Number },
+    { label: 'mobile', number: '100200' },
+  ],
   thumbnailPath: '',
 }
 

@@ -584,7 +584,7 @@ describe('Transfer tests', function(this: any) {
         })
 
         describe('Transfer CeloDollars', () => {
-          const evmGasCost = 20303
+          const evmGasCost = 20325
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
               expectedGas: evmGasCost + INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
@@ -660,7 +660,7 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 75303,
+              expectedGas: 75325,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
             })

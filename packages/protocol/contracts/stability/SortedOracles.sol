@@ -105,7 +105,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param n The number of expired reports to remove, at most (deterministic upper gas bound).
    */
   function removeExpiredReports(address token, uint256 n) external {
-    require(token != address(0) && n < timestamps[token].getNumElements());
+    require(
+      token != address(0) && n < timestamps[token].getNumElements(),
+      "token addr null or trying to remove too many reports"
+    );
     for (uint256 i = 0; i < n; i++) {
       address oldest = timestamps[token].getTail();
       uint256 timestamp = timestamps[token].getValue(oldest);
@@ -203,7 +206,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return The number of oracle report timestamps for `token`.
    */
-  function numTimestamps(address token) external view returns (uint256) {
+  function numTimestamps(address token) public view returns (uint256) {
     return timestamps[token].getNumElements();
   }
 
@@ -243,8 +246,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
+   * However, a > 1 elements reports list should alwas be maintained
    */
   function removeReport(address token, address oracle) private {
+    if (numTimestamps(token) == 1 && reportExists(token, oracle)) return;
     uint256 originalMedian = rates[token].getMedianValue();
     rates[token].remove(oracle);
     timestamps[token].remove(oracle);
