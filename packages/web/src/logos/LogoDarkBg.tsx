@@ -1,3 +1,4 @@
+import * as React from 'react'
 import Logo, { ColorScheme } from 'src/logos/Logo'
 
 interface Props {
