@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { typeFaces } from 'src/styles'
 import Svg, { Path, Text, TSpan } from 'svgs'
 
