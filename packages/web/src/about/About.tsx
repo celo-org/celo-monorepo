@@ -55,7 +55,7 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('MeaningTile')} endBlock={true}>
             <H1 style={standardStyles.elementalMarginBottom}>
               <Trans
-                ns={NameSpaces.brand}
+                ns={NameSpaces.about}
                 t={
                   t // @ts-ignore
                 }
@@ -74,7 +74,7 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('ValuesTitle')}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               <Trans
-                ns={NameSpaces.brand}
+                ns={NameSpaces.about}
                 i18nKey={'ValuesCopy'}
                 values={{ celoCLabs: 'Celo\u00a0– C\u00a0Labs' }}
                 children={<Strong key="0">M</Strong>}
@@ -86,7 +86,7 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('SacredEconTitle')} startBlock={true}>
             <Text style={[fonts.p, standardStyles.blockMarginBottomTablet]}>
               <Trans
-                ns={NameSpaces.brand}
+                ns={NameSpaces.about}
                 i18nKey="SacredEconText"
                 children={
                   <InlineAnchor key="sacred" href="http://sacred-economics.com/film/">
