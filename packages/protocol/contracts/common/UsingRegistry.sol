@@ -136,6 +136,14 @@ contract UsingRegistry is Ownable {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 
+  /**
+   * @notice Iterates over provided array of identifier hashes, getting the address for each.
+   *         Returns true if `sender` matches the address of one of the provided identifiers.
+   * @param identifierHashes Array of hash values of approved identifiers.
+   * @param sender Address in question to verify membership.
+   * @return True if `sender` corresponds to the address of any of `identifierHashes`
+   *         registry entries.
+   */
   function isOneOf(bytes32[] memory identifierHashes, address sender) internal view returns (bool) {
     for (uint256 i = 0; i < identifierHashes.length; i++) {
       if (registry.getAddressFor(identifierHashes[i]) == sender) {
