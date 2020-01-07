@@ -3,7 +3,7 @@ import throttle from 'lodash.throttle'
 import dynamic from 'next/dynamic'
 import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
-import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native'
+import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native'
 import BlueBanner, { styles as bannerStyle } from 'src/header/BlueBanner'
 import cssStyles from 'src/header/Header.3.scss'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -42,8 +42,6 @@ type Props = OwnProps & I18nProps
 interface State {
   showDesktopMenu: boolean
   mobileMenuActive: boolean
-  mobileMenuFade: Animated.Value
-  menuFade: Animated.Value
   menuFaded: boolean
   belowFoldUpScroll: boolean
   isBannerShowing: boolean
@@ -74,19 +72,9 @@ export class Header extends React.PureComponent<Props, State> {
     }
 
     if (goingUp) {
-      this.setState({ menuFaded: false }, () => {
-        Animated.timing(this.state.menuFade, {
-          toValue: 1,
-          duration: 100,
-          easing: Easing.in(Easing.quad),
-        }).start()
-      })
+      this.setState({ menuFaded: false })
     } else if (belowFold) {
-      Animated.timing(this.state.menuFade, {
-        toValue: 0,
-        duration: 100,
-        easing: Easing.in(Easing.quad),
-      }).start(() => this.setState({ menuFaded: true }))
+      this.setState({ menuFaded: true })
     }
 
     this.lastScrollOffset = scrollOffset()
@@ -94,18 +82,9 @@ export class Header extends React.PureComponent<Props, State> {
 
   clickHamburger = debounce(() => {
     if (!this.state.mobileMenuActive) {
-      this.setState(
-        {
-          mobileMenuActive: true,
-        },
-        () => {
-          Animated.timing(this.state.mobileMenuFade, {
-            toValue: 1,
-            duration: 150,
-            easing: Easing.inOut(Easing.quad),
-          }).start()
-        }
-      )
+      this.setState({
+        mobileMenuActive: true,
+      })
     } else {
       this.closeMenu()
     }
@@ -116,8 +95,6 @@ export class Header extends React.PureComponent<Props, State> {
 
     this.state = {
       showDesktopMenu: false,
-      mobileMenuFade: new Animated.Value(0),
-      menuFade: new Animated.Value(1),
       menuFaded: false,
       mobileMenuActive: false,
       belowFoldUpScroll: false,
@@ -153,11 +130,7 @@ export class Header extends React.PureComponent<Props, State> {
     }
   }
   closeMenu = () => {
-    Animated.timing(this.state.mobileMenuFade, {
-      toValue: 0,
-      duration: 200,
-      easing: Easing.inOut(Easing.quad),
-    }).start(() => this.setState({ mobileMenuActive: false }))
+    this.setState({ mobileMenuActive: false })
   }
 
   isDarkMode = () => {
@@ -216,42 +189,54 @@ export class Header extends React.PureComponent<Props, State> {
         {isHomePage && (
           <BlueBanner onVisibilityChange={this.toggleBanner} getHeight={this.setBannerHeight} />
         )}
-        {this.state.menuFaded || (
-          <Animated.View
-            style={[
-              styles.background,
-              {
-                backgroundColor: background,
-                opacity: this.state.menuFade,
-              },
-            ]}
-          />
-        )}
+
+        <View
+          // @ts-ignore
+          style={[
+            styles.background,
+            styles.fadeTransition,
+            this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
+            {
+              backgroundColor: background,
+            },
+          ]}
+        />
+
         <CookieConsent />
         <Responsive large={[styles.menuContainer, styles.largeMenuContainer]}>
           <View style={styles.menuContainer}>
             <Link href={'/'}>
               <View style={styles.logoLeftContainer}>
                 <View style={styles.logoContainer}>
-                  {!this.state.menuFaded ? (
-                    <>
-                      <Animated.View style={[{ opacity: this.state.menuFade }]}>
-                        {this.isDarkMode() ? (
-                          <LogoDarkBg
-                            height={30}
-                            allWhite={this.isTranslucent() && !this.state.belowFoldUpScroll}
-                          />
-                        ) : (
-                          <LogoLightBg height={30} />
-                        )}
-                      </Animated.View>
-                    </>
-                  ) : null}
+                  <>
+                    <View
+                      // @ts-ignore
+                      style={[
+                        styles.fadeTransition,
+                        this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
+                      ]}
+                    >
+                      {this.isDarkMode() ? (
+                        <LogoDarkBg
+                          height={30}
+                          allWhite={this.isTranslucent() && !this.state.belowFoldUpScroll}
+                        />
+                      ) : (
+                        <LogoLightBg height={30} />
+                      )}
+                    </View>
+                  </>
                 </View>
               </View>
             </Link>
-            {this.state.showDesktopMenu && !this.state.menuFaded && (
-              <Animated.View style={[styles.links, { opacity: this.state.menuFade }]}>
+            {this.state.showDesktopMenu && (
+              <View
+                style={[
+                  styles.links,
+                  styles.fadeTransition as ViewStyle,
+                  this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
+                ]}
+              >
                 {menuItems.map((item, index) => (
                   <View key={index} style={styles.linkWrapper}>
                     <Button
@@ -286,24 +271,18 @@ export class Header extends React.PureComponent<Props, State> {
                     }
                   />
                 </View>
-              </Animated.View>
+              </View>
             )}
           </View>
         </Responsive>
-        <Animated.View
-          style={[
-            styles.menuActive,
-            { opacity: this.state.mobileMenuFade },
-            !this.state.mobileMenuActive && styles.hidden,
-          ]}
-        >
+        <View style={[styles.menuActive, !this.state.mobileMenuActive && styles.hidden]}>
           <View style={styles.mobileOpenContainer}>
             <Footer isVertical={true} currentPage={this.props.router.pathname} />
           </View>
-        </Animated.View>
+        </View>
 
         {!this.state.showDesktopMenu && !this.state.menuFaded && (
-          <Animated.View style={[styles.hamburger]}>
+          <View style={[styles.hamburger]}>
             <div
               className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
                 this.state.mobileMenuActive ? cssStyles['is-active'] : ''
@@ -314,7 +293,7 @@ export class Header extends React.PureComponent<Props, State> {
                 <div className={cssStyles['hamburger-inner']} />
               </div>
             </div>
-          </Animated.View>
+          </View>
         )}
       </View>
     )
@@ -322,6 +301,18 @@ export class Header extends React.PureComponent<Props, State> {
 }
 
 const styles = StyleSheet.create({
+  fadeTransition: {
+    transitionProperty: 'opacity',
+    transitionDuration: '300ms',
+  },
+  menuVisible: {
+    opacity: 1,
+  },
+  menuInvisible: {
+    opacity: 0,
+    zIndex: -5,
+    visibility: 'hidden',
+  },
   container: {
     position: 'fixed',
     left: 0,
@@ -410,12 +401,6 @@ const styles = StyleSheet.create({
   },
   logoLeftVisible: {
     display: 'flex',
-  },
-  medium: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    paddingLeft: 10,
   },
 })
 
