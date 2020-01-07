@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Feature from 'src/dev/Feature'
@@ -19,7 +19,7 @@ const evmImg = require('src/dev/features/evm.png')
 type Props = I18nProps
 
 export default withNamespaces('dev')(
-  memo(function Features({ t }: Props) {
+  React.memo(function Features({ t }: Props) {
     return (
       <View style={styles.darkBackground}>
         <Fade bottom={true} distance={'40px'}>
