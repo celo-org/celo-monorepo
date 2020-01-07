@@ -11,7 +11,6 @@ Inside the [testnet](./testnet) folder you will find a module (and submodules) t
 - Proxy module for creating a Geth Proxy connected to a validator
 - Validator module for deploying a Validator
 - TX Node for deploying a transmission node, thought to expose the rpc interface and allows interaction with the network easily
-- TX Node Load balancer for deploying a load balancer exposing the tx nodes created
 - Attestation service for deploying the Attestation Service (https://docs.celo.org/getting-started/baklava-testnet/running-a-validator#running-the-attestation-service)
 
 ## Requirements
