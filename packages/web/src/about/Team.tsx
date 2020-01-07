@@ -4,7 +4,6 @@ import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
 import shuffleSeed from 'shuffle-seed'
 import { Contributor } from 'src/about/Contributor'
 import Fetch from 'src/brandkit/common/Fetch'
-import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import External from 'src/icons/External'
 import BookLayout from 'src/layout/BookLayout'
@@ -26,19 +25,10 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
     return (
       <>
         <BookLayout label={t('teamTitle')} startBlock={true}>
-          <H1>{t('teamAlternateTitle')}</H1>
-          <Text
-            style={[
-              fonts.p,
-              standardStyles.elementalMarginTop,
-              standardStyles.sectionMarginBottomMobile,
-            ]}
-          >
-            {t('teamCopy')}{' '}
-          </Text>
+          <Text style={[fonts.p, standardStyles.sectionMarginBottomMobile]}>{t('teamCopy')} </Text>
         </BookLayout>
         <GridRow>
-          <Cell span={Spans.full} tabletSpan={Spans.full}>
+          <Cell span={Spans.full} tabletSpan={Spans.full} style={standardStyles.centered}>
             <View
               style={[
                 styles.photoList,
@@ -147,24 +137,28 @@ function externalize(url: string) {
 
 // @ts-ignore
 const styles = StyleSheet.create({
+  name: {
+    marginRight: 5,
+  },
   purposeText: { fontSize: 26, lineHeight: 28, minHeight: 60 },
   photoListAuxMobile: {
+    display: 'flex',
     justifyContent: 'center',
     minHeight: '80vh',
   },
-  photoListAuxTablet: { justifyContent: 'flex-start' },
+  photoListAuxTablet: {
+    display: 'grid',
+    gridTemplateColumns: `repeat(2, 1fr)`,
+  },
   photo: {
     height: '100%',
     width: '100%',
   },
-  name: {
-    marginRight: 5,
-  },
   photoList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
+    display: 'grid',
+    gridRowGap: 50,
+    gridColumnGap: 40,
+    gridTemplateColumns: `repeat(3, 1fr)`,
     minHeight: '50vh',
   },
   person: {
@@ -172,20 +166,16 @@ const styles = StyleSheet.create({
     margin: 5,
     marginBottom: 50,
     width: '90vw',
-    minWidth: 200,
+    minWidth: 250,
     maxWidth: 300,
   },
   mediumPerson: {
     flexDirection: 'column',
-    marginBottom: 50,
-    width: 260,
-    paddingHorizontal: 10,
+    minWidth: 250,
+    maxWidth: 300,
   },
   largePerson: {
     flexDirection: 'column',
-    marginBottom: 50,
-    width: 275,
-    marginRight: 75,
   },
 })
 
