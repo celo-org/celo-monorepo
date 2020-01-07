@@ -1,7 +1,10 @@
 pragma solidity ^0.5.3;
 
-// TODO(asa): Limit assembly usage by using X.staticcall instead.
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 contract UsingPrecompiles {
+  using SafeMath for uint256;
+
   address constant TRANSFER = address(0xff - 2);
   address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
@@ -34,39 +37,17 @@ contract UsingPrecompiles {
     require(aDenominator != 0 && bDenominator != 0);
     uint256 returnNumerator;
     uint256 returnDenominator;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(0x40, add(newCallDataPosition, calldatasize))
-      mstore(newCallDataPosition, aNumerator)
-      mstore(add(newCallDataPosition, 32), aDenominator)
-      mstore(add(newCallDataPosition, 64), bNumerator)
-      mstore(add(newCallDataPosition, 96), bDenominator)
-      mstore(add(newCallDataPosition, 128), exponent)
-      mstore(add(newCallDataPosition, 160), _decimals)
-      let success := staticcall(
-        1050, // estimated gas cost for this function
-        0xfc,
-        newCallDataPosition,
-        0xc4, // input size, 6 * 32 = 192 bytes
-        0,
-        0
-      )
-
-      let returnDataSize := returndatasize
-      let returnDataPosition := mload(0x40)
-      mstore(0x40, add(returnDataPosition, returnDataSize))
-      returndatacopy(returnDataPosition, 0, returnDataSize)
-
-      switch success
-        case 0 {
-          revert(returnDataPosition, returnDataSize)
-        }
-        default {
-          returnNumerator := mload(returnDataPosition)
-          returnDenominator := mload(add(returnDataPosition, 32))
-        }
-    }
+    bool success;
+    bytes memory out;
+    (success, out) = FRACTION_MUL.staticcall(
+      abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
+    );
+    require(
+      success,
+      "UsingPrecompiles :: fractionMulExp Unsuccessful invocation of fraction exponent"
+    );
+    returnNumerator = getUint256FromBytes(out, 0);
+    returnDenominator = getUint256FromBytes(out, 32);
     return (returnNumerator, returnDenominator);
   }
 
@@ -82,13 +63,22 @@ contract UsingPrecompiles {
     return getUint256FromBytes(out, 0);
   }
 
+  /**
+   * @notice Returns the epoch number at a block.
+   * @param blockNumber Block number where epoch number is calculated.
+   * @return Epoch number.
+   */
+  function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
+    uint256 sz = getEpochSize();
+    return blockNumber.sub(1) / sz;
+  }
+
+  /**
+   * @notice Returns the epoch number at a block.
+   * @return Current epoch number.
+   */
   function getEpochNumber() public view returns (uint256) {
-    uint256 epochSize = getEpochSize();
-    uint256 epochNumber = block.number / epochSize;
-    if (block.number % epochSize == 0) {
-      epochNumber = epochNumber - 1;
-    }
-    return epochNumber;
+    return getEpochNumberOfBlock(block.number);
   }
 
   /**
@@ -206,7 +196,9 @@ contract UsingPrecompiles {
   }
 
   /**
-   * @notice Verifies the given header and returns the seal bitmap is successful.
+   * @notice Verifies the BLS signature on the header and returns the seal bitmap.
+   * The validator set used for verification is retrieved based on the parent hash field of the
+   * header.  If the parent hash is not in the blockchain, verification fails.
    * @param header RLP encoded header
    * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
    */

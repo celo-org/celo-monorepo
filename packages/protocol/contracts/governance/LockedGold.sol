@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -31,6 +32,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   mapping(address => Balances) private balances;
+  mapping(address => bool) public isSlasher;
+
+  modifier onlySlasher() {
+    require(isSlasher[msg.sender], "Caller must be registered slasher");
+    _;
+  }
+
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -38,6 +46,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
+  event SlasherWhitelistAdded(address indexed slasher);
+  event SlasherWhitelistRemoved(address indexed slasher);
+  event AccountSlashed(
+    address indexed slashed,
+    uint256 penalty,
+    address indexed reporter,
+    uint256 reward
+  );
 
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
@@ -236,5 +252,76 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
     list.length = lastIndex;
+  }
+
+  /**
+   * @notice Adds `slasher` to whitelist of approved slashing addresses.
+   * @param slasher Address to whitelist.
+   */
+  function addSlasher(address slasher) external onlyOwner {
+    require(slasher != address(0) && !isSlasher[slasher], "Invalid address to `addSlasher`.");
+    isSlasher[slasher] = true;
+    emit SlasherWhitelistAdded(slasher);
+  }
+
+  /**
+   * @notice Removes `slasher` from whitelist of approved slashing addresses.
+   * @param slasher Address to remove from whitelist.
+   */
+  function removeSlasher(address slasher) external onlyOwner {
+    require(isSlasher[slasher], "Address must be valid slasher.");
+    isSlasher[slasher] = false;
+    emit SlasherWhitelistRemoved(slasher);
+  }
+
+  /**
+   * @notice Slashes `account` by reducing its nonvoting locked gold by `penalty`.
+   *         If there is not enough nonvoting locked gold to slash, calls into
+   *         `Election.slashVotes` to slash the remaining gold. If `account` does not have
+   *         `penalty` worth of locked gold, slashes `account`'s total locked gold.
+   *         Also sends `reward` gold to the reporter, and penalty-reward to the Community Fund.
+   * @param account Address of account being slashed.
+   * @param penalty Amount to slash account.
+   * @param reporter Address of account reporting the slasher.
+   * @param reward Reward to give reporter.
+   * @param lessers The groups receiving fewer votes than i'th group, or 0 if the i'th group has
+   *                the fewest votes of any validator group.
+   * @param greaters The groups receiving more votes than the i'th group, or 0 if the i'th group
+   *                 has the most votes of any validator group.
+   * @param indices The indices of the i'th group in `account`'s voting list.
+   * @dev Fails if `reward` is greater than `account`'s total locked gold.
+   */
+  function slash(
+    address account,
+    uint256 penalty,
+    address reporter,
+    uint256 reward,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external onlySlasher {
+    uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
+    require(maxSlash >= reward, "reward cannot exceed penalty.");
+    // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
+    {
+      uint256 nonvotingBalance = balances[account].nonvoting;
+      uint256 difference = 0;
+      // If not enough nonvoting, revoke the difference
+      if (nonvotingBalance < maxSlash) {
+        difference = maxSlash.sub(nonvotingBalance);
+        require(
+          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
+            difference,
+          "Cannot revoke enough voting gold."
+        );
+      }
+      // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
+      _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
+      _incrementNonvotingAccountBalance(reporter, reward);
+    }
+    address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    address payable communityFundPayable = address(uint160(communityFund));
+    communityFundPayable.transfer(maxSlash.sub(reward));
+    emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }

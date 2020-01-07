@@ -112,8 +112,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
   observer: IntersectionObserver
 
-  pageRef = React.createRef<View>()
-
   footer = React.createRef<View>()
 
   sectionRefs = this.props.sections.reduce((acc, section) => {
@@ -217,7 +215,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
           description={metaDescription}
           image={require('src/brandkit/images/ogimage-brandkit.png')}
         />
-        <View style={styles.conatiner} ref={this.pageRef}>
+        <View style={styles.conatiner}>
           <View style={styles.topbar}>
             <Topbar isMobile={isMobile} />
           </View>
@@ -243,7 +241,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
                   styles.childrenArea,
                   screen === ScreenSizes.DESKTOP && styles.childrenAreaDesktop,
                 ]}
-                ref={this.pageRef}
               >
                 {sections.map(({ id, children }) => {
                   return (
