@@ -1,5 +1,5 @@
 import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
-import { TranslationFunction } from 'i18next'
+import { TFunction } from 'i18next'
 import * as _ from 'lodash'
 import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
@@ -24,7 +24,7 @@ export function decryptComment(
 
 export function getTransferFeedParams(
   type: TransactionTypes,
-  t: TranslationFunction,
+  t: TFunction,
   invitees: Invitees,
   recipientCache: NumberToRecipient,
   address: string,

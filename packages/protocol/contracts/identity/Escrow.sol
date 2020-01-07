@@ -173,7 +173,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     require(payment.sender == msg.sender, "Only sender of payment can attempt to revoke payment.");
     require(
       // solhint-disable-next-line not-rely-on-time
-      now >= (payment.timestamp + payment.expirySeconds),
+      now >= (payment.timestamp.add(payment.expirySeconds)),
       "Transaction not redeemable for sender yet."
     );
 

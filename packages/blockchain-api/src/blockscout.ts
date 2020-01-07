@@ -184,9 +184,7 @@ export class BlockscoutAPI extends RESTDataSource {
     })
 
     console.info(
-      `[Celo] getFeedEvents address=${args.address} startblock=${args.startblock} endblock=${
-        args.endblock
-      } rawTransactionCount=${rawTransactions.length} eventCount=${events.length}`
+      `[Celo] getFeedEvents address=${args.address} startblock=${args.startblock} endblock=${args.endblock} rawTransactionCount=${rawTransactions.length} eventCount=${events.length}`
     )
     return events.sort((a, b) => b.timestamp - a.timestamp)
   }
@@ -212,9 +210,7 @@ export class BlockscoutAPI extends RESTDataSource {
       })
     }
     console.info(
-      `[Celo] getFeedRewards address=${args.address} startblock=${args.startblock} endblock=${
-        args.endblock
-      } rawTransactionCount=${rawTransactions.length} rewardsCount=${rewards.length}`
+      `[Celo] getFeedRewards address=${args.address} startblock=${args.startblock} endblock=${args.endblock} rawTransactionCount=${rawTransactions.length} rewardsCount=${rewards.length}`
     )
     return rewards.sort((a, b) => b.timestamp - a.timestamp)
   }

@@ -30,7 +30,12 @@ class FaucetPage extends React.Component<I18nProps, State> {
 
     return (
       <>
-        <OpenGraph title={t('pageTitle')} path={CeloLinks.faucet} description={t('description')} />
+        <OpenGraph
+          title={t('pageTitle')}
+          path={CeloLinks.faucet}
+          description={t('description')}
+          image={require('src/fauceting/ogimage-faucet.png')}
+        />
         <View style={styles.container}>
           <H1 style={[textStyles.center, standardStyles.sectionMarginTablet]}>{t('title')}</H1>
           <SideTitledSection title={t('addFunds')} text={t('addFundsText')}>

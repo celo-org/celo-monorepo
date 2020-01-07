@@ -20,6 +20,8 @@ import {
   MockSortedOraclesInstance,
   RegistryContract,
   RegistryInstance,
+  ReserveContract,
+  ReserveInstance,
 } from 'types'
 
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
@@ -27,6 +29,7 @@ const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const Registry: RegistryContract = artifacts.require('Registry')
+const Reserve: ReserveContract = artifacts.require('Reserve')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -473,15 +476,18 @@ contract('EpochRewards', (accounts: string[]) => {
     const totalSupply = new BigNumber(129762987346298761037469283746)
     const reserveBalance = new BigNumber(2397846127684712867321)
     const floatingSupply = totalSupply.minus(reserveBalance)
-    const mockReserveAddress = web3.utils.randomHex(20)
+    let reserve: ReserveInstance
+
     beforeEach(async () => {
+      reserve = await Reserve.new()
+      await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
+      await reserve.initialize(registry.address, 60, toFixed(1))
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
-        to: mockReserveAddress,
+        to: reserve.address,
         value: reserveBalance.toString(),
       })
-      await registry.setAddressFor(CeloContractName.Reserve, mockReserveAddress)
     })
 
     describe('when the percentage of voting gold is equal to the target', () => {

@@ -1,10 +1,10 @@
 import gql from 'graphql-tag'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import UserTransactionsQuery, { Event, UserTransactionsData } from 'src/apollo/types'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
@@ -22,7 +22,7 @@ interface DispatchProps {
 
 type Props = StateProps &
   DispatchProps &
-  WithNamespaces & {
+  WithTranslation & {
     key?: string
   }
 
@@ -108,10 +108,7 @@ export class TransactionsList extends React.PureComponent<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      removeStandbyTransaction,
-    }
-  )(withNamespaces(Namespaces.walletFlow5)(TransactionsList))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    removeStandbyTransaction,
+  })(withTranslation(Namespaces.walletFlow5)(TransactionsList))
 )

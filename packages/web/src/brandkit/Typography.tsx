@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
-import Page from 'src/brandkit/common/Page'
+import Page, { TYPE_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import UseageExamples from 'src/brandkit/typography/UseageExample'
@@ -27,19 +27,24 @@ function getWeight(weight: string | undefined) {
   }
 }
 
-export default React.memo(function Typography() {
-  return (
-    <Page
-      sections={[
-        { id: brandTypography.overview, children: <Overview /> },
-        { id: brandTypography.scale, children: <TypeScale /> },
-      ]}
-    />
-  )
-})
+export default React.memo(
+  withNamespaces(NameSpaces.brand)(function Typography({ t }: I18nProps) {
+    return (
+      <Page
+        title={t('typography.title')}
+        metaDescription={t('typography.headline')}
+        path={TYPE_PATH}
+        sections={[
+          { id: brandTypography.overview, children: <Overview /> },
+          { id: brandTypography.scale, children: <TypeScale /> },
+        ]}
+      />
+    )
+  })
+)
 
 const Overview = withNamespaces(NameSpaces.brand)(
-  React.memo(function _Overview({ t, i18n }: I18nProps) {
+  React.memo(function _Overview({ t }: I18nProps) {
     return (
       <View>
         <PageHeadline
