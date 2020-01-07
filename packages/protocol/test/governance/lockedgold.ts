@@ -485,7 +485,7 @@ contract('LockedGold', (accounts: string[]) => {
       const penalty = value
       const reward = value / 2
       beforeEach(async () => {
-        await lockedGold.removeSlasher(CeloContractName.DowntimeSlasher)
+        await lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0)
       })
 
       it('should revert', async () => {
