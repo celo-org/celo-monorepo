@@ -1,8 +1,32 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertLogMatches, assertLogMatches2, assertRevert, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertLogMatches,
+  assertLogMatches2,
+  assertRevert,
+  NULL_ADDRESS,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/src/fixidity'
 import BigNumber from 'bignumber.js'
-import { AccountsContract, AccountsInstance, ElectionTestContract, ElectionTestInstance, LockedGoldContract, LockedGoldInstance, MockElectionContract, MockElectionInstance, MockGoldTokenContract, MockGoldTokenInstance, MockGovernanceContract, MockGovernanceInstance, MockValidatorsContract, MockValidatorsInstance, RegistryContract, RegistryInstance } from 'types'
+import {
+  AccountsContract,
+  AccountsInstance,
+  ElectionTestContract,
+  ElectionTestInstance,
+  LockedGoldContract,
+  LockedGoldInstance,
+  MockElectionContract,
+  MockElectionInstance,
+  MockGoldTokenContract,
+  MockGoldTokenInstance,
+  MockGovernanceContract,
+  MockGovernanceInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
+} from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
@@ -421,7 +445,8 @@ contract('LockedGold', (accounts: string[]) => {
       await mockValidators.setNumRegisteredValidators(1)
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await lockedGold.lock({ value })
-      await lockedGold.addSlasher(accounts[2])
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
     })
 
     describe('when the account is slashed for all of its locked gold', () => {
@@ -460,12 +485,21 @@ contract('LockedGold', (accounts: string[]) => {
       const penalty = value
       const reward = value / 2
       beforeEach(async () => {
-        await lockedGold.removeSlasher(accounts[2])
+        await lockedGold.removeSlasher(CeloContractName.DowntimeSlasher)
       })
 
       it('should revert', async () => {
         await assertRevert(
-          lockedGold.slash(account, penalty, reporter, reward, [NULL_ADDRESS], [NULL_ADDRESS], [0])
+          lockedGold.slash(
+            account,
+            penalty,
+            reporter,
+            reward,
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0],
+            { from: accounts[2] }
+          )
         )
       })
     })

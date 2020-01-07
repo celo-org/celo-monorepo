@@ -20,12 +20,12 @@ module.exports = deploymentForCoreContract<DowntimeSlasherInstance>(
   artifacts,
   CeloContractName.DowntimeSlasher,
   initializeArgs,
-  async (slasher: DowntimeSlasherInstance) => {
+  async () => {
     console.info('Adding DowntimeSlasher contract as slasher.')
     const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
       'LockedGold',
       artifacts
     )
-    await lockedGold.addSlasher(slasher.address)
+    await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
   }
 )

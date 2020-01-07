@@ -135,4 +135,13 @@ contract UsingRegistry is Ownable {
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
+
+  function isOneOf(bytes32[] memory identifierHashes, address sender) internal view returns (bool) {
+    for (uint256 i = 0; i < identifierHashes.length; i++) {
+      if (registry.getAddressFor(identifierHashes[i]) == sender) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
