@@ -1926,24 +1926,6 @@ exports[`About renders 1`] = `
         }
       }
     >
-      <h1
-        aria-level="1"
-        className="css-reset-4rbku5 css-text-901oao"
-        dir="auto"
-        role="heading"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "36px",
-            "lineHeight": "40px",
-            "textRendering": "geometricPrecision",
-            "textTransform": "none",
-          }
-        }
-      >
-        teamAlternateTitle
-      </h1>
       <div
         className="css-text-901oao"
         dir="auto"
@@ -1954,7 +1936,6 @@ exports[`About renders 1`] = `
             "fontSize": "20px",
             "lineHeight": "28px",
             "marginBottom": "50px",
-            "marginTop": "20px",
             "textRendering": "geometricPrecision",
           }
         }
@@ -1987,12 +1968,20 @@ exports[`About renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
           "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "center",
           "WebkitFlexGrow": 0,
           "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
           "flexGrow": 0,
           "flexShrink": 0,
+          "justifyContent": "center",
+          "msFlexAlign": "center",
           "msFlexNegative": 0,
+          "msFlexPack": "center",
           "msFlexPositive": 0,
           "paddingBottom": "10px",
           "paddingLeft": "10px",
@@ -2006,24 +1995,14 @@ exports[`About renders 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
-            "WebkitAlignItems": "flex-start",
-            "WebkitBoxAlign": "start",
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxLines": "multiple",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitBoxPack": "start",
-            "WebkitFlexDirection": "row",
-            "WebkitFlexWrap": "wrap",
-            "WebkitJustifyContent": "flex-start",
-            "alignItems": "flex-start",
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "justifyContent": "flex-start",
+            "display": "grid",
+            "gridColumnGap": "40px",
+            "gridRowGap": "50px",
+            "gridTemplateColumns": "repeat(3, 1fr)",
             "minHeight": "50vh",
-            "msFlexAlign": "start",
-            "msFlexDirection": "row",
-            "msFlexPack": "start",
-            "msFlexWrap": "wrap",
+            "msGridColumnGap": "40px",
+            "msGridRowGap": "50px",
+            "msGridTemplateColumns": "repeat(3, 1fr)",
           }
         }
       >
