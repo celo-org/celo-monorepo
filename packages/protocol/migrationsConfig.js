@@ -9,7 +9,7 @@ BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 const DefaultConfig = {
   attestations: {
-    attestationExpiryBlocks: (60 * 60) / 5, // 1 hour,
+    attestationExpiryBlocks: (60 * 60) / (5 * 24), // 1 hour,
     attestationRequestFeeInDollars: 0.05,
     selectIssuersWaitBlocks: 4,
   },
@@ -56,7 +56,7 @@ const DefaultConfig = {
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
-    updateFrequency: 5 * 60, // 5 minutes
+    updateFrequency: (5 * 60) / 24, // 5 minutes
     minimumReports: 1,
   },
   gasPriceMinimum: {
@@ -65,33 +65,33 @@ const DefaultConfig = {
     adjustmentSpeed: 1 / 2,
   },
   governance: {
-    approvalStageDuration: 15 * 60, // 15 minutes
+    approvalStageDuration: (15 * 60) / 24, // 15 minutes
     concurrentProposals: 10,
-    dequeueFrequency: 15 * 60, // 15 minutes
-    executionStageDuration: 2 * 24 * 60 * 60, // 2 days
+    dequeueFrequency: (15 * 60) / 24, // 15 minutes
+    executionStageDuration: (2 * 24 * 60 * 60) / 24, // 2 days
     minDeposit: 1, // 1 cGLD
-    queueExpiry: 7 * 24 * 60 * 60, // 1 week
-    referendumStageDuration: 15 * 60, // 15 minutes
+    queueExpiry: (7 * 24 * 60 * 60) / 24, // 1 week
+    referendumStageDuration: (15 * 60) / 24, // 15 minutes
     participationBaseline: 8 / 10,
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
   },
   lockedGold: {
-    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
+    unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days
   },
   oracles: {
-    reportExpiry: 10 * 60, // 10 minutes
+    reportExpiry: (10 * 60) / 24, // 10 minutes
   },
   random: {
-    randomnessBlockRetentionWindow: (60 * 60) / 5, // 1 hour to match attestationExpiryBlocks
+    randomnessBlockRetentionWindow: (60 * 60) / (5 * 24), // 1 hour to match attestationExpiryBlocks
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
     goldBalance: 100000000,
-    tobinTaxStalenessThreshold: 60 * 60, // 1 hour
+    tobinTaxStalenessThreshold: (60 * 60) / 24, // 1 hour
     dailySpendingRatio: '1000000000000000000000000', // 100%
   },
   stableToken: {
@@ -100,7 +100,7 @@ const DefaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
-    inflationPeriod: 1.5 * 365 * 24 * 60 * 60, // 1.5 years
+    inflationPeriod: (1.5 * 365 * 24 * 60 * 60) / 24, // 1.5 years
     initialBalances: {
       addresses: [],
       values: [],
@@ -110,11 +110,11 @@ const DefaultConfig = {
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold per validator
-      duration: 60 * 24 * 60 * 60, // 60 days
+      duration: (60 * 24 * 60 * 60) / 24, // 60 days
     },
     validatorLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold
-      duration: 60 * 24 * 60 * 60, // 60 days
+      duration: (60 * 24 * 60 * 60) / 24, // 60 days
     },
     validatorScoreParameters: {
       exponent: 10,
@@ -122,7 +122,7 @@ const DefaultConfig = {
     },
     membershipHistoryLength: 60,
     maxGroupSize: '5',
-    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30, // 30 Days
+    slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24, // 30 Days
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
