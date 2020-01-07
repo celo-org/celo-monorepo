@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
-import { i18n as i18nType, TranslationFunction } from 'i18next'
+import { i18n as i18nType, TFunction } from 'i18next'
 
 export const maskPhoneNumber = (phoneNumber?: string) => {
   return `+XXX XXX XXX ${phoneNumber ? phoneNumber.substr(-4) : 'XXXX'}`
@@ -20,11 +20,7 @@ export const formatFeedDate = (timestamp: number, i18next: i18nType) => {
   })
 }
 
-export const getDatetimeDisplayString = (
-  timestamp: number,
-  t: TranslationFunction,
-  i18next: i18nType
-) => {
+export const getDatetimeDisplayString = (timestamp: number, t: TFunction, i18next: i18nType) => {
   const timeFormatted = formatFeedTime(timestamp, i18next)
   const dateFormatted = formatFeedDate(timestamp, i18next)
   return `${dateFormatted} ${t('common:at')} ${timeFormatted}`

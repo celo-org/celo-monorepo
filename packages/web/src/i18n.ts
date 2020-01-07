@@ -7,6 +7,7 @@ export const Trans = NextI18NextInstance.Trans
 export interface I18nProps {
   t: TFunction
   i18n: I18n
+  tReady: boolean
 }
 
 export default NextI18NextInstance

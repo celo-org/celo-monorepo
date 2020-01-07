@@ -1,23 +1,17 @@
 /* tslint:disable: no-console */
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
-import {
-  convertToContractDecimals,
-  GoldToken,
-  sendTransaction,
-  StableToken,
-  unlockAccount,
-} from '@celo/walletkit'
-import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
-import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
+import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { unlockAccount } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import fs from 'fs'
 import { range } from 'lodash'
 import fetch from 'node-fetch'
 import path from 'path'
 import sleep from 'sleep-promise'
-import Web3Type from 'web3'
 import { TransactionReceipt } from 'web3/types'
+import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
 import { retrieveIPAddress } from './helm_deploy'
@@ -25,8 +19,6 @@ import { execCmd, execCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
-
-const Web3 = require('web3')
 
 const DEFAULT_TRANSFER_AMOUNT = new BigNumber('0.00000000000001')
 const LOAD_TEST_TRANSFER_WEI = new BigNumber(10000)
@@ -103,10 +95,19 @@ const getExternalEnodeAddresses = async (namespace: string) => {
 }
 
 export const getBootnodeEnode = async (namespace: string) => {
-  const ip = await retrieveIPAddress(`${namespace}-bootnode`)
+  const ip = await retrieveBootnodeIPAddress(namespace)
   const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.BOOTNODE, 0)
   const nodeId = privateKeyToPublicKey(privateKey)
   return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
+}
+
+const retrieveBootnodeIPAddress = async (namespace: string) => {
+  if (isVmBased()) {
+    const outputs = await getTestnetOutputs(namespace)
+    return outputs.bootnode_ip_address.value
+  } else {
+    return retrieveIPAddress(`${namespace}-bootnode`)
+  }
 }
 
 const retrieveTxNodeAddresses = async (namespace: string, txNodesNum: number) => {
@@ -131,9 +132,11 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
       if (getExternalIP) {
         address = txAddresses[index]
       } else {
-        address = (await execCmd(
-          `kubectl get service/${namespace}-service-${index} --namespace ${namespace} -o jsonpath='{.spec.clusterIP}'`
-        ))[0]
+        address = (
+          await execCmd(
+            `kubectl get service/${namespace}-service-${index} --namespace ${namespace} -o jsonpath='{.spec.clusterIP}'`
+          )
+        )[0]
         if (address.length === 0) {
           console.error('IP address is empty for transaction node')
           throw new Error('IP address is empty for transaction node')
@@ -198,16 +201,16 @@ export const checkGethStarted = (dataDir: string) => {
 }
 
 export const getWeb3AndTokensContracts = async () => {
-  const web3Instance = new Web3('http://localhost:8545')
-  const [goldTokenContact, stableTokenContact] = await Promise.all([
-    GoldToken(web3Instance),
-    StableToken(web3Instance),
+  const kit = newKit('http://localhost:8545')
+  const [goldToken, stableToken] = await Promise.all([
+    kit.contracts.getGoldToken(),
+    kit.contracts.getStableToken(),
   ])
 
   return {
-    web3: web3Instance,
-    goldToken: goldTokenContact,
-    stableToken: stableTokenContact,
+    kit,
+    goldToken,
+    stableToken,
   }
 }
 
@@ -215,7 +218,7 @@ export const getRandomInt = (from: number, to: number) => {
   return Math.floor(Math.random() * (to - from)) + from
 }
 
-const getRandomToken = (goldToken: GoldTokenType, stableToken: StableTokenType) => {
+const getRandomToken = (goldToken: GoldTokenWrapper, stableToken: StableTokenWrapper) => {
   const tokenType = getRandomInt(0, 2)
   if (tokenType === 0) {
     return goldToken
@@ -225,12 +228,12 @@ const getRandomToken = (goldToken: GoldTokenType, stableToken: StableTokenType) 
 }
 
 const validateGethRPC = async (
-  web3: Web3Type,
+  kit: ContractKit,
   txHash: string,
   from: string,
   handleError: HandleErrorCallback
 ) => {
-  const transaction = await web3.eth.getTransaction(txHash)
+  const transaction = await kit.web3.eth.getTransaction(txHash)
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -327,9 +330,9 @@ const exitTracerTool = (logMessage: any) => {
 }
 
 const transferAndTrace = async (
-  web3: Web3Type,
-  goldToken: GoldTokenType,
-  stableToken: StableTokenType,
+  kit: ContractKit,
+  goldToken: GoldTokenWrapper,
+  stableToken: StableTokenWrapper,
   from: string,
   to: string,
   password: string,
@@ -341,8 +344,8 @@ const transferAndTrace = async (
   const feeCurrencyToken = getRandomToken(goldToken, stableToken)
 
   const [tokenName, feeCurrencySymbol] = await Promise.all([
-    token.methods.symbol().call(),
-    feeCurrencyToken.methods.symbol().call(),
+    token.symbol(),
+    feeCurrencyToken.symbol(),
   ])
 
   const logMessage: any = {
@@ -359,13 +362,13 @@ const transferAndTrace = async (
   const txParams: any = {}
   // Fill txParams below
   if (getRandomInt(0, 2) === 3) {
-    txParams.feeCurrency = feeCurrencyToken._address
+    txParams.feeCurrency = feeCurrencyToken.address
     logMessage.feeCurrency = feeCurrencySymbol
   }
 
   const transferToken = new Promise(async (resolve) => {
     await transferERC20Token(
-      web3,
+      kit,
       token,
       from,
       to,
@@ -376,7 +379,6 @@ const transferAndTrace = async (
       (receipt: any) => {
         resolve(receipt)
       },
-      undefined,
       (error: any) => {
         logMessage.error = error
         exitTracerTool(logMessage)
@@ -401,37 +403,21 @@ const transferAndTrace = async (
 
   validateTransactionAndReceipt(from, txReceipt!, handleError)
   await validateBlockscout(blockscoutUrl, txHash, from, handleError)
-  await validateGethRPC(web3, txHash, from, handleError)
+  await validateGethRPC(kit, txHash, from, handleError)
 }
 
 export const traceTransactions = async (
-  web3: Web3Type,
-  goldToken: GoldTokenType,
-  stableToken: StableTokenType,
+  kit: ContractKit,
+  goldToken: GoldTokenWrapper,
+  stableToken: StableTokenWrapper,
   addresses: string[],
   blockscoutUrl: string
 ) => {
   console.info('Starting simulation')
 
-  await transferAndTrace(
-    web3,
-    goldToken,
-    stableToken,
-    addresses[0],
-    addresses[1],
-    '',
-    blockscoutUrl
-  )
+  await transferAndTrace(kit, goldToken, stableToken, addresses[0], addresses[1], '', blockscoutUrl)
 
-  await transferAndTrace(
-    web3,
-    goldToken,
-    stableToken,
-    addresses[1],
-    addresses[0],
-    '',
-    blockscoutUrl
-  )
+  await transferAndTrace(kit, goldToken, stableToken, addresses[1], addresses[0], '', blockscoutUrl)
 
   console.info('Simulation finished successully!')
 }
@@ -630,7 +616,7 @@ export const onLoadTestTxResult = async (
     )
   }
 
-  await validateGethRPC(kit.web3, txHash, senderAddress, (isError, data) => {
+  await validateGethRPC(kit, txHash, senderAddress, (isError, data) => {
     if (isError) {
       tracerLog({
         tag: LOG_TAG_GETH_RPC_ERROR,
@@ -642,8 +628,8 @@ export const onLoadTestTxResult = async (
 }
 
 export const transferERC20Token = async (
-  web3: Web3Type,
-  token: GoldTokenType | StableTokenType,
+  kit: ContractKit,
+  token: GoldTokenWrapper | StableTokenWrapper,
   from: string,
   to: string,
   amount: BigNumber,
@@ -651,25 +637,25 @@ export const transferERC20Token = async (
   txParams: any = {},
   onTransactionHash?: (hash: string) => void,
   onReceipt?: (receipt: TransactionReceipt) => void,
-  onConfirmation?: (confirmationNumber: number, receipt: TransactionReceipt) => void,
   onError?: (error: any) => void
 ) => {
   txParams.from = from
-  await unlockAccount(web3, 0, password, from)
+  await unlockAccount(kit.web3, 0, password, from)
 
-  const [convertedAmount, symbol] = await Promise.all([
-    convertToContractDecimals(amount, token),
-    token.methods.symbol().call(),
-  ])
+  const convertedAmount = await convertToContractDecimals(amount, token)
 
-  await sendTransaction(
-    `celotool/transfer-${symbol}`,
-    `transfer ${symbol}`,
-    token.methods.transfer(to, convertedAmount.toString()),
-    txParams,
-    onTransactionHash,
-    onReceipt,
-    onConfirmation,
-    onError
-  )
+  try {
+    const result = await token.transfer(to, convertedAmount.toString()).send()
+    if (onTransactionHash) {
+      onTransactionHash(await result.getHash())
+    }
+    if (onReceipt) {
+      const receipt = await result.waitReceipt()
+      onReceipt(receipt)
+    }
+  } catch (error) {
+    if (onError) {
+      onError(error)
+    }
+  }
 }

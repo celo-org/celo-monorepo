@@ -22,9 +22,9 @@ export async function removeHelmRelease(celoEnv: string) {
 export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Upgrading helm release ${releaseName(celoEnv)}`)
 
-  const upgradeCmdArgs = `${releaseName(
-    celoEnv
-  )} ${helmChartPath} --namespace ${celoEnv} ${(await helmParameters(celoEnv)).join(' ')}`
+  const upgradeCmdArgs = `${releaseName(celoEnv)} ${helmChartPath} --namespace ${celoEnv} ${(
+    await helmParameters(celoEnv)
+  ).join(' ')}`
 
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     await execCmdWithExitOnFailure(`helm upgrade --debug --dry-run ${upgradeCmdArgs}`)

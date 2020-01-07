@@ -8,7 +8,7 @@ import {
   GRAY_PALETTE,
   PRIMARY_PALETTE,
 } from 'src/brandkit/common/data'
-import Page from 'src/brandkit/common/Page'
+import Page, { COLOR_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
 import Judgement, { Value } from 'src/brandkit/logo/Judgement'
@@ -18,16 +18,21 @@ import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 const { brandColor } = hashNav
 
-export default React.memo(function Color() {
-  return (
-    <Page
-      sections={[
-        { id: brandColor.overview, children: <Overview /> },
-        { id: brandColor.backgrounds, children: <Backgrounds /> },
-      ]}
-    />
-  )
-})
+export default React.memo(
+  withNamespaces(NameSpaces.brand)(function Color({ t }: I18nProps) {
+    return (
+      <Page
+        title={t('color.title')}
+        metaDescription={t('colo.headline')}
+        path={COLOR_PATH}
+        sections={[
+          { id: brandColor.overview, children: <Overview /> },
+          { id: brandColor.backgrounds, children: <Backgrounds /> },
+        ]}
+      />
+    )
+  })
+)
 
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (

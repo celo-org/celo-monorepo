@@ -32,10 +32,9 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
   }
 
   async function addMember(member: string) {
-    return (await (await kit.contracts.getValidators()).addMember(
-      group,
-      member
-    )).sendAndWaitForReceipt({ from: group })
+    return (
+      await (await kit.contracts.getValidators()).addMember(group, member)
+    ).sendAndWaitForReceipt({ from: group })
   }
 
   async function getGroupMembers() {
@@ -603,6 +602,7 @@ describe('governance tests', () => {
       // Returns the gas fee base for a given block, which is distributed to the governance contract.
       const blockBaseGasFee = async (blockNumber: number): Promise<BigNumber> => {
         const gas = (await web3.eth.getBlock(blockNumber)).gasUsed
+        // @ts-ignore - TODO: remove when web3 upgrade completed
         const gpm = await gasPriceMinimum.methods.gasPriceMinimum().call({}, blockNumber)
         return new BigNumber(gpm).times(new BigNumber(gas))
       }

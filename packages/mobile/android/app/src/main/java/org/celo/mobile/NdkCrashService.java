@@ -5,8 +5,8 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import ru.ivanarh.jndcrash.NDCrashService;
 
 public class NdkCrashService extends NDCrashService {
@@ -32,10 +32,10 @@ public class NdkCrashService extends NDCrashService {
     Log.d(
       TAG,
       "Logcat logs for the native error (from last " +
-        NUM_LOGCAT_LINES +
-        " lines): \"" +
-        logcatLogs +
-        "\""
+      NUM_LOGCAT_LINES +
+      " lines): \"" +
+      logcatLogs +
+      "\""
     );
     try (FileWriter fileWriter = new FileWriter(ndkLogcatLogsReportPath, false/* append */)) {
       for (String line : logcatLogs.split("\n")) {

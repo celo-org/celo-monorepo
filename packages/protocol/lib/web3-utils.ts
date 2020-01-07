@@ -21,6 +21,7 @@ export async function sendTransactionWithPrivateKey<T>(
   // Encode data and estimate gas or use default values for a transfer.
   let encodedTxData: string|undefined
   let estimatedGas = 21000 // Gas cost of a basic transfer.
+
   if (tx !== null) {
     encodedTxData = tx.encodeABI()
     estimatedGas = await tx.estimateGas({
@@ -35,7 +36,9 @@ export async function sendTransactionWithPrivateKey<T>(
       ...txArgs,
       data: encodedTxData,
       from: address,
-      gas: estimatedGas * 10,
+      // make sure to use enough gas but dont overspend
+      // or we will run into "block gas limit exceeded" errors
+      gas: estimatedGas * 2,
     },
     privateKey
   )
