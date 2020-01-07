@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import QuarterCircle from 'src/community/connect/QuarterCircle'
 import { H2 } from 'src/fonts/Fonts'
