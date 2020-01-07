@@ -60,6 +60,7 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executors's address
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
+  --salt=salt                                        (required) Secret salt associated with hotfix
 ```
 
 _See code: [packages/cli/src/commands/governance/executehotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/executehotfix.ts)_

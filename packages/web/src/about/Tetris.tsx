@@ -1,3 +1,4 @@
+import * as React from 'react'
 import Svg, { Path } from 'svgs'
 
 export default function Tetris() {
