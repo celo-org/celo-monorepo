@@ -97,6 +97,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   ) external initializer {
     _transferOwnership(msg.sender);
     setFreezer(_freezer);
+    freeze();
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
     setRewardsMultiplierParameters(

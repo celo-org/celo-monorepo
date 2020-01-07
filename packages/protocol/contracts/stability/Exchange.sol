@@ -79,6 +79,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   ) external initializer {
     _transferOwnership(msg.sender);
     setFreezer(_freezer);
+    freeze();
     setRegistry(registryAddress);
     setStableToken(stableToken);
     setSpread(_spread);
