@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
