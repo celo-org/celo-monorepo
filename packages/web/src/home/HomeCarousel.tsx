@@ -1,19 +1,40 @@
-import Carousel from 'nuka-carousel'
+import Dynamic from 'next/dynamic'
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import CarouselDot from 'src/home/carousel/CarouselDot'
 import Responsive from 'src/shared/Responsive'
+import Spinner from 'src/shared/Spinner'
 import { DESKTOP_BREAKPOINT, TABLET_BREAKPOINT } from 'src/shared/Styles'
-import { fonts, textStyles } from 'src/styles'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+
+const Carousel = Dynamic(import('nuka-carousel'), {
+  loading: () => (
+    <View style={[standardStyles.centered]}>
+      <Cell image={placeholder} imageWidth={IMAGE_WIDTHS[ScreenSize.TABLET]} />
+    </View>
+  ),
+  ssr: false,
+})
+
+const CarouselDot = Dynamic(import('src/home/carousel/CarouselDot'), {
+  ssr: false,
+})
 
 const Cell = ({ image: { image, width, height, caption }, imageWidth }) => {
   const imageHeight = (height * imageWidth) / width
   return (
     <Responsive medium={[styles.cell, styles.cellMedium]} large={[styles.cell, styles.cellLarge]}>
       <View style={styles.cell}>
-        <FadeIn offset={600} height={imageHeight}>
+        <FadeIn
+          offset={600}
+          height={imageHeight}
+          placeholder={
+            <View style={[standardStyles.centered, styles.placeholder]}>
+              <Spinner size="medium" color={colors.primary} />
+            </View>
+          }
+        >
           {(onload) => (
             <Image
               onLoad={onload}
@@ -36,6 +57,13 @@ const Dot = ({ show, text }) => {
       </View>
     </View>
   )
+}
+
+const placeholder = {
+  height: 300,
+  width: 450,
+  image: '',
+  caption: '',
 }
 
 const images = [
@@ -194,6 +222,7 @@ const CONTAINER_PADDING_TOP = 0
 const CONTAINER_PADDING_BOTTOM = 0
 
 const styles = StyleSheet.create({
+  placeholder: { height: '100%', flex: 1 },
   container: {
     flex: 1,
     paddingTop: CONTAINER_PADDING_TOP,
