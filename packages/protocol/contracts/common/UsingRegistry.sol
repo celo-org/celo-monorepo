@@ -137,11 +137,11 @@ contract UsingRegistry is Ownable {
   }
 
   /**
-   * @notice Iterates over provided array of identifier hashes, getting the address for each.
+   * @notice Iterates over provided array of identifiers, getting the address for each.
    *         Returns true if `sender` matches the address of one of the provided identifiers.
    * @param identifiers Array of approved identifiers.
    * @param sender Address in question to verify membership.
-   * @return True if `sender` corresponds to the address of any of `identifierHashes`
+   * @return True if `sender` corresponds to the address of any of `identifiers`
    *         registry entries.
    */
   function isOneOf(string[] memory identifiers, address sender) internal view returns (bool) {
