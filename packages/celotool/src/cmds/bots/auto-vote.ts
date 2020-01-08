@@ -2,8 +2,10 @@
 // behavior by validators. This introduces some non-validator stakers into the
 // network that will judge the validator groups, and vote accordingly.
 import { ContractKit, newKit } from '@celo/contractkit'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
+import { groupBy, mapValues } from 'lodash'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
@@ -30,7 +32,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     const numBotAccounts = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
 
-    const kit: ContractKit = newKit(argv.celoProvider)
+    const kit = newKit(argv.celoProvider)
     const election = await kit.contracts.getElection()
     const validators = await kit.contracts.getValidators()
 
@@ -109,10 +111,10 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         }
       }
     }
+    process.exit(0)
   } catch (error) {
     console.error(error)
-  } finally {
-    process.exit(0)
+    process.exit(1)
   }
 }
 
@@ -120,36 +122,21 @@ async function calculateGroupWeights(kit: ContractKit): Promise<Map<string, BigN
   const election = await kit.contracts.getElection()
   const validators = await kit.contracts.getValidators()
 
-  const groupScores = new Map<string, BigNumber[]>()
-  for (const valSigner of await election.getCurrentValidatorSigners()) {
-    try {
-      const val = await validators.getValidatorFromSigner(valSigner)
-      const groupAddress = val.affiliation!
-      if (groupScores.has(groupAddress)) {
-        groupScores.get(groupAddress)!.push(val.score)
-      } else {
-        groupScores.set(groupAddress, [val.score])
-      }
-    } catch (error) {
-      console.info(`could not get info for ${valSigner}, skipping...`)
-    }
-  }
+  const validatorSigners = await election.getCurrentValidatorSigners()
+  const validatorAccounts = await concurrentMap(
+    10,
+    validatorSigners,
+    validators.getValidatorFromSigner
+  )
 
-  const groupWeights = new Map<string, BigNumber>()
+  const validatorsByGroup = groupBy(validatorAccounts, (validator) => validator.affiliation!)
+  const validatorGroupWeights = mapValues(validatorsByGroup, (vals) => {
+    const scoreSum = vals.reduce((a, b) => a.plus(b.score), new BigNumber(0))
+    const avg = scoreSum.dividedBy(vals.length)
+    return avg.pow(20)
+  })
 
-  // Add up the scores for each group's validators and calculate weights
-  for (const group of groupScores.keys()) {
-    const scores = groupScores.get(group)!
-    // This shouldn't end up being 0, but handle the edge case and avoid division by 0
-    if (scores.length > 0) {
-      const avg = scores.reduce((a, b) => a.plus(b), new BigNumber(0)).div(scores.length)
-      groupWeights.set(group, avg.pow(20))
-    } else {
-      groupWeights.set(group, new BigNumber(0))
-    }
-  }
-
-  return groupWeights
+  return new Map(Object.entries(validatorGroupWeights))
 }
 
 function getWeightedRandomChoice(
@@ -186,7 +173,7 @@ function getWeightedRandomChoice(
 async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promise<void> {
   const election = await kit.contracts.getElection()
 
-  for (const key of botKeys) {
+  await concurrentMap(10, botKeys, async (key) => {
     kit.addAccount(key)
     const account = ensure0x(getAccountAddressFromPrivateKey(key))
     if (!(await election.hasActivatablePendingVotes(account))) {
@@ -200,5 +187,5 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
         console.error(`Failed to activate pending votes for ${account}`)
       }
     }
-  }
+  })
 }
