@@ -70,6 +70,7 @@
 - [ContractKit](developer-resources/contractkit/README.md)
   - [Getting Started](developer-resources/contractkit/setup.md)
   - [Examples](developer-resources/contractkit/examples.md)
+<<<<<<< HEAD
   - [Reference]()
 <!--contractkit-reference-start-->
     - [Globals](developer-resources/contractkit/reference/globals.md)
@@ -289,7 +290,15 @@
       - [ValidatorReward](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorreward.md)
       - [ValidatorsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorsconfig.md)
 <!--contractkit-reference-end-->
+=======
+- [Walkthroughs](developer-resources/walkthroughs/README.md)
+  - [Hello Celo: sending value with Celo](developer-resources/walkthroughs/hellocelo.md)
+  - [Hello Contracts: writing and deploying Celo contracts](developer-resources/walkthroughs/hellocontracts.md)
+  - [Building a dApp on Celo](developer-resources/walkthroughs/hellodapp.md)
+  - [Deploying an Ethereum project to Celo](developer-resources/walkthroughs/hellodeploy.md)
+>>>>>>> initial docs skeleton
 - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+- [Reference](developer-resources/reference.md)
 
 ## Command Line Interface
 
