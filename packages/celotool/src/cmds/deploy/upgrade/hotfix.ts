@@ -2,12 +2,13 @@
 
 import { newKit } from '@celo/contractkit'
 import {
+  hotfixToHash,
   ProposalBuilder,
-  proposalToHash,
   proposalToJSON,
 } from '@celo/contractkit/lib/governance/proposals'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
+import { randomBytes } from 'crypto'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
@@ -78,7 +79,9 @@ export const handler = async (argv: EthstatsArgv) => {
       console.error('\nPlease see examples in hotfix.ts and add transactions')
       process.exit(1)
     }
-    const proposalHash = proposalToHash(kit, proposal)
+
+    const salt = randomBytes(32)
+    const proposalHash = hotfixToHash(kit, proposal, salt)
 
     // If your proposal is just made of Celo Registry contract methods, you can print it out
     console.info('Proposal: ', await proposalToJSON(kit, proposal))
@@ -119,7 +122,7 @@ export const handler = async (argv: EthstatsArgv) => {
       throw new Error()
     }
     console.info('\nExecute the hotfix')
-    await governance.executeHotfix(proposal).sendAndWaitForReceipt({ from: addresses[0] })
+    await governance.executeHotfix(proposal, salt).sendAndWaitForReceipt({ from: addresses[0] })
 
     hotfixRecord = await governance.getHotfixRecord(proposalHash)
     console.info('\nHotfix Record: ', hotfixRecord)
