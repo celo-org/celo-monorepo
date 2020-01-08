@@ -1,6 +1,6 @@
 import getConfig from 'next/config'
-import Sentry from '../fullstack/sentry'
 import airtableInit from '../server/airtable'
+import Sentry from '../server/sentry'
 
 interface Fields {
   live: boolean
