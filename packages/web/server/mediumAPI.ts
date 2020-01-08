@@ -1,8 +1,8 @@
 import { parse, validate } from 'fast-xml-parser'
 import { Articles } from 'fullstack/ArticleProps'
 import htmlToFormattedText from 'html-to-formatted-text'
+import abortableFetch from 'src/utils/abortableFetch'
 import Sentry from '../server/sentry'
-import abortableFetch from '../src/utils/abortableFetch'
 interface JSONRSS {
   rss: {
     channel: {
@@ -57,7 +57,6 @@ function getGramaticallyCorrectExcerpt(htmlstring: string) {
       : plainText
   } catch (e) {
     console.error(e)
-    return htmlstring
   }
 }
 
