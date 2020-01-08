@@ -64,6 +64,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     _;
   }
 
+  function() external payable {} // solhint-disable no-empty-blocks
+
   /**
    * @notice A constructor for initialising a new instance of a Vesting Schedule contract
    * @param vestingBeneficiary address of the beneficiary to whom vested tokens are transferred
@@ -89,22 +91,19 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     address vestingRefundDestination,
     address registryAddress
   ) public {
-    require(vestingAmount > 0, "Vesting amount must be positive");
+    uint256 numPeriods = vestingAmount.div(vestAmountPerPeriod);
+    require(numPeriods >= 1, "There must be at least one vesting period");
+    require(
+      numPeriods.mul(vestAmountPerPeriod) == vestingAmount,
+      "Vesting amount per period and total vesting amount are inconsistent"
+    );
     require(vestingBeneficiary != address(0), "Beneficiary is the zero address");
     require(vestingRefundDestination != address(0), "Refund destination is the zero address");
+    require(vestingAmount > 0, "Vesting amount must be positive");
     require(vestingCliff <= vestingPeriodSec, "Vesting cliff is longer than vesting duration");
-    require(vestingPeriodSec > 0, "Vesting period is 0 s.");
     require(
-      vestAmountPerPeriod <= vestingAmount,
-      "Vesting amount per period is greater than the total vesting amount"
-    );
-    require(
-      vestingAmount.div(vestAmountPerPeriod) >= 1,
-      "There must be more than 1 vesting periods"
-    );
-    require(
-      vestingStartTime.add(vestingCliff) > block.timestamp,
-      "Vesting end time is before current time"
+      vestingStartTime.add(numPeriods.mul(vestingPeriodSec)) > block.timestamp,
+      "Vesting end time must be in the future"
     );
 
     setRegistry(registryAddress);
@@ -125,9 +124,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @notice Transfers available released tokens from the vesting back to beneficiary.
    */
   function withdraw() external nonReentrant onlyBeneficiary {
-    bool isUnpaused = !paused || (paused && block.timestamp >= pauseEndTime);
-    require(isUnpaused, "Withdrawals only allowed in the unpaused state");
-    if (isUnpaused) paused = false;
+    bool isPaused = block.timestamp < pauseEndTime;
+    require(!isPaused, "Withdrawals only allowed in the unpaused state");
     uint256 withdrawableAmount = getWithdrawableAmountAtTimestamp(block.timestamp);
     require(withdrawableAmount > 0, "No gold is due for withdrawal");
     currentlyWithdrawn = currentlyWithdrawn.add(withdrawableAmount);
@@ -160,7 +158,10 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param pausePeriod the period for which the withdrawal shall be paused
    */
   function pause(uint256 pausePeriod) external onlyRevoker {
-    require(!paused, "Vesting withdrawals already paused");
+    require(
+      !paused || (paused && pauseEndTime < block.timestamp),
+      "Vesting withdrawals already paused"
+    );
     require(revocable, "Vesting must be revokable");
     require(!revoked, "Vesting already revoked");
     require(pausePeriod <= 365 days, "Pause period is limited to max. 365 days");
@@ -194,13 +195,15 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param timestamp the timestamp at which to calculate the already vested amount
    */
   function calculateVestedAmountAtTimestamp(uint256 timestamp) private view returns (uint256) {
-    uint256 currentBalance = getVestingInstanceTotalBalance();
-    uint256 totalBalance = currentBalance.add(currentlyWithdrawn);
-    uint256 vestingPeriods = vestingSchedule.vestingAmount.div(vestingSchedule.vestAmountPerPeriod);
-
     if (timestamp < vestingSchedule.vestingCliffStartTime) {
       return 0;
     }
+    uint256 currentBalance = getVestingInstanceTotalBalance();
+    uint256 totalBalance = currentBalance.add(currentlyWithdrawn);
+    uint256 vestingPeriods = uint256(
+      vestingSchedule.vestingAmount.div(vestingSchedule.vestAmountPerPeriod)
+    );
+
     if (
       timestamp >=
       vestingSchedule.vestingStartTime.add(vestingPeriods.mul(vestingSchedule.vestingPeriodSec)) ||
@@ -210,8 +213,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     }
 
     uint256 timeSinceStart = timestamp.sub(vestingSchedule.vestingStartTime);
-    uint256 timeToEnd = vestingPeriods.mul(vestingSchedule.vestingPeriodSec);
-    return totalBalance.mul(timeSinceStart).div(timeToEnd);
+    uint256 periodsSinceStart = uint256(timeSinceStart.div(vestingSchedule.vestingPeriodSec));
+    return totalBalance.mul(periodsSinceStart).div(vestingPeriods);
   }
 
   /**
@@ -222,7 +225,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   function lockGold(uint256 value) external nonReentrant onlyBeneficiary {
     // the beneficiary may not lock more than the vesting currently has available
     require(
-      value <= getGoldToken().balanceOf(address(this)),
+      value <= address(this).balance,
       "Gold amount to lock is greater than the currently vested amount"
     );
     getLockedGold().lock.gas(gasleft()).value(value)();

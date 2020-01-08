@@ -10,7 +10,6 @@ interface IVestingFactory {
     uint256,
     bool,
     address,
-    address,
     address
   ) external returns (address);
 }
