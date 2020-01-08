@@ -656,6 +656,7 @@ contract Governance is
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
   function approveHotfix(bytes32 hash) external {
+    require(!hotfixes[hash].executed, "hotfix already executed");
     require(msg.sender == approver, "Not approver");
     hotfixes[hash].approved = true;
     emit HotfixApproved(hash);
@@ -675,6 +676,7 @@ contract Governance is
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
   function whitelistHotfix(bytes32 hash) external {
+    require(!hotfixes[hash].executed, "hotfix already executed");
     hotfixes[hash].whitelisted[msg.sender] = true;
     emit HotfixWhitelisted(hash, msg.sender);
   }
@@ -684,6 +686,7 @@ contract Governance is
    * @param hash The hash of the hotfix to be prepared.
    */
   function prepareHotfix(bytes32 hash) external {
+    require(!hotfixes[hash].executed, "hotfix already executed");
     require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
     uint256 epoch = getEpochNumber();
     require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
@@ -697,15 +700,17 @@ contract Governance is
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
+   * @param salt Secret associated with hotfix which guarantees uniqueness of hash.
    * @dev Reverts if hotfix is already executed, not approved, or not prepared for current epoch.
    */
   function executeHotfix(
     uint256[] calldata values,
     address[] calldata destinations,
     bytes calldata data,
-    uint256[] calldata dataLengths
+    uint256[] calldata dataLengths,
+    bytes32 salt
   ) external {
-    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths));
+    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
 
     (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
     require(!executed, "hotfix already executed");

@@ -1,4 +1,4 @@
-import { proposalToHash } from '@celo/contractkit/lib/governance/proposals'
+import { hotfixToHash } from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
@@ -13,6 +13,7 @@ export default class ExecuteHotfix extends BaseCommand {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "Executors's address" }),
     jsonTransactions: flags.string({ required: true, description: 'Path to json transactions' }),
+    salt: flags.string({ required: true, description: 'Secret salt associated with hotfix' }),
   }
 
   static examples = []
@@ -21,7 +22,8 @@ export default class ExecuteHotfix extends BaseCommand {
     const res = this.parse(ExecuteHotfix)
     const account = res.flags.from
     const hotfix = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
-    const hash = proposalToHash(this.kit, hotfix)
+    const saltBuff = Buffer.from(res.flags.salt, 'hex')
+    const hash = hotfixToHash(this.kit, hotfix, saltBuff)
 
     const governance = await this.kit.contracts.getGovernance()
     const record = await governance.getHotfixRecord(hash)
@@ -37,6 +39,6 @@ export default class ExecuteHotfix extends BaseCommand {
       .addCheck(`Hotfix ${hash} is approved`, () => record.approved)
       .runChecks()
 
-    await displaySendTx('executeHotfixTx', governance.executeHotfix(hotfix))
+    await displaySendTx('executeHotfixTx', governance.executeHotfix(hotfix, saltBuff))
   }
 }
