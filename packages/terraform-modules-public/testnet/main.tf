@@ -231,7 +231,7 @@ module "attestation-service" {
   attestation_service_docker_image_tag        = var.attestation_service_docker_image_tag
   account_address                             = var.attestation_service_addresses
   attestation_key                             = var.attestation_service_private_keys
-  celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.proxy.internal_ip_addresses[0]}:8545"
+  celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.tx_node.internal_ip_addresses[0]}:8545"
   sms_providers                               = var.attestation_service_sms_providers
   nexmo_key                                   = var.attestation_service_nexmo_key
   nexmo_secret                                = var.attestation_service_nexmo_secret
