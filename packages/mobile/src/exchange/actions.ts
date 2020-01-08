@@ -10,8 +10,6 @@ export enum Actions {
   EXCHANGE_TOKENS = 'EXCHANGE/EXCHANGE_TOKENS',
 }
 
-//
-
 export interface FetchExchangeRateAction {
   type: Actions.FETCH_EXCHANGE_RATE
   makerToken?: CURRENCY_ENUM
@@ -27,8 +25,6 @@ export const fetchExchangeRate = (
   makerAmount,
 })
 
-//
-
 export interface SetExchangeRateAction {
   type: Actions.SET_EXCHANGE_RATE
   exchangeRatePair: ExchangeRatePair
@@ -38,8 +34,6 @@ export const setExchangeRate = (exchangeRatePair: ExchangeRatePair): SetExchange
   type: Actions.SET_EXCHANGE_RATE,
   exchangeRatePair,
 })
-
-//
 
 export interface UpdateCeloGoldExchangeRateHistory {
   type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY
@@ -52,8 +46,6 @@ export const updateCeloGoldExchangeRateHistory = (
   type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY,
   exchangeRates,
 })
-
-//
 
 export interface ExchangeTokensAction {
   type: Actions.EXCHANGE_TOKENS
