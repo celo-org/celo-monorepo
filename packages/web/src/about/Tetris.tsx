@@ -1,15 +1,16 @@
 import * as React from 'react'
+import { colors } from 'src/styles'
 import Svg, { Path } from 'svgs'
 
 export default function Tetris() {
   return (
     <Svg width="100%" height="100%" viewBox="0 0 421 301" fill="none">
       {PATHS.map((path) => (
-        <Path key={path} d={path} stroke="#81868B" strokeMiterlimit="10" />
+        <Path key={path} d={path} stroke={'#CFCFCF'} strokeMiterlimit="10" />
       ))}
       <Path
         d="M335.738 42.236C326.939 65.5568 306.233 83.2383 289.516 81.6523C272.799 80.0662 265.233 61.1511 272.682 39.4163C280.073 17.6228 298.96 0 317.085 0C335.21 0 344.595 18.9151 335.738 42.236Z"
-        fill="#35D07F"
+        fill={colors.primary}
       />
     </Svg>
   )
