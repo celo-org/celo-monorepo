@@ -225,7 +225,7 @@ function ringStyle({ color, playing, duration, lightBackground, stillMode }: Rin
   const styleArray: ViewStyle[] = [
     styles.normal,
     stillMode
-      ? { stroke: colors.screenGray }
+      ? { stroke: '#CFCFCF', mixBlendMode: 'multiply' }
       : lightBackground
       ? baseCoinStyleLight
       : baseCoinStyle,

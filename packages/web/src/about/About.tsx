@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
+import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import AudioIcon from 'src/about/AudioIcon'
 import Backers from 'src/about/Backers'
 import { sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
@@ -20,6 +21,11 @@ import { fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
   randomSeed: number
+}
+
+async function pronunceCelo() {
+  const audio = document.getElementById('pronunce')
+  await audio.play()
 }
 
 export class About extends React.Component<Props & I18nProps> {
@@ -61,11 +67,18 @@ export class About extends React.Component<Props & I18nProps> {
                 }
                 i18nKey={'MeaningText'}
                 values={{ phonetic: '/ˈtselo/' }}
-                children={
+                children={[
                   <Text key={1} style={textStyles.italic}>
                     "/ˈtselo/"
-                  </Text>
-                }
+                  </Text>,
+                  <TouchableOpacity key={2} onPress={pronunceCelo}>
+                    <AudioIcon />
+                    <audio id="pronunce">
+                      <source src="audio/celo-pronunce.ogg" type="audio/ogg" />
+                      <source src="audio/celo-pronunce.mp3" type="audio/mp3" />
+                    </audio>
+                  </TouchableOpacity>,
+                ]}
               />
             </H1>
             <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('MeaningCopy')}</Text>
