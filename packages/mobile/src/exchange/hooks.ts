@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { getExchangeRatePair } from 'src/exchange/selectors'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import useSelector from 'src/redux/useSelector'
-import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
+import { getRateForMakerToken, goldToDollarAmount } from 'src/utils/currencyExchange'
 
 export function useExchangeRate() {
   return getRateForMakerToken(
@@ -12,17 +12,7 @@ export function useExchangeRate() {
   )
 }
 
-export function useGoldToDollarAmount(amount: number | string | BigNumber | null) {
+export function useGoldToDollarAmount(amount: BigNumber.Value) {
   const exchangeRate = useExchangeRate()
-  const isRateValid = exchangeRate && !exchangeRate.isZero() && exchangeRate.isFinite()
-  if (!isRateValid) {
-    return null
-  }
-
-  const convertedAmount = getTakerAmount(amount, exchangeRate)
-  if (!convertedAmount) {
-    return null
-  }
-
-  return convertedAmount
+  return goldToDollarAmount(amount, exchangeRate)
 }

@@ -32,7 +32,6 @@ it('renders while update is in progress', () => {
         exchange: {
           exchangeRatePair,
           history: {
-            isLoading: true,
             celoGoldExchangeRates: [
               {
                 exchangeRate: '0.123',
@@ -59,7 +58,6 @@ it('renders properly', () => {
         exchange: {
           exchangeRatePair,
           history: {
-            isLoading: false,
             celoGoldExchangeRates: _.range(60).map((i) => ({
               exchangeRate: (i / 60).toString(),
               timestamp: now - i * 24 * 3600 * 1000,

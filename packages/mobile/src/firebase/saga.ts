@@ -23,8 +23,8 @@ import { showError } from 'src/alert/actions'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
-import { Actions as ExchangeActions, updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
-import { exchangeHistorySelector, ExchangeRate } from 'src/exchange/reducer'
+import { updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
+import { exchangeHistorySelector, ExchangeRate, MAX_HISTORY_RETENTION } from 'src/exchange/reducer'
 import {
   Actions,
   firebaseAuthorized,
@@ -220,40 +220,64 @@ export function* watchWritePaymentRequest() {
   yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, paymentRequestWriter)
 }
 
-export function* syncCeloGoldExchangeRateHistory() {
-  yield call(waitForFirebaseAuth)
-  const history = yield select(exchangeHistorySelector)
-  const latestExchangeRate = history.celoGoldExchangeRates[history.celoGoldExchangeRates.length - 1]
+function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
 
-  const exchangeRatesPromise = new Promise((resolve, reject) => {
+  const now = Date.now()
+
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: DataSnapshot) => {
+      const result: ExchangeRate[] = []
+      snapshot.forEach((childSnapshot) => {
+        result.push(childSnapshot.val())
+        return false
+      })
+      emit(result)
+    }
+
+    // timestamp + 1 cause .startAt is inclusive
+    const startAt = latestExchangeRate
+      ? latestExchangeRate.timestamp + 1
+      : now - MAX_HISTORY_RETENTION
+
+    const cancel = () => {
+      firebase
+        .database()
+        .ref(`${EXCHANGE_RATES}/cGLD/cUSD`)
+        .orderByChild('timestamp')
+        .startAt(startAt)
+        .off(VALUE, emitter)
+    }
+
     firebase
       .database()
       .ref(`${EXCHANGE_RATES}/cGLD/cUSD`)
       .orderByChild('timestamp')
-      // timestamp + 1 cause .startAt is inclusive
-      .startAt(latestExchangeRate ? latestExchangeRate.timestamp + 1 : 0)
-      .once('value', (snapshot) => {
-        const result: ExchangeRate[] = []
-        snapshot.forEach((childSnapshot) => {
-          result.push(childSnapshot.val())
-          return false
-        })
-        resolve(result)
-      })
-      .catch(reject)
+      .startAt(startAt)
+      .on(VALUE, emitter, errorCallback)
+    return cancel
   })
-
-  const exchangeRates = yield exchangeRatesPromise
-  if (exchangeRates.length) {
-    yield put(updateCeloGoldExchangeRateHistory(exchangeRates))
-  }
 }
 
-export function* watchCeloGoldExchangeRateHistory() {
-  yield takeEvery(
-    ExchangeActions.SYNC_CELO_GOLD_EXCHANGE_RATE_HISTORY,
-    syncCeloGoldExchangeRateHistory
-  )
+export function* subscribeToCeloGoldExchangeRateHistory() {
+  yield call(waitForFirebaseAuth)
+  const history = yield select(exchangeHistorySelector)
+  const latestExchangeRate = history.celoGoldExchangeRates[history.celoGoldExchangeRates.length - 1]
+  const chan = yield call(celoGoldExchangeRateHistoryChannel, latestExchangeRate)
+  try {
+    while (true) {
+      const exchangeRates = yield take(chan)
+      yield put(updateCeloGoldExchangeRateHistory(exchangeRates))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@subscribeToCeloGoldExchangeRateHistory`, error)
+  } finally {
+    if (yield cancelled()) {
+      chan.close()
+    }
+  }
 }
 
 export function* firebaseSaga() {
@@ -261,8 +285,8 @@ export function* firebaseSaga() {
   yield spawn(watchLanguage)
   yield spawn(subscribeToIncomingPaymentRequests)
   yield spawn(subscribeToOutgoingPaymentRequests)
+  yield spawn(subscribeToCeloGoldExchangeRateHistory)
   yield spawn(watchPaymentRequestStatusUpdates)
   yield spawn(watchPaymentRequestNotifiedUpdates)
   yield spawn(watchWritePaymentRequest)
-  yield spawn(watchCeloGoldExchangeRateHistory)
 }

@@ -9,7 +9,7 @@ import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { fetchExchangeRate, syncCeloGoldExchangeRateHistory } from 'src/exchange/actions'
+import { fetchExchangeRate } from 'src/exchange/actions'
 import Activity from 'src/exchange/Activity'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
@@ -29,7 +29,6 @@ interface StateProps {
 
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
-  syncCeloGoldExchangeRateHistory: typeof syncCeloGoldExchangeRateHistory
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -43,7 +42,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class ExchangeHomeScreen extends React.Component<Props> {
   componentDidMount() {
     this.props.fetchExchangeRate()
-    this.props.syncCeloGoldExchangeRateHistory()
   }
 
   goToBuyGold = () => {
@@ -111,7 +109,6 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
     fetchExchangeRate,
-    syncCeloGoldExchangeRateHistory,
   })(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 )
 

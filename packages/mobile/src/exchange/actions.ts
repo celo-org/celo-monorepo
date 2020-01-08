@@ -5,8 +5,8 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 export enum Actions {
   FETCH_EXCHANGE_RATE = 'EXCHANGE/FETCH_EXCHANGE_RATE',
   SET_EXCHANGE_RATE = 'EXCHANGE/SET_EXCHANGE_RATE',
-  SYNC_CELO_GOLD_EXCHANGE_RATE_HISTORY = 'EXCHANGE/SYNC_CELO_GOLD_EXCHANGE_RATE_HISTORY',
   UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY = 'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY',
+  SET_CELO_GOLD_EXCHANGE_RATE_HISTORY = 'SET_CELO_GOLD_EXCHANGE_RATE_HISTORY',
   EXCHANGE_TOKENS = 'EXCHANGE/EXCHANGE_TOKENS',
 }
 
@@ -41,16 +41,6 @@ export const setExchangeRate = (exchangeRatePair: ExchangeRatePair): SetExchange
 
 //
 
-export interface SyncCeloGoldExchangeRateHistory {
-  type: Actions.SYNC_CELO_GOLD_EXCHANGE_RATE_HISTORY
-}
-
-export const syncCeloGoldExchangeRateHistory = (): SyncCeloGoldExchangeRateHistory => ({
-  type: Actions.SYNC_CELO_GOLD_EXCHANGE_RATE_HISTORY,
-})
-
-//
-
 export interface UpdateCeloGoldExchangeRateHistory {
   type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY
   exchangeRates: ExchangeRate[]
@@ -79,8 +69,8 @@ export const exchangeTokens = (
   makerToken,
   makerAmount,
 })
+
 export type ActionTypes =
   | SetExchangeRateAction
   | ExchangeTokensAction
   | UpdateCeloGoldExchangeRateHistory
-  | SyncCeloGoldExchangeRateHistory
