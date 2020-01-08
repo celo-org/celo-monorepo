@@ -1,10 +1,10 @@
 pragma solidity ^0.5.3;
 
 interface IVestingInstance {
-  function withdraw() external;
-  function revoke(uint256) external;
+  function withdraw(uint256) external;
+  function refundAndFinalize() external;
+  function revoke() external;
   function pause(uint256) external;
-  function getWithdrawableAmountAtTimestamp(uint256) external view returns (uint256);
   function lockGold(uint256) external;
   function unlockGold(uint256) external;
   function relockGold(uint256, uint256) external;
@@ -17,4 +17,8 @@ interface IVestingInstance {
   function setAccountDataEncryptionKey(bytes calldata) external;
   function setAccountMetadataURL(string calldata) external;
   function getVestingInstanceTotalBalance() external view returns (uint256);
+  function getVestingInstanceNonWithdrawnTotalBalance() external view returns (uint256);
+  function getVestingInstanceAvailableBalance() external view returns (uint256);
+  function getVestingInstanceLockedBalance() external view returns (uint256);
+  function getWithdrawableAmount() external view returns (uint256);
 }

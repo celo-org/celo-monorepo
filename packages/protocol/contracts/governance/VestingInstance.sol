@@ -160,10 +160,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
         "Required withdraw amount is above the allowed withdrawal limit"
       );
       currentlyWithdrawn = currentlyWithdrawn.add(withdrawableAmount);
-      require(
-        getGoldToken().transfer(beneficiary, withdrawableAmount),
-        "Withdrawal of gold failed"
-      );
+      require(getGoldToken().transfer(beneficiary, amount), "Withdrawal of gold failed");
       if (getVestingInstanceTotalBalance().sub(currentlyWithdrawn) == 0) {
         selfdestruct(beneficiary);
       }
@@ -231,10 +228,10 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice Calculates non-locked, locked and available gold balance parts and returns their sum as the total balance of the vesting instance
+   * @notice Calculates the sum of non-locked, locked, available and withdrawn gold
    * @return The total vesting instance balance
    */
-  function getVestingInstanceTotalBalance() private view returns (uint256) {
+  function getVestingInstanceTotalBalance() public view returns (uint256) {
     return
       getVestingInstanceAvailableBalance().add(getVestingInstanceLockedBalance()).add(
         currentlyWithdrawn
@@ -242,10 +239,18 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
+   * @notice Calculates the sum of non-locked, locked and available gold
+   * @return The total vesting instance non-withdrawn balance
+   */
+  function getVestingInstanceNonWithdrawnTotalBalance() public view returns (uint256) {
+    return getVestingInstanceAvailableBalance().add(getVestingInstanceLockedBalance());
+  }
+
+  /**
    * @notice Calculates available gold balance in the vesting instance
    * @return The available vesting instance balance
    */
-  function getVestingInstanceAvailableBalance() private view returns (uint256) {
+  function getVestingInstanceAvailableBalance() public view returns (uint256) {
     return address(this).balance;
   }
 
@@ -253,7 +258,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @notice Calculates locked gold balance in the vesting instance
    * @return The locked vesting instance balance
    */
-  function getVestingInstanceLockedBalance() private view returns (uint256) {
+  function getVestingInstanceLockedBalance() public view returns (uint256) {
     return getLockedGold().getAccountTotalLockedGold(address(this));
   }
 
@@ -262,7 +267,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @return The withdrawable amount up to the point of call
    * @dev Function is also made public in order to be called for informational purpose
    */
-  function getWithdrawableAmount() private view returns (uint256) {
+  function getWithdrawableAmount() public view returns (uint256) {
     return calculateVestedAmount().sub(currentlyWithdrawn).sub(getVestingInstanceLockedBalance());
   }
 
@@ -281,8 +286,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
 
     if (
       block.timestamp >=
-      vestingSchedule.vestingStartTime.add(vestingPeriods.mul(vestingSchedule.vestingPeriodSec)) ||
-      revoked
+      vestingSchedule.vestingStartTime.add(vestingPeriods.mul(vestingSchedule.vestingPeriodSec))
     ) {
       return totalBalance;
     }
