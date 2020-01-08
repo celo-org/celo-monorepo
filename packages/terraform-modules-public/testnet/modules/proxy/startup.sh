@@ -28,6 +28,7 @@ else
 fi
 
 echo "Mounting $DISK_PATH onto $DATA_DIR"
+mkdir -p $DATA_DIR
 mount -o discard,defaults $DISK_PATH $DATA_DIR
 [[ ${reset_geth_data} == "true" ]] && rm -rf $DATA_DIR/geth
 mkdir -p $DATA_DIR/account
@@ -71,8 +72,6 @@ echo -n '${static_nodes_base64}' | base64 -d > $DATA_DIR/static-nodes.json
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${proxy_private_key}' > $DATA_DIR/pkey
-echo -n '${validator_private_key}' > $DATA_DIR/validatorPKey
-echo -n '${validator_account_password}' > $DATA_DIR/account/accountSecret
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
@@ -84,7 +83,7 @@ docker run \
   -v $DATA_DIR:$DATA_DIR \
   --entrypoint /bin/sh \
   -i $GETH_NODE_DOCKER_IMAGE \
-  -c "geth init $DATA_DIR/genesis.json && geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/validatorPKey | true"
+  -c "geth init $DATA_DIR/genesis.json"
 
 cat <<EOF >/etc/systemd/system/geth.service
 [Unit]

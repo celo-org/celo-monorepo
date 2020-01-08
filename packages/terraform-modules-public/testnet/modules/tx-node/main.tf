@@ -61,7 +61,7 @@ resource "google_compute_instance" "tx_node" {
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.tx_node[count.index].address,
-      max_peers : var.tx_node_count * 2,
+      max_peers : var.txnode_max_peers,
       network_id : var.network_id,
       static_nodes_base64 : var.static_nodes_base64,
       rid : count.index,

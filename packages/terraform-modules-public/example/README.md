@@ -8,6 +8,21 @@ The file [variables.tf](./variables.tf) contains most of the parameters used by 
 
 Most of the parameters are safe to go with the default value. You can configure the replica count for each service, but a good starting point would be 1 validator, 1 proxy, and 1 attestation service. Each validator service has an attached proxy service.
 
+## Required changes/parameters
+
+In order to run this example module in your Google Cloud account, you need to follow the next steps:
+
+- It is recommended to [create a new Project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) for this, so every resource can be easily located.
+- You need to [create a storage bucket](https://cloud.google.com/storage/docs/creating-buckets) for storing the Terraform remote state and lock. You can use also an existing one if you prefer. Then, update the storage bucket parameters in the [main.tf](./main.tf#L9-L12). Please take care that the account secrets will be stored in this terraform state/bucket, so proper bucket access policies may apply to safe those values.
+- You need to create and configure the values for the etherbase needed accounts, as described in the [Ethereum accounts](#ethereum-accounts) section. Particularly, you will need the next accounts (for each instance/replica count):
+  - An account for the Validator address. This account does not have to be submitted to the terraform module, and it is the account that must run for election as a validator.
+  - An account for the validator instance. It is recommended to use a validator authorized signer address and submit to the module as `validator_accounts` parameter. You can use the validator address here, but is recommended to use an authorized account instead.
+  - An account for the proxy. This account is only used for having a fixed enode address, so we can configure correctly the validator<->proxy communication. Submit this address using the `proxy_accounts` parameter.
+  - An account for the attestation service. Again, it is recommended to use a validator authorized signer address and submit to the module as `attestation_service_accounts` parameter.
+  - Additionally, you will need an account for the validation group each 5 validator instances. This account does not need to be submitted to terraform.
+- The management of the accounts for election, authorizing, etc... has to be done using the `celocli` tool following the official [documentation](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator). This steps can be done before of after deploying the terraform instances.
+- Finally, update the rest of values as the `replicas`, `instance_types`, `validator_name` and `proxy_name` as you prefer.
+
 ## Ethereum accounts
 
 The terraform module uses as input the different account parameters: public address, public key (that also corresponds to the enode address), and the private key. These accounts are submitted as an array variable, and you have to include inputs as much as instances of that service you are deploying. Although you can specify different number or validators and attestation service, makes more sense to deploy the same number of instances for both services. The number of proxy instances will be coupled always with the number of validator instances.

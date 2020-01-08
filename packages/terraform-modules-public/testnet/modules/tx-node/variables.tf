@@ -73,3 +73,9 @@ variable static_nodes_base64 {
   type        = string
   description = "Content of the static_nodes.json file encoded in base64"
 }
+
+variable txnode_max_peers {
+  type        = number
+  description = "Max number of peers to connect with"
+  default     = 120
+}

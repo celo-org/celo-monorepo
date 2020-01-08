@@ -46,12 +46,12 @@ variable network_name {
 
 variable account_address {
   type        = list(string)
-  description = "The account address for signing the attestations. Must be the address of the associated validator"
+  description = "The account address for signing the attestations. Must be an authorized address of the associated validator"
 }
 
 variable attestation_key {
   type        = list(string)
-  description = "The account private key for signing the attestations. Must be the private key of the associated validator"
+  description = "The account private key for signing the attestations. Must be the private key of an authorized address for the associated validator"
 }
 
 variable celo_provider {

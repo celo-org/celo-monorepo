@@ -108,6 +108,7 @@ ExecStart=/usr/bin/docker run \\
   --entrypoint /bin/bash \\
   -v $DATA_DIR:$DATA_DIR \\
   -e NODE_ENV=production \\
+  -e PORT=80 \\
   -e DATABASE_URL="$DATABASE_URL" \\
   -e ACCOUNT_ADDRESS="$ACCOUNT_ADDRESS" \\
   -e ATTESTATION_KEY="$ATTESTATION_KEY" \\

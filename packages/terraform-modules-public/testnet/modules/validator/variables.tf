@@ -11,7 +11,7 @@ variable celo_env {
 variable instance_type {
   description = "The instance type"
   type        = string
-  default = "n1-standard-1"
+  default = "n1-standard-2"
 }
 
 variable ethstats_host {

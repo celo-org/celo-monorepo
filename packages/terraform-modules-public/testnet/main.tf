@@ -28,7 +28,6 @@ data "http" "genesis" {
 
 data "http" "static-nodes" {
   url = "https://storage.googleapis.com/static_nodes/${var.celo_env}"
-  // url = "https://storage.googleapis.com/javier_cortejoso/baklavastaging"
 
   request_headers = {
     "Accept" = "application/json"
@@ -63,7 +62,7 @@ resource "google_compute_firewall" "geth_firewall" {
   name    = "${var.celo_env}-geth-firewall"
   network = var.network_name
 
-  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_validator, local.firewall_target_tags_proxy)
+  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_proxy)
 
   allow {
     protocol = "tcp"
@@ -72,6 +71,18 @@ resource "google_compute_firewall" "geth_firewall" {
 
   allow {
     protocol = "udp"
+    ports    = ["30303"]
+  }
+}
+
+resource "google_compute_firewall" "geth_firewall_validator" {
+  name    = "${var.celo_env}-geth-firewall"
+  network = var.network_name
+
+  target_tags = concat(local.firewall_target_tags_validator)
+
+  allow {
+    protocol = "tcp"
     ports    = ["30303"]
   }
 }
@@ -95,7 +106,7 @@ resource "google_compute_firewall" "rpc_firewall" {
   name    = "${var.celo_env}-rpc-firewall"
   network = var.network_name
 
-  target_tags = local.firewall_target_tags_proxy
+  target_tags = local.firewall_target_tags_txnode
 
   allow {
     protocol = "tcp"
@@ -114,11 +125,6 @@ resource "google_compute_firewall" "proxy" {
     protocol = "tcp"
     ports    = ["30503"]
   }
-
-  allow {
-    protocol = "udp"
-    ports    = ["30503"]
-  }
 }
 
 resource "google_compute_firewall" "attestation-service" {
@@ -130,7 +136,7 @@ resource "google_compute_firewall" "attestation-service" {
 
   allow {
     protocol = "tcp"
-    ports    = ["3000"]
+    ports    = ["80"]
   }
 }
 
@@ -206,8 +212,6 @@ module "validator" {
 
   validator_name              = var.validator_name
   validator_account_addresses = var.validator_account_addresses
-  validator_private_keys      = var.validator_private_keys
-  validator_account_passwords = var.validator_account_passwords
   proxy_enodes                = var.proxy_enodes
   proxy_internal_ips          = module.proxy.internal_ip_addresses
   proxy_external_ips          = module.proxy.external_ip_addresses

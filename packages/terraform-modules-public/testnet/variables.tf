@@ -23,8 +23,8 @@ variable instance_types {
   type        = map(string)
 
   default = {
-    validator           = "n1-standard-1"
-    proxy               = "n1-standard-1"
+    validator           = "n1-standard-2"
+    proxy               = "n1-standard-2"
     txnode              = "n1-standard-1"
     attestation_service = "n1-standard-1"
   }

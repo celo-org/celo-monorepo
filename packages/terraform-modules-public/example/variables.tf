@@ -62,27 +62,10 @@ variable instance_types {
   type        = map(string)
 
   default = {
-    validator           = "n1-standard-1"
-    proxy               = "n1-standard-1"
+    validator           = "n1-standard-2"
+    proxy               = "n1-standard-2"
     txnode              = "n1-standard-1"
     attestation_service = "n1-standard-1"
-  }
-}
-
-variable proxy_accounts {
-  description = "The account data for the proxy nodes"
-  type        = map
-
-  default = {
-    account_addresses = [
-      "0xF2...",
-    ]
-    private_keys = [
-      "1b...",
-    ]
-    enodes = [
-      "f8...",
-    ]
   }
 }
 
@@ -99,6 +82,24 @@ variable validator_accounts {
     ]
     account_passwords = [
       "secret1",
+    ]
+  }
+}
+
+variable proxy_accounts {
+  description = "The account data for the proxy nodes"
+  type        = map
+
+  default = {
+    # account_address is not needed by the module. Can be left blank.
+    account_addresses = [
+      "0xF2...",
+    ]
+    private_keys = [
+      "1b...",
+    ]
+    enodes = [
+      "f8...",
     ]
   }
 }
@@ -159,7 +160,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-c8e3392aa2ca44ff83b4035700ece5fd12ed2b84"
+    tag        = "attestation-service-baklava"
   }
 }
 

@@ -28,6 +28,7 @@ else
 fi
 
 echo "Mounting $DISK_PATH onto $DATA_DIR"
+mkdir -p $DATA_DIR
 mount -o discard,defaults $DISK_PATH $DATA_DIR
 [[ ${reset_geth_data} == "true" ]] && rm -rf $DATA_DIR/geth
 mkdir -p $DATA_DIR/account
@@ -65,7 +66,7 @@ echo "Address: $ACCOUNT_ADDRESS"
 echo "Proxy enode address: ${proxy_enode}"
 echo "Proxy internal ip address: ${proxy_internal_ip}"
 echo "Proxy external ip address: ${proxy_external_ip}"
-PROXY_INTERNAL_ENODE="enode://${proxy_enode}@${proxy_internal_ip}:30303"
+PROXY_INTERNAL_ENODE="enode://${proxy_enode}@${proxy_internal_ip}:30503"
 PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30303"
 
 PROXY_URL="$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
