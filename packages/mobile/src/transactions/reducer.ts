@@ -1,10 +1,11 @@
 import BigNumber from 'bignumber.js'
+import { TransactionType } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, ActionTypes } from 'src/transactions/actions'
 
 export interface ExchangeStandby {
   id: string
-  type: TransactionTypes.EXCHANGE
+  type: TransactionType.Exchange
   status: TransactionStatus
   inSymbol: CURRENCY_ENUM
   inValue: string
@@ -15,7 +16,7 @@ export interface ExchangeStandby {
 }
 export interface TransferStandby {
   id: string
-  type: TransferTransactionTypes
+  type: TransferTransactionType
   status: TransactionStatus
   value: string | BigNumber
   comment: string
@@ -33,33 +34,17 @@ export enum TransactionStatus {
   Failed = 'Failed',
 }
 
-// Should correspond to EventTypes enum in blockchain api
-export enum TransactionTypes {
-  EXCHANGE = 'EXCHANGE',
-  RECEIVED = 'RECEIVED',
-  SENT = 'SENT',
-  ESCROW_SENT = 'ESCROW_SENT',
-  ESCROW_RECEIVED = 'ESCROW_RECEIVED',
-  FAUCET = 'FAUCET',
-  VERIFICATION_REWARD = 'VERIFICATION_REWARD',
-  VERIFICATION_FEE = 'VERIFICATION_FEE',
-  INVITE_SENT = 'INVITE_SENT',
-  INVITE_RECEIVED = 'INVITE_RECEIVED',
-  PAY_REQUEST = 'PAY_REQUEST',
-  NETWORK_FEE = 'NETWORK_FEE',
-}
-
-type TransferTransactionTypes =
-  | TransactionTypes.SENT
-  | TransactionTypes.RECEIVED
-  | TransactionTypes.ESCROW_RECEIVED
-  | TransactionTypes.ESCROW_SENT
-  | TransactionTypes.FAUCET
-  | TransactionTypes.VERIFICATION_REWARD
-  | TransactionTypes.VERIFICATION_FEE
-  | TransactionTypes.INVITE_SENT
-  | TransactionTypes.INVITE_RECEIVED
-  | TransactionTypes.NETWORK_FEE
+type TransferTransactionType =
+  | TransactionType.Sent
+  | TransactionType.Received
+  | TransactionType.EscrowReceived
+  | TransactionType.EscrowSent
+  | TransactionType.Faucet
+  | TransactionType.VerificationReward
+  | TransactionType.VerificationFee
+  | TransactionType.InviteSent
+  | TransactionType.InviteReceived
+  | TransactionType.NetworkFee
 
 export interface State {
   standbyTransactions: StandbyTransaction[]

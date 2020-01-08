@@ -31,7 +31,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus, TransactionType } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
@@ -85,7 +85,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   yield put(
     addStandbyTransaction({
       id,
-      type: TransactionTypes.ESCROW_SENT,
+      type: TransactionType.EscrowSent,
       status: TransactionStatus.Pending,
       value,
       symbol: CURRENCY_ENUM.DOLLAR,

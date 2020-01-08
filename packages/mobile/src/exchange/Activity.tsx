@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import UserTransactionsQuery from 'src/apollo/types'
+import UserTransactionsQuery, { TransactionType } from 'src/apollo/types'
 import { transactionQuery } from 'src/home/TransactionsList'
 import { RootState } from 'src/redux/reducers'
 import { resetStandbyTransactions } from 'src/transactions/actions'
-import { StandbyTransaction, TransactionTypes } from 'src/transactions/reducer'
+import { StandbyTransaction } from 'src/transactions/reducer'
 import TransactionFeed, { FeedType } from 'src/transactions/TransactionFeed'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -24,7 +24,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 function filterToExchangeTxs(tx: StandbyTransaction) {
-  return tx.type === TransactionTypes.EXCHANGE
+  return tx.type === TransactionType.Exchange
 }
 
 export class Activity extends React.Component<Props> {

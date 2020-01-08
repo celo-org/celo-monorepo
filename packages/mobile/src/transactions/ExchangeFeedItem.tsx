@@ -4,12 +4,13 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
+import gql from 'graphql-tag'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { HomeExchangeFragment } from 'src/apollo/types'
+import { ExchangeItemFragment } from 'src/apollo/types'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import {
@@ -18,15 +19,14 @@ import {
   useLocalCurrencySymbol,
 } from 'src/localCurrency/hooks'
 import { navigateToExchangeReview } from 'src/transactions/actions'
-import { ExchangeStandby, TransactionStatus } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
-type Props = (HomeExchangeFragment | ExchangeStandby) &
-  WithTranslation & {
-    status?: TransactionStatus
-    showGoldAmount: boolean
-  }
+type Props = ExchangeItemFragment & {
+  status?: TransactionStatus
+  showGoldAmount: boolean
+}
 
 type ExchangeInputProps = Props & {
   localCurrencyCode: LocalCurrencyCode | null
@@ -125,7 +125,8 @@ function getDollarAmountProps({
 }
 
 export function ExchangeFeedItem(props: Props) {
-  const { showGoldAmount, inSymbol, status, timestamp, t, i18n } = props
+  const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+  const { showGoldAmount, inSymbol, status, timestamp } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
@@ -217,6 +218,44 @@ export function ExchangeFeedItem(props: Props) {
   )
 }
 
+ExchangeFeedItem.fragments = {
+  exchange: gql`
+    fragment ExchangeItem on TransactionExchange {
+      __typename
+      type
+      hash
+      amount {
+        amount
+        currencyCode
+        localAmount {
+          amount
+          currencyCode
+          exchangeRate
+        }
+      }
+      timestamp
+      takerAmount {
+        amount
+        currencyCode
+        localAmount {
+          amount
+          currencyCode
+          exchangeRate
+        }
+      }
+      makerAmount {
+        amount
+        currencyCode
+        localAmount {
+          amount
+          currencyCode
+          exchangeRate
+        }
+      }
+    }
+  `,
+}
+
 const styles = StyleSheet.create({
   arrow: {
     paddingHorizontal: 5,
@@ -287,4 +326,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.walletFlow5)(React.memo(ExchangeFeedItem))
+export default ExchangeFeedItem

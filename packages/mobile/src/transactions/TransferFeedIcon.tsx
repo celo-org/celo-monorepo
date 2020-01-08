@@ -2,14 +2,14 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
+import { TransactionType } from 'src/apollo/types'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { TransactionTypes } from 'src/transactions/reducer'
 
 const AVATAR_SIZE = 40
 
 interface Props {
-  type: TransactionTypes
+  type: TransactionType
   recipient?: Recipient
   address?: string
 }
@@ -18,24 +18,24 @@ export default function TransferFeedIcon(props: Props) {
   const { recipient, address, type } = props
 
   switch (type) {
-    case TransactionTypes.VERIFICATION_FEE: // fallthrough
-    case TransactionTypes.FAUCET: // fallthrough
-    case TransactionTypes.INVITE_SENT: // fallthrough
-    case TransactionTypes.NETWORK_FEE: // fallthrough
-    case TransactionTypes.INVITE_RECEIVED: {
+    case TransactionType.VerificationFee: // fallthrough
+    case TransactionType.Faucet: // fallthrough
+    case TransactionType.InviteSent: // fallthrough
+    case TransactionType.NetworkFee: // fallthrough
+    case TransactionType.InviteReceived: {
       return <Image source={coinsIcon} style={styles.image} />
     }
-    case TransactionTypes.VERIFICATION_REWARD: {
+    case TransactionType.VerificationReward: {
       return (
         <View style={styles.image}>
           <RewardIcon height={38} />
         </View>
       )
     }
-    case TransactionTypes.RECEIVED: // fallthrough
-    case TransactionTypes.SENT: // fallthrough
-    case TransactionTypes.ESCROW_SENT:
-    case TransactionTypes.ESCROW_RECEIVED:
+    case TransactionType.Received: // fallthrough
+    case TransactionType.Sent: // fallthrough
+    case TransactionType.EscrowSent:
+    case TransactionType.EscrowReceived:
     default: {
       return (
         <ContactCircle

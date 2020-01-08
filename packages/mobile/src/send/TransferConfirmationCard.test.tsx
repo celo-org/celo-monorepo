@@ -3,8 +3,8 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { TransactionType } from 'src/apollo/types'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { createMockStore } from 'test/utils'
 import {
   mockAccount,
@@ -23,7 +23,7 @@ const store = createMockStore({
 describe('TransferConfirmationCard', () => {
   it('renders correctly for verification fee drilldown', () => {
     const props = {
-      type: TransactionTypes.VERIFICATION_FEE,
+      type: TransactionType.VerificationFee,
       address: mockAccount,
       comment: '',
       value: new BigNumber(0.3),
@@ -40,7 +40,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for faucet drilldown', () => {
     const props = {
-      type: TransactionTypes.FAUCET,
+      type: TransactionType.Faucet,
       address: mockAccount,
       comment: '',
       value: new BigNumber(100),
@@ -57,7 +57,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for received transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.RECEIVED,
+      type: TransactionType.Received,
       address: mockAccount,
       comment: '',
       value: new BigNumber(100),
@@ -76,7 +76,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for received escrow transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.ESCROW_RECEIVED,
+      type: TransactionType.EscrowReceived,
       address: mockAccount,
       comment: '',
       value: new BigNumber(100),
@@ -95,7 +95,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for sent transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.SENT,
+      type: TransactionType.Sent,
       address: mockAccount,
       comment: mockComment,
       value: new BigNumber(100),
@@ -115,7 +115,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for sent escrow transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.ESCROW_SENT,
+      type: TransactionType.EscrowSent,
       address: mockAccount,
       comment: mockComment,
       value: new BigNumber(100),

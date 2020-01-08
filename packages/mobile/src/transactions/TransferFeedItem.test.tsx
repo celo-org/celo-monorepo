@@ -2,9 +2,8 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { EventTypeNames } from 'src/apollo/types'
+import { EventTypeNames, TransactionType } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import {
@@ -33,7 +32,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={mockComment}
-          type={TransactionTypes.SENT}
+          type={TransactionType.Sent}
           hash={'0x'}
           value={1}
           address={mockAccount}
@@ -56,7 +55,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={encryptedMockComment}
-          type={TransactionTypes.SENT}
+          type={TransactionType.Sent}
           hash={'0x'}
           value={1}
           address={mockAccount2}
@@ -79,7 +78,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={encryptedMockComment}
-          type={TransactionTypes.RECEIVED}
+          type={TransactionType.Received}
           hash={'0x'}
           value={100}
           address={mockAccount}
@@ -102,7 +101,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.VERIFICATION_FEE}
+          type={TransactionType.VerificationFee}
           hash={'0x'}
           value={0.33}
           address={mockAccount}
@@ -125,7 +124,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.NETWORK_FEE}
+          type={TransactionType.NetworkFee}
           hash={'0x'}
           value={0.002}
           address={mockAccount}
@@ -148,7 +147,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.NETWORK_FEE}
+          type={TransactionType.NetworkFee}
           hash={'0x'}
           value={0.0000002}
           address={mockAccount}
@@ -171,7 +170,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.VERIFICATION_REWARD}
+          type={TransactionType.VerificationReward}
           hash={'0x'}
           value={1}
           address={mockAccount}
@@ -194,7 +193,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.FAUCET}
+          type={TransactionType.Faucet}
           hash={'0x'}
           value={100}
           address={mockAccount}
@@ -217,7 +216,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.INVITE_SENT}
+          type={TransactionType.InviteSent}
           hash={'0x'}
           value={1}
           address={mockAccount}
@@ -240,7 +239,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.INVITE_RECEIVED}
+          type={TransactionType.InviteReceived}
           hash={'0x'}
           value={1}
           address={mockAccount}
@@ -263,7 +262,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.RECEIVED}
+          type={TransactionType.Received}
           hash={'0x'}
           value={100}
           address={mockAccount}
@@ -286,7 +285,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.RECEIVED}
+          type={TransactionType.Received}
           hash={'0x'}
           value={100}
           address={mockAccount}
@@ -309,7 +308,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.SENT}
+          type={TransactionType.Sent}
           hash={'0x'}
           value={100}
           address={mockAccount}
@@ -332,7 +331,7 @@ describe('transfer feed item renders correctly', () => {
         <TransferFeedItem
           __typename={EventTypeNames.Transfer}
           comment={''}
-          type={TransactionTypes.SENT}
+          type={TransactionType.Sent}
           hash={'0x'}
           value={100}
           address={mockAccount}

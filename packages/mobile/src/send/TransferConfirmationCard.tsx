@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { TransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
 import { FAQ_LINK } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -21,7 +22,6 @@ import {
   useLocalCurrencySymbol,
 } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
 
@@ -29,10 +29,10 @@ const iconSize = 40
 
 export interface TransferConfirmationCardProps {
   address?: string
-  comment?: string
+  comment?: string | null
   value: BigNumber
   currency: CURRENCY_ENUM
-  type: TransactionTypes
+  type: TransactionType
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
   recipient?: Recipient
@@ -49,9 +49,9 @@ const onPressGoToFaq = () => {
 const renderTopSection = (props: Props) => {
   const { address, recipient, type, e164PhoneNumber } = props
   if (
-    type === TransactionTypes.VERIFICATION_FEE ||
-    type === TransactionTypes.NETWORK_FEE ||
-    type === TransactionTypes.FAUCET
+    type === TransactionType.VerificationFee ||
+    type === TransactionType.NetworkFee ||
+    type === TransactionType.Faucet
   ) {
     return <Image source={faucetIcon} style={style.icon} />
   } else {
@@ -79,10 +79,10 @@ const renderAmountSection = (props: Props) => {
   )
 
   switch (type) {
-    case TransactionTypes.INVITE_SENT: // fallthrough
-    case TransactionTypes.INVITE_RECEIVED:
+    case TransactionType.InviteSent: // fallthrough
+    case TransactionType.InviteReceived:
       return null
-    case TransactionTypes.NETWORK_FEE:
+    case TransactionType.NetworkFee:
       return (
         <MoneyAmount
           symbol={CURRENCIES[currency].symbol}
@@ -105,9 +105,9 @@ const renderAmountSection = (props: Props) => {
 const renderBottomSection = (props: Props) => {
   const { t, currency, comment, type, value } = props
 
-  if (type === TransactionTypes.VERIFICATION_FEE) {
+  if (type === TransactionType.VerificationFee) {
     return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
-  } else if (type === TransactionTypes.FAUCET) {
+  } else if (type === TransactionType.Faucet) {
     return (
       <Text style={style.pSmall}>
         {t('receiveFlow8:receivedAmountFromCelo.0')}
@@ -116,7 +116,7 @@ const renderBottomSection = (props: Props) => {
         {t('receiveFlow8:receivedAmountFromCelo.1')}
       </Text>
     )
-  } else if (type === TransactionTypes.NETWORK_FEE) {
+  } else if (type === TransactionType.NetworkFee) {
     return (
       <View>
         <Text style={style.pSmall}>
@@ -125,14 +125,14 @@ const renderBottomSection = (props: Props) => {
         </Text>
       </View>
     )
-  } else if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
+  } else if (type === TransactionType.InviteSent || type === TransactionType.InviteReceived) {
     return (
       <View style={style.bottomContainer}>
         <View style={style.inviteLine}>
           <HorizontalLine />
         </View>
         <Text style={style.inviteTitle}>{t('inviteFlow11:inviteFee')}</Text>
-        {type === TransactionTypes.INVITE_SENT ? (
+        {type === TransactionType.InviteSent ? (
           <Text style={style.pSmall}>{t('inviteFlow11:whySendFees')}</Text>
         ) : (
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>

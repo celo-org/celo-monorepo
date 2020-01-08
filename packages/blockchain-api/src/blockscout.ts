@@ -1,7 +1,7 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
-import { EventArgs, EventInterface, EventTypes, TransferEvent } from './schema'
+import { EventArgs, EventInterface, EventTypes, TransactionArgs, TransferEvent } from './schema'
 import { formatCommentString, getContractAddresses } from './utils'
 
 // to get rid of 18 extra 0s in the values
@@ -27,6 +27,9 @@ export interface BlockscoutTransaction {
   value: string
   txreceipt_status: string
   transactionIndex: string
+  tokenSymbol: string
+  tokenName: string
+  tokenDecimal: string
   to: string
   timeStamp: string
   nonce: string
@@ -126,6 +129,7 @@ export class BlockscoutAPI extends RESTDataSource {
 
     // Mapping to figure out what event each raw transaction belongs to
     const txHashToEventTransactions = new Map<string, any>()
+
     for (const tx of rawTransactions) {
       const currentTX = txHashToEventTransactions.get(tx.hash) || []
       currentTX.push(tx)
@@ -213,6 +217,109 @@ export class BlockscoutAPI extends RESTDataSource {
       `[Celo] getFeedRewards address=${args.address} startblock=${args.startblock} endblock=${args.endblock} rawTransactionCount=${rawTransactions.length} rewardsCount=${rewards.length}`
     )
     return rewards.sort((a, b) => b.timestamp - a.timestamp)
+  }
+
+  async getTransactions(args: TransactionArgs) {
+    const rawTransactions = await this.getTokenTransactions(args)
+    const events: any[] = []
+    const userAddress = args.address.toLowerCase()
+
+    console.log('==rawTx', rawTransactions)
+
+    // Mapping to figure out what event each raw transaction belongs to
+    const txHashToEventTransactions = new Map<string, any>()
+    for (const tx of rawTransactions) {
+      const currentTX = txHashToEventTransactions.get(tx.hash) || []
+      currentTX.push(tx)
+      txHashToEventTransactions.set(tx.hash, currentTX)
+    }
+
+    await this.ensureTokenAddresses()
+    // Generate final events
+    txHashToEventTransactions.forEach((transactions: BlockscoutTransaction[], txhash: string) => {
+      // Exchange events have two corresponding transactions (in and out)
+      if (transactions.length === 2) {
+        let inEvent: BlockscoutTransaction, outEvent: BlockscoutTransaction
+        if (transactions[0].from.toLowerCase() === userAddress) {
+          inEvent = transactions[0]
+          outEvent = transactions[1]
+        } else {
+          inEvent = transactions[1]
+          outEvent = transactions[0]
+        }
+
+        // Find the event related to the queried token
+        const tokenEvent = [inEvent, outEvent].find((event) => event.tokenSymbol === args.token)
+        if (tokenEvent) {
+          const timestamp = new BigNumber(inEvent.timeStamp).toNumber()
+          events.push({
+            type: EventTypes.EXCHANGE,
+            timestamp,
+            block: inEvent.blockNumber,
+            amount: {
+              // Signed amount relative to the account currency
+              amount: new BigNumber(tokenEvent.value)
+                .multipliedBy(tokenEvent === inEvent ? -1 : 1)
+                .dividedBy(WEI_PER_GOLD)
+                .toString(),
+              currencyCode: tokenEvent.tokenSymbol,
+              timestamp,
+            },
+            takerAmount: {
+              amount: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toString(),
+              currencyCode: inEvent.tokenSymbol,
+              timestamp,
+            },
+            makerAmount: {
+              amount: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toString(),
+              currencyCode: outEvent.tokenSymbol,
+              timestamp,
+            },
+            hash: txhash,
+          })
+        }
+
+        // Otherwise, it's a regular token transfer
+      } else {
+        const event = transactions[0]
+        const comment = event.input ? formatCommentString(event.input) : ''
+        const eventToAddress = event.to.toLowerCase()
+        const eventFromAddress = event.from.toLowerCase()
+        const [type, address] = resolveTransferEventType(
+          userAddress,
+          eventToAddress,
+          eventFromAddress,
+          this.getAttestationAddress(),
+          this.getEscrowAddress()
+        )
+        const timestamp = new BigNumber(event.timeStamp).toNumber()
+        events.push({
+          type,
+          timestamp,
+          block: event.blockNumber,
+          amount: {
+            // Signed amount relative to the account currency
+            amount: new BigNumber(event.value)
+              .multipliedBy(eventFromAddress === userAddress ? -1 : 1)
+              .dividedBy(WEI_PER_GOLD)
+              .toString(),
+            currencyCode: event.tokenSymbol,
+            timestamp,
+          },
+          address,
+          comment,
+          hash: txhash,
+        })
+      }
+    })
+
+    console.info(
+      `[Celo] getTransactions address=${args.address} token=${args.token} localCurrencyCode=${args.localCurrencyCode}
+      } rawTransactionCount=${rawTransactions.length} eventCount=${events.length}`
+    )
+    return events
+      .filter((event) => event.amount.currencyCode === args.token)
+      .sort((a, b) => b.timestamp - a.timestamp)
   }
 }
 

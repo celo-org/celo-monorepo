@@ -1,9 +1,10 @@
 import gql from 'graphql-tag'
 import * as React from 'react'
+import { Query } from 'react-apollo'
 import { WithTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import UserTransactionsQuery, { Event, UserTransactionsData } from 'src/apollo/types'
+import { Token, UserTransactionsQuery, UserTransactionsQueryVariables } from 'src/apollo/types'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
@@ -26,44 +27,50 @@ type Props = StateProps &
     key?: string
   }
 
-const HomeExchangeFragment = gql`
-  fragment HomeExchange on Exchange {
-    type
-    hash
-    inValue
-    outValue
-    inSymbol
-    outSymbol
-    timestamp
-  }
-`
+// See https://github.com/microsoft/TypeScript/issues/16069#issuecomment-565658443
+function isPresent<T>(t: T | undefined | null | void): t is T {
+  return t !== undefined && t !== null
+}
 
-const HomeTransferFragment = gql`
-  fragment HomeTransfer on Transfer {
-    type
-    hash
-    value
-    symbol
-    timestamp
-    address
-    comment
-  }
-`
-
-// https://github.com/dotansimha/graphql-code-generator/issues/700
-// https://github.com/dotansimha/graphql-code-generator/issues/695
-export const transactionQuery = gql`
-  query UserTransactions($address: String!) {
-    events(address: $address) {
-      __typename
-      ...HomeExchange
-      ...HomeTransfer
+export const TRANSACTIONS_QUERY = gql`
+  query UserTransactions($address: Address!, $token: Token!, $localCurrencyCode: String) {
+    transactions(address: $address, token: $token, localCurrencyCode: $localCurrencyCode) {
+      edges {
+        node {
+          ...TransactionFeed
+        }
+      }
     }
   }
 
-  ${HomeExchangeFragment}
-  ${HomeTransferFragment}
+  ${TransactionFeed.fragments.transaction}
 `
+
+// export type UserTransactionsComponentProps = Omit<
+//   ApolloReactComponents.QueryComponentOptions<
+//     UserTransactionsQuery,
+//     UserTransactionsQueryVariables
+//   >,
+//   'query'
+// > &
+//   ({ variables: UserTransactionsQueryVariables; skip?: boolean } | { skip: boolean })
+
+class UserTransactionsComponent extends Query<
+  UserTransactionsQuery,
+  UserTransactionsQueryVariables
+> {}
+
+// const UserTransactionsComponent = (props: UserTransactionsComponentProps) => (
+//   <ApolloReactComponents.Query<UserTransactionsQuery, UserTransactionsQueryVariables>
+//     query={UserTransactionsDocument}
+//     {...props}
+//   />
+// )
+
+// export type UserTransactionsQueryResult = ApolloReactCommon.QueryResult<
+//   UserTransactionsQuery,
+//   UserTransactionsQueryVariables
+// >
 
 const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
@@ -71,13 +78,13 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class TransactionsList extends React.PureComponent<Props> {
-  txsFetched = (data: UserTransactionsData | undefined) => {
+  txsFetched = (data: UserTransactionsQuery | undefined) => {
     if (!data || !data.events || data.events.length < 1) {
       return
     }
 
     const events = data.events
-    const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
+    const queryDataTxIDs = new Set(events.map((event) => event?.hash))
     const inQueryTxs = (tx: StandbyTransaction) =>
       tx.hash && queryDataTxIDs.has(tx.hash) && tx.status !== TransactionStatus.Failed
     const filteredStandbyTxs = this.props.standbyTransactions.filter(inQueryTxs)
@@ -91,18 +98,26 @@ export class TransactionsList extends React.PureComponent<Props> {
     const queryAddress = address || ''
 
     return (
-      <UserTransactionsQuery
-        query={transactionQuery}
+      <UserTransactionsComponent
+        query={TRANSACTIONS_QUERY}
         pollInterval={10000}
-        variables={{ address: queryAddress }}
+        variables={{ address: queryAddress, token: Token.CUsd, localCurrencyCode: 'EUR' }}
         onCompleted={this.txsFetched}
       >
         {({ loading, error, data }) => {
+          console.log('==dataquery', data)
+          const transactions =
+            data?.transactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
           return (
-            <TransactionFeed kind={FeedType.HOME} loading={loading} error={error} data={data} />
+            <TransactionFeed
+              kind={FeedType.HOME}
+              loading={loading}
+              error={error}
+              data={transactions}
+            />
           )
         }}
-      </UserTransactionsQuery>
+      </UserTransactionsComponent>
     )
   }
 }

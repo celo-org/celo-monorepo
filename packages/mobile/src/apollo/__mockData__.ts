@@ -2,16 +2,16 @@ import {
   EventTypeNames,
   HomeExchangeFragment,
   HomeTransferFragment,
+  TransactionType,
   UserTransactionsData,
 } from 'src/apollo/types'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
-import { TransactionTypes } from 'src/transactions/reducer'
 
 export const invitedAddress = '0x1b173'
 
 const exchangeDollar: HomeExchangeFragment = {
   __typename: EventTypeNames.Exchange,
-  type: 'EXCHANGE' as TransactionTypes,
+  type: 'EXCHANGE' as TransactionType,
   hash: '1',
   inValue: 19080,
   timestamp: Date.now(),
@@ -22,7 +22,7 @@ const exchangeDollar: HomeExchangeFragment = {
 
 const exchangeGold: HomeExchangeFragment = {
   __typename: EventTypeNames.Exchange,
-  type: 'EXCHANGE' as TransactionTypes,
+  type: 'EXCHANGE' as TransactionType,
   hash: '1',
   inValue: 190,
   timestamp: Date.now(),
@@ -33,7 +33,7 @@ const exchangeGold: HomeExchangeFragment = {
 
 const sent: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'SENT' as TransactionTypes,
+  type: 'SENT' as TransactionType,
   value: 987161,
   symbol: 'Celo Gold',
   timestamp: Date.now(),
@@ -44,7 +44,7 @@ const sent: HomeTransferFragment = {
 
 const sentInvite: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'SENT' as TransactionTypes,
+  type: 'SENT' as TransactionType,
   value: 0.33,
   symbol: 'Celo Dollar',
   timestamp: Date.now(),
@@ -55,7 +55,7 @@ const sentInvite: HomeTransferFragment = {
 
 const recieved: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'RECEIVED' as TransactionTypes,
+  type: 'RECEIVED' as TransactionType,
   value: 587161,
   symbol: 'Celo Gold',
   timestamp: Date.now(),
@@ -65,7 +65,7 @@ const recieved: HomeTransferFragment = {
 }
 const faucet: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'FAUCET' as TransactionTypes,
+  type: 'FAUCET' as TransactionType,
   value: 387161,
   symbol: 'Celo Dollar',
   timestamp: Date.now(),
@@ -75,7 +75,7 @@ const faucet: HomeTransferFragment = {
 }
 const verificationFee: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'VERIFICATION_FEE' as TransactionTypes,
+  type: 'VERIFICATION_FEE' as TransactionType,
   value: 0.3,
   symbol: 'Celo Gold',
   timestamp: Date.now(),
@@ -85,7 +85,7 @@ const verificationFee: HomeTransferFragment = {
 }
 const verificationReward: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'VERIFICATION_REWARD' as TransactionTypes,
+  type: 'VERIFICATION_REWARD' as TransactionType,
   value: 9371,
   symbol: 'Celo Dollar',
   timestamp: Date.now(),

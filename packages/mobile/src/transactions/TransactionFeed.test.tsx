@@ -3,9 +3,9 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { EventTypeNames, HomeExchangeFragment } from 'src/apollo/types'
+import { EventTypeNames, HomeExchangeFragment, TransactionType } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { StandbyTransaction, TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, {
   FeedType,
   TransactionFeed as TransactionFeedClass,
@@ -17,7 +17,7 @@ jest.mock('src/utils/time.ts')
 const standbyTransactions: StandbyTransaction[] = [
   {
     id: '0110',
-    type: TransactionTypes.SENT,
+    type: TransactionType.Sent,
     comment: 'Eye for an Eye',
     status: TransactionStatus.Pending,
     value: '100',
@@ -27,7 +27,7 @@ const standbyTransactions: StandbyTransaction[] = [
   },
   {
     id: '0112',
-    type: TransactionTypes.EXCHANGE,
+    type: TransactionType.Exchange,
     status: TransactionStatus.Pending,
     inSymbol: CURRENCY_ENUM.DOLLAR,
     inValue: '20',
@@ -37,7 +37,7 @@ const standbyTransactions: StandbyTransaction[] = [
   },
   {
     id: '0113',
-    type: TransactionTypes.NETWORK_FEE,
+    type: TransactionType.NetworkFee,
     comment: '',
     status: TransactionStatus.Pending,
     value: '0.0001',
@@ -49,7 +49,7 @@ const standbyTransactions: StandbyTransaction[] = [
 
 const failedExchange: StandbyTransaction[] = [
   {
-    type: TransactionTypes.EXCHANGE,
+    type: TransactionType.Exchange,
     status: TransactionStatus.Failed,
     inSymbol: CURRENCY_ENUM.DOLLAR,
     inValue: '20',
@@ -63,7 +63,7 @@ const failedExchange: StandbyTransaction[] = [
 const exchangeEvents: HomeExchangeFragment[] = [
   {
     __typename: EventTypeNames.Exchange,
-    type: TransactionTypes.EXCHANGE,
+    type: TransactionType.Exchange,
     inValue: 30,
     outValue: 200,
     outSymbol: CURRENCY_ENUM.GOLD,
