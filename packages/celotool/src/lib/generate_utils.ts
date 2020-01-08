@@ -1,5 +1,4 @@
 // @ts-ignore
-import { config } from '@celo/protocol/migrationsConfig'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
@@ -32,6 +31,7 @@ export enum AccountType {
   PRICE_ORACLE = 6,
   PROXY = 7,
   ATTESTATION_BOT = 8,
+  VOTING_BOT = 9,
 }
 
 export enum ConsensusType {
@@ -59,6 +59,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'price_oracle',
   'proxy',
   'attestation_bot',
+  'voting_bot',
 ]
 
 export const add0x = (str: string) => {
@@ -212,6 +213,17 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
       })
     }
   }
+
+  // Allocate voting bot account(s)
+  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
+  initialAccounts.concat(
+    getStrippedAddressesFor(AccountType.VOTING_BOT, mnemonic, numVotingBotAccounts).map((addr) => {
+      return {
+        address: addr,
+        balance: fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '100000000000000000000'),
+      }
+    })
+  )
 
   return generateGenesis({
     validators,
