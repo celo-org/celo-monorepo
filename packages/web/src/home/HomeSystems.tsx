@@ -2,6 +2,7 @@ import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import analytics from 'src/analytics/analytics'
 import { H2 } from 'src/fonts/Fonts'
 import Cyclone from 'src/home/Cyclone'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -12,7 +13,6 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import analytics from '../analytics/analytics'
 const builtOn = require('src/home/version3/builtOn.png')
 const groupVerify = require('src/home/version3/groupVerify.png')
 const mobileFirst = require('src/home/version3/mobileFirst.png')

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
+import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import AudioIcon from 'src/about/AudioIcon'
 import Backers from 'src/about/Backers'
 import { sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
@@ -20,6 +21,11 @@ import { fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
   randomSeed: number
+}
+
+async function pronunceCelo() {
+  const audio = document.getElementById('pronunce') as HTMLAudioElement
+  await audio.play()
 }
 
 export class About extends React.Component<Props & I18nProps> {
@@ -55,17 +61,22 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('MeaningTile')} endBlock={true}>
             <H1 style={standardStyles.elementalMarginBottom}>
               <Trans
-                ns={NameSpaces.brand}
-                t={
-                  t // @ts-ignore
-                }
+                ns={NameSpaces.about}
+                t={t}
                 i18nKey={'MeaningText'}
                 values={{ phonetic: '/ˈtselo/' }}
-                children={
+                children={[
                   <Text key={1} style={textStyles.italic}>
                     "/ˈtselo/"
-                  </Text>
-                }
+                  </Text>,
+                  <TouchableOpacity key={2} onPress={pronunceCelo}>
+                    <AudioIcon />
+                    <audio id="pronunce">
+                      <source src="audio/celo-pronunce.ogg" type="audio/ogg" />
+                      <source src="audio/celo-pronunce.mp3" type="audio/mp3" />
+                    </audio>
+                  </TouchableOpacity>,
+                ]}
               />
             </H1>
             <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('MeaningCopy')}</Text>
@@ -74,7 +85,7 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('ValuesTitle')}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               <Trans
-                ns={NameSpaces.brand}
+                ns={NameSpaces.about}
                 i18nKey={'ValuesCopy'}
                 values={{ celoCLabs: 'Celo\u00a0– C\u00a0Labs' }}
                 children={<Strong key="0">M</Strong>}
@@ -86,7 +97,7 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('SacredEconTitle')} startBlock={true}>
             <Text style={[fonts.p, standardStyles.blockMarginBottomTablet]}>
               <Trans
-                ns={NameSpaces.brand}
+                ns={NameSpaces.about}
                 i18nKey="SacredEconText"
                 children={
                   <InlineAnchor key="sacred" href="http://sacred-economics.com/film/">
