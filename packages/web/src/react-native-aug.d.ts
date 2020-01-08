@@ -22,7 +22,7 @@ declare module 'react-native' {
     animationTimingFunction?: string
     scrollPadding?: number
     cursor?: string
-    display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item' | 'block'
+    display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item' | 'block' | 'grid'
     fill?: string
     filter?: string
     mixBlendMode?: 'multiply' | 'screen'
