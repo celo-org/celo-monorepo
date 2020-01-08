@@ -113,6 +113,7 @@ const validatorBalance = fetchEnvOrFallback(
 ) // 10,011 CG
 const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
 const oracleBalance = fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
+const votingBotBalance = fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '10000000000000000000000') // 10,000 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -176,7 +177,15 @@ export const getFaucetedAccounts = (mnemonic: string) => {
     oracleBalance
   )
 
-  return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts]
+  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
+  const votingBotAccounts = getFaucetedAccountsFor(
+    AccountType.VOTING_BOT,
+    mnemonic,
+    numVotingBotAccounts,
+    votingBotBalance
+  )
+
+  return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts, ...votingBotAccounts]
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
@@ -213,17 +222,6 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
       })
     }
   }
-
-  // Allocate voting bot account(s)
-  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
-  initialAccounts.concat(
-    getStrippedAddressesFor(AccountType.VOTING_BOT, mnemonic, numVotingBotAccounts).map((addr) => {
-      return {
-        address: addr,
-        balance: fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '100000000000000000000'),
-      }
-    })
-  )
 
   return generateGenesis({
     validators,
