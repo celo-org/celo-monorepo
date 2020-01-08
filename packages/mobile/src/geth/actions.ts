@@ -3,6 +3,7 @@ import { InitializationState } from 'src/geth/reducer'
 export enum Actions {
   SET_INIT_STATE = 'GETH/SET_INIT_STATE',
   SET_GETH_CONNECTED = 'GETH/SET_GETH_CONNECTED',
+  CANCEL_GETH_SAGA = 'GETH/CANCEL_GETH_SAGA',
 }
 
 interface SetInitState {

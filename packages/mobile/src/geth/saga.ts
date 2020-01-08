@@ -1,6 +1,18 @@
 import { AppState, NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
-import { call, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  cancel,
+  cancelled,
+  delay,
+  fork,
+  put,
+  race,
+  select,
+  take,
+  takeLatest,
+} from 'redux-saga/effects'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
@@ -203,8 +215,11 @@ function* monitorAppState() {
   }
 }
 
+function* cancelSaga(task: any) {
+  yield cancel(task)
+}
+
 export function* gethSaga() {
-  yield call(initGethSaga)
-  yield fork(monitorAppState)
-  yield fork(monitorGeth)
+  const gethRelated = yield all([call(initGethSaga), fork(monitorAppState), fork(monitorGeth)])
+  yield takeLatest(Actions.CANCEL_GETH_SAGA, cancelSaga, gethRelated)
 }

@@ -117,6 +117,7 @@ export function* waitForWeb3Sync() {
     if (timeout || !syncComplete) {
       Logger.error(TAG, 'Could not complete sync')
       navigateToError('web3FailedToSync')
+      // TODO(anna) prompt switch to forno
       return false
     }
 
@@ -124,6 +125,7 @@ export function* waitForWeb3Sync() {
   } catch (error) {
     Logger.error(TAG, 'checkWeb3Sync', error)
     navigateToError('errorDuringSync')
+    // TODO(anna) prompt switch to forno
     return false
   }
 }
