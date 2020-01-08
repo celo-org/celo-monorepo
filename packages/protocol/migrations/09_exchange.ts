@@ -39,6 +39,8 @@ module.exports = deploymentForCoreContract<ExchangeInstance>(
       artifacts
     )
     await reserve.addSpender(exchange.address)
-    await exchange.freeze()
+    if (config.epochRewards.frozen) {
+      await exchange.freeze()
+    }
   }
 )

@@ -27,6 +27,8 @@ module.exports = deploymentForCoreContract<EpochRewardsInstance>(
   CeloContractName.EpochRewards,
   initializeArgs,
   async (epochRewards: EpochRewardsInstance) => {
-    await epochRewards.freeze()
+    if (config.epochRewards.frozen) {
+      await epochRewards.freeze()
+    }
   }
 )
