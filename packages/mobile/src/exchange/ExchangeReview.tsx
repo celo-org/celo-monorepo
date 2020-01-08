@@ -274,8 +274,9 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    { exchangeTokens, fetchExchangeRate, fetchTobinTax }
-  )(withNamespaces(Namespaces.exchangeFlow9)(ExchangeReview))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    exchangeTokens,
+    fetchExchangeRate,
+    fetchTobinTax,
+  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))
 )
