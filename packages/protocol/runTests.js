@@ -17,12 +17,12 @@ async function startGanache() {
     network_id: network.network_id,
     mnemonic: network.mnemonic,
     gasPrice: network.gasPrice,
-    gasLimit: 10000000,
+    gasLimit: network.gas,
     allowUnlimitedContractSize: true,
   })
 
   await new Promise((resolve, reject) => {
-    server.listen(8545, (err, blockchain) => {
+    server.listen(network.port, (err, blockchain) => {
       if (err) {
         reject(err)
       } else {

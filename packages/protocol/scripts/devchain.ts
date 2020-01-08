@@ -5,9 +5,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as yargs from 'yargs'
 
-const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
-
-const gasLimit = 10000000
+const network = require('../truffle-config.js').networks.development
 
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
 
@@ -70,19 +68,19 @@ async function startGanache(datadir: string, opts: { verbose?: boolean }) {
       }
 
   const server = ganache.server({
-    default_balance_ether: 200000000,
+    default_balance_ether: network.defaultBalance,
     logger: {
       log: logFn,
     },
-    network_id: 1101,
+    network_id: network.network_id,
     db_path: datadir,
-    mnemonic: MNEMONIC,
-    gasLimit,
+    mnemonic: network.mnemonic,
+    gasLimit: network.gas,
     allowUnlimitedContractSize: true,
   })
 
   await new Promise((resolve, reject) => {
-    server.listen(8545, (err, blockchain) => {
+    server.listen(network.port, (err, blockchain) => {
       if (err) {
         reject(err)
       } else {
