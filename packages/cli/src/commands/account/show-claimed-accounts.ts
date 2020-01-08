@@ -4,7 +4,7 @@ import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
-import { ensureHexLeader } from '@celo/utils/lib/address'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { notEmpty } from '@celo/utils/lib/collections'
 
 import { BaseCommand } from '../../base'
@@ -30,7 +30,7 @@ async function getClaims(
 ): Promise<string[]> {
   const accounts = await kit.contracts.getAccounts()
   const getClaim = async (claim: AccountClaim) => {
-    const error = await verifyAccountClaim(claim, ensureHexLeader(address), accounts.getMetadataURL)
+    const error = await verifyAccountClaim(claim, ensureLeading0x(address), accounts.getMetadataURL)
     return error ? null : claim.address.toLowerCase()
   }
   const res = (await Promise.all(data.filterClaims(ClaimTypes.ACCOUNT).map(getClaim))).filter(
@@ -58,21 +58,13 @@ export default class ShowClaimedAccounts extends BaseCommand {
 
     const claimedAccounts = await getClaims(this.kit, args.address, metadata)
 
-    const goldToken = await this.kit.contracts.getGoldToken()
-    const stableToken = await this.kit.contracts.getStableToken()
-
     console.log('All balances expressed in units of 10^-18.')
     let sum = new BigNumber(0)
     for (const address of claimedAccounts) {
       console.log('\nShowing balances for', address)
-      const totalBalance = await this.kit.getTotalBalance(address)
-      const balances = {
-        goldBalance: await goldToken.balanceOf(address),
-        dollarBalance: await stableToken.balanceOf(address),
-        totalBalance,
-      }
-      sum = sum.plus(totalBalance)
-      printValueMap(balances)
+      const balance = await this.kit.getTotalBalance(address)
+      sum = sum.plus(balance.total)
+      printValueMap(balance)
     }
 
     console.log('\nSum of total balances:', sum.toString(10))

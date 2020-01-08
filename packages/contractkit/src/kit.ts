@@ -56,6 +56,13 @@ export interface KitOptions {
   from?: Address
 }
 
+interface AccountBalance {
+  gold: BigNumber
+  usd: BigNumber
+  total: BigNumber
+  lockedGold: BigNumber
+}
+
 export class ContractKit {
   /** core contract's address registry */
   readonly registry: AddressRegistry
@@ -76,16 +83,20 @@ export class ContractKit {
     this.contracts = new WrapperCache(this)
   }
 
-  async getTotalBalance(address: string): Promise<BigNumber> {
+  async getTotalBalance(address: string): Promise<AccountBalance> {
     const goldToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
     const lockedGold = await this.contracts.getLockedGold()
-    const oracle = await this.contracts.getSortedOracles()
+    const exchange = await this.contracts.getExchange()
     const goldBalance = await goldToken.balanceOf(address)
     const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
-    const rate = await oracle.medianRate(CeloContract.StableToken)
-    return goldBalance.plus(lockedBalance).plus(dollarBalance.multipliedBy(rate.rate))
+    return {
+      gold: goldBalance,
+      lockedGold: lockedBalance,
+      usd: dollarBalance,
+      total: goldBalance.plus(lockedBalance).plus(await exchange.quoteUsdSell(dollarBalance)),
+    }
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
