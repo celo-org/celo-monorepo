@@ -48,11 +48,14 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   address public revoker;
   address public refundDestination;
 
+  // amount owned by the beneficiary at revoke time
+  uint256 public beneficiaryWithdrawableAtRevoke;
+
   // a public struct hosting the vesting scheme params
   VestingSchedule public vestingSchedule;
 
   event WithdrawalPaused(uint256 pausePeriod, uint256 pauseTimestamp);
-  event VestingRevoked(uint256 revokeTimestamp);
+  event VestingRevoked(uint256 revokeTimestamp, uint256 beneficiaryWithdrawableAtRevoke);
 
   modifier onlyRevoker() {
     require(msg.sender == revoker, "sender must be the vesting revoker");
@@ -61,6 +64,27 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
 
   modifier onlyBeneficiary() {
     require(msg.sender == beneficiary, "sender must be the vesting beneficiary");
+    _;
+  }
+
+  modifier onlyRevoked() {
+    require(revoked, "vesting instance must have already been revoked");
+    _;
+  }
+
+  modifier onlyRevokerAndRevoked() {
+    require(
+      msg.sender == revoker && revoked,
+      "sender must be the revoker and state must be revoked"
+    );
+    _;
+  }
+
+  modifier onlyWhenInProperState() {
+    require(
+      (msg.sender == revoker && revoked) || (msg.sender == beneficiary && !revoked),
+      "either revoker in revoked state or beneficiary in unrevoked"
+    );
     _;
   }
 
@@ -121,36 +145,72 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice Transfers available released tokens from the vesting back to beneficiary.
+   * @notice Transfers gold from the vesting back to beneficiary.
+   * @param amount the requested gold amount
    */
-  function withdraw() external nonReentrant onlyBeneficiary {
+  function withdraw(uint256 amount) external nonReentrant onlyBeneficiary {
     bool isPaused = block.timestamp < pauseEndTime;
     require(!isPaused, "Withdrawals only allowed in the unpaused state");
-    uint256 withdrawableAmount = getWithdrawableAmountAtTimestamp(block.timestamp);
-    require(withdrawableAmount > 0, "No gold is due for withdrawal");
-    currentlyWithdrawn = currentlyWithdrawn.add(withdrawableAmount);
-    require(getGoldToken().transfer(beneficiary, withdrawableAmount), "Withdrawal of gold failed");
+
+    if (!revoked) {
+      uint256 withdrawableAmount = getWithdrawableAmount();
+      require(withdrawableAmount > 0, "No gold is due for withdrawal");
+      require(
+        withdrawableAmount >= amount,
+        "Required withdraw amount is above the allowed withdrawal limit"
+      );
+      currentlyWithdrawn = currentlyWithdrawn.add(withdrawableAmount);
+      require(
+        getGoldToken().transfer(beneficiary, withdrawableAmount),
+        "Withdrawal of gold failed"
+      );
+      if (getVestingInstanceTotalBalance().sub(currentlyWithdrawn) == 0) {
+        selfdestruct(beneficiary);
+      }
+    } else {
+      // e.g revoked
+      require(
+        getVestingInstanceAvailableBalance() >= beneficiaryWithdrawableAtRevoke,
+        "Insufficient contract balance to withdraw in the revoked state"
+      );
+      require(
+        beneficiaryWithdrawableAtRevoke >= amount,
+        "Required withdraw amount is above the allowed limit"
+      );
+      require(getGoldToken().transfer(beneficiary, amount), "Withdrawal of gold failed");
+    }
   }
 
   /**
-   * @notice Allows only the revoker to revoke the vesting. Gold already vested
-   * remains in the contract, the rest is returned to the _refundDestination.
-   * @param revokeTimestamp the revocation timestamp
-   * @dev If revokeTimestamp is less than the current block timestamp, it is set equal to the latter
+   * @notice Refund revoker and beneficiary after the vesting has been revoked.
    */
-  function revoke(uint256 revokeTimestamp) external nonReentrant onlyRevoker {
+  function refundAndFinalize() external nonReentrant onlyRevokerAndRevoked {
+    require(getVestingInstanceLockedBalance() == 0, "Some of the vested gold is still locked");
+    require(
+      getVestingInstanceAvailableBalance() >= beneficiaryWithdrawableAtRevoke,
+      "Insufficient contract balance to refund beneficiary"
+    );
+    require(
+      getGoldToken().transfer(beneficiary, beneficiaryWithdrawableAtRevoke),
+      "Refund of gold to beneficiary failed"
+    );
+    uint256 revokerRefund = getVestingInstanceAvailableBalance().sub(
+      beneficiaryWithdrawableAtRevoke
+    );
+    require(getGoldToken().transfer(revoker, revokerRefund), "Refund of gold to revoker failed");
+    selfdestruct(beneficiary);
+  }
+
+  /**
+   * @notice Revoke the vesting scheme
+   */
+  function revoke() external nonReentrant onlyRevoker {
     require(revocable, "Revoking is not allowed");
     require(!revoked, "Vesting already revoked");
-    revokeTime = revokeTimestamp > block.timestamp ? revokeTimestamp : block.timestamp;
-    uint256 balance = getVestingInstanceTotalBalance();
-    uint256 withdrawableAmount = getWithdrawableAmountAtTimestamp(revokeTime);
-    uint256 refundAmount = balance.sub(withdrawableAmount);
+    revokeTime = block.timestamp;
     revoked = true;
-    require(
-      getGoldToken().transfer(refundDestination, refundAmount),
-      "Transfer of refund upon revokation failed"
-    );
-    emit VestingRevoked(revokeTime);
+    beneficiaryWithdrawableAtRevoke = getWithdrawableAmount();
+    emit VestingRevoked(revokeTime, beneficiaryWithdrawableAtRevoke);
   }
 
   /**
@@ -171,48 +231,63 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @dev Calculates the amount that has already vested but hasn't been withdrawn yet.
-   * @param timestamp the timestamp at which to calculate the withdrawable amount
-   * @return The withdrawable amount at the timestamp
-   * @dev Function is also made public in order to be called for informational purpose
-   */
-  function getWithdrawableAmountAtTimestamp(uint256 timestamp) public view returns (uint256) {
-    return calculateVestedAmountAtTimestamp(timestamp).sub(currentlyWithdrawn);
-  }
-
-  /**
-   * @notice Calculates both non-locked and locked gold balance parts and returns their sum as the total balance of the vesting instance
+   * @notice Calculates non-locked, locked and available gold balance parts and returns their sum as the total balance of the vesting instance
    * @return The total vesting instance balance
    */
-  function getVestingInstanceTotalBalance() public view returns (uint256) {
-    uint256 nonLockedBalance = getGoldToken().balanceOf(address(this));
-    uint256 lockedBalance = getLockedGold().getAccountTotalLockedGold(address(this));
-    return nonLockedBalance.add(lockedBalance);
+  function getVestingInstanceTotalBalance() private view returns (uint256) {
+    return
+      getVestingInstanceAvailableBalance().add(getVestingInstanceLockedBalance()).add(
+        currentlyWithdrawn
+      );
   }
 
   /**
-   * @dev Calculates the amount that has already vested.
-   * @param timestamp the timestamp at which to calculate the already vested amount
+   * @notice Calculates available gold balance in the vesting instance
+   * @return The available vesting instance balance
    */
-  function calculateVestedAmountAtTimestamp(uint256 timestamp) private view returns (uint256) {
-    if (timestamp < vestingSchedule.vestingCliffStartTime) {
+  function getVestingInstanceAvailableBalance() private view returns (uint256) {
+    return address(this).balance;
+  }
+
+  /**
+   * @notice Calculates locked gold balance in the vesting instance
+   * @return The locked vesting instance balance
+   */
+  function getVestingInstanceLockedBalance() private view returns (uint256) {
+    return getLockedGold().getAccountTotalLockedGold(address(this));
+  }
+
+  /**
+   * @dev Calculates the amount that has already vested up to now and is available for withdraw.
+   * @return The withdrawable amount up to the point of call
+   * @dev Function is also made public in order to be called for informational purpose
+   */
+  function getWithdrawableAmount() private view returns (uint256) {
+    return calculateVestedAmount().sub(currentlyWithdrawn).sub(getVestingInstanceLockedBalance());
+  }
+
+  /**
+   * @dev Calculates the amount that has already vested up to now.
+   * @return The already vested amount up to the point of call
+   */
+  function calculateVestedAmount() private view returns (uint256) {
+    if (block.timestamp < vestingSchedule.vestingCliffStartTime) {
       return 0;
     }
-    uint256 currentBalance = getVestingInstanceTotalBalance();
-    uint256 totalBalance = currentBalance.add(currentlyWithdrawn);
+    uint256 totalBalance = getVestingInstanceTotalBalance();
     uint256 vestingPeriods = uint256(
       vestingSchedule.vestingAmount.div(vestingSchedule.vestAmountPerPeriod)
     );
 
     if (
-      timestamp >=
+      block.timestamp >=
       vestingSchedule.vestingStartTime.add(vestingPeriods.mul(vestingSchedule.vestingPeriodSec)) ||
       revoked
     ) {
       return totalBalance;
     }
 
-    uint256 timeSinceStart = timestamp.sub(vestingSchedule.vestingStartTime);
+    uint256 timeSinceStart = block.timestamp.sub(vestingSchedule.vestingStartTime);
     uint256 periodsSinceStart = uint256(timeSinceStart.div(vestingSchedule.vestingPeriodSec));
     return totalBalance.mul(periodsSinceStart).div(vestingPeriods);
   }
@@ -222,11 +297,11 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param value the value of gold to be locked
    * @dev To be called only by the beneficiary of the vesting
    */
-  function lockGold(uint256 value) external nonReentrant onlyBeneficiary {
+  function lockGold(uint256 value) external nonReentrant onlyWhenInProperState {
     // the beneficiary may not lock more than the vesting currently has available
     require(
       value <= address(this).balance,
-      "Gold amount to lock is greater than the currently vested amount"
+      "Gold amount to lock is greater than the currently available gold"
     );
     getLockedGold().lock.gas(gasleft()).value(value)();
   }
@@ -236,7 +311,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param value the value of gold to be unlocked for the vesting instance
    * @dev To be called only by the beneficiary of the vesting
    */
-  function unlockGold(uint256 value) external nonReentrant onlyBeneficiary {
+  function unlockGold(uint256 value) external nonReentrant onlyWhenInProperState {
     getLockedGold().unlock(value);
   }
 
@@ -246,7 +321,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param value the value of gold to be relocked for the vesting instance
    * @dev To be called only by the beneficiary of the vesting.
    */
-  function relockGold(uint256 index, uint256 value) external nonReentrant onlyBeneficiary {
+  function relockGold(uint256 index, uint256 value) external nonReentrant onlyWhenInProperState {
     getLockedGold().relock(index, value);
   }
 
@@ -255,7 +330,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param index the index of the pending locked gold withdrawal
    * @dev To be called only by the beneficiary of the vesting. The amount shall be withdrawn back to the vesting instance
    */
-  function withdrawLockedGold(uint256 index) external nonReentrant onlyBeneficiary {
+  function withdrawLockedGold(uint256 index) external nonReentrant onlyWhenInProperState {
     getLockedGold().withdraw(index);
   }
 
@@ -270,7 +345,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
-    onlyBeneficiary
+    onlyWhenInProperState
   {
     getAccounts().authorizeVoteSigner(signer, v, r, s);
   }
@@ -284,7 +359,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    */
   function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
     external
-    onlyBeneficiary
+    onlyWhenInProperState
   {
     getAccounts().setAccount(name, dataEncryptionKey, walletAddress);
   }
@@ -293,7 +368,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @notice A wrapper setter function for creating an account
    * @dev To be called only by the beneficiary of the vesting.
    */
-  function createAccount() external onlyBeneficiary {
+  function createAccount() external onlyWhenInProperState {
     require(getAccounts().createAccount(), "Account creation failed");
   }
 
@@ -302,7 +377,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param name A string to set as the name of the account
    * @dev To be called only by the beneficiary of the vesting.
    */
-  function setAccountName(string calldata name) external onlyBeneficiary {
+  function setAccountName(string calldata name) external onlyWhenInProperState {
     getAccounts().setName(name);
   }
 
@@ -311,7 +386,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param walletAddress The wallet address to set for the account
    * @dev To be called only by the beneficiary of the vesting.
    */
-  function setAccountWalletAddress(address walletAddress) external onlyBeneficiary {
+  function setAccountWalletAddress(address walletAddress) external onlyWhenInProperState {
     getAccounts().setWalletAddress(walletAddress);
   }
 
@@ -320,7 +395,10 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @dev To be called only by the beneficiary of the vesting.
    */
-  function setAccountDataEncryptionKey(bytes calldata dataEncryptionKey) external onlyBeneficiary {
+  function setAccountDataEncryptionKey(bytes calldata dataEncryptionKey)
+    external
+    onlyWhenInProperState
+  {
     getAccounts().setAccountDataEncryptionKey(dataEncryptionKey);
   }
 
@@ -329,7 +407,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param metadataURL The URL to access the metadata.
    * @dev To be called only by the beneficiary of the vesting.
    */
-  function setAccountMetadataURL(string calldata metadataURL) external onlyBeneficiary {
+  function setAccountMetadataURL(string calldata metadataURL) external onlyWhenInProperState {
     getAccounts().setMetadataURL(metadataURL);
   }
 }
