@@ -19,12 +19,12 @@ export class Backers extends React.Component<I18nProps & ScreenProps> {
           <Text style={fonts.p}>{t('celoBackersText')}</Text>
         </BookLayout>
         <GridRow
-          allStyle={standardStyles.elementalMarginTop}
+          allStyle={standardStyles.blockMarginTopTablet}
           desktopStyle={[styles.backerContainer, standardStyles.sectionMarginBottom]}
           tabletStyle={[styles.backerContainer, standardStyles.sectionMarginBottomTablet]}
           mobileStyle={standardStyles.sectionMarginBottomMobile}
         >
-          <Cell span={Spans.three4th} tabletSpan={Spans.full}>
+          <Cell span={Spans.full} tabletSpan={Spans.full}>
             <View
               style={[styles.photoList, screen === ScreenSizes.DESKTOP && styles.photoListDesktop]}
             >

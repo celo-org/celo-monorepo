@@ -3,7 +3,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import UserTransactionsQuery, { Event, UserTransactionsData } from 'src/apollo/types'
+import UserTransactionsQuery, { Transaction, UserTransactionsData } from 'src/apollo/types'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
@@ -77,7 +77,7 @@ export class TransactionsList extends React.PureComponent<Props> {
     }
 
     const events = data.events
-    const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
+    const queryDataTxIDs = new Set(events.map((event: Transaction) => event.hash))
     const inQueryTxs = (tx: StandbyTransaction) =>
       tx.hash && queryDataTxIDs.has(tx.hash) && tx.status !== TransactionStatus.Failed
     const filteredStandbyTxs = this.props.standbyTransactions.filter(inQueryTxs)

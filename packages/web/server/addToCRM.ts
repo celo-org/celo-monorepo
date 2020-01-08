@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch'
 import getConfig from 'next/config'
-import Sentry from '../fullstack/sentry'
+import Sentry from '../server/sentry'
 interface ActiveCampaignNewContact {
   email: string
   firstName: string
