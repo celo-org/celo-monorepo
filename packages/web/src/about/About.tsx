@@ -24,7 +24,7 @@ interface Props {
 }
 
 async function pronunceCelo() {
-  const audio = document.getElementById('pronunce')
+  const audio = document.getElementById('pronunce') as HTMLAudioElement
   await audio.play()
 }
 
@@ -62,9 +62,7 @@ export class About extends React.Component<Props & I18nProps> {
             <H1 style={standardStyles.elementalMarginBottom}>
               <Trans
                 ns={NameSpaces.about}
-                t={
-                  t // @ts-ignore
-                }
+                t={t}
                 i18nKey={'MeaningText'}
                 values={{ phonetic: '/ˈtselo/' }}
                 children={[
