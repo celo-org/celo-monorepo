@@ -42,7 +42,7 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 mkdir -p $DATA_DIR/account
 echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
-echo -n '${static_nodes_base64}' | base64 -d > $DATA_DIR/static-nodes.json
+echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 
@@ -73,6 +73,7 @@ ExecStart=/usr/bin/docker run \\
   --entrypoint /bin/sh \\
   $GETH_NODE_DOCKER_IMAGE -c "\\
     geth \\
+      --bootnodes $(cat $DATA_DIR/bootnodes) \\
       --lightserv 90 \\
       --lightpeers 1000 \\
       --maxpeers 1100 \\

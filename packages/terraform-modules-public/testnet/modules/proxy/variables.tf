@@ -89,9 +89,9 @@ variable validator_account_addresses {
   description = "Array with the Validator etherbase account addresses"
 }
 
-variable static_nodes_base64 {
+variable bootnodes_base64 {
   type        = string
-  description = "Content of the static_nodes.json file encoded in base64"
+  description = "Bootnodes ethereum address encoded as base64"
 }
 
 variable reset_geth_data {

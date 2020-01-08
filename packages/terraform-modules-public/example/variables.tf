@@ -130,17 +130,6 @@ variable proxy_name {
   default     = "myvalidator-proxy"
 }
 
-# Attestation variables
-variable attestation_service_db {
-  description = "Configuration for the Postgres Cloud SQL DB"
-  type        = map(string)
-
-  default = {
-    username = "celo"
-    password = "mysecret"
-  }
-}
-
 variable reset_geth_data {	
   type        = bool	
   description = "Specifies if the existing chain data should be removed while creating the instance"	
@@ -154,6 +143,16 @@ variable geth_verbosity {
 }	
 
 # Attestation variables
+variable attestation_service_db {
+  description = "Configuration for the Postgres Cloud SQL DB"
+  type        = map(string)
+
+  default = {
+    username = "celo"
+    password = "mysecret"
+  }
+}
+
 variable attestation_service_docker_image {
   description = "The attestation_service docker image"
   type        = map(string)
@@ -206,7 +205,7 @@ variable geth_exporter_docker_image {
   type        = map(string)
 
   default = {
-    repository = "jcortejoso/ge"
-    tag        = "test"
+    repository = "us.gcr.io/celo-testnet/geth-exporter"
+    tag        = "ed7d21bd50592709173368cd697ef73c1774a261"
   }
 }

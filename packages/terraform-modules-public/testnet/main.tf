@@ -26,11 +26,11 @@ data "http" "genesis" {
   }
 }
 
-data "http" "static-nodes" {
-  url = "https://storage.googleapis.com/static_nodes/${var.celo_env}"
+data "http" "bootnodes" {
+  url = "https://storage.googleapis.com/env_bootnodes/${var.celo_env}"
 
   request_headers = {
-    "Accept" = "application/json"
+    "Accept" = "text/plain"
   }
 }
 
@@ -76,7 +76,7 @@ resource "google_compute_firewall" "geth_firewall" {
 }
 
 resource "google_compute_firewall" "geth_firewall_validator" {
-  name    = "${var.celo_env}-geth-firewall"
+  name    = "${var.celo_env}-geth-firewall-validator"
   network = var.network_name
 
   target_tags = concat(local.firewall_target_tags_validator)
@@ -157,7 +157,7 @@ module "tx_node" {
   network_id                            = var.network_id
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
-  static_nodes_base64                   = base64encode(data.http.static-nodes.body)
+  bootnodes_base64                      = base64encode(data.http.bootnodes.body)
 }
 
 module "proxy" {
@@ -184,9 +184,7 @@ module "proxy" {
   proxy_name                  = var.proxy_name
   proxy_private_keys          = var.proxy_private_keys
   validator_account_addresses = var.validator_account_addresses
-  validator_account_passwords = var.validator_account_passwords
-  validator_private_keys      = var.validator_private_keys
-  static_nodes_base64         = base64encode(data.http.static-nodes.body)
+  bootnodes_base64            = base64encode(data.http.bootnodes.body)
 }
 
 module "validator" {
@@ -212,6 +210,8 @@ module "validator" {
 
   validator_name              = var.validator_name
   validator_account_addresses = var.validator_account_addresses
+  validator_account_passwords = var.validator_account_passwords
+  validator_private_keys      = var.validator_private_keys
   proxy_enodes                = var.proxy_enodes
   proxy_internal_ips          = module.proxy.internal_ip_addresses
   proxy_external_ips          = module.proxy.external_ip_addresses

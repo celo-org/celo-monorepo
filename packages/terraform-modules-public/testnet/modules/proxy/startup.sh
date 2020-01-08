@@ -68,7 +68,7 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 # Load configuration to files
 echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
-echo -n '${static_nodes_base64}' | base64 -d > $DATA_DIR/static-nodes.json
+echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${proxy_private_key}' > $DATA_DIR/pkey
@@ -101,6 +101,7 @@ ExecStart=/usr/bin/docker run \\
   --entrypoint /bin/sh \\
   $GETH_NODE_DOCKER_IMAGE -c "\\
     geth \\
+      --bootnodes $(cat $DATA_DIR/bootnodes) \\
       --rpc \\
       --rpcaddr 0.0.0.0 \\
       --rpcapi=eth,net,web3 \\
@@ -111,7 +112,6 @@ ExecStart=/usr/bin/docker run \\
       --wsorigins=* \\
       --wsapi=eth,net,web3 \\
       --nodekey=$DATA_DIR/pkey \\
-      --etherbase=${validator_account_address} \\
       --networkid=${network_id} \\
       --syncmode=full \\
       --consoleformat=json \\

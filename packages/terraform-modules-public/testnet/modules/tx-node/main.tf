@@ -63,7 +63,7 @@ resource "google_compute_instance" "tx_node" {
       ip_address : google_compute_address.tx_node[count.index].address,
       max_peers : var.txnode_max_peers,
       network_id : var.network_id,
-      static_nodes_base64 : var.static_nodes_base64,
+      bootnodes_base64 : var.bootnodes_base64,
       rid : count.index,
     }
   )
