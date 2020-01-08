@@ -10,8 +10,12 @@ module.exports = withImages(
       localIdentName: '[local]___[hash:base64:5]',
     },
     cssModules: true,
+    experimental: {
+      granularChunks: true,
+    },
     publicRuntimeConfig: envConfig,
     serverRuntimeConfig: serverEnvConfig,
+
     // options: {buildId, dev, isServer, defaultLoaders, webpack}   https://nextjs.org/docs#customizing-webpack-config
     webpack: (config, { dev, isServer }) => {
       config.node = {
@@ -21,6 +25,7 @@ module.exports = withImages(
         ...config.resolve.alias,
         'react-native$': 'react-native-web',
       }
+
       if (!isServer) {
         config.resolve.alias['@sentry/node'] = '@sentry/browser'
       }
