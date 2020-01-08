@@ -15,10 +15,11 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
 
   event TargetDensitySet(uint256 targetDensity);
-
+  event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
   event AdjustmentSpeedSet(uint256 adjustmentSpeed);
 
   uint256 public gasPriceMinimum;
+  uint256 public gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
   FixidityLib.Fraction public targetDensity;
@@ -33,13 +34,14 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
 
   function initialize(
     address _registryAddress,
-    uint256 initialGas,
+    uint256 _gasPriceMinimumFloor,
     uint256 _targetDensity,
     uint256 _adjustmentSpeed
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
-    gasPriceMinimum = initialGas;
+    gasPriceMinimum = _gasPriceMinimumFloor;
+    setGasPriceMinimumFloor(_gasPriceMinimumFloor);
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
   }
@@ -62,6 +64,16 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     targetDensity = FixidityLib.wrap(_targetDensity);
     require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
     emit TargetDensitySet(_targetDensity);
+  }
+
+  /**
+   * @notice Set the minimum gas price treshold.
+   * @dev Value is expected to be > 0.
+   */
+  function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner {
+    require(_gasPriceMinimumFloor > 0, "gas price minimum floor must be greater than zero");
+    gasPriceMinimumFloor = _gasPriceMinimumFloor;
+    emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
   /**
@@ -128,10 +140,11 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
       ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
       : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
-    return
-      adjustment
-        .multiply(FixidityLib.newFixed(gasPriceMinimum))
-        .add(FixidityLib.fixed1())
-        .fromFixed();
+    uint256 newGasPriceMinimum = adjustment
+      .multiply(FixidityLib.newFixed(gasPriceMinimum))
+      .add(FixidityLib.fixed1())
+      .fromFixed();
+
+    return newGasPriceMinimum >= gasPriceMinimumFloor ? newGasPriceMinimum : gasPriceMinimumFloor;
   }
 }

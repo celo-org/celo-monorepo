@@ -90,10 +90,7 @@ export function useBalanceInNavigationParam(
   dollarBalance: string | null,
   navigation: NavigationScreenProp<NavigationParams>
 ) {
-  useEffect(
-    () => {
-      navigation.setParams({ dollarBalance })
-    },
-    [dollarBalance]
-  )
+  useEffect(() => {
+    navigation.setParams({ dollarBalance })
+  }, [dollarBalance])
 }

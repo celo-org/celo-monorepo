@@ -129,6 +129,10 @@ export class Account extends React.Component<Props, State> {
     Logger.showMessage('App onboarding state reset.')
   }
 
+  toggleNumberVerified = () => {
+    this.props.setNumberVerified(!this.props.numberVerified)
+  }
+
   revokeNumberVerification = async () => {
     if (!isE164Number(this.props.e164PhoneNumber)) {
       Logger.showMessage('Cannot revoke verificaton: number invalid')
@@ -179,10 +183,16 @@ export class Account extends React.Component<Props, State> {
             </TouchableOpacity>
           </View> */}
           <View style={style.devSettingsItem}>
+            <TouchableOpacity onPress={this.toggleNumberVerified}>
+              <Text>Toggle verification done</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.resetAppOpenedState}>
               <Text>Reset app opened state</Text>
             </TouchableOpacity>
           </View>
+
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.resetBackupState}>
               <Text>Reset backup state</Text>

@@ -481,7 +481,7 @@ contract('EpochRewards', (accounts: string[]) => {
     beforeEach(async () => {
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60)
+      await reserve.initialize(registry.address, 60, toFixed(1))
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
