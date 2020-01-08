@@ -55,15 +55,15 @@ class BackupComplete extends React.Component<Props> {
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
           <NuxLogo height={70} />
-          {backupCompleted &&
-            !socialBackupCompleted && (
-              <>
-                <Text style={styles.h1}>{t('backupComplete.0')}</Text>
-                <Text style={styles.h2}>{t('backupComplete.1')}</Text>
-              </>
-            )}
-          {backupCompleted &&
-            socialBackupCompleted && <Text style={styles.h1}>{t('backupComplete.2')}</Text>}
+          {backupCompleted && !socialBackupCompleted && (
+            <>
+              <Text style={styles.h1}>{t('backupComplete.0')}</Text>
+              <Text style={styles.h2}>{t('backupComplete.1')}</Text>
+            </>
+          )}
+          {backupCompleted && socialBackupCompleted && (
+            <Text style={styles.h1}>{t('backupComplete.2')}</Text>
+          )}
         </View>
       </SafeAreaView>
     )
@@ -92,10 +92,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      exitBackupFlow,
-    }
-  )(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))
+  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+    exitBackupFlow,
+  })(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))
 )
