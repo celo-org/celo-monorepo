@@ -47,7 +47,7 @@ In the example, `0x2A809BeE654AAe41794838291390BC75BEd100BB` would be an account
 
 You have to generate an account for each instance of each component you want to deploy. Please save this credentials securely so you can recover or access your account when you need.
 
-The passwords referred in the variables will be used to import the accounts in the geth deployed (i.e.: The passwords have not to exist previously). They will keep your account safe if somebody access to the keystore file or if you want to unlock the account.
+The passwords referred in the variables will be used to import the accounts in the geth deployed (i.e.: the password are using to import the private keys as json keystore format required by geth). They will keep your account safe if somebody access to the keystore file or if you want to unlock the account.
 
 ## Running terraform
 
