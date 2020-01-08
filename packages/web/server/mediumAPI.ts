@@ -2,6 +2,7 @@ import { parse, validate } from 'fast-xml-parser'
 import { Articles } from 'fullstack/ArticleProps'
 import htmlToFormattedText from 'html-to-formatted-text'
 import abortableFetch from 'src/utils/abortableFetch'
+import cache from '../server/cache'
 import Sentry from '../server/sentry'
 interface JSONRSS {
   rss: {
@@ -85,10 +86,14 @@ async function fetchMediumArticles(): Promise<string> {
   return response.text()
 }
 
+async function getAndTransform() {
+  const xmlString = await fetchMediumArticles()
+  return transform(parseXML(xmlString))
+}
+
 export async function getFormattedMediumArticles(): Promise<Articles> {
   try {
-    const xmlString = await fetchMediumArticles()
-    const articles = transform(parseXML(xmlString))
+    const articles = await cache('medium-blog', getAndTransform)
     return { articles }
   } catch (e) {
     Sentry.withScope((scope) => {
