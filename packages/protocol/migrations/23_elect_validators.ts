@@ -15,18 +15,28 @@ import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInsta
 import Web3 = require('web3')
 import { TransactionObject } from 'web3/eth/types'
 
+const truffle = require('@celo/protocol/truffle-config.js')
+const bip39 = require('bip39')
+const hdkey = require('ethereumjs-wallet/hdkey')
+
+function ganachePrivateKey(num) {
+  const seed = bip39.mnemonicToSeedSync(truffle.networks.development.mnemonic)
+  const hdk = hdkey.fromMasterSeed(seed)
+  const addrNode = hdk.derivePath("m/44'/60'/0'/0/" + num) // m/44'/60'/0'/0/0 is derivation path for the first account. m/44'/60'/0'/0/1 is the derivation path for the second account and so on
+  return addrNode
+    .getWallet()
+    .getPrivateKey()
+    .toString('hex')
+}
+
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
 }
 
 let isGanache = false
 
-// Ganache private keys for accounts 7-9, used for group keys
-const extraKeys = [
-  '0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
-  '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
-  '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
-]
+// Will include Ganache private keys for accounts 7-9, used for group keys
+let extraKeys = []
 
 async function sendTransaction<T>(
   web3: Web3,
@@ -238,15 +248,8 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   if (networkName === 'development') {
     isGanache = true
-    config.validators.validatorKeys = [
-      '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
-      '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72',
-      '0xdf02719c4df8b9b8ac7f551fcb5d9ef48fa27eef7a66453879f4d8fdc6e78fb1',
-      '0xff12e391b79415e941a94de3bf3a9aee577aed0731e297d5cfa0b8a1e02fa1d0',
-      '0x752dd9cf65e68cfaba7d60225cbdbc1f4729dd5e5507def72815ed0d8abc6249',
-      '0xefb595a0178eb79a8df953f87c5148402a224cdf725e88c0146727c6aceadccd',
-      '0x83c6d2cc5ddcf9711a6d59b417dc20eb48afd58d45290099e5987e3d768f328f',
-    ]
+    config.validators.validatorKeys = [...Array(7)].map((_, i) => ganachePrivateKey(i))
+    extraKeys = [...Array(3)].map((_, i) => ganachePrivateKey(i + 7))
     config.validators.attestationKeys = config.validators.validatorKeys
   }
 

@@ -37,26 +37,22 @@ function headerFromBlock(web3: Web3, block: any) {
 }
 
 describe('slashing tests', function(this: any) {
-  const gethConfig: GethTestConfig = {
+  const gethConfigDown: GethTestConfig = {
     migrate: true,
     instances: [
       { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
       { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
       { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
       { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-      // Validator 4 will be down in the downtime test
-      { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
     ],
   }
 
-  const gethConfigDown = {
+  const gethConfig: GethTestConfig = {
     migrate: true,
-    instances: [
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-    ],
+    instances: gethConfigDown.instances.concat([
+      // Validator 4 will be down in the downtime test
+      { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
+    ]),
   }
 
   const context: any = getContext(gethConfig)
