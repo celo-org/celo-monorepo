@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Slide from 'react-reveal/Slide'
+import analytics from 'src/analytics/analytics'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, standardStyles, textStyles } from 'src/styles'
-import analytics from '../analytics/analytics'
 
 function downloadBenefits() {
   analytics.track(`benefits.pdf download`)

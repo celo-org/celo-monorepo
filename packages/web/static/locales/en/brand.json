@@ -1,101 +1,76 @@
 {
   "home": {
     "title": "Welcome to the Celo Brand Kit",
-    "introduction":
-      "The Celo Brand Kit includes resources to visually represent Celo and the mission of prosperity for all. The kit offers instructions and assets for community contributors to appropriately communicate Celo brand affiliation. By using the Celo brand consistently, we can connect in our shared purpose.",
+    "introduction": "The Celo Brand Kit includes resources to visually represent Celo and the mission of prosperity for all. The kit offers instructions and assets for community contributors to appropriately communicate Celo brand affiliation. By using the Celo brand consistently, we can connect in our shared purpose.",
     "useageTitle": "How to use this guide?",
-    "useageText":
-      "Shared norms and behaviors are the foundation of a beautiful community. Support the effort responsibly and uphold <0>Celo’s Code of Conduct.</0>"
+    "useageText": "Shared norms and behaviors are the foundation of a beautiful community. Support the effort responsibly and uphold <0>Celo’s Code of Conduct.</0>"
   },
   "logo": {
     "title": "Logo",
-    "overviewCopy":
-      "The Celo logo is a universal signature uniting community efforts and bringing prosperity to the world.",
+    "overviewCopy": "The Celo logo is a universal signature uniting community efforts and bringing prosperity to the world.",
     "overviewBtn": "Download Logo Package",
     "logoTitle": "Logo",
-    "logoText":
-      "The Celo logo is composed of a glyph and wordmark. All aspects of its construction are intentional, so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.\n\nPlease use the full-color logo whenever possible.",
-    "license":
-      "The use of the Celo logo requires following the Celo Community Code of Conduct as provided <0>here.</0>",
+    "logoText": "The Celo logo is composed of a glyph and wordmark. All aspects of its construction are intentional, so please do not edit, change, distort, recolor, reconfigure, or rearrange the lockup of the logo.\n\nPlease use the full-color logo whenever possible.",
+    "license": "The use of the Celo logo requires following the Celo Community Code of Conduct as provided <0>here.</0>",
     "glyphTitle": "Glyph",
-    "glyphText":
-      "Utilize the glyph when the full logo is too small to achieve maximum impact. It works best on Celo brand colors. Be sure to use the monochrome glyphs on other custom colors.",
+    "glyphText": "Utilize the glyph when the full logo is too small to achieve maximum impact. It works best on Celo brand colors. Be sure to use the monochrome glyphs on other custom colors.",
     "fullColorOnLightCaption": "Full color logo for lighter backgrounds",
     "fullColorOnDarkCaption": "Full color logo for darker backgrounds",
     "monochromeCaption": "Monochrome logo",
     "monochromeInverseCaption": "Monochrome logo (inverse)",
     "spaceSizeTitle": "Space and Sizing",
     "sizeTitle": "Size",
-    "sizeText":
-      "The logo and glyph should not appear smaller than their minimum height of 24 pixels on digital displays or 8mm in print.",
+    "sizeText": "The logo and glyph should not appear smaller than their minimum height of 24 pixels on digital displays or 8mm in print.",
     "clearspaceTitle": "Clearspace",
-    "clearspaceText":
-      "Clearspace is the protected area around the logo. This space must be kept free of all other graphics and text, including other logos. The Celo logo has allotted Clearspace based on the height of the “o” in Celo.  Please use the below image as a guide.",
+    "clearspaceText": "Clearspace is the protected area around the logo. This space must be kept free of all other graphics and text, including other logos. The Celo logo has allotted Clearspace based on the height of the “o” in Celo.  Please use the below image as a guide.",
     "backgroundsTitle": "Backgrounds",
     "backgroundsTextTop": "The Celo logo works best on these brand background colors.",
     "colorBackgroundsTitle": "Color Backgrounds",
-    "colorBackgroundsText":
-      "When it comes to applying the Celo brand to your own projects, the monochrome Celo logo works well on a variety of backgrounds. Use the dark logo on lighter backgrounds and the inverse logo on darker and more colorful backgrounds.",
+    "colorBackgroundsText": "When it comes to applying the Celo brand to your own projects, the monochrome Celo logo works well on a variety of backgrounds. Use the dark logo on lighter backgrounds and the inverse logo on darker and more colorful backgrounds.",
     "darkLogoBackgroundText": "",
-    "backgroundDoNotAndDo":
-      "Do not overlay any of the logos of glyphs on top of images. Do not overlay the two-color logo ontop of unpreferred light colors."
+    "backgroundDoNotAndDo": "Do not overlay any of the logos of glyphs on top of images. Do not overlay the two-color logo ontop of unpreferred light colors."
   },
   "color": {
     "title": "Color",
-    "headline":
-      "The Celo color palette consistes of primary brand colors, accent colors, and grays.",
+    "headline": "The Celo color palette consistes of primary brand colors, accent colors, and grays.",
     "primaries": "Primary Brand Colors",
-    "primariesText":
-      "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to cGLD like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",
+    "primariesText": "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to cGLD like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",
     "accents": "Accent Colors",
-    "accentsText":
-      "Accent colors include violet, red, cyan, and blue.\n\nViolet, red, and cyan are colors that often represent alternative coins, projects, and personas in the ecosystem.\n\nBlue represents help within digital experiences like websites and mobile applications.",
+    "accentsText": "Accent colors include violet, red, cyan, and blue.\n\nViolet, red, and cyan are colors that often represent alternative coins, projects, and personas in the ecosystem.\n\nBlue represents help within digital experiences like websites and mobile applications.",
     "grays": "Grays",
-    "graysText":
-      "Grays are used when hierarchy needs to be established. Use grays to visually communicate intended ranking of importance in Typography or UI.",
+    "graysText": "Grays are used when hierarchy needs to be established. Use grays to visually communicate intended ranking of importance in Typography or UI.",
     "backgroundTitle": "Background Colors",
-    "backgroundText":
-      "Background colors function as canvases in which accent and brand colors can punctuate layout compositions.",
+    "backgroundText": "Background colors function as canvases in which accent and brand colors can punctuate layout compositions.",
     "contrast": "Contrast",
-    "contrastText":
-      "For accessibility, choose high contrast color combinations when laying out text.",
+    "contrastText": "For accessibility, choose high contrast color combinations when laying out text.",
     "contrastText2": "For best results, we recommend following these dos and don’ts:"
   },
   "typography": {
     "title": "Typography",
-    "headline":
-      "The Celo fonts were intentionally chosen to speak to Celo’s Approachable and Academic brand principles. To honor both energies and compliment a broader range of expression, a serif and a sans serif font were chosen.",
+    "headline": "The Celo fonts were intentionally chosen to speak to Celo’s Approachable and Academic brand principles. To honor both energies and compliment a broader range of expression, a serif and a sans serif font were chosen.",
     "facesTitle": "Typefaces",
-    "facesText":
-      "Celo uses open-source fonts in order for community members to download, build, and design Celo branded material.\n\nRefer to the <0>philosophy</0> and guidelines below when building a project on Celo",
+    "facesText": "Celo uses open-source fonts in order for community members to download, build, and design Celo branded material.\n\nRefer to the <0>philosophy</0> and guidelines below when building a project on Celo",
     "downloadAllBTN": "Download Fonts",
     "mainFontTitle": "This is Garamond,\nthe Celo brand typeface.",
-    "mainFontText":
-      "EB Garamond represents our Academic brand principle described as timeless and professional. It is an appropriate formal visual tone for education and declaration.\n\nUse EB Garamond for the majority of titles and paragraphs",
+    "mainFontText": "EB Garamond represents our Academic brand principle described as timeless and professional. It is an appropriate formal visual tone for education and declaration.\n\nUse EB Garamond for the majority of titles and paragraphs",
     "subFontTitle": "This is Jost*, our supporting font.",
-    "subFontText":
-      "Jost*’s geometric form functions as an approachable compliment to EB Garamond. It is used more sparingly and speaks to the typography found in the logo and the round shapes in the illustrations.\n\nUse Jost* for call to actions, diagrams, instructions, and infographics.",
+    "subFontText": "Jost*’s geometric form functions as an approachable compliment to EB Garamond. It is used more sparingly and speaks to the typography found in the logo and the round shapes in the illustrations.\n\nUse Jost* for call to actions, diagrams, instructions, and infographics.",
     "typescaleTitle": "Type Scale",
     "typescaleText": "For typographic hierarchy, we recommend the following type scale.",
     "examplesTitle": "Usage Examples",
     "h1Example": "Main Title",
     "h2Example": "Article Title",
     "h3Example": "Section Title",
-    "h4Example":
-      "Subtitle / larger text that is one size larger than the body, lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
+    "h4Example": "Subtitle / larger text that is one size larger than the body, lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
     "h5Example": "Sub-section Title",
     "h6Example": "Small Title",
-    "bodyExample":
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.",
-    "smallExample":
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere."
+    "bodyExample": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.",
+    "smallExample": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere."
   },
   "icons": {
     "title": "Icons",
-    "license":
-      "All icons are licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
-    "headline":
-      "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
+    "license": "All icons are licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
+    "headline": "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
   },
   "downloadAssetBtn": "Download",
   "licenseTitle": "Usage & License Note"
