@@ -155,9 +155,7 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
       const recoveredSigner = recoverTransaction(result.rawTransaction).toLowerCase()
       if (recoveredSigner !== txn.from) {
         throw new Error(
-          `transaction-utils@getRawTransaction@Signing: Signer mismatch ${recoveredSigner} != ${
-            txn.from
-          }, retrying...`
+          `transaction-utils@getRawTransaction@Signing: Signer mismatch ${recoveredSigner} != ${txn.from}, retrying...`
         )
       } else {
         Logger.debug(

@@ -265,9 +265,7 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   if (valKeys.length < config.validators.minElectableValidators) {
     console.warn(
-      `  Warning: Have ${valKeys.length} Validator keys but require a minimum of ${
-        config.validators.minElectableValidators
-      } Validators in order for a new validator set to be elected.`
+      `  Warning: Have ${valKeys.length} Validator keys but require a minimum of ${config.validators.minElectableValidators} Validators in order for a new validator set to be elected.`
     )
   }
 

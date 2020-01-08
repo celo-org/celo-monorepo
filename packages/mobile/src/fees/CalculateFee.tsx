@@ -63,16 +63,13 @@ function useAsyncShowError<R, Args extends any[]>(
   const asyncResult = useAsync(asyncFunction, params)
   const dispatch = useDispatch()
 
-  useEffect(
-    () => {
-      // Generic error banner
-      if (asyncResult.error) {
-        Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
-        dispatch(showError(ErrorMessages.CALCULATE_FEE_FAILED))
-      }
-    },
-    [asyncResult.error]
-  )
+  useEffect(() => {
+    // Generic error banner
+    if (asyncResult.error) {
+      Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
+      dispatch(showError(ErrorMessages.CALCULATE_FEE_FAILED))
+    }
+  }, [asyncResult.error])
 
   return asyncResult
 }
