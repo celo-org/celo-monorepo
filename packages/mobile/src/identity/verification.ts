@@ -27,6 +27,7 @@ import {
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   resetVerification,
+  setHasSeenVerificationNux,
   setVerificationStatus,
 } from 'src/identity/actions'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
@@ -61,6 +62,30 @@ export enum CodeInputType {
 export interface AttestationCode {
   code: string
   issuer: string
+}
+
+export function* checkVerification() {
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+
+  const account: string = yield call(getConnectedUnlockedAccount)
+  const e164Number: string = yield select(e164NumberSelector)
+
+  const status: AttestationsStatus = yield call(
+    getAttestationsStatus,
+    attestationsWrapper,
+    account,
+    e164Number
+  )
+
+  if (status.isVerified) {
+    yield put(setNumberVerified(true))
+    yield put(setHasSeenVerificationNux(true))
+    return true
+  }
+  return false
 }
 
 export function* startVerification() {
