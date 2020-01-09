@@ -16,6 +16,11 @@ interface IVestingInstance {
   function setAccountWalletAddress(address) external;
   function setAccountDataEncryptionKey(bytes calldata) external;
   function setAccountMetadataURL(string calldata) external;
+  function vote(address, uint256, address, address) external;
+  function activate(address) external;
+  function revokeActive(address, uint256, address, address, uint256) external;
+  function revokePending(address, uint256, address, address, uint256) external;
+
   function getVestingInstanceTotalBalance() external view returns (uint256);
   function getVestingInstanceNonWithdrawnTotalBalance() external view returns (uint256);
   function getVestingInstanceAvailableBalance() external view returns (uint256);

@@ -414,4 +414,79 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   function setAccountMetadataURL(string calldata metadataURL) external onlyWhenInProperState {
     getAccounts().setMetadataURL(metadataURL);
   }
+
+  /**
+   * @notice Increments the number of total and pending votes for `group`.
+   * @param group The validator group to vote for.
+   * @param value The amount of gold to use to vote.
+   * @param lesser The group receiving fewer votes than `group`, or 0 if `group` has the
+   *   fewest votes of any validator group.
+   * @param greater The group receiving more votes than `group`, or 0 if `group` has the
+   *   most votes of any validator group.
+   * @dev Fails if `group` is empty or not a validator group.
+   */
+  function vote(address group, uint256 value, address lesser, address greater)
+    external
+    nonReentrant
+    onlyWhenInProperState
+  {
+    require(getElection().vote(group, value, lesser, greater), "voting for a group failed");
+  }
+
+  /**
+   * @notice Converts `account`'s pending votes for `group` to active votes.
+   * @param group The validator group to vote for.
+   * @dev Pending votes cannot be activated until an election has been held.
+   */
+  function activate(address group) external nonReentrant onlyWhenInProperState {
+    require(getElection().activate(group), "activating votes for a group failed");
+  }
+
+  /**
+   * @notice Revokes `value` active votes for `group`
+   * @param group The validator group to revoke votes from.
+   * @param value The number of votes to revoke.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *   or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *   or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @dev Fails if the account has not voted on a validator group.
+   */
+  function revokeActive(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) external nonReentrant onlyWhenInProperState {
+    require(
+      getElection().revokeActive(group, value, lesser, greater, index),
+      "revoking active votes for a group failed"
+    );
+  }
+
+  /**
+   * @notice Revokes `value` pending votes for `group`
+   * @param group The validator group to revoke votes from.
+   * @param value The number of votes to revoke.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *   or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *   or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @dev Fails if the account has not voted on a validator group.
+   */
+  function revokePending(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) external nonReentrant onlyWhenInProperState {
+    require(
+      getElection().revokePending(group, value, lesser, greater, index),
+      "revoking pending votes for a group failed"
+    );
+  }
 }

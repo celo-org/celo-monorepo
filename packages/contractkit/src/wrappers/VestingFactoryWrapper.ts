@@ -1,4 +1,3 @@
-import { CeloContract } from '../base'
 import { VestingFactory } from '../generated/types/VestingFactory'
 import { newVestingInstance } from '../generated/VestingInstance'
 import { BaseWrapper, CeloTransactionObject, toTransactionObject } from './BaseWrapper'
@@ -39,8 +38,7 @@ export class VestingFactoryWrapper extends BaseWrapper<VestingFactory> {
         initData.vestAmountPerPeriod,
         initData.vestingRevokable,
         initData.vestingRevoker,
-        initData.vestingRefundDestination,
-        await this.kit.registry.addressFor(CeloContract.Registry)
+        initData.vestingRefundDestination
       )
     )
   }
