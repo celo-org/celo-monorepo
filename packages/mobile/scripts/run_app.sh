@@ -98,7 +98,7 @@ if [ $PLATFORM = "android" ]; then
 
   if [ $MACHINE = "Mac" ]; then
     echo "Starting packager in new terminal"
-    RN_START_CMD="cd `pwd`;yarn react-native start"
+    RN_START_CMD="cd `pwd` && (yarn react-native start || yarn react-native start)"
     OSASCRIPT_CMD="tell application \"Terminal\" to do script \"$RN_START_CMD\""
     echo "FULLCMD: $OSASCRIPT_CMD"
     osascript -e "$OSASCRIPT_CMD"

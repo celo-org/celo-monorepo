@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SwitchButton from 'src/components/HomeScreen/SwitchButton'
 
@@ -10,7 +10,7 @@ type Props = {
   isVerifying: boolean
   networkType: string
   toggleVerifyingService: () => void
-} & WithNamespaces
+} & WithTranslation
 
 class Verifying extends React.PureComponent<Props, {}> {
   render() {
@@ -59,4 +59,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.profile)(Verifying)
+export default withTranslation(Namespaces.profile)(Verifying)

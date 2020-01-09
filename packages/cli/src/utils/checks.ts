@@ -119,7 +119,10 @@ class CheckBuilder {
     )
 
   isValidator = (account: Address) =>
-    this.addCheck(`${account} is Validator`, this.withValidators((v) => v.isValidator(account)))
+    this.addCheck(
+      `${account} is Validator`,
+      this.withValidators((v) => v.isValidator(account))
+    )
 
   isValidatorGroup = (account: Address) =>
     this.addCheck(

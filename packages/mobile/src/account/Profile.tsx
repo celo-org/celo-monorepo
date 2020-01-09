@@ -1,13 +1,13 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { UserContactDetails, userContactDetailsSelector } from 'src/account/reducer'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -22,7 +22,7 @@ interface OwnProps {
   navigation: any
 }
 
-type Props = OwnProps & StateProps & WithNamespaces
+type Props = OwnProps & StateProps & WithTranslation
 const mapStateToProps = (state: RootState) => {
   return {
     name: state.account.name,
@@ -88,5 +88,5 @@ const style = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.accountScreen10)(Profile)
+  withTranslation(Namespaces.accountScreen10)(Profile)
 )

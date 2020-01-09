@@ -25,7 +25,7 @@ contract MockLockedGold is ILockedGold {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].add(value);
   }
 
-  function decrementNonvotingAccountBalance(address account, uint256 value) external {
+  function decrementNonvotingAccountBalance(address account, uint256 value) public {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
   }
 
@@ -42,5 +42,16 @@ contract MockLockedGold is ILockedGold {
   }
   function getTotalLockedGold() external view returns (uint256) {
     return totalLockedGold;
+  }
+  function slash(
+    address account,
+    uint256 penalty,
+    address,
+    uint256,
+    address[] calldata,
+    address[] calldata,
+    uint256[] calldata
+  ) external {
+    accountTotalLockedGold[account] = accountTotalLockedGold[account].sub(penalty);
   }
 }

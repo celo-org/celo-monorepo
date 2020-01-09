@@ -7,7 +7,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { ensureHexLeader } from '@celo/utils/lib/address'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   FeeCurrencyWhitelistInstance,
@@ -47,7 +47,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
 
     for (const oracle of config.stableToken.oracles) {
       console.info(`Adding ${oracle} as an Oracle for StableToken`)
-      await sortedOracles.addOracle(stableToken.address, ensureHexLeader(oracle))
+      await sortedOracles.addOracle(stableToken.address, ensureLeading0x(oracle))
     }
 
     // We need to seed the exchange rate, and that must be done with an account

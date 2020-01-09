@@ -16,7 +16,9 @@ testWithGanache('Validators Wrapper', (web3) => {
     kit.defaultAccount = account
     lockedGold = await kit.contracts.getLockedGold()
     accounts = await kit.contracts.getAccounts()
-    await accounts.createAccount().sendAndWaitForReceipt()
+    if (!(await accounts.isAccount(account))) {
+      await accounts.createAccount().sendAndWaitForReceipt({ from: account })
+    }
   })
 
   test('SBAT lock gold', async () => {
