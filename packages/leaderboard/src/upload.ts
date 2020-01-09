@@ -191,8 +191,8 @@ async function getBTUs(kit: ContractKit, address: string) {
   let sum = new BigNumber(0)
   for (const address of claimedAccounts) {
     try {
-      const totalBalance = await kit.getTotalBalance(address)
-      sum = sum.plus(totalBalance)
+      const balance = await kit.getTotalBalance(address)
+      sum = sum.plus(balance.total)
     } catch (err) {
       console.error('Error', err)
     }
@@ -239,14 +239,18 @@ async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) 
     if (!address) data.push('')
     else {
       try {
-        let req = (await attestations.getPastEvents('AttestationIssuerSelected', {
-          fromBlock: 0,
-          filter: { issuer: address },
-        })).length
-        let full = (await attestations.getPastEvents('AttestationCompleted', {
-          fromBlock: 0,
-          filter: { issuer: address },
-        })).length
+        let req = (
+          await attestations.getPastEvents('AttestationIssuerSelected', {
+            fromBlock: 0,
+            filter: { issuer: address },
+          })
+        ).length
+        let full = (
+          await attestations.getPastEvents('AttestationCompleted', {
+            fromBlock: 0,
+            filter: { issuer: address },
+          })
+        ).length
         console.log('Attestations requested', req, 'fulfilled', full, 'by', address)
         if (req == 0) data.push(0)
         else data.push(full / req)
