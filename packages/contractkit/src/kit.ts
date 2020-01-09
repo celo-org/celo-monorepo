@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
@@ -55,6 +56,13 @@ export interface KitOptions {
   from?: Address
 }
 
+interface AccountBalance {
+  gold: BigNumber
+  usd: BigNumber
+  total: BigNumber
+  lockedGold: BigNumber
+}
+
 export class ContractKit {
   /** core contract's address registry */
   readonly registry: AddressRegistry
@@ -73,6 +81,22 @@ export class ContractKit {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+  }
+
+  async getTotalBalance(address: string): Promise<AccountBalance> {
+    const goldToken = await this.contracts.getGoldToken()
+    const stableToken = await this.contracts.getStableToken()
+    const lockedGold = await this.contracts.getLockedGold()
+    const exchange = await this.contracts.getExchange()
+    const goldBalance = await goldToken.balanceOf(address)
+    const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
+    const dollarBalance = await stableToken.balanceOf(address)
+    return {
+      gold: goldBalance,
+      lockedGold: lockedBalance,
+      usd: dollarBalance,
+      total: goldBalance.plus(lockedBalance).plus(await exchange.quoteUsdSell(dollarBalance)),
+    }
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
