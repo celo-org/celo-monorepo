@@ -45,7 +45,7 @@ Contents:
 
 - [Celo's Mission - Prosperity for All](#mission)
 - [The Celo Stack](#stack)
-- [Documentation](#documentation)
+- [Documentation](#docs)
 - [Issues](#issues)
 - [Repo Structure](#repo)
 - [Contributing](#contributing)
