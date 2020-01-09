@@ -10,7 +10,7 @@ export async function cache<T>(
   key: string,
   func: (param?: any) => Promise<T>,
   options?: { minutes?: number; args?: any }
-) {
+): Promise<T> {
   const cachedResult = myCache.get<T>(key)
   if (cachedResult) {
     return cachedResult
