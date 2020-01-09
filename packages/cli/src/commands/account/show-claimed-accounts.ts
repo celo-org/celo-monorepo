@@ -2,7 +2,10 @@ import BigNumber from 'bignumber.js'
 
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
+import { ensureLeading0x } from '@celo/utils/lib/address'
+import { notEmpty } from '@celo/utils/lib/collections'
 
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
@@ -16,32 +19,25 @@ async function getMetadata(kit: ContractKit, address: string) {
   else return IdentityMetadataWrapper.fetchFromURL(url)
 }
 
+function dedup(lst: string[]): string[] {
+  return [...new Set(lst)]
+}
+
 async function getClaims(
   kit: ContractKit,
   address: string,
   data: IdentityMetadataWrapper
 ): Promise<string[]> {
-  if (address.substr(0, 2) === '0x') {
-    address = address.substr(2)
-  }
-  const res = [address]
   const accounts = await kit.contracts.getAccounts()
-  for (const claim of data.claims) {
-    switch (claim.type) {
-      case ClaimTypes.KEYBASE:
-        break
-      case ClaimTypes.ACCOUNT:
-        const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
-        if (status) console.error('Cannot verify claim:', status)
-        else {
-          console.log('Claim success', address, claim.address)
-          res.push(claim.address)
-        }
-      default:
-        break
-    }
+  const getClaim = async (claim: AccountClaim) => {
+    const error = await verifyAccountClaim(claim, ensureLeading0x(address), accounts.getMetadataURL)
+    return error ? null : claim.address.toLowerCase()
   }
-  return res
+  const res = (await Promise.all(data.filterClaims(ClaimTypes.ACCOUNT).map(getClaim))).filter(
+    notEmpty
+  )
+  res.push(address)
+  return dedup(res)
 }
 
 export default class ShowClaimedAccounts extends BaseCommand {
@@ -62,21 +58,13 @@ export default class ShowClaimedAccounts extends BaseCommand {
 
     const claimedAccounts = await getClaims(this.kit, args.address, metadata)
 
-    const goldToken = await this.kit.contracts.getGoldToken()
-    const stableToken = await this.kit.contracts.getStableToken()
-
     console.log('All balances expressed in units of 10^-18.')
     let sum = new BigNumber(0)
     for (const address of claimedAccounts) {
       console.log('\nShowing balances for', address)
-      const totalBalance = await this.kit.getTotalBalance(address)
-      const balances = {
-        goldBalance: await goldToken.balanceOf(address),
-        dollarBalance: await stableToken.balanceOf(address),
-        totalBalance,
-      }
-      sum = sum.plus(totalBalance)
-      printValueMap(balances)
+      const balance = await this.kit.getTotalBalance(address)
+      sum = sum.plus(balance.total)
+      printValueMap(balance)
     }
 
     console.log('\nSum of total balances:', sum.toString(10))

@@ -406,15 +406,6 @@ jobs:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
 
-      - run:
-          name: Install and test the npm package
-          command: |
-            set -euo pipefail
-            cd packages/contractkit
-            yarn pack
-            cd /tmp
-            npm install ~/app/packages/contractkit/*.tgz
-
   walletkit-test:
     <<: *defaults
     steps:
@@ -435,15 +426,6 @@ jobs:
             set -euo pipefail
             yarn --cwd=packages/walletkit build alfajoresstaging
             yarn --cwd=packages/walletkit test
-
-      - run:
-          name: Install and test the npm package
-          command: |
-            set -euo pipefail
-            cd packages/walletkit
-            yarn pack
-            cd /tmp
-            npm install ~/app/packages/walletkit/*.tgz
 
   cli-test:
     <<: *defaults
@@ -675,10 +657,6 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - end-to-end-mobile-test:
-          requires:
-            - install_dependencies
-            - mobile-test-build-app
       - lint-checks:
           requires:
             - install_dependencies

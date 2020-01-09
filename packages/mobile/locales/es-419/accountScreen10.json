@@ -9,13 +9,13 @@
   "shareAnalytics": "Compartir estadisticas de uso",
   "shareAnalytics_detail":
     "Recopilamos datos anónimos sobre cómo utiliza Celo para ayudar a mejorar la aplicación para todos.",
-  "celoLite": "Celo Lite",
-  "enableCeloLite": "Habilitar Celo Lite",
-  "celoLiteDetail":
-    "El modo Celo Lite te permite comunicarte con la Red Celo  a través de un nodo confiable. Puedes cambiar este modo en la configuración de la aplicación.",
+  "dataSaver": "Data Saver",
+  "enableDataSaver": "Habilitar Data Saver",
+  "dataSaverDetail":
+    "El modo Data Saver te permite comunicarte con la Red Celo  a través de un nodo confiable. Puedes cambiar este modo en la configuración de la aplicación.",
   "restartModal": {
-    "header": "Reiniciar para apagar Celo Lite",
-    "body": "Para encender y apagar Celo Lite repetidamente, deberá reiniciar la aplicación.",
+    "header": "Reiniciar para apagar Data Saver",
+    "body": "Para encender y apagar Data Saver repetidamente, deberá reiniciar la aplicación.",
     "restart": "Reiniciar para alternar"
   },
   "testFaqLink": "Las Preguntas Frecuentes del Monedero Celo",

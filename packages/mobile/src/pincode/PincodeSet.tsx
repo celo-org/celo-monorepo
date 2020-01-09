@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -17,7 +17,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -35,7 +35,7 @@ interface State {
   pin2: string
 }
 
-type Props = DispatchProps & WithNamespaces
+type Props = DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   showError,
@@ -192,5 +192,5 @@ export default componentWithAnalytics(
   connect<{}, DispatchProps>(
     null,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxNamePin1)(PincodeSet))
+  )(withTranslation(Namespaces.nuxNamePin1)(PincodeSet))
 )

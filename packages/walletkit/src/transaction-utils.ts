@@ -7,6 +7,7 @@ import {
 } from '@0x/subproviders'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
+import { TransactionConfig } from 'web3-eth'
 import { Tx } from 'web3/eth/types'
 import { Logger } from './logger'
 import { getAccountAddressFromPrivateKey } from './new-web3-utils'
@@ -134,7 +135,7 @@ export async function getRawTransaction(
     gatewayFee: gatewayFee && gatewayFee.toString(),
   }
   Logger.debug('transaction-utils@getRawTransaction@Signing', 'transaction...')
-  const signedTransaction = await web3.eth.signTransaction(transaction)
+  const signedTransaction = await web3.eth.signTransaction(transaction as TransactionConfig)
   Logger.debug(
     'transaction-utils@getRawTransaction@Signing',
     `Signed transaction ${JSON.stringify(signedTransaction)}`

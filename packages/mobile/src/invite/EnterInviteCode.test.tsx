@@ -54,7 +54,7 @@ describe('EnterInviteCode Screen', () => {
     const store = createMockStore()
     const tree = renderer.create(
       <Provider store={store}>
-        <EnterInviteCode {...getMockI18nProps()} />
+        <EnterInviteCode />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
-import Sentry from '../../fullstack/sentry'
+import { getSentry } from 'src/utils/sentry'
 
 interface Props {
   link: string
@@ -14,7 +14,7 @@ interface Props {
 export class BlueBanner extends React.PureComponent<Props> {
   ref = React.createRef<View>()
   componentDidUpdate = () => {
-    this.ref.current.measure((x, y, w, height) => {
+    this.ref.current.measure((_x, _y, _w, height) => {
       this.props.getRealHeight(height)
     })
   }
@@ -43,7 +43,6 @@ export const BANNER_HEIGHT = 50
 
 export const styles = StyleSheet.create({
   container: {
-    // @ts-ignore-next-line
     position: 'fixed',
     top: 0,
     backgroundColor: '#3C9BF4',
@@ -112,6 +111,7 @@ export default class Announcement extends React.Component<AnnouncementProps, Sta
 
       this.props.onVisibilityChange(visible)
     } catch (e) {
+      const Sentry = await getSentry()
       Sentry.captureException(e)
     }
   }

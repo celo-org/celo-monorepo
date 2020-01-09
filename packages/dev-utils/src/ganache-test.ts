@@ -34,6 +34,11 @@ export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promi
   })
 }
 
+export async function timeTravel(seconds: number, web3: Web3) {
+  await jsonRpcCall(web3, 'evm_increaseTime', [seconds])
+  await jsonRpcCall(web3, 'evm_mine', [])
+}
+
 export function evmRevert(web3: Web3, snapId: string): Promise<void> {
   return jsonRpcCall(web3, 'evm_revert', [snapId])
 }

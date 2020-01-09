@@ -1,5 +1,5 @@
 {
-  "presets": ["next/babel", "@zeit/next-typescript/babel"],
+  "presets": ["next/babel"],
   "plugins": [
     [
       "module-resolver",
@@ -7,7 +7,8 @@
         "root": ["./"],
         "alias": {
           "src": "./src",
-          "server": "./server"
+          "server": "./server",
+          "pages": "./pages"
         }
       }
     ],

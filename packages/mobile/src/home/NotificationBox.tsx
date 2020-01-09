@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
@@ -12,9 +12,10 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
+import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/saga'
 import { setEducationCompleted as setGoldEducationCompleted } from 'src/goldToken/actions'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   backupIcon,
   getVerifiedIcon,
@@ -24,10 +25,9 @@ import {
 } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import EscrowedPaymentReminderSummaryNotification from 'src/notifications/EscrowedPaymentReminderSummaryNotification'
-import IncomingPaymentRequestSummaryNotification from 'src/notifications/IncomingPaymentRequestSummaryNotification'
-import OutgoingPaymentRequestSummaryNotification from 'src/notifications/OutgoingPaymentRequestSummaryNotification'
 import SimpleNotification from 'src/notifications/SimpleNotification'
+import IncomingPaymentRequestSummaryNotification from 'src/paymentRequest/IncomingPaymentRequestSummaryNotification'
+import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/OutgoingPaymentRequestSummaryNotification'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 import { navigateToVerifierApp } from 'src/utils/linking'
@@ -52,7 +52,7 @@ interface DispatchProps {
   setGoldEducationCompleted: typeof setGoldEducationCompleted
 }
 
-type Props = DispatchProps & StateProps & WithNamespaces
+type Props = DispatchProps & StateProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => ({
   backupCompleted: state.account.backupCompleted,
@@ -341,5 +341,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.walletFlow5)(NotificationBox))
+  )(withTranslation(Namespaces.walletFlow5)(NotificationBox))
 )

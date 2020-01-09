@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/src/address'
 import { getEscrowContract, getStableTokenContract } from '@celo/walletkit'
 import { Escrow } from '@celo/walletkit/lib/types/Escrow'
 import { StableToken } from '@celo/walletkit/types/StableToken'
@@ -86,7 +87,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
       id,
       type: TransactionTypes.ESCROW_SENT,
       status: TransactionStatus.Pending,
-      value,
+      value: +value,
       symbol: CURRENCY_ENUM.DOLLAR,
       timestamp: Math.floor(Date.now() / 1000),
       address,
@@ -144,7 +145,7 @@ function* withdrawFromEscrow() {
     signature = signature.slice(2)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = web3.utils.hexToNumber(signature.slice(128, 130))
+    const v = web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
 
     const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
@@ -243,7 +244,6 @@ function* doFetchSentPayments() {
     const sentPaymentsRaw = yield all(
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
-
     const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {

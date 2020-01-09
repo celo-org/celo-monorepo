@@ -5,7 +5,7 @@ import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
 import { CONSENT_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts } from 'src/styles'
-import { initSentry } from '../../fullstack/sentry'
+import { initSentry } from 'src/utils/sentry'
 import { agree, disagree, showVisitorCookieConsent } from '../analytics/analytics'
 
 interface State {
@@ -17,18 +17,18 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
     showConsent: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({
-      showConsent: showVisitorCookieConsent(),
+      showConsent: await showVisitorCookieConsent(),
     })
   }
 
-  onAgree = () => {
-    agree()
+  onAgree = async () => {
+    await agree()
     this.setState({
       showConsent: false,
     })
-    initSentry()
+    await initSentry()
   }
 
   onDisagree = () => {
@@ -47,7 +47,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
 
     return (
       <View style={styles.container}>
-        <Text style={[fonts.p, styles.infoMessageText, styles.infoMessageTextFirstBlock]}>
+        <Text style={[fonts.p, styles.infoMessageText]}>
           <Text style={styles.infoMessageTextPrefix}>{t('weUseCookies')} </Text>
           {t('weUseCookiesReasons')}
         </Text>
