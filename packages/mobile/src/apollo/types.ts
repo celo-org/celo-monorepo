@@ -1,51 +1,41 @@
 import { Query } from 'react-apollo'
-import { CURRENCY_ENUM } from 'src/geth/consts'
-import {
-  TransactionStatus,
-  TransactionTypes,
-  TransferTransactionTypes,
-} from 'src/transactions/reducer'
+import { TransactionTypes } from 'src/transactions/reducer'
 
 export interface UserTransactionsVariables {
   address: string
 }
 
-export interface ExchangeTransaction {
-  type: TransactionTypes.EXCHANGE
-  id?: string
-  hash?: string
-  inValue: number
-  outValue: number
-  inSymbol: CURRENCY_ENUM
-  outSymbol: CURRENCY_ENUM
-  timestamp: number
-  status?: TransactionStatus
+export enum EventTypeNames {
+  Exchange = 'Exchange',
+  Transfer = 'Transfer',
 }
 
-export interface TransferTransaction {
-  type: TransferTransactionTypes
-  id?: string
-  hash?: string
+export interface HomeExchangeFragment {
+  __typename: EventTypeNames.Exchange
+  type: TransactionTypes
+  hash: string
+  inValue: number
+  outValue: number
+  inSymbol: string
+  outSymbol: string
+  timestamp: number
+}
+
+export interface HomeTransferFragment {
+  __typename: EventTypeNames.Transfer
+  type: TransactionTypes
+  hash: string
   value: number
-  symbol: CURRENCY_ENUM
+  symbol: string
   timestamp: number
   address: string
   comment: string
-  status?: TransactionStatus
   // TODO: fee needs to be added here
 }
 
-export interface HomeExchangeFragment extends ExchangeTransaction {
-  hash: string
-}
-
-export interface HomeTransferFragment extends TransferTransaction {
-  hash: string
-}
-
-export type Transaction = ExchangeTransaction | TransferTransaction
+export type Event = HomeExchangeFragment | HomeTransferFragment
 export interface UserTransactionsData {
-  events?: Transaction[] | null
+  events?: Event[] | null
 }
 
 export default class UserTransactionsQuery extends Query<

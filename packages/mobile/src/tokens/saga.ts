@@ -158,7 +158,7 @@ export function tokenTransferFactory({
           type: TransactionTypes.SENT,
           comment,
           status: TransactionStatus.Pending,
-          value: +amount,
+          value: amount.toString(),
           symbol: currency,
           timestamp: Math.floor(Date.now() / 1000),
           address: recipientAddress,

@@ -2,6 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { EventTypeNames } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
@@ -30,6 +31,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={mockComment}
           type={TransactionTypes.SENT}
           hash={'0x'}
@@ -52,6 +54,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={encryptedMockComment}
           type={TransactionTypes.SENT}
           hash={'0x'}
@@ -74,6 +77,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={encryptedMockComment}
           type={TransactionTypes.RECEIVED}
           hash={'0x'}
@@ -96,6 +100,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.VERIFICATION_FEE}
           hash={'0x'}
@@ -118,6 +123,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.NETWORK_FEE}
           hash={'0x'}
@@ -140,6 +146,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.NETWORK_FEE}
           hash={'0x'}
@@ -162,6 +169,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.VERIFICATION_REWARD}
           hash={'0x'}
@@ -184,6 +192,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.FAUCET}
           hash={'0x'}
@@ -206,6 +215,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.INVITE_SENT}
           hash={'0x'}
@@ -228,6 +238,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.INVITE_RECEIVED}
           hash={'0x'}
@@ -250,6 +261,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.RECEIVED}
           hash={'0x'}
@@ -272,6 +284,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.RECEIVED}
           hash={'0x'}
@@ -294,6 +307,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.SENT}
           hash={'0x'}
@@ -316,6 +330,7 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
           comment={''}
           type={TransactionTypes.SENT}
           hash={'0x'}

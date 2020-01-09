@@ -535,10 +535,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       }
     }
   } catch (error) {
-    Logger.warn(
-      tag,
-      `Transaction failed with error "${error.name + ' ' + JSON.stringify(error.message)}"`
-    )
+    Logger.warn(tag, `Transaction failed with error "${error.name + ' ' + error.message}"`)
     logger(Exception(error))
     rejectAll(error)
   }

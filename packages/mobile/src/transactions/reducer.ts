@@ -1,13 +1,28 @@
-import { ExchangeTransaction, TransferTransaction } from 'src/apollo/types'
+import BigNumber from 'bignumber.js'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, ActionTypes } from 'src/transactions/actions'
 
-export interface ExchangeStandby extends ExchangeTransaction {
+export interface ExchangeStandby {
   id: string
+  type: TransactionTypes.EXCHANGE
   status: TransactionStatus
+  inSymbol: CURRENCY_ENUM
+  inValue: string
+  outSymbol: CURRENCY_ENUM
+  outValue: string
+  timestamp: number
+  hash?: string
 }
-export interface TransferStandby extends TransferTransaction {
+export interface TransferStandby {
   id: string
+  type: TransferTransactionTypes
   status: TransactionStatus
+  value: string | BigNumber
+  comment: string
+  symbol: CURRENCY_ENUM
+  timestamp: number
+  address: string
+  hash?: string
 }
 
 export type StandbyTransaction = ExchangeStandby | TransferStandby
@@ -34,7 +49,7 @@ export enum TransactionTypes {
   NETWORK_FEE = 'NETWORK_FEE',
 }
 
-export type TransferTransactionTypes =
+type TransferTransactionTypes =
   | TransactionTypes.SENT
   | TransactionTypes.RECEIVED
   | TransactionTypes.ESCROW_RECEIVED
@@ -45,24 +60,6 @@ export type TransferTransactionTypes =
   | TransactionTypes.INVITE_SENT
   | TransactionTypes.INVITE_RECEIVED
   | TransactionTypes.NETWORK_FEE
-
-export const isTransferType = (txType: TransactionTypes) => {
-  if (
-    txType === TransactionTypes.SENT ||
-    txType === TransactionTypes.RECEIVED ||
-    txType === TransactionTypes.ESCROW_RECEIVED ||
-    txType === TransactionTypes.ESCROW_SENT ||
-    txType === TransactionTypes.FAUCET ||
-    txType === TransactionTypes.VERIFICATION_REWARD ||
-    txType === TransactionTypes.VERIFICATION_FEE ||
-    txType === TransactionTypes.INVITE_SENT ||
-    txType === TransactionTypes.INVITE_RECEIVED ||
-    txType === TransactionTypes.NETWORK_FEE
-  ) {
-    return true
-  }
-  return false
-}
 
 export interface State {
   standbyTransactions: StandbyTransaction[]

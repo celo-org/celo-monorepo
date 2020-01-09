@@ -235,9 +235,9 @@ function* createStandbyTx(
       type: TransactionTypes.EXCHANGE,
       status: TransactionStatus.Pending,
       inSymbol: makerToken,
-      inValue: makerAmount.toNumber(),
+      inValue: makerAmount.toString(),
       outSymbol: makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR,
-      outValue: takerAmount.toNumber(),
+      outValue: takerAmount.toString(),
       timestamp: Math.floor(Date.now() / 1000),
     })
   )

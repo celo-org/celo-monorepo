@@ -2,6 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { EventTypeNames } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { ExchangeFeedItem } from 'src/transactions/ExchangeFeedItem'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
@@ -27,7 +28,8 @@ describe('ExchangeFeedItem', () => {
       <Provider store={createMockStore({})}>
         <ExchangeFeedItem
           status={TransactionStatus.Complete}
-          type={'EXCHANGE' as TransactionTypes.EXCHANGE}
+          __typename={EventTypeNames.Exchange}
+          type={'EXCHANGE' as TransactionTypes}
           hash={'0x'}
           inValue={1}
           outValue={10}

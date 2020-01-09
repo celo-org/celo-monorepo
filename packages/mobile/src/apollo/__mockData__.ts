@@ -1,34 +1,41 @@
-import { HomeExchangeFragment, HomeTransferFragment, UserTransactionsData } from 'src/apollo/types'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import {
+  EventTypeNames,
+  HomeExchangeFragment,
+  HomeTransferFragment,
+  UserTransactionsData,
+} from 'src/apollo/types'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
-import { TransactionTypes, TransferTransactionTypes } from 'src/transactions/reducer'
+import { TransactionTypes } from 'src/transactions/reducer'
 
 export const invitedAddress = '0x1b173'
 
 const exchangeDollar: HomeExchangeFragment = {
-  type: TransactionTypes.EXCHANGE,
+  __typename: EventTypeNames.Exchange,
+  type: 'EXCHANGE' as TransactionTypes,
   hash: '1',
   inValue: 19080,
   timestamp: Date.now(),
-  inSymbol: 'Celo Dollar' as CURRENCY_ENUM,
-  outSymbol: 'Celo Gold' as CURRENCY_ENUM,
+  inSymbol: 'Celo Dollar',
+  outSymbol: 'Celo Gold',
   outValue: 62252,
 }
 
 const exchangeGold: HomeExchangeFragment = {
-  type: TransactionTypes.EXCHANGE,
+  __typename: EventTypeNames.Exchange,
+  type: 'EXCHANGE' as TransactionTypes,
   hash: '1',
   inValue: 190,
   timestamp: Date.now(),
-  inSymbol: 'Celo Gold' as CURRENCY_ENUM,
-  outSymbol: 'Celo Dollar' as CURRENCY_ENUM,
+  inSymbol: 'Celo Gold',
+  outSymbol: 'Celo Dollar',
   outValue: 62,
 }
 
 const sent: HomeTransferFragment = {
-  type: TransactionTypes.SENT,
+  __typename: EventTypeNames.Transfer,
+  type: 'SENT' as TransactionTypes,
   value: 987161,
-  symbol: 'Celo Gold' as CURRENCY_ENUM,
+  symbol: 'Celo Gold',
   timestamp: Date.now(),
   address: '0x423043cca38e75d7913504fedfd1dd4539cc55b3',
   comment: 'FAKE FAKE FAKE',
@@ -36,9 +43,10 @@ const sent: HomeTransferFragment = {
 }
 
 const sentInvite: HomeTransferFragment = {
-  type: TransactionTypes.SENT,
+  __typename: EventTypeNames.Transfer,
+  type: 'SENT' as TransactionTypes,
   value: 0.33,
-  symbol: 'Celo Dollar' as CURRENCY_ENUM,
+  symbol: 'Celo Dollar',
   timestamp: Date.now(),
   address: invitedAddress,
   comment: SENTINEL_INVITE_COMMENT,
@@ -46,36 +54,40 @@ const sentInvite: HomeTransferFragment = {
 }
 
 const recieved: HomeTransferFragment = {
-  type: TransactionTypes.RECEIVED,
+  __typename: EventTypeNames.Transfer,
+  type: 'RECEIVED' as TransactionTypes,
   value: 587161,
-  symbol: 'Celo Gold' as CURRENCY_ENUM,
+  symbol: 'Celo Gold',
   timestamp: Date.now(),
   address: '0x423043cca38e75d7913504fedfd1dd4539cc55b3',
   comment: 'FAKE FAKE FAKE',
   hash: '01010',
 }
 const faucet: HomeTransferFragment = {
-  type: TransactionTypes.FAUCET,
+  __typename: EventTypeNames.Transfer,
+  type: 'FAUCET' as TransactionTypes,
   value: 387161,
-  symbol: 'Celo Dollar' as CURRENCY_ENUM,
+  symbol: 'Celo Dollar',
   timestamp: Date.now(),
   address: '0x423043cca38e75d7913504fedfd1dd4539cc55b3',
   comment: 'FAKE FAKE FAKE',
   hash: '01010',
 }
 const verificationFee: HomeTransferFragment = {
-  type: 'VERIFICATION_FEE' as TransferTransactionTypes,
+  __typename: EventTypeNames.Transfer,
+  type: 'VERIFICATION_FEE' as TransactionTypes,
   value: 0.3,
-  symbol: 'Celo Gold' as CURRENCY_ENUM,
+  symbol: 'Celo Gold',
   timestamp: Date.now(),
   address: '0x423043cca38e75d7913504fedfd1dd4539cc55b3',
   comment: 'FAKE FAKE FAKE',
   hash: '01010',
 }
 const verificationReward: HomeTransferFragment = {
-  type: 'VERIFICATION_REWARD' as TransferTransactionTypes,
+  __typename: EventTypeNames.Transfer,
+  type: 'VERIFICATION_REWARD' as TransactionTypes,
   value: 9371,
-  symbol: 'Celo Dollar' as CURRENCY_ENUM,
+  symbol: 'Celo Dollar',
   timestamp: Date.now(),
   address: '0x423043cca38e75d7913504fedfd1dd4539cc55b3',
   comment: 'FAKE FAKE FAKE',
