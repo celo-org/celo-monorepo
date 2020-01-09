@@ -1,5 +1,6 @@
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
+import { EventLog } from 'web3/types'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
@@ -26,6 +27,14 @@ interface AccountSummary {
     requirement: BigNumber
   }
   pendingWithdrawals: PendingWithdrawal[]
+}
+
+export interface AccountSlashed {
+  slashed: Address
+  penalty: BigNumber
+  reporter: Address
+  reward: BigNumber
+  epochNumber: number
 }
 
 interface PendingWithdrawal {
@@ -185,6 +194,26 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       }),
       withdrawals[1],
       withdrawals[0]
+    )
+  }
+
+  /**
+   * Retrieves AccountSlashed for epochNumber.
+   * @param epochNumber The epoch to retrieve AccountSlashed at.
+   */
+  async getAccountsSlashed(epochNumber: number): Promise<AccountSlashed[]> {
+    const events = await this.getPastEvents('AccountSlashed', {
+      fromBlock: await this.kit.getFirstBlockNumberForEpoch(epochNumber),
+      toBlock: await this.kit.getLastBlockNumberForEpoch(epochNumber),
+    })
+    return events.map(
+      (e: EventLog): AccountSlashed => ({
+        epochNumber,
+        slashed: e.returnValues.slashed,
+        penalty: e.returnValues.penalty,
+        reporter: e.returnValues.reporter,
+        reward: e.returnValues.reward,
+      })
     )
   }
 }

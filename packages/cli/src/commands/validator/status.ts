@@ -51,10 +51,6 @@ export default class ValidatorStatus extends BaseCommand {
       description: 'how many blocks to look back for signer activity',
       default: 100,
     }),
-    'no-truncate': flags.boolean({
-      description: "Don't truncate fields to fit line",
-      required: false,
-    }),
   }
 
   static examples = [
@@ -126,6 +122,6 @@ export default class ValidatorStatus extends BaseCommand {
       this.getStatus(s, blocks, electedSigners, frontRunnerSigners)
     )
     cli.action.stop()
-    cli.table(validatorStatuses, statusTable, { 'no-truncate': res.flags['no-truncate'] })
+    cli.table(validatorStatuses, statusTable, { 'no-truncate': !res.flags.truncate })
   }
 }
