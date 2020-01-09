@@ -1,5 +1,6 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
+import cache from '../server/cache'
 import airtableInit from './airtable'
 
 const ASSSET_FIELD_LIGHT = 'Assets (on light bg)'
@@ -21,7 +22,11 @@ enum AssetSheet {
   AbstractGraphics = 'Abstract Graphics',
 }
 
-export default function getAssets(sheet: AssetSheet) {
+export default async function getAssets(sheet: AssetSheet) {
+  return cache(`brand-assets-${sheet}`, fetchAssets, { args: sheet, minutes: 10 })
+}
+
+function fetchAssets(sheet: AssetSheet) {
   return getAirtable(sheet)
     .select({
       filterByFormula: `AND(${IS_APROVED}, ${TERMS_SIGNED})`,
