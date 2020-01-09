@@ -31,7 +31,7 @@ spec:
         - -c
         args:
         - |
-           mix cmd --app indexer iex -S mix
+           mix cmd --app indexer iex -S mix | sed 's/^iex(1)> //'
         ports:
         - name: http
           containerPort: 4000
