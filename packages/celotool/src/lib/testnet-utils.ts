@@ -48,15 +48,16 @@ export async function getGenesisBlockFromGoogleStorage(networkName: string) {
 export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
-  const nodesJsonData: string[] | null = await retryCmd(() =>
+  const nodesData: string[] | null = await retryCmd(() =>
     getEnodesWithExternalIPAddresses(networkName)
   )
-  if (nodesJsonData === null) {
+  if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  console.debug('Static nodes are ' + nodesJsonData + '\n')
+  const nodesJson = JSON.stringify(nodesData)
+  console.debug('Static nodes are ' + nodesJson + '\n')
   await uploadDataToGoogleStorage(
-    nodesJsonData,
+    nodesJson,
     staticNodesBucketName,
     networkName,
     true,
