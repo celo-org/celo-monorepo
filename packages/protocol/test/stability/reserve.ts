@@ -549,8 +549,6 @@ contract('Reserve', (accounts: string[]) => {
     it('should return the correct ratio', async () => {
       const stableTokenSupply = new BigNumber(10).pow(21)
       await mockStableToken.setTotalSupply(stableTokenSupply)
-      // TODO: convert to gold
-      console.info(reserveGoldBalance.div(stableTokenSupply))
       const ratio = new BigNumber(await reserve.getReserveRatio())
       assert(
         fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenSupply.div(exchangeRate))),
