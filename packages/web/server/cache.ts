@@ -16,3 +16,5 @@ export async function cache<T>(key: string, func: (param?: any) => Promise<T>, a
     return freshResult as T
   }
 }
+
+export default cache
