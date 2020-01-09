@@ -50,6 +50,7 @@ type EndReason =
   | { reason: 'connection-error'; error: any }
   | { reason: 'subscription-error'; error: any }
   | { reason: 'not-listening' }
+  | { reason: 'connection not open' }
 
 export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   const blockProcessor = await newBlockHeaderProcessor(kit)
