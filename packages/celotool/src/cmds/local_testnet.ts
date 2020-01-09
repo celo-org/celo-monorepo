@@ -117,6 +117,7 @@ function selectPorts(configs: GethInstanceConfig[]): GethInstanceConfig[] {
     }
     if (!config.rpcport && !config.wsport) {
       config.rpcport = 8545 + 2 * i
+      config.wsport = 8546 + 2 * i
     }
   }
   return configs
@@ -179,9 +180,7 @@ export const handler = async (argv: LocalTestnetArgs) => {
   console.info(`Local testnet is online with ${gethConfig.instances.length} nodes:`)
   for (const instance of gethConfig.instances) {
     console.info(
-      `  * ${instance.name} (pid:${instance.pid}) is listening on on http://localhost:${
-        instance.rpcport
-      }`
+      `  * ${instance.name} (pid:${instance.pid}) is listening on on http://localhost:${instance.rpcport}`
     )
   }
   console.info('\nPress CTRL+C to quit')

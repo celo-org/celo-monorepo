@@ -299,7 +299,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      '--rpcapi=eth,net,web3,debug,admin,personal'
+      '--rpcapi=eth,net,web3,debug,admin,personal,istanbul'
     )
   }
 
