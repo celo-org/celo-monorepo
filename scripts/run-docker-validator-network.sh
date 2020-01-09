@@ -25,6 +25,9 @@ export TWILIO_ACCOUNT_SID=AC00000000000000000000000000000000
 export TWILIO_BLACKLIST=""
 export TWILIO_AUTH_TOKEN="ffffffffffffffffffffffffffffffff"
 
+# If the value is true, the script will print the CELO_* environment variables
+export FORCE_PRINT_ENV=true
+
 HOSTNAME=$(hostname)
 export ETHSTATS_ARG="$HOSTNAME@$NETWORK_NAME-ethstats.celo-testnet.org"
 
@@ -382,7 +385,7 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
     echo -e "\t 'screen -r -S celo-fullnode'\n"
 fi
 
-if [[ $COMMAND == *"print-env"* ]] || [[ 1 ]]; then
+if [[ $COMMAND == *"print-env"* ]] || [[ $FORCE_PRINT_ENV == *"true"* ]]; then
 
     echo -e "\n************************************************************************\n"
     echo -e "Celo Environment Variables (copy to validator-config.rc to re-use them!):\n\n"
