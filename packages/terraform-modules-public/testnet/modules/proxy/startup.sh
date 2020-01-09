@@ -1,20 +1,15 @@
 #!/bin/bash
 
-# ---- Set Up Logging ----
-
-curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
-bash install-logging-agent.sh
-
 # ---- Set Up Persistent Disk ----
 
 # gives a path similar to `/dev/sdb`
-DISK_PATH=`readlink -f /dev/disk/by-id/google-${attached_disk_name}`
+DISK_PATH=$(readlink -f /dev/disk/by-id/google-${attached_disk_name})
 DATA_DIR=/root/.celo
 
 echo "Setting up persistent disk ${attached_disk_name} at $DISK_PATH..."
 
 DISK_FORMAT=ext4
-CURRENT_DISK_FORMAT=`lsblk -i -n -o fstype $DISK_PATH`
+CURRENT_DISK_FORMAT=$(lsblk -i -n -o fstype $DISK_PATH)
 
 echo "Checking if disk $DISK_PATH format $CURRENT_DISK_FORMAT matches desired $DISK_FORMAT..."
 
@@ -27,20 +22,25 @@ else
   mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard $DISK_PATH
 fi
 
+# Mounting the volume
 echo "Mounting $DISK_PATH onto $DATA_DIR"
 mkdir -p $DATA_DIR
-mount -o discard,defaults $DISK_PATH $DATA_DIR
+DISK_UUID=$(blkid $DISK_PATH | cut -d '"' -f2)
+echo "UUID=$DISK_UUID     $DATA_DIR   auto    discard,defaults    0    0" >> /etc/fstab
+mount $DATA_DIR
+
+# Remove existing chain data
 [[ ${reset_geth_data} == "true" ]] && rm -rf $DATA_DIR/geth
 mkdir -p $DATA_DIR/account
 
 # ---- Install Docker ----
 
 echo "Installing Docker..."
-apt update && apt upgrade
+apt update -y && apt upgrade -y
 apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-apt update && apt upgrade
+apt update -y && apt upgrade -y
 apt install -y docker-ce
 systemctl start docker
 

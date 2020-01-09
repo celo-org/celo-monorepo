@@ -7,19 +7,14 @@ function save_variable {
   [ -n "$var" ] && echo -n "$var" > "$file"
 }
 
-# ---- Set Up Logging ----
-
-curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
-bash install-logging-agent.sh
-
 # ---- Install Docker ----
 
 echo "Installing Docker..."
-apt update && apt upgrade
+apt update -y && apt upgrade -y
 apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-apt update && apt upgrade
+apt update -y && apt upgrade -y
 apt install -y docker-ce
 systemctl start docker
 
