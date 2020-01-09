@@ -280,6 +280,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--syncmode',
     syncmode,
     '--debug',
+    '--metrics',
     '--port',
     port.toString(),
     '--nodiscover',
@@ -309,7 +310,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--ws',
       '--wsport',
       wsport.toString(),
-      '--wsapi=eth,net,web3,debug,admin,personal'
+      '--wsapi=eth,net,web3,debug,admin,personal,istanbul'
     )
   }
 
