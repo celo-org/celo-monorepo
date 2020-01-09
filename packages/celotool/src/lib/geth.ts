@@ -55,10 +55,6 @@ export const getEnodeAddress = (nodeId: string, ipAddress: string, port: number)
   return `enode://${nodeId}@${ipAddress}:${port}`
 }
 
-const getClusterNativeEnodes = async (namespace: string) => {
-  return getEnodesWithIpAddresses(namespace, false)
-}
-
 export const getBootnodeEnode = async (namespace: string) => {
   const ip = await retrieveBootnodeIPAddress(namespace)
   const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.BOOTNODE, 0)
@@ -114,7 +110,7 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
 }
 
 export const getEnodesAddresses = async (namespace: string) => {
-  return getClusterNativeEnodes(namespace)
+  return getEnodesWithIpAddresses(namespace, false)
 }
 
 export const getEnodesWithExternalIPAddresses = async (namespace: string) => {
