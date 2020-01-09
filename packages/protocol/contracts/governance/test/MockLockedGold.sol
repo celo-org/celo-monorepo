@@ -19,7 +19,7 @@ contract MockLockedGold is ILockedGold {
   mapping(address => uint256) public nonvotingAccountBalance;
   mapping(address => address) public authorizedValidators;
   mapping(address => address) public authorizedBy;
-  mapping(address => bool) public isSlasher;
+  bytes32[] public slashingWhitelist;
   uint256 private totalLockedGold;
 
   function incrementNonvotingAccountBalance(address account, uint256 value) external {
@@ -44,6 +44,9 @@ contract MockLockedGold is ILockedGold {
   function getTotalLockedGold() external view returns (uint256) {
     return totalLockedGold;
   }
+  function getSlashingWhitelist() external view returns (bytes32[] memory) {
+    return slashingWhitelist;
+  }
   function slash(
     address account,
     uint256 penalty,
@@ -56,11 +59,13 @@ contract MockLockedGold is ILockedGold {
     accountTotalLockedGold[account] = accountTotalLockedGold[account].sub(penalty);
   }
 
-  function addSlasher(address slasher) external {
-    isSlasher[slasher] = true;
+  function addSlasher(string calldata slasherIdentifier) external {
+    bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
+    slashingWhitelist.push(keyBytes);
   }
 
-  function removeSlasher(address slasher) external {
-    isSlasher[slasher] = false;
+  function removeSlasher(string calldata, uint256 index) external {
+    slashingWhitelist[index] = slashingWhitelist[slashingWhitelist.length - 1];
+    slashingWhitelist.pop();
   }
 }

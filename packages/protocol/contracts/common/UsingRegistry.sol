@@ -61,17 +61,25 @@ contract UsingRegistry is Ownable {
   }
 
   modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
-    bool registered = false;
+    require(isOneOf(identifierHashes, msg.sender), "only registered contracts");
+    _;
+  }
+
+  /**
+   * @notice Iterates over provided array of identifiers, getting the address for each.
+   *         Returns true if `sender` matches the address of one of the provided identifiers.
+   * @param identifierHashes Array of hashes of approved identifiers.
+   * @param sender Address in question to verify membership.
+   * @return True if `sender` corresponds to the address of any of `identifiers`
+   *         registry entries.
+   */
+  function isOneOf(bytes32[] memory identifierHashes, address sender) internal view returns (bool) {
     for (uint256 i = 0; i < identifierHashes.length; i++) {
-      if (registry.getAddressForOrDie(identifierHashes[i]) == msg.sender) {
-        registered = true;
-        break;
+      if (registry.getAddressFor(identifierHashes[i]) == sender) {
+        return true;
       }
     }
-    // TODO(lucas): remove once DowntimeSlasher is implemented.
-    bool isCLabsValZero = (msg.sender == address(0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D));
-    require(registered || isCLabsValZero, "only registered contracts");
-    _;
+    return false;
   }
 
   /**
@@ -136,21 +144,4 @@ contract UsingRegistry is Ownable {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 
-  /**
-   * @notice Iterates over provided array of identifiers, getting the address for each.
-   *         Returns true if `sender` matches the address of one of the provided identifiers.
-   * @param identifiers Array of approved identifiers.
-   * @param sender Address in question to verify membership.
-   * @return True if `sender` corresponds to the address of any of `identifiers`
-   *         registry entries.
-   */
-  function isOneOf(string[] memory identifiers, address sender) internal view returns (bool) {
-    for (uint256 i = 0; i < identifiers.length; i++) {
-      bytes32 identifierHash = keccak256(abi.encodePacked(identifiers[i]));
-      if (registry.getAddressFor(identifierHash) == sender) {
-        return true;
-      }
-    }
-    return false;
-  }
 }
