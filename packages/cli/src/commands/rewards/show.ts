@@ -247,7 +247,7 @@ export default class Show extends BaseCommand {
           slashed: {},
           penalty: {},
           reporter: {},
-          award: {},
+          reward: {},
           epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }

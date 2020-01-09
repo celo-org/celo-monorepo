@@ -1,6 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { Address, NULL_ADDRESS } from '../base'
+import { Address } from '../base'
 import { DowntimeSlasher } from '../generated/types/DowntimeSlasher'
 import {
   BaseWrapper,
@@ -9,8 +7,6 @@ import {
   toTransactionObject,
   valueToInt,
 } from './BaseWrapper'
-import { ValidatorGroupVote } from './Election'
-import { GroupMembership } from './Validators'
 
 /**
  * Contract handling slashing for Validator downtime
@@ -22,14 +18,6 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     valueToInt
   )
 
-  numberValidatorsInSet = proxyCall(
-    this.contract.methods.numberValidatorsInSet,
-    undefined,
-    valueToInt
-  )
-
-  validatorSignerAddressFromSet = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
-
   slashableDowntime = proxyCall(this.contract.methods.slashableDowntime, undefined, valueToInt)
 
   isDown = proxyCall(this.contract.methods.isDown)
@@ -40,10 +28,14 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   ): Promise<CeloTransactionObject<void>> {
     const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidator(validatorAddress)
-    return this.slash(startBlock, await this.findSignerIndexForBlock(validator.signer, startBlock))
+    return this.slash(
+      startBlock,
+      await validators.findSignerIndexForBlock(validator.signer, startBlock)
+    )
   }
 
   async slash(startBlock: number, signerIndex: number): Promise<CeloTransactionObject<void>> {
+    const validators = await this.kit.contracts.getValidators()
     const signer = await this.contract.methods
       .validatorSignerAddressFromSet(signerIndex, startBlock)
       .call()
@@ -52,21 +44,22 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const endBlock = startBlock + (await this.slashableDowntime()) - 1
     const endEpoch = await this.getEpochNumberOfBlock(endBlock)
     const endIndex =
-      startEpoch === endEpoch ? signerIndex : await this.findSignerIndexForBlock(signer, endBlock)
+      startEpoch === endEpoch
+        ? signerIndex
+        : await validators.findSignerIndexForBlock(signer, endBlock)
 
-    const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidatorFromSigner(signer)
     const history = await validators.getValidatorMembershipHistory(validator.address)
-    const historyIndex = this.findMembershipHistoryIndexForEpoch(history, startEpoch)
+    const historyIndex = validators.findMembershipHistoryIndexForEpoch(history, startEpoch)
     const group = history[historyIndex].group
 
     const election = await this.kit.contracts.getElection()
     const eligibleGroups = await election.getEligibleValidatorGroupsVotes()
-    const validatorVotes = await this.findLesserAndGreaterKeys(
+    const validatorVotes = await election.findLessersAndGreaters(
       await election.getGroupsVotedForByAccount(validator.address),
       eligibleGroups
     )
-    const groupVotes = await this.findLesserAndGreaterKeys(
+    const groupVotes = await election.findLessersAndGreaters(
       await election.getGroupsVotedForByAccount(group),
       eligibleGroups
     )
@@ -78,52 +71,13 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
         signerIndex,
         endIndex,
         historyIndex,
-        validatorVotes.lesserKey,
-        validatorVotes.greaterKey,
-        validatorVotes.indexKey,
-        groupVotes.lesserKey,
-        groupVotes.greaterKey,
-        groupVotes.indexKey
+        validatorVotes.lesser,
+        validatorVotes.greater,
+        validatorVotes.index,
+        groupVotes.lesser,
+        groupVotes.greater,
+        groupVotes.index
       )
     )
-  }
-
-  private findMembershipHistoryIndexForEpoch(history: GroupMembership[], epoch: number): number {
-    for (let index = history.length - 1; index >= 0; index--) {
-      if (history[index].epoch <= epoch) {
-        return index
-      }
-    }
-    throw new Error(`No group membership for epoch ${epoch}`)
-  }
-
-  private async findSignerIndexForBlock(signer: Address, blockNumber: number): Promise<number> {
-    const numValidators = await this.numberValidatorsInSet(blockNumber)
-    const signerIndices = Array.from(Array(numValidators), (_, i) => i)
-    const signers = await concurrentMap(10, signerIndices, (i) =>
-      this.validatorSignerAddressFromSet(i, blockNumber)
-    )
-    for (let i = 0; i < numValidators; i++) {
-      if (signers[i] === signer) {
-        return i
-      }
-    }
-    throw new Error(`No signer ${signer} for block ${blockNumber}`)
-  }
-
-  private findLesserAndGreaterKeys(
-    groupsVotedFor: Address[],
-    eligible: ValidatorGroupVote[]
-  ): { indexKey: number[]; lesserKey: Address[]; greaterKey: Address[] } {
-    const indexKey: number[] = []
-    const lesserKey: Address[] = []
-    const greaterKey: Address[] = []
-    for (const votedGroup of groupsVotedFor) {
-      const index = eligible.findIndex((votes) => eqAddress(votes.address, votedGroup))
-      indexKey.push(index)
-      lesserKey.push(index === 0 ? NULL_ADDRESS : eligible[index - 1].address)
-      greaterKey.push(index === eligible.length - 1 ? NULL_ADDRESS : eligible[index + 1].address)
-    }
-    return { indexKey, lesserKey, greaterKey }
   }
 }

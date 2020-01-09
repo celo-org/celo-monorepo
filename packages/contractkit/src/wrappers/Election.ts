@@ -341,6 +341,22 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
   }
 
+  findLessersAndGreaters(
+    groupsVotedFor: Address[],
+    eligible: ValidatorGroupVote[]
+  ): { index: number[]; lesser: Address[]; greater: Address[] } {
+    const index: number[] = []
+    const lesser: Address[] = []
+    const greater: Address[] = []
+    for (const votedGroup of groupsVotedFor) {
+      const idx = eligible.findIndex((votes) => eqAddress(votes.address, votedGroup))
+      index.push(idx)
+      lesser.push(idx === 0 ? NULL_ADDRESS : eligible[idx - 1].address)
+      greater.push(idx === eligible.length - 1 ? NULL_ADDRESS : eligible[idx + 1].address)
+    }
+    return { index, lesser, greater }
+  }
+
   async findLesserAndGreaterAfterVote(
     votedGroup: Address,
     voteWeight: BigNumber

@@ -473,4 +473,38 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       })
     )
   }
+
+  numberValidatorsInSet: (blockNumber: number) => Promise<number> = proxyCall(
+    this.contract.methods.numberValidatorsInSet,
+    undefined,
+    valueToInt
+  )
+
+  validatorSignerAddressFromSet: (
+    signedIndex: number,
+    blockNumber: number
+  ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
+
+  async findSignerIndexForBlock(signer: Address, blockNumber: number): Promise<number> {
+    const numValidators = await this.numberValidatorsInSet(blockNumber)
+    const signerIndices = Array.from(Array(numValidators), (_, i) => i)
+    const signers = await concurrentMap(10, signerIndices, (i) =>
+      this.validatorSignerAddressFromSet(i, blockNumber)
+    )
+    for (let i = 0; i < numValidators; i++) {
+      if (signers[i] === signer) {
+        return i
+      }
+    }
+    throw new Error(`No signer ${signer} for block ${blockNumber}`)
+  }
+
+  findMembershipHistoryIndexForEpoch(history: GroupMembership[], epoch: number): number {
+    for (let index = history.length - 1; index >= 0; index--) {
+      if (history[index].epoch <= epoch) {
+        return index
+      }
+    }
+    throw new Error(`No group membership for epoch ${epoch}`)
+  }
 }
