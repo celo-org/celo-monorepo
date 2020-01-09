@@ -4,7 +4,6 @@ import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
 import shuffleSeed from 'shuffle-seed'
 import { Contributor } from 'src/about/Contributor'
 import Fetch from 'src/brandkit/common/Fetch'
-import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import External from 'src/icons/External'
 import BookLayout from 'src/layout/BookLayout'
@@ -26,19 +25,10 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
     return (
       <>
         <BookLayout label={t('teamTitle')} startBlock={true}>
-          <H1>{t('teamAlternateTitle')}</H1>
-          <Text
-            style={[
-              fonts.p,
-              standardStyles.elementalMarginTop,
-              standardStyles.sectionMarginBottomMobile,
-            ]}
-          >
-            {t('teamCopy')}{' '}
-          </Text>
+          <Text style={[fonts.p, standardStyles.sectionMarginBottomMobile]}>{t('teamCopy')} </Text>
         </BookLayout>
         <GridRow>
-          <Cell span={Spans.full} tabletSpan={Spans.full}>
+          <Cell span={Spans.full} tabletSpan={Spans.full} style={standardStyles.centered}>
             <View
               style={[
                 styles.photoList,
@@ -117,17 +107,20 @@ const Portrait = React.memo(function _Portrait({
           >
             {purpose}
           </Text>
-          <View style={[standardStyles.row, standardStyles.elementalMarginTop]}>
+          <View style={standardStyles.row}>
             <Text style={[fonts.p, textStyles.heavy, styles.name]}>{name}</Text>
             {url && (
-              <a href={url}>
-                <External size={12} color={colors.dark} />
-              </a>
+              <View style={styles.outLink}>
+                <a href={externalize(url)} target="_blank">
+                  <External size={12} color={colors.dark} />
+                </a>
+              </View>
             )}
           </View>
 
           <Text style={fonts.p}>
-            {company} – {team}
+            {company.trim()}
+            {team && `, ${team.trim()}`}
           </Text>
         </View>
       </Responsive>
@@ -135,46 +128,61 @@ const Portrait = React.memo(function _Portrait({
   )
 })
 
+function externalize(url: string) {
+  try {
+    const uri = new URL(url)
+    return uri.href
+  } catch {
+    return `//${url}`
+  }
+}
+
 // @ts-ignore
 const styles = StyleSheet.create({
+  name: {
+    marginTop: 3,
+    marginRight: 5,
+  },
+  outLink: {
+    paddingBottom: 1,
+    justifyContent: 'flex-end',
+  },
   purposeText: { fontSize: 26, lineHeight: 28, minHeight: 60 },
   photoListAuxMobile: {
-    justifyContent: 'flex-start',
+    display: 'flex',
+    justifyContent: 'center',
     minHeight: '80vh',
   },
-  photoListAuxTablet: { justifyContent: 'space-around' },
+  photoListAuxTablet: {
+    display: 'grid',
+    gridTemplateColumns: `repeat(2, 1fr)`,
+  },
   photo: {
     height: '100%',
     width: '100%',
   },
-  name: {
-    marginRight: 5,
-  },
   photoList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    display: 'grid',
+    gridRowGap: 55,
+    gridColumnGap: 40,
+    gridTemplateColumns: `repeat(3, 1fr)`,
     minHeight: '50vh',
   },
   person: {
     flexDirection: 'column',
     margin: 5,
-    marginBottom: 30,
-    width: '80vw',
-    minWidth: 200,
+    marginBottom: 50,
+    width: '90vw',
+    minWidth: 250,
     maxWidth: 300,
   },
   mediumPerson: {
     flexDirection: 'column',
-    marginBottom: 30,
-    width: 245,
-    paddingHorizontal: 10,
+    minWidth: 250,
+    maxWidth: 300,
   },
   largePerson: {
     flexDirection: 'column',
-    marginBottom: 30,
-    width: 275,
   },
 })
 

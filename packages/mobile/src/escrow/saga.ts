@@ -87,7 +87,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
       id,
       type: TransactionTypes.ESCROW_SENT,
       status: TransactionStatus.Pending,
-      value,
+      value: +value,
       symbol: CURRENCY_ENUM.DOLLAR,
       timestamp: Math.floor(Date.now() / 1000),
       address,

@@ -4,20 +4,17 @@ import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
 import scrollIntoView from 'scroll-into-view'
-import { canTrack } from 'src/analytics/analytics'
+import { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
-import Sentry, { initSentry } from '../fullstack/sentry'
+import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
 
 config({ ssrReveal: true })
 class MyApp extends App {
-  componentDidMount() {
-    if (canTrack()) {
-      initSentry()
-    }
+  async componentDidMount() {
     if (window.location.hash) {
       hashScroller(window.location.hash)
     }
@@ -26,6 +23,10 @@ class MyApp extends App {
 
     if (getConfig().publicRuntimeConfig.FLAGS.ENV === 'development') {
       checkH1Count()
+    }
+    await initializeAnalytics()
+    if (await canTrack()) {
+      await initSentry()
     }
   }
 
@@ -39,8 +40,9 @@ class MyApp extends App {
     return this.props.router.asPath.startsWith('/experience')
   }
 
-  componentDidCatch = (error: Error, info: object) => {
-    Sentry.withScope((scope: Sentry.Scope) => {
+  componentDidCatch = async (error: Error, info: object) => {
+    const Sentry = await getSentry()
+    Sentry.withScope((scope) => {
       scope.setExtras(info)
       Sentry.captureException(error)
     })
