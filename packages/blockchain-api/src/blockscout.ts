@@ -265,12 +265,12 @@ export class BlockscoutAPI extends RESTDataSource {
               currencyCode: tokenEvent.tokenSymbol,
               timestamp,
             },
-            takerAmount: {
+            makerAmount: {
               amount: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toString(),
               currencyCode: inEvent.tokenSymbol,
               timestamp,
             },
-            makerAmount: {
+            takerAmount: {
               amount: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toString(),
               currencyCode: outEvent.tokenSymbol,
               timestamp,

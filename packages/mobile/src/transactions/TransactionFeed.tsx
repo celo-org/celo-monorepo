@@ -160,8 +160,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
       loading,
       error,
       data,
-      standbyTransactions,
-      transactionFilter,
+      // standbyTransactions,
+      // transactionFilter,
       commentKey,
     } = this.props
 

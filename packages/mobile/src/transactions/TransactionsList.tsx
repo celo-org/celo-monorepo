@@ -3,29 +3,32 @@ import * as React from 'react'
 import { Query } from 'react-apollo'
 import { WithTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { Token, UserTransactionsQuery, UserTransactionsQueryVariables } from 'src/apollo/types'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, { FeedType } from 'src/transactions/TransactionFeed'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+interface OwnProps {
+  currency: CURRENCY_ENUM
+}
+
 interface StateProps {
   address?: string | null
   standbyTransactions: StandbyTransaction[]
+  localCurrencyCode: LocalCurrencyCode | null
 }
 
 interface DispatchProps {
   removeStandbyTransaction: typeof removeStandbyTransaction
 }
 
-type Props = StateProps &
-  DispatchProps &
-  WithTranslation & {
-    key?: string
-  }
+type Props = OwnProps & StateProps & DispatchProps & WithTranslation
 
 // See https://github.com/microsoft/TypeScript/issues/16069#issuecomment-565658443
 function isPresent<T>(t: T | undefined | null | void): t is T {
@@ -75,15 +78,16 @@ class UserTransactionsComponent extends Query<
 const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
   standbyTransactions: state.transactions.standbyTransactions,
+  localCurrencyCode: getLocalCurrencyCode(state),
 })
 
 export class TransactionsList extends React.PureComponent<Props> {
   txsFetched = (data: UserTransactionsQuery | undefined) => {
-    if (!data || !data.events || data.events.length < 1) {
+    const events = data?.transactions?.edges.map((edge) => edge.node)
+    if (!events || events.length < 1) {
       return
     }
 
-    const events = data.events
     const queryDataTxIDs = new Set(events.map((event) => event?.hash))
     const inQueryTxs = (tx: StandbyTransaction) =>
       tx.hash && queryDataTxIDs.has(tx.hash) && tx.status !== TransactionStatus.Failed
@@ -94,18 +98,18 @@ export class TransactionsList extends React.PureComponent<Props> {
   }
 
   render() {
-    const { address } = this.props
+    const { address, currency, localCurrencyCode } = this.props
     const queryAddress = address || ''
+    const token = currency === CURRENCY_ENUM.GOLD ? Token.CGld : Token.CUsd
 
     return (
       <UserTransactionsComponent
         query={TRANSACTIONS_QUERY}
         pollInterval={10000}
-        variables={{ address: queryAddress, token: Token.CUsd, localCurrencyCode: 'EUR' }}
+        variables={{ address: queryAddress, token, localCurrencyCode }}
         onCompleted={this.txsFetched}
       >
         {({ loading, error, data }) => {
-          console.log('==dataquery', data)
           const transactions =
             data?.transactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
           return (
@@ -122,8 +126,6 @@ export class TransactionsList extends React.PureComponent<Props> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    removeStandbyTransaction,
-  })(withTranslation(Namespaces.walletFlow5)(TransactionsList))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  removeStandbyTransaction,
+})(withTranslation(Namespaces.walletFlow5)(TransactionsList))

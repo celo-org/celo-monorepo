@@ -9,15 +9,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { ExchangeItemFragment } from 'src/apollo/types'
-import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
-import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import {
-  useExchangeRate,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
+import { useLocalCurrencyCode, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
 import { navigateToExchangeReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/reducer'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -31,73 +26,61 @@ type Props = ExchangeItemFragment & {
 type ExchangeInputProps = Props & {
   localCurrencyCode: LocalCurrencyCode | null
   localCurrencySymbol: LocalCurrencySymbol | null
-  localExchangeRate: number | null | undefined
 }
 type ExchangeProps =
   | ReturnType<typeof getDollarExchangeProps>
   | ReturnType<typeof getGoldExchangeProps>
 
-function getLocalAmount(
-  dollarAmount: BigNumber.Value,
-  localExchangeRate: number | null | undefined
-) {
-  const localAmount = convertDollarsToLocalAmount(dollarAmount, localExchangeRate)
-  if (!localAmount) {
-    return null
-  }
-
-  return localAmount.toString()
-}
-
 function getDollarExchangeProps({
-  inValue: dollarAmount,
-  outValue: goldAmount,
+  makerAmount: dollarAmount,
+  takerAmount: goldAmount,
   localCurrencyCode,
   localCurrencySymbol,
-  localExchangeRate,
 }: ExchangeInputProps) {
-  const localAmount = getLocalAmount(dollarAmount, localExchangeRate)
   return {
     icon: require('src/transactions/ExchangeGreenGold.png'),
     dollarAmount,
     dollarDirection: '-',
     localCurrencyCode,
     localCurrencySymbol,
-    localAmount,
     goldAmount,
     goldDirection: '',
-    inValue: localCurrencyCode ? localAmount : dollarAmount,
+    inValue:
+      localCurrencyCode && dollarAmount.localAmount
+        ? dollarAmount.localAmount?.amount
+        : dollarAmount.amount,
     inColor: colors.celoGreen,
-    outValue: goldAmount,
+    outValue: goldAmount.amount,
     outColor: colors.celoGold,
   }
 }
 
 function getGoldExchangeProps({
-  inValue: goldAmount,
-  outValue: dollarAmount,
+  makerAmount: goldAmount,
+  takerAmount: dollarAmount,
   localCurrencyCode,
   localCurrencySymbol,
-  localExchangeRate,
 }: ExchangeInputProps) {
-  const localAmount = getLocalAmount(dollarAmount, localExchangeRate)
   return {
     icon: require('src/transactions/ExchangeGoldGreen.png'),
     dollarAmount,
     dollarDirection: '',
     localCurrencyCode,
     localCurrencySymbol,
-    localAmount,
     goldAmount,
     goldDirection: '-',
-    inValue: goldAmount,
+    inValue: goldAmount.amount,
     inColor: colors.celoGold,
-    outValue: localCurrencyCode ? localAmount : dollarAmount,
+    outValue:
+      localCurrencyCode && dollarAmount.localAmount
+        ? dollarAmount.localAmount?.amount
+        : dollarAmount.amount,
     outColor: colors.celoGreen,
   }
 }
 
-function getGoldAmountProps({ goldAmount: amount, goldDirection: amountDirection }: ExchangeProps) {
+function getGoldAmountProps({ goldAmount, goldDirection: amountDirection }: ExchangeProps) {
+  const amount = goldAmount.amount
   return {
     amount,
     amountDirection,
@@ -111,9 +94,11 @@ function getDollarAmountProps({
   dollarDirection: amountDirection,
   localCurrencyCode,
   localCurrencySymbol,
-  localAmount,
 }: ExchangeProps) {
-  const amount = localCurrencyCode ? localAmount : dollarAmount
+  const amount =
+    localCurrencyCode && dollarAmount.localAmount
+      ? dollarAmount.localAmount.amount
+      : dollarAmount.amount
   return {
     amount,
     amountDirection,
@@ -126,24 +111,27 @@ function getDollarAmountProps({
 
 export function ExchangeFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
-  const { showGoldAmount, inSymbol, status, timestamp } = props
+  const { showGoldAmount, makerAmount, status, timestamp } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
-  const localExchangeRate = useExchangeRate()
+
+  const makerToken =
+    makerAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      ? CURRENCY_ENUM.GOLD
+      : CURRENCY_ENUM.DOLLAR
 
   const onPress = () => {
     navigateToExchangeReview(timestamp, {
-      makerToken: resolveCurrency(inSymbol),
-      makerAmount: new BigNumber(props.inValue),
-      takerAmount: new BigNumber(props.outValue),
+      makerToken,
+      makerAmount: new BigNumber(props.makerAmount.amount),
+      takerAmount: new BigNumber(props.takerAmount.amount),
     })
   }
 
-  const inCurrency = resolveCurrency(inSymbol)
-  const exchangeInputProps = { ...props, localCurrencyCode, localCurrencySymbol, localExchangeRate }
+  const exchangeInputProps = { ...props, localCurrencyCode, localCurrencySymbol }
   const exchangeProps =
-    inCurrency === CURRENCY_ENUM.DOLLAR
+    makerToken === CURRENCY_ENUM.DOLLAR
       ? getDollarExchangeProps(exchangeInputProps)
       : getGoldExchangeProps(exchangeInputProps)
   const amountProps = showGoldAmount

@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
 import { call, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { apolloClient } from 'src/apollo'
-import { ExchangeRateQuery, ExchangeRateQueryVariables } from 'src/apollo/generated/graphql'
+import { ExchangeRateQuery, ExchangeRateQueryVariables } from 'src/apollo/types'
 import {
   Actions,
   fetchCurrentRate,

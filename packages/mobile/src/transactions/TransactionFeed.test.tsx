@@ -3,7 +3,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { EventTypeNames, HomeExchangeFragment, TransactionType } from 'src/apollo/types'
+import { ExchangeItemFragment, TransactionType } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, {
@@ -60,14 +60,25 @@ const failedExchange: StandbyTransaction[] = [
   },
 ]
 
-const exchangeEvents: HomeExchangeFragment[] = [
+const exchangeTransactions: ExchangeItemFragment[] = [
   {
-    __typename: EventTypeNames.Exchange,
+    __typename: 'TransactionExchange',
     type: TransactionType.Exchange,
-    inValue: 30,
-    outValue: 200,
-    outSymbol: CURRENCY_ENUM.GOLD,
-    inSymbol: CURRENCY_ENUM.DOLLAR,
+    amount: {
+      amount: '-30',
+      currencyCode: 'cUSD',
+      localAmount: null,
+    },
+    makerAmount: {
+      amount: '30',
+      currencyCode: 'cUSD',
+      localAmount: null,
+    },
+    takerAmount: {
+      amount: '200',
+      currencyCode: 'cGLD',
+      localAmount: null,
+    },
     timestamp: 1542306118,
     hash: '0x00000000000000000000',
   },
@@ -80,12 +91,7 @@ const store = createMockStore({
 it('renders for no transactions', () => {
   const tree = renderer.create(
     <Provider store={store}>
-      <TransactionFeed
-        loading={false}
-        error={undefined}
-        data={{ events: [] }}
-        kind={FeedType.HOME}
-      />
+      <TransactionFeed loading={false} error={undefined} data={[]} kind={FeedType.HOME} />
     </Provider>
   )
   expect(tree).toMatchSnapshot()
@@ -97,7 +103,7 @@ it('renders for error', () => {
       <TransactionFeed
         loading={false}
         error={new ApolloError({})}
-        data={undefined}
+        data={[]}
         kind={FeedType.EXCHANGE}
       />
     </Provider>
@@ -108,12 +114,7 @@ it('renders for error', () => {
 it('renders for loading', () => {
   const tree = renderer.create(
     <Provider store={store}>
-      <TransactionFeed
-        loading={true}
-        error={undefined}
-        data={{ events: [] }}
-        kind={FeedType.HOME}
-      />
+      <TransactionFeed loading={true} error={undefined} data={undefined} kind={FeedType.HOME} />
     </Provider>
   )
   expect(tree).toMatchSnapshot()
@@ -125,7 +126,7 @@ it('renders for standbyTransactions', () => {
       <TransactionFeedClass
         loading={false}
         error={undefined}
-        data={{ events: [] }}
+        data={[]}
         standbyTransactions={standbyTransactions}
         kind={FeedType.HOME}
         addressToE164Number={{}}
@@ -144,7 +145,7 @@ it('filters out Failed', () => {
       <TransactionFeedClass
         loading={false}
         error={undefined}
-        data={{ events: null }}
+        data={undefined}
         standbyTransactions={failedExchange}
         kind={FeedType.EXCHANGE}
         addressToE164Number={{}}
@@ -163,9 +164,7 @@ it('renders for gold to dollar exchange properly', () => {
       <TransactionFeed
         loading={false}
         error={undefined}
-        data={{
-          events: exchangeEvents,
-        }}
+        data={exchangeTransactions}
         kind={FeedType.HOME}
       />
     </Provider>

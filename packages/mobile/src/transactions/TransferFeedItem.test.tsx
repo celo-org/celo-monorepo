@@ -2,8 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { EventTypeNames, TransactionType } from 'src/apollo/types'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { TransactionType } from 'src/apollo/types'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import {
@@ -30,19 +29,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={mockComment}
           type={TransactionType.Sent}
           hash={'0x'}
-          value={1}
+          amount={{ amount: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -53,19 +50,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={encryptedMockComment}
           type={TransactionType.Sent}
           hash={'0x'}
-          value={1}
+          amount={{ amount: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount2}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={mockPrivateDEK}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -76,19 +71,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={encryptedMockComment}
           type={TransactionType.Received}
           hash={'0x'}
-          value={100}
+          amount={{ amount: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={mockPrivateDEK2}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -99,19 +92,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.VerificationFee}
           hash={'0x'}
-          value={0.33}
+          amount={{ amount: '0.33', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -122,19 +113,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.NetworkFee}
           hash={'0x'}
-          value={0.002}
+          amount={{ amount: '0.002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -145,19 +134,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.NetworkFee}
           hash={'0x'}
-          value={0.0000002}
+          amount={{ amount: '0.0000002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -168,19 +155,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.VerificationReward}
           hash={'0x'}
-          value={1}
+          amount={{ amount: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -191,19 +176,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.Faucet}
           hash={'0x'}
-          value={100}
+          amount={{ amount: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -214,19 +197,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.InviteSent}
           hash={'0x'}
-          value={1}
+          amount={{ amount: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={invitee}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -237,19 +218,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.InviteReceived}
           hash={'0x'}
-          value={1}
+          amount={{ amount: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={invitee}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -260,19 +239,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.Received}
           hash={'0x'}
-          value={100}
+          amount={{ amount: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -283,19 +260,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.Received}
           hash={'0x'}
-          value={100}
+          amount={{ amount: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -306,19 +281,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.Sent}
           hash={'0x'}
-          value={100}
+          amount={{ amount: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -329,19 +302,17 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename={EventTypeNames.Transfer}
+          __typename="TransactionTransfer"
           comment={''}
           type={TransactionType.Sent}
           hash={'0x'}
-          value={100}
+          amount={{ amount: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
           invitees={{}}
-          symbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
-          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>

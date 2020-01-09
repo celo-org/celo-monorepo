@@ -21,8 +21,6 @@ import { decryptComment, getTransferFeedParams } from 'src/transactions/transfer
 import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
-const TAG = 'transactions/TransferFeedItem.tsx'
-
 type Props = TransferItemFragment & {
   type: TransactionType
   status?: TransactionStatus
