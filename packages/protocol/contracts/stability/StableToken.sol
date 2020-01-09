@@ -170,6 +170,7 @@ contract StableToken is
    * @notice Sets initial inflation Parameters.
    * @param inflationRate new rate.
    * @param inflationFactorUpdatePeriod how often inflationFactor is updated.
+   * @dev unwrapped Fixidity value expected for inflationRate
    */
   function setInitialInflationParameters(uint256 inflationRate, uint256 inflationFactorUpdatePeriod)
     private

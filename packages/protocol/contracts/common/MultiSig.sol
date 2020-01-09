@@ -125,6 +125,7 @@ contract MultiSig is Initializable {
         "owner was null or already given owner status"
       );
       isOwner[_owners[i]] = true;
+      emit OwnerAddition(_owners[i]);
     }
     owners = _owners;
   }

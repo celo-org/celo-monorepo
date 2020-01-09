@@ -165,6 +165,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @notice Sets the target voting yield for validators.
    * @param _targetVotingYield The value of the target voting yield.
    * @return True upon success.
+   * @dev unwrapped Fixidity value expected for _targetVotingYield
    */
   function setTargetVotingYield(uint256 _targetVotingYield) public onlyOwner returns (bool) {
     targetVotingYieldParams.target = FixidityLib.wrap(_targetVotingYield);

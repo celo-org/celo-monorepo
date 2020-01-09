@@ -119,7 +119,7 @@ contract('SortedOracles', (accounts: string[]) => {
       beforeEach(async () => {
         await sortedOracles.report(
           aToken,
-          new BigNumber(1 / 1).multipliedBy(fractionDenominator),
+          new BigNumber(1).multipliedBy(fractionDenominator),
           NULL_ADDRESS,
           NULL_ADDRESS,
           {
@@ -140,7 +140,7 @@ contract('SortedOracles', (accounts: string[]) => {
             await sortedOracles.addOracle(aToken, anotherOracle)
             await sortedOracles.report(
               aToken,
-              new BigNumber(2 / 1).multipliedBy(fractionDenominator),
+              new BigNumber(2).multipliedBy(fractionDenominator),
               anOracle,
               NULL_ADDRESS,
               {
@@ -188,7 +188,7 @@ contract('SortedOracles', (accounts: string[]) => {
       beforeEach(async () => {
         await sortedOracles.report(
           aToken,
-          new BigNumber(10 / 1).multipliedBy(fractionDenominator),
+          new BigNumber(10).multipliedBy(fractionDenominator),
           NULL_ADDRESS,
           NULL_ADDRESS,
           {
@@ -294,7 +294,9 @@ contract('SortedOracles', (accounts: string[]) => {
     it('should increase the number of rates', async () => {
       await sortedOracles.report(
         aToken,
-        new BigNumber(numerator / denominator).multipliedBy(fractionDenominator),
+        new BigNumber(numerator)
+          .dividedBy(new BigNumber(denominator))
+          .multipliedBy(fractionDenominator),
         NULL_ADDRESS,
         NULL_ADDRESS,
         {
@@ -307,7 +309,9 @@ contract('SortedOracles', (accounts: string[]) => {
     it('should set the median rate', async () => {
       await sortedOracles.report(
         aToken,
-        new BigNumber(numerator / denominator).multipliedBy(fractionDenominator),
+        new BigNumber(numerator)
+          .dividedBy(new BigNumber(denominator))
+          .multipliedBy(fractionDenominator),
         NULL_ADDRESS,
         NULL_ADDRESS,
         {
@@ -322,7 +326,9 @@ contract('SortedOracles', (accounts: string[]) => {
     it('should increase the number of timestamps', async () => {
       await sortedOracles.report(
         aToken,
-        new BigNumber(numerator / denominator).multipliedBy(fractionDenominator),
+        new BigNumber(numerator)
+          .dividedBy(new BigNumber(denominator))
+          .multipliedBy(fractionDenominator),
         NULL_ADDRESS,
         NULL_ADDRESS,
         {
@@ -335,7 +341,9 @@ contract('SortedOracles', (accounts: string[]) => {
     it('should set the median timestamp', async () => {
       await sortedOracles.report(
         aToken,
-        new BigNumber(numerator / denominator).multipliedBy(fractionDenominator),
+        new BigNumber(numerator)
+          .dividedBy(new BigNumber(denominator))
+          .multipliedBy(fractionDenominator),
         NULL_ADDRESS,
         NULL_ADDRESS,
         {
@@ -349,7 +357,9 @@ contract('SortedOracles', (accounts: string[]) => {
     it('should emit the OracleReported and MedianUpdated events', async () => {
       const resp = await sortedOracles.report(
         aToken,
-        new BigNumber(numerator / denominator).multipliedBy(fractionDenominator),
+        new BigNumber(numerator)
+          .dividedBy(new BigNumber(denominator))
+          .multipliedBy(fractionDenominator),
         NULL_ADDRESS,
         NULL_ADDRESS,
         {
@@ -396,7 +406,9 @@ contract('SortedOracles', (accounts: string[]) => {
       beforeEach(async () => {
         await sortedOracles.report(
           aToken,
-          new BigNumber(numerator / denominator).multipliedBy(fractionDenominator),
+          new BigNumber(numerator)
+            .dividedBy(new BigNumber(denominator))
+            .multipliedBy(fractionDenominator),
           NULL_ADDRESS,
           NULL_ADDRESS,
           {
@@ -411,7 +423,9 @@ contract('SortedOracles', (accounts: string[]) => {
 
         await sortedOracles.report(
           aToken,
-          new BigNumber(newNumerator / denominator).multipliedBy(fractionDenominator),
+          new BigNumber(newNumerator)
+            .dividedBy(new BigNumber(denominator))
+            .multipliedBy(fractionDenominator),
           NULL_ADDRESS,
           NULL_ADDRESS,
           {
@@ -427,7 +441,9 @@ contract('SortedOracles', (accounts: string[]) => {
         const initialNumReports = await sortedOracles.numRates(aToken)
         await sortedOracles.report(
           aToken,
-          new BigNumber(numerator / denominator).multipliedBy(fractionDenominator),
+          new BigNumber(newNumerator)
+            .dividedBy(new BigNumber(denominator))
+            .multipliedBy(fractionDenominator),
           NULL_ADDRESS,
           NULL_ADDRESS,
           {
@@ -457,7 +473,7 @@ contract('SortedOracles', (accounts: string[]) => {
         sortedOracles.addOracle(aToken, anotherOracle)
         await sortedOracles.report(
           aToken,
-          new BigNumber(anotherOracleNumerator / 1).multipliedBy(fractionDenominator),
+          new BigNumber(anotherOracleNumerator).multipliedBy(fractionDenominator),
           NULL_ADDRESS,
           NULL_ADDRESS,
           {
@@ -467,7 +483,7 @@ contract('SortedOracles', (accounts: string[]) => {
         await timeTravel(5, web3)
         await sortedOracles.report(
           aToken,
-          new BigNumber(anOracleNumerator1 / 1).multipliedBy(fractionDenominator),
+          new BigNumber(anOracleNumerator1).multipliedBy(fractionDenominator),
           anotherOracle,
           NULL_ADDRESS,
           {
@@ -485,7 +501,7 @@ contract('SortedOracles', (accounts: string[]) => {
       it('updates the list of rates correctly', async () => {
         await sortedOracles.report(
           aToken,
-          new BigNumber(anOracleNumerator2 / 1).multipliedBy(fractionDenominator),
+          new BigNumber(anOracleNumerator2).multipliedBy(fractionDenominator),
           anotherOracle,
           NULL_ADDRESS,
           {
@@ -501,7 +517,7 @@ contract('SortedOracles', (accounts: string[]) => {
         const initialTimestamps = await sortedOracles.getTimestamps(aToken)
         await sortedOracles.report(
           aToken,
-          new BigNumber(anOracleNumerator2 / 1).multipliedBy(fractionDenominator),
+          new BigNumber(anOracleNumerator2).multipliedBy(fractionDenominator),
           anotherOracle,
           NULL_ADDRESS,
           {
