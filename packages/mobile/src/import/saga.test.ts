@@ -6,6 +6,7 @@ import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
+import { checkVerification } from 'src/identity/verification'
 import {
   backupPhraseEmpty,
   importBackupPhraseFailure,
@@ -32,6 +33,7 @@ describe('Import wallet saga', () => {
         [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(10)],
         [matchers.call.fn(assignAccountFromPrivateKey), mockAccount],
         [call(setKey, 'mnemonic', mockPhraseValid), true],
+        [matchers.call.fn(checkVerification), true],
       ])
       .put(setBackupCompleted())
       .put(redeemInviteSuccess())

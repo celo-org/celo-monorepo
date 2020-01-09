@@ -7,9 +7,9 @@ import helmet from 'helmet'
 import next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
 import { Tables } from '../fullstack/EcoFundFields'
-import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
+import Sentry, { initSentryServer } from '../server/sentry'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
 import latestAnnouncements from './Announcement'
@@ -204,7 +204,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     return handle(req, res)
   })
 
-  initSentry()
+  await initSentryServer()
   await server.listen(port)
 
   // tslint:disable-next-line
