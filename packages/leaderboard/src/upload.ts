@@ -7,6 +7,31 @@ import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { BigNumber } from 'bignumber.js'
 
+process.on('unhandledRejection', (reason, _promise) => {
+  console.log('Unhandled Rejection at:', reason.stack || reason)
+  process.exit(0)
+})
+
+// If modifying these scopes, delete token.json.
+const SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+// The file token.json stores the user's access and refresh tokens, and is
+// created automatically when the authorization flow completes for the first
+// time.
+const TOKEN_PATH = 'token.json'
+
+const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN'] || 0
+const LEADERBOARD_SHEET =
+  process.env['LEADERBOARD_SHEET'] || '1TxrgEaY7I9wc8eKE1zQrpBiCXwJWFiMufwbbgbLhLUU'
+const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
+
+function getCredentials() {
+  let credentials = process.env['LEADERBOARD_CREDENTIALS']
+  if (!credentials) {
+    return fs.readFileSync('credentials.json')
+  }
+  return credentials
+}
+
 async function getMetadata(kit: ContractKit, address: string) {
   const accounts = await kit.contracts.getAccounts()
   const url = await accounts.getMetadataURL(address)
@@ -55,25 +80,6 @@ async function getClaims(
     }
   }
   return dedup(res)
-}
-
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json'
-
-const LEADERBOARD_TOKEN = process.env['LEADERBOARD_TOKEN'] || 0
-const LEADERBOARD_SHEET =
-  process.env['LEADERBOARD_SHEET'] || '1TxrgEaY7I9wc8eKE1zQrpBiCXwJWFiMufwbbgbLhLUU'
-
-function getCredentials() {
-  let credentials = process.env['LEADERBOARD_CREDENTIALS']
-  if (!credentials) {
-    return fs.readFileSync('credentials.json')
-  }
-  return credentials
 }
 
 function readSheet(cb: any) {
@@ -276,7 +282,7 @@ async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) 
 }
 
 function main() {
-  const web3 = new Web3('http://localhost:8545')
+  const web3 = new Web3(LEADERBOARD_WEB3)
   const kit: ContractKit = newKitFromWeb3(web3)
   readSheet((rows: any, sheets: any) => {
     updateNames(kit, rows, sheets)
