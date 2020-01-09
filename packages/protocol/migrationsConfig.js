@@ -130,9 +130,7 @@ const DefaultConfig = {
     attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
-    groupLockedGold: {
-      value: '22000000000000000000000', // 22k gold per group
-    },
+    votesRatioOfLastVsFirstGroup: 2.0,
   },
 }
 
