@@ -283,10 +283,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
 
   /**
-   * @notice Computes the current reserve gold to stable token ratio
-   * @return A fixed point ratio cast as a uint256
+   * @notice Computes the ratio of current reserve balance to total stable token valuation.
+   * @return Reserve ratio in a fixed point format.
    */
-  function calculateReserveRatio() public view returns (uint256) {
+  function getReserveRatio() public view returns (uint256) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
     uint256 reserveGoldBalance = getReserveGoldBalance();

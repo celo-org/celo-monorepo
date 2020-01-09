@@ -551,7 +551,7 @@ contract('Reserve', (accounts: string[]) => {
       await mockStableToken.setTotalSupply(stableTokenSupply)
       // TODO: convert to gold
       console.info(reserveGoldBalance.div(stableTokenSupply))
-      const ratio = new BigNumber(await reserve.calculateReserveRatio())
+      const ratio = new BigNumber(await reserve.getReserveRatio())
       assert(
         fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenSupply.div(exchangeRate))),
         'reserve ratio should be correct'

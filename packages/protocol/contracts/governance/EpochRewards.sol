@@ -392,7 +392,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
     FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
     FixidityLib.Fraction memory targetRatio = b.subtract(timeSinceInitialization.divide(m));
-    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().calculateReserveRatio());
+    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().getReserveRatio());
     return ratio.lte(targetRatio);
   }
 
