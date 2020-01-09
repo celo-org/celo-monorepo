@@ -266,6 +266,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
     reserve = await getDeployedProxiedContract('Reserve', artifacts)
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
+    await exchange.unfreeze()
   })
 
   describe('When selling gold', () => {
