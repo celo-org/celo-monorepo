@@ -382,18 +382,16 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   /**
    * @notice Determines if the reserve is low enough to demand a diversion from
-   *    the community reward.
+   *    the community reward. Targets initial ratio of 2 with a linear decline
+   *    until 25 years have passed where the target ratio will be 1.
    */
   function isReserveLow() external view returns (bool) {
-    // TODO: What should this return when frozen?
-    // y = b - mx
-    // b = 2, m = -1/SECONDS_IN_25_YEARS, x = time in seconds
+    // TODO: Does this need to be onlyWhenNotFrozen ?
+    // Target reserve ratio = 2 - time in second / 25 years
     FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
-    FixidityLib.Fraction memory m = (FixidityLib.newFixed(1)).divide(
-      FixidityLib.newFixed(25 * 365 * 1 days)
-    );
+    FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
     FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
-    FixidityLib.Fraction memory targetRatio = b.subtract(timeSinceInitialization.multiply(m));
+    FixidityLib.Fraction memory targetRatio = b.subtract(timeSinceInitialization.divide(m));
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().calculateReserveRatio());
     return ratio.lte(targetRatio);
   }
