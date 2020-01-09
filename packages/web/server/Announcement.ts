@@ -23,17 +23,17 @@ export default async function latestAnnouncements(ipAddress: string): Promise<Fi
     const anyBlocked = announcements.some(
       (announcement) => announcement.block && announcement.block.length > 0
     )
+
     if (anyBlocked) {
       const country = await cache(`geo-${ipAddress}`, getCountryFromIP, {
         args: ipAddress,
-        minutes: 120,
+        minutes: 240,
       })
       return censor(announcements, country)
     }
     return announcements
   } catch (err) {
-    console.error(err)
-    Sentry.captureEvent(err)
+    Sentry.captureException(err)
   }
 }
 
@@ -56,7 +56,7 @@ function getAirtable() {
 // remove announcements that have been marked as blocked for the country our ip says we are in
 export function censor(announcements: Fields[], country: string) {
   return announcements.filter((announcement) =>
-    announcement.block ? !announcement.block.includes(country) : true
+    announcement.block ? !announcement.block.includes(country.toLowerCase()) : true
   )
 }
 

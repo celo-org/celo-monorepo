@@ -1,5 +1,7 @@
 import fetch from 'cross-fetch'
 import getConfig from 'next/config'
+
+// @returns uppercase 2 letter country code
 export async function getCountryFromIP(ip: string) {
   const key = getConfig().serverRuntimeConfig.IPSTACK_KEY
 

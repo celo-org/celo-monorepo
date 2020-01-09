@@ -1,14 +1,24 @@
 import { censor, Fields } from './Announcement'
 describe('censor', () => {
   const ANNOUNCEMENTS: Fields[] = [
-    { block: ['us', 'nk'], live: true, text: 'no kimchi fries', link: 'example.us' },
+    { block: ['us', 'np'], live: true, text: 'no kimchi fries', link: 'example.us' },
     { block: ['uk'], live: true, text: 'brexit', link: 'example.co.uk' },
     { block: [], live: true, text: 'none', link: 'example.com' },
     { live: true, text: 'no array', link: 'example.com' },
   ]
-  describe('when an announcment contains the given country', () => {
+  describe('when an announcment contains the given country lowercase', () => {
     it('removes the anouncment from list', () => {
       expect(censor(ANNOUNCEMENTS, 'us')).toEqual([
+        { block: ['uk'], live: true, text: 'brexit', link: 'example.co.uk' },
+        { block: [], live: true, text: 'none', link: 'example.com' },
+        { live: true, text: 'no array', link: 'example.com' },
+      ])
+    })
+  })
+
+  describe('when an announcment contains the given country uppercase', () => {
+    it('removes the anouncment from list', () => {
+      expect(censor(ANNOUNCEMENTS, 'NP')).toEqual([
         { block: ['uk'], live: true, text: 'brexit', link: 'example.co.uk' },
         { block: [], live: true, text: 'none', link: 'example.com' },
         { live: true, text: 'no array', link: 'example.com' },
