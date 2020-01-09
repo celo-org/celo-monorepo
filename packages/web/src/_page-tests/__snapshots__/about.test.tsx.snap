@@ -2119,11 +2119,11 @@ exports[`About renders 1`] = `
           Object {
             "display": "grid",
             "gridColumnGap": "40px",
-            "gridRowGap": "50px",
+            "gridRowGap": "55px",
             "gridTemplateColumns": "repeat(3, 1fr)",
             "minHeight": "50vh",
             "msGridColumnGap": "40px",
-            "msGridRowGap": "50px",
+            "msGridRowGap": "55px",
             "msGridTemplateColumns": "repeat(3, 1fr)",
           }
         }
