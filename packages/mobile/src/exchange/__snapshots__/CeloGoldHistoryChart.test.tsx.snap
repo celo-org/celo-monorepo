@@ -30,7 +30,7 @@ exports[`renders properly 1`] = `
           }
         }
       >
-        Gold Price
+        goldPrice
       </Text>
     </View>
     <View
@@ -199,7 +199,7 @@ exports[`renders properly 1`] = `
       }
     }
   >
-    timeframes.30d
+    global:timeframes.30d
   </Text>
 </View>
 `;
@@ -234,7 +234,7 @@ exports[`renders while update is in progress 1`] = `
           }
         }
       >
-        Gold Price
+        goldPrice
       </Text>
     </View>
     <View
@@ -403,7 +403,7 @@ exports[`renders while update is in progress 1`] = `
       }
     }
   >
-    timeframes.30d
+    global:timeframes.30d
   </Text>
 </View>
 `;

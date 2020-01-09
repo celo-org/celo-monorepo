@@ -24,6 +24,7 @@ const CHART_POINTS_NUMBER = 60
 const CHART_WIDTH = variables.width - variables.contentPadding * 2
 const CHART_HEIGHT = 180
 const CHART_MIN_VERTICAL_RANGE = 0.1
+const CHART_DOMAIN_PADDING = { y: [30, 30], x: [5, 5] }
 
 interface OwnProps {
   testID: string
@@ -151,7 +152,6 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
       getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true),
     [localCurrencyCode]
   )
-  // const blackColor = useCallback(() => `rgba(0, 0, 0)`, [])
   const exchangeRate = useExchangeRate()
   const goldToDollars = useCallback((amount) => goldToDollarAmount(amount, exchangeRate), [
     exchangeRate,
@@ -217,7 +217,7 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
     <View style={styles.container} testID={testID}>
       <View style={styles.goldPrice}>
         <View>
-          <Text style={styles.goldPriceTitle}>Gold Price</Text>
+          <Text style={styles.goldPriceTitle}>{t('goldPrice')}</Text>
         </View>
         <View style={styles.goldPriceValues}>
           <Text style={styles.goldPriceCurrentValue}>
@@ -230,7 +230,7 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
         </View>
       </View>
       <VictoryGroup
-        domainPadding={{ y: [30, 30], x: [5, 5] }}
+        domainPadding={CHART_DOMAIN_PADDING}
         singleQuadrantDomainPadding={false}
         padding={{ left: 0 }}
         width={CHART_WIDTH}
@@ -243,7 +243,7 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
         // @ts-ignore */}
         <VictoryScatter dataComponent={<RenderPoint />} />
       </VictoryGroup>
-      <Text style={styles.timeframe}>{t('timeframes.30d')}</Text>
+      <Text style={styles.timeframe}>{t('global:timeframes.30d')}</Text>
     </View>
   )
 }
@@ -292,4 +292,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.global)(CeloGoldHistoryChart)
+export default withTranslation(Namespaces.exchangeFlow9)(CeloGoldHistoryChart)
