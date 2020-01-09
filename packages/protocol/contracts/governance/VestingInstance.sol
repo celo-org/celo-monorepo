@@ -24,7 +24,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   // beneficiary of the Celo Gold to be vested in this contract
-  address public beneficiary;
+  address payable public beneficiary;
 
   // indicates how much of the vested amount has been withdrawn
   uint256 public currentlyWithdrawn;
@@ -44,9 +44,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   // indicates if the contract is revokable
   bool public revocable;
 
-  // revoking address and refund destination
-  address public revoker;
-  address public refundDestination;
+  // revoking address
+  address payable public revoker;
 
   // amount owned by the beneficiary at revoke time
   uint256 public beneficiaryWithdrawableAtRevoke;
@@ -100,19 +99,17 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param vestAmountPerPeriod the vesting amound per period where period is the vestingAmount distributed over the vestingPeriodSec
    * @param vestingRevocable whether the vesting is revocable or not
    * @param vestingRevoker address of the person revoking the vesting
-   * @param vestingRefundDestination address of the refund receiver after the vesting is deemed revoked
    * @param registryAddress address of the deployed contracts registry
    */
   constructor(
-    address vestingBeneficiary,
+    address payable vestingBeneficiary,
     uint256 vestingAmount,
     uint256 vestingCliff,
     uint256 vestingStartTime,
     uint256 vestingPeriodSec,
     uint256 vestAmountPerPeriod,
     bool vestingRevocable,
-    address vestingRevoker,
-    address vestingRefundDestination,
+    address payable vestingRevoker,
     address registryAddress
   ) public {
     uint256 numPeriods = vestingAmount.div(vestAmountPerPeriod);
@@ -122,7 +119,6 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
       "Vesting amount per period and total vesting amount are inconsistent"
     );
     require(vestingBeneficiary != address(0), "Beneficiary is the zero address");
-    require(vestingRefundDestination != address(0), "Refund destination is the zero address");
     require(vestingAmount > 0, "Vesting amount must be positive");
     require(vestingCliff <= vestingPeriodSec, "Vesting cliff is longer than vesting duration");
     require(
@@ -140,7 +136,6 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
 
     beneficiary = vestingBeneficiary;
     revocable = vestingRevocable;
-    refundDestination = vestingRefundDestination;
     revoker = vestingRevoker;
   }
 

@@ -2,14 +2,13 @@ pragma solidity ^0.5.3;
 
 interface IVestingFactory {
   function createVestingInstance(
-    address,
+    address payable,
     uint256,
     uint256,
     uint256,
     uint256,
     uint256,
     bool,
-    address,
-    address
+    address payable
   ) external returns (address);
 }
