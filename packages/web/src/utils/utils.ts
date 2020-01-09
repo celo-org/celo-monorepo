@@ -24,10 +24,10 @@ interface Speeds {
 export async function getNetworkDownloadSpeed() {
   try {
     const testNetworkSpeed = new NetworkSpeed()
-    const fileSize = 5000000
-    const baseUrl = `https://eu.httpbin.org/stream-bytes/${fileSize}`
+    const byteSize = 2000
+    const baseUrl = `https://eu.httpbin.org/stream-byteSize/${byteSize}`
 
-    const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, fileSize)
+    const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, byteSize)
     return speed
   } catch (e) {
     return { mbps: '0', kbps: '0', bps: '0' }
@@ -75,6 +75,7 @@ async function multiPartCheck() {
     getNetworkDownloadSpeed(),
     getNetworkDownloadSpeed(),
   ])
+
   const averageSpeed =
     multiPart
       .map((speeds) => speeds.mbps)
