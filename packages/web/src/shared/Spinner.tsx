@@ -7,16 +7,16 @@ interface Props {
   size: 'small' | 'medium'
 }
 
-const PATHS = {
-  [colors.primary]: 'greenSpinner.json',
-  [colors.white]: 'whiteSpinner.json',
-  [colors.dark]: 'darkSpinner.json',
+const DATA = {
+  [colors.primary]: require('src/shared/greenSpinner.json'),
+  [colors.white]: require('src/shared/whiteSpinner.json'),
+  [colors.dark]: require('src/shared/darkSpinner.json'),
 }
 
 export default React.memo(function Spinner(props: Props) {
   return (
     <View style={styles[props.size]}>
-      <LottieBase path={PATHS[props.color]} />
+      <LottieBase data={DATA[props.color]} />
     </View>
   )
 })

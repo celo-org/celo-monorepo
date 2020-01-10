@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
-import Sentry from '../../fullstack/sentry'
+import { getSentry } from 'src/utils/sentry'
 
 interface Props {
   link: string
@@ -111,6 +111,7 @@ export default class Announcement extends React.Component<AnnouncementProps, Sta
 
       this.props.onVisibilityChange(visible)
     } catch (e) {
+      const Sentry = await getSentry()
       Sentry.captureException(e)
     }
   }

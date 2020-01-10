@@ -52,6 +52,9 @@ export default class FullCircle extends React.PureComponent<Props, State> {
 
   componentDidMount = () => {
     if (!this.props.stillMode) {
+      if (this.props.init) {
+        this.props.init()
+      }
       this.clock = setTimeout(() => this.setPlaying(), WAIT_TO_PLAY_MS)
     } else {
       this.setStill()
@@ -224,15 +227,20 @@ interface RingStyle {
 function ringStyle({ color, playing, duration, lightBackground, stillMode }: RingStyle) {
   const styleArray: ViewStyle[] = [
     styles.normal,
-    lightBackground ? baseCoinStyleLight : baseCoinStyle,
+    stillMode
+      ? { stroke: '#CFCFCF', mixBlendMode: 'multiply' }
+      : lightBackground
+      ? baseCoinStyleLight
+      : baseCoinStyle,
   ]
 
   if (stillMode && playing) {
     styleArray.push({
-      opacity: 0.95,
+      opacity: 0.9,
       fill: color,
       // @ts-ignore
       stroke: color,
+      mixBlendMode: 'multiply',
     })
   } else if (playing) {
     styleArray.push(styles.animatedBase, {

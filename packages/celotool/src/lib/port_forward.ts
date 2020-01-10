@@ -10,14 +10,7 @@ function sleep(ms: number) {
 export const defaultPortsString = '8545:8545 8546:8546 9200:9200'
 
 const PORT_CONTROL_CMD = 'nc -z 127.0.0.1 8545'
-
-function getDefaultComponent() {
-  if (fetchEnv(envVar.VALIDATORS) === 'og') {
-    return 'gethminer1'
-  } else {
-    return 'validators'
-  }
-}
+const DEFAULT_COMPONENT = 'validators'
 
 async function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
   if (isVmBased()) {
@@ -41,7 +34,7 @@ async function getKubernetesPortForwardCmd(
   ports = defaultPortsString
 ) {
   if (!component) {
-    component = getDefaultComponent()
+    component = DEFAULT_COMPONENT
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   const portForwardArgs = await getPortForwardArgs(celoEnv, component, ports)
@@ -50,7 +43,7 @@ async function getKubernetesPortForwardCmd(
 
 async function getPortForwardArgs(celoEnv: string, component?: string, ports = defaultPortsString) {
   if (!component) {
-    component = getDefaultComponent()
+    component = DEFAULT_COMPONENT
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   const podName = await execCmd(
