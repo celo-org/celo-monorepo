@@ -298,12 +298,12 @@ exports[`About renders 1`] = `
           style={Object {}}
         />
         <path
-          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
           fill="#FBCC5C"
           style={Object {}}
         />
         <path
-          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
           fill="#35D07F"
           style={Object {}}
         />
@@ -518,6 +518,81 @@ exports[`About renders 1`] = `
         >
           "/ˈtselo/"
         </span>
+        <div
+          className="css-view-1dbjc4n"
+          data-focusable={true}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "MozTransitionProperty": "opacity",
+              "MozUserSelect": "none",
+              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionProperty": "opacity",
+              "WebkitUserSelect": "none",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "msTouchAction": "manipulation",
+              "msUserSelect": "none",
+              "touchAction": "manipulation",
+              "transitionDuration": "0.15s",
+              "transitionProperty": "opacity",
+              "userSelect": "none",
+            }
+          }
+          tabIndex="0"
+        >
+          <svg
+            fill="none"
+            height="32"
+            style={Object {}}
+            viewBox="0 0 31 32"
+            width="31"
+          >
+            <rect
+              fill="#35D07F"
+              height="12"
+              style={Object {}}
+              width="9"
+              y="10"
+            />
+            <path
+              d="M6.66667 10.1666L16.6667 1.83325V30.1666L6.66667 21.8333V10.1666Z"
+              fill="#35D07F"
+              style={Object {}}
+            />
+            <path
+              d="M20 23.5C21.6667 22.6667 24.1667 20.1421 24.1667 16C24.1667 11.8579 21.6667 9.33333 20 8.5"
+              stroke="#35D07F"
+              strokeWidth="2"
+              style={Object {}}
+            />
+            <path
+              d="M20 31C24 29.3333 30 24.2843 30 16C30 7.71573 24 2.66667 20 1"
+              stroke="#35D07F"
+              strokeWidth="2"
+              style={Object {}}
+            />
+          </svg>
+          <audio
+            id="pronunce"
+          >
+            <source
+              src="audio/celo-pronunce.ogg"
+              type="audio/ogg"
+            />
+            <source
+              src="audio/celo-pronunce.mp3"
+              type="audio/mp3"
+            />
+          </audio>
+        </div>
       </h1>
       <div
         className="css-text-901oao"
@@ -745,85 +820,85 @@ exports[`About renders 1`] = `
         >
           <path
             d="M386.82 147.078C368.481 147.078 353.615 161.966 353.615 180.332C353.615 198.697 368.481 213.585 386.82 213.585C405.158 213.585 420.025 198.697 420.025 180.332C420.025 161.966 405.158 147.078 386.82 147.078Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M299.25 147.078C280.912 147.078 266.045 161.966 266.045 180.332C266.045 198.697 280.912 213.585 299.25 213.585C317.589 213.585 332.455 198.697 332.455 180.332C332.455 161.966 317.589 147.078 299.25 147.078Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M210.512 147.078C192.174 147.078 177.308 161.966 177.308 180.332C177.308 198.697 192.174 213.585 210.512 213.585C228.851 213.585 243.717 198.697 243.717 180.332C243.717 161.966 228.851 147.078 210.512 147.078Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M122.943 147.078C104.604 147.078 89.7378 161.966 89.7378 180.332C89.7378 198.697 104.604 213.585 122.943 213.585C141.281 213.585 156.147 198.697 156.147 180.332C156.147 161.966 141.281 147.078 122.943 147.078Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M34.2048 147.078C15.8663 147.078 0.999997 161.966 0.999995 180.332C0.999994 198.697 15.8663 213.585 34.2048 213.585C52.5433 213.585 67.4096 198.697 67.4096 180.332C67.4096 161.966 52.5433 147.078 34.2048 147.078Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M386.82 59.149C368.481 59.149 353.615 74.0372 353.615 92.4027C353.615 110.768 368.481 125.657 386.82 125.657C405.158 125.657 420.025 110.768 420.025 92.4028C420.025 74.0372 405.158 59.149 386.82 59.149Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M210.323 59.1489C191.984 59.1489 177.118 74.0371 177.118 92.4026C177.118 110.768 191.984 125.656 210.323 125.656C228.661 125.656 243.527 110.768 243.527 92.4026C243.527 74.0371 228.661 59.1489 210.323 59.1489Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M122.943 59.1489C104.604 59.1489 89.7378 74.0371 89.7378 92.4026C89.7378 110.768 104.604 125.656 122.943 125.656C141.281 125.656 156.147 110.768 156.147 92.4026C156.147 74.0371 141.281 59.1489 122.943 59.1489Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M34.2048 59.1489C15.8663 59.1489 0.999997 74.0371 0.999995 92.4026C0.999994 110.768 15.8663 125.656 34.2048 125.656C52.5433 125.656 67.4096 110.768 67.4096 92.4026C67.4096 74.0371 52.5433 59.1489 34.2048 59.1489Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M386.82 233.121C368.481 233.121 353.615 248.01 353.615 266.375C353.615 284.741 368.481 299.629 386.82 299.629C405.158 299.629 420.025 284.741 420.025 266.375C420.025 248.01 405.158 233.121 386.82 233.121Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M299.25 233.121C280.912 233.121 266.045 248.01 266.045 266.375C266.045 284.741 280.912 299.629 299.25 299.629C317.589 299.629 332.455 284.741 332.455 266.375C332.455 248.01 317.589 233.121 299.25 233.121Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M210.512 233.121C192.174 233.121 177.308 248.01 177.308 266.375C177.308 284.741 192.174 299.629 210.512 299.629C228.851 299.629 243.717 284.741 243.717 266.375C243.717 248.01 228.851 233.121 210.512 233.121Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M122.943 233.121C104.604 233.121 89.7378 248.01 89.7378 266.375C89.7378 284.741 104.604 299.629 122.943 299.629C141.281 299.629 156.147 284.741 156.147 266.375C156.147 248.01 141.281 233.121 122.943 233.121Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
           <path
             d="M34.2048 233.121C15.8663 233.121 0.999997 248.01 0.999995 266.375C0.999994 284.741 15.8663 299.629 34.2048 299.629C52.5433 299.629 67.4096 284.741 67.4096 266.375C67.4096 248.01 52.5433 233.121 34.2048 233.121Z"
-            stroke="#81868B"
+            stroke="#CFCFCF"
             strokeMiterlimit="10"
             style={Object {}}
           />
@@ -936,7 +1011,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -945,7 +1020,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -954,7 +1029,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -963,7 +1038,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -972,7 +1047,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -981,7 +1056,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -990,7 +1065,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -999,7 +1074,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1008,7 +1083,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1017,7 +1092,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1026,7 +1101,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1035,7 +1110,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1044,7 +1119,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1053,7 +1128,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1062,7 +1137,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1071,7 +1146,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1080,7 +1155,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1089,7 +1164,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1098,7 +1173,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1107,7 +1182,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1116,7 +1191,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1125,7 +1200,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1134,7 +1209,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1143,7 +1218,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1152,7 +1227,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1161,7 +1236,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1170,7 +1245,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1179,7 +1254,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1188,7 +1263,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1197,7 +1272,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1206,7 +1281,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1215,7 +1290,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1224,7 +1299,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1233,7 +1308,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1242,7 +1317,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1251,7 +1326,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1260,7 +1335,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1269,7 +1344,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1279,7 +1354,7 @@ exports[`About renders 1`] = `
               Object {
                 "fill": "#0CDA6E",
                 "mixBlendMode": "multiply",
-                "opacity": 0.95,
+                "opacity": 0.9,
                 "stroke": "#0CDA6E",
               }
             }
@@ -1289,7 +1364,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1298,7 +1373,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1307,7 +1382,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1317,7 +1392,7 @@ exports[`About renders 1`] = `
               Object {
                 "fill": "#52B6FF",
                 "mixBlendMode": "multiply",
-                "opacity": 0.95,
+                "opacity": 0.9,
                 "stroke": "#52B6FF",
               }
             }
@@ -1327,7 +1402,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1336,7 +1411,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1345,7 +1420,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1355,7 +1430,7 @@ exports[`About renders 1`] = `
               Object {
                 "fill": "#924EFF",
                 "mixBlendMode": "multiply",
-                "opacity": 0.95,
+                "opacity": 0.9,
                 "stroke": "#924EFF",
               }
             }
@@ -1365,7 +1440,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1374,7 +1449,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1383,7 +1458,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "mixBlendMode": "multiply",
-                "stroke": "#DDDDDD",
+                "stroke": "#CFCFCF",
               }
             }
           />
@@ -1393,7 +1468,7 @@ exports[`About renders 1`] = `
               Object {
                 "fill": "#FF6553",
                 "mixBlendMode": "multiply",
-                "opacity": 0.95,
+                "opacity": 0.9,
                 "stroke": "#FF6553",
               }
             }
@@ -1973,24 +2048,6 @@ exports[`About renders 1`] = `
         }
       }
     >
-      <h1
-        aria-level="1"
-        className="css-reset-4rbku5 css-text-901oao"
-        dir="auto"
-        role="heading"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "36px",
-            "lineHeight": "40px",
-            "textRendering": "geometricPrecision",
-            "textTransform": "none",
-          }
-        }
-      >
-        teamAlternateTitle
-      </h1>
       <div
         className="css-text-901oao"
         dir="auto"
@@ -2001,7 +2058,6 @@ exports[`About renders 1`] = `
             "fontSize": "20px",
             "lineHeight": "28px",
             "marginBottom": "50px",
-            "marginTop": "20px",
             "textRendering": "geometricPrecision",
           }
         }
@@ -2034,12 +2090,20 @@ exports[`About renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
           "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "center",
           "WebkitFlexGrow": 0,
           "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
           "flexGrow": 0,
           "flexShrink": 0,
+          "justifyContent": "center",
+          "msFlexAlign": "center",
           "msFlexNegative": 0,
+          "msFlexPack": "center",
           "msFlexPositive": 0,
           "paddingBottom": "10px",
           "paddingLeft": "10px",
@@ -2053,24 +2117,14 @@ exports[`About renders 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
-            "WebkitAlignItems": "flex-start",
-            "WebkitBoxAlign": "start",
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxLines": "multiple",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitBoxPack": "justify",
-            "WebkitFlexDirection": "row",
-            "WebkitFlexWrap": "wrap",
-            "WebkitJustifyContent": "space-between",
-            "alignItems": "flex-start",
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "justifyContent": "space-between",
+            "display": "grid",
+            "gridColumnGap": "40px",
+            "gridRowGap": "55px",
+            "gridTemplateColumns": "repeat(3, 1fr)",
             "minHeight": "50vh",
-            "msFlexAlign": "start",
-            "msFlexDirection": "row",
-            "msFlexPack": "justify",
-            "msFlexWrap": "wrap",
+            "msGridColumnGap": "40px",
+            "msGridRowGap": "55px",
+            "msGridTemplateColumns": "repeat(3, 1fr)",
           }
         }
       >
@@ -2201,7 +2255,7 @@ exports[`About renders 1`] = `
         "alignSelf": "center",
         "flexDirection": "column",
         "marginBottom": "50px",
-        "marginTop": "20px",
+        "marginTop": "40px",
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",

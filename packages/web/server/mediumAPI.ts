@@ -1,7 +1,8 @@
 import { parse, validate } from 'fast-xml-parser'
 import { Articles } from 'fullstack/ArticleProps'
-import * as htmlToFormattedText from 'html-to-formatted-text'
-import Sentry from '../fullstack/sentry'
+import htmlToFormattedText from 'html-to-formatted-text'
+import cache from '../server/cache'
+import Sentry from '../server/sentry'
 import abortableFetch from '../src/utils/abortableFetch'
 interface JSONRSS {
   rss: {
@@ -25,10 +26,14 @@ interface JSONRSSItem {
 }
 
 function getFirstImgURL(htmlstring: string) {
-  return htmlstring
-    .split('<img')[1]
-    .split('src=')[1]
-    .split('"')[1]
+  try {
+    return htmlstring
+      .split('<img')[1]
+      .split('src=')[1]
+      .split('"')[1]
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 // @param htmlstring - a string of valid html with at least one p element
@@ -37,19 +42,23 @@ function getFirstImgURL(htmlstring: string) {
 // B) the '.' character will be use to end a sentence more often than its other uses
 // the result is an excerpt that is likely to be no more than 320 characters long while retaining readability
 function getGramaticallyCorrectExcerpt(htmlstring: string) {
-  const charsInClosingTag = 4
-  const approximateMaxChars = 320
-  const firstParagraph = htmlstring.substring(
-    htmlstring.indexOf('<p'),
-    htmlstring.indexOf('</p>') + charsInClosingTag
-  )
-  // remove any links or emphasis tags etc
-  const plainText = htmlToFormattedText(firstParagraph).replace('&amp;', '&')
+  try {
+    const charsInClosingTag = 4
+    const approximateMaxChars = 320
+    const firstParagraph = htmlstring.substring(
+      htmlstring.indexOf('<p'),
+      htmlstring.indexOf('</p>') + charsInClosingTag
+    )
+    // remove any links or emphasis tags etc
+    const plainText = htmlToFormattedText(firstParagraph).replace('&amp;', '&')
 
-  // ensure it is a reasonable length
-  return plainText.length > approximateMaxChars
-    ? plainText.substring(0, plainText.indexOf('. ') + 1)
-    : plainText
+    // ensure it is a reasonable length
+    return plainText.length > approximateMaxChars
+      ? plainText.substring(0, plainText.indexOf('. ') + 1)
+      : plainText
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 function transform(items: JSONRSSItem[]) {
@@ -77,10 +86,14 @@ async function fetchMediumArticles(): Promise<string> {
   return response.text()
 }
 
+async function getAndTransform() {
+  const xmlString = await fetchMediumArticles()
+  return transform(parseXML(xmlString))
+}
+
 export async function getFormattedMediumArticles(): Promise<Articles> {
   try {
-    const xmlString = await fetchMediumArticles()
-    const articles = transform(parseXML(xmlString))
+    const articles = await cache('medium-blog', getAndTransform)
     return { articles }
   } catch (e) {
     Sentry.withScope((scope) => {
