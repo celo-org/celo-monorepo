@@ -1,4 +1,10 @@
 {
+  "epochRewards": {
+    "frozen": false
+  },
+  "exchange": {
+    "frozen": false
+  },
   "stableToken": {
     "initialBalances": {
       "addresses": [

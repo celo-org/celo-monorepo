@@ -53,12 +53,14 @@ const DefaultConfig = {
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
+    frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * 60, // 5 minutes
     minimumReports: 1,
+    frozen: true,
   },
   gasPriceMinimum: {
     minimumFloor: 1000000000,
@@ -79,7 +81,7 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   lockedGold: {
-    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
+    unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days divided by 24 to accelerate for Stake off
   },
   oracles: {
     reportExpiry: 10 * 60, // 10 minutes
@@ -111,11 +113,11 @@ const DefaultConfig = {
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold per validator
-      duration: 60 * 24 * 60 * 60, // 60 days
+      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
     },
     validatorLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold
-      duration: 60 * 24 * 60 * 60, // 60 days
+      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
     },
     validatorScoreParameters: {
       exponent: 10,
@@ -123,16 +125,15 @@ const DefaultConfig = {
     },
     membershipHistoryLength: 60,
     maxGroupSize: '5',
-    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30, // 30 Days
+    // 30 Days divided by 24 to accelerate for Stake off
+    slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24,
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
     attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
-    groupLockedGold: {
-      value: '22000000000000000000000', // 22k gold per group
-    },
+    votesRatioOfLastVsFirstGroup: 2.0,
   },
 }
 
