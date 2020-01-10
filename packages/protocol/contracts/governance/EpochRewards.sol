@@ -386,12 +386,17 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *    until 25 years have passed where the target ratio will be 1.
    */
   function isReserveLow() external view returns (bool) {
-    // TODO: Does this need to be onlyWhenNotFrozen ?
     // Target reserve ratio = 2 - time in second / 25 years
     FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
     FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
     FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
-    FixidityLib.Fraction memory targetRatio = b.subtract(timeSinceInitialization.divide(m));
+    FixidityLib.Fraction memory targetRatio;
+    // Don't let the target reserve ratio go under 1 after 25 years.
+    if (timeSinceInitialization.gte(m)) {
+      targetRatio = FixidityLib.fixed1();
+    } else {
+      targetRatio = b.subtract(timeSinceInitialization.divide(m));
+    }
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().getReserveRatio());
     return ratio.lte(targetRatio);
   }
