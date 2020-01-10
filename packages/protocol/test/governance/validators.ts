@@ -2182,8 +2182,7 @@ contract('Validators', (accounts: string[]) => {
       await registerValidator(validator)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
-      await mockLockedGold.addSlasher(CeloContractName.DowntimeSlasher)
-      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await mockLockedGold.addSlasher(accounts[2])
     })
 
     describe('when the sender is one of the whitelisted slashing addresses', () => {
@@ -2323,8 +2322,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when run from an approved address', async () => {
       beforeEach(async () => {
-        await mockLockedGold.addSlasher(CeloContractName.DowntimeSlasher)
-        await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+        await mockLockedGold.addSlasher(accounts[2])
       })
 
       it('should halve the slashing multiplier of a group', async () => {
@@ -2355,8 +2353,7 @@ contract('Validators', (accounts: string[]) => {
       await registerValidator(validator)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
-      await mockLockedGold.addSlasher(CeloContractName.DowntimeSlasher)
-      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await mockLockedGold.addSlasher(accounts[2])
       await validators.halveSlashingMultiplier(group, { from: accounts[2] })
       const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
       assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))

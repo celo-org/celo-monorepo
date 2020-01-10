@@ -39,8 +39,15 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   bytes32[] public slashingWhitelist;
 
   modifier onlySlasher {
-    require(isOneOf(slashingWhitelist, msg.sender), "Caller is not a whitelisted slasher.");
+    require(
+      registry.isOneOf(slashingWhitelist, msg.sender),
+      "Caller is not a whitelisted slasher."
+    );
     _;
+  }
+
+  function isSlasher(address slasher) external view returns (bool) {
+    return (registry.isOneOf(slashingWhitelist, slasher));
   }
 
   uint256 public totalNonvoting;
@@ -268,6 +275,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function addSlasher(string calldata slasherIdentifier) external onlyOwner {
     bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
+    require(registry.getAddressFor(keyBytes) != address(0), "Identifier is not registered");
     require(!slashingMap[keyBytes], "Cannot add slasher ID twice.");
     slashingWhitelist.push(keyBytes);
     slashingMap[keyBytes] = true;
