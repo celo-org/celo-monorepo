@@ -73,12 +73,12 @@ module "celo_cluster" {
   celo_env       = var.celo_env
   instance_types = var.instance_types
 
-  tx_node_count    = var.replicas["txnode"]
-  validator_count  = var.replicas["validator"]
+  tx_node_count   = var.replicas["txnode"]
+  validator_count = var.replicas["validator"]
 
-  validator_account_addresses = var.validator_accounts["account_addresses"]
-  validator_private_keys      = var.validator_accounts["private_keys"]
-  validator_account_passwords = var.validator_accounts["account_passwords"]
+  validator_signer_account_addresses = var.validator_signer_accounts["account_addresses"]
+  validator_signer_private_keys      = var.validator_signer_accounts["private_keys"]
+  validator_signer_account_passwords = var.validator_signer_accounts["account_passwords"]
 
   proxy_private_keys = var.proxy_accounts["private_keys"]
   proxy_enodes       = var.proxy_accounts["enodes"]
@@ -104,8 +104,8 @@ module "celo_cluster" {
   attestation_service_db_password                  = var.attestation_service_db["password"]
   attestation_service_docker_image_repository      = var.attestation_service_docker_image["repository"]
   attestation_service_docker_image_tag             = var.attestation_service_docker_image["tag"]
-  attestation_service_addresses                    = var.attestation_service_accounts["account_addresses"]
-  attestation_service_private_keys                 = var.attestation_service_accounts["private_keys"]
+  attestation_signer_addresses                     = var.attestation_signer_accounts["account_addresses"]
+  attestation_signer_private_keys                  = var.attestation_signer_accounts["private_keys"]
   attestation_service_sms_providers                = var.attestation_service_credentials["sms_providers"]
   attestation_service_nexmo_key                    = var.attestation_service_credentials["nexmo_key"]
   attestation_service_nexmo_secret                 = var.attestation_service_credentials["nexmo_secret"]

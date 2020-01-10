@@ -96,17 +96,17 @@ variable gcloud_zone {
   description = "Name of the Google Cloud zone to use"
 }
 
-variable validator_account_addresses {
+variable validator_signer_account_addresses {
   type        = list(string)
   description = "Array with the Validator etherbase account addresses"
 }
 
-variable validator_private_keys {
+variable validator_signer_private_keys {
   type        = list(string)
   description = "Array with the Validator etherbase account private keys"
 }
 
-variable validator_account_passwords {
+variable validator_signer_account_passwords {
   type        = list(string)
   description = "Array with the Validator etherbase account passwords"
 }
@@ -156,13 +156,13 @@ variable attestation_service_docker_image_tag {
   default     = ""
 }
 
-variable attestation_service_addresses {
+variable attestation_signer_addresses {
   type        = list(string)
   description = "The account address for signing the attestations. Must be the address of the associated validator"
   default     = [""]
 }
 
-variable attestation_service_private_keys {
+variable attestation_signer_private_keys {
   type        = list(string)
   description = "The account private key for signing the attestations. Must be the private key of the associated validator"
   default     = [""]

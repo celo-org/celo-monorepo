@@ -16,7 +16,7 @@ variable gcloud_region {
 variable instance_type {
   description = "The instance type"
   type        = string
-  default = "n1-standard-1"
+  default     = "n1-standard-1"
 }
 
 variable attestation_service_docker_image_repository {

@@ -69,7 +69,7 @@ variable instance_types {
   }
 }
 
-variable validator_accounts {
+variable validator_signer_accounts {
   description = "The account data for the validator nodes"
   type        = map
 
@@ -104,7 +104,7 @@ variable proxy_accounts {
   }
 }
 
-variable attestation_service_accounts {
+variable attestation_signer_accounts {
   description = "Etherbase address and private key to sign the attestations"
   type        = map
 
@@ -130,17 +130,17 @@ variable proxy_name {
   default     = "myvalidator-proxy"
 }
 
-variable reset_geth_data {	
-  type        = bool	
-  description = "Specifies if the existing chain data should be removed while creating the instance"	
-  default     = false	
-}	
-  
-variable geth_verbosity {	
-  description = "Geth log level"	
-  type        = number	
-  default     = 3	
-}	
+variable reset_geth_data {
+  type        = bool
+  description = "Specifies if the existing chain data should be removed while creating the instance"
+  default     = false
+}
+
+variable geth_verbosity {
+  description = "Geth log level"
+  type        = number
+  default     = 3
+}
 
 # Attestation variables
 variable attestation_service_db {

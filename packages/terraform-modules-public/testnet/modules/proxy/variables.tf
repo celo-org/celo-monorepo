@@ -11,7 +11,7 @@ variable celo_env {
 variable instance_type {
   description = "The instance type"
   type        = string
-  default = "n1-standard-2"
+  default     = "n1-standard-2"
 }
 
 variable ethstats_host {
@@ -84,7 +84,7 @@ variable proxy_private_keys {
   description = "Array with the Proxy private keys"
 }
 
-variable validator_account_addresses {
+variable validator_signer_account_addresses {
   type        = list(string)
   description = "Array with the Validator etherbase account addresses"
 }

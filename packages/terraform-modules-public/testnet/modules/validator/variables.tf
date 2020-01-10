@@ -11,7 +11,7 @@ variable celo_env {
 variable instance_type {
   description = "The instance type"
   type        = string
-  default = "n1-standard-2"
+  default     = "n1-standard-2"
 }
 
 variable ethstats_host {
@@ -79,17 +79,17 @@ variable validator_count {
   description = "Number of validators to create"
 }
 
-variable validator_account_addresses {
+variable validator_signer_account_addresses {
   type        = list(string)
   description = "Array with the Validator account addresses"
 }
 
-variable validator_private_keys {
+variable validator_signer_private_keys {
   type        = list(string)
   description = "Array with the Validator account private keys"
 }
 
-variable validator_account_passwords {
+variable validator_signer_account_passwords {
   type        = list(string)
   description = "Array with the Validator account passwords"
 }

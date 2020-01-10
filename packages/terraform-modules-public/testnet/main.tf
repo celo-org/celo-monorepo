@@ -181,10 +181,10 @@ module "proxy" {
   validator_count                       = var.validator_count
   reset_geth_data                       = var.reset_geth_data
 
-  proxy_name                  = var.proxy_name
-  proxy_private_keys          = var.proxy_private_keys
-  validator_account_addresses = var.validator_account_addresses
-  bootnodes_base64            = base64encode(data.http.bootnodes.body)
+  proxy_name                         = var.proxy_name
+  proxy_private_keys                 = var.proxy_private_keys
+  validator_signer_account_addresses = var.validator_signer_account_addresses
+  bootnodes_base64                   = base64encode(data.http.bootnodes.body)
 }
 
 module "validator" {
@@ -208,13 +208,13 @@ module "validator" {
   validator_count                       = var.validator_count
   reset_geth_data                       = var.reset_geth_data
 
-  validator_name              = var.validator_name
-  validator_account_addresses = var.validator_account_addresses
-  validator_account_passwords = var.validator_account_passwords
-  validator_private_keys      = var.validator_private_keys
-  proxy_enodes                = var.proxy_enodes
-  proxy_internal_ips          = module.proxy.internal_ip_addresses
-  proxy_external_ips          = module.proxy.external_ip_addresses
+  validator_name                     = var.validator_name
+  validator_signer_account_addresses = var.validator_signer_account_addresses
+  validator_signer_account_passwords = var.validator_signer_account_passwords
+  validator_signer_private_keys      = var.validator_signer_private_keys
+  proxy_enodes                       = var.proxy_enodes
+  proxy_internal_ips                 = module.proxy.internal_ip_addresses
+  proxy_external_ips                 = module.proxy.external_ip_addresses
 }
 
 module "attestation-service" {
@@ -229,8 +229,8 @@ module "attestation-service" {
   db_password                                 = var.attestation_service_db_password
   attestation_service_docker_image_repository = var.attestation_service_docker_image_repository
   attestation_service_docker_image_tag        = var.attestation_service_docker_image_tag
-  account_address                             = var.attestation_service_addresses
-  attestation_key                             = var.attestation_service_private_keys
+  account_address                             = var.attestation_signer_addresses
+  attestation_key                             = var.attestation_signer_private_keys
   celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.tx_node.internal_ip_addresses[0]}:8545"
   sms_providers                               = var.attestation_service_sms_providers
   nexmo_key                                   = var.attestation_service_nexmo_key
