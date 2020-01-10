@@ -359,6 +359,12 @@ export async function migrateContracts(
       election: {
         minElectableValidators: '1',
       },
+      epochRewards: {
+        frozen: false,
+      },
+      exchange: {
+        frozen: false,
+      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
