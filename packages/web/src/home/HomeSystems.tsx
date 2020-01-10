@@ -170,7 +170,7 @@ class HomeSystems extends React.PureComponent<Props> {
                         t={t}
                         screen={screen}
                         onPress={onWhitePaperPress}
-                        href="https://storage.googleapis.com/celo_whitepapers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf"
+                        href="/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf"
                       />
                     </View>
                   </Responsive>
@@ -208,7 +208,7 @@ class HomeSystems extends React.PureComponent<Props> {
                         t={t}
                         screen={screen}
                         onPress={onStabilityPress}
-                        href="https://storage.googleapis.com/celo_whitepapers/Celo_Stability_Analysis.pdf"
+                        href="/papers/Celo_Stability_Analysis.pdf"
                       />
                     </View>
                   </Responsive>
