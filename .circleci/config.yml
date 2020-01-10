@@ -41,6 +41,7 @@ e2e-defaults: &e2e-defaults
 general:
   artifacts:
     - 'mobile/coverage'
+    - 'web/coverage'
     - 'protocol/coverage'
 
 jobs:
