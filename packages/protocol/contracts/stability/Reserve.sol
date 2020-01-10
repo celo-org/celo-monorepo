@@ -312,24 +312,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
-    address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
-    ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = getReserveGoldBalance();
-    uint256 stableTokensValueInGold = 0;
-
-    for (uint256 i = 0; i < _tokens.length; i++) {
-      uint256 stableAmount;
-      uint256 goldAmount;
-      (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
-      uint256 stableTokenSupply = IERC20Token(_tokens[i]).totalSupply();
-      uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
-      stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
-    }
-
     // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 2.
-    // The protocol aims to keep half of the reserve value in gold, thus the reserve ratio
-    // is two when the value of gold in the reserve is equal to the total supply of stable tokens.
-    if (reserveGoldBalance >= stableTokensValueInGold) {
+    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
+    if (ratio.gt(FixidityLib.newFixed(2))) {
       return FixidityLib.wrap(0);
     } else {
       return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
