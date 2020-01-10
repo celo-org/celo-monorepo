@@ -1,5 +1,7 @@
+// Not intended for publication.  Used only as scaffolding to develop contractkit.
 import { Address } from '@celo/contractkit/lib/base'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { sleep } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { BaseCommand } from '../../base'
 
@@ -15,7 +17,7 @@ export default class Slasher extends BaseCommand {
   static examples = ['slasher']
 
   async run() {
-    // const res = this.parse(Slasher)
+    this.parse(Slasher)
     const validators = await this.kit.contracts.getValidators()
     const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
     const slashableDowntime = await downtimeSlasher.slashableDowntime()
@@ -64,7 +66,7 @@ export default class Slasher extends BaseCommand {
           }
         }
       }
-      await new Promise<void>((resolve) => setTimeout(resolve, 1 * 1000))
+      await sleep(1)
     }
   }
 }

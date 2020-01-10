@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { Address } from '../base'
 import { DoubleSigningSlasher } from '../generated/types/DoubleSigningSlasher'
 import {
   BaseWrapper,
@@ -38,6 +39,50 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
 
   /**
    * Slash a Validator for double-signing.
+   * @param validator Validator to slash.
+   * @param headerA First double signed block header.
+   * @param headerB Second double signed block header.
+   */
+  async slashValidator(
+    validatorAddress: Address,
+    headerA: string,
+    headerB: string
+  ): Promise<CeloTransactionObject<void>> {
+    const validators = await this.kit.contracts.getValidators()
+    const validator = await validators.getValidator(validatorAddress)
+    const blockNumber = await this.getBlockNumberFromHeader([headerA])
+    return this.slash(
+      validators.findSignerIndex(
+        validator.signer,
+        await validators.getSignersForBlock(blockNumber)
+      ),
+      headerA,
+      headerB
+    )
+  }
+
+  /**
+   * Slash a Validator for double-signing.
+   * @param validator Validator to slash.
+   * @param headerA First double signed block header.
+   * @param headerB Second double signed block header.
+   */
+  async slashSigner(
+    signerAddress: Address,
+    headerA: string,
+    headerB: string
+  ): Promise<CeloTransactionObject<void>> {
+    const validators = await this.kit.contracts.getValidators()
+    const blockNumber = await this.getBlockNumberFromHeader([headerA])
+    return this.slash(
+      validators.findSignerIndex(signerAddress, await validators.getSignersForBlock(blockNumber)),
+      headerA,
+      headerB
+    )
+  }
+
+  /**
+   * Slash a Validator for double-signing.
    * @param signerIndex Validator index at the block.
    * @param headerA First double signed block header.
    * @param headerB Second double signed block header.
@@ -52,7 +97,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     const validators = await this.kit.contracts.getValidators()
     const signer = await validators.validatorSignerAddressFromSet(signerIndex, blockNumber)
     const validator = await validators.getValidatorFromSigner(signer)
-    const membership = await validators.getGroupMembershipAtBlock(validator.address, blockNumber)
+    const membership = await validators.getValidatorGroupMembership(validator.address, blockNumber)
     const lockedGold = await this.kit.contracts.getLockedGold()
     const slashValidator = await lockedGold.computeParametersForSlashing(
       validator.address,

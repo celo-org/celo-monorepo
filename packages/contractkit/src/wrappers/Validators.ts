@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+import { range, zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3/types'
@@ -474,51 +474,76 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     )
   }
 
+  /**
+   * Gets the size of the validator set that must sign the given block number.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Size of the validator set.
+   */
   numberValidatorsInSet: (blockNumber: number) => Promise<number> = proxyCall(
     this.contract.methods.numberValidatorsInSet,
     undefined,
     valueToInt
   )
 
+  /**
+   * Gets a validator address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator at the requested index.
+   */
   validatorSignerAddressFromSet: (
-    signedIndex: number,
+    signerIndex: number,
     blockNumber: number
   ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
 
+  /**
+   * Returns the signers for block `blockNumber`.
+   * @param blockNumber Block number to retrieve signers for.
+   * @return Address of each signer in the validator set.
+   */
   async getSignersForBlock(blockNumber: number): Promise<Address[]> {
     const numValidators = await this.numberValidatorsInSet(blockNumber)
-    const signerIndices = Array.from(Array(numValidators), (_, i) => i)
-    return concurrentMap(10, signerIndices, (i) =>
+    return concurrentMap(10, range(0, numValidators, 1), (i) =>
       this.validatorSignerAddressFromSet(i, blockNumber)
     )
   }
 
-  async getGroupMembershipAtBlock(
+  /**
+   * Returns the group membership for `validator`.
+   * @param validator Address of validator to retrieve group membership for.
+   * @param blockNumber Block number to retrieve group membership at.
+   * @return Group and membership history index for `validator`.
+   */
+  async getValidatorGroupMembership(
     validator: Address,
-    blockNumber: number
+    blockNumber?: number
   ): Promise<{ group: Address; historyIndex: number }> {
-    const blockEpoch = await this.kit.getEpochNumberOfBlock(blockNumber)
+    const blockEpoch = await this.kit.getEpochNumberOfBlock(
+      blockNumber || (await this.kit.web3.eth.getBlockNumber())
+    )
     const membershipHistory = await this.getValidatorMembershipHistory(validator)
-    const historyIndex = this.findMembershipHistoryIndexForEpoch(membershipHistory, blockEpoch)
+    const historyIndex = this.findMembershipHistoryIndex(blockEpoch, membershipHistory)
     const group = membershipHistory[historyIndex].group
     return { group, historyIndex }
   }
 
-  findSignerIndex(signers: Address[], signer: Address): number {
-    for (let i = 0; i < signers.length; i++) {
-      if (signers[i] === signer) {
-        return i
-      }
-    }
-    throw new Error(`No signer ${signer} for block`)
+  /**
+   * Returns the index into `signers` of `signer`.
+   * @param signer The needle.
+   * @param signers The haystack.
+   * @return Index of signer or -1.
+   */
+  findSignerIndex(signer: Address, signers: Address[]): number {
+    return signers.findIndex((x) => eqAddress(x, signer))
   }
 
-  findMembershipHistoryIndexForEpoch(history: GroupMembership[], epoch: number): number {
-    for (let index = history.length - 1; index >= 0; index--) {
-      if (history[index].epoch <= epoch) {
-        return index
-      }
-    }
-    throw new Error(`No group membership for epoch ${epoch}`)
+  /**
+   * Returns the index into `history` for `epoch`.
+   * @param epoch The needle.
+   * @param history The haystack.
+   * @return Index for epoch or -1.
+   */
+  findMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
+    return history.reverse().findIndex((x) => x.epoch <= epoch)
   }
 }

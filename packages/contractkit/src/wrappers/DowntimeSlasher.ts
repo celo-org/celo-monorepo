@@ -54,7 +54,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const validator = await validators.getValidator(validatorAddress)
     return this.slashStartSignerIndex(
       startBlock,
-      validators.findSignerIndex(await validators.getSignersForBlock(startBlock), validator.signer)
+      validators.findSignerIndex(validator.signer, await validators.getSignersForBlock(startBlock))
     )
   }
 
@@ -76,7 +76,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const endSignerIndex =
       startEpoch === endEpoch
         ? startSignerIndex
-        : validators.findSignerIndex(await validators.getSignersForBlock(endBlock), signer)
+        : validators.findSignerIndex(signer, await validators.getSignersForBlock(endBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
   }
@@ -99,7 +99,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const startSignerIndex =
       startEpoch === endEpoch
         ? endSignerIndex
-        : validators.findSignerIndex(await validators.getSignersForBlock(startBlock), signer)
+        : validators.findSignerIndex(signer, await validators.getSignersForBlock(startBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
   }
@@ -119,7 +119,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
     const validators = await this.kit.contracts.getValidators()
-    const membership = await validators.getGroupMembershipAtBlock(validator, startBlock)
+    const membership = await validators.getValidatorGroupMembership(validator, startBlock)
     const lockedGold = await this.kit.contracts.getLockedGold()
     const slashValidator = await lockedGold.computeParametersForSlashing(
       validator,
