@@ -30,23 +30,23 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const validator = await validators.getValidator(validatorAddress)
     return this.slash(
       startBlock,
-      await validators.findSignerIndexForBlock(validator.signer, startBlock)
+      validators.findSignerIndex(await validators.getSignersForBlock(startBlock), validator.signer)
     )
   }
 
-  async slash(startBlock: number, signerIndex: number): Promise<CeloTransactionObject<void>> {
+  async slash(endBlock: number, endSignerIndex: number): Promise<CeloTransactionObject<void>> {
     const validators = await this.kit.contracts.getValidators()
     const signer = await this.contract.methods
-      .validatorSignerAddressFromSet(signerIndex, startBlock)
+      .validatorSignerAddressFromSet(endSignerIndex, endBlock)
       .call()
-    const startEpoch = await this.getEpochNumberOfBlock(startBlock)
-    // DowntimeSlasher.getEndBlock()
-    const endBlock = startBlock + (await this.slashableDowntime()) - 1
     const endEpoch = await this.getEpochNumberOfBlock(endBlock)
-    const endIndex =
+    // Reverses DowntimeSlasher.getEndBlock()
+    const startBlock = endBlock - (await this.slashableDowntime()) + 1
+    const startEpoch = await this.getEpochNumberOfBlock(startBlock)
+    const startSignerIndex =
       startEpoch === endEpoch
-        ? signerIndex
-        : await validators.findSignerIndexForBlock(signer, endBlock)
+        ? endSignerIndex
+        : validators.findSignerIndex(await validators.getSignersForBlock(startBlock), signer)
 
     const validator = await validators.getValidatorFromSigner(signer)
     const history = await validators.getValidatorMembershipHistory(validator.address)
@@ -68,8 +68,8 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
       this.kit,
       this.contract.methods.slash(
         startBlock,
-        signerIndex,
-        endIndex,
+        startSignerIndex,
+        endSignerIndex,
         historyIndex,
         validatorVotes.lesser,
         validatorVotes.greater,

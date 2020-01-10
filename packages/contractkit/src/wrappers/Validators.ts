@@ -485,18 +485,21 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     blockNumber: number
   ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
 
-  async findSignerIndexForBlock(signer: Address, blockNumber: number): Promise<number> {
+  async getSignersForBlock(blockNumber: number): Promise<Address[]> {
     const numValidators = await this.numberValidatorsInSet(blockNumber)
     const signerIndices = Array.from(Array(numValidators), (_, i) => i)
-    const signers = await concurrentMap(10, signerIndices, (i) =>
+    return concurrentMap(10, signerIndices, (i) =>
       this.validatorSignerAddressFromSet(i, blockNumber)
     )
-    for (let i = 0; i < numValidators; i++) {
+  }
+
+  findSignerIndex(signers: Address[], signer: Address): number {
+    for (let i = 0; i < signers.length; i++) {
       if (signers[i] === signer) {
         return i
       }
     }
-    throw new Error(`No signer ${signer} for block ${blockNumber}`)
+    throw new Error(`No signer ${signer} for block`)
   }
 
   findMembershipHistoryIndexForEpoch(history: GroupMembership[], epoch: number): number {
