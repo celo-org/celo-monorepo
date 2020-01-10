@@ -645,13 +645,8 @@ contract('EpochRewards', (accounts: string[]) => {
           .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
           .times(fromFixed(communityRewardFraction))
           .times(expectedMultiplier)
-          // Kinda hacky, but it works. Probably something with order of ops/
-          // rounding with fixed point math
           .integerValue(BigNumber.ROUND_FLOOR)
-        assertEqualBN(
-          (await epochRewards.calculateTargetEpochRewards())[2],
-          expected.integerValue(BigNumber.ROUND_CEIL)
-        )
+        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected)
       })
     })
   })
