@@ -7,7 +7,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/utils/src/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -58,9 +58,10 @@ contract('LockedGold', (accounts: string[]) => {
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
+  let mockGoldToken: MockGoldTokenInstance
 
   beforeEach(async () => {
-    const mockGoldToken: MockGoldTokenInstance = await MockGoldToken.new()
+    mockGoldToken = await MockGoldToken.new()
     accountsInstance = await Accounts.new()
     lockedGold = await LockedGold.new()
     mockElection = await MockElection.new()
@@ -72,6 +73,7 @@ contract('LockedGold', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
     await accountsInstance.createAccount()
   })
