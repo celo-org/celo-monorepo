@@ -315,22 +315,6 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
-   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
-   * @return The rewards multiplier based on the current and target Gold supplies.
-   */
-  function getRewardsMultiplier() external view returns (uint256) {
-    uint256 targetEpochRewards = getTargetEpochRewards();
-    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
-    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
-    // increase =/ (1 - fraction) st communityReward = increase * fraction
-    targetGoldSupplyIncrease = FixidityLib
-      .newFixed(targetGoldSupplyIncrease)
-      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
-      .fromFixed();
-    return _getRewardsMultiplier(targetGoldSupplyIncrease).unwrap();
-  }
-
-  /**
    * @notice Returns the total target epoch rewards for voters.
    * @return the total target epoch rewards for voters.
    */
@@ -353,6 +337,30 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
         numerator
       );
+  }
+
+  /**
+   * @notice Returns the target gold supply increase used in calculating the rewards multiplier.
+   * @return The target increase in gold w/out the rewards multiplier.
+   */
+  function _getTargetGoldSupplyIncrease() internal view returns (uint256) {
+    uint256 targetEpochRewards = getTargetEpochRewards();
+    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
+    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
+    // increase /= (1 - fraction) st the final community reward is fraction * increase
+    targetGoldSupplyIncrease = FixidityLib
+      .newFixed(targetGoldSupplyIncrease)
+      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
+      .fromFixed();
+    return targetGoldSupplyIncrease;
+  }
+
+  /**
+   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
+   * @return The rewards multiplier based on the current and target Gold supplies.
+   */
+  function getRewardsMultiplier() external view returns (uint256) {
+    return _getRewardsMultiplier(_getTargetGoldSupplyIncrease()).unwrap();
   }
 
   /**
@@ -420,19 +428,12 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       return (0, 0, 0);
     }
 
-    uint256 targetEpochRewards = getTargetEpochRewards();
-    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
-    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
-    // increase =/ (1 - fraction) st communityReward = increase * fraction
-    targetGoldSupplyIncrease = FixidityLib
-      .newFixed(targetGoldSupplyIncrease)
-      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
-      .fromFixed();
+    uint256 targetVoterReward = getTargetEpochRewards();
+    uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
     return (
       FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
-      FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed(),
-      // TODO: Should this be multiplied by the rewards multiplier?
+      FixidityLib.newFixed(targetVoterReward).multiply(rewardsMultiplier).fromFixed(),
       FixidityLib
         .newFixed(targetGoldSupplyIncrease)
         .multiply(communityRewardFraction)
