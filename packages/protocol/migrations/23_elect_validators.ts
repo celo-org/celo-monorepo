@@ -295,16 +295,23 @@ module.exports = async (_deployer: any, networkName: string) => {
     .div(Math.max(valKeyGroups.length - 1, 1))
     .integerValue()
 
-  const groups = valKeyGroups.map((keys, i) => ({
-    valKeys: keys,
-    name: valKeyGroups.length
-      ? config.validators.groupName + `(${i + 1})`
-      : config.validators.groupName,
-    lockedGold: lockedGoldPerValAtFirstGroup
+  const groups = valKeyGroups.map((keys, i) => {
+    const lockedGoldAmount = lockedGoldPerValAtFirstGroup
       .plus(lockedGoldPerValEachGroup.times(i))
-      .times(keys.length),
-    account: null,
-  }))
+      .times(keys.length)
+    return {
+      valKeys: keys,
+      name: valKeyGroups.length
+        ? config.validators.groupName + `(${i + 1})`
+        : config.validators.groupName,
+      lockedGold: lockedGoldAmount,
+      voteAmount:
+        i === 0 || i === valKeyGroups.length - 1
+          ? lockedGoldAmount
+          : new BigNumber(config.validators.groupLockedGoldRequirements.value),
+      account: null,
+    }
+  })
 
   for (const [idx, group] of groups.entries()) {
     console.info(
@@ -342,7 +349,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       console.info(`    - Adding ${address} ...`)
       if (i === 0) {
         const groupsWithVotes = groups.slice(0, idx)
-        groupsWithVotes.sort((a, b) => a.lockedGold.comparedTo(b.lockedGold))
+        groupsWithVotes.sort((a, b) => a.voteAmount.comparedTo(b.voteAmount))
 
         // @ts-ignore
         const addTx = validators.contract.methods.addFirstMember(
@@ -364,7 +371,7 @@ module.exports = async (_deployer: any, networkName: string) => {
 
     // Determine the lesser and greater group addresses after voting.
     const sortedGroups = groups.slice(0, idx + 1)
-    sortedGroups.sort((a, b) => a.lockedGold.comparedTo(b.lockedGold))
+    sortedGroups.sort((a, b) => a.voteAmount.comparedTo(b.voteAmount))
     const groupSortedIndex = sortedGroups.indexOf(group)
     const lesser =
       groupSortedIndex > 0 ? sortedGroups[groupSortedIndex - 1].account.address : NULL_ADDRESS
@@ -375,10 +382,8 @@ module.exports = async (_deployer: any, networkName: string) => {
     console.info('  * Group voting for itself ...')
 
     // Make first and last group high votes so we can maintain presence.
-    const voteAmount =
-      idx === 0 || idx === groups.length - 1
-        ? '0x' + group.lockedGold.toString(16)
-        : '0x' + config.validators.groupLockedGoldRequirements.value.toString(16)
+    const voteAmount = '0x' + group.voteAmount.toString(16)
+
     // @ts-ignore
     const voteTx = election.contract.methods.vote(
       group.account.address,
