@@ -41,11 +41,11 @@
   },
   "dependencies": {
     "@celo/client": "0.0.247",
-    "@celo/contractkit": "0.2.8-dev",
+    "@celo/contractkit": "0.2.10-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-fast-crypto": "^1.8.2",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "0.1.5-dev",
+    "@celo/utils": "0.1.6-dev",
     "@celo/walletkit": "^0.0.15",
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/netinfo": "^4.4.0",
