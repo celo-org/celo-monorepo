@@ -3,7 +3,6 @@ import ExchangeArrow from '@celo/react-components/icons/ExchangeArrow'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -111,7 +110,7 @@ function getDollarAmountProps({
 
 export function ExchangeFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
-  const { showGoldAmount, makerAmount, status, timestamp } = props
+  const { showGoldAmount, makerAmount, takerAmount, status, timestamp } = props
 
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
@@ -123,9 +122,8 @@ export function ExchangeFeedItem(props: Props) {
 
   const onPress = () => {
     navigateToExchangeReview(timestamp, {
-      makerToken,
-      makerAmount: new BigNumber(props.makerAmount.amount),
-      takerAmount: new BigNumber(props.takerAmount.amount),
+      makerAmount,
+      takerAmount,
     })
   }
 
