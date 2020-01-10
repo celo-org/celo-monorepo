@@ -147,6 +147,11 @@ contract Validators is
     _;
   }
 
+  modifier onlySlasher() {
+    require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
+    _;
+  }
+
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
@@ -1152,24 +1157,11 @@ contract Validators is
     return true;
   }
 
-  function getCanForceDeaffiliation() internal pure returns (bytes32[] memory) {
-    bytes32[] memory res = new bytes32[](4);
-    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
-    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
-    res[2] = GOVERNANCE_SLASHER_REGISTRY_ID;
-    res[3] = GOVERNANCE_REGISTRY_ID;
-    return res;
-  }
-
   /**
    * @notice Removes a validator from the group for which it is a member.
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
-  function forceDeaffiliateIfValidator(address validatorAccount)
-    external
-    nonReentrant
-    onlyRegisteredContracts(getCanForceDeaffiliation())
-  {
+  function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -1201,22 +1193,11 @@ contract Validators is
     group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
-  function getCanHalveSlashingMultiplier() internal pure returns (bytes32[] memory) {
-    bytes32[] memory res = new bytes32[](2);
-    res[0] = DOWNTIME_SLASHER_REGISTRY_ID;
-    res[1] = DOUBLE_SIGNING_SLASHER_REGISTRY_ID;
-    return res;
-  }
-
   /**
    * @notice Halves the group's slashing multiplier.
    * @param account The group being slashed.
    */
-  function halveSlashingMultiplier(address account)
-    external
-    nonReentrant
-    onlyRegisteredContracts(getCanHalveSlashingMultiplier())
-  {
+  function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
