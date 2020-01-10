@@ -65,4 +65,25 @@ contract Registry is IRegistry, Ownable, Initializable {
     bytes32 identifierHash = keccak256(abi.encodePacked(identifier));
     return registry[identifierHash];
   }
+
+  /**
+   * @notice Iterates over provided array of identifiers, getting the address for each.
+   *         Returns true if `sender` matches the address of one of the provided identifiers.
+   * @param identifierHashes Array of hashes of approved identifiers.
+   * @param sender Address in question to verify membership.
+   * @return True if `sender` corresponds to the address of any of `identifiers`
+   *         registry entries.
+   */
+  function isOneOf(bytes32[] calldata identifierHashes, address sender)
+    external
+    view
+    returns (bool)
+  {
+    for (uint256 i = 0; i < identifierHashes.length; i++) {
+      if (registry[identifierHashes[i]] == sender) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
