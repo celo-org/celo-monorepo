@@ -257,7 +257,7 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 export BOOTNODE_ENODES=`docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes`
 ```
 
-You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to use for your Validator account.
+You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to use for your Validator account. Your proxy should start syncing after a few seconds.
 
 ```bash
 # On the proxy machine
