@@ -11,7 +11,9 @@ Inside the [testnet](./testnet) folder you will find a module (and submodules) t
 - `proxy` module for creating a Geth Proxy connected to a validator
 - `validator` module for deploying a Validator
 - `tx-node` for deploying a transaction node (also known as full-node), thought to expose the rpc interface and allows interaction with the network easily
-- Attestation service for deploying the Attestation Service (https://docs.celo.org/getting-started/baklava-testnet/running-a-validator#running-the-attestation-service)
+- `attestation-service` for deploying the Attestation Service (https://docs.celo.org/getting-started/baklava-testnet/running-a-validator#running-the-attestation-service)
+
+The proxy, validator and tx-node services includes the [geth-exporter](https://github.com/status-im/geth_exporter) service to export geth metrics for Prometheus. Serving at port 9200, you can configure your Prometheus server to collect the metrics at endpoint http://<instance>:9200/metrics
 
 ## Requirements
 
