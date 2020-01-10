@@ -76,7 +76,7 @@ variable nexmo_secret {
 
 variable nexmo_blacklist {
   type        = string
-  description = "Nexmo blacklisted country codes, separated by coma (check nexmo documentation)"
+  description = "Nexmo blacklisted country codes, separated by comma (check nexmo documentation)"
 }
 
 variable twilio_account_sid {
@@ -96,5 +96,5 @@ variable twilio_auth_token {
 
 variable twilio_blacklist {
   type        = string
-  description = "Twilio blacklisted country codes, separated by coma  (check twilio documentation)"
+  description = "Twilio blacklisted country codes, separated by comma  (check twilio documentation)"
 }

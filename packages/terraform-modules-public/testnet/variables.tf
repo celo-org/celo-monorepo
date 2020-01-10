@@ -195,7 +195,7 @@ variable attestation_service_nexmo_secret {
 
 variable attestation_service_nexmo_blacklist {
   type        = string
-  description = "Nexmo blacklisted country codes, separated by coma (check nexmo documentation)"
+  description = "Nexmo blacklisted country codes, separated by comma (check nexmo documentation)"
   default     = ""
 }
 
@@ -219,7 +219,7 @@ variable attestation_service_twilio_auth_token {
 
 variable attestation_service_twilio_blacklist {
   type        = string
-  description = "Twilio blacklisted country codes, separated by coma  (check twilio documentation)"
+  description = "Twilio blacklisted country codes, separated by comma  (check twilio documentation)"
   default     = ""
 }
 
