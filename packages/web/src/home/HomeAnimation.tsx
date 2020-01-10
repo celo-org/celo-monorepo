@@ -117,7 +117,7 @@ export const styles = StyleSheet.create({
     ],
   },
   still: {
-    height: 'calc(100% - 250px)',
+    height: '70vh',
     justifyContent: 'center',
   },
   stillMobile: {
