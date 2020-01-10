@@ -12,25 +12,30 @@ import {
  * Contract handling slashing for Validator double-signing
  */
 export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlasher> {
-  getEpochNumberOfBlock = proxyCall(
-    this.contract.methods.getEpochNumberOfBlock,
-    undefined,
-    valueToInt
-  )
-
+  /**
+   * Parses block number out of header.
+   * @param header RLP encoded header
+   * @return Block number.
+   */
   getBlockNumberFromHeader = proxyCall(
     this.contract.methods.getBlockNumberFromHeader,
     undefined,
     valueToInt
   )
 
+  /**
+   * Slash a Validator for double-signing.
+   * @param signerIndex Validator index at the block.
+   * @param headerA First double signed block header.
+   * @param headerB Second double signed block header.
+   */
   async slash(
     signerIndex: number,
     headerA: string,
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const blockNumber = await this.getBlockNumberFromHeader([headerA])
-    const blockEpoch = await this.getEpochNumberOfBlock(blockNumber)
+    const blockEpoch = await this.kit.getEpochNumberOfBlock(blockNumber)
 
     const validators = await this.kit.contracts.getValidators()
     const signer: Address = await this.contract.methods

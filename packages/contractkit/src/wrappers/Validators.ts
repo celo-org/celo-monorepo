@@ -493,6 +493,17 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     )
   }
 
+  async getGroupMembershipAtBlock(
+    validator: Address,
+    blockNumber: number
+  ): Promise<{ group: Address; historyIndex: number }> {
+    const blockEpoch = await this.kit.getEpochNumberOfBlock(blockNumber)
+    const membershipHistory = await this.getValidatorMembershipHistory(validator)
+    const historyIndex = this.findMembershipHistoryIndexForEpoch(membershipHistory, blockEpoch)
+    const group = membershipHistory[historyIndex].group
+    return { group, historyIndex }
+  }
+
   findSignerIndex(signers: Address[], signer: Address): number {
     for (let i = 0; i < signers.length; i++) {
       if (signers[i] === signer) {
