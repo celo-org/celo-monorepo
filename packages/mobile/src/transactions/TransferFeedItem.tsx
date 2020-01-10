@@ -23,7 +23,7 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = TransferItemFragment & {
   type: TransactionType
-  status?: TransactionStatus
+  status: TransactionStatus
   invitees: Invitees
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient

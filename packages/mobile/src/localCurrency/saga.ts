@@ -15,7 +15,7 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'localCurrency/saga'
 
-export async function fetchExchangeRate(currencyCode: string): Promise<number> {
+export async function fetchExchangeRate(currencyCode: string): Promise<string> {
   const response = await apolloClient.query<ExchangeRateQuery, ExchangeRateQueryVariables>({
     query: gql`
       query ExchangeRate($currencyCode: String!) {
@@ -34,7 +34,7 @@ export async function fetchExchangeRate(currencyCode: string): Promise<number> {
     throw new Error(`Invalid response data ${response.data}`)
   }
 
-  return new BigNumber(rate).toNumber()
+  return new BigNumber(rate).toString()
 }
 
 export function* fetchLocalCurrencyRateSaga() {

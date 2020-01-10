@@ -87,7 +87,7 @@ interface StateProps {
   e164NumberToAddress: E164NumberToAddressType
   feeType: FeeType | null
   localCurrencyCode: LocalCurrencyCode | null
-  localCurrencyExchangeRate: number | null | undefined
+  localCurrencyExchangeRate: string | null | undefined
 }
 
 interface DispatchProps {

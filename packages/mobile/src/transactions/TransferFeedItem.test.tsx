@@ -3,6 +3,7 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TransactionType } from 'src/apollo/types'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import {
@@ -30,6 +31,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={mockComment}
           type={TransactionType.Sent}
           hash={'0x'}
@@ -51,6 +53,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={encryptedMockComment}
           type={TransactionType.Sent}
           hash={'0x'}
@@ -72,6 +75,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={encryptedMockComment}
           type={TransactionType.Received}
           hash={'0x'}
@@ -93,6 +97,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.VerificationFee}
           hash={'0x'}
@@ -114,6 +119,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.NetworkFee}
           hash={'0x'}
@@ -135,6 +141,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.NetworkFee}
           hash={'0x'}
@@ -156,6 +163,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.VerificationReward}
           hash={'0x'}
@@ -177,6 +185,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.Faucet}
           hash={'0x'}
@@ -198,6 +207,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.InviteSent}
           hash={'0x'}
@@ -219,6 +229,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.InviteReceived}
           hash={'0x'}
@@ -240,6 +251,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.Received}
           hash={'0x'}
@@ -261,6 +273,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.Received}
           hash={'0x'}
@@ -282,6 +295,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.Sent}
           hash={'0x'}
@@ -303,6 +317,7 @@ describe('transfer feed item renders correctly', () => {
       <Provider store={createMockStore({})}>
         <TransferFeedItem
           __typename="TransactionTransfer"
+          status={TransactionStatus.Complete}
           comment={''}
           type={TransactionType.Sent}
           hash={'0x'}

@@ -19,7 +19,7 @@ import { getMoneyDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = ExchangeItemFragment & {
-  status?: TransactionStatus
+  status: TransactionStatus
   showGoldAmount: boolean
 }
 

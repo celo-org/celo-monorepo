@@ -101,7 +101,7 @@ export const typeDefs = gql`
   }
 
   type ExchangeRate {
-    rate: Float!
+    rate: Decimal!
   }
 
   scalar Timestamp
@@ -123,7 +123,7 @@ export const typeDefs = gql`
   type LocalMoneyAmount {
     amount: Decimal!
     currencyCode: String!
-    exchangeRate: Float!
+    exchangeRate: Decimal!
   }
 
   enum TransactionType {
@@ -323,7 +323,7 @@ export const resolvers = {
       return {
         amount: new BigNumber(moneyAmount.amount).multipliedBy(rate).toString(),
         currencyCode: localCurrencyCode || 'USD',
-        exchangeRate: rate.toNumber(),
+        exchangeRate: rate.toString(),
       }
     },
   },

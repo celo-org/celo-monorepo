@@ -3,66 +3,17 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { ExchangeItemFragment, TransactionType } from 'src/apollo/types'
-import { CURRENCY_ENUM } from 'src/geth/consts'
-import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
-import TransactionFeed, {
-  FeedType,
-  TransactionFeed as TransactionFeedClass,
-} from 'src/transactions/TransactionFeed'
+import { TransactionType } from 'src/apollo/types'
+import { TransactionStatus } from 'src/transactions/reducer'
+import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
 import { createMockStore } from 'test/utils'
 
 jest.mock('src/utils/time.ts')
 
-const standbyTransactions: StandbyTransaction[] = [
-  {
-    id: '0110',
-    type: TransactionType.Sent,
-    comment: 'Eye for an Eye',
-    status: TransactionStatus.Pending,
-    value: '100',
-    symbol: CURRENCY_ENUM.DOLLAR,
-    timestamp: 1542406112,
-    address: '0072bvy2o23u',
-  },
-  {
-    id: '0112',
-    type: TransactionType.Exchange,
-    status: TransactionStatus.Pending,
-    inSymbol: CURRENCY_ENUM.DOLLAR,
-    inValue: '20',
-    outSymbol: CURRENCY_ENUM.GOLD,
-    outValue: '30',
-    timestamp: 1542409112,
-  },
-  {
-    id: '0113',
-    type: TransactionType.NetworkFee,
-    comment: '',
-    status: TransactionStatus.Pending,
-    value: '0.0001',
-    symbol: CURRENCY_ENUM.DOLLAR,
-    timestamp: 1542406112,
-    address: '0072bvy2o23u',
-  },
-]
-
-const failedExchange: StandbyTransaction[] = [
-  {
-    type: TransactionType.Exchange,
-    status: TransactionStatus.Failed,
-    inSymbol: CURRENCY_ENUM.DOLLAR,
-    inValue: '20',
-    outSymbol: CURRENCY_ENUM.GOLD,
-    outValue: '30',
-    timestamp: 1542409112,
-    id: '0x00000000000000000001',
-  },
-]
-
-const exchangeTransactions: ExchangeItemFragment[] = [
+const exchangeTransactions: FeedItem[] = [
   {
     __typename: 'TransactionExchange',
+    status: TransactionStatus.Complete,
     type: TransactionType.Exchange,
     amount: {
       amount: '-30',
@@ -84,9 +35,7 @@ const exchangeTransactions: ExchangeItemFragment[] = [
   },
 ]
 
-const store = createMockStore({
-  transactions: { standbyTransactions },
-})
+const store = createMockStore({})
 
 it('renders for no transactions', () => {
   const tree = renderer.create(
@@ -115,44 +64,6 @@ it('renders for loading', () => {
   const tree = renderer.create(
     <Provider store={store}>
       <TransactionFeed loading={true} error={undefined} data={undefined} kind={FeedType.HOME} />
-    </Provider>
-  )
-  expect(tree).toMatchSnapshot()
-})
-
-it('renders for standbyTransactions', () => {
-  const tree = renderer.create(
-    <Provider store={store}>
-      <TransactionFeedClass
-        loading={false}
-        error={undefined}
-        data={[]}
-        standbyTransactions={standbyTransactions}
-        kind={FeedType.HOME}
-        addressToE164Number={{}}
-        invitees={{}}
-        commentKey={''}
-        recipientCache={{}}
-      />
-    </Provider>
-  )
-  expect(tree).toMatchSnapshot()
-})
-
-it('filters out Failed', () => {
-  const tree = renderer.create(
-    <Provider store={store}>
-      <TransactionFeedClass
-        loading={false}
-        error={undefined}
-        data={undefined}
-        standbyTransactions={failedExchange}
-        kind={FeedType.EXCHANGE}
-        addressToE164Number={{}}
-        invitees={{}}
-        commentKey={''}
-        recipientCache={{}}
-      />
     </Provider>
   )
   expect(tree).toMatchSnapshot()

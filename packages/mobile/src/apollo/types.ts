@@ -41,14 +41,14 @@ export interface Exchange {
 
 export interface ExchangeRate {
   __typename?: 'ExchangeRate'
-  rate: Scalars['Float']
+  rate: Scalars['Decimal']
 }
 
 export interface LocalMoneyAmount {
   __typename?: 'LocalMoneyAmount'
   amount: Scalars['Decimal']
   currencyCode: Scalars['String']
-  exchangeRate: Scalars['Float']
+  exchangeRate: Scalars['Decimal']
 }
 
 export interface MoneyAmount {
@@ -183,6 +183,67 @@ export interface Transfer {
   hash: Scalars['String']
 }
 
+export interface ExchangeRateQueryVariables {
+  currencyCode: Scalars['String']
+}
+
+export interface ExchangeRateQuery {
+  __typename?: 'Query'
+  currencyConversion: Maybe<{ __typename?: 'ExchangeRate'; rate: string }>
+}
+
+export interface ExchangeItemFragment {
+  __typename: 'TransactionExchange'
+  type: TransactionType
+  hash: string
+  timestamp: number
+  amount: {
+    __typename?: 'MoneyAmount'
+    amount: string
+    currencyCode: string
+    localAmount: Maybe<{
+      __typename?: 'LocalMoneyAmount'
+      amount: string
+      currencyCode: string
+      exchangeRate: string
+    }>
+  }
+  takerAmount: {
+    __typename?: 'MoneyAmount'
+    amount: string
+    currencyCode: string
+    localAmount: Maybe<{
+      __typename?: 'LocalMoneyAmount'
+      amount: string
+      currencyCode: string
+      exchangeRate: string
+    }>
+  }
+  makerAmount: {
+    __typename?: 'MoneyAmount'
+    amount: string
+    currencyCode: string
+    localAmount: Maybe<{
+      __typename?: 'LocalMoneyAmount'
+      amount: string
+      currencyCode: string
+      exchangeRate: string
+    }>
+  }
+}
+
+type TransactionFeed_TransactionExchange_Fragment = {
+  __typename?: 'TransactionExchange'
+} & ExchangeItemFragment
+
+type TransactionFeed_TransactionTransfer_Fragment = {
+  __typename?: 'TransactionTransfer'
+} & TransferItemFragment
+
+export type TransactionFeedFragment =
+  | TransactionFeed_TransactionExchange_Fragment
+  | TransactionFeed_TransactionTransfer_Fragment
+
 export interface UserTransactionsQueryVariables {
   address: Scalars['Address']
   token: Token
@@ -203,67 +264,6 @@ export interface UserTransactionsQuery {
   }>
 }
 
-export interface ExchangeRateQueryVariables {
-  currencyCode: Scalars['String']
-}
-
-export interface ExchangeRateQuery {
-  __typename?: 'Query'
-  currencyConversion: Maybe<{ __typename?: 'ExchangeRate'; rate: number }>
-}
-
-export interface ExchangeItemFragment {
-  __typename: 'TransactionExchange'
-  type: TransactionType
-  hash: string
-  timestamp: number
-  amount: {
-    __typename?: 'MoneyAmount'
-    amount: string
-    currencyCode: string
-    localAmount: Maybe<{
-      __typename?: 'LocalMoneyAmount'
-      amount: string
-      currencyCode: string
-      exchangeRate: number
-    }>
-  }
-  takerAmount: {
-    __typename?: 'MoneyAmount'
-    amount: string
-    currencyCode: string
-    localAmount: Maybe<{
-      __typename?: 'LocalMoneyAmount'
-      amount: string
-      currencyCode: string
-      exchangeRate: number
-    }>
-  }
-  makerAmount: {
-    __typename?: 'MoneyAmount'
-    amount: string
-    currencyCode: string
-    localAmount: Maybe<{
-      __typename?: 'LocalMoneyAmount'
-      amount: string
-      currencyCode: string
-      exchangeRate: number
-    }>
-  }
-}
-
-type TransactionFeed_TransactionExchange_Fragment = {
-  __typename?: 'TransactionExchange'
-} & ExchangeItemFragment
-
-type TransactionFeed_TransactionTransfer_Fragment = {
-  __typename?: 'TransactionTransfer'
-} & TransferItemFragment
-
-export type TransactionFeedFragment =
-  | TransactionFeed_TransactionExchange_Fragment
-  | TransactionFeed_TransactionTransfer_Fragment
-
 export interface TransferItemFragment {
   __typename: 'TransactionTransfer'
   type: TransactionType
@@ -279,7 +279,7 @@ export interface TransferItemFragment {
       __typename?: 'LocalMoneyAmount'
       amount: string
       currencyCode: string
-      exchangeRate: number
+      exchangeRate: string
     }>
   }
 }

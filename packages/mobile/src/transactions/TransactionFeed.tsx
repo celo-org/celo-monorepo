@@ -12,7 +12,7 @@ import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
-import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import Logger from 'src/utils/Logger'
 import { privateCommentKeySelector } from 'src/web3/selectors'
@@ -28,24 +28,24 @@ interface StateProps {
   invitees: Invitees
   commentKey: string | null | undefined
   addressToE164Number: AddressToE164NumberType
-  standbyTransactions: StandbyTransaction[]
   recipientCache: NumberToRecipient
+}
+
+export type FeedItem = TransactionFeedFragment & {
+  status: TransactionStatus // for standby transactions
 }
 
 type Props = {
   kind: FeedType
   loading: boolean
   error: ApolloError | undefined
-  data: TransactionFeedFragment[] | undefined
-  standbyTransactions: StandbyTransaction[]
-  transactionFilter?: (tx: StandbyTransaction) => boolean
+  data: FeedItem[] | undefined
 } & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   invitees: state.invite.invitees,
   commentKey: privateCommentKeySelector(state),
   addressToE164Number: state.identity.addressToE164Number,
-  standbyTransactions: state.transactions.standbyTransactions,
   recipientCache: recipientCacheSelector(state),
 })
 
@@ -66,7 +66,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
   renderItem = (commentKeyBuffer: Buffer | null) => ({
     item: tx,
   }: {
-    item: TransactionFeedFragment
+    item: FeedItem
     index: number
   }) => {
     const { kind, addressToE164Number, invitees, recipientCache } = this.props
@@ -86,7 +86,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
       case 'TransactionTransfer':
         return (
           <TransferFeedItem
-            status={TransactionStatus.Complete}
             invitees={invitees}
             addressToE164Number={addressToE164Number}
             recipientCache={recipientCache}
@@ -95,13 +94,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           />
         )
       case 'TransactionExchange':
-        return (
-          <ExchangeFeedItem
-            status={TransactionStatus.Complete}
-            showGoldAmount={kind === FeedType.EXCHANGE}
-            {...tx}
-          />
-        )
+        return <ExchangeFeedItem showGoldAmount={kind === FeedType.EXCHANGE} {...tx} />
     }
 
     return <React.Fragment />
@@ -155,19 +148,11 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   render() {
-    const {
-      kind,
-      loading,
-      error,
-      data,
-      // standbyTransactions,
-      // transactionFilter,
-      commentKey,
-    } = this.props
+    const { kind, loading, error, data, commentKey } = this.props
 
     if (error) {
       Logger.error(TAG, 'Failure while loading transaction feed', error)
-      // return <NoActivity kind={kind} loading={loading} error={error} />
+      return <NoActivity kind={kind} loading={loading} error={error} />
     }
 
     // const events = data?.transactions?.edges.map((edge) => edge.node) ?? []

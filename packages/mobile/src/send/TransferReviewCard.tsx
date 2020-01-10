@@ -52,7 +52,7 @@ function TransferReviewCard({
 }: OwnProps & WithTranslation) {
   const localCurrencyCode = useLocalCurrencyCode()
   const localValue = useDollarsToLocalAmount(value)
-  const exchangeRate = new BigNumber(useExchangeRate() as number)
+  const exchangeRate = new BigNumber(useExchangeRate() as string)
   const amountWithFees = value.plus(fee || 0)
   const adjustedFee =
     type === TransactionType.InviteSent && fee

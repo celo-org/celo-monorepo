@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js'
 import { TransactionType } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, ActionTypes } from 'src/transactions/actions'
@@ -18,7 +17,7 @@ export interface TransferStandby {
   id: string
   type: TransferTransactionType
   status: TransactionStatus
-  value: string | BigNumber
+  value: string
   comment: string
   symbol: CURRENCY_ENUM
   timestamp: number
