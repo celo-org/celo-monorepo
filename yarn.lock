@@ -2570,10 +2570,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@0.0.224":
-  version "0.0.224"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.224.tgz#253706fd6e692c85ea36de7de3c3aeec294a25cb"
-  integrity sha512-9+e+xUvE1M7LksaCzFwX9tvANexHopJdrY3nerhegm5k2mQtDRRgRTsd6b6AZwN4jOXvIlukGf0SxEhSX1iFFQ==
+"@celo/client@0.0.247":
+  version "0.0.247"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.247.tgz#7e9119bb7b3c5c4b1d12ba5f8aa6b1fd20fb38f2"
+  integrity sha512-dGaARMtqc8ZYMEz/x79rP8ewJTDD88NxbthqYNCPkoYNSlgCLMd6SEVHI6IipYK2+wAMskILLW4De0v3Ia0Lzw==
 
 "@celo/contractkit@0.1.5":
   version "0.1.5"
@@ -2673,6 +2673,14 @@
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
     yargs "13.2.4"
+
+"@celo/react-native-fast-crypto@^1.8.2":
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/@celo/react-native-fast-crypto/-/react-native-fast-crypto-1.8.2.tgz#7563e73a47c9ce22407e0ceb4d6406078872795f"
+  integrity sha512-yb8TNnfVU6dWEWc2x8oNyF4mIzerXcS/Gv6ETRi5lM8bz1RyJUrX87mxTPhDJp0vdwtX0bnXRBjycgpPEPSPAA==
+  dependencies:
+    buffer "^5.0.8"
+    rfc4648 "^1.0.0"
 
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
@@ -9784,6 +9792,14 @@ buffer@^5.0.5, buffer@^5.0.6:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
 
+buffer@^5.0.8:
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.4.3.tgz#3fbc9c69eb713d323e3fc1a895eee0710c072115"
+  integrity sha512-zvj65TkFeIt3i6aj5bIvJDzjjQQGs4o/sNoezg1F1kYap9Nu2jcUdpwzRSJTHMMzG0H7bZkn4rNQpImhuxWX2A==
+  dependencies:
+    base64-js "^1.0.2"
+    ieee754 "^1.1.4"
+
 buffer@^5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.2.1.tgz#dd57fa0f109ac59c602479044dca7b8b3d0b71d6"
@@ -10811,7 +10827,7 @@ clone@2.1.1:
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.1.tgz#d217d1e961118e3ac9a4b8bba3285553bf647cdb"
   integrity sha1-0hfR6WERjjrJpLi7oyhVU79kfNs=
 
-clone@2.1.2, clone@^2.0.0, clone@^2.1.1:
+clone@2.1.2, clone@2.x, clone@^2.0.0, clone@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
   integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
@@ -10926,6 +10942,11 @@ color-convert@^2.0.1:
   integrity sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==
   dependencies:
     color-name "~1.1.4"
+
+color-convert@~0.5.0:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-0.5.3.tgz#bdb6c69ce660fadffe0b0007cc447e1b9f7282bd"
+  integrity sha1-vbbGnOZg+t/+CwAHzER+G59ygr0=
 
 color-name@1.1.3, color-name@^1.0.0:
   version "1.1.3"
@@ -12022,6 +12043,11 @@ cssesc@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-3.0.0.tgz#37741919903b868565e1c09ea747445cd18983ee"
   integrity sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==
+
+cssfontparser@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/cssfontparser/-/cssfontparser-1.2.1.tgz#f4022fc8f9700c68029d542084afbaf425a3f3e3"
+  integrity sha1-9AIvyPlwDGgCnVQghK+69CWj8+M=
 
 cssnano-preset-simple@^1.0.0:
   version "1.0.1"
@@ -18591,7 +18617,7 @@ ignore-by-default@^1.0.0, ignore-by-default@^1.0.1:
   resolved "https://registry.yarnpkg.com/ignore-by-default/-/ignore-by-default-1.0.1.tgz#48ca6d72f6c6a3af00a9ad4ae6876be3889e2b09"
   integrity sha1-SMptcvbGo68Aqa1K5odr44ieKwk=
 
-ignore-loader@0.1.2:
+ignore-loader@0.1.2, ignore-loader@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/ignore-loader/-/ignore-loader-0.1.2.tgz#d81f240376d0ba4f0d778972c3ad25874117a463"
   integrity sha1-2B8kA3bQuk8Nd4lyw60lh0EXpGM=
@@ -19803,6 +19829,14 @@ javascript-natural-sort@0.7.1:
   resolved "https://registry.yarnpkg.com/javascript-natural-sort/-/javascript-natural-sort-0.7.1.tgz#f9e2303d4507f6d74355a73664d1440fb5a0ef59"
   integrity sha1-+eIwPUUH9tdDVac2ZNFED7Wg71k=
 
+jest-canvas-mock@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/jest-canvas-mock/-/jest-canvas-mock-2.2.0.tgz#45fbc58589c6ce9df50dc90bd8adce747cbdada7"
+  integrity sha512-DcJdchb7eWFZkt6pvyceWWnu3lsp5QWbUeXiKgEMhwB3sMm5qHM1GQhDajvJgBeiYpgKcojbzZ53d/nz6tXvJw==
+  dependencies:
+    cssfontparser "^1.2.1"
+    parse-color "^1.0.0"
+
 jest-changed-files@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/jest-changed-files/-/jest-changed-files-24.9.0.tgz#08d8c15eb79a7fa3fc98269bc14b451ee82f8039"
@@ -19917,6 +19951,14 @@ jest-fetch-mock@^2.1.2:
   dependencies:
     cross-fetch "^2.2.2"
     promise-polyfill "^7.1.1"
+
+jest-fetch-mock@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/jest-fetch-mock/-/jest-fetch-mock-3.0.1.tgz#4dde94c9e91fa76bceb6001f54e33039f1f02da6"
+  integrity sha512-R5GVbQLVjk+PCfzf4vFoYDXt+oCEWuYigyaAnucdeVCXkElAgAYXDFFikHxLyCVjSNDc7TCYQZ1ItLNOE6OCrQ==
+  dependencies:
+    cross-fetch "^3.0.4"
+    promise-polyfill "^8.1.3"
 
 jest-get-type@^24.0.0:
   version "24.0.0"
@@ -23646,6 +23688,13 @@ node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
+node-cache@^5.0.2:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/node-cache/-/node-cache-5.1.0.tgz#266786c28dcec0fd34385ee29c383e6d6f1aa5de"
+  integrity sha512-gFQwYdoOztBuPlwg6DKQEf50G+gkK69aqLnw4djkmlHCzeVrLJfwvg9xl4RCAGviTIMUVoqcyoZ/V/wPEu/VVg==
+  dependencies:
+    clone "2.x"
+
 node-cleanup@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/node-cleanup/-/node-cleanup-2.1.2.tgz#7ac19abd297e09a7f72a71545d951b517e4dde2c"
@@ -25464,6 +25513,13 @@ parse-code-context@^1.0.0:
   resolved "https://registry.yarnpkg.com/parse-code-context/-/parse-code-context-1.0.0.tgz#718c295c593d0d19a37f898473268cc75e98de1e"
   integrity sha512-OZQaqKaQnR21iqhlnPfVisFjBWjhnMl5J9MgbP8xC+EwoVqbXrq78lp+9Zb3ahmLzrIX5Us/qbvBnaS3hkH6OA==
 
+parse-color@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/parse-color/-/parse-color-1.0.0.tgz#7b748b95a83f03f16a94f535e52d7f3d94658619"
+  integrity sha1-e3SLlag/A/FqlPU15S1/PZRlhhk=
+  dependencies:
+    color-convert "~0.5.0"
+
 parse-filepath@^0.6.1:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/parse-filepath/-/parse-filepath-0.6.3.tgz#38e17a73e5e4e6776bae9506fc3ccb14bc3a2b80"
@@ -26853,7 +26909,7 @@ promise-inflight@^1.0.1, promise-inflight@~1.0.1:
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
   integrity sha1-mEcocL8igTL8vdhoEputEsPAKeM=
 
-promise-polyfill@8.1.3:
+promise-polyfill@8.1.3, promise-polyfill@^8.1.3:
   version "8.1.3"
   resolved "https://registry.yarnpkg.com/promise-polyfill/-/promise-polyfill-8.1.3.tgz#8c99b3cf53f3a91c68226ffde7bde81d7f904116"
   integrity sha512-MG5r82wBzh7pSKDRa9y+vllNHz3e3d4CNj1PQE4BQYxLme0gKYYBm9YENq+UkEikyZ0XbiGWxYlVw3Rl9O/U8g==
@@ -27718,12 +27774,13 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@git://github.com/celo-org/react-native-bip39#1488fa1":
+"react-native-bip39@git://github.com/celo-org/react-native-bip39#8d00738":
   version "2.2.0"
-  resolved "git://github.com/celo-org/react-native-bip39#1488fa18a482809732b3c50ec989d56d5c539a6b"
+  resolved "git://github.com/celo-org/react-native-bip39#8d007387fc8bcc18a2d0e2344ec986a0c6f15834"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"
+    react-native-fast-crypto "^1.8.1"
     react-native-secure-randombytes "^2.2.3"
     unorm "^1.3.3"
 
@@ -27804,6 +27861,14 @@ react-native-exit-app@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/react-native-exit-app/-/react-native-exit-app-1.1.0.tgz#5ec082152974240e2d6a93f1608efb49a4385f21"
   integrity sha512-Spne19zfMfJvnUTX909EHUqWMk69rATtLJq9XMBGpNSHhx0M7v5yetx2Z87egBhLOqQm+CWfD/oxWzDG8rbIQA==
+
+react-native-fast-crypto@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/react-native-fast-crypto/-/react-native-fast-crypto-1.8.1.tgz#9b59d7eb4bcb19f99c62695df9ea4f683bb1e52c"
+  integrity sha512-5Cym09wcYSDXS7+QFg5oWGuW4rz2DyaU09YTeGxn3Qc+rqc01VQ5T6ruW4dWv7bIULtyBcJ2ovTkXTtbsDl3uA==
+  dependencies:
+    buffer "^5.0.8"
+    rfc4648 "^1.0.0"
 
 react-native-firebase@5.5.6, react-native-firebase@^5.5.6:
   version "5.5.6"
@@ -29385,6 +29450,11 @@ retry@^0.10.0, retry@~0.10.0, retry@~0.10.1:
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/retry/-/retry-0.10.1.tgz#e76388d217992c252750241d3d3956fed98d8ff4"
   integrity sha1-52OI0heZLCUnUCQdPTlW/tmNj/Q=
+
+rfc4648@^1.0.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.3.0.tgz#2a69c76f05bc0e388feab933672de9b492af95f1"
+  integrity sha512-x36K12jOflpm1V8QjPq3I+pt7Z1xzeZIjiC8J2Oxd7bE1efTrOG241DTYVJByP/SxR9jl1t7iZqYxDX864jgBQ==
 
 right-align@^0.1.1:
   version "0.1.3"
