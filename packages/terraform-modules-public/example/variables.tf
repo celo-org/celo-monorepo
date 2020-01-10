@@ -169,13 +169,13 @@ variable attestation_service_credentials {
   type        = map(string)
 
   default = {
-    sms_providers                = "nexmo"
-    nexmo_key                    = "..."
-    nexmo_secret                 = "..."
+    sms_providers                = "twilio"
+    nexmo_key                    = ""
+    nexmo_secret                 = ""
     nexmo_blacklist              = ""
-    twilio_account_sid           = ""
-    twilio_messaging_service_sid = ""
-    twilio_auth_token            = ""
+    twilio_account_sid           = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    twilio_messaging_service_sid = "MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    twilio_auth_token            = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     twilio_blacklist             = ""
   }
 }
