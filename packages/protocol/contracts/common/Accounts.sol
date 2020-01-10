@@ -51,6 +51,9 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
   event ValidatorSignerAuthorized(address indexed account, address signer);
+  event AttestationSignerRemoved(address indexed account, address oldSigner);
+  event VoteSignerRemoved(address indexed account, address oldSigner);
+  event ValidatorSignerRemoved(address indexed account, address oldSigner);
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountNameSet(address indexed account, string name);
   event AccountMetadataURLSet(address indexed account, string metadataURL);
@@ -210,6 +213,33 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
+   * @notice Removes the currently authorized vote signer for the account
+   */
+  function removeVoteSigner() public {
+    Account storage account = accounts[msg.sender];
+    emit VoteSignerRemoved(msg.sender, account.signers.vote);
+    account.signers.vote = address(0);
+  }
+
+  /**
+   * @notice Removes the currently authorized validator signer for the account
+   */
+  function removeValidatorSigner() public {
+    Account storage account = accounts[msg.sender];
+    emit ValidatorSignerRemoved(msg.sender, account.signers.validator);
+    account.signers.validator = address(0);
+  }
+
+  /**
+   * @notice Removes the currently authorized attestation signer for the account
+   */
+  function removeAttestationSigner() public {
+    Account storage account = accounts[msg.sender];
+    emit AttestationSignerRemoved(msg.sender, account.signers.attestation);
+    account.signers.attestation = address(0);
+  }
+
+  /**
    * @notice Returns the account associated with `signer`.
    * @param signer The address of the account or currently authorized attestation signer.
    * @dev Fails if the `signer` is not an account or currently authorized attestation signer.
@@ -316,6 +346,39 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     require(isAccount(account), "Unknown account");
     address signer = accounts[account].signers.attestation;
     return signer == address(0) ? account : signer;
+  }
+
+  /**
+   * @notice Returns if account has specified a dedicated vote signer.
+   * @param account The address of the account.
+   * @return Whether the account has specified a dedicated vote signer.
+   */
+  function hasAuthorizedVoteSigner(address account) external view returns (bool) {
+    require(isAccount(account));
+    address signer = accounts[account].signers.vote;
+    return signer != address(0);
+  }
+
+  /**
+   * @notice Returns if account has specified a dedicated validator signer.
+   * @param account The address of the account.
+   * @return Whether the account has specified a dedicated validator signer.
+   */
+  function hasAuthorizedValidatorSigner(address account) external view returns (bool) {
+    require(isAccount(account));
+    address signer = accounts[account].signers.validator;
+    return signer != address(0);
+  }
+
+  /**
+   * @notice Returns if account has specified a dedicated attestation signer.
+   * @param account The address of the account.
+   * @return Whether the account has specified a dedicated attestation signer.
+   */
+  function hasAuthorizedAttestationSigner(address account) external view returns (bool) {
+    require(isAccount(account));
+    address signer = accounts[account].signers.attestation;
+    return signer != address(0);
   }
 
   /**
