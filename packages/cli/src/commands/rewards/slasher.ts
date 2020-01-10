@@ -28,7 +28,7 @@ export default class Slasher extends BaseCommand {
       while (blockNumber < newBlockNumber) {
         blockNumber++
 
-        const newEpochNumber = await downtimeSlasher.getEpochNumberOfBlock(blockNumber)
+        const newEpochNumber = await this.kit.getEpochNumberOfBlock(blockNumber)
         if (epochNumber !== newEpochNumber) {
           epochNumber = newEpochNumber
           console.info(`New epoch: ${epochNumber}`)
@@ -59,7 +59,7 @@ export default class Slasher extends BaseCommand {
             } else if (blockNumber - validatorDownSince[i] >= slashableDowntime) {
               validatorDownSince[i] = -1
               console.info(`Slashing signer index ${i} for downtime through block ${blockNumber}`)
-              await downtimeSlasher.slash(blockNumber, i)
+              await downtimeSlasher.slashEndSignerIndex(blockNumber, i)
             }
           }
         }

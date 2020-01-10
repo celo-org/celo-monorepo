@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { DowntimeSlasher } from '../generated/types/DowntimeSlasher'
 import {
@@ -5,6 +6,7 @@ import {
   CeloTransactionObject,
   proxyCall,
   toTransactionObject,
+  valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
 
@@ -12,6 +14,18 @@ import {
  * Contract handling slashing for Validator downtime
  */
 export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
+  /**
+   * Returns slashing incentives.
+   * @return Rewards and penaltys for slashing.
+   */
+  slashingIncentives = proxyCall(this.contract.methods.slashingIncentives, undefined, (res): {
+    reward: BigNumber
+    penalty: BigNumber
+  } => ({
+    reward: valueToBigNumber(res.reward),
+    penalty: valueToBigNumber(res.penalty),
+  }))
+
   /**
    * Returns slashable downtime in blocks.
    * @return The number of consecutive blocks before a Validator missing from IBFT consensus
@@ -103,18 +117,17 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     startSignerIndex: number,
     endSignerIndex: number
   ): Promise<CeloTransactionObject<void>> {
+    const incentives = await this.slashingIncentives()
     const validators = await this.kit.contracts.getValidators()
     const membership = await validators.getGroupMembershipAtBlock(validator, startBlock)
-
-    const election = await this.kit.contracts.getElection()
-    const eligibleGroups = await election.getEligibleValidatorGroupsVotes()
-    const validatorVotes = await election.findLessersAndGreaters(
-      await election.getGroupsVotedForByAccount(validator),
-      eligibleGroups
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const slashValidator = await lockedGold.computeParametersForSlashing(
+      validator,
+      incentives.penalty
     )
-    const groupVotes = await election.findLessersAndGreaters(
-      await election.getGroupsVotedForByAccount(membership.group),
-      eligibleGroups
+    const slashGroup = await lockedGold.computeParametersForSlashing(
+      membership.group,
+      incentives.penalty
     )
 
     return toTransactionObject(
@@ -124,12 +137,12 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
         startSignerIndex,
         endSignerIndex,
         membership.historyIndex,
-        validatorVotes.lesser,
-        validatorVotes.greater,
-        validatorVotes.index,
-        groupVotes.lesser,
-        groupVotes.greater,
-        groupVotes.index
+        slashValidator.lessers,
+        slashValidator.greaters,
+        slashValidator.indices,
+        slashGroup.lessers,
+        slashGroup.greaters,
+        slashGroup.indices
       )
     )
   }

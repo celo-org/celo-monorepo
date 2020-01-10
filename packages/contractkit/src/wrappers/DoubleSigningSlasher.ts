@@ -1,10 +1,11 @@
-import { Address } from '../base'
+import BigNumber from 'bignumber.js'
 import { DoubleSigningSlasher } from '../generated/types/DoubleSigningSlasher'
 import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
   toTransactionObject,
+  valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
 
@@ -12,6 +13,18 @@ import {
  * Contract handling slashing for Validator double-signing
  */
 export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlasher> {
+  /**
+   * Returns slashing incentives.
+   * @return Rewards and penaltys for slashing.
+   */
+  slashingIncentives = proxyCall(this.contract.methods.slashingIncentives, undefined, (res): {
+    reward: BigNumber
+    penalty: BigNumber
+  } => ({
+    reward: valueToBigNumber(res.reward),
+    penalty: valueToBigNumber(res.penalty),
+  }))
+
   /**
    * Parses block number out of header.
    * @param header RLP encoded header
@@ -34,28 +47,20 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     headerA: string,
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
+    const incentives = await this.slashingIncentives()
     const blockNumber = await this.getBlockNumberFromHeader([headerA])
-    const blockEpoch = await this.kit.getEpochNumberOfBlock(blockNumber)
-
     const validators = await this.kit.contracts.getValidators()
-    const signer: Address = await this.contract.methods
-      .validatorSignerAddressFromSet(signerIndex, blockNumber)
-      .call()
-
+    const signer = await validators.validatorSignerAddressFromSet(signerIndex, blockNumber)
     const validator = await validators.getValidatorFromSigner(signer)
-    const history = await validators.getValidatorMembershipHistory(validator.address)
-    const historyIndex = validators.findMembershipHistoryIndexForEpoch(history, blockEpoch)
-    const group = history[historyIndex].group
-
-    const election = await this.kit.contracts.getElection()
-    const eligibleGroups = await election.getEligibleValidatorGroupsVotes()
-    const validatorVotes = await election.findLessersAndGreaters(
-      await election.getGroupsVotedForByAccount(validator.address),
-      eligibleGroups
+    const membership = await validators.getGroupMembershipAtBlock(validator.address, blockNumber)
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const slashValidator = await lockedGold.computeParametersForSlashing(
+      validator.address,
+      incentives.penalty
     )
-    const groupVotes = await election.findLessersAndGreaters(
-      await election.getGroupsVotedForByAccount(group),
-      eligibleGroups
+    const slashGroup = await lockedGold.computeParametersForSlashing(
+      membership.group,
+      incentives.penalty
     )
 
     return toTransactionObject(
@@ -65,13 +70,13 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
         signerIndex,
         [headerA],
         [headerB],
-        historyIndex,
-        validatorVotes.lesser,
-        validatorVotes.greater,
-        validatorVotes.index,
-        groupVotes.lesser,
-        groupVotes.greater,
-        groupVotes.index
+        membership.historyIndex,
+        slashValidator.lessers,
+        slashValidator.greaters,
+        slashValidator.indices,
+        slashGroup.lessers,
+        slashGroup.greaters,
+        slashGroup.indices
       )
     )
   }
