@@ -3,6 +3,8 @@ import { CeloContract } from './base'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
+import { newDoubleSigningSlasher } from './generated/DoubleSigningSlasher'
+import { newDowntimeSlasher } from './generated/DowntimeSlasher'
 import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
@@ -26,6 +28,8 @@ const ContractFactories = {
   [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
+  [CeloContract.DoubleSigningSlasher]: newDoubleSigningSlasher,
+  [CeloContract.DowntimeSlasher]: newDowntimeSlasher,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
   [CeloContract.Escrow]: newEscrow,
@@ -66,6 +70,12 @@ export class Web3ContractCache {
   }
   getBlockchainParameters() {
     return this.getContract(CeloContract.BlockchainParameters)
+  }
+  getDoubleSigningSlasher() {
+    return this.getContract(CeloContract.DoubleSigningSlasher)
+  }
+  getDowntimeSlasher() {
+    return this.getContract(CeloContract.DowntimeSlasher)
   }
   getElection() {
     return this.getContract(CeloContract.Election)
