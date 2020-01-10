@@ -110,9 +110,11 @@ const Portrait = React.memo(function _Portrait({
           <View style={standardStyles.row}>
             <Text style={[fonts.p, textStyles.heavy, styles.name]}>{name}</Text>
             {url && (
-              <a href={externalize(url)} target="_blank">
-                <External size={12} color={colors.dark} />
-              </a>
+              <View style={styles.outLink}>
+                <a href={externalize(url)} target="_blank">
+                  <External size={12} color={colors.dark} />
+                </a>
+              </View>
             )}
           </View>
 
@@ -138,7 +140,12 @@ function externalize(url: string) {
 // @ts-ignore
 const styles = StyleSheet.create({
   name: {
+    marginTop: 3,
     marginRight: 5,
+  },
+  outLink: {
+    paddingBottom: 1,
+    justifyContent: 'flex-end',
   },
   purposeText: { fontSize: 26, lineHeight: 28, minHeight: 60 },
   photoListAuxMobile: {
@@ -156,7 +163,7 @@ const styles = StyleSheet.create({
   },
   photoList: {
     display: 'grid',
-    gridRowGap: 50,
+    gridRowGap: 55,
     gridColumnGap: 40,
     gridTemplateColumns: `repeat(3, 1fr)`,
     minHeight: '50vh',
