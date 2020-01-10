@@ -295,6 +295,20 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show.ts)_
 
+### Show-claimed-accounts
+
+Show information about claimed accounts
+
+```
+USAGE
+  $ celocli account:show-claimed-accounts ADDRESS
+
+EXAMPLE
+  show-claimed-accounts 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/show-claimed-accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show-claimed-accounts.ts)_
+
 ### Show-metadata
 
 Show the data in a local metadata file
