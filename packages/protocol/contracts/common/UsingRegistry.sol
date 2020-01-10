@@ -61,14 +61,7 @@ contract UsingRegistry is Ownable {
   }
 
   modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
-    bool registered = false;
-    for (uint256 i = 0; i < identifierHashes.length; i++) {
-      if (registry.getAddressFor(identifierHashes[i]) == msg.sender) {
-        registered = true;
-        break;
-      }
-    }
-    require(registered, "only registered contracts");
+    require(registry.isOneOf(identifierHashes, msg.sender), "only registered contracts");
     _;
   }
 
