@@ -233,6 +233,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   }
 
   // Returns how much voting gold will be decremented from the groups voted by an account
+  // Implementation follows protocol/test/common/integration slashingOfGroups()
   private async computeDecrementsForSlashing(account: Address, penalty: BigNumber) {
     // first check how much voting gold has to be slashed
     const nonVoting = await this.getAccountNonvotingLockedGold(account)

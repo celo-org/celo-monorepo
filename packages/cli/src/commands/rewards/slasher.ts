@@ -1,6 +1,5 @@
 // Not intended for publication.  Used only as scaffolding to develop contractkit.
-import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
-import { mapAddressIndex } from '@celo/utils/lib/address'
+import { mapAddressListDataOnto } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { BaseCommand } from '../../base'
@@ -22,9 +21,9 @@ export default class Slasher extends BaseCommand {
     const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
     const slashableDowntime = await downtimeSlasher.slashableDowntime()
     let validatorDownSince: number[] = []
-
     let blockNumber = (await this.kit.web3.eth.getBlockNumber()) - 1
     let epochNumber = -2
+
     while (true) {
       const newBlockNumber = await this.kit.web3.eth.getBlockNumber()
       while (blockNumber < newBlockNumber) {
@@ -34,10 +33,12 @@ export default class Slasher extends BaseCommand {
         if (epochNumber !== newEpochNumber) {
           epochNumber = newEpochNumber
           console.info(`New epoch: ${epochNumber}`)
-          validatorDownSince = await mapSignerDataToNextEpoch(
-            validators,
-            blockNumber,
+          const oldEpochSigners = await validators.getValidatorSignerAddressSet(blockNumber - 1)
+          const newEpochSigners = await validators.getValidatorSignerAddressSet(blockNumber)
+          validatorDownSince = await mapAddressListDataOnto(
             validatorDownSince,
+            oldEpochSigners,
+            newEpochSigners,
             -1
           )
         }
@@ -69,25 +70,4 @@ export default class Slasher extends BaseCommand {
       await sleep(1)
     }
   }
-}
-
-async function mapSignerDataToNextEpoch<T>(
-  validators: ValidatorsWrapper,
-  blockNumber: number,
-  signerData: T[],
-  initialValue: T
-): Promise<T[]> {
-  const oldEpochSigners = await validators.getSignersForBlock(blockNumber - 1)
-  if (oldEpochSigners.length !== signerData.length) {
-    throw new Error(`Signer set size mismatch ${oldEpochSigners.length} != ${signerData.length}`)
-  }
-  const newEpochSigners = await validators.getSignersForBlock(blockNumber)
-  const signerIndexMap = mapAddressIndex(oldEpochSigners, newEpochSigners)
-  const res = [...Array(newEpochSigners.length).fill(initialValue)]
-  for (let i = 0; i < signerIndexMap.length; i++) {
-    if (signerIndexMap[i] >= 0) {
-      res[signerIndexMap[i]] = signerData[i]
-    }
-  }
-  return res
 }

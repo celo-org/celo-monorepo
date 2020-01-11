@@ -55,7 +55,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const validator = await validators.getValidator(validatorAddress)
     return this.slashStartSignerIndex(
       startBlock,
-      findAddressIndex(validator.signer, await validators.getSignersForBlock(startBlock))
+      findAddressIndex(validator.signer, await validators.getValidatorSignerAddressSet(startBlock))
     )
   }
 
@@ -77,7 +77,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const endSignerIndex =
       startEpoch === endEpoch
         ? startSignerIndex
-        : findAddressIndex(signer, await validators.getSignersForBlock(endBlock))
+        : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(endBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
   }
@@ -100,7 +100,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const startSignerIndex =
       startEpoch === endEpoch
         ? endSignerIndex
-        : findAddressIndex(signer, await validators.getSignersForBlock(startBlock))
+        : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(startBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
   }
@@ -120,7 +120,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
     const validators = await this.kit.contracts.getValidators()
-    const membership = await validators.getValidatorGroupMembership(validator, startBlock)
+    const membership = await validators.getValidatorMembershipHistoryIndex(validator, startBlock)
     const lockedGold = await this.kit.contracts.getLockedGold()
     const slashValidator = await lockedGold.computeParametersForSlashing(
       validator,

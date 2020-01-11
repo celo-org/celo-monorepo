@@ -501,7 +501,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param blockNumber Block number to retrieve signers for.
    * @return Address of each signer in the validator set.
    */
-  async getSignersForBlock(blockNumber: number): Promise<Address[]> {
+  async getValidatorSignerAddressSet(blockNumber: number): Promise<Address[]> {
     const numValidators = await this.numberValidatorsInSet(blockNumber)
     return concurrentMap(10, range(0, numValidators, 1), (i) =>
       this.validatorSignerAddressFromSet(i, blockNumber)
@@ -514,7 +514,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param blockNumber Block number to retrieve group membership at.
    * @return Group and membership history index for `validator`.
    */
-  async getValidatorGroupMembership(
+  async getValidatorMembershipHistoryIndex(
     validator: Address,
     blockNumber?: number
   ): Promise<{ group: Address; historyIndex: number }> {
@@ -522,7 +522,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       blockNumber || (await this.kit.web3.eth.getBlockNumber())
     )
     const membershipHistory = await this.getValidatorMembershipHistory(validator)
-    const historyIndex = this.findMembershipHistoryIndex(blockEpoch, membershipHistory)
+    const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
     const group = membershipHistory[historyIndex].group
     return { group, historyIndex }
   }
@@ -533,7 +533,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param history The haystack.
    * @return Index for epoch or -1.
    */
-  findMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
+  findValidatorMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
     return history.reverse().findIndex((x) => x.epoch <= epoch)
   }
 }

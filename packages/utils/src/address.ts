@@ -37,7 +37,7 @@ export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const findAddressIndex = (address: Address, addresses: Address[]) =>
   addresses.findIndex((x) => eqAddress(x, address))
 
-export const mapAddressIndex = (oldAddress: Address[], newAddress: Address[]) => {
+export const mapAddressListOnto = (oldAddress: Address[], newAddress: Address[]) => {
   const oldAddressIndex: Array<{
     address: Address
     index: number
@@ -63,6 +63,25 @@ export const mapAddressIndex = (oldAddress: Address[], newAddress: Address[]) =>
       res[oldAddressIndex[i].index] = newAddressIndex[j].index
       i++
       j++
+    }
+  }
+  return res
+}
+
+export function mapAddressListDataOnto<T>(
+  data: T[],
+  oldAddress: Address[],
+  newAddress: Address[],
+  initialValue: T
+): T[] {
+  const res = [...Array(oldAddress.length).fill(initialValue)]
+  if (data.length === 0) {
+    return res
+  }
+  const addressIndexMap = mapAddressListOnto(oldAddress, newAddress)
+  for (let i = 0; i < addressIndexMap.length; i++) {
+    if (addressIndexMap[i] >= 0) {
+      res[addressIndexMap[i]] = data[i]
     }
   }
   return res
