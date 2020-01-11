@@ -355,8 +355,8 @@ Once these accounts have a balance, unlock them so that we can sign transactions
 
 ```bash
 # On your local machine
-celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS
-celocli account:unlock --account $CELO_VALIDATOR_ADDRESS
+celocli account:unlock $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:unlock $CELO_VALIDATOR_ADDRESS
 celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <NAME YOUR VALIDATOR GROUP>
 celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <NAME YOUR VALIDATOR>
 ```
