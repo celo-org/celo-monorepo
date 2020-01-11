@@ -1,6 +1,6 @@
 // Not intended for publication.  Used only as scaffolding to develop contractkit.
-import { Address } from '@celo/contractkit/lib/base'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { mapAddressIndex } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { BaseCommand } from '../../base'
@@ -34,7 +34,7 @@ export default class Slasher extends BaseCommand {
         if (epochNumber !== newEpochNumber) {
           epochNumber = newEpochNumber
           console.info(`New epoch: ${epochNumber}`)
-          validatorDownSince = await mapSignerIndexedDataToNextEpoch(
+          validatorDownSince = await mapSignerDataToNextEpoch(
             validators,
             blockNumber,
             validatorDownSince,
@@ -71,7 +71,7 @@ export default class Slasher extends BaseCommand {
   }
 }
 
-async function mapSignerIndexedDataToNextEpoch<T>(
+async function mapSignerDataToNextEpoch<T>(
   validators: ValidatorsWrapper,
   blockNumber: number,
   signerData: T[],
@@ -81,30 +81,13 @@ async function mapSignerIndexedDataToNextEpoch<T>(
   if (oldEpochSigners.length !== signerData.length) {
     throw new Error(`Signer set size mismatch ${oldEpochSigners.length} != ${signerData.length}`)
   }
-
   const newEpochSigners = await validators.getSignersForBlock(blockNumber)
-  const oldEpochSignerIndex: Array<{
-    signer: Address
-    index: number
-  }> = oldEpochSigners.map((signer: Address, index: number) => ({ signer, index }))
-  const newEpochSignerIndex: Array<{
-    signer: Address
-    index: number
-  }> = newEpochSigners.map((signer: Address, index: number) => ({ signer, index }))
-  oldEpochSignerIndex.sort((a, b) => a.signer.localeCompare(b.signer))
-  newEpochSignerIndex.sort((a, b) => a.signer.localeCompare(b.signer))
-
-  const ret = [...Array(newEpochSigners.length).fill(initialValue)]
-  for (let i = 0, j = 0; i < oldEpochSigners.length && j < newEpochSigners.length /**/; ) {
-    if (oldEpochSignerIndex[i].signer < newEpochSignerIndex[i].signer) {
-      i++
-    } else if (newEpochSignerIndex[j].signer < oldEpochSignerIndex[i].signer) {
-      j++
-    } else {
-      ret[newEpochSignerIndex[j].index] = signerData[oldEpochSignerIndex[i].index]
-      i++
-      j++
+  const signerIndexMap = mapAddressIndex(oldEpochSigners, newEpochSigners)
+  const res = [...Array(newEpochSigners.length).fill(initialValue)]
+  for (let i = 0; i < signerIndexMap.length; i++) {
+    if (signerIndexMap[i] >= 0) {
+      res[signerIndexMap[i]] = signerData[i]
     }
   }
-  return ret
+  return res
 }

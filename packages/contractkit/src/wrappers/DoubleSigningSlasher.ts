@@ -1,3 +1,4 @@
+import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { DoubleSigningSlasher } from '../generated/types/DoubleSigningSlasher'
@@ -52,10 +53,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     const validator = await validators.getValidator(validatorAddress)
     const blockNumber = await this.getBlockNumberFromHeader([headerA])
     return this.slash(
-      validators.findSignerIndex(
-        validator.signer,
-        await validators.getSignersForBlock(blockNumber)
-      ),
+      findAddressIndex(validator.signer, await validators.getSignersForBlock(blockNumber)),
       headerA,
       headerB
     )
@@ -75,7 +73,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     const validators = await this.kit.contracts.getValidators()
     const blockNumber = await this.getBlockNumberFromHeader([headerA])
     return this.slash(
-      validators.findSignerIndex(signerAddress, await validators.getSignersForBlock(blockNumber)),
+      findAddressIndex(signerAddress, await validators.getSignersForBlock(blockNumber)),
       headerA,
       headerB
     )

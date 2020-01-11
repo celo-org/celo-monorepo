@@ -1,3 +1,4 @@
+import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { DowntimeSlasher } from '../generated/types/DowntimeSlasher'
@@ -54,7 +55,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const validator = await validators.getValidator(validatorAddress)
     return this.slashStartSignerIndex(
       startBlock,
-      validators.findSignerIndex(validator.signer, await validators.getSignersForBlock(startBlock))
+      findAddressIndex(validator.signer, await validators.getSignersForBlock(startBlock))
     )
   }
 
@@ -76,7 +77,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const endSignerIndex =
       startEpoch === endEpoch
         ? startSignerIndex
-        : validators.findSignerIndex(signer, await validators.getSignersForBlock(endBlock))
+        : findAddressIndex(signer, await validators.getSignersForBlock(endBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
   }
@@ -99,7 +100,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const startSignerIndex =
       startEpoch === endEpoch
         ? endSignerIndex
-        : validators.findSignerIndex(signer, await validators.getSignersForBlock(startBlock))
+        : findAddressIndex(signer, await validators.getSignersForBlock(startBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
   }

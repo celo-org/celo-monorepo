@@ -528,16 +528,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
-   * Returns the index into `signers` of `signer`.
-   * @param signer The needle.
-   * @param signers The haystack.
-   * @return Index of signer or -1.
-   */
-  findSignerIndex(signer: Address, signers: Address[]): number {
-    return signers.findIndex((x) => eqAddress(x, signer))
-  }
-
-  /**
    * Returns the index into `history` for `epoch`.
    * @param epoch The needle.
    * @param history The haystack.
