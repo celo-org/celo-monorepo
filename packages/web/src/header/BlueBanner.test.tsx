@@ -1,4 +1,3 @@
-import '@testing-library/jest-dom'
 import { render } from '@testing-library/react'
 import * as React from 'react'
 import { BlueBanner } from 'src/header/BlueBanner'
