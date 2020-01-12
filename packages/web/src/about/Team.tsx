@@ -95,7 +95,12 @@ const Portrait = React.memo(function _Portrait({
       <Responsive medium={styles.mediumPerson} large={styles.largePerson}>
         <View style={styles.person}>
           <AspectRatio ratio={1}>
-            <Image source={source} onLoad={onLoad} style={styles.photo} />
+            <Image
+              accessibilityLabel={`Photo of ${name}`}
+              source={source}
+              onLoad={onLoad}
+              style={styles.photo}
+            />
           </AspectRatio>
           <Text
             style={[
