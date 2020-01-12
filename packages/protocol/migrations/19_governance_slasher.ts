@@ -15,11 +15,12 @@ module.exports = deploymentForCoreContract<GovernanceSlasherInstance>(
   artifacts,
   CeloContractName.GovernanceSlasher,
   initializeArgs,
-  async (slasher: GovernanceSlasherInstance) => {
+  async () => {
+    console.info('Adding GovernanceSlasher contract as slasher.')
     const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
       'LockedGold',
       artifacts
     )
-    await lockedGold.addSlasher(slasher.address)
+    await lockedGold.addSlasher(CeloContractName.GovernanceSlasher)
   }
 )

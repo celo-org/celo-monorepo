@@ -282,7 +282,7 @@ export class Header extends React.PureComponent<Props, State> {
         </View>
 
         {!this.state.showDesktopMenu && !this.state.menuFaded && (
-          <View style={[styles.hamburger]}>
+          <View style={styles.hamburger}>
             <div
               className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
                 this.state.mobileMenuActive ? cssStyles['is-active'] : ''
@@ -371,10 +371,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: '100vh',
     backgroundColor: colors.white,
-    // @ts-ignore
     overflowY: 'scroll',
   },
-  mobileMenuActive: { bottom: 0, height: 'auto' },
+  mobileMenuActive: {
+    bottom: 0,
+    top: 0,
+    height: 'auto',
+    position: 'absolute',
+    overflowY: 'hidden',
+  },
   activeTab: {
     position: 'absolute',
     height: 8,
