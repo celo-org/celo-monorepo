@@ -7,12 +7,11 @@ describe('BlueBanner', () => {
 
   describe('when isVisible true', () => {
     it('renders with height', () => {
-      const { debug, getByRole, getByTestId } = render(
+      const { getByRole, getByTestId } = render(
         <BlueBanner link="/testing" isVisible={true} getRealHeight={getHeight}>
           Say Hi
         </BlueBanner>
       )
-      debug()
       expect(getByRole('link').getAttribute('href')).toEqual('/testing')
       expect(getByTestId('banner').style.minHeight).toEqual('50px')
     })
