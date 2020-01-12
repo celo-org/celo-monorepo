@@ -300,6 +300,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
     uint256 reserveGoldBalance = getReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
+    FixidityLib.Fraction memory cgldWeight = FixidityLib.wrap(assetAllocationWeights["cGLD"]);
+    if (cgldWeight.equals(FixidityLib.wrap(0))) {
+      cgldWeight = FixidityLib.fixed1();
+    }
 
     for (uint256 i = 0; i < _tokens.length; i++) {
       uint256 stableAmount;
@@ -312,6 +316,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return
       FixidityLib
         .newFixed(reserveGoldBalance)
+        .divide(cgldWeight)
         .divide(FixidityLib.newFixed(stableTokensValueInGold))
         .unwrap();
   }
@@ -321,9 +326,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
-    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 2.
+    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 1.
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
-    if (ratio.gt(FixidityLib.newFixed(2))) {
+    if (ratio.gt(FixidityLib.newFixed(1))) {
       return FixidityLib.wrap(0);
     } else {
       return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
