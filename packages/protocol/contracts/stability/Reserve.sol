@@ -35,7 +35,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   address[] public otherReserveAddresses;
 
   bytes32[] public assetAllocationSymbols;
-  uint256[] public assetAllocationWeights;
+  mapping(bytes32 => uint256) public assetAllocationWeights;
 
   uint256 public lastSpendingDay;
   uint256 public spendingLimit;
@@ -117,8 +117,13 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       sum = sum.add(FixidityLib.wrap(weights[i]));
     }
     require(sum.equals(FixidityLib.fixed1()), "Sum of asset allocation must be 1");
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+      delete assetAllocationWeights[assetAllocationSymbols[i]];
+    }
     assetAllocationSymbols = symbols;
-    assetAllocationWeights = weights;
+    for (uint256 i = 0; i < symbols.length; i++) {
+      assetAllocationWeights[symbols[i]] = weights[i];
+    }
     emit AssetAllocationSet(symbols, weights);
   }
 
@@ -267,7 +272,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function getAssetAllocationWeights() external view returns (uint256[] memory) {
-    return assetAllocationWeights;
+    uint256[] memory weights = new uint256[](assetAllocationSymbols.length);
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+      weights[i] = assetAllocationWeights[assetAllocationSymbols[i]];
+    }
+    return weights;
   }
 
   function getReserveGoldBalance() public view returns (uint256) {
