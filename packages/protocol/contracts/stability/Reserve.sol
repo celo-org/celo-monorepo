@@ -326,9 +326,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
-    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 1.
+    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 2.
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
-    if (ratio.gt(FixidityLib.newFixed(1))) {
+    if (ratio.gte(FixidityLib.newFixed(2))) {
       return FixidityLib.wrap(0);
     } else {
       return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
