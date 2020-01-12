@@ -28,12 +28,14 @@ The recommended Celo Validator setup involves continually running three nodes on
 - 1 **Validator Proxy node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), but requires high availability
 - 1 **Attestation node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), and has moderate availability requirements
 
-Celo is a Proof of Stake network, which has different hardware requirements than a Proof of Work network. Proof of Stake consensus is less CPU intensive, but is more sensitive to network connectivity and latency. Below is a list of standard requirements for running a Validator node on the Celo Network:
+Celo is a Proof of Stake network, which has different hardware requirements than a Proof of Work network. Proof of Stake consensus is less CPU intensive, but is more sensitive to network connectivity and latency. Below is a list of standard requirements for running Validator and Proxy nodes on the Celo Network:
 
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
 - Disk: 256 GB of SSD storage, plus a secondary HDD desirable
 - Network: At least 1 GB input/output Ethernet with a fiber Internet connection, ideally redundant connections and HA switches
+
+Attestation Service nodes consume less resources and can run on machines with less memory and compute.
 
 In addition, to get things started, it will be useful to temporarily run a node on your local machine.
 
@@ -268,7 +270,7 @@ docker run --name celo-proxy -it --restart always -p 30303:30303 -p 30303:30303/
 ```
 
 {% hint style="info" %}
-You can detach from the running container by pressing `ctrl+p ctrl+q`, or start it without `-d` instead of `it` to start detached. Access the logs for a container in the background with the `docker logs` command.
+You can detach from the running container by pressing `ctrl+p ctrl+q`, or start it with `-d` instead of `-it` to start detached. Access the logs for a container in the background with the `docker logs` command.
 {% endhint %}
 
 ### Get your Proxy's connection info
@@ -353,8 +355,8 @@ Once these accounts have a balance, unlock them so that we can sign transactions
 
 ```bash
 # On your local machine
-celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS
-celocli account:unlock --account $CELO_VALIDATOR_ADDRESS
+celocli account:unlock $CELO_VALIDATOR_GROUP_ADDRESS
+celocli account:unlock $CELO_VALIDATOR_ADDRESS
 celocli account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name <NAME YOUR VALIDATOR GROUP>
 celocli account:register --from $CELO_VALIDATOR_ADDRESS --name <NAME YOUR VALIDATOR>
 ```
@@ -465,10 +467,11 @@ celocli election:show $CELO_VALIDATOR_GROUP_ADDRESS --voter
 celocli election:show $CELO_VALIDATOR_ADDRESS --voter
 ```
 
-Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable them. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction.
+Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable them. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction:
 
 ```bash
 # On your local machine
+# Note that this may take some time, as the epoch needs to end before votes can be activated
 celocli election:activate --from $CELO_VALIDATOR_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_ADDRESS --wait
 ```
 
@@ -537,7 +540,7 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 ```
 
-Let's generate the proof-of-possession for the attestation signer
+Let's generate the proof-of-possession for the attestation signer:
 
 ```bash
 # On the Attestation machine
@@ -653,7 +656,7 @@ The `ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation 
 celocli account:claim-attestation-service-url ./metadata.json --url $ATTESTATION_SERVICE_URL --from 0x$CELO_VALIDATOR_ADDRESS
 ```
 
-Let's claim our group address
+Let's claim our group address:
 
 ```bash
 # On your local machine
