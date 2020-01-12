@@ -216,6 +216,20 @@ contract('Reserve', (accounts: string[]) => {
   })
 
   describe('#getOrComputeTobinTax()', () => {
+    const newAssetAllocationSymbols = [
+      web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
+      web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64),
+    ]
+    const newAssetAllocationWeights = [
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(2))
+        .integerValue(),
+      new BigNumber(10)
+        .pow(24)
+        .dividedBy(new BigNumber(2))
+        .integerValue(),
+    ]
     let mockStableToken: MockStableTokenInstance
 
     const expectedNoTobinTax: [BN, BN] = [new BN(0), new BN(10).pow(new BN(24))]
@@ -231,6 +245,7 @@ contract('Reserve', (accounts: string[]) => {
         mockStableToken.address,
         sortedOraclesDenominator.times(10)
       )
+      await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
       await reserve.addToken(mockStableToken.address)
       const reserveGoldBalance = new BigNumber(10).pow(19)
       await web3.eth.sendTransaction({
