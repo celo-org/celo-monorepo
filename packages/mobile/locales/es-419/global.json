@@ -105,7 +105,7 @@
   "or": "o",
   "accepted": "Aceptado",
   "processing": "Procesando",
-  "moreWithCount": "~~+{{count }} more",
-  "unknown": "~~Unknown",
-  "emptyList": "~~Empty list"
+  "moreWithCount": "+{{count }} más",
+  "unknown": "Desconocido",
+  "emptyList": "Lista vacía"
 }
