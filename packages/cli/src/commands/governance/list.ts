@@ -1,7 +1,8 @@
 import { concurrentMap } from '@celo/utils/src/async'
+import { zip } from '@celo/utils/src/collections'
 import chalk from 'chalk'
 import { BaseCommand } from '../../base'
-import { printValueMap, printValueMapRecursive } from '../../utils/cli'
+import { printValueMap } from '../../utils/cli'
 
 export default class List extends BaseCommand {
   static description = 'List live governance proposals (queued and ongoing)'
@@ -23,10 +24,10 @@ export default class List extends BaseCommand {
     sortedQueue.map(printValueMap)
 
     const dequeue = await governance.getDequeue()
-    const dequeueRecords = await concurrentMap(5, dequeue, (proposalID) =>
-      governance.getProposalRecord(proposalID)
-    )
+    const stages = await concurrentMap(5, dequeue, (id) => governance.getProposalStage(id))
+    const proposals = zip((proposalID, stage) => ({ proposalID, stage }), dequeue, stages)
+
     console.log(chalk`{blue.bold Dequeued Proposals:}`)
-    dequeueRecords.map(printValueMapRecursive)
+    proposals.map(printValueMap)
   }
 }
