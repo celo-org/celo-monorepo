@@ -50,15 +50,11 @@ exports[`CeloDollarsOverview renders correctly 1`] = `
   </Text>
   <Text
     style={
-      Array [
-        Object {
-          "fontFamily": "Hind-Light",
-        },
-        Object {
-          "color": "#B0B5B9",
-          "fontSize": 18,
-        },
-      ]
+      Object {
+        "color": "#B0B5B9",
+        "fontFamily": "Hind-Light",
+        "fontSize": 18,
+      }
     }
   >
     <Text>
