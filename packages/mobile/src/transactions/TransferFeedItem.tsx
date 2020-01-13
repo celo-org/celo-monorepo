@@ -55,11 +55,7 @@ function navigateToTransactionReview({
   navigateToPaymentTransferReview(type, timestamp, {
     address,
     comment: decryptComment(comment, commentKey, type),
-    currency:
-      amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
-        ? CURRENCY_ENUM.GOLD
-        : CURRENCY_ENUM.DOLLAR,
-    value: new BigNumber(amount.amount),
+    amount,
     recipient,
     type,
     // fee TODO: add fee here.

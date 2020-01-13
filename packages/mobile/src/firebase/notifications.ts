@@ -9,7 +9,7 @@ import {
 } from 'src/account/types'
 import { showMessage } from 'src/alert/actions'
 import { TransactionType } from 'src/apollo/types'
-import { resolveCurrency } from 'src/geth/consts'
+import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
@@ -59,13 +59,16 @@ function* handlePaymentReceived(
     const recipientCache = yield select(recipientCacheSelector)
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const address = transferNotification.sender.toLowerCase()
+    const currency = resolveCurrency(transferNotification.currency)
 
     navigateToPaymentTransferReview(
       TransactionType.Received,
       new BigNumber(transferNotification.timestamp).toNumber(),
       {
-        value: divideByWei(transferNotification.value),
-        currency: resolveCurrency(transferNotification.currency),
+        amount: {
+          amount: divideByWei(transferNotification.value).toString(),
+          currencyCode: CURRENCIES[currency].code,
+        },
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,
         recipient: getRecipientFromAddress(address, addressToE164Number, recipientCache),

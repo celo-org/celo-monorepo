@@ -91,9 +91,11 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.stableEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
-                  amount={new BigNumber(dollarBalance || 0)}
+                  amount={{
+                    amount: new BigNumber(dollarBalance || 0).toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
                   size={this.getFontSize(dollarBalance, !this.props.stableEducationCompleted)}
-                  type={CURRENCY_ENUM.DOLLAR}
                 />
               </TouchableOpacity>
             </View>
@@ -108,9 +110,11 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.goldEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
-                  amount={new BigNumber(goldBalance || 0)}
+                  amount={{
+                    amount: new BigNumber(goldBalance || 0).toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
+                  }}
                   size={this.getFontSize(goldBalance, !this.props.goldEducationCompleted)}
-                  type={CURRENCY_ENUM.GOLD}
                 />
               </TouchableOpacity>
             </View>

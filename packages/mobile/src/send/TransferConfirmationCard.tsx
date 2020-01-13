@@ -1,26 +1,20 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
-import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
-import { CURRENCIES } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { TransactionType } from 'src/apollo/types'
+import { MoneyAmount, TransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
-import {
-  useDollarsToLocalAmount,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
 import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
@@ -30,8 +24,7 @@ const iconSize = 40
 export interface TransferConfirmationCardProps {
   address?: string
   comment?: string | null
-  value: BigNumber
-  currency: CURRENCY_ENUM
+  amount: MoneyAmount
   type: TransactionType
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
@@ -67,16 +60,7 @@ const renderTopSection = (props: Props) => {
 }
 
 const renderAmountSection = (props: Props) => {
-  const { currency, type, value } = props
-
-  // tslint:disable react-hooks-nesting
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
-  const localValue = useDollarsToLocalAmount(value) || 0
-  // tslint:enable react-hooks-nesting
-  const transactionValue = getMoneyDisplayValue(
-    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode ? localValue : value
-  )
+  const { amount, type } = props
 
   switch (type) {
     case TransactionType.InviteSent: // fallthrough
@@ -84,26 +68,25 @@ const renderAmountSection = (props: Props) => {
       return null
     case TransactionType.NetworkFee:
       return (
-        <MoneyAmount
-          symbol={CURRENCIES[currency].symbol}
-          amount={getNetworkFeeDisplayValue(value, true)}
+        <CurrencyDisplay
+          amount={amount}
+          // tslint:disable-next-line: jsx-no-lambda
+          formatAmount={(value) => getNetworkFeeDisplayValue(value, true)}
+          useColors={false}
         />
       )
     default:
-      return (
-        <MoneyAmount
-          symbol={
-            (currency === CURRENCY_ENUM.DOLLAR && localCurrencySymbol) ||
-            CURRENCIES[currency].symbol
-          }
-          amount={transactionValue}
-        />
-      )
+      return <CurrencyDisplay amount={amount} useColors={false} />
   }
 }
 
 const renderBottomSection = (props: Props) => {
-  const { t, currency, comment, type, value } = props
+  const { t, amount, comment, type } = props
+
+  const currency =
+    amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      ? CURRENCY_ENUM.GOLD
+      : CURRENCY_ENUM.DOLLAR
 
   if (type === TransactionType.VerificationFee) {
     return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
@@ -112,7 +95,7 @@ const renderBottomSection = (props: Props) => {
       <Text style={style.pSmall}>
         {t('receiveFlow8:receivedAmountFromCelo.0')}
         {CURRENCIES[currency].symbol}
-        {getMoneyDisplayValue(props.value)}
+        {getMoneyDisplayValue(amount.amount)}
         {t('receiveFlow8:receivedAmountFromCelo.1')}
       </Text>
     )
@@ -138,7 +121,7 @@ const renderBottomSection = (props: Props) => {
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+        <CurrencyDisplay amount={amount} useColors={false} />
       </View>
     )
   } else if (comment) {
