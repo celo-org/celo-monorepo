@@ -76,10 +76,13 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         standbyTransactions: state.standbyTransactions.map((tx) => {
-          if (tx.id === action.idx) {
-            tx.hash = action.hash
+          if (tx.id !== action.idx) {
+            return tx
           }
-          return tx
+          return {
+            ...tx,
+            hash: action.hash,
+          }
         }),
       }
     default:
