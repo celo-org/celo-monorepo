@@ -1,11 +1,12 @@
 import fs from 'fs'
 import readline from 'readline'
-import { google } from 'googleapis'
 import { ContractKit, newKitFromWeb3, IdentityMetadataWrapper } from '@celo/contractkit'
 import Web3 from 'web3'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { BigNumber } from 'bignumber.js'
+
+import { google } from 'googleapis'
 
 process.on('unhandledRejection', (reason, _promise) => {
   console.log('Unhandled Rejection at:', reason.stack || reason)
