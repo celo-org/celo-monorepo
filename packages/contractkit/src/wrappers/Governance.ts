@@ -373,7 +373,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       queue = await this.getQueue()
     }
     return {
-      index: this.getIndex(proposalID, queue.map((record) => record.proposalID)),
+      index: this.getIndex(
+        proposalID,
+        queue.map((record) => record.proposalID)
+      ),
       queue,
     }
   }

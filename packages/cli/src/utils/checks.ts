@@ -219,7 +219,10 @@ class CheckBuilder {
     this.addCheck(
       `${this.signer!} is vote signer or registered account`,
       this.withAccounts(async (accs) => {
-        return accs.voteSignerToAccount(this.signer!).then(() => true, () => false)
+        return accs.voteSignerToAccount(this.signer!).then(
+          () => true,
+          () => false
+        )
       })
     )
 
