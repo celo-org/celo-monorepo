@@ -32,6 +32,6 @@ module.exports = {
     '\\.js$': '<rootDir>/../../node_modules/react-native/jest/preprocessor.js',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@celo/)?react-native|@react-navigation|@react-native-community|react-navigation|redux-persist|date-fns)',
+    'node_modules/(?!(@celo/)?react-native|@react-navigation|@react-native-community|react-navigation|redux-persist|date-fns|victory-*)',
   ],
 }
