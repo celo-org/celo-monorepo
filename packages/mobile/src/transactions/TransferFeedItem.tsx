@@ -61,6 +61,8 @@ function navigateToTransactionReview({
   })
 }
 
+// TODO(jeanregisser): ExchangeFeedItem and TransferFeedItem renders are very similar, we should use the same building blocks
+// so the parts that need to be identical stay the same as we change the code (main layout)
 export function TransferFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
 

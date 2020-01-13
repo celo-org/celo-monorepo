@@ -95,7 +95,7 @@ export default function CurrencyDisplay({
   }
 
   return (
-    <Text numberOfLines={1} style={[styles.container, style]}>
+    <Text numberOfLines={1} style={[styles.container, { color }, style]}>
       {sign}
       {currencySymbol}
       {formattedValue}
