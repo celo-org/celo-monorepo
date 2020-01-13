@@ -86,16 +86,18 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
             })
           )
 
-          // Revoke existing vote(s) if any
+          // Revoke existing vote(s) if any and update capacity of the group
           for (const vote of currentVotes) {
             const revokeTxs = await election.revoke(
               botAccount,
               vote.group,
               vote.pending.plus(vote.active)
             )
-            for (const tx of revokeTxs) {
-              await tx.sendAndWaitForReceipt({ from: botAccount })
-            }
+            await concurrentMap(10, revokeTxs, (tx) => {
+              return tx.sendAndWaitForReceipt({ from: botAccount })
+            })
+            const oldCapacity = groupCapacities.get(vote.group)!
+            groupCapacities.set(vote.group, oldCapacity.plus(vote.pending.plus(vote.active)))
           }
 
           const groupCapacity = groupCapacities.get(randomlySelectedGroup)!
@@ -123,11 +125,9 @@ async function calculateGroupWeights(kit: ContractKit): Promise<Map<string, BigN
   const validators = await kit.contracts.getValidators()
 
   const validatorSigners = await election.getCurrentValidatorSigners()
-  const validatorAccounts = await concurrentMap(
-    10,
-    validatorSigners,
-    validators.getValidatorFromSigner
-  )
+  const validatorAccounts = await concurrentMap(10, validatorSigners, (acc) => {
+    return validators.getValidatorFromSigner(acc)
+  })
 
   const validatorsByGroup = groupBy(validatorAccounts, (validator) => validator.affiliation!)
   const validatorGroupWeights = mapValues(validatorsByGroup, (vals) => {
@@ -178,11 +178,8 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
     const account = ensure0x(getAccountAddressFromPrivateKey(key))
     if (!(await election.hasActivatablePendingVotes(account))) {
       try {
-        console.info(`activating votes for ${account}`)
         const activateTxs = await election.activate(account)
-        for (const tx of activateTxs) {
-          await tx.sendAndWaitForReceipt({ from: account })
-        }
+        await concurrentMap(10, activateTxs, (tx) => tx.sendAndWaitForReceipt({ from: account }))
       } catch (error) {
         console.error(`Failed to activate pending votes for ${account}`)
       }

@@ -44,7 +44,8 @@ export async function setupVotingBotAccounts(celoEnv: string) {
       await registerTx.sendAndWaitForReceipt({ from: botAccount })
     }
 
-    if ((await lockedGold.getAccountTotalLockedGold(botAccount)).isEqualTo(0)) {
+    const amountLocked = await lockedGold.getAccountTotalLockedGold(botAccount)
+    if (amountLocked.isZero()) {
       const tx = await lockedGold.lock()
       const amountToLock = goldBalance.multipliedBy(0.99).toFixed(0)
 
@@ -69,6 +70,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
 
 function helmParameters(celoEnv: string) {
   return [
+    `--set celoProvider=${getFornoUrl(celoEnv)}`,
     `--set cronSchedule="${fetchEnv(envVar.VOTING_BOT_CRON_SCHEDULE)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment=${celoEnv}`,
