@@ -29,9 +29,6 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   // indicates how much of the vested amount has been accummulatively withdrawn
   uint256 public totalWithdrawn;
 
-  // indicates if the vesting has been revoked. false by default
-  bool public revoked;
-
   // indicates if the withdrawing has been paused
   bool public paused;
 
@@ -70,13 +67,13 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   modifier onlyRevoked() {
-    require(revoked, "vesting instance must have already been revoked");
+    require(isRevoked(), "vesting instance must have already been revoked");
     _;
   }
 
   modifier onlyRevokerAndRevoked() {
     require(
-      msg.sender == revoker && revoked,
+      msg.sender == revoker && isRevoked(),
       "sender must be the revoker and state must be revoked"
     );
     _;
@@ -84,7 +81,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
 
   modifier onlyWhenInProperState() {
     require(
-      (msg.sender == revoker && revoked) || (msg.sender == beneficiary && !revoked),
+      (msg.sender == revoker && isRevoked()) || (msg.sender == beneficiary && !isRevoked()),
       "either revoker in revoked state or beneficiary in unrevoked"
     );
     _;
@@ -147,6 +144,13 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
+   * @notice Returns if the vesting has been revoked or not.
+   */
+  function isRevoked() public view returns (bool) {
+    return revokeTime > 0;
+  }
+
+  /**
    * @notice Transfers gold from the vesting back to beneficiary.
    * @param amount the requested gold amount
    */
@@ -156,7 +160,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     require(amount > 0, "withdrawable amount must be greater than zero");
 
     uint256 vestedAmount;
-    if (revoked) {
+    if (isRevoked()) {
       vestedAmount = vestedBalanceAtRevoke;
     } else {
       vestedAmount = getVestedTotalBalance();
@@ -197,9 +201,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    */
   function revoke() external nonReentrant onlyRevoker {
     require(revocable, "Revoking is not allowed");
-    require(!revoked, "Vesting already revoked");
+    require(!isRevoked(), "Vesting already revoked");
     revokeTime = block.timestamp;
-    revoked = true;
     vestedBalanceAtRevoke = getVestedTotalBalance();
     emit VestingRevoked(revokeTime, vestedBalanceAtRevoke);
   }
@@ -214,7 +217,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
       "Vesting withdrawals already paused"
     );
     require(revocable, "Vesting must be revocable");
-    require(!revoked, "Vesting already revoked");
+    require(!isRevoked(), "Vesting already revoked");
     require(pausePeriod <= maxPausePeriod, "Pause period is limited by maximum pause period");
     paused = true;
     pauseEndTime = block.timestamp.add(pausePeriod);

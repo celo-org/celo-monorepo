@@ -1,6 +1,7 @@
 pragma solidity ^0.5.3;
 
 interface IVestingInstance {
+  function isRevoked() external view returns (bool);
   function withdraw(uint256) external;
   function refundAndFinalize() external;
   function revoke() external;
