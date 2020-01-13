@@ -136,23 +136,34 @@ contract StableToken is
     /* solhint-disable not-rely-on-time */
     require(rate != 0, "Must provide a non-zero inflation rate.");
 
-    uint256 completePeriodsLastUpdated;
-    (inflationState.factor, completePeriodsLastUpdated) = getUpdatedInflationFactor();
+    // desired update:
+    // incompletePeriodRate = (1 + (inflationRate - 1) * percentageIncompletePeriod)
+    // inflationFactor = inflationFactor * partialRate
 
-    FixidityLib.Fraction memory percentageNextPeriod = FixidityLib.newFixedFraction(
+    uint256 completePeriodsLastUpdated;
+    FixidityLib.Fraction memory completePeriodsFactor;
+    (completePeriodsFactor, completePeriodsLastUpdated) = getUpdatedInflationFactor();
+
+    // (now - factorLastUpdated) represents how much time has elapsed in the incomplete period
+    FixidityLib.Fraction memory percentageIncompletePeriod = FixidityLib.newFixedFraction(
       now.sub(completePeriodsLastUpdated),
       inflationState.updatePeriod
     );
-    require(percentageNextPeriod.isProperFraction()); // should never be greater than 1
+    require(percentageIncompletePeriod.isProperFraction()); // should never be greater than 1
 
+    // due to uint usage, this is implemented as
+    // partialRate = (1 - percentageIncompletePeriod) + (inflationRate * percentageIncompletePeriod)
     FixidityLib.Fraction memory incompletePeriodRate = FixidityLib // avoids uint underflow
       .fixed1()
-      .subtract(percentageNextPeriod)
-      .add(inflationState.rate.multiply(percentageNextPeriod));
+      .subtract(percentageIncompletePeriod)
+      .add(inflationState.rate.multiply(percentageIncompletePeriod));
 
-    inflationState.factor = inflationState.factor.multiply(incompletePeriodRate);
-    inflationState.factorLastUpdated = now;
-    emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
+    completePeriodsFactor = completePeriodsFactor.multiply(incompletePeriodRate);
+    if (!completePeriodsFactor.equals(inflationState.factor)) {
+      inflationState.factor = completePeriodsFactor;
+      inflationState.factorLastUpdated = now;
+      emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
+    }
 
     inflationState.rate = FixidityLib.wrap(rate);
     inflationState.updatePeriod = updatePeriod;
