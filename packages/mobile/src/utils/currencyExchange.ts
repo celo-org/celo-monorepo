@@ -90,3 +90,17 @@ export function getNewGoldBalance(
     ? getNewMakerBalance(goldBalance, makerAmount)
     : getNewTakerBalance(goldBalance, takerAmount)
 }
+
+export function goldToDollarAmount(amount: BigNumber.Value, exchangeRate: BigNumber | null) {
+  const isRateValid = exchangeRate && !exchangeRate.isZero() && exchangeRate.isFinite()
+  if (!isRateValid) {
+    return null
+  }
+
+  const convertedAmount = getTakerAmount(new BigNumber(amount), exchangeRate)
+  if (!convertedAmount) {
+    return null
+  }
+
+  return convertedAmount
+}

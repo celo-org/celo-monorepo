@@ -18,7 +18,7 @@ export function useDollarsToLocalAmount(amount: BigNumber.Value | null) {
     return null
   }
 
-  return convertedAmount.toString()
+  return convertedAmount
 }
 
 export function useLocalCurrencyCode() {
