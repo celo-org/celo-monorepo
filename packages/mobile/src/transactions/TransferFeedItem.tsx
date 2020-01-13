@@ -8,17 +8,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { TransactionType, TransferItemFragment } from 'src/apollo/types'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
-import { useLocalCurrencyCode, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
-import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
+import { getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = TransferItemFragment & {
@@ -82,18 +81,10 @@ export function TransferFeedItem(props: Props) {
     recipientCache,
   } = props
 
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
-  const moneyAmount = localCurrencyCode && amount.localAmount ? amount.localAmount : amount
-  const value = new BigNumber(moneyAmount.amount)
+  const isSent = new BigNumber(amount.amount).isNegative()
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-  const direction = value.isNegative() ? '-' : ''
   const isPending = status === TransactionStatus.Pending
-  const transactionValue =
-    type === TransactionType.NetworkFee
-      ? getNetworkFeeDisplayValue(value.absoluteValue())
-      : getMoneyDisplayValue(value.absoluteValue())
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
@@ -115,24 +106,16 @@ export function TransferFeedItem(props: Props) {
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{title}</Text>
-            <Text
+            <CurrencyDisplay
+              amount={amount}
+              formatAmount={
+                type === TransactionType.NetworkFee ? getNetworkFeeDisplayValue : undefined
+              }
               style={[
-                direction === '-'
-                  ? fontStyles.activityCurrencySent
-                  : {
-                      ...fontStyles.activityCurrencyReceived,
-                      color:
-                        amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
-                          ? colors.celoGold
-                          : colors.celoGreen,
-                    },
                 styles.amount,
+                isSent ? fontStyles.activityCurrencySent : fontStyles.activityCurrencyReceived,
               ]}
-            >
-              {direction}
-              {localCurrencySymbol}
-              {transactionValue}
-            </Text>
+            />
           </View>
           {!!info && <Text style={styles.info}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
@@ -235,13 +218,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 17,
     color: colors.darkSecondary,
-  },
-  localAmount: {
-    marginLeft: 'auto',
-    paddingLeft: 10,
-    fontSize: 14,
-    lineHeight: 18,
-    color: colors.lightGray,
   },
 })
 

@@ -7,7 +7,7 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import Styles from 'src/components/Styles'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -91,6 +91,7 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.stableEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
+                  type={DisplayType.Big}
                   amount={{
                     amount: new BigNumber(dollarBalance || 0).toString(),
                     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
@@ -110,6 +111,7 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.goldEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
+                  type={DisplayType.Big}
                   amount={{
                     amount: new BigNumber(goldBalance || 0).toString(),
                     currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,

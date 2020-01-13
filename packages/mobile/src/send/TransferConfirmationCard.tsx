@@ -10,7 +10,7 @@ import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { MoneyAmount, TransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -69,6 +69,7 @@ const renderAmountSection = (props: Props) => {
     case TransactionType.NetworkFee:
       return (
         <CurrencyDisplay
+          type={DisplayType.Big}
           amount={amount}
           // tslint:disable-next-line: jsx-no-lambda
           formatAmount={(value) => getNetworkFeeDisplayValue(value, true)}
@@ -76,7 +77,7 @@ const renderAmountSection = (props: Props) => {
         />
       )
     default:
-      return <CurrencyDisplay amount={amount} useColors={false} />
+      return <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
   }
 }
 
@@ -121,7 +122,7 @@ const renderBottomSection = (props: Props) => {
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <CurrencyDisplay amount={amount} useColors={false} />
+        <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
       </View>
     )
   } else if (comment) {

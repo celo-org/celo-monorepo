@@ -5,7 +5,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import ExchangeRate from 'src/exchange/ExchangeRate'
@@ -80,11 +80,11 @@ export function ExchangeConfirmationCard(props: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.exchange}>
-        <CurrencyDisplay amount={makerAmount} size={36} />
+        <CurrencyDisplay type={DisplayType.Big} amount={makerAmount} size={36} />
         <View style={styles.arrow}>
           <RoundedArrow />
         </View>
-        <CurrencyDisplay amount={takerAmount} size={36} />
+        <CurrencyDisplay type={DisplayType.Big} amount={takerAmount} size={36} />
       </View>
 
       <View style={styles.title}>

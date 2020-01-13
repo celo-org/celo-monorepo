@@ -2,23 +2,30 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
+export enum DisplayType {
+  Default,
+  Big, // symbol displayed as superscript
+}
+
 interface Props {
+  type: DisplayType
   amount: MoneyAmount
   size: number
   useColors: boolean
   formatAmount: (amount: BigNumber.Value) => string
+  style?: StyleProp<TextStyle>
 }
 
 const SYMBOL_RATIO = 0.6
 
-function getSymbolStyle(fontSize: number, color: string) {
+function getBigSymbolStyle(fontSize: number, color: string) {
   const size = Math.floor(fontSize * SYMBOL_RATIO)
   return {
     fontSize: size,
@@ -29,60 +36,89 @@ function getSymbolStyle(fontSize: number, color: string) {
 }
 
 // TODO(Rossy) This is mostly duped by MoneyAmount, converge the two
-export default function CurrencyDisplay({ size, useColors, amount, formatAmount }: Props) {
+export default function CurrencyDisplay({
+  type,
+  size,
+  useColors,
+  amount,
+  formatAmount,
+  style,
+}: Props) {
   const localCurrencyCode = useLocalCurrencyCode()
   // tslint:disable-next-line: react-hooks-nesting
   const localValue = useDollarsToLocalAmount(amount.amount) || 0
 
-  const type =
+  const currency =
     amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
       ? CURRENCY_ENUM.GOLD
       : CURRENCY_ENUM.DOLLAR
-  const color = useColors
-    ? type === CURRENCY_ENUM.GOLD
-      ? colors.celoGold
-      : colors.celoGreen
-    : colors.darkSecondary
-  const fontSize = size
-  const symbolStyle = getSymbolStyle(fontSize, color)
-  const amountStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color }
 
   // For now only show the local amount when original currency is dollars
   const localAmount =
-    type === CURRENCY_ENUM.DOLLAR && localCurrencyCode
+    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode
       ? amount.localAmount ?? { amount: localValue, currencyCode: localCurrencyCode }
       : null
   const displayAmount = localAmount ?? amount
   const currencySymbol =
-    displayAmount === amount.localAmount
+    displayAmount === localAmount
       ? LocalCurrencySymbol[displayAmount.currencyCode as LocalCurrencyCode]
-      : CURRENCIES[type].symbol
+      : CURRENCIES[currency].symbol
+  const value = new BigNumber(displayAmount.amount)
+  const sign = value.isNegative() ? '-' : ''
+  const formattedValue = formatAmount(value.absoluteValue())
+
+  const color = useColors
+    ? currency === CURRENCY_ENUM.GOLD
+      ? colors.celoGold
+      : colors.celoGreen
+    : colors.darkSecondary
+
+  if (type === DisplayType.Big) {
+    // In this type the symbol is displayed as superscript
+    // the downside is we have to workaround React Native not supporting it
+    // and have to involve a View, which prevents this type to be embedded into a Text node
+    // see https://medium.com/@aaronmgdr/a-better-superscript-in-react-native-591b83db6caa
+    const fontSize = size
+    const symbolStyle = getBigSymbolStyle(fontSize, color)
+    const amountStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color }
+
+    return (
+      <View style={[styles.bigContainer, style]}>
+        <Text numberOfLines={1} style={[fontStyles.regular, symbolStyle]}>
+          {currencySymbol}
+        </Text>
+        <Text numberOfLines={1} style={[fontStyles.regular, styles.bigCurrency, amountStyle]}>
+          {formattedValue}
+        </Text>
+      </View>
+    )
+  }
 
   return (
-    <View style={styles.container}>
-      <Text numberOfLines={1} style={[fontStyles.regular, symbolStyle]}>
-        {currencySymbol}
-      </Text>
-      <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, amountStyle]}>
-        {formatAmount(displayAmount.amount)}
-      </Text>
-    </View>
+    <Text numberOfLines={1} style={[styles.container, style]}>
+      {sign}
+      {currencySymbol}
+      {formattedValue}
+    </Text>
   )
 }
 
 CurrencyDisplay.defaultProps = {
+  type: DisplayType.Default,
   size: 48,
   useColors: true,
   formatAmount: (amount: BigNumber.Value) => getMoneyDisplayValue(amount),
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: {},
+  bigContainer: {
     flexDirection: 'row',
+    alignSelf: 'center',
     alignItems: 'flex-start',
     marginTop: 5,
   },
-  currency: {
+  bigCurrency: {
     paddingHorizontal: 3,
   },
 })
