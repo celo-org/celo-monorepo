@@ -473,4 +473,29 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       })
     )
   }
+
+  /**
+   * Returns the current set of validator signer addresses
+   */
+  async currentSignerSet(): Promise<Address[]> {
+    const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
+    const validators = []
+    for (let i = 0; i < n; i++) {
+      const signer = await this.contract.methods.validatorSignerAddressFromCurrentSet(i).call()
+      validators.push(signer)
+    }
+    return validators
+  }
+
+  /**
+   * Returns the current set of validator signer and account addresses
+   */
+  async currentValidatorAccountsSet() {
+    const signerAddresses = await this.currentSignerSet()
+    const accountAddresses = await concurrentMap(5, signerAddresses, (addr) =>
+      this.validatorSignerToAccount(addr)
+    )
+
+    return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
+  }
 }
