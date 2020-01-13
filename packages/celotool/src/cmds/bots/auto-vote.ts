@@ -47,8 +47,6 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     console.info(`Voting this time: ${botKeysVotingThisRound.length} of ${numBotAccounts}`)
 
     if (botKeysVotingThisRound.length > 0) {
-      const lockedGold = await kit.contracts.getLockedGold()
-
       console.info('Determining which groups have capacity for more votes')
       const groupCapacities = new Map<string, BigNumber>()
       for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
@@ -69,44 +67,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
 
         console.info(`Voting as: ${botAccount}.`)
         try {
-          const lockedGoldAmount = await lockedGold.getAccountTotalLockedGold(botAccount)
-          if (lockedGoldAmount.isZero()) {
-            console.info(`No locked gold exists for ${botAccount}, skipping...`)
-            continue
-          }
-
-          const currentVotes = (await election.getVoter(botAccount)).votes
-          const currentGroups = currentVotes.map((v) => v.group)
-
-          const randomlySelectedGroup = getWeightedRandomChoice(
-            groupWeights,
-            [...groupCapacities.keys()].filter((k) => {
-              const capacity = groupCapacities.get(k)
-              return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
-            })
-          )
-
-          // Revoke existing vote(s) if any and update capacity of the group
-          for (const vote of currentVotes) {
-            const revokeTxs = await election.revoke(
-              botAccount,
-              vote.group,
-              vote.pending.plus(vote.active)
-            )
-            await concurrentMap(10, revokeTxs, (tx) => {
-              return tx.sendAndWaitForReceipt({ from: botAccount })
-            })
-            const oldCapacity = groupCapacities.get(vote.group)!
-            groupCapacities.set(vote.group, oldCapacity.plus(vote.pending.plus(vote.active)))
-          }
-
-          const groupCapacity = groupCapacities.get(randomlySelectedGroup)!
-          const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
-          const voteTx = await election.vote(randomlySelectedGroup, BigNumber.minimum(voteAmount))
-          await voteTx.sendAndWaitForReceipt({ from: botAccount })
-          console.info(`Completed voting as ${botAccount}`)
-
-          groupCapacities.set(randomlySelectedGroup, groupCapacity.minus(voteAmount))
+          await castVote(kit, botAccount, groupWeights, groupCapacities)
         } catch (error) {
           console.error(`Failed to vote as ${botAccount}`)
           console.info(error)
@@ -118,6 +79,51 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     console.error(error)
     process.exit(1)
   }
+}
+
+async function castVote(
+  kit: ContractKit,
+  botAccount: string,
+  groupWeights: Map<string, BigNumber>,
+  groupCapacities: Map<string, BigNumber>
+) {
+  const lockedGold = await kit.contracts.getLockedGold()
+  const election = await kit.contracts.getElection()
+
+  const lockedGoldAmount = await lockedGold.getAccountTotalLockedGold(botAccount)
+  if (lockedGoldAmount.isZero()) {
+    console.info(`No locked gold exists for ${botAccount}, skipping...`)
+    return
+  }
+
+  const currentVotes = (await election.getVoter(botAccount)).votes
+  const currentGroups = currentVotes.map((v) => v.group)
+
+  const randomlySelectedGroup = getWeightedRandomChoice(
+    groupWeights,
+    [...groupCapacities.keys()].filter((k) => {
+      const capacity = groupCapacities.get(k)
+      return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
+    })
+  )
+
+  // Revoke existing vote(s) if any and update capacity of the group
+  for (const vote of currentVotes) {
+    const revokeTxs = await election.revoke(botAccount, vote.group, vote.pending.plus(vote.active))
+    await concurrentMap(10, revokeTxs, (tx) => {
+      return tx.sendAndWaitForReceipt({ from: botAccount })
+    })
+    const oldCapacity = groupCapacities.get(vote.group)!
+    groupCapacities.set(vote.group, oldCapacity.plus(vote.pending.plus(vote.active)))
+  }
+
+  const groupCapacity = groupCapacities.get(randomlySelectedGroup)!
+  const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
+  const voteTx = await election.vote(randomlySelectedGroup, BigNumber.minimum(voteAmount))
+  await voteTx.sendAndWaitForReceipt({ from: botAccount })
+  console.info(`Completed voting as ${botAccount}`)
+
+  groupCapacities.set(randomlySelectedGroup, groupCapacity.minus(voteAmount))
 }
 
 async function calculateGroupWeights(kit: ContractKit): Promise<Map<string, BigNumber>> {
