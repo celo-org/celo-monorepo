@@ -16,13 +16,7 @@ export default class Balance extends BaseCommand {
   async run() {
     const { args } = this.parse(Balance)
 
-    const goldToken = await this.kit.contracts.getGoldToken()
-    const stableToken = await this.kit.contracts.getStableToken()
-    const balances = {
-      goldBalance: await goldToken.balanceOf(args.address),
-      dollarBalance: await stableToken.balanceOf(args.address),
-    }
     console.log('All balances expressed in units of 10^-18.')
-    printValueMap(balances)
+    printValueMap(await this.kit.getTotalBalance(args.address))
   }
 }
