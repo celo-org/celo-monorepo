@@ -29,6 +29,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
    * @param vestAmountPerPeriod the vesting amound per period where period is the vestingAmount distributed over the vestingPeriodSec
    * @param vestingRevokable whether the vesting is revocable or not
    * @param vestingRevoker address of the person revoking the vesting
+   * @param vestingMaxPausePeriod maximum pause period in seconds
    * @return The address of the newly created vesting instance
    */
   function createVestingInstance(
@@ -39,7 +40,8 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
     uint256 vestingPeriodSec,
     uint256 vestAmountPerPeriod,
     bool vestingRevokable,
-    address payable vestingRevoker
+    address payable vestingRevoker,
+    uint256 vestingMaxPausePeriod
   ) external onlyOwner returns (address) {
     require(
       getGoldToken().balanceOf(address(this)) >= vestingAmount,
@@ -58,6 +60,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
         vestAmountPerPeriod,
         vestingRevokable,
         vestingRevoker,
+        vestingMaxPausePeriod,
         address(registry)
       )
     );

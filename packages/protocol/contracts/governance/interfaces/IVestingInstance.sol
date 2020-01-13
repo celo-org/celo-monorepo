@@ -21,9 +21,9 @@ interface IVestingInstance {
   function revokeActive(address, uint256, address, address, uint256) external;
   function revokePending(address, uint256, address, address, uint256) external;
 
-  function getVestingInstanceTotalBalance() external view returns (uint256);
-  function getVestingInstanceNonWithdrawnTotalBalance() external view returns (uint256);
-  function getVestingInstanceAvailableBalance() external view returns (uint256);
-  function getVestingInstanceLockedBalance() external view returns (uint256);
-  function getWithdrawableAmount() external view returns (uint256);
+  function getTotalBalance() external view returns (uint256);
+  function getRemainingTotalBalance() external view returns (uint256);
+  function getRemainingUnlockedBalance() external view returns (uint256);
+  function getRemainingLockedBalance() external view returns (uint256);
+  function getVestedTotalBalance() external view returns (uint256);
 }

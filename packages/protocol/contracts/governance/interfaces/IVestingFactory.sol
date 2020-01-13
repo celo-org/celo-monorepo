@@ -9,6 +9,7 @@ interface IVestingFactory {
     uint256,
     uint256,
     bool,
-    address payable
+    address payable,
+    uint256
   ) external returns (address);
 }

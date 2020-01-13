@@ -47,4 +47,35 @@ contract MockElection is IElection {
   function electValidatorSigners() external view returns (address[] memory) {
     return electedValidators;
   }
+
+  function vote(address group, uint256 value, address lesser, address greater)
+    external
+    returns (bool)
+  {
+    return true;
+  }
+
+  function activate(address group) external returns (bool) {
+    return true;
+  }
+
+  function revokeActive(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) external returns (bool) {
+    return true;
+  }
+
+  function revokePending(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater,
+    uint256 index
+  ) external returns (bool) {
+    return true;
+  }
 }
