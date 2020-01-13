@@ -1,6 +1,6 @@
 import getConfig from 'next/config'
 import Head from 'next/head'
-
+import * as React from 'react'
 interface Props {
   description: string
   image?: string

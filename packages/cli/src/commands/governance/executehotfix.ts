@@ -11,6 +11,7 @@ export default class ExecuteHotfix extends BaseCommand {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "Executors's address" }),
     jsonTransactions: flags.string({ required: true, description: 'Path to json transactions' }),
+    salt: flags.string({ required: true, description: 'Secret salt associated with hotfix' }),
   }
 
   static examples = []
@@ -20,7 +21,9 @@ export default class ExecuteHotfix extends BaseCommand {
 
     const governance = await this.kit.contracts.getGovernance()
     const hotfix = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
-    const tx = governance.executeHotfix(hotfix)
+
+    const saltBuff = Buffer.from(res.flags.salt, 'hex')
+    const tx = governance.executeHotfix(hotfix, saltBuff)
     await displaySendTx('executeHotfixTx', tx, { from: res.flags.from })
   }
 }
