@@ -61,16 +61,7 @@ contract UsingRegistry is Ownable {
   }
 
   modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
-    bool registered = false;
-    for (uint256 i = 0; i < identifierHashes.length; i++) {
-      if (registry.getAddressForOrDie(identifierHashes[i]) == msg.sender) {
-        registered = true;
-        break;
-      }
-    }
-    // TODO(lucas): remove once DowntimeSlasher is implemented.
-    bool isCLabsValZero = (msg.sender == address(0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D));
-    require(registered || isCLabsValZero, "only registered contracts");
+    require(registry.isOneOf(identifierHashes, msg.sender), "only registered contracts");
     _;
   }
 
@@ -135,4 +126,5 @@ contract UsingRegistry is Ownable {
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
+
 }

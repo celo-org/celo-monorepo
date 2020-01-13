@@ -19,9 +19,9 @@ import OvalCoin from 'src/shared/OvalCoin'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
-const CookieConsent = dynamic((import('src/header/CookieConsent') as unknown) as Promise<
-  React.ComponentType
->)
+const CookieConsent = dynamic(
+  (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
+)
 
 const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 const DARK_PAGES = new Set([
@@ -281,21 +281,20 @@ export class Header extends React.PureComponent<Props, State> {
           </View>
         </View>
 
-        {!this.state.showDesktopMenu &&
-          !this.state.menuFaded && (
-            <View style={[styles.hamburger]}>
-              <div
-                className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
-                  this.state.mobileMenuActive ? cssStyles['is-active'] : ''
-                }`}
-                onClick={this.clickHamburger}
-              >
-                <div className={cssStyles['hamburger-box']}>
-                  <div className={cssStyles['hamburger-inner']} />
-                </div>
+        {!this.state.showDesktopMenu && !this.state.menuFaded && (
+          <View style={[styles.hamburger]}>
+            <div
+              className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
+                this.state.mobileMenuActive ? cssStyles['is-active'] : ''
+              }`}
+              onClick={this.clickHamburger}
+            >
+              <div className={cssStyles['hamburger-box']}>
+                <div className={cssStyles['hamburger-inner']} />
               </div>
-            </View>
-          )}
+            </div>
+          </View>
+        )}
       </View>
     )
   }
@@ -372,10 +371,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: '100vh',
     backgroundColor: colors.white,
-    // @ts-ignore
     overflowY: 'scroll',
   },
-  mobileMenuActive: { bottom: 0, height: 'auto' },
+  mobileMenuActive: {
+    bottom: 0,
+    top: 0,
+    height: 'auto',
+    position: 'absolute',
+    overflowY: 'hidden',
+  },
   activeTab: {
     position: 'absolute',
     height: 8,
