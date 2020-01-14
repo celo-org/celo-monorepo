@@ -100,6 +100,15 @@ function printList(lst: any[]) {
   })
 }
 
+function printBitmap(str: string) {
+  while (str.length < 100) str = '0' + str
+  let res = ''
+  for (let i = 0; i < 100; i++) {
+    res += str.charAt(i) === '1' ? '.' : 'X'
+  }
+  return res
+}
+
 export default class Downtime extends BaseCommand {
   static description = 'Slash for downtime'
 
@@ -157,6 +166,18 @@ export default class Downtime extends BaseCommand {
 
     console.log(data.afterValidator.lessers, data.afterValidator.greaters, data.indicesValidator)
     console.log(data.afterGroup.lessers, data.afterGroup.greaters, data.indicesGroup)
+
+    for (let i = block; i < endBlock; i++) {
+      const bitmap = new BigNumber(
+        // @ts-ignore
+        await slasher.methods.getParentSealBitmap(i + 1).call({}, endBlock + 10)
+      )
+      const binary = bitmap.toString(2)
+      const epoch = await slasher.methods.getEpochNumberOfBlock(i).call()
+      const idx = epoch === startEpoch ? startIndex : endIndex
+      const down = binary.charAt(binary.length - 1 - idx) === '0'
+      console.log(epoch, i, printBitmap(binary), idx, down ? 'down' : 'up')
+    }
 
     const test = await slasher.methods
       .isDown(block, startIndex, endIndex)
