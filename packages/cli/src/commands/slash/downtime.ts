@@ -165,6 +165,7 @@ export default class Downtime extends BaseCommand {
     console.log('is down: ', test)
 
     console.log('dry run of slashing')
+    // doesn't wait for error, so just have to check from geth log or something
     const dry = await slasher.methods
       .slash(
         block,
