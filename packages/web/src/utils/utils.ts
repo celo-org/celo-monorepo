@@ -102,3 +102,8 @@ export function getDeviceMemory(): MemoryGB {
   // only available on chrome / android browser assume 4 if we dont know
   return (navigator.deviceMemory as MemoryGB) || 4
 }
+
+export function isBrowser() {
+  console.log('process.browser')
+  return process.browser
+}
