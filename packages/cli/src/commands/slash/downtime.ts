@@ -163,5 +163,23 @@ export default class Downtime extends BaseCommand {
       // @ts-ignore
       .call({ gas: 10000000 }, endBlock + 100)
     console.log('is down: ', test)
+
+    console.log('dry run of slashing')
+    const dry = await slasher.methods
+      .slash(
+        block,
+        startIndex,
+        endIndex,
+        historyIndex,
+        data.afterValidator.lessers,
+        data.afterValidator.greaters,
+        data.indicesValidator,
+        data.afterGroup.lessers,
+        data.afterGroup.greaters,
+        data.indicesGroup
+      )
+      // @ts-ignore
+      .call({ gas: 10000000 })
+    console.log('got', dry)
   }
 }
