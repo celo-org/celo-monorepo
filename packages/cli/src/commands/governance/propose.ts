@@ -1,5 +1,7 @@
 import { flags } from '@oclif/command'
+import { BigNumber } from 'bignumber.js'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { buildProposalFromJsonFile } from '../../utils/governance'
@@ -18,13 +20,17 @@ export default class Propose extends BaseCommand {
 
   async run() {
     const res = this.parse(Propose)
+    const proposal = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
+    const account = res.flags.from
+    const deposit = new BigNumber(res.flags.deposit)
+    this.kit.defaultAccount = account
+
+    await newCheckBuilder(this, account)
+      .hasEnoughGold(account, deposit)
+      .exceedsProposalMinDeposit(deposit)
+      .runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
-
-    const proposal = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
-    const tx = governance.propose(proposal)
-    await displaySendTx('proposeTx', tx, { from: res.flags.from, value: res.flags.deposit })
-    // const proposalID = await tx.txo.call()
-    // this.log(`ProposalID: ${proposalID}`)
+    await displaySendTx('proposeTx', governance.propose(proposal), { value: res.flags.deposit })
   }
 }

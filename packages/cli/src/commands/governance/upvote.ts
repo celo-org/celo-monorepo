@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -16,9 +17,18 @@ export default class Upvote extends BaseCommand {
 
   async run() {
     const res = this.parse(Upvote)
-
+    const signer = res.flags.from
+    const id = res.flags.proposalID
+    this.kit.defaultAccount = signer
     const governance = await this.kit.contracts.getGovernance()
-    const tx = await governance.upvote(res.flags.proposalID, res.flags.from)
-    await displaySendTx('upvoteTx', tx, { from: res.flags.from })
+
+    await newCheckBuilder(this, signer)
+      .isVoteSignerOrAccount()
+      .proposalExists(id)
+      .proposalInStage(id, 'Queued')
+      .runChecks()
+
+    const account = await (await this.kit.contracts.getAccounts()).voteSignerToAccount(signer)
+    await displaySendTx('upvoteTx', await governance.upvote(id, account))
   }
 }
