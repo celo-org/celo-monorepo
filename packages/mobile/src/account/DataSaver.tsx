@@ -35,7 +35,8 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 interface State {
-  modalVisible: boolean
+  switchOffModalVisible: boolean
+  switchOnModalVisible: boolean
 }
 
 export class DataSaver extends React.Component<Props, State> {
@@ -45,29 +46,45 @@ export class DataSaver extends React.Component<Props, State> {
   })
 
   state = {
-    modalVisible: false,
+    switchOffModalVisible: false,
+    switchOnModalVisible: false,
   }
 
-  showModal = () => {
-    this.setState({ modalVisible: true })
+  showSwitchOffModal = () => {
+    this.setState({ switchOffModalVisible: true })
   }
 
-  hideModal = () => {
-    this.setState({ modalVisible: false })
+  hideSwitchOffModal = () => {
+    this.setState({ switchOffModalVisible: false })
   }
 
-  onPressToggleWithRestartModal = () => {
+  onPressToggleWithSwitchOffModal = () => {
     this.props.toggleZeroSyncMode(false)
-    this.hideModal()
+    this.hideSwitchOffModal()
+  }
+
+  showSwitchOnModal = () => {
+    this.setState({ switchOnModalVisible: true })
+  }
+
+  hideSwitchOnModal = () => {
+    this.setState({ switchOnModalVisible: false })
+  }
+
+  onPressToggleWithSwitchOnModal = () => {
+    this.props.toggleZeroSyncMode(true)
+    this.hideSwitchOnModal()
   }
 
   handleZeroSyncToggle = (zeroSyncMode: boolean) => {
     if (!zeroSyncMode && this.props.gethStartedThisSession) {
       // Starting geth a second time this app session which will
       // require an app restart, so show restart modal
-      this.showModal()
+      this.showSwitchOffModal()
     } else {
-      this.props.toggleZeroSyncMode(zeroSyncMode)
+      // If move to zeroSync was not successful we will need
+      // to rollback starting geth a second time
+      this.showSwitchOnModal()
     }
   }
 
@@ -82,16 +99,36 @@ export class DataSaver extends React.Component<Props, State> {
         >
           <Text style={fontStyles.body}>{t('enableDataSaver')}</Text>
         </SettingsSwitchItem>
-        <Modal isVisible={this.state.modalVisible}>
+        <Modal isVisible={this.state.switchOffModalVisible}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('restartModal.header')}</Text>
-            <Text style={fontStyles.body}>{t('restartModal.body')}</Text>
+            <Text style={styles.modalHeader}>{t('restartModalSwitchOff.header')}</Text>
+            <Text style={fontStyles.body}>{t('restartModalSwitchOff.body')}</Text>
             <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.hideModal} style={styles.modalCancelText}>
+              <TextButton onPress={this.hideSwitchOffModal} style={styles.modalCancelText}>
                 {t('global:cancel')}
               </TextButton>
-              <TextButton onPress={this.onPressToggleWithRestartModal} style={styles.modalSkipText}>
-                {t('restartModal.restart')}
+              <TextButton
+                onPress={this.onPressToggleWithSwitchOffModal}
+                style={styles.modalSkipText}
+              >
+                {t('restartModalSwitchOff.restart')}
+              </TextButton>
+            </View>
+          </View>
+        </Modal>
+        <Modal isVisible={this.state.switchOnModalVisible}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalHeader}>{t('restartModalSwitchOn.header')}</Text>
+            <Text style={fontStyles.body}>{t('restartModalSwitchOn.body')}</Text>
+            <View style={styles.modalButtonsContainer}>
+              <TextButton onPress={this.hideSwitchOnModal} style={styles.modalCancelText}>
+                {t('global:cancel')}
+              </TextButton>
+              <TextButton
+                onPress={this.onPressToggleWithSwitchOnModal}
+                style={styles.modalSkipText}
+              >
+                {t('restartModalSwitchOn.understand')}
               </TextButton>
             </View>
           </View>
