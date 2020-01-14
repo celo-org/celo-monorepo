@@ -336,18 +336,18 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   /*
    * Checks conditions required for bucket updates.
    * @return Whether or not buckets should be updated.
-   * TODO: check the oldest report isn't expired
    */
   function shouldUpdateBuckets() private view returns (bool) {
     ISortedOracles sortedOracles = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     );
+    bool isLastBucketValid = sortedOracles.isReportActive(stable);
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
     bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
-    return timePassed && enoughReports && medianReportRecent;
+    return timePassed && enoughReports && medianReportRecent && isLastBucketValid;
   }
 
   function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {

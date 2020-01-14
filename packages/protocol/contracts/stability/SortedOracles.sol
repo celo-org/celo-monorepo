@@ -119,6 +119,21 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   }
 
   /**
+   * @notice Check if last report is expired.
+   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   */
+  function isReportActive(address token) external view returns (bool) {
+    require(token != address(0));
+    address oldest = timestamps[token].getTail();
+    uint256 timestamp = timestamps[token].getValue(oldest);
+    // solhint-disable-next-line not-rely-on-time
+    if (now.sub(timestamp) >= reportExpirySeconds) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param numerator The amount of tokens equal to `denominator` Celo Gold.

@@ -158,6 +158,34 @@ contract('SortedOracles', (accounts: string[]) => {
     })
   })
 
+  describe('#isReportActive', () => {
+    beforeEach(async () => {
+      await sortedOracles.addOracle(aToken, anOracle)
+    })
+
+    it('should return false if there are no reports', async () => {
+      let isReportActive = await sortedOracles.isReportActive(aToken)
+      assert.isNotTrue(isReportActive)
+    })
+
+    describe('when a report has been made', () => {
+      beforeEach(async () => {
+        await sortedOracles.report(aToken, 1, 1, NULL_ADDRESS, NULL_ADDRESS, { from: anOracle })
+      })
+
+      it('should return true if report is not expired', async () => {
+        let isReportActive = await sortedOracles.isReportActive(aToken)
+        assert.isTrue(isReportActive)
+      })
+
+      it('should return false if report is expired', async () => {
+        await timeTravel(aReportExpiry, web3)
+        let isReportActive = await sortedOracles.isReportActive(aToken)
+        assert.isNotTrue(isReportActive)
+      })
+    })
+  })
+
   describe('#removeOracle', () => {
     beforeEach(async () => {
       await sortedOracles.addOracle(aToken, anOracle)
