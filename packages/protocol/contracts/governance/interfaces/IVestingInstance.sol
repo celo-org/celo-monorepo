@@ -2,6 +2,7 @@ pragma solidity ^0.5.3;
 
 interface IVestingInstance {
   function isRevoked() external view returns (bool);
+  function isPaused() external view returns (bool);
   function withdraw(uint256) external;
   function refundAndFinalize() external;
   function revoke() external;
@@ -26,5 +27,7 @@ interface IVestingInstance {
   function getRemainingTotalBalance() external view returns (uint256);
   function getRemainingUnlockedBalance() external view returns (uint256);
   function getRemainingLockedBalance() external view returns (uint256);
-  function getVestedTotalBalance() external view returns (uint256);
+  function getCurrentVestedTotalAmount() external view returns (uint256);
+  function getInitialVestingAmount() external view returns (uint256);
+
 }

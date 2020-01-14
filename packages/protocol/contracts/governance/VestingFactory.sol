@@ -1,6 +1,7 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./VestingInstance.sol";
 import "./interfaces/IVestingFactory.sol";
@@ -9,6 +10,8 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
 contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
+  using SafeMath for uint256;
+
   // mapping between beneficiary addresses and associated vesting contracts (schedules)
   mapping(address => address) public vestings;
 
@@ -22,7 +25,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
   /**
    * @notice Factory function for creating a new vesting contract instance
    * @param vestingBeneficiary address of the beneficiary to whom vested tokens are transferred
-   * @param vestingAmount the amount that is to be vested by the contract
+   * @param vestingNumPeriods number of vesting periods
    * @param vestingCliff duration in seconds of the cliff in which tokens will begin to vest
    * @param vestingStartTime the time (as Unix time) at which point vesting starts
    * @param vestingPeriodSec duration in seconds of the period in which the tokens will vest
@@ -34,7 +37,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
    */
   function createVestingInstance(
     address payable vestingBeneficiary,
-    uint256 vestingAmount,
+    uint256 vestingNumPeriods,
     uint256 vestingCliff,
     uint256 vestingStartTime,
     uint256 vestingPeriodSec,
@@ -43,6 +46,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
     address payable vestingRevoker,
     uint256 vestingMaxPausePeriod
   ) external onlyOwner returns (address) {
+    uint256 vestingAmount = vestingNumPeriods.mul(vestAmountPerPeriod);
     require(
       getGoldToken().balanceOf(address(this)) >= vestingAmount,
       "factory balance is unsufficient to create a new vesting"
@@ -53,7 +57,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
     address newVestingInstance = address(
       new VestingInstance(
         vestingBeneficiary,
-        vestingAmount,
+        vestingNumPeriods,
         vestingCliff,
         vestingStartTime,
         vestingPeriodSec,

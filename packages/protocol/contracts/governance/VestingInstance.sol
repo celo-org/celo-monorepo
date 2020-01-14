@@ -11,8 +11,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   using SafeMath for uint256;
 
   struct VestingSchedule {
-    // total that is to be vested
-    uint256 vestingAmount;
+    // number of vesting periods
+    uint256 vestingNumPeriods;
     // amount that is to be vested per period
     uint256 vestAmountPerPeriod;
     // durations in secs. of one period
@@ -28,9 +28,6 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
 
   // indicates how much of the vested amount has been accummulatively withdrawn
   uint256 public totalWithdrawn;
-
-  // indicates if the withdrawing has been paused
-  bool public paused;
 
   // the time at which the revocation has taken place
   uint256 public revokeTime;
@@ -53,7 +50,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   // a public struct hosting the vesting scheme params
   VestingSchedule public vestingSchedule;
 
-  event WithdrawalPaused(uint256 pausePeriod, uint256 pauseTimestamp);
+  event WithdrawalPaused(uint256 pauseStart, uint256 pauseEnd);
   event VestingRevoked(uint256 revokeTimestamp, uint256 vestedBalanceAtRevoke);
 
   modifier onlyRevoker() {
@@ -71,6 +68,11 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     _;
   }
 
+  modifier onlyRevocable() {
+    require(revocable, "vesting instance must be revocable");
+    _;
+  }
+
   modifier onlyRevokerAndRevoked() {
     require(
       msg.sender == revoker && isRevoked(),
@@ -80,8 +82,9 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   modifier onlyWhenInProperState() {
+    bool isRevoked = isRevoked();
     require(
-      (msg.sender == revoker && isRevoked()) || (msg.sender == beneficiary && !isRevoked()),
+      (msg.sender == revoker && isRevoked) || (msg.sender == beneficiary && !isRevoked),
       "either revoker in revoked state or beneficiary in unrevoked"
     );
     _;
@@ -92,11 +95,11 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   /**
    * @notice A constructor for initialising a new instance of a Vesting Schedule contract
    * @param vestingBeneficiary address of the beneficiary to whom vested tokens are transferred
-   * @param vestingAmount the amount that is to be vested by the contract
+   * @param vestingNumPeriods number of vesting periods
    * @param vestingCliff duration in seconds of the cliff in which tokens will begin to vest
    * @param vestingStartTime the time (as Unix time) at which point vesting starts
    * @param vestingPeriodSec duration in seconds of the period in which the tokens will vest
-   * @param vestAmountPerPeriod the vesting amound per period where period is the vestingAmount distributed over the vestingPeriodSec
+   * @param vestAmountPerPeriod the vesting amount per period - vestingPeriodSec
    * @param vestingRevocable whether the vesting is revocable or not
    * @param vestingRevoker address of the person revoking the vesting
    * @param vestingMaxPausePeriod maximum pause period in seconds
@@ -104,7 +107,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    */
   constructor(
     address payable vestingBeneficiary,
-    uint256 vestingAmount,
+    uint256 vestingNumPeriods,
     uint256 vestingCliff,
     uint256 vestingStartTime,
     uint256 vestingPeriodSec,
@@ -114,24 +117,22 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     uint256 vestingMaxPausePeriod,
     address registryAddress
   ) public {
-    uint256 numPeriods = vestingAmount.div(vestAmountPerPeriod);
-    require(numPeriods >= 1, "There must be at least one vesting period");
-    require(
-      numPeriods.mul(vestAmountPerPeriod) == vestingAmount,
-      "Vesting amount per period and total vesting amount are inconsistent"
-    );
+    require(vestingNumPeriods >= 1, "There must be at least one vesting period");
+    require(vestAmountPerPeriod > 0, "Vesting amount per period must be positive");
+    require(vestingMaxPausePeriod > 0, "maximum pause period must be greater than zero");
     require(vestingBeneficiary != address(0), "Beneficiary is the zero address");
-    require(vestingAmount > 0, "Vesting amount must be positive");
+    require(vestingRevoker != address(0), "Revoker is the zero address");
+    require(registryAddress != address(0), "Registry address cannot be the genesis address");
+    require(vestingNumPeriods.mul(vestAmountPerPeriod) > 0, "Total vested amount has overflown");
     require(vestingCliff <= vestingPeriodSec, "Vesting cliff is longer than vesting duration");
     require(
-      vestingStartTime.add(numPeriods.mul(vestingPeriodSec)) > block.timestamp,
+      vestingStartTime.add(vestingNumPeriods.mul(vestingPeriodSec)) > block.timestamp,
       "Vesting end time must be in the future"
     );
-    require(vestingMaxPausePeriod > 0, "maximum pause period must be greater than zero");
 
     setRegistry(registryAddress);
 
-    vestingSchedule.vestingAmount = vestingAmount;
+    vestingSchedule.vestingNumPeriods = vestingNumPeriods;
     vestingSchedule.vestAmountPerPeriod = vestAmountPerPeriod;
     vestingSchedule.vestingPeriodSec = vestingPeriodSec;
     vestingSchedule.vestingCliffStartTime = vestingStartTime.add(vestingCliff);
@@ -151,19 +152,25 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
+   * @notice Returns if the vesting has been paused or not.
+   */
+  function isPaused() public view returns (bool) {
+    return pauseEndTime > block.timestamp;
+  }
+
+  /**
    * @notice Transfers gold from the vesting back to beneficiary.
    * @param amount the requested gold amount
    */
   function withdraw(uint256 amount) external nonReentrant onlyBeneficiary {
-    bool isPaused = block.timestamp < pauseEndTime;
-    require(!isPaused, "Withdrawals only allowed in the unpaused state");
+    require(!isPaused(), "Withdrawals only allowed in the unpaused state");
     require(amount > 0, "withdrawable amount must be greater than zero");
 
     uint256 vestedAmount;
     if (isRevoked()) {
       vestedAmount = vestedBalanceAtRevoke;
     } else {
-      vestedAmount = getVestedTotalBalance();
+      vestedAmount = getCurrentVestedTotalAmount();
     }
 
     require(
@@ -177,7 +184,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     totalWithdrawn = totalWithdrawn.add(amount);
     require(getGoldToken().transfer(beneficiary, amount), "Withdrawal of gold failed");
     if (getRemainingTotalBalance() == 0) {
-      selfdestruct(beneficiary);
+      selfdestruct(revoker);
     }
   }
 
@@ -187,6 +194,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   function refundAndFinalize() external nonReentrant onlyRevokerAndRevoked {
     require(getRemainingLockedBalance() == 0, "Some of the vested gold is still locked");
     uint256 beneficiaryAmount = vestedBalanceAtRevoke.sub(totalWithdrawn);
+    require(beneficiaryAmount > 0, "beneficiary amount is zero");
     require(
       getGoldToken().transfer(beneficiary, beneficiaryAmount),
       "Transfer of gold to beneficiary failed"
@@ -199,11 +207,10 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   /**
    * @notice Revoke the vesting scheme
    */
-  function revoke() external nonReentrant onlyRevoker {
-    require(revocable, "Revoking is not allowed");
+  function revoke() external nonReentrant onlyRevoker onlyRevocable {
     require(!isRevoked(), "Vesting already revoked");
     revokeTime = block.timestamp;
-    vestedBalanceAtRevoke = getVestedTotalBalance();
+    vestedBalanceAtRevoke = getCurrentVestedTotalAmount();
     emit VestingRevoked(revokeTime, vestedBalanceAtRevoke);
   }
 
@@ -211,22 +218,18 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @notice Allows only the revoker to pause the gold withdrawal
    * @param pausePeriod the period for which the withdrawal shall be paused
    */
-  function pause(uint256 pausePeriod) external onlyRevoker {
-    require(
-      !paused || (paused && pauseEndTime < block.timestamp),
-      "Vesting withdrawals already paused"
-    );
-    require(revocable, "Vesting must be revocable");
+  function pause(uint256 pausePeriod) external onlyRevoker onlyRevocable {
+    require(!isPaused(), "Vesting withdrawals already paused");
     require(!isRevoked(), "Vesting already revoked");
     require(pausePeriod <= maxPausePeriod, "Pause period is limited by maximum pause period");
-    paused = true;
     pauseEndTime = block.timestamp.add(pausePeriod);
-    emit WithdrawalPaused(pausePeriod, block.timestamp);
+    emit WithdrawalPaused(block.timestamp, pauseEndTime);
   }
 
   /**
    * @notice Calculates the total balance of the vesting instance
    * @return The total vesting instance balance
+   * @dev The returned amount may vary over time due to locked gold rewards
    */
   function getTotalBalance() public view returns (uint256) {
     return getRemainingUnlockedBalance().add(getRemainingLockedBalance()).add(totalWithdrawn);
@@ -235,6 +238,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   /**
    * @notice Calculates the sum of locked and unlocked gold in the vesting instance
    * @return The remaining total vesting instance balance
+   * @dev The returned amount may vary over time due to locked gold rewards
    */
   function getRemainingTotalBalance() public view returns (uint256) {
     return getRemainingUnlockedBalance().add(getRemainingLockedBalance());
@@ -251,32 +255,43 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   /**
    * @notice Calculates remaining locked gold balance in the vesting instance
    * @return The remaining locked vesting instance gold balance
+   * @dev The returned amount may vary over time due to locked gold rewards
    */
   function getRemainingLockedBalance() public view returns (uint256) {
     return getLockedGold().getAccountTotalLockedGold(address(this));
   }
 
   /**
+   * @notice Calculates initial vesting amount in the vesting instance
+   * @return The initial vesting amount
+   */
+  function getInitialVestingAmount() public view returns (uint256) {
+    return vestingSchedule.vestingNumPeriods.mul(vestingSchedule.vestAmountPerPeriod);
+  }
+
+  /**
    * @dev Calculates the total amount that has already vested up to now.
    * @return The already vested amount up to the point of call
+   * @dev The returned amount may vary over time due to locked gold rewards
    */
-  function getVestedTotalBalance() public view returns (uint256) {
+  function getCurrentVestedTotalAmount() public view returns (uint256) {
     if (block.timestamp < vestingSchedule.vestingCliffStartTime) {
       return 0;
     }
     uint256 totalBalance = getTotalBalance();
-    uint256 vestingPeriods = vestingSchedule.vestingAmount.div(vestingSchedule.vestAmountPerPeriod);
 
     if (
       block.timestamp >=
-      vestingSchedule.vestingStartTime.add(vestingPeriods.mul(vestingSchedule.vestingPeriodSec))
+      vestingSchedule.vestingStartTime.add(
+        vestingSchedule.vestingNumPeriods.mul(vestingSchedule.vestingPeriodSec)
+      )
     ) {
       return totalBalance;
     }
 
     uint256 timeSinceStart = block.timestamp.sub(vestingSchedule.vestingStartTime);
     uint256 periodsSinceStart = timeSinceStart.div(vestingSchedule.vestingPeriodSec);
-    return totalBalance.mul(periodsSinceStart).div(vestingPeriods);
+    return totalBalance.mul(periodsSinceStart).div(vestingSchedule.vestingNumPeriods);
   }
 
   /**
