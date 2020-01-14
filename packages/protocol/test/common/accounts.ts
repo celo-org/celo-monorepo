@@ -59,18 +59,24 @@ contract('Accounts', (accounts: string[]) => {
       eventName: 'VoteSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getVoteSigner,
       authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
+      hasAuthorizedSigner: accountsInstance.hasAuthorizedVoteSigner,
+      removeSigner: accountsInstance.removeVoteSigner,
     }
     authorizationTests.validating = {
       fn: accountsInstance.authorizeValidatorSigner,
       eventName: 'ValidatorSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
       authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
+      hasAuthorizedSigner: accountsInstance.hasAuthorizedValidatorSigner,
+      removeSigner: accountsInstance.removeValidatorSigner,
     }
     authorizationTests.attesting = {
       fn: accountsInstance.authorizeAttestationSigner,
       eventName: 'AttestationSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
       authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
+      hasAuthorizedSigner: accountsInstance.hasAuthorizedAttestationSigner,
+      removeSigner: accountsInstance.removeAttestationSigner,
     }
   })
 
@@ -367,10 +373,12 @@ contract('Accounts', (accounts: string[]) => {
         })
 
         it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
+          assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
           await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           assert.equal(await accountsInstance.authorizedBy(authorized), account)
           assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
           assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
+          assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
         })
 
         it(`should emit the right event`, async () => {
@@ -475,6 +483,21 @@ contract('Accounts', (accounts: string[]) => {
           it(`should return the ${key} when passed the account`, async () => {
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
           })
+        })
+      })
+
+      describe(`#remove${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+        it(`should be able to remove the ${key} signer after authorizing`, async () => {
+          const authorized = accounts[1]
+          const sig = await getParsedSignatureOfAddress(web3, account, authorized)
+          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+
+          assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
+          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+
+          await authorizationTest.removeSigner()
+          assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
+          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
         })
       })
     })

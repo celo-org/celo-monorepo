@@ -1,4 +1,3 @@
-{{ if not (eq (.Values.geth.validators | toString) "og") }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -244,4 +243,3 @@ spec:
       - name: account
         secret:
           secretName: {{ template "ethereum.fullname" . }}-geth-account
-{{ end }}
