@@ -17,9 +17,9 @@
     "restart": "Reiniciar para alternar"
   },
   "restartModalSwitchOn": {
-    "header": "~~Beware Of Restart",
-    "body": "~~In case of incorrect PIN, you will need to restart the app.",
-    "understand": "~~I understand"
+    "header": "La aplicación se reiniciará",
+    "body": "En caso de ingresar un PIN incorrecto, la aplicación se reiniciará.",
+    "understand": "Entendido"
   },
 
   "testFaqLink": "Las Preguntas Frecuentes del Monedero Celo",
