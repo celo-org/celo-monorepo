@@ -15,7 +15,10 @@ export default class ViewHotfix extends BaseCommand {
     }),
   }
 
-  static examples = []
+  static examples = [
+    'viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658',
+    'viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --notyet',
+  ]
 
   async run() {
     const res = this.parse(ViewHotfix)

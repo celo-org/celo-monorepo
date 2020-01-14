@@ -11,7 +11,7 @@ export default class List extends BaseCommand {
     ...BaseCommand.flags,
   }
 
-  static examples = []
+  static examples = ['list']
 
   async run() {
     this.parse(List)
