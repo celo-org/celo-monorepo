@@ -238,7 +238,7 @@ contract Governance is
    * @notice Updates the last dequeue timestamp.
    * @param _lastDequeue The last dequeue timestamp.
    */
-  function setLastDequeue(uint256 _lastDequeue) public onlyOwner {
+  function setLastDequeue(uint256 _lastDequeue) private {
     require(_lastDequeue >= block.timestamp, "last dequeuing time must not be in the past");
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = _lastDequeue;

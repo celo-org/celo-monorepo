@@ -113,26 +113,25 @@ contract MultiSig is Initializable {
     for (uint256 i = 0; i < _owners.length; i++) {
       _addOwner(_owners[i]);
     }
-    changeRequirement(_required);
+    _changeRequirement(_required);
   }
 
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of new owner.
-  function addOwner(address owner) external onlyWallet {
+  function addOwner(address owner)
+    external
+    onlyWallet
+    validRequirement(owners.length + 1, required)
+  {
     _addOwner(owner);
   }
 
   /// @dev adding new owner
   /// @param owner Address of new owner.
-  function _addOwner(address _owner)
-    private
-    ownerDoesNotExist(owner)
-    notNull(owner)
-    validRequirement(owners.length + 1, required)
-  {
-    isOwner[_owner] = true;
-    owners.push(_owner);
-    emit OwnerAddition(_owner);
+  function _addOwner(address owner) private ownerDoesNotExist(owner) notNull(owner) {
+    isOwner[owner] = true;
+    owners.push(owner);
+    emit OwnerAddition(owner);
   }
 
   /// @dev Allows to remove an owner. Transaction has to be sent by wallet.
@@ -177,6 +176,10 @@ contract MultiSig is Initializable {
     onlyWallet
     validRequirement(owners.length, _required)
   {
+    _changeRequirement(_required);
+  }
+
+  function _changeRequirement(uint256 _required) private {
     required = _required;
     emit RequirementChange(_required);
   }

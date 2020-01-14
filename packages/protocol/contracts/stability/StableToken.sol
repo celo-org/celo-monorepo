@@ -35,14 +35,6 @@ contract StableToken is
 
   event TransferComment(string comment);
 
-  event TotalSupplySet(address sender, uint256 totalSupply);
-
-  event TokenNameSet(address sender, string name);
-
-  event TokenSymbolSet(address sender, string symbol);
-
-  event TokenDecimalslSet(address sender, uint8 decimals);
-
   string internal name_;
   string internal symbol_;
   uint8 internal decimals_;
@@ -117,10 +109,9 @@ contract StableToken is
     require(inflationRate != 0, "Must provide a non-zero inflation rate.");
 
     _transferOwnership(msg.sender);
-    setTotalSupply(0);
-    setName(_name);
-    setSymbol(_symbol);
-    setDecimals(_decimals);
+    name_ = _name;
+    symbol_ = _symbol;
+    decimals_ = _decimals;
     setInitialInflationParameters(inflationRate, inflationFactorUpdatePeriod);
 
     require(initialBalanceAddresses.length == initialBalanceValues.length);
@@ -128,42 +119,6 @@ contract StableToken is
       require(_mint(initialBalanceAddresses[i], initialBalanceValues[i]));
     }
     setRegistry(registryAddress);
-  }
-
-  /**
-   * @notice Setter for the total supply.
-   * @param totalSupply The total supply to set.
-   */
-  function setTotalSupply(uint256 totalSupply) public {
-    totalSupply_ = totalSupply;
-    emit TotalSupplySet(msg.sender, totalSupply);
-  }
-
-  /**
-   * @notice Setter for the name of the token.
-   * @param name The name to set.
-   */
-  function setName(string memory name) public {
-    name_ = name;
-    emit TokenNameSet(msg.sender, name);
-  }
-
-  /**
-   * @notice Setter for the symbol of the token.
-   * @param symbol The symbol to set.
-   */
-  function setSymbol(string memory symbol) public {
-    symbol_ = symbol;
-    emit TokenSymbolSet(msg.sender, symbol);
-  }
-
-  /**
-   * @notice Setter for the decimals of the token.
-   * @param decimals The decimals to set.
-   */
-  function setDecimals(uint8 decimals) public {
-    decimals_ = decimals;
-    emit TokenDecimalslSet(msg.sender, decimals);
   }
 
   /**

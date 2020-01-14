@@ -166,7 +166,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @param _targetVotingYield The value of the target voting yield.
    * @return True upon success.
    */
-  function setTargetVotingYield(uint256 _targetVotingYield) public onlyOwner returns (bool) {
+  function setTargetVotingYield(uint256 _targetVotingYield) private returns (bool) {
     targetVotingYieldParams.target = FixidityLib.wrap(_targetVotingYield);
     emit TargetVotingYield(_targetVotingYield);
     return true;
@@ -177,7 +177,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @param _startTime The time in unix.
    * @return True upon success.
    */
-  function setStartTime(uint256 _startTime) public onlyOwner returns (bool) {
+  function setStartTime(uint256 _startTime) private returns (bool) {
     require(_startTime >= block.timestamp, "The start time must not be in the past");
     startTime = _startTime;
     emit StartTimeSet(_startTime);
