@@ -38,9 +38,9 @@ methods {
 
 rule totalNonVotingGEAccountNonVoting(address a,method f)  {
 	require sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a);
-	require f!=decrementNonvotingAccountBalance && f!=incrementNonvotingAccountBalance;
+	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector;
 	env eF; 
-	require f!=unlock || eF.msg.sender==a;
+	require f.selector!=unlock(uint256).selector	|| eF.msg.sender==a;
 	calldataarg arg;
 	sinvoke f(eF,arg);
 	assert sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a);
@@ -68,7 +68,7 @@ rule totalPreserved( address a,  method f)
 	env eF;
 	require eF.msg.sender==a;
 	//this two function breaks the rule 
-	require f!=decrementNonvotingAccountBalance && f!=incrementNonvotingAccountBalance;
+	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector;
 	calldataarg arg;
 	sinvoke f(eF,arg);
 	// we limit the amount of pending records due to loop handling 
@@ -100,7 +100,7 @@ rule noChangeByOther( address a, address b, method f )
 	env eF;
 	require eF.msg.sender==b;
 	calldataarg arg;
-	require f!=decrementNonvotingAccountBalance && f!=incrementNonvotingAccountBalance;
+	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector;
 	sinvoke f(eF,arg);
 	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a); 
 	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
@@ -163,7 +163,7 @@ rule only_initializer_changes_initialized_field(method f) {
 	
 	bool _isInitialized = sinvoke initialized(_e);
 	
-	require f != initialize;
+	require f.selector != initialize(address,uint256).selector;
 	calldataarg arg;
 	invoke f(eF,arg);
 	
