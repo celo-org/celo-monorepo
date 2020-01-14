@@ -1,4 +1,4 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -36,6 +36,7 @@ export abstract class BaseCommand extends LocalCommand {
     ...LocalCommand.flags,
     privateKey: flags.string({ hidden: true }),
     node: flags.string({ char: 'n', hidden: true }),
+    feeCurrency: flags.enum({ options: ['cUSD', 'cGLD'], hidden: true }),
   }
 
   // This specifies whether the node needs to be synced before the command
@@ -72,6 +73,13 @@ export abstract class BaseCommand extends LocalCommand {
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags && res.flags.privateKey) {
       this._kit.addAccount(res.flags.privateKey)
+    }
+    if (res.flags && res.flags.feeCurrency) {
+      const token =
+        res.flags.feeCurrency === 'cUSD' ? CeloContract.StableToken : CeloContract.GoldToken
+      return this._kit.setFeeCurrency(token).then(() => {
+        return this._kit
+      })
     }
     return this._kit
   }
