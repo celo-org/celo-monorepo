@@ -110,47 +110,29 @@ contract MultiSig is Initializable {
     initializer
     validRequirement(_owners.length, _required)
   {
-    setInitialOwners(_owners);
-    setInitialRequired(_required);
-  }
-
-  /**
-   * @notice Sets the initial owners of the wallet.
-   * @param _owners List of initial owners.
-   */
-  function setInitialOwners(address[] memory _owners) private {
     for (uint256 i = 0; i < _owners.length; i++) {
-      require(
-        !isOwner[_owners[i]] && _owners[i] != address(0),
-        "owner was null or already given owner status"
-      );
-      isOwner[_owners[i]] = true;
+      _addOwner(_owners[i]);
     }
-    owners = _owners;
-  }
-
-  /**
-   * @notice Sets the required number of tx confirmations.
-   * @param _required The number of required tx confirmations.
-   */
-  function setInitialRequired(uint256 _required) private {
-    require(_required > 0, "Required confirmations must be greater than zero");
-    required = _required;
-    emit RequirementSet(_required);
+    changeRequirement(_required);
   }
 
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of new owner.
-  function addOwner(address owner)
-    external
-    onlyWallet
+  function addOwner(address owner) external onlyWallet {
+    _addOwner(owner);
+  }
+
+  /// @dev adding new owner
+  /// @param owner Address of new owner.
+  function _addOwner(address _owner)
+    private
     ownerDoesNotExist(owner)
     notNull(owner)
     validRequirement(owners.length + 1, required)
   {
-    isOwner[owner] = true;
-    owners.push(owner);
-    emit OwnerAddition(owner);
+    isOwner[_owner] = true;
+    owners.push(_owner);
+    emit OwnerAddition(_owner);
   }
 
   /// @dev Allows to remove an owner. Transaction has to be sent by wallet.
