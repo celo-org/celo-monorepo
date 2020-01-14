@@ -602,15 +602,11 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
           </Text>
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Light",
-                },
-                Object {
-                  "color": "#B0B5B9",
-                  "fontSize": 18,
-                },
-              ]
+              Object {
+                "color": "#B0B5B9",
+                "fontFamily": "Hind-Light",
+                "fontSize": 18,
+              }
             }
           >
             <Text>
@@ -1294,15 +1290,11 @@ exports[`Testnet banner Renders when disconnected 1`] = `
           </Text>
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Light",
-                },
-                Object {
-                  "color": "#B0B5B9",
-                  "fontSize": 18,
-                },
-              ]
+              Object {
+                "color": "#B0B5B9",
+                "fontFamily": "Hind-Light",
+                "fontSize": 18,
+              }
             }
           >
             <Text>
@@ -1967,15 +1959,11 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           </Text>
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Light",
-                },
-                Object {
-                  "color": "#B0B5B9",
-                  "fontSize": 18,
-                },
-              ]
+              Object {
+                "color": "#B0B5B9",
+                "fontFamily": "Hind-Light",
+                "fontSize": 18,
+              }
             }
           >
             <Text>
