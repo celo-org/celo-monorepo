@@ -65,7 +65,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
       )
     );
     vestings[vestingBeneficiary] = newVestingInstance;
-    getGoldToken().transfer(vestings[vestingBeneficiary], vestingAmount);
+    getGoldToken().transfer(newVestingInstance, vestingAmount);
     emit NewVestingInstanceCreated(vestingBeneficiary, newVestingInstance);
     return newVestingInstance;
   }
