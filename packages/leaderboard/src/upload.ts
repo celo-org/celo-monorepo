@@ -1,12 +1,11 @@
-import fs from 'fs'
-import readline from 'readline'
-import { ContractKit, newKitFromWeb3, IdentityMetadataWrapper } from '@celo/contractkit'
-import Web3 from 'web3'
+import { ContractKit, IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { BigNumber } from 'bignumber.js'
-
+import fs from 'fs'
 import { google } from 'googleapis'
+import readline from 'readline'
+import Web3 from 'web3'
 
 process.on('unhandledRejection', (reason, _promise) => {
   console.log('Unhandled Rejection at:', reason.stack || reason)
@@ -165,6 +164,22 @@ function getInfo(auth: any, cb: any) {
   )
 }
 
+function makeRequest(sheets: any, column: string, data: string[]) {
+  let req = {
+    spreadsheetId: LEADERBOARD_SHEET,
+    range: `TGCSO!${column}3`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      range: `TGCSO!${column}3`,
+      majorDimension: 'COLUMNS',
+      values: [data],
+    },
+  }
+  sheets.spreadsheets.values.update(req, (err: any, res: any) => {
+    console.log(res, err)
+  })
+}
+
 async function updateNames(kit: ContractKit, rows: any[][], sheets: any) {
   let accounts = await kit.contracts.getAccounts()
   let data = []
@@ -176,19 +191,7 @@ async function updateNames(kit: ContractKit, rows: any[][], sheets: any) {
       data.push(name)
     }
   }
-  let req = {
-    spreadsheetId: LEADERBOARD_SHEET,
-    range: 'TGCSO!D3',
-    valueInputOption: 'USER_ENTERED',
-    requestBody: {
-      range: 'TGCSO!D3',
-      majorDimension: 'COLUMNS',
-      values: [data],
-    },
-  }
-  sheets.spreadsheets.values.update(req, (err: any, res: any) => {
-    console.log(res, err)
-  })
+  makeRequest(sheets, 'D', data)
 }
 
 async function getBTUs(kit: ContractKit, address: string) {
@@ -223,19 +226,7 @@ async function updateBTUs(kit: ContractKit, rows: any[][], sheets: any) {
       }
     }
   }
-  let req = {
-    spreadsheetId: LEADERBOARD_SHEET,
-    range: 'TGCSO!E3',
-    valueInputOption: 'USER_ENTERED',
-    requestBody: {
-      range: 'TGCSO!E3',
-      majorDimension: 'COLUMNS',
-      values: [data],
-    },
-  }
-  sheets.spreadsheets.values.update(req, (err: any, res: any) => {
-    console.log(res, err)
-  })
+  makeRequest(sheets, 'E', data)
 }
 
 async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) {
@@ -259,27 +250,15 @@ async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) 
           })
         ).length
         console.log('Attestations requested', req, 'fulfilled', full, 'by', address)
-        if (req == 0) data.push(0)
-        else data.push(full / req)
+        if (req == 0) data.push('0')
+        else data.push((full / req).toString())
       } catch (err) {
         console.error('Cannot resolve attestations for', address, err)
         data.push('')
       }
     }
   }
-  let req = {
-    spreadsheetId: LEADERBOARD_SHEET,
-    range: 'TGCSO!G3',
-    valueInputOption: 'USER_ENTERED',
-    requestBody: {
-      range: 'TGCSO!G3',
-      majorDimension: 'COLUMNS',
-      values: [data],
-    },
-  }
-  sheets.spreadsheets.values.update(req, (err: any, res: any) => {
-    console.log(res, err)
-  })
+  makeRequest(sheets, 'G', data)
 }
 
 function main() {
