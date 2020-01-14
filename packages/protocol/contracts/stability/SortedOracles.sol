@@ -124,7 +124,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   /**
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param value The amount of tokens equal to Celo Gold represented as a FixidityLib fraction
+   * @param value The amount of tokens equal to Celo Gold represented as a FixidityLib fraction, premultiplied with the denominator
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
