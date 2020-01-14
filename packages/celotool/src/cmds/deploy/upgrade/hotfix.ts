@@ -79,12 +79,13 @@ export const handler = async (argv: EthstatsArgv) => {
       console.error('\nPlease see examples in hotfix.ts and add transactions')
       process.exit(1)
     }
-
-    const salt = randomBytes(32)
-    const proposalHash = hotfixToHash(kit, proposal, salt)
-
     // If your proposal is just made of Celo Registry contract methods, you can print it out
     console.info('Proposal: ', await proposalToJSON(kit, proposal))
+
+    const salt = randomBytes(32)
+    console.info(`Salt: ${salt.toString('hex')}`)
+
+    const proposalHash = hotfixToHash(kit, proposal, salt)
     console.info(`Proposal Hash: ${proposalHash.toString('hex')}`)
 
     console.info('\nWhitelist the hotfix')
