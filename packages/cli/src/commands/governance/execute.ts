@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -16,10 +17,17 @@ export default class Execute extends BaseCommand {
 
   async run() {
     const res = this.parse(Execute)
+    const id = res.flags.proposalID
+    const account = res.flags.from
+
+    this.kit.defaultAccount = account
+    await newCheckBuilder(this, account)
+      .proposalExists(id)
+      .proposalInStage(id, 'Execution')
+      .proposalIsPassing(id)
+      .runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
-
-    const tx = await governance.execute(res.flags.proposalID)
-    await displaySendTx('executeTx', tx, { from: res.flags.from })
+    await displaySendTx('executeTx', await governance.execute(id))
   }
 }
