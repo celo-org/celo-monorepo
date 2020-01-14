@@ -1,6 +1,7 @@
 import { flags } from '@oclif/command'
 import { toBuffer } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -17,10 +18,16 @@ export default class ApproveHotfix extends BaseCommand {
 
   async run() {
     const res = this.parse(ApproveHotfix)
-
-    const governance = await this.kit.contracts.getGovernance()
+    const account = res.flags.from
     const hash = toBuffer(res.flags.hash) as Buffer
-    const tx = governance.approveHotfix(hash)
-    await displaySendTx('approveHotfixTx', tx, { from: res.flags.from })
+    this.kit.defaultAccount = account
+    const governance = await this.kit.contracts.getGovernance()
+
+    await newCheckBuilder(this)
+      .isApprover(account)
+      .hotfixNotExecuted(hash)
+      .runChecks()
+
+    await displaySendTx('approveTx', governance.approveHotfix(hash))
   }
 }
