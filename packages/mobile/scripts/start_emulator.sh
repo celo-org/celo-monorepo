@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+#TODO delete
 ENABLE_EMULATOR_WINDOW="${ENABLE_EMULATOR_WINDOW:-false}"
 
 PARAMS=""

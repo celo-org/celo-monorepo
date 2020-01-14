@@ -21,6 +21,7 @@ export const AVAILABLE_LANGUAGES = [
 ]
 
 // DEV only related settings
+//TODO is this still needed?
 export const isE2EEnv = Config.IS_E2E || false
 export const DEV_RESTORE_NAV_STATE_ON_RELOAD = stringToBoolean(
   Config.DEV_RESTORE_NAV_STATE_ON_RELOAD || 'false'
