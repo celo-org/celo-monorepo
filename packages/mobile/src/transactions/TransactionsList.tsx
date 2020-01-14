@@ -296,8 +296,6 @@ export class TransactionsList extends React.PureComponent<Props> {
               )
             )
 
-          console.log('==data', data)
-
           const feedData = [...standbyTxs, ...transactions]
 
           return (

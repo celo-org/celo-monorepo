@@ -1,52 +1,30 @@
 import * as React from 'react'
-import 'react-native'
+import { MockedProvider } from 'react-apollo/test-utils'
+import { render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
-import { TransactionType } from 'src/apollo/types'
+import { TransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
-import TransactionList, {
-  TransactionsList as TransactionsListClass,
-} from 'src/transactions/TransactionsList'
+import { TransactionFeed } from 'src/transactions/TransactionFeed'
+import TransactionsList, { TRANSACTIONS_QUERY } from 'src/transactions/TransactionsList'
 import { createMockStore } from 'test/utils'
 
-jest.mock('src/utils/time.ts')
+jest.unmock('react-apollo')
 
 const standbyTransactions: StandbyTransaction[] = [
   {
-    id: '0110',
+    id: 'a-standby-tx-id',
     type: TransactionType.Sent,
     comment: 'Eye for an Eye',
     status: TransactionStatus.Pending,
     value: '100',
     symbol: CURRENCY_ENUM.DOLLAR,
-    timestamp: 1542406112,
-    address: '0072bvy2o23u',
-  },
-  {
-    id: '0112',
-    type: TransactionType.Exchange,
-    status: TransactionStatus.Pending,
-    inSymbol: CURRENCY_ENUM.DOLLAR,
-    inValue: '20',
-    outSymbol: CURRENCY_ENUM.GOLD,
-    outValue: '30',
-    timestamp: 1542409112,
-  },
-  {
-    id: '0113',
-    type: TransactionType.NetworkFee,
-    comment: '',
-    status: TransactionStatus.Pending,
-    value: '0.0001',
-    symbol: CURRENCY_ENUM.DOLLAR,
-    timestamp: 1542406112,
+    timestamp: 1542406110,
     address: '0072bvy2o23u',
   },
 ]
 
-const failedExchange: StandbyTransaction[] = [
+const failedStandbyTransactions: StandbyTransaction[] = [
   {
     type: TransactionType.Exchange,
     status: TransactionStatus.Failed,
@@ -59,98 +37,159 @@ const failedExchange: StandbyTransaction[] = [
   },
 ]
 
-/*
-const exchangeTransactions: any[] = [
+const pendingStandbyTransactions: StandbyTransaction[] = [
   {
-    __typename: 'TransactionExchange',
-    type: TransactionType.Exchange,
-    amount: {
-      amount: '-30',
-      currencyCode: 'cUSD',
-      localAmount: null,
-    },
-    makerAmount: {
-      amount: '30',
-      currencyCode: 'cUSD',
-      localAmount: null,
-    },
-    takerAmount: {
-      amount: '200',
-      currencyCode: 'cGLD',
-      localAmount: null,
-    },
-    timestamp: 1542306118,
-    hash: '0x00000000000000000000',
+    id: 'a-standby-tx-id',
+    hash: '0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353',
+    type: TransactionType.Sent,
+    comment: 'Hi',
+    status: TransactionStatus.Pending,
+    value: '0.2',
+    symbol: CURRENCY_ENUM.DOLLAR,
+    timestamp: 1578530538,
+    address: '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10',
   },
 ]
-*/
 
-const store = createMockStore({
-  transactions: { standbyTransactions },
+const mockQueryData: UserTransactionsQuery = {
+  transactions: {
+    edges: [
+      {
+        node: {
+          __typename: 'TransactionTransfer',
+          type: TransactionType.Sent,
+          hash: '0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353',
+          amount: {
+            amount: '-0.2',
+            currencyCode: 'cUSD',
+            localAmount: {
+              amount: '-0.2',
+              currencyCode: 'USD',
+              exchangeRate: '1',
+            },
+          },
+          timestamp: 1578530538,
+          address: '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10',
+          comment: 'Hi',
+        },
+      },
+      {
+        node: {
+          __typename: 'TransactionExchange',
+          type: TransactionType.Exchange,
+          hash: '0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852',
+          amount: {
+            amount: '0.994982275992944156',
+            currencyCode: 'cUSD',
+            localAmount: {
+              amount: '0.994982275992944156',
+              currencyCode: 'USD',
+              exchangeRate: '1',
+            },
+          },
+          takerAmount: {
+            amount: '0.994982275992944156',
+            currencyCode: 'cUSD',
+            localAmount: {
+              amount: '0.994982275992944156',
+              currencyCode: 'USD',
+              exchangeRate: '1',
+            },
+          },
+          makerAmount: {
+            amount: '0.1',
+            currencyCode: 'cGLD',
+            localAmount: {
+              amount: '1.006007113270411465777',
+              currencyCode: 'USD',
+              exchangeRate: '10.06007113270411465777',
+            },
+          },
+          timestamp: 1578530498,
+        },
+      },
+    ],
+  },
+}
+
+const mocks = [
+  {
+    request: {
+      query: TRANSACTIONS_QUERY,
+      variables: {
+        address: '0x0000000000000000000000000000000000007e57',
+        token: 'cUSD',
+        localCurrencyCode: 'MXN',
+      },
+    },
+    result: {
+      data: mockQueryData,
+    },
+  },
+]
+
+beforeEach(() => {
+  // According to the react-native-testing-library docs, if we're using
+  // fake timers, tests that use async/await will stall.
+  jest.useRealTimers()
 })
 
-it('renders for no transactions', () => {
-  const tree = renderer.create(
+it('renders the received data along with the standby transactions', async () => {
+  const store = createMockStore({
+    transactions: { standbyTransactions },
+  })
+
+  const { getByType, toJSON } = render(
     <Provider store={store}>
-      <TransactionList currency={CURRENCY_ENUM.DOLLAR} />
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <TransactionsList currency={CURRENCY_ENUM.DOLLAR} />
+      </MockedProvider>
     </Provider>
   )
-  expect(tree).toMatchSnapshot()
+
+  const feed = await waitForElement(() => getByType(TransactionFeed))
+  expect(feed.props.data.length).toEqual(3)
+  expect(toJSON()).toMatchSnapshot()
 })
 
-it('renders for error', () => {
-  const tree = renderer.create(
+it('ignores pending standby transactions that are completed in the response and removes them', async () => {
+  const store = createMockStore({
+    transactions: { standbyTransactions: pendingStandbyTransactions },
+  })
+
+  const { getByType, toJSON } = render(
     <Provider store={store}>
-      <TransactionList currency={CURRENCY_ENUM.DOLLAR} />
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <TransactionsList currency={CURRENCY_ENUM.DOLLAR} />
+      </MockedProvider>
     </Provider>
   )
-  expect(tree).toMatchSnapshot()
+
+  expect(store.getActions()).toEqual([])
+
+  const feed = await waitForElement(() => getByType(TransactionFeed))
+  expect(feed.props.data.length).toEqual(2)
+  expect(toJSON()).toMatchSnapshot()
+
+  expect(store.getActions()).toEqual([
+    { type: 'TRANSACTIONS/REMOVE_STANDBY_TRANSACTION', idx: 'a-standby-tx-id' },
+  ])
 })
 
-it('renders for loading', () => {
-  const tree = renderer.create(
-    <Provider store={store}>
-      <TransactionList currency={CURRENCY_ENUM.DOLLAR} />
-    </Provider>
-  )
-  expect(tree).toMatchSnapshot()
-})
+it('ignores failed standby transactions', async () => {
+  const store = createMockStore({
+    transactions: { standbyTransactions: failedStandbyTransactions },
+  })
 
-it('renders for standbyTransactions', () => {
-  const tree = renderer.create(
+  const { getByType, toJSON } = render(
     <Provider store={store}>
-      <TransactionsListClass
-        currency={CURRENCY_ENUM.DOLLAR}
-        standbyTransactions={standbyTransactions}
-        localCurrencyCode={LocalCurrencyCode.MXN}
-        localCurrencyExchangeRate="1.33"
-        removeStandbyTransaction={jest.fn()}
-      />
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <TransactionsList currency={CURRENCY_ENUM.DOLLAR} />
+      </MockedProvider>
     </Provider>
   )
-  expect(tree).toMatchSnapshot()
-})
 
-it('filters out Failed', () => {
-  const tree = renderer.create(
-    <Provider store={store}>
-      <TransactionsListClass
-        currency={CURRENCY_ENUM.DOLLAR}
-        standbyTransactions={failedExchange}
-        localCurrencyCode={LocalCurrencyCode.MXN}
-        localCurrencyExchangeRate="1.33"
-        removeStandbyTransaction={jest.fn()}
-      />
-    </Provider>
-  )
-  expect(tree).toMatchSnapshot()
-})
-
-it('renders for gold to dollar exchange properly', () => {
-  const tree = renderer.create(
-    <Provider store={store}>
-      <TransactionList currency={CURRENCY_ENUM.DOLLAR} />
-    </Provider>
-  )
-  expect(tree).toMatchSnapshot()
+  const feed = await waitForElement(() => getByType(TransactionFeed))
+  expect(feed.props.data.length).toEqual(2)
+  expect(toJSON()).toMatchSnapshot()
 })
