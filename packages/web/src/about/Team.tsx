@@ -23,7 +23,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
     const isTablet = screen === ScreenSizes.TABLET
     const isMobile = screen === ScreenSizes.MOBILE
     return (
-      <>
+      <View nativeID="contributors">
         <BookLayout label={t('teamTitle')} startBlock={true}>
           <Text style={[fonts.p, standardStyles.sectionMarginBottomMobile]}>{t('teamCopy')} </Text>
         </BookLayout>
@@ -66,7 +66,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
             </View>
           </Cell>
         </GridRow>
-      </>
+      </View>
     )
   }
 }

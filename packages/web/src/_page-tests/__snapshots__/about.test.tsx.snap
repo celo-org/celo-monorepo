@@ -1973,142 +1973,24 @@ exports[`About renders 1`] = `
   </div>
   <div
     className="css-view-1dbjc4n"
-    style={
-      Object {
-        "WebkitAlignSelf": "center",
-        "WebkitBoxDirection": "normal",
-        "WebkitBoxOrient": "vertical",
-        "WebkitFlexDirection": "column",
-        "alignSelf": "center",
-        "flexDirection": "column",
-        "marginTop": "50px",
-        "maxWidth": "100vw",
-        "msFlexDirection": "column",
-        "msFlexItemAlign": "center",
-        "paddingLeft": "10px",
-        "paddingRight": "10px",
-        "width": "100%",
-      }
-    }
+    id="contributors"
   >
     <div
       className="css-view-1dbjc4n"
       style={
         Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
+          "WebkitAlignSelf": "center",
+          "WebkitBoxDirection": "normal",
+          "WebkitBoxOrient": "vertical",
+          "WebkitFlexDirection": "column",
+          "alignSelf": "center",
+          "flexDirection": "column",
+          "marginTop": "50px",
+          "maxWidth": "100vw",
+          "msFlexDirection": "column",
+          "msFlexItemAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <h3
-        aria-level="3"
-        className="css-reset-4rbku5 css-text-901oao"
-        dir="auto"
-        role="heading"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "24px",
-            "lineHeight": "32px",
-            "textRendering": "geometricPrecision",
-            "textTransform": "none",
-          }
-        }
-      >
-        teamTitle
-      </h3>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "20px",
-            "lineHeight": "28px",
-            "marginBottom": "50px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        teamCopy
-         
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "WebkitAlignSelf": "center",
-        "WebkitBoxDirection": "normal",
-        "WebkitBoxOrient": "vertical",
-        "WebkitFlexDirection": "column",
-        "alignSelf": "center",
-        "flexDirection": "column",
-        "maxWidth": "100vw",
-        "msFlexDirection": "column",
-        "msFlexItemAlign": "center",
-        "paddingLeft": "10px",
-        "paddingRight": "10px",
-        "width": "100%",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitAlignItems": "center",
-          "WebkitBoxAlign": "center",
-          "WebkitBoxFlex": 0,
-          "WebkitBoxPack": "center",
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "WebkitJustifyContent": "center",
-          "alignItems": "center",
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "justifyContent": "center",
-          "msFlexAlign": "center",
-          "msFlexNegative": 0,
-          "msFlexPack": "center",
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
           "width": "100%",
         }
       }
@@ -2117,14 +1999,121 @@ exports[`About renders 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
-            "display": "grid",
-            "gridColumnGap": "40px",
-            "gridRowGap": "55px",
-            "gridTemplateColumns": "repeat(3, 1fr)",
-            "minHeight": "50vh",
-            "msGridColumnGap": "40px",
-            "msGridRowGap": "55px",
-            "msGridTemplateColumns": "repeat(3, 1fr)",
+            "WebkitBoxFlex": 0,
+            "WebkitFlexGrow": 0,
+            "WebkitFlexShrink": 0,
+            "flexGrow": 0,
+            "flexShrink": 0,
+            "msFlexNegative": 0,
+            "msFlexPositive": 0,
+            "paddingBottom": "10px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "10px",
+            "width": "100%",
+          }
+        }
+      >
+        <h3
+          aria-level="3"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "24px",
+              "lineHeight": "32px",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          teamTitle
+        </h3>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxFlex": 0,
+            "WebkitFlexGrow": 0,
+            "WebkitFlexShrink": 0,
+            "flexGrow": 0,
+            "flexShrink": 0,
+            "msFlexNegative": 0,
+            "msFlexPositive": 0,
+            "paddingBottom": "10px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "10px",
+            "width": "100%",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "marginBottom": "50px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          teamCopy
+           
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignSelf": "center",
+          "WebkitBoxDirection": "normal",
+          "WebkitBoxOrient": "vertical",
+          "WebkitFlexDirection": "column",
+          "alignSelf": "center",
+          "flexDirection": "column",
+          "maxWidth": "100vw",
+          "msFlexDirection": "column",
+          "msFlexItemAlign": "center",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxPack": "center",
+            "WebkitFlexGrow": 0,
+            "WebkitFlexShrink": 0,
+            "WebkitJustifyContent": "center",
+            "alignItems": "center",
+            "flexGrow": 0,
+            "flexShrink": 0,
+            "justifyContent": "center",
+            "msFlexAlign": "center",
+            "msFlexNegative": 0,
+            "msFlexPack": "center",
+            "msFlexPositive": 0,
+            "paddingBottom": "10px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "10px",
+            "width": "100%",
           }
         }
       >
@@ -2132,19 +2121,35 @@ exports[`About renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "height": "50px",
-              "width": "50px",
+              "display": "grid",
+              "gridColumnGap": "40px",
+              "gridRowGap": "55px",
+              "gridTemplateColumns": "repeat(3, 1fr)",
+              "minHeight": "50vh",
+              "msGridColumnGap": "40px",
+              "msGridRowGap": "55px",
+              "msGridTemplateColumns": "repeat(3, 1fr)",
             }
           }
         >
-          <span
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
-                "height": "100%",
-                "width": "100%",
+                "height": "50px",
+                "width": "50px",
               }
             }
-          />
+          >
+            <span
+              style={
+                Object {
+                  "height": "100%",
+                  "width": "100%",
+                }
+              }
+            />
+          </div>
         </div>
       </div>
     </div>
