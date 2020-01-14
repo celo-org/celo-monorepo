@@ -39,6 +39,43 @@ interface State {
   switchOnModalVisible: boolean
 }
 
+interface ModalProps {
+  isVisible: boolean
+  header: string
+  body: string
+  continueTitle: string
+  cancelTitle: string
+  onCancel: () => void
+  onContinue: () => void
+}
+
+function WarningModal({
+  isVisible,
+  header,
+  body,
+  continueTitle,
+  cancelTitle,
+  onCancel,
+  onContinue,
+}: ModalProps) {
+  return (
+    <Modal isVisible={isVisible}>
+      <View style={styles.modalContainer}>
+        <Text style={styles.modalHeader}>{header}</Text>
+        <Text style={fontStyles.body}>{body}</Text>
+        <View style={styles.modalButtonsContainer}>
+          <TextButton onPress={onCancel} style={styles.modalCancelText}>
+            {cancelTitle}
+          </TextButton>
+          <TextButton onPress={onContinue} style={styles.modalSkipText}>
+            {continueTitle}
+          </TextButton>
+        </View>
+      </View>
+    </Modal>
+  )
+}
+
 export class DataSaver extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
@@ -99,40 +136,24 @@ export class DataSaver extends React.Component<Props, State> {
         >
           <Text style={fontStyles.body}>{t('enableDataSaver')}</Text>
         </SettingsSwitchItem>
-        <Modal isVisible={this.state.switchOffModalVisible}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('restartModalSwitchOff.header')}</Text>
-            <Text style={fontStyles.body}>{t('restartModalSwitchOff.body')}</Text>
-            <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.hideSwitchOffModal} style={styles.modalCancelText}>
-                {t('global:cancel')}
-              </TextButton>
-              <TextButton
-                onPress={this.onPressToggleWithSwitchOffModal}
-                style={styles.modalSkipText}
-              >
-                {t('restartModalSwitchOff.restart')}
-              </TextButton>
-            </View>
-          </View>
-        </Modal>
-        <Modal isVisible={this.state.switchOnModalVisible}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('restartModalSwitchOn.header')}</Text>
-            <Text style={fontStyles.body}>{t('restartModalSwitchOn.body')}</Text>
-            <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.hideSwitchOnModal} style={styles.modalCancelText}>
-                {t('global:cancel')}
-              </TextButton>
-              <TextButton
-                onPress={this.onPressToggleWithSwitchOnModal}
-                style={styles.modalSkipText}
-              >
-                {t('restartModalSwitchOn.understand')}
-              </TextButton>
-            </View>
-          </View>
-        </Modal>
+        <WarningModal
+          isVisible={this.state.switchOffModalVisible}
+          header={t('restartModalSwitchOff.header')}
+          body={t('restartModalSwitchOff.body')}
+          continueTitle={t('restartModalSwitchOff.restart')}
+          cancelTitle={t('global:cancel')}
+          onCancel={this.hideSwitchOffModal}
+          onContinue={this.onPressToggleWithSwitchOffModal}
+        />
+        <WarningModal
+          isVisible={this.state.switchOnModalVisible}
+          header={t('restartModalSwitchOn.header')}
+          body={t('restartModalSwitchOn.body')}
+          continueTitle={t('restartModalSwitchOn.understand')}
+          cancelTitle={t('global:cancel')}
+          onCancel={this.hideSwitchOnModal}
+          onContinue={this.onPressToggleWithSwitchOnModal}
+        />
       </ScrollView>
     )
   }
