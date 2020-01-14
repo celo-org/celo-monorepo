@@ -241,7 +241,7 @@ describe('slashing tests', function(this: any) {
 
       // Penalty is defined to be 100 cGLD in migrations, locked gold is 10000 cGLD for a validator
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      assert.equal(balance.toString(10), '99000000000000000000000')
+      assert.equal(balance.toString(10), '9900000000000000000000')
     })
   })
 })
