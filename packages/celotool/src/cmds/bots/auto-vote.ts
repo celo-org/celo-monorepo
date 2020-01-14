@@ -2,6 +2,8 @@
 // behavior by validators. This introduces some non-validator stakers into the
 // network that will judge the validator groups, and vote accordingly.
 import { ContractKit, newKit } from '@celo/contractkit'
+import { Address, NULL_ADDRESS } from '@celo/contractkit/lib/base'
+import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -67,7 +69,16 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
 
         console.info(`Voting as: ${botAccount}.`)
         try {
-          await castVote(kit, botAccount, groupWeights, groupCapacities)
+          const currentVotes = (await election.getVoter(botAccount)).votes
+          const currentGroups = currentVotes.map((v) => v.group)
+          const randomlySelectedGroup = getWeightedRandomChoice(
+            groupWeights,
+            [...groupCapacities.keys()].filter((k) => {
+              const capacity = groupCapacities.get(k)
+              return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
+            })
+          )
+          await castVote(kit, botAccount, randomlySelectedGroup, groupCapacities)
         } catch (error) {
           console.error(`Failed to vote as ${botAccount}`)
           console.info(error)
@@ -84,7 +95,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
 async function castVote(
   kit: ContractKit,
   botAccount: string,
-  groupWeights: Map<string, BigNumber>,
+  voteForGroup: Address,
   groupCapacities: Map<string, BigNumber>
 ) {
   const lockedGold = await kit.contracts.getLockedGold()
@@ -97,15 +108,6 @@ async function castVote(
   }
 
   const currentVotes = (await election.getVoter(botAccount)).votes
-  const currentGroups = currentVotes.map((v) => v.group)
-
-  const randomlySelectedGroup = getWeightedRandomChoice(
-    groupWeights,
-    [...groupCapacities.keys()].filter((k) => {
-      const capacity = groupCapacities.get(k)
-      return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
-    })
-  )
 
   // Revoke existing vote(s) if any and update capacity of the group
   for (const vote of currentVotes) {
@@ -117,13 +119,32 @@ async function castVote(
     groupCapacities.set(vote.group, oldCapacity.plus(vote.pending.plus(vote.active)))
   }
 
-  const groupCapacity = groupCapacities.get(randomlySelectedGroup)!
+  const groupCapacity = groupCapacities.get(voteForGroup)!
   const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
-  const voteTx = await election.vote(randomlySelectedGroup, BigNumber.minimum(voteAmount))
+  const voteTx = await election.vote(voteForGroup, BigNumber.minimum(voteAmount))
   await voteTx.sendAndWaitForReceipt({ from: botAccount })
   console.info(`Completed voting as ${botAccount}`)
 
-  groupCapacities.set(randomlySelectedGroup, groupCapacity.minus(voteAmount))
+  groupCapacities.set(voteForGroup, groupCapacity.minus(voteAmount))
+}
+
+// After saturation, explore never-elected-Validator-Groups in FIFO order.
+// @ts-ignore: declared but its value is never read.
+async function getNextNeverElectedValidatorGroup(kit: ContractKit): Promise<Address> {
+  const validators = await kit.contracts.getValidators()
+  const groups = await validators.getRegisteredValidatorGroups()
+  // Sort Validator Groups by max(ValidatorGroup.sizeHistory), e.g. last Validator.member update timestamp.
+  groups.sort((a, b) => a.membersUpdated - b.membersUpdated)
+  for (const group of groups) {
+    const groupValidators: Validator[] = await concurrentMap(10, group.members, (member) =>
+      validators.getValidator(member)
+    )
+    // If no member validator has a score then this group hasn't been elected since group.membersUpdated
+    if (0 === groupValidators.reduce((a, b) => a.plus(b.score), new BigNumber(0)).toNumber()) {
+      return group.address
+    }
+  }
+  return NULL_ADDRESS
 }
 
 async function calculateGroupWeights(kit: ContractKit): Promise<Map<string, BigNumber>> {
