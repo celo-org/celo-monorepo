@@ -12,7 +12,6 @@ const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
 const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
 export async function canTrack() {
-  console.log('cantrack')
   return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME) || !(await isInEU())
 }
 

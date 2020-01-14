@@ -104,6 +104,5 @@ export function getDeviceMemory(): MemoryGB {
 }
 
 export function isBrowser() {
-  console.log('process.browser')
   return process.browser
 }
