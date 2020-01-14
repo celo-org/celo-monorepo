@@ -62,14 +62,14 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
     ])
 
     for (const [name, contract] of Object.entries({ exchange, epochRewards })) {
-      if (contract == null) {
+      if (contract === null) {
         continue
       }
 
       if (argv.precheck) {
         const frozen = await contract.methods.frozen().call()
         // console.debug(`${name}.frozen = ${frozen}`)
-        if (argv.freeze == frozen) {
+        if (argv.freeze === frozen) {
           console.error(`${name} is already ${argv.freeze ? 'frozen' : 'unfrozen'}. Skipping.`)
           continue
         }
@@ -93,7 +93,7 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
       if (argv.verify) {
         const frozen = await contract.methods.frozen().call()
         // console.debug(`${name}.frozen = ${frozen}`)
-        if (argv.freeze != frozen) {
+        if (argv.freeze !== frozen) {
           console.error(
             `${name} is not ${argv.freeze ? 'frozen' : 'unfrozen'}. Something went wrong.`
           )
