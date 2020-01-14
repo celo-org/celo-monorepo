@@ -62,7 +62,14 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
     logger: consoleLogger,
     timeInBetweenMS: 5000,
     initialDelayMS: 5000,
-    pollCondition: async () => !(await kit.isListening()),
+    pollCondition: async () => {
+      try {
+        return !(await kit.isListening())
+      } catch (error) {
+        console.error(error)
+        return true
+      }
+    },
     onSuccess: () => endExporter({ reason: 'not-listening' }),
   })
 

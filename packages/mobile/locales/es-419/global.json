@@ -101,7 +101,7 @@
   "or": "o",
   "accepted": "Aceptado",
   "processing": "Procesando",
-  "moreWithCount": "~~+{{count }} more",
+  "moreWithCount": "+{{count }} más",
   "unknown": "Desconocido",
   "emptyList": "Lista vacía",
   "timeframes": {
