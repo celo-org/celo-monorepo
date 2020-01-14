@@ -2,8 +2,7 @@
 // behavior by validators. This introduces some non-validator stakers into the
 // network that will judge the validator groups, and vote accordingly.
 import { ContractKit, newKit } from '@celo/contractkit'
-import { Address, NULL_ADDRESS } from '@celo/contractkit/lib/base'
-import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
+import { Address } from '@celo/contractkit/lib/base'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -38,15 +37,18 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     const election = await kit.contracts.getElection()
     const validators = await kit.contracts.getValidators()
 
-    const changeVoteProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_CHANGE_PROBABILITY))
+    const wakeProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_WAKE_PROBABILITY))
+    const baseChangeProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_CHANGE_BASELINE))
+    const exploreProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_EXPLORE_PROBABILITY))
+    const scoreSensitivity = new BigNumber(fetchEnv(envVar.VOTING_BOT_SCORE_SENSITIVITY))
 
     const allBotKeys = getPrivateKeysFor(AccountType.VOTING_BOT, mnemonic, numBotAccounts)
     await activatePendingVotes(kit, allBotKeys)
 
     const botKeysVotingThisRound = allBotKeys.filter((_) =>
-      changeVoteProbability.isGreaterThan(Math.random())
+      wakeProbability.isGreaterThan(Math.random())
     )
-    console.info(`Voting this time: ${botKeysVotingThisRound.length} of ${numBotAccounts}`)
+    console.info(`Participating this time: ${botKeysVotingThisRound.length} of ${numBotAccounts}`)
 
     if (botKeysVotingThisRound.length > 0) {
       console.info('Determining which groups have capacity for more votes')
@@ -59,7 +61,10 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
       }
 
       console.info('Calculating weights of groups based on the scores of elected validators')
-      const groupWeights = await calculateGroupWeights(kit)
+      const groupScores = await calculateGroupScores(kit)
+      const groupWeights = calculateGroupWeights(groupScores, scoreSensitivity)
+
+      const unelectedGroups = Object.keys(groupCapacities).filter((k) => !groupScores.has(k))
 
       for (const key of botKeysVotingThisRound) {
         const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
@@ -69,16 +74,42 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
 
         console.info(`Voting as: ${botAccount}.`)
         try {
-          const currentVotes = (await election.getVoter(botAccount)).votes
-          const currentGroups = currentVotes.map((v) => v.group)
-          const randomlySelectedGroup = getWeightedRandomChoice(
-            groupWeights,
-            [...groupCapacities.keys()].filter((k) => {
-              const capacity = groupCapacities.get(k)
-              return capacity && capacity.isGreaterThan(0) && !currentGroups.includes(k)
-            })
-          )
-          await castVote(kit, botAccount, randomlySelectedGroup, groupCapacities)
+          // Get current vote for this bot.
+          // Note: though this returns an array, the bot process only ever chooses one group,
+          // so this takes a shortcut and only looks at the first in the response
+          const currentVote = (await election.getVoter(botAccount)).votes[0]
+          const currentGroup = currentVote.group
+
+          // Handle the case where the group the bot is currently voting for does not have a score
+          if (
+            shouldChangeVote(
+              groupScores.get(currentGroup) || new BigNumber(0),
+              scoreSensitivity,
+              baseChangeProbability
+            )
+          ) {
+            // Decide which method of picking a new group
+            let randomlySelectedGroup: string
+            if (exploreProbability.isGreaterThan(Math.random())) {
+              randomlySelectedGroup = getUnweightedRandomChoice(
+                unelectedGroups.filter((k) => {
+                  const capacity = groupCapacities.get(k)
+                  return capacity && capacity.isGreaterThan(0) && !currentGroup.match(k)
+                })
+              )
+            } else {
+              randomlySelectedGroup = getWeightedRandomChoice(
+                groupWeights,
+                [...groupCapacities.keys()].filter((k) => {
+                  const capacity = groupCapacities.get(k)
+                  return capacity && capacity.isGreaterThan(0) && !currentGroup.match(k)
+                })
+              )
+            }
+            await castVote(kit, botAccount, randomlySelectedGroup, groupCapacities)
+          } else {
+            console.info(`${botAccount} has decided to keep their existing vote`)
+          }
         } catch (error) {
           console.error(`Failed to vote as ${botAccount}`)
           console.info(error)
@@ -128,26 +159,27 @@ async function castVote(
   groupCapacities.set(voteForGroup, groupCapacity.minus(voteAmount))
 }
 
-// After saturation, explore never-elected-Validator-Groups in FIFO order.
-// @ts-ignore: declared but its value is never read.
-async function getNextNeverElectedValidatorGroup(kit: ContractKit): Promise<Address> {
-  const validators = await kit.contracts.getValidators()
-  const groups = await validators.getRegisteredValidatorGroups()
-  // Sort Validator Groups by max(ValidatorGroup.sizeHistory), e.g. last Validator.member update timestamp.
-  groups.sort((a, b) => a.membersUpdated - b.membersUpdated)
-  for (const group of groups) {
-    const groupValidators: Validator[] = await concurrentMap(10, group.members, (member) =>
-      validators.getValidator(member)
-    )
-    // If no member validator has a score then this group hasn't been elected since group.membersUpdated
-    if (0 === groupValidators.reduce((a, b) => a.plus(b.score), new BigNumber(0)).toNumber()) {
-      return group.address
-    }
-  }
-  return NULL_ADDRESS
-}
+// NOTE: commented out becayse this relies on an unpublished contract kit version
+// // After saturation, explore never-elected-Validator-Groups in FIFO order.
+// // @ts-ignore: declared but its value is never read.
+// async function getNextNeverElectedValidatorGroup(kit: ContractKit): Promise<Address> {
+//   const validators = await kit.contracts.getValidators()
+//   const groups = await validators.getRegisteredValidatorGroups()
+//   // Sort Validator Groups by max(ValidatorGroup.sizeHistory), e.g. last Validator.member update timestamp.
+//   groups.sort((a, b) => a.membersUpdated - b.membersUpdated)
+//   for (const group of groups) {
+//     const groupValidators: Validator[] = await concurrentMap(10, group.members, (member) =>
+//       validators.getValidator(member)
+//     )
+//     // If no member validator has a score then this group hasn't been elected since group.membersUpdated
+//     if (0 === groupValidators.reduce((a, b) => a.plus(b.score), new BigNumber(0)).toNumber()) {
+//       return group.address
+//     }
+//   }
+//   return NULL_ADDRESS
+// }
 
-async function calculateGroupWeights(kit: ContractKit): Promise<Map<string, BigNumber>> {
+async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNumber>> {
   const election = await kit.contracts.getElection()
   const validators = await kit.contracts.getValidators()
 
@@ -157,13 +189,33 @@ async function calculateGroupWeights(kit: ContractKit): Promise<Map<string, BigN
   })
 
   const validatorsByGroup = groupBy(validatorAccounts, (validator) => validator.affiliation!)
-  const validatorGroupWeights = mapValues(validatorsByGroup, (vals) => {
+  const validatorGroupScores = mapValues(validatorsByGroup, (vals) => {
     const scoreSum = vals.reduce((a, b) => a.plus(b.score), new BigNumber(0))
-    const avg = scoreSum.dividedBy(vals.length)
-    return avg.pow(20)
+    return scoreSum.dividedBy(vals.length)
   })
 
-  return new Map(Object.entries(validatorGroupWeights))
+  return new Map(Object.entries(validatorGroupScores))
+}
+
+function calculateGroupWeights(
+  groupScores: Map<string, BigNumber>,
+  scoreSensitivity: BigNumber
+): Map<string, BigNumber> {
+  const groupWeights = new Map<string, BigNumber>()
+  for (const group of Object.keys(groupScores)) {
+    const score = groupScores.get(group)
+    if (score && score.isGreaterThan(0)) {
+      groupWeights.set(group, score.pow(scoreSensitivity))
+    } else {
+      groupWeights.set(group, new BigNumber(0))
+    }
+  }
+  return groupWeights
+}
+
+function getUnweightedRandomChoice(groupsToConsider: string[]) {
+  const randomIndex = Math.floor(groupsToConsider.length * Math.random())
+  return groupsToConsider[randomIndex]
 }
 
 function getWeightedRandomChoice(
@@ -212,4 +264,19 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
       }
     }
   })
+}
+
+function shouldChangeVote(
+  score: BigNumber,
+  scoreSensitivity: BigNumber,
+  baseChangeProbability: BigNumber
+): boolean {
+  const scoreBasedProbability = score
+    .pow(scoreSensitivity)
+    .negated()
+    .plus(1)
+  const scaledProbability = scoreBasedProbability.times(baseChangeProbability.negated().plus(1))
+  const totalProbability = scaledProbability.plus(baseChangeProbability)
+
+  return totalProbability.isGreaterThan(Math.random())
 }
