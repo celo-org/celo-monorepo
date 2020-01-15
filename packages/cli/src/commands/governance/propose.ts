@@ -16,7 +16,9 @@ export default class Propose extends BaseCommand {
     from: Flags.address({ required: true, description: "Proposer's address" }),
   }
 
-  static examples = []
+  static examples = [
+    'propose --jsonTransactions ./transactions.json --deposit 10000 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+  ]
 
   async run() {
     const res = this.parse(Propose)
@@ -31,6 +33,11 @@ export default class Propose extends BaseCommand {
       .runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
-    await displaySendTx('proposeTx', governance.propose(proposal), { value: res.flags.deposit })
+    await displaySendTx(
+      'proposeTx',
+      governance.propose(proposal),
+      { value: res.flags.deposit },
+      'ProposalQueued'
+    )
   }
 }

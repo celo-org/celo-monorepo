@@ -13,17 +13,19 @@ export default class Vote extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     proposalID: flags.string({ required: true, description: 'UUID of proposal to vote on' }),
-    vote: flags.enum({ options: Vote.voteOptions, required: true, description: 'Vote' }),
+    value: flags.enum({ options: Vote.voteOptions, required: true, description: 'Vote' }),
     from: Flags.address({ required: true, description: "Voter's address" }),
   }
 
-  static examples = []
+  static examples = [
+    'vote --proposalID 99 --value Yes --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+  ]
 
   async run() {
     const res = this.parse(Vote)
     const signer = res.flags.from
     const id = res.flags.proposalID
-    const voteValue = res.flags.vote as keyof typeof VoteValue
+    const voteValue = res.flags.value as keyof typeof VoteValue
 
     this.kit.defaultAccount = signer
     const governance = await this.kit.contracts.getGovernance()
