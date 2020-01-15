@@ -20,8 +20,7 @@
   "inviteAndSecurityFee": "Comisión de Invitación",
   "amountInCelloDollars": "Cantidad en Celo dólares",
   "localValueHint": "@ {{localValue}} {{localCurrencyCode}}",
-  "feeEducation":
-    "Enviar pagos y hacer cambios incluye una pequeña comisión de seguridad y mantenimiento.",
+  "feeEducation": "Enviar pagos y hacer cambios incluye una pequeña comisión de seguridad y mantenimiento.",
   "learnMore": "Saber más",
   "inviteMoneyEscrow": "Mantendremos este dinero seguro hasta que tu amigo cree una cuenta en Celo",
   "reviewPayment": "Revisar pago",
@@ -45,7 +44,6 @@
   "sentEscrowPayment": "Pago de depósito enviado",
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
-  "unknown": "Desconocido",
   "inviteSMS":
     "Hola{{name}}! Me gustaría invitarte a que te unas a la red de pagos de Celo. Tu código de invitación es: {{code}} Podés instalarte la aplicación Celo desde el siguiente vínculo: {{link}}",
   "inviteSent": "Código de invitación enviado!",
@@ -54,12 +52,10 @@
   "QRCode": "QR código",
   "shareCodeImage": "Compartir imagen de código",
   "scanCode": "Escanear código",
-  "writeStorageNeededForQrDownload":
-    "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
+  "writeStorageNeededForQrDownload": "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
   "cameraScanInfo": "Escanee el código colocándolo en la caja",
   "cameraNotAuthorizedTitle": "Habilitar Cámara",
-  "cameraNotAuthorizedDescription":
-    "Habilite la cámara en la configuración de su teléfono. Lo necesitará para escanear códigos QR.",
+  "cameraNotAuthorizedDescription": "Habilite la cámara en la configuración de su teléfono. Lo necesitará para escanear códigos QR.",
   "cameraSettings": "Configuraciones",
   "showYourQRCode": "Muestra tu código QR",
   "toSentOrRequestPayment": "enviar o solicitar pago",
@@ -74,14 +70,12 @@
   "estimatedFee": "Tarifa estimada: ",
   "verificationCta": {
     "header": "¿Enviar a un amigo?",
-    "body":
-      "Verifique su teléfono y sincronice sus contactos para enviarlos rápidamente a sus amigos.",
+    "body": "Verifique su teléfono y sincronice sus contactos para enviarlos rápidamente a sus amigos.",
     "cta": "Iniciar verificación"
   },
   "importContactsCta": {
     "header": "Importar contactos",
-    "body":
-      "Habilite Contactos en la Configuración de su teléfono para encontrar a sus amigos por nombre.",
+    "body": "Habilite Contactos en la Configuración de su teléfono para encontrar a sus amigos por nombre.",
     "cta": "Configuraciones"
   },
   "contactSyncProgress": {

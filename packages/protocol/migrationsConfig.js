@@ -23,13 +23,13 @@ const DefaultConfig = {
     blockGasLimit: 20000000,
   },
   doubleSigningSlasher: {
-    reward: '10000000000000000000', // 10 cGLD
-    penalty: '1000000000000000000000', // 1000 cGLD
+    reward: '20000000000000000000', // 20 cGLD
+    penalty: '100000000000000000000', // 100 cGLD
   },
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
-    penalty: '1000000000000000000000', // 1000 cGLD
-    slashableDowntime: 5,
+    penalty: '20000000000000000000', // 20 cGLD
+    slashableDowntime: 480,
   },
   election: {
     minElectableValidators: '22',
@@ -132,9 +132,7 @@ const DefaultConfig = {
     attestationKeys: [],
     groupName: 'C-Labs',
     commission: 0.1,
-    groupLockedGold: {
-      value: '22000000000000000000000', // 22k gold per group
-    },
+    votesRatioOfLastVsFirstGroup: 2.0,
   },
 }
 
