@@ -124,6 +124,10 @@ export class Account extends React.Component<Props, State> {
     navigateToURI(TOS_LINK)
   }
 
+  goToFiatExchange() {
+    navigate(Screens.FiatExchange)
+  }
+
   resetAppOpenedState = () => {
     this.props.resetAppOpenedState()
     Logger.showMessage('App onboarding state reset.')
@@ -201,6 +205,11 @@ export class Account extends React.Component<Props, State> {
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.showDebugScreen}>
               <Text>Show Debug Screen</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={style.devSettingsItem}>
+            <TouchableOpacity onPress={this.goToFiatExchange}>
+              <Text>Show Fiat Exchange</Text>
             </TouchableOpacity>
           </View>
           <View style={style.devSettingsItem}>
