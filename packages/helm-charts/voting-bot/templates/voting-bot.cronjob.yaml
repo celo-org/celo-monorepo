@@ -32,8 +32,14 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.environment }}-voting-bot-secrets
                   key: mnemonic
-            - name: VOTING_BOT_CHANGE_PROBABILITY
-              value: {{ .Values.voteChangeProbability | quote }}
+            - name: VOTING_BOT_CHANGE_BASELINE
+              value: {{ .Values.votingBot.changeBaseline | quote }}
+            - name: VOTING_BOT_EXPLORE_PROBABILITY
+              value: {{ .Values.votingBot.exploreProbability | quote }}
+            - name: VOTING_BOT_SCORE_SENSITIVITY
+              value: {{ .Values.votingBot.scoreSensitivity | quote }}
+            - name: VOTING_BOT_WAKE_PROBABILITY
+              value: {{ .Values.votingBot.wakeProbability | quote }}
             - name: VOTING_BOTS
-              value: {{ .Values.votingBotCount | quote }}
+              value: {{ .Values.votingBot.count | quote }}
           restartPolicy: Never

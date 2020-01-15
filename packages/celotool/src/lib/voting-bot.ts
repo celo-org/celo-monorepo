@@ -77,8 +77,11 @@ function helmParameters(celoEnv: string) {
     `--set imageRepository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
     `--set imageTag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
-    `--set votingBotCount=${fetchEnv(envVar.VOTING_BOTS)}`,
-    `--set voteChangeProbability="${fetchEnv(envVar.VOTING_BOT_CHANGE_PROBABILITY)}"`,
+    `--set votingBot.changeBaseline="${fetchEnv(envVar.VOTING_BOT_CHANGE_BASELINE)}"`,
+    `--set votingBot.count=${fetchEnv(envVar.VOTING_BOTS)}`,
+    `--set votingBot.exploreProbability="${fetchEnv(envVar.VOTING_BOT_EXPLORE_PROBABILITY)}"`,
+    `--set votingBot.scoreSensitivity="${fetchEnv(envVar.VOTING_BOT_SCORE_SENSITIVITY)}"`,
+    `--set votingBot.wakeProbability="${fetchEnv(envVar.VOTING_BOT_WAKE_PROBABILITY)}"`,
   ]
 }
 

@@ -91,6 +91,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
             // Decide which method of picking a new group
             let randomlySelectedGroup: string
             if (exploreProbability.isGreaterThan(Math.random())) {
+              console.info('Vote Method: unweighted random choice of unelected')
               randomlySelectedGroup = getUnweightedRandomChoice(
                 unelectedGroups.filter((k) => {
                   const capacity = groupCapacities.get(k)
@@ -98,6 +99,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
                 })
               )
             } else {
+              console.info('Vote Method: weighted random choice among those with scores')
               randomlySelectedGroup = getWeightedRandomChoice(
                 groupWeights,
                 [...groupCapacities.keys()].filter((k) => {
@@ -189,6 +191,7 @@ async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNu
   })
 
   const validatorsByGroup = groupBy(validatorAccounts, (validator) => validator.affiliation!)
+
   const validatorGroupScores = mapValues(validatorsByGroup, (vals) => {
     const scoreSum = vals.reduce((a, b) => a.plus(b.score), new BigNumber(0))
     return scoreSum.dividedBy(vals.length)
@@ -202,7 +205,7 @@ function calculateGroupWeights(
   scoreSensitivity: BigNumber
 ): Map<string, BigNumber> {
   const groupWeights = new Map<string, BigNumber>()
-  for (const group of Object.keys(groupScores)) {
+  for (const group of groupScores.keys()) {
     const score = groupScores.get(group)
     if (score && score.isGreaterThan(0)) {
       groupWeights.set(group, score.pow(scoreSensitivity))
