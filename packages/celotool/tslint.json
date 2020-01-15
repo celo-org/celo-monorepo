@@ -7,6 +7,7 @@
     "no-relative-imports": false,
     "max-classes-per-file": [true, 2],
     "no-global-arrow-functions": false,
-    "no-floating-promises": true
+    "no-floating-promises": true,
+    "no-bitwise": false
   }
 }

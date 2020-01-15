@@ -26,7 +26,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged",
+      "pre-commit": "pretty-quick --staged --pattern '**/*.+(ts|tsx|js|jsx|sol|java)'",
       "pre-push": "node ./scripts/hooks/pre-push.js"
     }
   },
@@ -35,7 +35,8 @@
       "packages/*"
     ],
     "nohoist": [
-      "**/openzeppelin-solidity"
+      "**/openzeppelin-solidity",
+      "**/solidity-bytes-utils"
     ]
   },
   "devDependencies": {
