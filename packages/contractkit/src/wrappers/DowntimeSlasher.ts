@@ -50,7 +50,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
       this.contract.methods
         .isDown(startBlock, startSignerIndex, endSignerIndex)
         // @ts-ignore: Expected 0-1 arguments, but got 2
-        .call({}, startBlock + period)
+        .call({}, startBlock + period + 1)
     )
   }
 
@@ -143,15 +143,6 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
       incentives.penalty,
       slashValidator.list
     )
-
-    console.info(
-      'validator',
-      slashValidator.lessers,
-      slashValidator.greaters,
-      slashValidator.indices
-    )
-
-    console.info('group', slashGroup.lessers, slashGroup.greaters, slashGroup.indices)
 
     return toTransactionObject(
       this.kit,

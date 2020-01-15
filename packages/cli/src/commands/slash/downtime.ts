@@ -22,7 +22,10 @@ export default class Downtime extends BaseCommand {
     const block = res.flags.block
 
     const slasher = await kit.contracts.getDowntimeSlasher()
-    // const election = await kit._web3Contracts.getElection()
+
+    const election = await kit.contracts.getElection()
+    // const lst = await election.getEligibleValidatorGroupsVotes()
+    // lst.forEach((a) => console.log(a))
 
     const period = await slasher.slashableDowntime()
 
@@ -51,6 +54,32 @@ export default class Downtime extends BaseCommand {
     )
 
     console.log('start index', startIndex, 'end index', endIndex)
+
+    const votedGroups = await election.getGroupsVotedForByAccount(address)
+
+    console.log(votedGroups)
+
+    const incentives = await slasher.slashingIncentives()
+    const membership = await validators.getValidatorMembershipHistoryIndex(address, block)
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const slashValidator = await lockedGold.computeInitialParametersForSlashing(
+      address,
+      incentives.penalty
+    )
+    const slashGroup = await lockedGold.computeParametersForSlashing(
+      membership.group,
+      incentives.penalty,
+      slashValidator.list
+    )
+
+    console.info(
+      'validator',
+      slashValidator.lessers,
+      slashValidator.greaters,
+      slashValidator.indices
+    )
+
+    console.info('group', slashGroup.lessers, slashGroup.greaters, slashGroup.indices)
 
     await slasher.slashValidator(address, block)
 
