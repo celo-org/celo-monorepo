@@ -479,12 +479,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentSignerSet(): Promise<Address[]> {
     const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
-    const validators = []
-    for (let i = 0; i < n; i++) {
-      const signer = await this.contract.methods.validatorSignerAddressFromCurrentSet(i).call()
-      validators.push(signer)
-    }
-    return validators
+    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+      this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
+    )
   }
 
   /**
@@ -492,10 +489,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentValidatorAccountsSet() {
     const signerAddresses = await this.currentSignerSet()
-    const accountAddresses = await concurrentMap(5, signerAddresses, (addr) =>
-      this.validatorSignerToAccount(addr)
-    )
-
+    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
     return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
   }
 }

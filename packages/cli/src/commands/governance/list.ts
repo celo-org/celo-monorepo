@@ -24,7 +24,7 @@ export default class List extends BaseCommand {
     sortedQueue.map(printValueMap)
 
     const dequeue = await governance.getDequeue()
-    const stages = await concurrentMap(5, dequeue, (id) => governance.getProposalStage(id))
+    const stages = await concurrentMap(5, dequeue, governance.getProposalStage)
     const proposals = zip((proposalID, stage) => ({ proposalID, stage }), dequeue, stages)
 
     console.log(chalk`{blue.bold Dequeued Proposals:}`)
