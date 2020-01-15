@@ -14,7 +14,9 @@ export default class PrepareHotfix extends BaseCommand {
     hash: flags.string({ required: true, description: 'Hash of hotfix transactions' }),
   }
 
-  static examples = []
+  static examples = [
+    'preparehotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+  ]
 
   async run() {
     const res = this.parse(PrepareHotfix)
