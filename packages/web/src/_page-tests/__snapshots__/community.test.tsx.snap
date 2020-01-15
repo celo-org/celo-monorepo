@@ -2586,6 +2586,7 @@ exports[`Community renders 1`] = `
               }
             >
               <div
+                aria-label="loading"
                 className="css-view-1dbjc4n"
                 style={
                   Object {
@@ -2873,6 +2874,7 @@ exports[`Community renders 1`] = `
           }
         >
           <div
+            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
@@ -2931,6 +2933,7 @@ exports[`Community renders 1`] = `
           }
         >
           <div
+            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
@@ -2989,6 +2992,7 @@ exports[`Community renders 1`] = `
           }
         >
           <div
+            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
