@@ -224,8 +224,6 @@ export class BlockscoutAPI extends RESTDataSource {
     const events: any[] = []
     const userAddress = args.address.toLowerCase()
 
-    console.log('==rawTx', rawTransactions)
-
     // Mapping to figure out what event each raw transaction belongs to
     const txHashToEventTransactions = new Map<string, any>()
     for (const tx of rawTransactions) {

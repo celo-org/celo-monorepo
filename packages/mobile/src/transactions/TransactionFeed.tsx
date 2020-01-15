@@ -62,7 +62,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  // TODO(cmcewen): Clean this up. Standby txs should have the same data shape
   renderItem = (commentKeyBuffer: Buffer | null) => ({
     item: tx,
   }: {
@@ -98,49 +97,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
     }
 
     return <React.Fragment />
-
-    // // @ts-ignore
-    // if (tx.__typename && tx.__typename === EventTypeNames.Transfer) {
-    //   return (
-    //     // @ts-ignore
-    //     <TransferFeedItem
-    //       status={TransactionStatus.Complete}
-    //       invitees={invitees}
-    //       addressToE164Number={addressToE164Number}
-    //       recipientCache={recipientCache}
-    //       commentKey={commentKeyBuffer}
-    //       showLocalCurrency={kind === FeedType.HOME}
-    //       {...tx}
-    //     />
-    //   )
-    //   // @ts-ignore
-    // } else if (tx.__typename && tx.__typename === EventTypeNames.Exchange) {
-    //   return (
-    //     // @ts-ignore
-    //     <ExchangeFeedItem
-    //       status={TransactionStatus.Complete}
-    //       showGoldAmount={kind === FeedType.EXCHANGE}
-    //       {...tx}
-    //     />
-    //   )
-    // } else if (tx.type && tx.type === TransactionType.Exchange) {
-    //   // @ts-ignore
-    //   return <ExchangeFeedItem showGoldAmount={kind === FeedType.EXCHANGE} {...tx} />
-    // } else if (tx.type) {
-    //   return (
-    //     // @ts-ignore
-    //     <TransferFeedItem
-    //       recipientCache={recipientCache}
-    //       addressToE164Number={addressToE164Number}
-    //       invitees={invitees}
-    //       commentKey={commentKeyBuffer}
-    //       showLocalCurrency={kind === FeedType.HOME}
-    //       {...tx}
-    //     />
-    //   )
-    // } else {
-    //   return <React.Fragment />
-    // }
   }
 
   keyExtractor = (item: TransactionFeedFragment) => {
@@ -155,21 +111,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
       return <NoActivity kind={kind} loading={loading} error={error} />
     }
 
-    // const events = data?.transactions?.edges.map((edge) => edge.node) ?? []
     const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
-
-    // const queryDataTxIDs = new Set(events.map((event) => event?.hash))
-    // const notInQueryTxs = (tx: StandbyTransaction) =>
-    //   !queryDataTxIDs.has(tx.id) && tx.status !== TransactionStatus.Failed
-    // let filteredStandbyTxs = standbyTransactions.filter(notInQueryTxs)
-
-    // if (transactionFilter) {
-    //   filteredStandbyTxs = filteredStandbyTxs.filter(transactionFilter)
-    // }
-
-    console.log('==data', data)
-
-    // const txData = [...filteredStandbyTxs, ...events]
 
     if (data && data.length > 0) {
       return (

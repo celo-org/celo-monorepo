@@ -51,10 +51,6 @@ export interface TransactionArgs {
   address: string
   token: 'cUSD' | 'cGLD'
   localCurrencyCode: string
-  // startblock?: number
-  // endblock?: number
-  // page?: number
-  // offset?: number
 }
 
 export interface ExchangeRate {
@@ -237,7 +233,6 @@ export const resolvers = {
   Query: {
     events: async (_source: any, args: EventArgs, context: Context) => {
       const { dataSources } = context
-      console.log('==context events', context)
       return dataSources.blockscoutAPI.getFeedEvents(args)
     },
     rewards: async (_source: any, args: EventArgs, { dataSources }: Context) => {
@@ -245,7 +240,6 @@ export const resolvers = {
     },
     transactions: async (_source: any, args: TransactionArgs, context: Context) => {
       const { dataSources } = context
-      console.log('==context transaction', context)
       context.localCurrencyCode = args.localCurrencyCode
       const transactions = await dataSources.blockscoutAPI.getTransactions(args)
 
@@ -313,8 +307,6 @@ export const resolvers = {
   MoneyAmount: {
     localAmount: async (moneyAmount: MoneyAmount, args: any, context: Context) => {
       const { dataSources, localCurrencyCode } = context
-      console.log('==parent', moneyAmount)
-      console.log('==localcurrencycode', localCurrencyCode)
       const rate = await dataSources.currencyConversionAPI.getExchangeRate({
         sourceCurrencyCode: moneyAmount.currencyCode,
         currencyCode: localCurrencyCode || 'USD',

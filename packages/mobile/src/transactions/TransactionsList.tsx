@@ -60,31 +60,10 @@ export const TRANSACTIONS_QUERY = gql`
   ${TransactionFeed.fragments.transaction}
 `
 
-// export type UserTransactionsComponentProps = Omit<
-//   ApolloReactComponents.QueryComponentOptions<
-//     UserTransactionsQuery,
-//     UserTransactionsQueryVariables
-//   >,
-//   'query'
-// > &
-//   ({ variables: UserTransactionsQueryVariables; skip?: boolean } | { skip: boolean })
-
 class UserTransactionsComponent extends Query<
   UserTransactionsQuery,
   UserTransactionsQueryVariables
 > {}
-
-// const UserTransactionsComponent = (props: UserTransactionsComponentProps) => (
-//   <ApolloReactComponents.Query<UserTransactionsQuery, UserTransactionsQueryVariables>
-//     query={UserTransactionsDocument}
-//     {...props}
-//   />
-// )
-
-// export type UserTransactionsQueryResult = ApolloReactCommon.QueryResult<
-//   UserTransactionsQuery,
-//   UserTransactionsQueryVariables
-// >
 
 const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
