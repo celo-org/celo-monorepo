@@ -40,7 +40,7 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
     return t('walletAddress')
   }
   // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
-  return t('unknown')
+  return t('global:unknown')
 }
 
 function getE164Number(e164Number?: string, recipient?: Recipient) {
