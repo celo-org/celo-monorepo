@@ -7,17 +7,21 @@
   "sendIssueReport": "Reportar un incidente",
   "analytics": "Estadisticas de uso",
   "shareAnalytics": "Compartir estadisticas de uso",
-  "shareAnalytics_detail":
-    "Recopilamos datos anónimos sobre cómo utiliza Celo para ayudar a mejorar la aplicación para todos.",
+  "shareAnalytics_detail": "Recopilamos datos anónimos sobre cómo utiliza Celo para ayudar a mejorar la aplicación para todos.",
   "dataSaver": "Data Saver",
   "enableDataSaver": "Habilitar Data Saver",
-  "dataSaverDetail":
-    "El modo Data Saver te permite comunicarte con la Red Celo  a través de un nodo confiable. Puedes cambiar este modo en la configuración de la aplicación.",
-  "restartModal": {
+  "dataSaverDetail": "El modo Data Saver te permite comunicarte con la Red Celo  a través de un nodo confiable. Puedes cambiar este modo en la configuración de la aplicación.",
+  "restartModalSwitchOff": {
     "header": "Reiniciar para apagar Data Saver",
     "body": "Para encender y apagar Data Saver repetidamente, deberá reiniciar la aplicación.",
     "restart": "Reiniciar para alternar"
   },
+  "restartModalSwitchOn": {
+    "header": "La aplicación se reiniciará",
+    "body": "En caso de ingresar un PIN incorrecto, la aplicación se reiniciará.",
+    "understand": "Entendido"
+  },
+
   "testFaqLink": "Las Preguntas Frecuentes del Monedero Celo",
   "termsOfServiceLink": "Las Condiciones de Servicio",
   "editProfile": "Editar perfil",
