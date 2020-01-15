@@ -219,6 +219,14 @@ export const v4Schema = {
     pincodeType: PincodeType.Unset,
     isSettingPin: false,
   },
+  exchange: {
+    exchangeRatePair: null,
+    history: {
+      isLoading: false,
+      celoGoldExchangeRates: [],
+      lastTimeUpdated: 0,
+    },
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
