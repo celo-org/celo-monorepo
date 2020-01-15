@@ -3,6 +3,7 @@
 // network that will judge the validator groups, and vote accordingly.
 import { ContractKit, newKit } from '@celo/contractkit'
 import { Address } from '@celo/contractkit/lib/base'
+import { NULL_ADDRESS } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -35,7 +36,6 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
 
     const kit = newKit(argv.celoProvider)
     const election = await kit.contracts.getElection()
-    const validators = await kit.contracts.getValidators()
 
     const wakeProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_WAKE_PROBABILITY))
     const baseChangeProbability = new BigNumber(fetchEnv(envVar.VOTING_BOT_CHANGE_BASELINE))
@@ -50,78 +50,92 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     )
     console.info(`Participating this time: ${botKeysVotingThisRound.length} of ${numBotAccounts}`)
 
-    if (botKeysVotingThisRound.length > 0) {
-      console.info('Determining which groups have capacity for more votes')
-      const groupCapacities = new Map<string, BigNumber>()
-      for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
-        const vgv = await election.getValidatorGroupVotes(groupAddress)
-        if (vgv.eligible) {
-          groupCapacities.set(groupAddress, vgv.capacity)
-        }
-      }
+    // If no bots are participating, return early
+    if (botKeysVotingThisRound.length === 0) {
+      return
+    }
 
-      console.info('Calculating weights of groups based on the scores of elected validators')
-      const groupScores = await calculateGroupScores(kit)
-      const groupWeights = calculateGroupWeights(groupScores, scoreSensitivity)
+    const groupCapacities = await calculateInitialGroupCapacities(kit)
+    const groupScores = await calculateGroupScores(kit)
+    const groupWeights = calculateGroupWeights(groupScores, scoreSensitivity)
 
-      const unelectedGroups = Object.keys(groupCapacities).filter((k) => !groupScores.has(k))
+    const unelectedGroups = Object.keys(groupCapacities).filter((k) => !groupScores.has(k))
 
-      for (const key of botKeysVotingThisRound) {
-        const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
+    for (const key of botKeysVotingThisRound) {
+      const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
 
-        kit.addAccount(key)
-        kit.defaultAccount = botAccount
+      kit.addAccount(key)
+      kit.defaultAccount = botAccount
 
-        console.info(`Voting as: ${botAccount}.`)
-        try {
-          // Get current vote for this bot.
-          // Note: though this returns an array, the bot process only ever chooses one group,
-          // so this takes a shortcut and only looks at the first in the response
-          const currentVote = (await election.getVoter(botAccount)).votes[0]
-          const currentGroup = currentVote.group
+      console.info(`Voting as: ${botAccount}.`)
+      try {
+        // Get current vote for this bot.
+        // Note: though this returns an array, the bot process only ever chooses one group,
+        // so this takes a shortcut and only looks at the first in the response
+        const currentVote = (await election.getVoter(botAccount)).votes[0]
+        const currentGroup = currentVote ? currentVote.group : undefined
 
-          // Handle the case where the group the bot is currently voting for does not have a score
-          if (
-            shouldChangeVote(
-              groupScores.get(currentGroup) || new BigNumber(0),
-              scoreSensitivity,
-              baseChangeProbability
+        // Handle the case where the group the bot is currently voting for does not have a score
+        if (
+          !currentGroup ||
+          shouldChangeVote(
+            groupScores.get(currentGroup) || new BigNumber(0),
+            scoreSensitivity,
+            baseChangeProbability
+          )
+        ) {
+          // Decide which method of picking a new group, and pick one if there are unelected
+          // groups with capacity
+          let randomlySelectedGroup: string = NULL_ADDRESS
+          if (exploreProbability.isGreaterThan(Math.random())) {
+            console.info('Vote Method: unweighted random choice of unelected')
+            randomlySelectedGroup = getUnweightedRandomChoice(
+              unelectedGroups.filter((k) => {
+                const capacity = groupCapacities.get(k)
+                return (
+                  capacity && capacity.isGreaterThan(0) && (!currentGroup || !currentGroup.match(k))
+                )
+              })
             )
-          ) {
-            // Decide which method of picking a new group
-            let randomlySelectedGroup: string
-            if (exploreProbability.isGreaterThan(Math.random())) {
-              console.info('Vote Method: unweighted random choice of unelected')
-              randomlySelectedGroup = getUnweightedRandomChoice(
-                unelectedGroups.filter((k) => {
-                  const capacity = groupCapacities.get(k)
-                  return capacity && capacity.isGreaterThan(0) && !currentGroup.match(k)
-                })
-              )
-            } else {
-              console.info('Vote Method: weighted random choice among those with scores')
-              randomlySelectedGroup = getWeightedRandomChoice(
-                groupWeights,
-                [...groupCapacities.keys()].filter((k) => {
-                  const capacity = groupCapacities.get(k)
-                  return capacity && capacity.isGreaterThan(0) && !currentGroup.match(k)
-                })
-              )
+            if (randomlySelectedGroup === NULL_ADDRESS) {
+              console.info('No unelected groups available, falling back to weighted-by-score')
             }
-            await castVote(kit, botAccount, randomlySelectedGroup, groupCapacities)
-          } else {
-            console.info(`${botAccount} has decided to keep their existing vote`)
           }
-        } catch (error) {
-          console.error(`Failed to vote as ${botAccount}`)
-          console.info(error)
+
+          // This catches 2 cases in which randomlySelectedGroup is undefined:
+          // 1. it tried to pick an unelected group, but none were available
+          // 2. it is not using the "explore" strategy
+          if (randomlySelectedGroup === NULL_ADDRESS) {
+            console.info('Vote Method: weighted random choice among those with scores')
+            randomlySelectedGroup = getWeightedRandomChoice(
+              groupWeights,
+              [...groupCapacities.keys()].filter((k) => {
+                const capacity = groupCapacities.get(k)
+                return (
+                  capacity && capacity.isGreaterThan(0) && (!currentGroup || !currentGroup.match(k))
+                )
+              })
+            )
+          }
+
+          if (randomlySelectedGroup === NULL_ADDRESS) {
+            console.info('Was unable to find an available group to vote for. Skipping this time.')
+          } else {
+            await castVote(kit, botAccount, randomlySelectedGroup, groupCapacities)
+          }
+        } else {
+          console.info(`${botAccount} has decided to keep their existing vote`)
         }
+      } catch (error) {
+        console.error(`Failed to vote as ${botAccount}`)
+        console.info(error)
       }
     }
-    process.exit(0)
   } catch (error) {
     console.error(error)
     process.exit(1)
+  } finally {
+    process.exit(0)
   }
 }
 
@@ -161,7 +175,7 @@ async function castVote(
   groupCapacities.set(voteForGroup, groupCapacity.minus(voteAmount))
 }
 
-// NOTE: commented out becayse this relies on an unpublished contract kit version
+// NOTE: commented out because this relies on an unpublished contract kit version
 // // After saturation, explore never-elected-Validator-Groups in FIFO order.
 // // @ts-ignore: declared but its value is never read.
 // async function getNextNeverElectedValidatorGroup(kit: ContractKit): Promise<Address> {
@@ -181,16 +195,36 @@ async function castVote(
 //   return NULL_ADDRESS
 // }
 
+async function calculateInitialGroupCapacities(kit: ContractKit): Promise<Map<string, BigNumber>> {
+  console.info('Determining which groups have capacity for more votes')
+
+  const validators = await kit.contracts.getValidators()
+  const election = await kit.contracts.getElection()
+
+  const groupCapacities = new Map<string, BigNumber>()
+  for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
+    const vgv = await election.getValidatorGroupVotes(groupAddress)
+    if (vgv.eligible) {
+      groupCapacities.set(groupAddress, vgv.capacity)
+    }
+  }
+
+  return groupCapacities
+}
+
 async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNumber>> {
+  console.info('Calculating weights of groups based on the scores of elected validators')
   const election = await kit.contracts.getElection()
   const validators = await kit.contracts.getValidators()
 
   const validatorSigners = await election.getCurrentValidatorSigners()
-  const validatorAccounts = await concurrentMap(10, validatorSigners, (acc) => {
-    return validators.getValidatorFromSigner(acc)
-  })
+  const validatorAccounts = (
+    await concurrentMap(10, validatorSigners, (acc) => {
+      return validators.getValidatorFromSigner(acc)
+    })
+  ).filter((v) => !!v.affiliation) // Skip unaffiliated
 
-  const validatorsByGroup = groupBy(validatorAccounts, (validator) => validator.affiliation!)
+  const validatorsByGroup = groupBy(validatorAccounts, (validator) => validator.affiliation)
 
   const validatorGroupScores = mapValues(validatorsByGroup, (vals) => {
     const scoreSum = vals.reduce((a, b) => a.plus(b.score), new BigNumber(0))
@@ -216,9 +250,9 @@ function calculateGroupWeights(
   return groupWeights
 }
 
-function getUnweightedRandomChoice(groupsToConsider: string[]) {
+function getUnweightedRandomChoice(groupsToConsider: string[]): string {
   const randomIndex = Math.floor(groupsToConsider.length * Math.random())
-  return groupsToConsider[randomIndex]
+  return groupsToConsider[randomIndex] || NULL_ADDRESS
 }
 
 function getWeightedRandomChoice(
@@ -246,10 +280,9 @@ function getWeightedRandomChoice(
       return key
     }
   }
-  // This shouldn't happen, since the accumulated total at the last key of the
-  // sorted groups is always going to be higher than the value for `choice`.
-  // This is here to handle unknown edge-cases and to make Typescript happy
-  throw Error('An unexpected error occured when choosing a group via weighted random choice')
+
+  // If this happens, it means no groups were available
+  return NULL_ADDRESS
 }
 
 async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promise<void> {
