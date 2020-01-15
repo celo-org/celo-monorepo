@@ -180,26 +180,35 @@ function makeRequest(sheets: any, column: string, data: string[]) {
   })
 }
 
-async function updateNames(kit: ContractKit, rows: any[][], sheets: any) {
+async function updateNames(kit: ContractKit, addresses: any[], sheets: any) {
   let accounts = await kit.contracts.getAccounts()
   let data = []
-  for (let item of rows) {
-    if (!item[0]) data.push('')
+  for (let item of addresses) {
+    if (!item) data.push('')
     else {
-      let name = await accounts.getName(item[0])
-      console.log('Name for', item[0], name)
+      let name = await accounts.getName(item)
+      console.log('Name for', item, name)
       data.push(name)
     }
   }
   makeRequest(sheets, 'D', data)
 }
 
-async function getBTUs(kit: ContractKit, address: string) {
-  const metadata = await getMetadata(kit, address)
-  const claimedAccounts = await getClaims(kit, address, metadata)
+async function getClaimedAccounts(kit: ContractKit, address: string) {
+  if (!address) return []
+  try {
+    const metadata = await getMetadata(kit, address)
+    const res = getClaims(kit, address, metadata)
+    return res
+  } catch (err) {
+    console.error('Error', err)
+    return [address]
+  }
+}
 
+async function getBTUs(kit: ContractKit, accounts: string[]) {
   let sum = new BigNumber(0)
-  for (const address of claimedAccounts) {
+  for (const address of accounts) {
     try {
       const balance = await kit.getTotalBalance(address)
       sum = sum.plus(balance.total)
@@ -210,51 +219,58 @@ async function getBTUs(kit: ContractKit, address: string) {
   return sum.multipliedBy(new BigNumber('1e-18')).toString(10)
 }
 
-async function updateBTUs(kit: ContractKit, rows: any[][], sheets: any) {
+async function updateBTUs(kit: ContractKit, rows: string[][], sheets: any) {
   let data = []
   for (let item of rows) {
-    let address = item[0]
-    if (!address) data.push('')
-    else {
-      try {
-        let v = await getBTUs(kit, address)
-        console.log('BTU for', address, v)
-        data.push(v)
-      } catch (err) {
-        console.error('Cannot find BTU for', address, err)
-        data.push('')
-      }
+    try {
+      let v = await getBTUs(kit, item)
+      console.log('BTU for', item[0], v)
+      data.push(v)
+    } catch (err) {
+      console.error('Cannot find BTU for', item[0], err)
+      data.push('')
     }
   }
   makeRequest(sheets, 'E', data)
 }
 
-async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) {
-  let data = []
+async function getAttestations(kit: ContractKit, address: string) {
   let attestations = await kit._web3Contracts.getAttestations()
+  let req = (
+    await attestations.getPastEvents('AttestationIssuerSelected', {
+      fromBlock: 0,
+      filter: { issuer: address },
+    })
+  ).length
+  let full = (
+    await attestations.getPastEvents('AttestationCompleted', {
+      fromBlock: 0,
+      filter: { issuer: address },
+    })
+  ).length
+  return { req, full }
+}
+
+async function updateAttestations(kit: ContractKit, rows: string[][], sheets: any) {
+  let data = []
   for (let item of rows) {
     let address = item[0]
-    if (!address) data.push('')
+    if (!address) data.push('=0')
     else {
       try {
-        let req = (
-          await attestations.getPastEvents('AttestationIssuerSelected', {
-            fromBlock: 0,
-            filter: { issuer: address },
-          })
-        ).length
-        let full = (
-          await attestations.getPastEvents('AttestationCompleted', {
-            fromBlock: 0,
-            filter: { issuer: address },
-          })
-        ).length
-        console.log('Attestations requested', req, 'fulfilled', full, 'by', address)
-        if (req == 0) data.push('0')
-        else data.push((full / req).toString())
+        let reqAcc = 0
+        let fullAcc = 0
+        for (let account of item) {
+          let { req, full } = await getAttestations(kit, account)
+          reqAcc += req
+          fullAcc += full
+        }
+        console.log('Attestations requested', reqAcc, 'fulfilled', fullAcc, 'by', address)
+        if (reqAcc == 0) data.push('=0')
+        else data.push('=' + (fullAcc / reqAcc).toString())
       } catch (err) {
         console.error('Cannot resolve attestations for', address, err)
-        data.push('')
+        data.push('=0')
       }
     }
   }
@@ -264,10 +280,16 @@ async function updateAttestations(kit: ContractKit, rows: any[][], sheets: any) 
 function main() {
   const web3 = new Web3(LEADERBOARD_WEB3)
   const kit: ContractKit = newKitFromWeb3(web3)
-  readSheet((rows: any, sheets: any) => {
-    updateNames(kit, rows, sheets)
-    updateBTUs(kit, rows, sheets)
-    updateAttestations(kit, rows, sheets)
+  readSheet(async (rows: any[][], sheets: any) => {
+    let addresses = rows.map((a) => a[0])
+    updateNames(kit, addresses, sheets)
+    //    let accounts = await Promise.all(addresses.map((address) => getClaimedAccounts(kit, address)))
+    let accounts = []
+    for (let address of addresses) {
+      accounts.push(await getClaimedAccounts(kit, address))
+    }
+    updateBTUs(kit, accounts, sheets)
+    updateAttestations(kit, accounts, sheets)
   })
 }
 
