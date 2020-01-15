@@ -260,7 +260,7 @@ exports[`ignores failed standby transactions 1`] = `
                   }
                 }
               >
-                Jan 9 global:at 1:42 AM
+                Jan 9 global:at 12:42 AM
               </Text>
             </View>
           </View>
@@ -489,7 +489,7 @@ exports[`ignores failed standby transactions 1`] = `
                   }
                 }
               >
-                Jan 9 global:at 1:41 AM
+                Jan 9 global:at 12:41 AM
               </Text>
             </View>
           </View>
@@ -760,7 +760,7 @@ exports[`ignores pending standby transactions that are completed in the response
                   }
                 }
               >
-                Jan 9 global:at 1:42 AM
+                Jan 9 global:at 12:42 AM
               </Text>
             </View>
           </View>
@@ -989,7 +989,7 @@ exports[`ignores pending standby transactions that are completed in the response
                   }
                 }
               >
-                Jan 9 global:at 1:41 AM
+                Jan 9 global:at 12:41 AM
               </Text>
             </View>
           </View>
@@ -1297,7 +1297,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 >
                   confirmingPayment
                 </Text>
-                 11:08 PM
+                 10:08 PM
               </Text>
             </View>
           </View>
@@ -1490,7 +1490,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   }
                 }
               >
-                Jan 9 global:at 1:42 AM
+                Jan 9 global:at 12:42 AM
               </Text>
             </View>
           </View>
@@ -1719,7 +1719,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   }
                 }
               >
-                Jan 9 global:at 1:41 AM
+                Jan 9 global:at 12:41 AM
               </Text>
             </View>
           </View>

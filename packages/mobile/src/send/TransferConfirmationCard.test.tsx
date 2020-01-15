@@ -1,4 +1,3 @@
-import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
@@ -26,8 +25,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.VerificationFee,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(0.3),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { amount: '-0.3', currencyCode: 'cUSD', localAmount: null },
     }
 
     const tree = renderer.create(
@@ -43,8 +41,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.Faucet,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { amount: '100', currencyCode: 'cUSD', localAmount: null },
     }
 
     const tree = renderer.create(
@@ -60,8 +57,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.Received,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { amount: '100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
     }
@@ -79,8 +75,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.EscrowReceived,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { amount: '100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
     }
@@ -98,8 +93,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.Sent,
       address: mockAccount,
       comment: mockComment,
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { amount: '-100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
       fee: new BigNumber(0.01),
@@ -118,8 +112,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.EscrowSent,
       address: mockAccount,
       comment: mockComment,
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { amount: '-100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
       fee: new BigNumber(0.01),

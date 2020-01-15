@@ -34,7 +34,6 @@ describe('ExchangeFeedItem', () => {
           makerAmount={{ amount: '1', currencyCode: 'cUSD', localAmount: null }}
           takerAmount={{ amount: '10', currencyCode: 'cGLD', localAmount: null }}
           timestamp={1}
-          showGoldAmount={true}
           {...getMockI18nProps()}
         />
       </Provider>

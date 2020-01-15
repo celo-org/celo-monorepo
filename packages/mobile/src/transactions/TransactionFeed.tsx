@@ -68,7 +68,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     item: FeedItem
     index: number
   }) => {
-    const { kind, addressToE164Number, invitees, recipientCache } = this.props
+    const { addressToE164Number, invitees, recipientCache } = this.props
 
     if (tx.hasOwnProperty('comment')) {
       // @ts-ignore
@@ -93,7 +93,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           />
         )
       case 'TransactionExchange':
-        return <ExchangeFeedItem showGoldAmount={kind === FeedType.EXCHANGE} {...tx} />
+        return <ExchangeFeedItem {...tx} />
     }
 
     return <React.Fragment />

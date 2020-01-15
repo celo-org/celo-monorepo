@@ -18,7 +18,6 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = ExchangeItemFragment & {
   status: TransactionStatus
-  showGoldAmount: boolean
 }
 
 // TODO(jeanregisser): ExchangeFeedItem and TransferFeedItem renders are very similar, we should use the same building blocks
