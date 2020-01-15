@@ -282,7 +282,7 @@ export class Header extends React.PureComponent<Props, State> {
         </View>
 
         {!this.state.showDesktopMenu && !this.state.menuFaded && (
-          <View style={styles.hamburger}>
+          <View style={[styles.hamburger]}>
             <div
               className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
                 this.state.mobileMenuActive ? cssStyles['is-active'] : ''

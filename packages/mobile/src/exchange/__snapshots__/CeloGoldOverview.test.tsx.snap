@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly when not ready 1`] = `
+<View
+  style={
+    Object {
+      "paddingBottom": 20,
+      "paddingHorizontal": 16,
+    }
+  }
+  testID="SnapshotCeloGoldOverview"
+>
+  <Text
+    style={
+      Object {
+        "fontFamily": "Hind-SemiBold",
+        "fontSize": 18,
+      }
+    }
+  >
+    global:celoGold
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "fontSize": 44,
+        "height": 48,
+        "lineHeight": 62,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "fontFamily": "Hind-SemiBold",
+        }
+      }
+    >
+      55.00
+    </Text>
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#B0B5B9",
+        "fontFamily": "Hind-Light",
+        "fontSize": 18,
+      }
+    }
+  >
+    loadingExchangeRate
+  </Text>
+</View>
+`;
+
+exports[`renders correctly when ready 1`] = `
+<View
+  style={
+    Object {
+      "paddingBottom": 20,
+      "paddingHorizontal": 16,
+    }
+  }
+  testID="SnapshotCeloGoldOverview"
+>
+  <Text
+    style={
+      Object {
+        "fontFamily": "Hind-SemiBold",
+        "fontSize": 18,
+      }
+    }
+  >
+    global:celoGold
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "fontSize": 44,
+        "height": 48,
+        "lineHeight": 62,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "fontFamily": "Hind-SemiBold",
+        }
+      }
+    >
+      55.00
+    </Text>
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#B0B5B9",
+        "fontFamily": "Hind-Light",
+        "fontSize": 18,
+      }
+    }
+  >
+    equalToAmount
+  </Text>
+</View>
+`;
