@@ -40,7 +40,19 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    * @param startSignerIndex Validator index at the first block.
    * @param endSignerIndex Validator index at the last block.
    */
-  isDown = proxyCall(this.contract.methods.isDown)
+  async isDown(
+    startBlock: number,
+    startSignerIndex: number,
+    endSignerIndex: number
+  ): Promise<boolean> {
+    const period = await this.slashableDowntime()
+    return (
+      this.contract.methods
+        .isDown(startBlock, startSignerIndex, endSignerIndex)
+        // @ts-ignore: Expected 0-1 arguments, but got 2
+        .call({}, startBlock + period)
+    )
+  }
 
   /**
    * Slash a Validator for downtime.
@@ -122,14 +134,24 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const validators = await this.kit.contracts.getValidators()
     const membership = await validators.getValidatorMembershipHistoryIndex(validator, startBlock)
     const lockedGold = await this.kit.contracts.getLockedGold()
-    const slashValidator = await lockedGold.computeParametersForSlashing(
+    const slashValidator = await lockedGold.computeInitialParametersForSlashing(
       validator,
       incentives.penalty
     )
     const slashGroup = await lockedGold.computeParametersForSlashing(
       membership.group,
-      incentives.penalty
+      incentives.penalty,
+      slashValidator.list
     )
+
+    console.info(
+      'validator',
+      slashValidator.lessers,
+      slashValidator.greaters,
+      slashValidator.indices
+    )
+
+    console.info('group', slashGroup.lessers, slashGroup.greaters, slashGroup.indices)
 
     return toTransactionObject(
       this.kit,

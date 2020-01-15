@@ -103,13 +103,14 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
       blockNumber
     )
     const lockedGold = await this.kit.contracts.getLockedGold()
-    const slashValidator = await lockedGold.computeParametersForSlashing(
+    const slashValidator = await lockedGold.computeInitialParametersForSlashing(
       validator.address,
       incentives.penalty
     )
     const slashGroup = await lockedGold.computeParametersForSlashing(
       membership.group,
-      incentives.penalty
+      incentives.penalty,
+      slashValidator.list
     )
 
     return toTransactionObject(

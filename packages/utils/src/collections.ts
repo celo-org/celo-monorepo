@@ -66,39 +66,9 @@ function upsert(sortedList: AddressListItem[], change: AddressListItem) {
   }
 }
 
-function upsertRel(sortedList: AddressListItem[], relChange: AddressListItem) {
-  const oldIdx = sortedList.findIndex((a) => eqAddress(a.address, relChange.address))
-  if (oldIdx === -1) {
-    throw new Error('')
-  }
-  console.log('found', sortedList[oldIdx])
-  const change = {
-    address: relChange.address,
-    value: sortedList[oldIdx].value.minus(relChange.value),
-  }
-  console.log('change', relChange)
-  console.log('changed to', change)
-  sortedList.splice(oldIdx, 1)
-  const newIdx = sortedList.findIndex((a) => a.value.lt(change.value))
-  if (newIdx === -1) {
-    sortedList.push(change)
-    return sortedList.length - 1
-  } else {
-    sortedList.splice(newIdx, 0, change)
-    return newIdx
-  }
-}
-
 // Warning: sortedList is modified
 function _linkedListChange(sortedList: AddressListItem[], change: AddressListItem) {
   const idx = upsert(sortedList, change)
-  const greater = idx === 0 ? NULL_ADDRESS : sortedList[idx - 1].address
-  const lesser = idx === sortedList.length - 1 ? NULL_ADDRESS : sortedList[idx + 1].address
-  return { lesser, greater }
-}
-
-function _linkedListChangeRel(sortedList: AddressListItem[], change: AddressListItem) {
-  const idx = upsertRel(sortedList, change)
   const greater = idx === 0 ? NULL_ADDRESS : sortedList[idx - 1].address
   const lesser = idx === sortedList.length - 1 ? NULL_ADDRESS : sortedList[idx + 1].address
   return { lesser, greater }
@@ -122,22 +92,6 @@ export function linkedListChanges(
   const greaters: string[] = []
   for (const it of changeList) {
     const { lesser, greater } = _linkedListChange(list, it)
-    lessers.push(lesser)
-    greaters.push(greater)
-  }
-  return { lessers, greaters, list }
-}
-
-export function linkedListChangesRel(
-  sortedList: AddressListItem[],
-  changeList: AddressListItem[]
-): { lessers: string[]; greaters: string[]; list: AddressListItem[] } {
-  const list = sortedList.concat()
-  const lessers: string[] = []
-  const greaters: string[] = []
-  for (const it of changeList) {
-    console.log(it)
-    const { lesser, greater } = _linkedListChangeRel(list, it)
     lessers.push(lesser)
     greaters.push(greater)
   }
