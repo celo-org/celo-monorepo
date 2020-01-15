@@ -12,9 +12,11 @@ import { Address } from '../base'
 import { Accounts } from '../generated/types/Accounts'
 import {
   BaseWrapper,
+  bytesToString,
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  stringToBytes,
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
@@ -129,8 +131,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       },
       metadataURL: ret[4],
       wallet: ret[5],
-      // @ts-ignore Incorrect bytes type.
-      dataEncryptionKey: ret[6],
+      dataEncryptionKey: bytesToString(ret[6]),
     }
   }
 
@@ -198,13 +199,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
       return toTransactionObject(
         this.kit,
-        this.contract.methods.authorizeValidatorSigner(
+        this.contract.methods.authorizeValidatorSignerWithPublicKey(
           signer,
-          pubKey,
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
-          // @ts-ignore Typescript does not support overloading.
-          proofOfSigningKeyPossession.s
+          proofOfSigningKeyPossession.s,
+          stringToBytes(pubKey)
         )
       )
     } else {

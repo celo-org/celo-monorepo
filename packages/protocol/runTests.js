@@ -11,6 +11,13 @@ const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * s
 // As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
 const isCI = process.env.CI === 'true'
 
+// Migration overrides specifically for unit tests
+const migrationOverrides = {
+  downtimeSlasher: {
+    slashableDowntime: 60, // epoch length is 100 for unit tests
+  },
+}
+
 async function startGanache() {
   const server = ganache.server({
     default_balance_ether: network.defaultBalance,
@@ -65,6 +72,9 @@ async function test() {
     if (argv.gas) {
       testArgs = testArgs.concat(['--color', '--gas'])
     }
+    // Add test specific migration overrides
+    testArgs = testArgs.concat(['--migration_override', JSON.stringify(migrationOverrides)])
+
     if (argv._.length > 0) {
       const testGlob = argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
       const testFiles = glob.readdirSync(testGlob)
