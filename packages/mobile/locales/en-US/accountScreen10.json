@@ -13,10 +13,15 @@
   "enableDataSaver": "Enable Data Saver",
   "dataSaverDetail":
     "Data Saver mode allows you to communicate with the Celo Network through a trusted node. You can always change this mode in app settings.",
-  "restartModal": {
+  "restartModalSwitchOff": {
     "header": "Restart To Switch Off Data Saver",
     "body": "To switch Data Saver on and off repeatedly, you will need to restart the app.",
     "restart": "Restart to Switch"
+  },
+  "restartModalSwitchOn": {
+    "header": "Beware Of Restart",
+    "body": "In case of incorrect PIN, you will need to restart the app.",
+    "understand": "I understand"
   },
   "testFaqLink": "Celo Wallet FAQ",
   "termsOfServiceLink": "Terms of service",

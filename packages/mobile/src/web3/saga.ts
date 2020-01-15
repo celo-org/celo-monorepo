@@ -493,11 +493,20 @@ export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
     yield call(switchToGethFromZeroSync)
   }
   // Unlock account to ensure private keys are accessible in new mode
-  const account = yield call(getConnectedUnlockedAccount)
-  Logger.debug(
-    TAG + '@toggleZeroSyncMode',
-    `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
-  )
+  try {
+    const account = yield call(getConnectedUnlockedAccount)
+    Logger.debug(
+      TAG + '@toggleZeroSyncMode',
+      `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
+    )
+  } catch (e) {
+    // Rollback if private keys aren't accessible in new mode
+    if (action.zeroSyncMode) {
+      yield call(switchToGethFromZeroSync)
+    } else {
+      yield call(switchToZeroSyncFromGeth)
+    }
+  }
 }
 export function* watchZeroSyncMode() {
   yield takeLatest(Actions.TOGGLE_IS_ZERO_SYNC, toggleZeroSyncMode)
