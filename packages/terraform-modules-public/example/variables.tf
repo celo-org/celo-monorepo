@@ -27,7 +27,7 @@ variable celo_env {
 variable network_id {
   description = "The ethereum network ID"
   type        = number
-  default     = 121119
+  default     = 200110
 }
 
 variable ethstats_host {
