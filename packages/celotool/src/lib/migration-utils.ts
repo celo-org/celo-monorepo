@@ -53,6 +53,12 @@ export function migrationOverrides() {
       },
       oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
     },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+    },
   }
 }
 
