@@ -1,5 +1,5 @@
-import { concurrentMap } from '@celo/utils/src/async'
-import { zip } from '@celo/utils/src/collections'
+import { concurrentMap } from '@celo/utils/lib/async'
+import { zip } from '@celo/utils/lib/collections'
 import chalk from 'chalk'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'

@@ -1,4 +1,4 @@
-import { concurrentMap } from '@celo/utils/src/async'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import { toBuffer } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
