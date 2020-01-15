@@ -33,6 +33,11 @@ export default class Propose extends BaseCommand {
       .runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
-    await displaySendTx('proposeTx', governance.propose(proposal), { value: res.flags.deposit })
+    await displaySendTx(
+      'proposeTx',
+      governance.propose(proposal),
+      { value: res.flags.deposit },
+      'ProposalQueued'
+    )
   }
 }
