@@ -30,13 +30,13 @@ There are three categories of slashing conditions:
 
 Automatic slashing conditions are enforced entirely through the protocol, and require no external information. Any Celo Gold slashed from stakes is transferred to the [Community Fund](community-fund.md).
 
-**Persistent downtime -** If the absolute number of signatures for an elected validator during an epoch is less than a small fraction of total blocks in the epoch, the protocol automatically slashes the validator and group 100 Celo Gold, suppresses future rewards, and (most importantly in this case) ejects the validator from its current group.
-
 ### Provable
 
 Provable slashing conditions cannot be initiated automatically on chain but information provided from an external source can be definitively verified on-chain.
 
 In exchange for sending a transaction which initiates a successful provable slashing condition on-chain, the initiator receives a portion of the slashed amount (which will always be greater than the gas costs of the proof). The remainder of the slashed amount is sent to the [Community Fund](community-fund.md).
+
+**Persistent downtime -** If the absolute number of signatures for an elected validator during an epoch is less than a small fraction of total blocks in the epoch, the protocol automatically slashes the validator and group 100 Celo Gold, suppresses future rewards, and (most importantly in this case) ejects the validator from its current group.
 
 **Double Signing -** A validator which can be shown to have produced BLS signatures for 2 distinct blocks at the same height but with different parent hashes will be slashed. Details are work in progress.
 

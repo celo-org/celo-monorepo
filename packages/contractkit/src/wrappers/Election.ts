@@ -122,6 +122,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   /**
+   * Returns the total votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The total votes for `group` made by `account`.
+   */
+  getTotalVotesForGroupByAccount = proxyCall(
+    this.contract.methods.getTotalVotesForGroupByAccount,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Returns the active votes for `group`.
    * @param group The address of the validator group.
    * @return The active votes for `group`.
@@ -326,7 +338,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   /**
    * Returns the current eligible validator groups and their total votes.
    */
-  private async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
+  async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip(
       (a, b) => ({
