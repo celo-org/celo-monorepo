@@ -405,8 +405,8 @@ if [[ $COMMAND == *"get-cooking"* ]]; then
     echo -e "* Prepping validator for The Great Celo Stake Off..."
     
     echo -e "\t1. Unlocking accounts .."
-    $CELOCLI account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password $DEFAULT_PASSWORD
-    $CELOCLI account:unlock --account $CELO_VALIDATOR_ADDRESS --password $DEFAULT_PASSWORD
+    $CELOCLI account:unlock $CELO_VALIDATOR_GROUP_ADDRESS --password $DEFAULT_PASSWORD
+    $CELOCLI account:unlock $CELO_VALIDATOR_ADDRESS --password $DEFAULT_PASSWORD
     
     echo -e "\t2. Registering accounts .."
     $CELOCLI account:register --from $CELO_VALIDATOR_GROUP_ADDRESS --name $VALIDATOR_GROUP_NAME || echo -e "$CELO_VALIDATOR_GROUP_ADDRESS already registered"
