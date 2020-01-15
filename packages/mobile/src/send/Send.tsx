@@ -16,7 +16,6 @@ import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
 import { importContacts } from 'src/identity/actions'
-import { E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -69,7 +68,6 @@ interface StateProps {
   e164PhoneNumber: string
   numberVerified: boolean
   devModeActive: boolean
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
   recentRecipients: Recipient[]
   allRecipients: Recipient[]
 }
@@ -89,7 +87,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumber: state.account.e164PhoneNumber,
   numberVerified: state.app.numberVerified,
   devModeActive: state.account.devModeActive || false,
-  e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
   recentRecipients: state.account.devModeActive
     ? [CeloDefaultRecipient, ...state.send.recentRecipients]
     : state.send.recentRecipients,

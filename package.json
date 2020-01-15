@@ -35,7 +35,8 @@
       "packages/*"
     ],
     "nohoist": [
-      "**/openzeppelin-solidity"
+      "**/openzeppelin-solidity",
+      "**/solidity-bytes-utils"
     ]
   },
   "devDependencies": {

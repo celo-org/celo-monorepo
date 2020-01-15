@@ -191,24 +191,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 }
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                John Doe
-              </Text>
               <View
                 style={
                   Object {
@@ -836,24 +818,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 }
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                John Doe
-              </Text>
               <View
                 style={
                   Object {
@@ -1481,24 +1445,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 }
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                John Doe
-              </Text>
               <View
                 style={
                   Object {

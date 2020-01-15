@@ -17,7 +17,7 @@ const storeData = {
   },
 }
 
-jest.mock('src/components/AccountOverview')
+jest.mock('src/exchange/CeloGoldOverview')
 jest.mock('src/home/TransactionsList')
 
 describe('Testnet banner', () => {
