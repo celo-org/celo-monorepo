@@ -45,9 +45,7 @@ export default class ViewHotfix extends BaseCommand {
         return (await governance.isHotfixWhitelistedBy(hash, validator.account)) || whitelisted
       })
       printValueMapRecursive({
-        Validators: accounts.filter((_, idx) =>
-          res.flags.notyet ? !whitelist[idx] : whitelist[idx]
-        ),
+        Validators: accounts.filter((_, idx) => res.flags.notyet !== whitelist[idx]),
       })
     }
   }
