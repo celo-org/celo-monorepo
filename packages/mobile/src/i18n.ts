@@ -102,10 +102,8 @@ RNLocalize.addEventListener('change', () => {
 // https://react.i18next.com/latest/withtranslation-hoc#hoist-non-react-statics
 export const withTranslation = (namespace: Namespaces) => <P extends WithTranslation>(
   component: React.ComponentType<P>
-): React.ComponentType<Omit<P, keyof WithTranslation> & WithTranslationProps> => {
-  const augmented = withTranslationI18Next(namespace)(component)
-  // @ts-ignore
-  return hoistStatics(augmented, component)
-}
+): React.ComponentType<Omit<P, keyof WithTranslation> & WithTranslationProps> =>
+  // cast as `any` here otherwise TypeScript complained
+  hoistStatics(withTranslationI18Next(namespace)(component), component as any)
 
 export default i18n
