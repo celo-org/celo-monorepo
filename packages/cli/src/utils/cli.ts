@@ -9,7 +9,8 @@ import { Tx } from 'web3/eth/types'
 export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,
-  tx?: Omit<Tx, 'data'>
+  tx?: Omit<Tx, 'data'>,
+  displayEventName?: string
 ) {
   cli.action.start(`Sending Transaction: ${name}`)
   const txResult = await txObj.send(tx)
@@ -19,8 +20,14 @@ export async function displaySendTx<A>(
   console.log(chalk`SendTransaction: {red.bold ${name}}`)
   printValueMap({ txHash })
 
-  await txResult.waitReceipt()
+  const txReceipt = await txResult.waitReceipt()
   cli.action.stop()
+
+  if (displayEventName && txReceipt.events) {
+    Object.entries(txReceipt.events)
+      .filter(([eventName]) => eventName === displayEventName)
+      .forEach(([, log]) => printValueMap(log.returnValues))
+  }
 }
 
 export function printValueMap(valueMap: Record<string, any>) {
