@@ -1,3 +1,3 @@
-import ValidatorsList from 'src/dev/ValidatorsList'
+import ValidatorsListApp from 'src/dev/ValidatorsListApp'
 
-export default ValidatorsList
+export default ValidatorsListApp
