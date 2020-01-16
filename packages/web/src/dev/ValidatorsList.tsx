@@ -189,54 +189,58 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                                 css['validator-list-expansion__table'],
                               ].join(' ')}
                             >
-                              <tr className={css['table__heading']}>
-                                <th>Name</th>
-                                <th className={css['table__cell--center']}>Elected</th>
-                                <th className={css['table__cell--center']}>Online</th>
-                                <th>Address</th>
-                                <th className={css['table__cell--center']}>CUSD</th>
-                                <th className={css['table__cell--center']}>CGLD</th>
-                                <th className={css['table__cell--center']}>Uptime</th>
-                              </tr>
-                              {group.validators.map((validator, j) => (
-                                <tr key={`${i}.${j}`}>
-                                  <td className={css['table__cell--title']}>{validator.name}</td>
-                                  <td className={css['table__cell--center']}>
-                                    <span
-                                      className={[
-                                        css['circle'],
-                                        css[`circle--${validator.elected ? 'ok' : 'error'}`],
-                                      ].join(' ')}
-                                    />
-                                  </td>
-                                  <td className={css['table__cell--center']}>
-                                    <span
-                                      className={[
-                                        css['circle'],
-                                        css[`circle--${validator.online ? 'ok' : 'error'}`],
-                                      ].join(' ')}
-                                    />
-                                  </td>
-                                  <td>
-                                    {this.cutAddress(validator.address)}
-                                    <span
-                                      className={css.copy}
-                                      onClick={() => this.copyAddress(validator.address)}
-                                    >
-                                      copy
-                                    </span>
-                                  </td>
-                                  <td className={css['table__cell--center']}>
-                                    {this.formatNumber(validator.usd, 2)}
-                                  </td>
-                                  <td className={css['table__cell--center']}>
-                                    {this.formatNumber(validator.gold, 2)}
-                                  </td>
-                                  <td className={css['table__cell--center']}>
-                                    {this.formatNumber(validator.uptime, 1)}%
-                                  </td>
+                              <thead>
+                                <tr className={css['table__heading']}>
+                                  <th>Name</th>
+                                  <th className={css['table__cell--center']}>Elected</th>
+                                  <th className={css['table__cell--center']}>Online</th>
+                                  <th>Address</th>
+                                  <th className={css['table__cell--center']}>CUSD</th>
+                                  <th className={css['table__cell--center']}>CGLD</th>
+                                  <th className={css['table__cell--center']}>Uptime</th>
                                 </tr>
-                              ))}
+                              </thead>
+                              <tbody>
+                                {group.validators.map((validator, j) => (
+                                  <tr key={`${i}.${j}`}>
+                                    <td className={css['table__cell--title']}>{validator.name}</td>
+                                    <td className={css['table__cell--center']}>
+                                      <span
+                                        className={[
+                                          css['circle'],
+                                          css[`circle--${validator.elected ? 'ok' : 'error'}`],
+                                        ].join(' ')}
+                                      />
+                                    </td>
+                                    <td className={css['table__cell--center']}>
+                                      <span
+                                        className={[
+                                          css['circle'],
+                                          css[`circle--${validator.online ? 'ok' : 'error'}`],
+                                        ].join(' ')}
+                                      />
+                                    </td>
+                                    <td>
+                                      {this.cutAddress(validator.address)}
+                                      <span
+                                        className={css.copy}
+                                        onClick={() => this.copyAddress(validator.address)}
+                                      >
+                                        copy
+                                      </span>
+                                    </td>
+                                    <td className={css['table__cell--center']}>
+                                      {this.formatNumber(validator.usd, 2)}
+                                    </td>
+                                    <td className={css['table__cell--center']}>
+                                      {this.formatNumber(validator.gold, 2)}
+                                    </td>
+                                    <td className={css['table__cell--center']}>
+                                      {this.formatNumber(validator.uptime, 1)}%
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
                             </table>
                           )}
                         </div>
