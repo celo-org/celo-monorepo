@@ -28691,10 +28691,10 @@ react-native-tab-view@^2.9.0:
     process "^0.11.9"
     util "^0.10.3"
 
-react-native-testing-library@^1.11.1, react-native-testing-library@^1.9.1:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/react-native-testing-library/-/react-native-testing-library-1.11.1.tgz#0e2d73991110cf7d7800d86610ad7b7f8a4c9455"
-  integrity sha512-PTwDn1sgegvFqqF1v9zrRUChHqFqp5rWVUjXgkk134wssVhfc2oAuS6kiOvr3w7tLmFzuspxvT5sw0gMrRnDfQ==
+react-native-testing-library@^1.12.0:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/react-native-testing-library/-/react-native-testing-library-1.12.0.tgz#aa16a2f3033ec742c7e49a5f7bdd46ccd9c83bba"
+  integrity sha512-DbWmlbXQabTsL9QGpdXJduPQdQk+91tmcpAant2lMu3mehkf2DxnfF0q20wogQnLrW+XHy8fCPznrAgQAnH04Q==
   dependencies:
     pretty-format "^24.0.0"
 
