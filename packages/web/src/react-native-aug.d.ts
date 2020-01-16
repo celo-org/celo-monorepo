@@ -7,6 +7,7 @@ declare module 'react-native' {
     display?: 'list-item' | 'inline' | 'none' | 'inline-flex' | 'flex'
     transitionProperty?: string
     transitionDuration?: string
+    gridArea?: string
   }
 
   interface ViewStyle {
@@ -26,6 +27,7 @@ declare module 'react-native' {
     fill?: string
     filter?: string
     mixBlendMode?: 'multiply' | 'screen'
+    gridArea?: string
   }
 
   interface ImageProps {
