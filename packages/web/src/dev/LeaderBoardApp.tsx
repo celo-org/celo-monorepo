@@ -6,7 +6,7 @@ import getConfig from 'next/config'
 import * as React from 'react'
 import { ApolloProvider, Query } from 'react-apollo'
 import LeaderBoard from 'src/dev/LeaderBoard'
-import LeaderBoardError from 'src/dev/LeaderBoardError'
+import ShowApolloError from 'src/dev/ShowApolloError'
 import { I18nProps, withNamespaces } from 'src/i18n'
 
 function createApolloClient() {
@@ -39,7 +39,7 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
         <Query query={query}>
           {({ loading, error, data }) => {
             if (error) {
-              return <LeaderBoardError error={error} />
+              return <ShowApolloError error={error} />
             }
             const leaders = loading ? loadingLeaders : data.leaderboard
             return <LeaderBoard leaders={leaders} isLoading={loading} />

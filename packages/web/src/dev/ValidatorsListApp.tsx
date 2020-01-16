@@ -6,13 +6,14 @@ import getConfig from 'next/config'
 import * as React from 'react'
 import { ApolloProvider, Query } from 'react-apollo'
 import ValidatorsList from 'src/dev/ValidatorsList'
-import LeaderBoardError from 'src/dev/LeaderBoardError'
+import ShowApolloError from 'src/dev/ShowApolloError'
 import { I18nProps, withNamespaces } from 'src/i18n'
 
 function createApolloClient() {
   return new ApolloClient({
     uri: getConfig().publicRuntimeConfig.LEADERBOARD.uri,
     cache: new InMemoryCache(),
+    // Avoid errors
     fetch: async (...args) => {
       const response = await fetch(...args)
       const { data } = await response.json()
@@ -73,7 +74,7 @@ class ValidatorsListApp extends React.PureComponent<I18nProps> {
         <Query query={query}>
           {({ loading, error, data }) => {
             if (error) {
-              return <LeaderBoardError error={error} />
+              return <ShowApolloError error={error} />
             }
             return <ValidatorsList data={loading ? undefined : data} isLoading={loading} />
           }}
