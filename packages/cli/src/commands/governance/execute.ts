@@ -13,7 +13,7 @@ export default class Execute extends BaseCommand {
     from: Flags.address({ required: true, description: "Executor's address" }),
   }
 
-  static examples = []
+  static examples = ['execute --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
   async run() {
     const res = this.parse(Execute)

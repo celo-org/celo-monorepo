@@ -174,7 +174,10 @@ async function runDevChain(
   createDirIfMissing(datadir)
   const stopGanache = await startGanache(datadir, { verbose: true })
   if (opts.reset) {
-    await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
+    const code = await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
+    if (code !== 0) {
+      throw Error('Migrations failed')
+    }
   }
   return stopGanache
 }

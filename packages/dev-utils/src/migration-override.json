@@ -1,4 +1,7 @@
 {
+  "downtimeSlasher": {
+    "slashableDowntime": 60
+  },
   "epochRewards": {
     "frozen": false
   },
