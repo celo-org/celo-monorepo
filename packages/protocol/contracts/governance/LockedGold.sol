@@ -32,11 +32,22 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   mapping(address => Balances) private balances;
-  mapping(address => bool) public isSlasher;
 
-  modifier onlySlasher() {
-    require(isSlasher[msg.sender], "Caller must be registered slasher");
+  // Iterable map to store whitelisted identifiers.
+  // Necessary to allow iterating over whitelisted IDs to check ID's address at runtime.
+  mapping(bytes32 => bool) internal slashingMap;
+  bytes32[] public slashingWhitelist;
+
+  modifier onlySlasher {
+    require(
+      registry.isOneOf(slashingWhitelist, msg.sender),
+      "Caller is not a whitelisted slasher."
+    );
     _;
+  }
+
+  function isSlasher(address slasher) external view returns (bool) {
+    return (registry.isOneOf(slashingWhitelist, slasher));
   }
 
   uint256 public totalNonvoting;
@@ -46,8 +57,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
-  event SlasherWhitelistAdded(address indexed slasher);
-  event SlasherWhitelistRemoved(address indexed slasher);
+  event SlasherWhitelistAdded(string indexed slasherIdentifier);
+  event SlasherWhitelistRemoved(string indexed slasherIdentifier);
   event AccountSlashed(
     address indexed slashed,
     uint256 penalty,
@@ -243,6 +254,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (values, timestamps);
   }
 
+  function getSlashingWhitelist() external view returns (bytes32[] memory) {
+    return slashingWhitelist;
+  }
+
   /**
    * @notice Deletes a pending withdrawal.
    * @param list The list of pending withdrawals from which to delete.
@@ -256,22 +271,30 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Adds `slasher` to whitelist of approved slashing addresses.
-   * @param slasher Address to whitelist.
+   * @param slasherIdentifier Identifier to whitelist.
    */
-  function addSlasher(address slasher) external onlyOwner {
-    require(slasher != address(0) && !isSlasher[slasher], "Invalid address to `addSlasher`.");
-    isSlasher[slasher] = true;
-    emit SlasherWhitelistAdded(slasher);
+  function addSlasher(string calldata slasherIdentifier) external onlyOwner {
+    bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
+    require(registry.getAddressFor(keyBytes) != address(0), "Identifier is not registered");
+    require(!slashingMap[keyBytes], "Cannot add slasher ID twice.");
+    slashingWhitelist.push(keyBytes);
+    slashingMap[keyBytes] = true;
+    emit SlasherWhitelistAdded(slasherIdentifier);
   }
 
   /**
    * @notice Removes `slasher` from whitelist of approved slashing addresses.
-   * @param slasher Address to remove from whitelist.
+   * @param slasherIdentifier Identifier to remove from whitelist.
+   * @param index Index of the provided identifier in slashingWhiteList array.
    */
-  function removeSlasher(address slasher) external onlyOwner {
-    require(isSlasher[slasher], "Address must be valid slasher.");
-    isSlasher[slasher] = false;
-    emit SlasherWhitelistRemoved(slasher);
+  function removeSlasher(string calldata slasherIdentifier, uint256 index) external onlyOwner {
+    bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
+    require(slashingMap[keyBytes], "Cannot remove slasher ID not yet added.");
+    require(index < slashingWhitelist.length, "Provided index exceeds whitelist bounds.");
+    slashingWhitelist[index] = slashingWhitelist[slashingWhitelist.length - 1];
+    slashingWhitelist.pop();
+    slashingMap[keyBytes] = false;
+    emit SlasherWhitelistRemoved(slasherIdentifier);
   }
 
   /**

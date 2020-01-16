@@ -14,8 +14,7 @@ import { TransactionReceipt } from 'web3/types'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
-import { retrieveIPAddress } from './helm_deploy'
-import { execCmd, execCmdWithExitOnFailure } from './utils'
+import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
@@ -51,47 +50,8 @@ export const LOG_TAG_TRANSACTION_VALIDATION_ERROR = 'validate_transaction_error'
 // the transaction has been sent
 export const LOG_TAG_TX_TIME_MEASUREMENT = 'tx_time_measurement'
 
-const getTxNodeName = (namespace: string, id: number) => {
-  return `${namespace}-gethtx${id}`
-}
-
 export const getEnodeAddress = (nodeId: string, ipAddress: string, port: number) => {
   return `enode://${nodeId}@${ipAddress}:${port}`
-}
-
-const getOGEnodesAddresses = async (namespace: string) => {
-  const txNodesIds = [
-    fetchEnv(envVar.GETHTX1_NODE_ID),
-    fetchEnv(envVar.GETHTX2_NODE_ID),
-    fetchEnv(envVar.GETHTX3_NODE_ID),
-    fetchEnv(envVar.GETHTX4_NODE_ID),
-  ]
-
-  const enodes = []
-  for (let id = 0; id < txNodesIds.length; id++) {
-    const [ipAddress] = await execCmdWithExitOnFailure(
-      `kubectl get service/${getTxNodeName(
-        namespace,
-        id + 1
-      )} --namespace ${namespace} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
-    )
-
-    enodes.push(getEnodeAddress(txNodesIds[id], ipAddress, DISCOVERY_PORT))
-  }
-
-  return enodes
-}
-
-const getClusterNativeEnodes = async (namespace: string) => {
-  return getEnodesWithIpAddresses(namespace, false)
-}
-
-const getExternalEnodeAddresses = async (namespace: string) => {
-  // const usingStaticIps = fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES)
-  // if (usingStaticIps === 'true') {
-  //   return getBootnodeEnode(namespace)
-  // }
-  return getEnodesWithIpAddresses(namespace, true)
 }
 
 export const getBootnodeEnode = async (namespace: string) => {
@@ -106,7 +66,12 @@ const retrieveBootnodeIPAddress = async (namespace: string) => {
     const outputs = await getTestnetOutputs(namespace)
     return outputs.bootnode_ip_address.value
   } else {
-    return retrieveIPAddress(`${namespace}-bootnode`)
+    const resourceName = `${namespace}-bootnode`
+    if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
+      return retrieveIPAddress(resourceName)
+    } else {
+      return retrieveClusterIPAddress('service', resourceName, namespace)
+    }
   }
 }
 
@@ -132,11 +97,11 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
       if (getExternalIP) {
         address = txAddresses[index]
       } else {
-        address = (
-          await execCmd(
-            `kubectl get service/${namespace}-service-${index} --namespace ${namespace} -o jsonpath='{.spec.clusterIP}'`
-          )
-        )[0]
+        address = await retrieveClusterIPAddress(
+          'service',
+          `${namespace}-service-${index}`,
+          namespace
+        )
         if (address.length === 0) {
           console.error('IP address is empty for transaction node')
           throw new Error('IP address is empty for transaction node')
@@ -149,21 +114,11 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
 }
 
 export const getEnodesAddresses = async (namespace: string) => {
-  const txNodes = fetchEnv(envVar.TX_NODES)
-  if (txNodes === 'og') {
-    return getOGEnodesAddresses(namespace)
-  } else {
-    return getClusterNativeEnodes(namespace)
-  }
+  return getEnodesWithIpAddresses(namespace, false)
 }
 
 export const getEnodesWithExternalIPAddresses = async (namespace: string) => {
-  const txNodes = fetchEnv(envVar.TX_NODES)
-  if (txNodes === 'og') {
-    return getOGEnodesAddresses(namespace)
-  } else {
-    return getExternalEnodeAddresses(namespace)
-  }
+  return getEnodesWithIpAddresses(namespace, true)
 }
 
 export const fetchPassword = (passwordFile: string) => {
