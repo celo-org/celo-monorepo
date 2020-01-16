@@ -100,10 +100,17 @@ export const typeDefs = gql`
     rate: Decimal!
   }
 
-  # Timestamp in milliseconds, represented as Int
+  """
+  Timestamp in milliseconds, represented as Float
+  """
   scalar Timestamp
+  """
+  Address, represented as String
+  """
   scalar Address
-  # Custom scalar for decimal amounts, represented as String
+  """
+  Custom scalar for decimal amounts, represented as String
+  """
   scalar Decimal
 
   enum Token {
