@@ -100,6 +100,7 @@ export const typeDefs = gql`
     rate: Decimal!
   }
 
+  # Timestamp in milliseconds, represented as Int
   scalar Timestamp
   scalar Address
   # Custom scalar for decimal amounts, represented as String
@@ -219,7 +220,7 @@ export const typeDefs = gql`
     currencyConversion(
       sourceCurrencyCode: String
       currencyCode: String!
-      timestamp: Float
+      timestamp: Timestamp
     ): ExchangeRate
   }
 `
@@ -310,7 +311,7 @@ export const resolvers = {
       const rate = await dataSources.currencyConversionAPI.getExchangeRate({
         sourceCurrencyCode: moneyAmount.currencyCode,
         currencyCode: localCurrencyCode || 'USD',
-        timestamp: moneyAmount.timestamp * 1000,
+        timestamp: moneyAmount.timestamp,
       })
       return {
         amount: new BigNumber(moneyAmount.amount).multipliedBy(rate).toString(),

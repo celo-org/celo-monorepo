@@ -249,7 +249,7 @@ export class BlockscoutAPI extends RESTDataSource {
         // Find the event related to the queried token
         const tokenEvent = [inEvent, outEvent].find((event) => event.tokenSymbol === args.token)
         if (tokenEvent) {
-          const timestamp = new BigNumber(inEvent.timeStamp).toNumber()
+          const timestamp = new BigNumber(inEvent.timeStamp).toNumber() * 1000
           events.push({
             type: EventTypes.EXCHANGE,
             timestamp,
@@ -290,7 +290,7 @@ export class BlockscoutAPI extends RESTDataSource {
           this.getAttestationAddress(),
           this.getEscrowAddress()
         )
-        const timestamp = new BigNumber(event.timeStamp).toNumber()
+        const timestamp = new BigNumber(event.timeStamp).toNumber() * 1000
         events.push({
           type,
           timestamp,

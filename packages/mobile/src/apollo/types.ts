@@ -105,7 +105,7 @@ export interface QueryTransactionsArgs {
 export interface QueryCurrencyConversionArgs {
   sourceCurrencyCode?: Maybe<Scalars['String']>
   currencyCode: Scalars['String']
-  timestamp?: Maybe<Scalars['Float']>
+  timestamp?: Maybe<Scalars['Timestamp']>
 }
 
 export enum Token {
