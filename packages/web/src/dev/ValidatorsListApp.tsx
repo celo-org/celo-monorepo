@@ -14,11 +14,7 @@ function createApolloClient() {
     uri: getConfig().publicRuntimeConfig.LEADERBOARD.uri,
     cache: new InMemoryCache(),
     // Avoid errors
-    fetch: async (...args) => {
-      const response = await fetch(...args)
-      const { data } = await response.json()
-      return new Response(JSON.stringify({ data }))
-    },
+    fetch,
   })
 }
 
