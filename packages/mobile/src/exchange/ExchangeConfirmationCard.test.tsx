@@ -1,4 +1,3 @@
-import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import 'react-native'
@@ -20,7 +19,6 @@ it('renders correctly with no exchange rate', () => {
   const tree = renderer.create(
     <Provider store={store}>
       <ExchangeConfirmationCard
-        makerToken={CURRENCY_ENUM.GOLD}
         newDollarBalance={newDollarBalance}
         newGoldBalance={newGoldBalance}
         makerAmount={makerAmount}
@@ -37,7 +35,6 @@ it('renders correctly with giant numbers', () => {
   const tree = renderer.create(
     <Provider store={store}>
       <ExchangeConfirmationCard
-        makerToken={CURRENCY_ENUM.DOLLAR}
         newDollarBalance={new BigNumber('10000000')}
         newGoldBalance={new BigNumber('10030000')}
         makerAmount={{ amount: '24000000.00', currencyCode: 'cUSD', localAmount: null }}
