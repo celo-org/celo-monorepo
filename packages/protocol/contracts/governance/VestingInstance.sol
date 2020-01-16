@@ -17,9 +17,9 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     uint256 vestAmountPerPeriod;
     // durations in secs. of one period
     uint256 vestingPeriodSec;
-    // timestamp for the starting point of the vesting. Timestamps are expressed in UNIX time, the same units as block.timestamp.
+    // timestamp for the starting point of the vesting. Timestamp is expressed in UNIX time, the same units as block.timestamp.
     uint256 vestingStartTime;
-    // timestamps for the cliff starting point. Timestamps are expressed in UNIX time, the same units as block.timestamp.
+    // timestamp for the cliff starting point. Timestamp is expressed in UNIX time, the same units as block.timestamp.
     uint256 vestingCliffStartTime;
   }
 
