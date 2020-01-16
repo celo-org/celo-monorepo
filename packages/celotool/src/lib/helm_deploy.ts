@@ -577,8 +577,10 @@ async function helmParameters(celoEnv: string) {
 }
 
 async function helmCommand(command: string) {
-  if (isCelotoolVerbose()) {
+  if (isCelotoolVerbose() && !command.includes(' dep build ')) {
     await execCmdWithExitOnFailure(command + ' --dry-run --debug')
+  } else if (isCelotoolVerbose()) {
+    await execCmdWithExitOnFailure(command + ' --debug')
   }
 
   await execCmdWithExitOnFailure(command)
