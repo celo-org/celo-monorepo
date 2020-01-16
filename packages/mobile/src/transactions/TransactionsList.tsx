@@ -11,6 +11,7 @@ import {
   UserTransactionsQueryVariables,
 } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { RootState } from 'src/redux/reducers'
@@ -23,6 +24,9 @@ import {
 } from 'src/transactions/reducer'
 import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
 import { currentAccountSelector } from 'src/web3/selectors'
+
+// Query poll interval
+const POLL_INTERVAL = 10000 // 10 secs
 
 interface OwnProps {
   currency: CURRENCY_ENUM
@@ -209,6 +213,21 @@ function mapStandbyTransactionToFeedItem(
   }
 }
 
+// TODO(jeanregisser): maybe move this to blockchain-api? and directly set the tx type to InviteSent for standbyTx
+function mapInvite(tx: FeedItem): FeedItem {
+  if (tx.__typename !== 'TransactionTransfer' || tx.comment !== SENTINEL_INVITE_COMMENT) {
+    return tx
+  }
+
+  if (tx.type === TransactionType.Sent) {
+    return { ...tx, type: TransactionType.InviteSent }
+  } else if (tx.type === TransactionType.Received) {
+    return { ...tx, type: TransactionType.InviteReceived }
+  }
+
+  return tx
+}
+
 function getTransactions(data: UserTransactionsQuery | undefined) {
   return data?.transactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
 }
@@ -244,7 +263,7 @@ export class TransactionsList extends React.PureComponent<Props> {
     return (
       <UserTransactionsComponent
         query={TRANSACTIONS_QUERY}
-        pollInterval={10000}
+        pollInterval={POLL_INTERVAL}
         variables={{ address: queryAddress, token, localCurrencyCode }}
         onCompleted={this.txsFetched}
       >
@@ -275,7 +294,7 @@ export class TransactionsList extends React.PureComponent<Props> {
               )
             )
 
-          const feedData = [...standbyTxs, ...transactions]
+          const feedData = [...standbyTxs, ...transactions].map(mapInvite)
 
           return (
             <TransactionFeed kind={FeedType.HOME} loading={loading} error={error} data={feedData} />

@@ -4,9 +4,9 @@ import gql from 'graphql-tag'
 import * as React from 'react'
 import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
-import { TransactionFeedFragment, TransactionType } from 'src/apollo/types'
+import { TransactionFeedFragment } from 'src/apollo/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees, SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
+import { Invitees } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -69,17 +69,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
     index: number
   }) => {
     const { addressToE164Number, invitees, recipientCache } = this.props
-
-    if (tx.hasOwnProperty('comment')) {
-      // @ts-ignore
-      if (tx.comment === SENTINEL_INVITE_COMMENT) {
-        if (tx.type === TransactionType.Sent) {
-          tx.type = TransactionType.InviteSent
-        } else if (tx.type === TransactionType.Received) {
-          tx.type = TransactionType.InviteReceived
-        }
-      }
-    }
 
     switch (tx.__typename) {
       case 'TransactionTransfer':

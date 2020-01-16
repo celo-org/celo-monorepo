@@ -60,12 +60,11 @@ export default class GoldExchangeRateAPI<TContext = any> extends DataSource {
     const cacheKey = `${pair}-${date.getTime()}`
 
     let promise = this.memoizedResults.get(cacheKey)
-    if (promise) {
-      return promise
+    if (!promise) {
+      promise = this.performRequest(pair, date)
+      this.memoizedResults.set(cacheKey, promise)
     }
 
-    promise = this.performRequest(pair, date)
-    this.memoizedResults.set(cacheKey, promise)
     return promise
   }
 

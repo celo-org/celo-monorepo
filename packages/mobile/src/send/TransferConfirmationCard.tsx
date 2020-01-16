@@ -59,6 +59,8 @@ const renderTopSection = (props: Props) => {
   }
 }
 
+const formatNetworkFee = (value: BigNumber.Value) => getNetworkFeeDisplayValue(value, true)
+
 const renderAmountSection = (props: Props) => {
   const { amount, type } = props
 
@@ -71,8 +73,7 @@ const renderAmountSection = (props: Props) => {
         <CurrencyDisplay
           type={DisplayType.Big}
           amount={amount}
-          // tslint:disable-next-line: jsx-no-lambda
-          formatAmount={(value) => getNetworkFeeDisplayValue(value, true)}
+          formatAmount={formatNetworkFee}
           useColors={false}
         />
       )
