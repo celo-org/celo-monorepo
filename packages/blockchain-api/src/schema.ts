@@ -105,7 +105,11 @@ export const typeDefs = gql`
   """
   scalar Timestamp
   """
-  Address, represented as String
+  The address (40 (hex) characters / 160 bits / 20 bytes) is derived from the public key (128 (hex) characters / 512 bits / 64 bytes) which is derived from the private key (64 (hex) characters / 256 bits / 32 bytes).
+
+  The address is actually the last 40 characters of the keccak-256 hash of the public key with 0x appended.
+
+  Represented as String.
   """
   scalar Address
   """
