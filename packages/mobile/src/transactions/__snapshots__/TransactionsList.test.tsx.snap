@@ -417,7 +417,6 @@ exports[`ignores failed standby transactions 1`] = `
                 }
               >
                 
-                
                 0.10
               </Text>
               <View
@@ -465,7 +464,6 @@ exports[`ignores failed standby transactions 1`] = `
                 }
               >
                 
-                $
                 0.99
               </Text>
             </View>
@@ -917,7 +915,6 @@ exports[`ignores pending standby transactions that are completed in the response
                 }
               >
                 
-                
                 0.10
               </Text>
               <View
@@ -965,7 +962,6 @@ exports[`ignores pending standby transactions that are completed in the response
                 }
               >
                 
-                $
                 0.99
               </Text>
             </View>
@@ -1647,7 +1643,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 }
               >
                 
-                
                 0.10
               </Text>
               <View
@@ -1695,7 +1690,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 }
               >
                 
-                $
                 0.99
               </Text>
             </View>

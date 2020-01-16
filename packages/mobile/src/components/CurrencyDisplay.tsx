@@ -17,8 +17,9 @@ export enum DisplayType {
 interface Props {
   type: DisplayType
   amount: MoneyAmount
-  size: number
+  size: number // only used for DisplayType.Big
   useColors: boolean
+  hideSymbol: boolean
   formatAmount: (amount: BigNumber.Value) => string
   style?: StyleProp<TextStyle>
 }
@@ -40,6 +41,7 @@ export default function CurrencyDisplay({
   type,
   size,
   useColors,
+  hideSymbol,
   amount,
   formatAmount,
   style,
@@ -84,9 +86,11 @@ export default function CurrencyDisplay({
 
     return (
       <View style={[styles.bigContainer, style]}>
-        <Text numberOfLines={1} style={[fontStyles.regular, symbolStyle]}>
-          {currencySymbol}
-        </Text>
+        {!hideSymbol && (
+          <Text numberOfLines={1} style={[fontStyles.regular, symbolStyle]}>
+            {currencySymbol}
+          </Text>
+        )}
         <Text numberOfLines={1} style={[fontStyles.regular, styles.bigCurrency, amountStyle]}>
           {formattedValue}
         </Text>
@@ -97,7 +101,7 @@ export default function CurrencyDisplay({
   return (
     <Text numberOfLines={1} style={[styles.container, { color }, style]}>
       {sign}
-      {currencySymbol}
+      {!hideSymbol && currencySymbol}
       {formattedValue}
     </Text>
   )
@@ -107,6 +111,7 @@ CurrencyDisplay.defaultProps = {
   type: DisplayType.Default,
   size: 48,
   useColors: true,
+  hideSymbol: false,
   formatAmount: (amount: BigNumber.Value) => getMoneyDisplayValue(amount),
 }
 

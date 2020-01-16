@@ -254,7 +254,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 }
               >
                 
-                $
                 39.90
               </Text>
               <View
@@ -301,7 +300,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                
                 
                 200.00
               </Text>
