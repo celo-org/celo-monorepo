@@ -1,4 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertBalance,
   assertEqualBN,
@@ -10,7 +11,9 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
+import { zip } from '@celo/utils/src/collections'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import {
@@ -20,6 +23,8 @@ import {
   GovernanceTestInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
   TestTransactionsContract,
@@ -29,6 +34,7 @@ import {
 const Governance: GovernanceTestContract = artifacts.require('GovernanceTest')
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
 
@@ -75,6 +81,7 @@ contract('Governance', (accounts: string[]) => {
   let governance: GovernanceTestInstance
   let accountsInstance: AccountsInstance
   let mockLockedGold: MockLockedGoldInstance
+  let mockValidators: MockValidatorsInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
   const nullFunctionId = '0x00000000'
@@ -109,6 +116,7 @@ contract('Governance', (accounts: string[]) => {
     accountsInstance = await Accounts.new()
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
+    mockValidators = await MockValidators.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
     await governance.initialize(
@@ -128,6 +136,8 @@ contract('Governance', (accounts: string[]) => {
     )
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount()
     await mockLockedGold.setAccountTotalLockedGold(account, weight)
     await mockLockedGold.setTotalLockedGold(weight)
@@ -1984,6 +1994,53 @@ contract('Governance', (accounts: string[]) => {
         },
       })
       assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(hotfixHash))
+    })
+  })
+
+  describe('#hotfixWhitelistValidatorTally', () => {
+    const newHotfixHash = '0x' + keccak256('celo bug fix').toString('hex')
+
+    const validators = zip(
+      (_account, signer) => ({ account: _account, signer }),
+      accounts.slice(2, 6),
+      accounts.slice(6, 10)
+    )
+
+    beforeEach(async () => {
+      await concurrentMap(5, validators, async (validator) => {
+        await accountsInstance.createAccount({ from: validator.account })
+        const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
+        await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
+          from: validator.account,
+        })
+        await mockValidators.setValidator(validator.account)
+        // add signers for mock precompile
+        await governance.addValidator(validator.signer)
+      })
+    })
+
+    const whitelistFrom = (t: keyof typeof validators[0]) =>
+      concurrentMap(5, validators, (v) => governance.whitelistHotfix(newHotfixHash, { from: v[t] }))
+
+    const checkTally = async () => {
+      const tally = await governance.hotfixWhitelistValidatorTally(newHotfixHash)
+      assert.equal(tally.toNumber(), validators.length)
+    }
+
+    it('should count validator accounts that have whitelisted', async () => {
+      await whitelistFrom('account')
+      await checkTally()
+    })
+
+    it('should count authorized validator signers that have whitelisted', async () => {
+      await whitelistFrom('signer')
+      await checkTally()
+    })
+
+    it('should not double count validator account and authorized signer accounts', async () => {
+      await whitelistFrom('signer')
+      await whitelistFrom('account')
+      await checkTally()
     })
   })
 
