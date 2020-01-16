@@ -1070,34 +1070,20 @@ contract('Vesting', (accounts: string[]) => {
 
       it('# should transfer gold proportions to both beneficiary and revoker when no gold locked', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
-        console.dir(beneficiaryBalanceBefore.toString())
-
         const revokerBalanceBefore = await goldTokenInstance.balanceOf(revoker)
-        console.dir(revokerBalanceBefore.toString())
-
         const vestedBalanceAtRevoke = await vestingInstance.vestedBalanceAtRevoke()
-        console.dir(vestedBalanceAtRevoke.toString())
-
         const beneficiaryRefundAmount = new BigNumber(vestedBalanceAtRevoke).minus(
           await vestingInstance.totalWithdrawn()
         )
-        console.dir(beneficiaryRefundAmount.toString())
-
         const revokerRefundAmount = new BigNumber(
           await goldTokenInstance.balanceOf(vestingInstance.address)
         ).minus(beneficiaryRefundAmount)
-        console.dir(revokerRefundAmount.toString())
-
         await vestingInstance.refundAndFinalize({ from: revoker })
         const contractBalanceAfterFinalize = await goldTokenInstance.balanceOf(
           vestingInstance.address
         )
-        console.dir(contractBalanceAfterFinalize.toString())
-
         const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
-        console.dir(beneficiaryBalanceAfter.toString())
         const revokerBalanceAfter = await goldTokenInstance.balanceOf(revoker)
-        console.dir(revokerBalanceAfter.toString())
 
         assertEqualBN(
           new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1419,61 +1405,113 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  /*
   describe('#withdraw', () => {
     let vestingInstanceRegistryAddress
     let vestingInstance
+    let initialVestingAmount
 
     beforeEach(async () => {
+      vestingDefaultSchedule.vestingCliff = 0
+      vestingDefaultSchedule.vestingStartTime = Math.round(Date.now() / 1000)
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       vestingInstanceRegistryAddress = await vestingFactoryInstance.vestings(beneficiary)
       vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      initialVestingAmount = vestingDefaultSchedule.vestAmountPerPeriod.multipliedBy(
+        vestingDefaultSchedule.vestingNumPeriods
+      )
     })
 
     describe('#when not revoked', () => {
-      it('beneficiary should be able to withdraw a quarter of the vested amount after before 3+1.5 months under current test constellation', async () => {
-        const timeToTravel = 4 * MONTH
+      it('should revert since beneficiary should not be able to withdraw anything within the first quarter under current test constellation', async () => {
+        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        const timeToTravel = 2.9 * MONTH
         await timeTravel(timeToTravel, web3)
-        await vestingInstance.withdraw({ from: beneficiary })
-        const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
-        assert.isTrue(
-          new BigNumber(currentlyWithdrawn).eq(vestingDefaultSchedule.vestingAmount.div(4))
+        const expectedWithdrawalAmount = await vestingInstance.getCurrentVestedTotalAmount()
+        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+        assertEqualBN(expectedWithdrawalAmount, 0)
+        await assertRevert(
+          vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+        )
+        assertEqualBN(
+          new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+          0
         )
       })
 
-      it('beneficiary should be able to withdraw half the vested amount after 4.5 months and before 6+1.5 under current test constellation', async () => {
-        const timeToTravel = 7 * MONTH
-        await timeTravel(timeToTravel, web3)
-        await vestingInstance.withdraw({ from: beneficiary })
-        const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
-        assert.isTrue(
-          new BigNumber(currentlyWithdrawn).eq(vestingDefaultSchedule.vestingAmount.div(2))
-        )
-      })
-
-      it('beneficiary should be able to withdraw three quarters of the vested amount after 7.5 months and before 9+1.5 under current test constellation', async () => {
-        const timeToTravel = 10 * MONTH
-        await timeTravel(timeToTravel, web3)
-        await vestingInstance.withdraw({ from: beneficiary })
-        const currentlyWithdrawn = await vestingInstance.currentlyWithdrawn()
-        assert.isTrue(
-          new BigNumber(currentlyWithdrawn).eq(
-            vestingDefaultSchedule.vestingAmount.multipliedBy(3).div(4)
-          )
-        )
-      })
-
-      it('beneficiary should be able to withdraw at a timestamp and have 0 withdrawable limit straight after', async () => {
-        // IMPORTANT: here some time must be passed as to avoid small numbers in solidity (e.g < 1*10**18)
+      it('beneficiary should be able to withdraw a quarter of the vested amount right after beginning of first quarter under current test constellation', async () => {
+        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 3 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
-        await vestingInstance.withdraw({ from: beneficiary })
-        const currentlyWithdrawable = await vestingInstance.getWithdrawableAmount()
-        assertEqualBN(currentlyWithdrawable, 0)
+        const expectedWithdrawalAmount = initialVestingAmount.div(4)
+        await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+        const totalWithdrawn = await vestingInstance.totalWithdrawn()
+        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+        assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
+        assertEqualBN(
+          new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+          expectedWithdrawalAmount
+        )
+      })
+
+      it('beneficiary should be able to withdraw half the vested amount right after beginning of second quarter under current test constellation', async () => {
+        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        const timeToTravel = 6 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        const expectedWithdrawalAmount = initialVestingAmount.div(2)
+        await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+        const totalWithdrawn = await vestingInstance.totalWithdrawn()
+        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+        assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
+        assertEqualBN(
+          new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+          expectedWithdrawalAmount
+        )
+      })
+
+      it('beneficiary should be able to withdraw three quarters of the vested amount right after beginning of third quarter under current test constellation', async () => {
+        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        const timeToTravel = 9 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        const expectedWithdrawalAmount = initialVestingAmount.multipliedBy(3).div(4)
+        await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+        const totalWithdrawn = await vestingInstance.totalWithdrawn()
+        assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
+        assertEqualBN(
+          new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+          expectedWithdrawalAmount
+        )
+      })
+
+      it('beneficiary should be able to withdraw the entire amount right after end of the vesting period under current test constellation', async () => {
+        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        const timeToTravel = 12 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        const expectedWithdrawalAmount = initialVestingAmount
+        await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+
+        assertEqualBN(
+          new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+          expectedWithdrawalAmount
+        )
+      })
+
+      it('should destruct vesting instance when the entire balance is withdrawn', async () => {
+        const timeToTravel = 12 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        const expectedWithdrawalAmount = initialVestingAmount
+        await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+
+        try {
+          await vestingInstance.totalWithdrawn()
+          return assert.isTrue(false)
+        } catch (ex) {
+          return assert.isTrue(true)
+        }
       })
     })
   })
-  */
 
   /*
   describe('#vesting - withdraw()', () => {
