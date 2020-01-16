@@ -195,7 +195,7 @@ export const typeDefs = gql`
       endblock: Int
       page: Int
       offset: Int
-    ): [Event]
+    ): [Event] @deprecated(reason: "Use transactions query instead")
 
     rewards(
       address: String!
