@@ -348,6 +348,9 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = _.merge(
     {
+      downtimeSlasher: {
+        slashableDowntime: 6,
+      },
       election: {
         minElectableValidators: '1',
       },
