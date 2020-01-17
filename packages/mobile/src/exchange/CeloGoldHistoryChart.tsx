@@ -27,7 +27,7 @@ const CHART_MIN_VERTICAL_RANGE = 0.1
 const CHART_DOMAIN_PADDING = { y: [30, 30], x: [5, 5] }
 
 interface OwnProps {
-  testID: string
+  testID?: string
 }
 
 type Props = WithTranslation & OwnProps
