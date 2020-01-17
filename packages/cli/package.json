@@ -90,6 +90,9 @@
       "exchange": {
         "description": "Exchange Celo Dollars and Celo Gold via the stability mechanism"
       },
+      "governance": {
+        "description": "Interact with on-chain governance proposals and hotfixes"
+      },
       "lockedgold": {
         "description": "View and manage locked Celo Gold"
       },
