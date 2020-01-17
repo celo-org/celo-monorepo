@@ -1526,6 +1526,58 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
+  describe('#getCurrentVestedTotalAmount', () => {
+    let vestingInstanceRegistryAddress
+    let vestingInstance
+    let initialVestingAmount
+
+    beforeEach(async () => {
+      vestingDefaultSchedule.vestingCliff = 0
+      vestingDefaultSchedule.vestingStartTime = Math.round(Date.now() / 1000)
+      await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
+      vestingInstanceRegistryAddress = await vestingFactoryInstance.vestings(beneficiary)
+      vestingInstance = await VestingInstance.at(vestingInstanceRegistryAddress)
+      initialVestingAmount = vestingDefaultSchedule.vestAmountPerPeriod.multipliedBy(
+        vestingDefaultSchedule.vestingNumPeriods
+      )
+    })
+
+    it('should return zero if before cliff start time under current test constellation', async () => {
+      const timeToTravel = 0.5 * HOUR
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = 0
+      assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
+    })
+
+    it('should return a quarter of the vested amount right after beginning of first quarter under current test constellation', async () => {
+      const timeToTravel = 3 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialVestingAmount.div(4)
+      assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
+    })
+
+    it('should return half the vested amount right after beginning of second quarter under current test constellation', async () => {
+      const timeToTravel = 6 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialVestingAmount.div(2)
+      assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
+    })
+
+    it('should return three quarters of the vested amount right after beginning of third quarter under current test constellation', async () => {
+      const timeToTravel = 9 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialVestingAmount.multipliedBy(3).div(4)
+      assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
+    })
+
+    it('should return the entire amount right after end of the vesting period under current test constellation', async () => {
+      const timeToTravel = 12 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialVestingAmount
+      assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
+    })
+  })
+
   /*
   describe('#vesting - withdraw()', () => {
     it('beneficiary should not be able to withdraw before start time of vesting', async () => {
