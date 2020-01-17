@@ -1,4 +1,5 @@
 import { eqAddress } from '@celo/utils/lib/address'
+import { toFixed } from '@celo/utils/src/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
@@ -98,9 +99,9 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       oracleAddress
     )
 
-    const reportedValue = toBigNumber(numerator.toString())
-      .dividedBy(toBigNumber(denominator.toString()))
-      .multipliedBy(await this.getInternalDenominator())
+    const reportedValue = toFixed(
+      toBigNumber(numerator.toString()).dividedBy(toBigNumber(denominator.toString()))
+    ).toString()
 
     return toTransactionObject(
       this.kit,
