@@ -19,7 +19,7 @@ export default React.memo(
           metaDescription={t('composition.introduction')}
           sections={[
             { id: hashNav.brandComposition.overview, children: <Overview /> },
-            { id: hashNav.brandComposition.grid, children: <Grid /> },
+            { id: hashNav.brandComposition.grid, children: <GridArea /> },
           ]}
         />
       </>
@@ -110,16 +110,57 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
   )
 })
 
-const Grid = withNamespaces(NameSpaces.brand)(function _Grid({ t }: I18nProps) {
+const GridArea = withNamespaces(NameSpaces.brand)(function _Grid({ t }: I18nProps) {
   return (
     <View style={brandStyles.gap}>
       <H2 style={standardStyles.elementalMarginBottom}>{t('composition.gridTitle')}</H2>
       <Text style={fonts.p}>{t('composition.gridText')}</Text>
+      <View style={[styles.gridExamplesContainer, standardStyles.blockMarginTopTablet]}>
+        <GridExamples size={'¼'} row={'1'} colStart="1" colEnd={'12'} />
+        <GridExamples size={'½'} row={'2'} colStart="1" colEnd={'6'} />
+        <GridExamples size={'½'} row={'2'} colStart="6" colEnd={'12'} />
+        <GridExamples size={'⅓'} row={'3'} colStart="1" colEnd={'4'} />
+        <GridExamples size={'⅓'} row={'3'} colStart="4" colEnd={'8'} />
+        <GridExamples size={'⅓'} row={'3'} colStart="8" colEnd={'12'} />
+        <GridExamples size={'¼'} row={'4'} colStart="1" colEnd={'3'} />
+        <GridExamples size={'¼'} row={'4'} colStart="3" colEnd={'6'} />
+        <GridExamples size={'¼'} row={'4'} colStart="6" colEnd={'9'} />
+        <GridExamples size={'¼'} row={'4'} colStart="9" colEnd={'12'} />
+      </View>
     </View>
   )
 })
 
+function GridExamples({ size, colStart, colEnd, row }) {
+  return (
+    <View style={[styles.gridExample, { gridArea: `${row} / ${colStart} / ${row} / ${colEnd} ` }]}>
+      <Text style={[fonts.a, styles.gridExampleWithin]}>{size}</Text>
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
+  gridExamplesContainer: {
+    display: 'grid',
+    gridColumns: 12,
+    gridColumnGap: 15,
+    gridRowGap: 15,
+  },
+  gridExample: {
+    backgroundColor: colors.faintPurple,
+    padding: 15,
+    flex: 1,
+  },
+  gridExampleWithin: {
+    borderColor: colors.purple,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 12,
+    color: colors.purpleScreen,
+    textAlign: 'center',
+    fontSize: 22,
+  },
   alignments: {
     flexDirection: 'row',
     flexWrap: 'wrap',
