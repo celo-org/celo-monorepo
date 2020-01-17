@@ -61,6 +61,7 @@ interface AccountBalance {
   usd: BigNumber
   total: BigNumber
   lockedGold: BigNumber
+  pending: BigNumber
 }
 
 export class ContractKit {
@@ -91,11 +92,16 @@ export class ContractKit {
     const goldBalance = await goldToken.balanceOf(address)
     const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
+    const pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
     return {
       gold: goldBalance,
       lockedGold: lockedBalance,
       usd: dollarBalance,
-      total: goldBalance.plus(lockedBalance).plus(await exchange.quoteUsdSell(dollarBalance)),
+      total: goldBalance
+        .plus(lockedBalance)
+        .plus(await exchange.quoteUsdSell(dollarBalance))
+        .plus(pending),
+      pending,
     }
   }
 
