@@ -122,7 +122,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     }
     assetAllocationSymbols = symbols;
     for (uint256 i = 0; i < symbols.length; i++) {
-      require(assetAllocationsWeights[symbols[i]] == 0, "Cannot set weight twice");
+      require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
     require(assetAllocationWeights["cGLD"] != 0, "Must set cGLD asset weight");

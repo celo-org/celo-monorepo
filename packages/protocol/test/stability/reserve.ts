@@ -539,12 +539,34 @@ contract('Reserve', (accounts: string[]) => {
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
       assert.equal(assetAllocationWeights.length, 0)
     })
+
+    it('should fail if the asset allocation includes multiple weights for one symbol', async () => {
+      let badAssetAllocationSymbols = newAssetAllocationSymbols
+      ;(badAssetAllocationSymbols[1] = web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)),
+        await assertRevert(
+          reserve.setAssetAllocations(badAssetAllocationSymbols, newAssetAllocationWeights)
+        )
+      const assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      assert.equal(assetAllocationWeights.length, 0)
+    })
+
+    it("should fail if the asset allocation doesn't include cGLD", async () => {
+      let badAssetAllocationSymbols = newAssetAllocationSymbols
+      ;(badAssetAllocationSymbols[0] = web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64)),
+        await assertRevert(
+          reserve.setAssetAllocations(badAssetAllocationSymbols, newAssetAllocationWeights)
+        )
+      const assetAllocationWeights = await reserve.getAssetAllocationWeights()
+      assert.equal(assetAllocationWeights.length, 0)
+    })
   })
 
   describe('#getReserveRatio', () => {
     let mockStableToken: MockStableTokenInstance
     let reserveGoldBalance: BigNumber
     const exchangeRate = 10
+    const newAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+    const newAssetAllocationWeights = [new BigNumber(10).pow(24)]
 
     beforeEach(async () => {
       mockStableToken = await MockStableToken.new()
@@ -555,6 +577,7 @@ contract('Reserve', (accounts: string[]) => {
       )
       await reserve.addToken(mockStableToken.address)
       reserveGoldBalance = new BigNumber(10).pow(19)
+      await reserve.setAssetAllocations(newAssetAllocationSymbols, newAssetAllocationWeights)
       await web3.eth.sendTransaction({
         from: accounts[0],
         to: reserve.address,
