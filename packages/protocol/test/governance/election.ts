@@ -811,7 +811,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe.only('#electValidatorSigners', () => {
+  describe('#electValidatorSigners', () => {
     let random: MockRandomInstance
     let totalLockedGold: number
     const group1 = accounts[0]
@@ -874,16 +874,6 @@ contract('Election', (accounts: string[]) => {
 
       it("should return that group's member list", async () => {
         await setRandomness(hash1)
-        // @ts-ignore
-        console.log(
-          'Min memory:',
-          await election.contract.methods.electValidatorSignersMinMemory().estimateGas()
-        )
-        // @ts-ignore
-        console.log(
-          'full memory:',
-          await election.contract.methods.electValidatorSigners().estimateGas()
-        )
         assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
@@ -902,16 +892,6 @@ contract('Election', (accounts: string[]) => {
 
       it('should return maxElectableValidators elected validators', async () => {
         await setRandomness(hash1)
-        // @ts-ignore
-        console.log(
-          'Min memory:',
-          await election.contract.methods.electValidatorSignersMinMemory().estimateGas()
-        )
-        // @ts-ignore
-        console.log(
-          'full memory:',
-          await election.contract.methods.electValidatorSigners().estimateGas()
-        )
         assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
@@ -937,16 +917,6 @@ contract('Election', (accounts: string[]) => {
 
       it('should elect only n members from that group', async () => {
         await setRandomness(hash1)
-        // @ts-ignore
-        console.log(
-          'Min memory:',
-          await election.contract.methods.electValidatorSignersMinMemory().estimateGas()
-        )
-        // @ts-ignore
-        console.log(
-          'full memory:',
-          await election.contract.methods.electValidatorSigners().estimateGas()
-        )
         assertSameAddresses(await election.electValidatorSigners(), [
           validator7,
           validator1,

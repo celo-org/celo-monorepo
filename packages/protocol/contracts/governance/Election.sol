@@ -25,14 +25,6 @@ contract Election is
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  function toBytes(address a) public pure returns (bytes32) {
-    return bytes32(uint256(a) << 96);
-  }
-
-  function toAddress(bytes32 b) public pure returns (address) {
-    return address(uint256(b) >> 96);
-  }
-
   struct PendingVote {
     // The value of the vote, in gold.
     uint256 value;

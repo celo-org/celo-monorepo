@@ -178,9 +178,5 @@ if (process.argv.includes('--gas')) {
     reporterOptions: {
       currency: 'USD',
     },
-    mocha: {
-      reporter: 'eth-gas-reporter',
-      currency: 'USD',
-    },
   }
 }
