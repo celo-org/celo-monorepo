@@ -13,9 +13,10 @@ export default class ElectionRun extends BaseCommand {
   async run() {
     const res = this.parse(ElectionRun)
     cli.action.start('Running mock election')
-    const election = await this.kit.contracts.getElection()
+    // const election = await this.kit.contracts.getElection()
+    const election = await this.kit._web3Contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const signers = await election.electValidatorSigners()
+    const signers = await election.methods.electValidatorSigners().call({ gas: 1000000 * 50 })
     const validatorList = await Promise.all(
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
