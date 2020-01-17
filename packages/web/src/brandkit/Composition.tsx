@@ -57,12 +57,10 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
             <Text style={[fonts.micro, styles.subtitle, standardStyles.elementalMarginTop]}>
               {t('composition.alignmentExampleSubtitle')}
             </Text>
-            <Text style={[fonts.legal]}>{t('composition.alignmentExampleText')}</Text>
+            <Text style={fonts.legal}>{t('composition.alignmentExampleText')}</Text>
           </View>
           <View style={[styles.alignmentExample, styles.alignment2]}>
-            <H4 style={[standardStyles.elementalMarginBottom, textStyles.center]}>
-              {t('composition.alignmentExampleTitle')}
-            </H4>
+            <AlignmentExampleTitle t={t} />
             <Image source={exampleImage} style={styles.graphicBig} />
             <Text
               style={[
@@ -79,23 +77,19 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
             </Text>
           </View>
           <View style={styles.alignmentExample}>
-            <H4 style={[standardStyles.elementalMarginBottom, textStyles.center]}>
-              {t('composition.alignmentExampleTitle')}
-            </H4>
+            <AlignmentExampleTitle t={t} />
             <View style={[standardStyles.row, standardStyles.elementalMarginTop]}>
               <Image source={exampleImage} style={styles.graphicTiny} />
               <View style={styles.alignment3row}>
                 <Text style={[fonts.micro, styles.subtitle]}>
                   {t('composition.alignmentExampleSubtitle')}
                 </Text>
-                <Text style={[fonts.legal]}>{t('composition.alignmentExampleText')}</Text>
+                <Text style={fonts.legal}>{t('composition.alignmentExampleText')}</Text>
               </View>
             </View>
           </View>
           <View style={[styles.alignmentExample]}>
-            <H4 style={[standardStyles.elementalMarginBottom, textStyles.center]}>
-              {t('composition.alignmentExampleTitle')}
-            </H4>
+            <AlignmentExampleTitle t={t} />
             <View style={styles.fourthAlignment}>
               <Text style={[fonts.micro, styles.subtitle, { gridArea: 'subtitle' }]}>
                 {t('composition.alignmentExampleSubtitle')}
@@ -138,6 +132,14 @@ function GridExamples({ size, colStart, colEnd, row }) {
     <View style={[styles.gridExample, { gridArea: `${row} / ${colStart} / ${row} / ${colEnd} ` }]}>
       <Text style={[fonts.a, styles.gridExampleWithin]}>{size}</Text>
     </View>
+  )
+}
+
+function AlignmentExampleTitle({ t }) {
+  return (
+    <H4 style={[standardStyles.elementalMarginBottom, textStyles.center]}>
+      {t('composition.alignmentExampleTitle')}
+    </H4>
   )
 }
 
