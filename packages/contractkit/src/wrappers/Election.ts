@@ -326,7 +326,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   /**
    * Returns the current eligible validator groups and their total votes.
    */
-  private async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
+  async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip(
       (a, b) => ({
