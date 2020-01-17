@@ -23,6 +23,7 @@ import {
   TransferStandby,
 } from 'src/transactions/reducer'
 import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
+import { isPresent } from 'src/utils/typescript'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 // Query poll interval
@@ -44,11 +45,6 @@ interface DispatchProps {
 }
 
 type Props = OwnProps & StateProps & DispatchProps
-
-// See https://github.com/microsoft/TypeScript/issues/16069#issuecomment-565658443
-function isPresent<T>(t: T | undefined | null | void): t is T {
-  return t !== undefined && t !== null
-}
 
 export const TRANSACTIONS_QUERY = gql`
   query UserTransactions($address: Address!, $token: Token!, $localCurrencyCode: String) {

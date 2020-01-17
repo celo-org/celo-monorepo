@@ -160,7 +160,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/images/exchangeGreenGold.png",
                 }
               }
               style={
@@ -202,7 +202,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -238,7 +237,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -285,7 +283,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#FBCC5C",
                     },

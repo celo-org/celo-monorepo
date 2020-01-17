@@ -200,7 +200,6 @@ exports[`ignores failed standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -323,7 +322,7 @@ exports[`ignores failed standby transactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGoldGreen.png",
+                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
                 }
               }
               style={
@@ -365,7 +364,6 @@ exports[`ignores failed standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -401,7 +399,6 @@ exports[`ignores failed standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#FBCC5C",
                     },
@@ -448,7 +445,6 @@ exports[`ignores failed standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -698,7 +694,6 @@ exports[`ignores pending standby transactions that are completed in the response
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -821,7 +816,7 @@ exports[`ignores pending standby transactions that are completed in the response
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGoldGreen.png",
+                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
                 }
               }
               style={
@@ -863,7 +858,6 @@ exports[`ignores pending standby transactions that are completed in the response
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -899,7 +893,6 @@ exports[`ignores pending standby transactions that are completed in the response
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#FBCC5C",
                     },
@@ -946,7 +939,6 @@ exports[`ignores pending standby transactions that are completed in the response
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -1221,7 +1213,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -1426,7 +1417,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -1549,7 +1539,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/transactions/ExchangeGoldGreen.png",
+                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
                 }
               }
               style={
@@ -1591,7 +1581,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },
@@ -1627,7 +1616,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#FBCC5C",
                     },
@@ -1674,7 +1662,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {},
                     Object {
                       "color": "#42D689",
                     },

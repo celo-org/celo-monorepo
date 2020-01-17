@@ -99,7 +99,7 @@ export default function CurrencyDisplay({
   }
 
   return (
-    <Text numberOfLines={1} style={[styles.container, { color }, style]}>
+    <Text numberOfLines={1} style={[{ color }, style]}>
       {sign}
       {!hideSymbol && currencySymbol}
       {formattedValue}
@@ -116,7 +116,6 @@ CurrencyDisplay.defaultProps = {
 }
 
 const styles = StyleSheet.create({
-  container: {},
   bigContainer: {
     flexDirection: 'row',
     alignSelf: 'center',
