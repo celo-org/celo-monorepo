@@ -9,7 +9,7 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 
 const moonpayUri = 'https://buy-staging.moonpay.io/'
-const apiKey = 'pk_test_EDT0SRJUlsJezJUFGaVZIr8LuaTsF5NO' // TODO production api key when actually buying cUSD
+const apiKey = 'pk_test_EDT0SRJUlsJezJUFGaVZIr8LuaTsF5NO' // (publishable) TODO production api key when actually buying cUSD
 const currencyCode = 'ETH' // TODO switch to cUSD when added to Moonpay
 const moonpaySupportedCurrencies = ['USD', 'EUR', 'GBP']
 
@@ -32,7 +32,7 @@ type Props = StateProps & WithTranslation
 class FiatExchange extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('accountScreen10:licenses'),
+    headerTitle: i18n.t('accountScreen10:addFunds'),
   })
 
   render() {
