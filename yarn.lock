@@ -4947,13 +4947,6 @@
   resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-1.1.0-beta.2.tgz#30d8a41624193d5d54e7a65af81a3e8ac492aa16"
   integrity sha512-HQNjGxBl7rJJbgcj0jjgAGWLHiViGBK72rqSfyBHBz9DpD1y57RtsRmshl4gScRvsuvy3Ig0TLUZRufSjpxM7w==
 
-"@segment/in-eu@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@segment/in-eu/-/in-eu-0.3.0.tgz#b7d452a2f7e3a29461c0774f4d1570c7e8448ca8"
-  integrity sha512-np6ves6pLi1nkKjQHXk3FBQJmu+C7Gs6n3UYM0TzHsIdZOz1Cfu636cuc+iidBRfE6S+3w0W8AD7F4hpicuUnw==
-  dependencies:
-    jstz "^2.0.0"
-
 "@sentry/apm@5.10.2":
   version "5.10.2"
   resolved "https://registry.yarnpkg.com/@sentry/apm/-/apm-5.10.2.tgz#41a401b3964b68514439f8a595b12c6fd05ab21a"
@@ -20813,11 +20806,6 @@ jsprim@^1.2.2:
     extsprintf "1.3.0"
     json-schema "0.2.3"
     verror "1.10.0"
-
-jstz@^2.0.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/jstz/-/jstz-2.1.1.tgz#fff3373a518fa7cce69299930466f5a2b980389d"
-  integrity sha512-8hfl5RD6P7rEeIbzStBz3h4f+BQHfq/ABtoU6gXKQv5OcZhnmrIpG7e1pYaZ8hS9e0mp+bxUj08fnDUbKctYyA==
 
 jsx-ast-utils@^2.0.1:
   version "2.2.1"

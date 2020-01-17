@@ -12,20 +12,13 @@ const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
 const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
 export async function canTrack() {
-  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME) || !(await isInEU())
+  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME)
 }
 
 export async function showVisitorCookieConsent() {
-  if (!Cookies.get(RESPONDED_TO_CONSENT)) {
-    return isInEU()
-  }
-  return false
+  return !Cookies.get(RESPONDED_TO_CONSENT)
 }
 
-async function isInEU() {
-  const inEU = await import('@segment/in-eu').then((mod) => mod.default)
-  return inEU()
-}
 export async function initializeAnalytics() {
   if (!isBrowser() || !(await canTrack())) {
     return {

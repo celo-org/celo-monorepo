@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@celo/utils": "0.1.4",
-    "@segment/in-eu": "^0.3.0",
     "@sentry/browser": "^5.10.2",
     "@sentry/node": "^5.10.2",
     "@zeit/next-sass": "^1.0.1",
@@ -97,13 +96,13 @@
     "babel-plugin-react-css-modules": "^5.2.6",
     "babel-plugin-react-native-web": "^0.11.7",
     "cross-env": "^5.1.6",
-    "node-sass": "^4.13.0",
+    "ignore-loader": "~0.1.2",
     "jest-canvas-mock": "^2.2.0",
     "jest-fetch-mock": "^3.0.0",
+    "node-sass": "^4.13.0",
     "nodemon": "^2.0.2",
     "postcss-scss": "^2.0.0",
     "react-native-svg": "^9.13.6",
-    "ignore-loader": "~0.1.2",
     "webpack": "4.41.2"
   }
 }
