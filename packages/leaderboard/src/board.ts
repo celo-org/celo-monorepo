@@ -79,6 +79,7 @@ async function updateDB(lst: any[], remove: any[]) {
     await client.query(
       "DELETE FROM competitors WHERE address = '\\x" + elem.address.toString() + "'"
     )
+    await client.query("DELETE FROM claims WHERE address = '\\x" + elem.address.toString() + "'")
   }
   await readAssoc(lst.map((a: any) => a.address.toString()))
 }
