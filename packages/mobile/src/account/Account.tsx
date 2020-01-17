@@ -209,7 +209,7 @@ export class Account extends React.Component<Props, State> {
           </View>
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.goToFiatExchange}>
-              <Text>Show Fiat Exchange</Text>
+              <Text>Buy/Sell Celo Dollars</Text>
             </TouchableOpacity>
           </View>
           <View style={style.devSettingsItem}>

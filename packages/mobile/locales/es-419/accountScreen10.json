@@ -21,7 +21,7 @@
     "body": "En caso de ingresar un PIN incorrecto, la aplicación se reiniciará.",
     "understand": "Entendido"
   },
-
+  "addFunds": "Añadir Fondos",
   "testFaqLink": "Las Preguntas Frecuentes del Monedero Celo",
   "termsOfServiceLink": "Las Condiciones de Servicio",
   "editProfile": "Editar perfil",
