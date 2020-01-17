@@ -83,7 +83,8 @@ contract DowntimeSlasher is SlasherUtil {
       uint256 signerIndex = epochNumberOfBlock(n, sz) == startEpoch
         ? startSignerIndex
         : endSignerIndex;
-      // We want to check signers for this block, so we get the parent seal bitmap for the next block
+      // We want to check signers for block n,
+      // so we get the parent seal bitmap for the next block
       if (uint256(getParentSealBitmap(n + 1)) & (1 << signerIndex) != 0) return false;
     }
     return true;
