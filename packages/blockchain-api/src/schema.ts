@@ -64,7 +64,7 @@ export interface CurrencyConversionArgs {
 }
 
 export interface MoneyAmount {
-  amount: BigNumber.Value
+  value: BigNumber.Value
   currencyCode: string
   timestamp: number
 }
@@ -123,13 +123,13 @@ export const typeDefs = gql`
   }
 
   type MoneyAmount {
-    amount: Decimal!
+    value: Decimal!
     currencyCode: String!
     localAmount: LocalMoneyAmount
   }
 
   type LocalMoneyAmount {
-    amount: Decimal!
+    value: Decimal!
     currencyCode: String!
     exchangeRate: Decimal!
   }
@@ -325,7 +325,7 @@ export const resolvers = {
         timestamp: moneyAmount.timestamp,
       })
       return {
-        amount: new BigNumber(moneyAmount.amount).multipliedBy(rate).toString(),
+        value: new BigNumber(moneyAmount.value).multipliedBy(rate).toString(),
         currencyCode: localCurrencyCode || 'USD',
         exchangeRate: rate.toString(),
       }

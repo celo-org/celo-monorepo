@@ -42,7 +42,7 @@ export function ExchangeFeedItem(props: Props) {
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
   const exchangeStyle = [styles.exchangeCurrency, isPending && { color: colors.gray }]
-  const isSent = new BigNumber(amount.amount).isNegative()
+  const isSent = new BigNumber(amount.value).isNegative()
 
   return (
     <Touchable onPress={onPress}>
@@ -98,29 +98,29 @@ ExchangeFeedItem.fragments = {
       type
       hash
       amount {
-        amount
+        value
         currencyCode
         localAmount {
-          amount
+          value
           currencyCode
           exchangeRate
         }
       }
       timestamp
       takerAmount {
-        amount
+        value
         currencyCode
         localAmount {
-          amount
+          value
           currencyCode
           exchangeRate
         }
       }
       makerAmount {
-        amount
+        value
         currencyCode
         localAmount {
-          amount
+          value
           currencyCode
           exchangeRate
         }

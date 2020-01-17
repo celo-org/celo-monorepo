@@ -60,10 +60,10 @@ const mockQueryData: UserTransactionsQuery = {
           type: TransactionType.Sent,
           hash: '0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353',
           amount: {
-            amount: '-0.2',
+            value: '-0.2',
             currencyCode: 'cUSD',
             localAmount: {
-              amount: '-0.2',
+              value: '-0.2',
               currencyCode: 'USD',
               exchangeRate: '1',
             },
@@ -79,28 +79,28 @@ const mockQueryData: UserTransactionsQuery = {
           type: TransactionType.Exchange,
           hash: '0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852',
           amount: {
-            amount: '0.994982275992944156',
+            value: '0.994982275992944156',
             currencyCode: 'cUSD',
             localAmount: {
-              amount: '0.994982275992944156',
+              value: '0.994982275992944156',
               currencyCode: 'USD',
               exchangeRate: '1',
             },
           },
           takerAmount: {
-            amount: '0.994982275992944156',
+            value: '0.994982275992944156',
             currencyCode: 'cUSD',
             localAmount: {
-              amount: '0.994982275992944156',
+              value: '0.994982275992944156',
               currencyCode: 'USD',
               exchangeRate: '1',
             },
           },
           makerAmount: {
-            amount: '0.1',
+            value: '0.1',
             currencyCode: 'cGLD',
             localAmount: {
-              amount: '1.006007113270411465777',
+              value: '1.006007113270411465777',
               currencyCode: 'USD',
               exchangeRate: '10.06007113270411465777',
             },

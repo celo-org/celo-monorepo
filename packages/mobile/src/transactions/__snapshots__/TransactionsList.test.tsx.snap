@@ -9,13 +9,13 @@ exports[`ignores failed standby transactions 1`] = `
         "__typename": "TransactionTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
-          "amount": "-0.2",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "-0.2",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "-0.2",
           },
+          "value": "-0.2",
         },
         "comment": "Hi",
         "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
@@ -26,33 +26,33 @@ exports[`ignores failed standby transactions 1`] = `
       Object {
         "__typename": "TransactionExchange",
         "amount": Object {
-          "amount": "0.994982275992944156",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "0.994982275992944156",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "0.994982275992944156",
           },
+          "value": "0.994982275992944156",
         },
         "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
         "makerAmount": Object {
-          "amount": "0.1",
           "currencyCode": "cGLD",
           "localAmount": Object {
-            "amount": "1.006007113270411465777",
             "currencyCode": "USD",
             "exchangeRate": "10.06007113270411465777",
+            "value": "1.006007113270411465777",
           },
+          "value": "0.1",
         },
         "status": "Complete",
         "takerAmount": Object {
-          "amount": "0.994982275992944156",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "0.994982275992944156",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "0.994982275992944156",
           },
+          "value": "0.994982275992944156",
         },
         "timestamp": 1578530498,
         "type": "EXCHANGE",
@@ -503,13 +503,13 @@ exports[`ignores pending standby transactions that are completed in the response
         "__typename": "TransactionTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
-          "amount": "-0.2",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "-0.2",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "-0.2",
           },
+          "value": "-0.2",
         },
         "comment": "Hi",
         "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
@@ -520,33 +520,33 @@ exports[`ignores pending standby transactions that are completed in the response
       Object {
         "__typename": "TransactionExchange",
         "amount": Object {
-          "amount": "0.994982275992944156",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "0.994982275992944156",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "0.994982275992944156",
           },
+          "value": "0.994982275992944156",
         },
         "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
         "makerAmount": Object {
-          "amount": "0.1",
           "currencyCode": "cGLD",
           "localAmount": Object {
-            "amount": "1.006007113270411465777",
             "currencyCode": "USD",
             "exchangeRate": "10.06007113270411465777",
+            "value": "1.006007113270411465777",
           },
+          "value": "0.1",
         },
         "status": "Complete",
         "takerAmount": Object {
-          "amount": "0.994982275992944156",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "0.994982275992944156",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "0.994982275992944156",
           },
+          "value": "0.994982275992944156",
         },
         "timestamp": 1578530498,
         "type": "EXCHANGE",
@@ -1004,13 +1004,13 @@ exports[`renders the received data along with the standby transactions 1`] = `
         "__typename": "TransactionTransfer",
         "address": "0072bvy2o23u",
         "amount": Object {
-          "amount": "-100",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "-133",
             "currencyCode": "MXN",
             "exchangeRate": "1.33",
+            "value": "-133",
           },
+          "value": "-100",
         },
         "comment": "Eye for an Eye",
         "hash": "",
@@ -1022,13 +1022,13 @@ exports[`renders the received data along with the standby transactions 1`] = `
         "__typename": "TransactionTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
-          "amount": "-0.2",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "-0.2",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "-0.2",
           },
+          "value": "-0.2",
         },
         "comment": "Hi",
         "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
@@ -1039,33 +1039,33 @@ exports[`renders the received data along with the standby transactions 1`] = `
       Object {
         "__typename": "TransactionExchange",
         "amount": Object {
-          "amount": "0.994982275992944156",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "0.994982275992944156",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "0.994982275992944156",
           },
+          "value": "0.994982275992944156",
         },
         "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
         "makerAmount": Object {
-          "amount": "0.1",
           "currencyCode": "cGLD",
           "localAmount": Object {
-            "amount": "1.006007113270411465777",
             "currencyCode": "USD",
             "exchangeRate": "10.06007113270411465777",
+            "value": "1.006007113270411465777",
           },
+          "value": "0.1",
         },
         "status": "Complete",
         "takerAmount": Object {
-          "amount": "0.994982275992944156",
           "currencyCode": "cUSD",
           "localAmount": Object {
-            "amount": "0.994982275992944156",
             "currencyCode": "USD",
             "exchangeRate": "1",
+            "value": "0.994982275992944156",
           },
+          "value": "0.994982275992944156",
         },
         "timestamp": 1578530498,
         "type": "EXCHANGE",

@@ -30,9 +30,9 @@ describe('ExchangeFeedItem', () => {
           __typename="TransactionExchange"
           type={TransactionType.Exchange}
           hash={'0x'}
-          amount={{ amount: '-1', currencyCode: 'cUSD', localAmount: null }}
-          makerAmount={{ amount: '1', currencyCode: 'cUSD', localAmount: null }}
-          takerAmount={{ amount: '10', currencyCode: 'cGLD', localAmount: null }}
+          amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
+          makerAmount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
+          takerAmount={{ value: '10', currencyCode: 'cGLD', localAmount: null }}
           timestamp={1}
           {...getMockI18nProps()}
         />

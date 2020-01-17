@@ -256,7 +256,7 @@ export class BlockscoutAPI extends RESTDataSource {
             block: inEvent.blockNumber,
             amount: {
               // Signed amount relative to the account currency
-              amount: new BigNumber(tokenEvent.value)
+              value: new BigNumber(tokenEvent.value)
                 .multipliedBy(tokenEvent === inEvent ? -1 : 1)
                 .dividedBy(WEI_PER_GOLD)
                 .toString(),
@@ -264,12 +264,12 @@ export class BlockscoutAPI extends RESTDataSource {
               timestamp,
             },
             makerAmount: {
-              amount: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toString(),
+              value: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toString(),
               currencyCode: inEvent.tokenSymbol,
               timestamp,
             },
             takerAmount: {
-              amount: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toString(),
+              value: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toString(),
               currencyCode: outEvent.tokenSymbol,
               timestamp,
             },
@@ -297,7 +297,7 @@ export class BlockscoutAPI extends RESTDataSource {
           block: event.blockNumber,
           amount: {
             // Signed amount relative to the account currency
-            amount: new BigNumber(event.value)
+            value: new BigNumber(event.value)
               .multipliedBy(eventFromAddress === userAddress ? -1 : 1)
               .dividedBy(WEI_PER_GOLD)
               .toString(),

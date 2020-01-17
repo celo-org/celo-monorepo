@@ -48,7 +48,7 @@ export default function CurrencyDisplay({
 }: Props) {
   const localCurrencyCode = useLocalCurrencyCode()
   // tslint:disable-next-line: react-hooks-nesting
-  const localValue = useDollarsToLocalAmount(amount.amount) || 0
+  const localValue = useDollarsToLocalAmount(amount.value) || 0
 
   const currency =
     amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
@@ -58,14 +58,14 @@ export default function CurrencyDisplay({
   // For now only show the local amount when original currency is dollars
   const localAmount =
     currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode
-      ? amount.localAmount ?? { amount: localValue, currencyCode: localCurrencyCode }
+      ? amount.localAmount ?? { value: localValue, currencyCode: localCurrencyCode }
       : null
   const displayAmount = localAmount ?? amount
   const currencySymbol =
     displayAmount === localAmount
       ? LocalCurrencySymbol[displayAmount.currencyCode as LocalCurrencyCode]
       : CURRENCIES[currency].symbol
-  const value = new BigNumber(displayAmount.amount)
+  const value = new BigNumber(displayAmount.value)
   const sign = value.isNegative() ? '-' : ''
   const formattedValue = formatAmount(value.absoluteValue())
 

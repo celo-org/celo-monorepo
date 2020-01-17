@@ -68,21 +68,21 @@ exports[`renders for gold to dollar exchange properly 1`] = `
       Object {
         "__typename": "TransactionExchange",
         "amount": Object {
-          "amount": "-30",
           "currencyCode": "cUSD",
           "localAmount": null,
+          "value": "-30",
         },
         "hash": "0x00000000000000000000",
         "makerAmount": Object {
-          "amount": "30",
           "currencyCode": "cUSD",
           "localAmount": null,
+          "value": "30",
         },
         "status": "Complete",
         "takerAmount": Object {
-          "amount": "200",
           "currencyCode": "cGLD",
           "localAmount": null,
+          "value": "200",
         },
         "timestamp": 1542306118,
         "type": "EXCHANGE",

@@ -97,7 +97,7 @@ const renderBottomSection = (props: Props) => {
       <Text style={style.pSmall}>
         {t('receiveFlow8:receivedAmountFromCelo.0')}
         {CURRENCIES[currency].symbol}
-        {getMoneyDisplayValue(amount.amount)}
+        {getMoneyDisplayValue(amount.value)}
         {t('receiveFlow8:receivedAmountFromCelo.1')}
       </Text>
     )

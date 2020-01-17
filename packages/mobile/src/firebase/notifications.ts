@@ -66,7 +66,7 @@ function* handlePaymentReceived(
       new BigNumber(transferNotification.timestamp).toNumber(),
       {
         amount: {
-          amount: divideByWei(transferNotification.value).toString(),
+          value: divideByWei(transferNotification.value).toString(),
           currencyCode: CURRENCIES[currency].code,
         },
         address: transferNotification.sender.toLowerCase(),

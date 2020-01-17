@@ -148,21 +148,21 @@ describe('Blockscout', () => {
       Array [
         Object {
           "amount": Object {
-            "amount": "10",
             "currencyCode": "cUSD",
             "timestamp": 1566345866000,
+            "value": "10",
           },
           "block": "90637",
           "hash": "0x961403536006f9c120c23900f94da59dbf43edf10eb3569b448665483bab77b2",
           "makerAmount": Object {
-            "amount": "10",
             "currencyCode": "cGLD",
             "timestamp": 1566345866000,
+            "value": "10",
           },
           "takerAmount": Object {
-            "amount": "10",
             "currencyCode": "cUSD",
             "timestamp": 1566345866000,
+            "value": "10",
           },
           "timestamp": 1566345866000,
           "type": "EXCHANGE",
@@ -170,9 +170,9 @@ describe('Blockscout', () => {
         Object {
           "address": "0x8b7649116f169d2d2aebb6ea1a77f0baf31f2811",
           "amount": Object {
-            "amount": "-0.15",
             "currencyCode": "cUSD",
             "timestamp": 1566346276000,
+            "value": "-0.15",
           },
           "block": "90719",
           "comment": "",
@@ -183,9 +183,9 @@ describe('Blockscout', () => {
         Object {
           "address": "0xf4314cb9046bece6aa54bb9533155434d0c76909",
           "amount": Object {
-            "amount": "10",
             "currencyCode": "cUSD",
             "timestamp": 1566479946000,
+            "value": "10",
           },
           "block": "117453",
           "comment": "",
@@ -196,9 +196,9 @@ describe('Blockscout', () => {
         Object {
           "address": "0x0000000000000000000000000000000000a77357",
           "amount": Object {
-            "amount": "-0.2",
             "currencyCode": "cUSD",
             "timestamp": 1566484000000,
+            "value": "-0.2",
           },
           "block": "117451",
           "comment": "",
@@ -224,21 +224,21 @@ describe('Blockscout', () => {
       Array [
         Object {
           "amount": Object {
-            "amount": "-10",
             "currencyCode": "cGLD",
             "timestamp": 1566345866000,
+            "value": "-10",
           },
           "block": "90637",
           "hash": "0x961403536006f9c120c23900f94da59dbf43edf10eb3569b448665483bab77b2",
           "makerAmount": Object {
-            "amount": "10",
             "currencyCode": "cGLD",
             "timestamp": 1566345866000,
+            "value": "10",
           },
           "takerAmount": Object {
-            "amount": "10",
             "currencyCode": "cUSD",
             "timestamp": 1566345866000,
+            "value": "10",
           },
           "timestamp": 1566345866000,
           "type": "EXCHANGE",
@@ -246,9 +246,9 @@ describe('Blockscout', () => {
         Object {
           "address": "0xf4314cb9046bece6aa54bb9533155434d0c76909",
           "amount": Object {
-            "amount": "-1",
             "currencyCode": "cGLD",
             "timestamp": 1566481000000,
+            "value": "-1",
           },
           "block": "117451",
           "comment": "",
@@ -259,9 +259,9 @@ describe('Blockscout', () => {
         Object {
           "address": "0xf4314cb9046bece6aa54bb9533155434d0c76909",
           "amount": Object {
-            "amount": "10",
             "currencyCode": "cGLD",
             "timestamp": 1566482000000,
+            "value": "10",
           },
           "block": "117451",
           "comment": "",
@@ -272,9 +272,9 @@ describe('Blockscout', () => {
         Object {
           "address": "0x0000000000000000000000000000000000f40c37",
           "amount": Object {
-            "amount": "5",
             "currencyCode": "cGLD",
             "timestamp": 1566483000000,
+            "value": "5",
           },
           "block": "117451",
           "comment": "",

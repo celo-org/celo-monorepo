@@ -33,7 +33,7 @@ const getExchangeRate = (props: Props) => {
   }
 
   // For feed drilldown, the exchange rate has not been provided
-  return new BigNumber(makerAmount.amount).dividedBy(takerAmount.amount)
+  return new BigNumber(makerAmount.value).dividedBy(takerAmount.value)
 }
 
 const renderNewBalances = (

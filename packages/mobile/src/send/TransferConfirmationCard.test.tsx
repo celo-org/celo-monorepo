@@ -25,7 +25,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.VerificationFee,
       address: mockAccount,
       comment: '',
-      amount: { amount: '-0.3', currencyCode: 'cUSD', localAmount: null },
+      amount: { value: '-0.3', currencyCode: 'cUSD', localAmount: null },
     }
 
     const tree = renderer.create(
@@ -41,7 +41,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.Faucet,
       address: mockAccount,
       comment: '',
-      amount: { amount: '100', currencyCode: 'cUSD', localAmount: null },
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
     }
 
     const tree = renderer.create(
@@ -57,7 +57,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.Received,
       address: mockAccount,
       comment: '',
-      amount: { amount: '100', currencyCode: 'cUSD', localAmount: null },
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
     }
@@ -75,7 +75,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.EscrowReceived,
       address: mockAccount,
       comment: '',
-      amount: { amount: '100', currencyCode: 'cUSD', localAmount: null },
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
     }
@@ -93,7 +93,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.Sent,
       address: mockAccount,
       comment: mockComment,
-      amount: { amount: '-100', currencyCode: 'cUSD', localAmount: null },
+      amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
       fee: new BigNumber(0.01),
@@ -112,7 +112,7 @@ describe('TransferConfirmationCard', () => {
       type: TransactionType.EscrowSent,
       address: mockAccount,
       comment: mockComment,
-      amount: { amount: '-100', currencyCode: 'cUSD', localAmount: null },
+      amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
       fee: new BigNumber(0.01),

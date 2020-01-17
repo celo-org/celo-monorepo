@@ -46,14 +46,14 @@ export interface ExchangeRate {
 
 export interface LocalMoneyAmount {
   __typename?: 'LocalMoneyAmount'
-  amount: Scalars['Decimal']
+  value: Scalars['Decimal']
   currencyCode: Scalars['String']
   exchangeRate: Scalars['Decimal']
 }
 
 export interface MoneyAmount {
   __typename?: 'MoneyAmount'
-  amount: Scalars['Decimal']
+  value: Scalars['Decimal']
   currencyCode: Scalars['String']
   localAmount?: Maybe<LocalMoneyAmount>
 }
@@ -199,33 +199,33 @@ export interface ExchangeItemFragment {
   timestamp: number
   amount: {
     __typename?: 'MoneyAmount'
-    amount: string
+    value: string
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      amount: string
+      value: string
       currencyCode: string
       exchangeRate: string
     }>
   }
   takerAmount: {
     __typename?: 'MoneyAmount'
-    amount: string
+    value: string
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      amount: string
+      value: string
       currencyCode: string
       exchangeRate: string
     }>
   }
   makerAmount: {
     __typename?: 'MoneyAmount'
-    amount: string
+    value: string
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      amount: string
+      value: string
       currencyCode: string
       exchangeRate: string
     }>
@@ -273,11 +273,11 @@ export interface TransferItemFragment {
   comment: Maybe<string>
   amount: {
     __typename?: 'MoneyAmount'
-    amount: string
+    value: string
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      amount: string
+      value: string
       currencyCode: string
       exchangeRate: string
     }>

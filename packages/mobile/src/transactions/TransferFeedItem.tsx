@@ -83,7 +83,7 @@ export function TransferFeedItem(props: Props) {
     recipientCache,
   } = props
 
-  const isSent = new BigNumber(amount.amount).isNegative()
+  const isSent = new BigNumber(amount.value).isNegative()
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
@@ -150,10 +150,10 @@ TransferFeedItem.fragments = {
       type
       hash
       amount {
-        amount
+        value
         currencyCode
         localAmount {
-          amount
+          value
           currencyCode
           exchangeRate
         }

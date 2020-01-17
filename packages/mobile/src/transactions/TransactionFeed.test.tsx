@@ -16,17 +16,17 @@ const exchangeTransactions: FeedItem[] = [
     status: TransactionStatus.Complete,
     type: TransactionType.Exchange,
     amount: {
-      amount: '-30',
+      value: '-30',
       currencyCode: 'cUSD',
       localAmount: null,
     },
     makerAmount: {
-      amount: '30',
+      value: '30',
       currencyCode: 'cUSD',
       localAmount: null,
     },
     takerAmount: {
-      amount: '200',
+      value: '200',
       currencyCode: 'cGLD',
       localAmount: null,
     },
