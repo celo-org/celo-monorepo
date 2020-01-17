@@ -135,7 +135,7 @@ module.exports = async (callback: (error?: any) => number) => {
     // Report it
     await oracles.report(
       stableToken.address,
-      numerator.dividedBy(denominator).multipliedBy(await oracles.getDenominator()),
+      numerator.dividedBy(denominator),
       lesserKey,
       greaterKey
     )
