@@ -38,7 +38,9 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
         style={standardStyles.blockMarginBottom}
       />
       <View style={brandStyles.gap}>
-        <Text style={fonts.h5}>{t('composition.alignmentTitle')}</Text>
+        <Text style={[fonts.h5, standardStyles.elementalMarginBottom]}>
+          {t('composition.alignmentTitle')}
+        </Text>
         <Text style={fonts.p}>{t('composition.alignmentText')}</Text>
         <View
           style={[
@@ -57,7 +59,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
             </Text>
             <Text style={[fonts.legal]}>{t('composition.alignmentExampleText')}</Text>
           </View>
-          <View style={[styles.alignmentExample, { alignItems: 'center' }]}>
+          <View style={[styles.alignmentExample, styles.alignment2]}>
             <H4 style={[standardStyles.elementalMarginBottom, textStyles.center]}>
               {t('composition.alignmentExampleTitle')}
             </H4>
@@ -82,7 +84,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
             </H4>
             <View style={[standardStyles.row, standardStyles.elementalMarginTop]}>
               <Image source={exampleImage} style={styles.graphicTiny} />
-              <View style={{ flex: 1, paddingLeft: 10 }}>
+              <View style={styles.alignment3row}>
                 <Text style={[fonts.micro, styles.subtitle]}>
                   {t('composition.alignmentExampleSubtitle')}
                 </Text>
@@ -116,7 +118,7 @@ const GridArea = withNamespaces(NameSpaces.brand)(function _Grid({ t }: I18nProp
       <H2 style={standardStyles.elementalMarginBottom}>{t('composition.gridTitle')}</H2>
       <Text style={fonts.p}>{t('composition.gridText')}</Text>
       <View style={[styles.gridExamplesContainer, standardStyles.blockMarginTopTablet]}>
-        <GridExamples size={'¼'} row={'1'} colStart="1" colEnd={'12'} />
+        <GridExamples size={'⅟₁'} row={'1'} colStart="1" colEnd={'12'} />
         <GridExamples size={'½'} row={'2'} colStart="1" colEnd={'6'} />
         <GridExamples size={'½'} row={'2'} colStart="6" colEnd={'12'} />
         <GridExamples size={'⅓'} row={'3'} colStart="1" colEnd={'4'} />
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
     color: colors.purpleScreen,
     textAlign: 'center',
     fontSize: 22,
+    letterSpacing: -8,
   },
   alignments: {
     flexDirection: 'row',
@@ -176,6 +179,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     maxWidth: 400,
   },
+  alignment2: { alignItems: 'center' },
+  alignment3row: { flex: 1, paddingLeft: 10 },
   fourthAlignment: {
     marginTop: 5,
     display: 'grid',

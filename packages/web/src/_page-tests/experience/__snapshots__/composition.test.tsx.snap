@@ -1028,6 +1028,7 @@ exports[`Experience/Composition renders 1`] = `
                   "fontSize": "20px",
                   "fontWeight": "500",
                   "lineHeight": "24px",
+                  "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                 }
               }
@@ -1697,6 +1698,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -1707,7 +1709,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  ¼
+                  ⅟₁
                 </div>
               </div>
               <div
@@ -1754,6 +1756,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -1811,6 +1814,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -1868,6 +1872,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -1925,6 +1930,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -1982,6 +1988,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -2039,6 +2046,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -2096,6 +2104,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -2153,6 +2162,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
@@ -2210,6 +2220,7 @@ exports[`Experience/Composition renders 1`] = `
                       "color": "rgba(146,78,255,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
                       "fontSize": "22px",
+                      "letterSpacing": "-8px",
                       "lineHeight": "16px",
                       "paddingBottom": "12px",
                       "paddingLeft": "8px",
