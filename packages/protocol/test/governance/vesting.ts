@@ -1421,6 +1421,19 @@ contract('Vesting', (accounts: string[]) => {
       )
     })
 
+    it('should revert when paused', async () => {
+      const timeToTravel = 3 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialVestingAmount.div(4)
+      await assertRevert(vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary }))
+    })
+
+    it('should revert when withdrawable amount is zero', async () => {
+      const timeToTravel = 3 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      await assertRevert(vestingInstance.withdraw(new BigNumber(0), { from: beneficiary }))
+    })
+
     describe('#when not revoked', () => {
       it('should revert since beneficiary should not be able to withdraw anything within the first quarter under current test constellation', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
