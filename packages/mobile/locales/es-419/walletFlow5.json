@@ -1,7 +1,7 @@
 {
   "getStarted": "Primeros pasos",
-  "incomingPaymentRequests": "~~Requests from Others",
-  "outgoingPaymentRequests": "~~Payments You’ve Requested",
+  "incomingPaymentRequests": "Solicitudes de otros",
+  "outgoingPaymentRequests": "Pagos que ha solicitado",
   "SMSError": "Error al enviar SMS",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
