@@ -50,9 +50,7 @@ class FiatExchange extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  exchangeWebView: {
-    marginHorizontal: 20,
-  },
+  exchangeWebView: {},
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
