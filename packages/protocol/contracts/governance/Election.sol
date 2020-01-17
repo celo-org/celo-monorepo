@@ -25,6 +25,14 @@ contract Election is
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
+  function toBytes(address a) public pure returns (bytes32) {
+    return bytes32(uint256(a) << 96);
+  }
+
+  function toAddress(bytes32 b) public pure returns (address) {
+    return address(uint256(b) >> 96);
+  }
+
   struct PendingVote {
     // The value of the vote, in gold.
     uint256 value;
@@ -803,6 +811,87 @@ contract Election is
     returns (address[] memory groups, uint256[] memory values)
   {
     return votes.total.eligible.getElements();
+  }
+
+  function electValidatorSignersMinMemory() external view returns (address[] memory) {
+    // Groups must have at least `electabilityThreshold` proportion of the total votes to be
+    // considered for the election.
+    uint256 requiredVotes = electabilityThreshold
+      .multiply(FixidityLib.newFixed(getTotalVotes()))
+      .fromFixed();
+    // Only consider groups with at least `requiredVotes` but do not consider more groups than the
+    // max number of electable validators.
+    uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(
+      requiredVotes,
+      electableValidators.max
+    );
+    IValidators validators = getValidators();
+    // Holds the number of members elected for each of the eligible validator groups.
+    uint256[] memory numMembersElected = new uint256[](numElectionGroups);
+    uint256 totalNumMembersElected = 0;
+    // Assign a number of seats to each validator group.
+    while (totalNumMembersElected < electableValidators.max) {
+      uint256 groupIndex = 0;
+      bool memberElected = false;
+      (groupIndex, memberElected) = dHondtMinMemory(
+        numElectionGroups,
+        validators,
+        numMembersElected
+      );
+
+      if (memberElected) {
+        numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
+        totalNumMembersElected = totalNumMembersElected.add(1);
+      } else {
+        break;
+      }
+    }
+    require(totalNumMembersElected >= electableValidators.min, "Not enough elected validators");
+
+    // Grab the top validators from each group that won seats.
+    address[] memory electedValidators = new address[](totalNumMembersElected);
+    totalNumMembersElected = 0;
+    address group = toAddress(votes.total.eligible.list.head);
+    for (uint256 i = 0; i < numElectionGroups; i = i.add(1)) {
+      // We use the validating delegate if one is set.
+      address[] memory electedGroupValidators = validators.getTopGroupValidators(
+        group,
+        numMembersElected[i]
+      );
+      for (uint256 j = 0; j < electedGroupValidators.length; j = j.add(1)) {
+        electedValidators[totalNumMembersElected] = electedGroupValidators[j];
+        totalNumMembersElected = totalNumMembersElected.add(1);
+      }
+      group = toAddress(votes.total.eligible.list.elements[toBytes(group)].previousKey);
+    }
+    return electedValidators;
+  }
+
+  function dHondtMinMemory(
+    uint256 numElectionGroups,
+    IValidators validators,
+    uint256[] memory numMembersElected
+  ) private view returns (uint256, bool) {
+    bool memberElected = false;
+    uint256 groupIndex = 0;
+    address group = toAddress(votes.total.eligible.list.head);
+    FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
+    for (uint256 i = 0; i < numElectionGroups; i = i.add(1)) {
+      // Only consider groups with members left to be elected.
+      uint256 numMembers = validators.getGroupNumMembers(group);
+      if (numMembers > numMembersElected[i]) {
+        FixidityLib.Fraction memory n = FixidityLib
+          .newFixed(votes.total.eligible.getValue(group))
+          .divide(FixidityLib.newFixed(numMembersElected[i].add(1)));
+        if (n.gt(maxN)) {
+          maxN = n;
+          groupIndex = i;
+          memberElected = true;
+        }
+      }
+      group = toAddress(votes.total.eligible.list.elements[toBytes(group)].previousKey);
+    }
+    return (groupIndex, memberElected);
   }
 
   /**
