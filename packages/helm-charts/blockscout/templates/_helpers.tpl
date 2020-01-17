@@ -54,6 +54,8 @@ volumes:
   value: prod
 - name: LOGO
   value: /images/celo_logo.svg
+- name: CHAIN_SPEC_PATH
+  value: {{ .Values.blockscout.chain_spec_path }}
 {{- end -}}
 
 {{- define "celo.prom-to-sd-container" -}}

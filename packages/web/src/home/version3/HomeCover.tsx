@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
   },
   animationWrapperLargeAug: {
     justifyContent: 'flex-start',
+    marginTop: 20,
   },
   stillText: {
     marginLeft: 25,

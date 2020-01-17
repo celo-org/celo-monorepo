@@ -1,10 +1,12 @@
 import BigNumber from 'bignumber.js'
-import { ExchangeRatePair } from 'src/exchange/reducer'
+import { ExchangeRate, ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 
 export enum Actions {
   FETCH_EXCHANGE_RATE = 'EXCHANGE/FETCH_EXCHANGE_RATE',
   SET_EXCHANGE_RATE = 'EXCHANGE/SET_EXCHANGE_RATE',
+  UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY = 'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY',
+  SET_CELO_GOLD_EXCHANGE_RATE_HISTORY = 'SET_CELO_GOLD_EXCHANGE_RATE_HISTORY',
   EXCHANGE_TOKENS = 'EXCHANGE/EXCHANGE_TOKENS',
   FETCH_TOBIN_TAX = 'EXCHANGE/FETCH_TOBIN_TAX',
   SET_TOBIN_TAX = 'EXCHANGE/SET_TOBIN_TAX',
@@ -38,6 +40,11 @@ export interface ExchangeTokensAction {
   makerAmount: BigNumber
 }
 
+export interface UpdateCeloGoldExchangeRateHistory {
+  type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY
+  exchangeRates: ExchangeRate[]
+}
+
 export const fetchExchangeRate = (
   makerToken?: CURRENCY_ENUM,
   makerAmount?: BigNumber
@@ -63,6 +70,13 @@ export const setTobinTax = (tobinTax: string): SetTobinTaxAction => ({
   tobinTax,
 })
 
+export const updateCeloGoldExchangeRateHistory = (
+  exchangeRates: ExchangeRate[]
+): UpdateCeloGoldExchangeRateHistory => ({
+  type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY,
+  exchangeRates,
+})
+
 export const exchangeTokens = (
   makerToken: CURRENCY_ENUM,
   makerAmount: BigNumber
@@ -71,4 +85,9 @@ export const exchangeTokens = (
   makerToken,
   makerAmount,
 })
-export type ActionTypes = SetExchangeRateAction | ExchangeTokensAction | SetTobinTaxAction
+
+export type ActionTypes =
+  | SetExchangeRateAction
+  | ExchangeTokensAction
+  | SetTobinTaxAction
+  | UpdateCeloGoldExchangeRateHistory
