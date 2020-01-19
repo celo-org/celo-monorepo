@@ -909,7 +909,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#vesting - pause()', () => {
+  describe('#pause()', () => {
     it('revoker should be able to pause the vesting', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -964,7 +964,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#vesting - revoke()', () => {
+  describe('#revoke()', () => {
     it('revoker should be able to revoke the vesting', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       const vestingInstanceRegistryAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -1515,6 +1515,58 @@ contract('Vesting', (accounts: string[]) => {
         await timeTravel(timeToTravel, web3)
         const expectedWithdrawalAmount = initialVestingAmount
         await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+
+        try {
+          await vestingInstance.totalWithdrawn()
+          return assert.isTrue(false)
+        } catch (ex) {
+          return assert.isTrue(true)
+        }
+      })
+    })
+
+    describe('#when revoked', () => {
+      it('beneficiary should be able to withdraw up to the vestedBalanceAtRevoke under current test constellation', async () => {
+        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        const timeToTravel = 6 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        await vestingInstance.revoke({ from: revoker })
+        const expectedWithdrawalAmount = await vestingInstance.vestedBalanceAtRevoke()
+        await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+        const totalWithdrawn = await vestingInstance.totalWithdrawn()
+        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+        assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
+        assertEqualBN(
+          new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+          expectedWithdrawalAmount
+        )
+      })
+
+      it('should revert if beneficiary attempts to withdraw more than vestedBalanceAtRevoke under current test constellation', async () => {
+        const timeToTravel = 6 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        await vestingInstance.revoke({ from: revoker })
+        const expectedWithdrawalAmount = await vestingInstance.vestedBalanceAtRevoke()
+        await assertRevert(
+          vestingInstance.withdraw(new BigNumber(expectedWithdrawalAmount).multipliedBy(1.1), {
+            from: beneficiary,
+          })
+        )
+      })
+
+      it('should selfdestruct if beneficiary withdraws the entire amount under current test constellation', async () => {
+        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        const timeToTravel = 12 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        await vestingInstance.revoke({ from: revoker })
+        const expectedWithdrawalAmount = await vestingInstance.vestedBalanceAtRevoke()
+        await vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+
+        assertEqualBN(
+          new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+          expectedWithdrawalAmount
+        )
 
         try {
           await vestingInstance.totalWithdrawn()
