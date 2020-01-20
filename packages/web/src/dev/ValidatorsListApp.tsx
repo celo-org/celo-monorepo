@@ -5,19 +5,19 @@ import gql from 'graphql-tag'
 import getConfig from 'next/config'
 import * as React from 'react'
 import { ApolloProvider, Query } from 'react-apollo'
-import ValidatorsList from 'src/dev/ValidatorsList'
 import ShowApolloError from 'src/dev/ShowApolloError'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import ValidatorsList from 'src/dev/ValidatorsList'
+import { I18nProps, withNamespaces, NameSpaces } from 'src/i18n'
 
 function createApolloClient() {
   return new ApolloClient({
-    uri: getConfig().publicRuntimeConfig.LEADERBOARD.uri,
+    uri: getConfig().publicRuntimeConfig.BLOCKSCOUT.uri,
     cache: new InMemoryCache(),
     // TODO: Remove this workaround when the backend service fixes not needed errors
     fetch: async (...args) => {
       const response = await fetch(...args)
       const { data } = await response.json()
-      return new Response(JSON.stringify({ data }))
+      return new (Response as any)(JSON.stringify({ data }))
     },
   })
 }
@@ -66,7 +66,7 @@ const query = gql`
 
 class ValidatorsListApp extends React.PureComponent<I18nProps> {
   render() {
-    if (!getConfig().publicRuntimeConfig.FLAGS.LEADERBOARD) {
+    if (!getConfig().publicRuntimeConfig.FLAGS.VALIDATORS) {
       return null
     }
     return (
@@ -84,4 +84,4 @@ class ValidatorsListApp extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces('dev')(ValidatorsListApp)
+export default withNamespaces(NameSpaces.dev)(ValidatorsListApp)

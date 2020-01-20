@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { H1 } from 'src/fonts/Fonts'
-import { StyleSheet, View, Clipboard } from 'react-native'
 import { BigNumber } from 'bignumber.js'
+import * as React from 'react'
+import { Clipboard, StyleSheet, View } from 'react-native'
+import css from 'src/dev/ValidatorsList.scss'
+import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import Chevron, { Direction } from 'src/icons/chevron'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
-import Chevron, { Direction } from 'src/icons/chevron'
-import css from 'src/dev/ValidatorsList.scss'
 
 interface ValidatorsListProps {
   data: any
@@ -49,12 +49,13 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
 
     return celoValidatorGroups
       .map(({ account, affiliates, votes }) => {
-        const { address, name, usd, lockedGold } = account
+        const group = account
+        const gName = group.name
         return {
-          name: (name || '').length <= 20 ? name : `${name.substr(0, 17)}...`,
-          address,
-          usd: usd / 10 ** 18,
-          gold: lockedGold / 10 ** 18,
+          name: (gName || '').length <= 20 ? gName : `${gName.substr(0, 17)}...`,
+          address: group.address,
+          usd: group.usd / 10 ** 18,
+          gold: group.lockedGold / 10 ** 18,
           votes: new BigNumber(votes)
             .dividedBy(totalVotes)
             .multipliedBy(100)
@@ -80,7 +81,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
         }
       })
       .map((group) => {
-        let data = group.validators.reduce(
+        const data = group.validators.reduce(
           ({ elected, online, uptime }, validator) => ({
             elected: elected + +validator.elected,
             online: online + +validator.online,
@@ -102,13 +103,13 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
     const validatorGroups = data ? this.cleanData(data) : []
     return (
       <View style={styles.cover}>
-        <View style={styles.container}>
+        <View>
           <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
             Validator Explorer
           </H1>
-          <table className={[css['table'], css['main-table']].join(' ')}>
+          <table className={[css.table, css['main-table']].join(' ')}>
             <thead>
-              <tr className={css['table__heading']}>
+              <tr className={css.table__heading}>
                 <th className={css['table__cell--title-padding']}>Name</th>
                 <th className={css['table__cell--center']}>Elected</th>
                 <th className={css['table__cell--center']}>Online</th>
@@ -124,7 +125,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                 <>
                   <tr key={i}>
                     <td
-                      onClick={() => this.expand(i)}
+                      onClick={this.expand.bind(this, i)}
                       className={[css['table__cell--title'], css['table__cell--clickable']].join(
                         ' '
                       )}
@@ -157,7 +158,10 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     </td>
                     <td>
                       {this.cutAddress(group.address)}
-                      <span className={css.copy} onClick={() => this.copyAddress(group.address)}>
+                      <span
+                        className={css.copy}
+                        onClick={this.copyAddress.bind(this, group.address)}
+                      >
                         copy
                       </span>
                     </td>
@@ -184,13 +188,13 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                           {group.validators && (
                             <table
                               className={[
-                                css['table'],
+                                css.table,
                                 css['table--secondary'],
                                 css['validator-list-expansion__table'],
                               ].join(' ')}
                             >
                               <thead>
-                                <tr className={css['table__heading']}>
+                                <tr className={css.table__heading}>
                                   <th>Name</th>
                                   <th className={css['table__cell--center']}>Elected</th>
                                   <th className={css['table__cell--center']}>Online</th>
@@ -207,7 +211,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                                     <td className={css['table__cell--center']}>
                                       <span
                                         className={[
-                                          css['circle'],
+                                          css.circle,
                                           css[`circle--${validator.elected ? 'ok' : 'error'}`],
                                         ].join(' ')}
                                       />
@@ -215,7 +219,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                                     <td className={css['table__cell--center']}>
                                       <span
                                         className={[
-                                          css['circle'],
+                                          css.circle,
                                           css[`circle--${validator.online ? 'ok' : 'error'}`],
                                         ].join(' ')}
                                       />
@@ -224,7 +228,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                                       {this.cutAddress(validator.address)}
                                       <span
                                         className={css.copy}
-                                        onClick={() => this.copyAddress(validator.address)}
+                                        onClick={this.copyAddress.bind(this, validator.address)}
                                       >
                                         copy
                                       </span>
@@ -260,9 +264,6 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
 export default withNamespaces('dev')(ValidatorsListApp)
 
 const styles = StyleSheet.create({
-  container: {
-    // marginTop: HEADER_HEIGHT,
-  },
   content: {
     paddingBottom: 10,
   },

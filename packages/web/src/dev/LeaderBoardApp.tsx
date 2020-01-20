@@ -11,7 +11,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 
 function createApolloClient() {
   return new ApolloClient({
-    uri: getConfig().publicRuntimeConfig.LEADERBOARD.uri,
+    uri: getConfig().publicRuntimeConfig.BLOCKSCOUT.uri,
     cache: new InMemoryCache(),
     fetch,
   })
@@ -50,4 +50,4 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces('dev')(LeaderBoardApp)
+export default withNamespaces(NameSpaces.dev)(LeaderBoardApp)
