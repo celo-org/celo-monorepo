@@ -31,6 +31,14 @@ OPTION_LINK = "link"
 OPTION_ADDRESS = "address"
 OPTION_VERIFY = "verify"
 OPTION_CACHE = "cache"
+OPTION_LINK_CANDIDATES = "linkCandidates"
+OPTION_SOLC_ARGS = "solc_args"
+
+def fatal_error(s):
+	print(s)
+	if DEBUG:
+		raise Exception(s)
+	sys.exit(1)
 
 def debug_print(s):
 	if DEBUG:
@@ -65,7 +73,8 @@ def run_cmd(cmd,name):
 		with open(stdout_name,'w+') as stdout:
 			with open(stderr_name,'w+') as stderr:
 				try:
-					exitcode = subprocess.call([cmd.split(" ")[0]] + cmd.split(" ")[1:], stdout=stdout, stderr=stderr)
+					# Skip blank strings
+					exitcode = subprocess.call([cmd.split(" ")[0]] + [x for x in cmd.split(" ")[1:] if x], stdout=stdout, stderr=stderr)
 					if exitcode:
 						print("Failed to run %s" % cmd)
 						with open(stderr_name,'r') as stderr_read:
@@ -105,6 +114,7 @@ def current_conf_to_file(parsed_options, files, fileToContractName):
 	simple_set(OPTION_SOLC)
 	simple_set(OPTION_SOLC_MAP)
 	simple_set(OPTION_PATH)
+	simple_set(OPTION_SOLC_ARGS)
 	
 	if OPTION_LINK in parsed_options:
 		out[OPTION_LINK] = {}
@@ -136,6 +146,8 @@ def current_conf_to_file(parsed_options, files, fileToContractName):
 				out[OPTION_VERIFY][contract].append(spec)
 			else:
 				out[OPTION_VERIFY][contract] = [spec,]
+				
+	# TODO: Add OPTION_LINK_CANDIDATES handling from comamnd line to conf			
 
 	# finally... files:
 	out[MANDATORY_CONTRACTS] = []
@@ -177,6 +189,9 @@ def read_from_conf(conf_file_name, parsed_options, files, fileToContractName):
 		
 		if OPTION_SOLC in json_obj:
 			parsed_options[OPTION_SOLC] = json_obj[OPTION_SOLC]
+		
+		if OPTION_SOLC_ARGS in json_obj:
+			parsed_options[OPTION_SOLC_ARGS] = json_obj[OPTION_SOLC_ARGS]
 			
 		if OPTION_LINK in json_obj:
 			flattened_links = []
@@ -206,6 +221,9 @@ def read_from_conf(conf_file_name, parsed_options, files, fileToContractName):
 				for specfile in json_obj[OPTION_VERIFY][contract_verquery]:
 					flattened_verification_queries.append("%s:%s" % (contract_verquery,specfile))
 			parsed_options[OPTION_VERIFY] = flattened_verification_queries
+		
+		if OPTION_LINK_CANDIDATES in json_obj:
+			parsed_options[OPTION_LINK_CANDIDATES] = json_obj[OPTION_LINK_CANDIDATES]
 			
 		if OPTION_CACHE in json_obj:
 			parsed_options[OPTION_CACHE] = json_obj[OPTION_CACHE]

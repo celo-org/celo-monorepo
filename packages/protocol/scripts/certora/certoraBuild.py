@@ -14,7 +14,7 @@ from datetime import datetime
 import distutils.dir_util
 import certoraUtils
 from certoraUtils import debug_print, is_windows, safe_create_dir, run_cmd, get_file_basename, get_file_extension, read_from_conf, handle_file_list, get_file_name, current_conf_to_file
-from certoraUtils import OPTION_SOLC, OPTION_SOLC_MAP, OPTION_PATH, OPTION_OUTPUT, OPTION_OUTPUT_FOLDER, OPTION_OUTPUT_VERIFY, OPTION_VERIFY, OPTION_LINK, OPTION_PACKAGES, OPTION_PACKAGES_PATH, OPTION_CACHE, DEFAULT_CONF, OPTION_ADDRESS
+from certoraUtils import OPTION_SOLC, OPTION_SOLC_ARGS, OPTION_SOLC_MAP, OPTION_PATH, OPTION_OUTPUT, OPTION_OUTPUT_FOLDER, OPTION_OUTPUT_VERIFY, OPTION_VERIFY, OPTION_LINK, OPTION_PACKAGES, OPTION_PACKAGES_PATH, OPTION_CACHE, DEFAULT_CONF, OPTION_ADDRESS, OPTION_LINK_CANDIDATES, fatal_error
 
 def print_usage(): # TODO use the macros in print usage as well?
 	print("""Usage: 
@@ -29,6 +29,7 @@ def print_usage(): # TODO use the macros in print usage as well?
        [--path ALLOWED_PATH (default: $PWD/contracts/)]
        [--packages_path PATH (default: $NODE_PATH)] or [--packages [name=path,...]]
        [--solc SOLC_EXEC (default: solc)] or [--solc_map [name=solc,..]]
+       [--solc_args 'SOLC_ARGS' (default: none. wrap in quotes, may need to escape)]
        [--verify [contractName:specName, ...]]
        [--dont_fetch_sources]
        [--iscygwin]
@@ -170,8 +171,11 @@ try:
 			debug_print("Adding solc mapping from %s to %s" % (contract,solcver))
 			solc_mappings[contract]=solcver
 			
-	
-	
+	if OPTION_SOLC_ARGS in parsed_options:
+		solcargs = parsed_options[OPTION_SOLC_ARGS]
+		normalized = ' '.join(map(lambda x: x.replace("'",""), solcargs))
+		parsed_options[OPTION_SOLC_ARGS] = normalized
+		
 	
 	### FROM THIS POINT ONWARD, parsed_options and solc_mappings are not changed!
 	# Store current options
@@ -205,6 +209,11 @@ try:
 				outputs = f["outputs"]
 				#outputTypes = ",".join(map(lambda x: "\"%s\""%(x["type"]), outputs))
 				outputTypes = [x["type"] for x in outputs]
+				if len(outputs)==1 and len(outputTypes)==1 and outputTypes[0]=="tuple":
+					outputTypes = [x["type"] for x in outputs[0]["components"]]
+				if len(outputs)>1 and len([x for x in outputs if x["type"]=="tuple" or x["type"]=="tuple[]"]) > 0:
+					print("There is a problem with function %s that has a complicated output type %s with tuples or tuple arrays" % (f["name"],outputs))
+					
 			else:
 				outputTypes = ""
 			if "payable" not in f:
@@ -218,7 +227,7 @@ try:
 			hash.update(str.encode(base))
 			hex = hash.hexdigest()[0:8]
 						
-			funcs.append({"name":f["name"],"args":inputTypes,"returns":outputTypes,"sighash":hex,"notpayable":isNotPayable})
+			funcs.append({"name":f["name"],"args":inputTypes,"returns":outputTypes,"sighash":hex,"notpayable":isNotPayable,"isABI":True})
 
 
 		# Add funcs from hashes (because of libraries for instance, that have empty ABI but do have hashes.)
@@ -240,7 +249,7 @@ try:
 				assert prev_func["sighash"] == hash, "There is already a function names %s, args %s, but hash %s with found %s" % (name,prev_func["args"],prev_func["sighash"],hash)
 			else: # Otherwise, add with available information
 				print("Found an instance of %s(%s) that did not appear in ABI" % (name,args))
-				funcs.append({"name":name,"args":args,"returns":[],"sighash":hash})
+				funcs.append({"name":name,"args":args,"returns":[],"sighash":hash,"isABI":False})
 			
 			
 		return funcs
@@ -281,6 +290,10 @@ try:
 		
 	def find_contract_address_str(contract,contracts_with_chosen_addresses):
 		address_and_contracts = [ e for e in contracts_with_chosen_addresses if e[1] == contract ]
+		if len(address_and_contracts) == 0:
+			contractFile,contractName = contract.split(":")
+			msg = "Failed to find a contract named %s in file %s, please make sure there is a file named like the contract, or a file containing a contract with this name. Available contracts: %s" % (contractName,contractFile, ','.join(map(lambda x: x[1], contracts_with_chosen_addresses)))
+			fatal_error(msg)
 		address_and_contract = address_and_contracts[0]
 		address = address_and_contract[0]
 		contract = address_and_contract[1].split(":")[1]
@@ -299,12 +312,45 @@ try:
 		debug_print("Contracts with chosen addresses: %s" % ([("0x%X" % x[0],x[1]) for x in contracts_with_chosen_addresses]))
 		
 		with open("%s/%s.bin-runtime" % (path, contract_name)) as binary:
+			old_style_linker_hints = False
+			
 			for i,line in enumerate(binary):
 				debug_print("Working on line %d - %s" % (i,line))
 				if i == 0:
 					unlinked_binary = line.strip()
+					try:
+						has_libraries = unlinked_binary.index("__")
+					except ValueError:
+						has_libraries = False
+					# If has libraries, then need to examine each link point, see if it's old-style (prefix of contract to link), or new-style ('$' delimited)
+					# If it's old style, we will build the linker hints here, otherwise we will look for new-style linker hints
+					if has_libraries:
+						# Fetch all occurrences of "__"
+						delimit_occurrences = [delocc.start() for delocc in re.finditer("__",unlinked_binary)]
+						for occ in range(0,len(delimit_occurrences), 2):
+							link_prefix = unlinked_binary[delimit_occurrences[occ]+len("__"):delimit_occurrences[occ+1]]
+							debug_print("Handling %d occurrence of delimiter, text is %s" %(occ,link_prefix))
+							# contracts_with_chosen_addresses is a list of pairs. look for pairs where the link is a prefix of the second element
+							full_link_candidates = [tup[1] for tup in contracts_with_chosen_addresses if tup[1].startswith(link_prefix)]
+							debug_print("Found full link candidates: %s" % (full_link_candidates))
+							if len(full_link_candidates) > 1:
+								fatal_error("Cannot have more than two contracts matching the library link hint %s" %(link_prefix))
+							if len(full_link_candidates) == 1:
+								# We're using old style linker hints for sure now
+								old_style_linker_hints = True
+								# Add linker hint
+								handle = link_prefix
+								contract = full_link_candidates[0]
+								# The linker hints map is a map from pairs of handle (the in-file string) and the contract representation to the number of its occurrences
+								if (handle,contract) not in linker_hints:
+									linker_hints[(handle,contract)] = 1
+								else:
+									linker_hints[(handle,contract)] += 1
 				
 				if line.startswith("//"):
+					if old_style_linker_hints:
+						fatal_error("Uses old-style linker hints (pre solc5) but still saw comments in bin-runtime. Examine that!")
+						
 					if saw_linker_hints == -1:
 						saw_linker_hints = i
 						
@@ -324,7 +370,10 @@ try:
 				# index is received from the full length, minus the length of the string, and minus the last split
 				return len(data) - len(string) - len(splits[-1])
 			
-			# Start to link
+			# Start to link.
+			# The loop changes the binary in each iteration. External loop goes through linker hints, internal loop goes through occurrences.
+			# The idea is to go through the pairs, and for each pair to go in reverse. We change the linked binary, therefore to avoid invalidating the indices of previous occurrences, we go from th e last occurrence to the first one
+			# (Not clear why solc itself produces entry key->value per each occurrence instead of just once - after all, a key should always map to the same linked contract.)
 			linked_binary = unlinked_binary
 			for linker_hint in linker_hints:
 				debug_print("Handling linker hint %s with %d occurrences" % (linker_hint, linker_hints[linker_hint]))
@@ -348,6 +397,12 @@ try:
 		else:
 			return parsed_options[OPTION_SOLC]
 			
+	def get_extra_solc_args(contract):
+		if OPTION_SOLC_ARGS in parsed_options:
+			return parsed_options[OPTION_SOLC_ARGS]
+		else:
+			return ""
+			
 	def collect_for_file(file,file_index):
 		global library_addresses
 		primary_contract = fileToContractName[file]
@@ -356,14 +411,15 @@ try:
 		safe_create_dir(compilation_path)
 		
 		solc_ver_to_run = get_relevant_solc(primary_contract)
+		solc_add_extra_args = get_extra_solc_args(primary_contract)
 		
 		# ABI and bin-runtime cmds preparation
 		if OPTION_PACKAGES in parsed_options:
-			abi_collect_cmd = "%s -o %s/ --overwrite --combined-json abi,hashes,srcmap-runtime%s --allow-paths %s %s %s" % (solc_ver_to_run, config_path, ",local-mappings-runtime" if "varmap" in parsed_options else "", parsed_options[OPTION_PATH], parsed_options[OPTION_PACKAGES], file)
-			bin_runtime_collect_cmd = "%s -o %s/ --overwrite --bin-runtime --allow-paths %s %s %s" % (solc_ver_to_run, compilation_path, parsed_options[OPTION_PATH], parsed_options[OPTION_PACKAGES], file)
+			abi_collect_cmd = "%s %s -o %s/ --overwrite --combined-json abi,hashes,srcmap-runtime%s --allow-paths %s %s %s" % (solc_ver_to_run, solc_add_extra_args, config_path, ",local-mappings-runtime" if "varmap" in parsed_options else "", parsed_options[OPTION_PATH], parsed_options[OPTION_PACKAGES], file)
+			bin_runtime_collect_cmd = "%s %s -o %s/ --overwrite --bin-runtime --allow-paths %s %s %s" % (solc_ver_to_run, solc_add_extra_args, compilation_path, parsed_options[OPTION_PATH], parsed_options[OPTION_PACKAGES], file)
 		else:
-			abi_collect_cmd = "%s -o %s/ --overwrite --combined-json abi,hashes,srcmap-runtime%s --allow-paths %s %s" % (solc_ver_to_run, config_path, ",local-mappings-runtime" if "varmap" in parsed_options else "", parsed_options[OPTION_PATH], file)
-			bin_runtime_collect_cmd = "%s -o %s/ --overwrite --bin-runtime --allow-paths %s %s" % (solc_ver_to_run, compilation_path, parsed_options[OPTION_PATH], file)
+			abi_collect_cmd = "%s %s -o %s/ --overwrite --combined-json abi,hashes,srcmap-runtime%s --allow-paths %s %s" % (solc_ver_to_run, solc_add_extra_args, config_path, ",local-mappings-runtime" if "varmap" in parsed_options else "", parsed_options[OPTION_PATH], file)
+			bin_runtime_collect_cmd = "%s %s -o %s/ --overwrite --bin-runtime --allow-paths %s %s" % (solc_ver_to_run, solc_add_extra_args, compilation_path, parsed_options[OPTION_PATH], file)
 			
 		# ABI
 		run_cmd(abi_collect_cmd,"%s.abi" % (sdc_name))
@@ -422,8 +478,16 @@ try:
 				fetched_source = contract_file
 				
 			fetched_srclist[idx_in_src_list] = fetched_source
+			
+			if OPTION_LINK_CANDIDATES in parsed_options:
+				if contract_name in parsed_options[OPTION_LINK_CANDIDATES]:
+					linkCandidates = parsed_options[OPTION_LINK_CANDIDATES][contract_name]
+				else:
+					linkCandidates = {}
+			else:
+				linkCandidates = {}
 		
-			contracts_in_sdc.append({"name":contract_name,"original_file":contract_file,"file":fetched_source,"address":address,"methods":funcs,"bytecode":bytecode,"srcmap":srcmap,"varmap":varmap})
+			contracts_in_sdc.append({"name":contract_name,"original_file":contract_file,"file":fetched_source,"address":address,"methods":funcs,"bytecode":bytecode,"srcmap":srcmap,"varmap":varmap,"linkCandidates":linkCandidates})
 		
 		# Rebuild srclist for web compatibility
 		if "fetched_sources" in parsed_options:
@@ -473,10 +537,12 @@ try:
 		sdc = SDCs[get_one_sdc_name_from_SDCs(primary_contract)] # Enough to pick one
 		file = sdc["sdc_origin_file"]
 		solc_ver_to_run = get_relevant_solc(primary_contract)
+		solc_add_extra_args = get_extra_solc_args(primary_contract)
+		
 		if OPTION_PACKAGES in parsed_options:
-			asm_collect_cmd = "%s -o %s/ --overwrite --asm --allow-paths %s %s %s" % (solc_ver_to_run, config_path, parsed_options[OPTION_PATH], parsed_options[OPTION_PACKAGES], file)
+			asm_collect_cmd = "%s %s -o %s/ --overwrite --asm --allow-paths %s %s %s" % (solc_ver_to_run, solc_add_extra_args, config_path, parsed_options[OPTION_PATH], parsed_options[OPTION_PACKAGES], file)
 		else:
-			asm_collect_cmd = "%s -o %s/ --overwrite --asm --allow-paths %s %s" % (solc_ver_to_run, config_path, parsed_options[OPTION_PATH], file)
+			asm_collect_cmd = "%s %s -o %s/ --overwrite --asm --allow-paths %s %s" % (solc_ver_to_run, solc_add_extra_args, config_path, parsed_options[OPTION_PATH], file)
 		run_cmd(asm_collect_cmd,"%s.asm" % (primary_contract))
 		with open("%s/%s.evm" % (config_path,primary_contract),"r") as asm_file:
 			debug_print("Got asm %s" % (asm_file))
@@ -609,6 +675,8 @@ try:
 		vq_idx = 0
 		for verification_query in verification_queries:
 			vq_contract,vq_spec = verification_query.split(":",2)
+			if len(get_matching_sdc_names_from_SDCs(vq_contract)) == 0:
+				fatal_error("Could not find contract %s in contracts [%s]" % (vq_contract, ','.join(map(lambda x: x[1]["primary_contract"], SDCs.items()))))
 			# copy vq_spec to config_path
 			specname = '%d_%s.spec' % (vq_idx,get_file_basename(vq_spec)) # make sure it is unique with vq_idx
 			path_to_specname = '%s/%s' % (CERTORA_CONFIG,specname)
