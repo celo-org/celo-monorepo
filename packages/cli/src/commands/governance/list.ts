@@ -1,8 +1,9 @@
+import { valueToString } from '@celo/contractkit/src/wrappers/BaseWrapper'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import chalk from 'chalk'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import { printValueMap } from '../../utils/cli'
 
 export default class List extends BaseCommand {
   static description = 'List live governance proposals (queued and ongoing)'
@@ -21,13 +22,19 @@ export default class List extends BaseCommand {
     const sortedQueue = governance.sortedQueue(queue)
 
     console.log(chalk.magenta.bold('Queued Proposals:'))
-    sortedQueue.forEach((p) => printValueMap(p, chalk.magenta))
+    cli.table(sortedQueue, {
+      ID: { get: (p) => valueToString(p.proposalID) },
+      upvotes: { get: (p) => valueToString(p.upvotes) },
+    })
 
     const dequeue = await governance.getDequeue()
     const stages = await concurrentMap(5, dequeue, governance.getProposalStage)
     const proposals = zip((proposalID, stage) => ({ proposalID, stage }), dequeue, stages)
 
     console.log(chalk.blue.bold('Dequeued Proposals:'))
-    proposals.forEach((p) => printValueMap(p, chalk.blue))
+    cli.table(proposals, {
+      ID: { get: (p) => valueToString(p.proposalID) },
+      stage: {},
+    })
   }
 }
