@@ -10,6 +10,8 @@ metadata:
     component: ethstats
   annotations:
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/permanent-redirect: "https://{{ .Release.Namespace }}-celostats.celo-networks-dev.org"
 spec:
   tls:
   - hosts:
