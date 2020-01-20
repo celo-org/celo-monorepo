@@ -39,7 +39,7 @@
 		"TIMEOUT": []
 	},
 		"envfreeFuncsStaticCheck": {
-		"SUCCESS": ["getNonvotingLockedGold", "getAccountNonvotingLockedGold", "getTotalPendingWithdrawals", "getPendingWithdrawalsLength", "getPendingWithdrawalsIndex", "getunlockingPeriod"],
+		"SUCCESS": ["getNonvotingLockedGold()", "getAccountNonvotingLockedGold(address)", "getTotalPendingWithdrawals(address)", "getPendingWithdrawalsLength(address)", "getPendingWithdrawalsIndex(address,uint256)", "getunlockingPeriod()"],
 		"FAIL": [],
 		"UNKNOWN": [],
 		"TIMEOUT": []
