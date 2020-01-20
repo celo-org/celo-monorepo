@@ -218,6 +218,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     (res) => Object.keys(ProposalStage)[valueToInt(res)] as ProposalStage
   )
 
+  async timeUntilStages(proposalID: BigNumber.Value) {
+    const meta = await this.getProposalMetadata(proposalID)
+    const durations = await this.stageDurations()
+    const referendum = meta.timestamp.plus(durations.Approval)
+    const execution = referendum.plus(durations.Referendum)
+    const expiration = referendum.plus(durations.Execution)
+    return { referendum, execution, expiration }
+  }
+
   /**
    * Returns the proposal associated with a given id.
    * @param proposalID Governance proposal UUID
@@ -241,7 +250,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
     if (stage === ProposalStage.Queued) {
       upvotes = await this.getUpvotes(proposalID)
-    } else if (stage >= ProposalStage.Referendum && stage < ProposalStage.Expiration) {
+    } else if (stage !== ProposalStage.Expiration) {
       votes = await this.getVotes(proposalID)
     }
 
