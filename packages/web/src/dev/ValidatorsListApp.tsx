@@ -13,8 +13,12 @@ function createApolloClient() {
   return new ApolloClient({
     uri: getConfig().publicRuntimeConfig.LEADERBOARD.uri,
     cache: new InMemoryCache(),
-    // Avoid errors
-    fetch,
+    // TODO: Remove this workaround when the backend service fixes not needed errors
+    fetch: async (...args) => {
+      const response = await fetch(...args)
+      const { data } = await response.json()
+      return new Response(JSON.stringify({ data }))
+    },
   })
 }
 
