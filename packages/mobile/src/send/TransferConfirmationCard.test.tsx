@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
 import { createMockStore } from 'test/utils'
 import {
@@ -22,7 +22,7 @@ const store = createMockStore({
 describe('TransferConfirmationCard', () => {
   it('renders correctly for verification fee drilldown', () => {
     const props = {
-      type: TransactionType.VerificationFee,
+      type: TokenTransactionType.VerificationFee,
       address: mockAccount,
       comment: '',
       amount: { value: '-0.3', currencyCode: 'cUSD', localAmount: null },
@@ -38,7 +38,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for faucet drilldown', () => {
     const props = {
-      type: TransactionType.Faucet,
+      type: TokenTransactionType.Faucet,
       address: mockAccount,
       comment: '',
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
@@ -54,7 +54,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for received transaction drilldown', () => {
     const props = {
-      type: TransactionType.Received,
+      type: TokenTransactionType.Received,
       address: mockAccount,
       comment: '',
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
@@ -72,7 +72,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for received escrow transaction drilldown', () => {
     const props = {
-      type: TransactionType.EscrowReceived,
+      type: TokenTransactionType.EscrowReceived,
       address: mockAccount,
       comment: '',
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
@@ -90,7 +90,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for sent transaction drilldown', () => {
     const props = {
-      type: TransactionType.Sent,
+      type: TokenTransactionType.Sent,
       address: mockAccount,
       comment: mockComment,
       amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },
@@ -109,7 +109,7 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for sent escrow transaction drilldown', () => {
     const props = {
-      type: TransactionType.EscrowSent,
+      type: TokenTransactionType.EscrowSent,
       address: mockAccount,
       comment: mockComment,
       amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },

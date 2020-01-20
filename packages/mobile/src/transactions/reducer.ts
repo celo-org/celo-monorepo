@@ -1,10 +1,10 @@
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, ActionTypes } from 'src/transactions/actions'
 
 export interface ExchangeStandby {
   id: string
-  type: TransactionType.Exchange
+  type: TokenTransactionType.Exchange
   status: TransactionStatus
   inSymbol: CURRENCY_ENUM
   inValue: string
@@ -34,16 +34,16 @@ export enum TransactionStatus {
 }
 
 type TransferTransactionType =
-  | TransactionType.Sent
-  | TransactionType.Received
-  | TransactionType.EscrowReceived
-  | TransactionType.EscrowSent
-  | TransactionType.Faucet
-  | TransactionType.VerificationReward
-  | TransactionType.VerificationFee
-  | TransactionType.InviteSent
-  | TransactionType.InviteReceived
-  | TransactionType.NetworkFee
+  | TokenTransactionType.Sent
+  | TokenTransactionType.Received
+  | TokenTransactionType.EscrowReceived
+  | TokenTransactionType.EscrowSent
+  | TokenTransactionType.Faucet
+  | TokenTransactionType.VerificationReward
+  | TokenTransactionType.VerificationFee
+  | TokenTransactionType.InviteSent
+  | TokenTransactionType.InviteReceived
+  | TokenTransactionType.NetworkFee
 
 export interface State {
   standbyTransactions: StandbyTransaction[]

@@ -93,7 +93,7 @@ export function ExchangeFeedItem(props: Props) {
 
 ExchangeFeedItem.fragments = {
   exchange: gql`
-    fragment ExchangeItem on TransactionExchange {
+    fragment ExchangeItem on TokenExchange {
       __typename
       type
       hash

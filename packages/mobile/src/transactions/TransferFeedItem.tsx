@@ -7,7 +7,7 @@ import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { TransactionType, TransferItemFragment } from 'src/apollo/types'
+import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -21,7 +21,7 @@ import { getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = TransferItemFragment & {
-  type: TransactionType
+  type: TokenTransactionType
   status: TransactionStatus
   invitees: Invitees
   addressToE164Number: AddressToE164NumberType
@@ -41,13 +41,13 @@ function navigateToTransactionReview({
   recipientCache,
 }: Props) {
   // TODO: remove this when verification reward drilldown is supported
-  if (type === TransactionType.VerificationReward) {
+  if (type === TokenTransactionType.VerificationReward) {
     return
   }
 
   const recipient = getRecipientFromAddress(
     address,
-    type === TransactionType.InviteSent ? invitees : addressToE164Number,
+    type === TokenTransactionType.InviteSent ? invitees : addressToE164Number,
     recipientCache
   )
 
@@ -111,7 +111,7 @@ export function TransferFeedItem(props: Props) {
             <CurrencyDisplay
               amount={amount}
               formatAmount={
-                type === TransactionType.NetworkFee ? getNetworkFeeDisplayValue : undefined
+                type === TokenTransactionType.NetworkFee ? getNetworkFeeDisplayValue : undefined
               }
               style={[
                 styles.amount,
@@ -145,7 +145,7 @@ export function TransferFeedItem(props: Props) {
 
 TransferFeedItem.fragments = {
   transfer: gql`
-    fragment TransferItem on TransactionTransfer {
+    fragment TransferItem on TokenTransfer {
       __typename
       type
       hash

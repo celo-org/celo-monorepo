@@ -24,7 +24,7 @@ import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
 import {
@@ -218,7 +218,7 @@ export class SendAmount extends React.Component<Props, State> {
     return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
   }
 
-  getConfirmationInput = (type: TransactionType) => {
+  getConfirmationInput = (type: TokenTransactionType) => {
     const amount = this.getDollarsAmount()
     const recipient = this.getRecipient()
     // TODO (Rossy) Remove address field from some recipient types.
@@ -255,12 +255,12 @@ export class SendAmount extends React.Component<Props, State> {
     let confirmationInput: ConfirmationInput
 
     if (verificationStatus === RecipientVerificationStatus.VERIFIED) {
-      confirmationInput = this.getConfirmationInput(TransactionType.Sent)
+      confirmationInput = this.getConfirmationInput(TokenTransactionType.Sent)
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
       })
     } else {
-      confirmationInput = this.getConfirmationInput(TransactionType.InviteSent)
+      confirmationInput = this.getConfirmationInput(TokenTransactionType.InviteSent)
       CeloAnalytics.track(CustomEventNames.send_invite_details)
     }
 
@@ -271,7 +271,7 @@ export class SendAmount extends React.Component<Props, State> {
 
   onRequest = () => {
     CeloAnalytics.track(CustomEventNames.request_payment_continue)
-    const confirmationInput = this.getConfirmationInput(TransactionType.PayRequest)
+    const confirmationInput = this.getConfirmationInput(TokenTransactionType.PayRequest)
     navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
   }
 

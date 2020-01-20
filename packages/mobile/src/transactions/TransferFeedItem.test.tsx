@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { TransactionStatus } from 'src/transactions/reducer'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
 import { createMockStore, getMockI18nProps } from 'test/utils'
@@ -30,10 +30,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={mockComment}
-          type={TransactionType.Sent}
+          type={TokenTransactionType.Sent}
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -52,10 +52,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={encryptedMockComment}
-          type={TransactionType.Sent}
+          type={TokenTransactionType.Sent}
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount2}
@@ -74,10 +74,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={encryptedMockComment}
-          type={TransactionType.Received}
+          type={TokenTransactionType.Received}
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -96,10 +96,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.VerificationFee}
+          type={TokenTransactionType.VerificationFee}
           hash={'0x'}
           amount={{ value: '-0.33', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -118,10 +118,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.NetworkFee}
+          type={TokenTransactionType.NetworkFee}
           hash={'0x'}
           amount={{ value: '-0.002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -140,10 +140,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.NetworkFee}
+          type={TokenTransactionType.NetworkFee}
           hash={'0x'}
           amount={{ value: '-0.0000002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -162,10 +162,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.VerificationReward}
+          type={TokenTransactionType.VerificationReward}
           hash={'0x'}
           amount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -184,10 +184,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.Faucet}
+          type={TokenTransactionType.Faucet}
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -206,10 +206,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.InviteSent}
+          type={TokenTransactionType.InviteSent}
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -228,10 +228,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.InviteReceived}
+          type={TokenTransactionType.InviteReceived}
           hash={'0x'}
           amount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -250,10 +250,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.Received}
+          type={TokenTransactionType.Received}
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -272,10 +272,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.Received}
+          type={TokenTransactionType.Received}
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -294,10 +294,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.Sent}
+          type={TokenTransactionType.Sent}
           hash={'0x'}
           amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
@@ -316,10 +316,10 @@ describe('transfer feed item renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <TransferFeedItem
-          __typename="TransactionTransfer"
+          __typename="TokenTransfer"
           status={TransactionStatus.Complete}
           comment={''}
-          type={TransactionType.Sent}
+          type={TokenTransactionType.Sent}
           hash={'0x'}
           amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}

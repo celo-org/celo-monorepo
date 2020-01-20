@@ -135,7 +135,7 @@ describe('Blockscout', () => {
   })
 
   it('should get dollar transactions and label them properly', async () => {
-    const result = await blockscoutAPI.getTransactions({
+    const result = await blockscoutAPI.getTokenTransactions({
       address: '0x0000000000000000000000000000000000007E57',
       token: 'cUSD',
       localCurrencyCode: 'MXN',
@@ -211,7 +211,7 @@ describe('Blockscout', () => {
   })
 
   it('should get gold transactions and label them properly', async () => {
-    const result = await blockscoutAPI.getTransactions({
+    const result = await blockscoutAPI.getTokenTransactions({
       address: '0x0000000000000000000000000000000000007E57',
       token: 'cGLD',
       localCurrencyCode: 'MXN',

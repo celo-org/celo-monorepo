@@ -47,7 +47,7 @@ export interface EventArgs {
   offset?: number
 }
 
-export interface TransactionArgs {
+export interface TokenTransactionArgs {
   address: string
   token: 'cUSD' | 'cGLD'
   localCurrencyCode: string
@@ -134,7 +134,7 @@ export const typeDefs = gql`
     exchangeRate: Decimal!
   }
 
-  enum TransactionType {
+  enum TokenTransactionType {
     EXCHANGE
     RECEIVED
     SENT
@@ -149,8 +149,8 @@ export const typeDefs = gql`
     NETWORK_FEE
   }
 
-  interface Transaction {
-    type: TransactionType!
+  interface TokenTransaction {
+    type: TokenTransactionType!
     timestamp: Timestamp!
     block: String!
     # signed amount (+/-)
@@ -158,8 +158,8 @@ export const typeDefs = gql`
     hash: String!
   }
 
-  type TransactionTransfer implements Transaction {
-    type: TransactionType!
+  type TokenTransfer implements TokenTransaction {
+    type: TokenTransactionType!
     timestamp: Timestamp!
     block: String!
     # signed amount (+/-)
@@ -170,8 +170,8 @@ export const typeDefs = gql`
     hash: String!
   }
 
-  type TransactionExchange implements Transaction {
-    type: TransactionType!
+  type TokenExchange implements TokenTransaction {
+    type: TokenTransactionType!
     timestamp: Timestamp!
     block: String!
     # signed amount (+/-)
@@ -181,13 +181,13 @@ export const typeDefs = gql`
     hash: String!
   }
 
-  type TransactionConnection {
-    edges: [TransactionEdge!]!
+  type TokenTransactionConnection {
+    edges: [TokenTransactionEdge!]!
     pageInfo: PageInfo!
   }
 
-  type TransactionEdge {
-    node: Transaction
+  type TokenTransactionEdge {
+    node: TokenTransaction
     cursor: String!
   }
 
@@ -206,7 +206,7 @@ export const typeDefs = gql`
       endblock: Int
       page: Int
       offset: Int
-    ): [Event] @deprecated(reason: "Use transactions query instead")
+    ): [Event] @deprecated(reason: "Use tokenTransactions query instead")
 
     rewards(
       address: String!
@@ -217,7 +217,7 @@ export const typeDefs = gql`
       offset: Int
     ): [Transfer]
 
-    transactions(
+    tokenTransactions(
       address: Address!
       token: Token!
       localCurrencyCode: String
@@ -226,7 +226,7 @@ export const typeDefs = gql`
       last: Int
       after: String
       first: Int
-    ): TransactionConnection
+    ): TokenTransactionConnection
 
     currencyConversion(
       sourceCurrencyCode: String
@@ -250,10 +250,10 @@ export const resolvers = {
     rewards: async (_source: any, args: EventArgs, { dataSources }: Context) => {
       return dataSources.blockscoutAPI.getFeedRewards(args)
     },
-    transactions: async (_source: any, args: TransactionArgs, context: Context) => {
+    tokenTransactions: async (_source: any, args: TokenTransactionArgs, context: Context) => {
       const { dataSources } = context
       context.localCurrencyCode = args.localCurrencyCode
-      const transactions = await dataSources.blockscoutAPI.getTransactions(args)
+      const transactions = await dataSources.blockscoutAPI.getTokenTransactions(args)
 
       return {
         edges: transactions.map((tx) => ({
@@ -297,10 +297,10 @@ export const resolvers = {
       return null
     },
   },
-  Transaction: {
+  TokenTransaction: {
     __resolveType(obj: EventInterface, context: any, info: any) {
       if (obj.type === EventTypes.EXCHANGE) {
-        return 'TransactionExchange'
+        return 'TokenExchange'
       }
       if (
         obj.type === EventTypes.RECEIVED ||
@@ -311,7 +311,7 @@ export const resolvers = {
         obj.type === EventTypes.VERIFICATION_FEE ||
         obj.type === EventTypes.VERIFICATION_REWARD
       ) {
-        return 'TransactionTransfer'
+        return 'TokenTransfer'
       }
       return null
     },

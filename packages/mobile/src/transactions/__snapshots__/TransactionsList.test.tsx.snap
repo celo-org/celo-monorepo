@@ -6,7 +6,7 @@ exports[`ignores failed standby transactions 1`] = `
   data={
     Array [
       Object {
-        "__typename": "TransactionTransfer",
+        "__typename": "TokenTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
           "currencyCode": "cUSD",
@@ -24,7 +24,7 @@ exports[`ignores failed standby transactions 1`] = `
         "type": "SENT",
       },
       Object {
-        "__typename": "TransactionExchange",
+        "__typename": "TokenExchange",
         "amount": Object {
           "currencyCode": "cUSD",
           "localAmount": Object {
@@ -500,7 +500,7 @@ exports[`ignores pending standby transactions that are completed in the response
   data={
     Array [
       Object {
-        "__typename": "TransactionTransfer",
+        "__typename": "TokenTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
           "currencyCode": "cUSD",
@@ -518,7 +518,7 @@ exports[`ignores pending standby transactions that are completed in the response
         "type": "SENT",
       },
       Object {
-        "__typename": "TransactionExchange",
+        "__typename": "TokenExchange",
         "amount": Object {
           "currencyCode": "cUSD",
           "localAmount": Object {
@@ -1001,7 +1001,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
   data={
     Array [
       Object {
-        "__typename": "TransactionTransfer",
+        "__typename": "TokenTransfer",
         "address": "0072bvy2o23u",
         "amount": Object {
           "currencyCode": "cUSD",
@@ -1019,7 +1019,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
         "type": "SENT",
       },
       Object {
-        "__typename": "TransactionTransfer",
+        "__typename": "TokenTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
           "currencyCode": "cUSD",
@@ -1037,7 +1037,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
         "type": "SENT",
       },
       Object {
-        "__typename": "TransactionExchange",
+        "__typename": "TokenExchange",
         "amount": Object {
           "currencyCode": "cUSD",
           "localAmount": Object {

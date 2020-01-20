@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import {
   MoneyAmount,
   Token,
-  TransactionType,
+  TokenTransactionType,
   UserTransactionsQuery,
   UserTransactionsQueryVariables,
 } from 'src/apollo/types'
@@ -48,7 +48,7 @@ type Props = OwnProps & StateProps & DispatchProps
 
 export const TRANSACTIONS_QUERY = gql`
   query UserTransactions($address: Address!, $token: Token!, $localCurrencyCode: String) {
-    transactions(address: $address, token: $token, localCurrencyCode: $localCurrencyCode) {
+    tokenTransactions(address: $address, token: $token, localCurrencyCode: $localCurrencyCode) {
       edges {
         node {
           ...TransactionFeed
@@ -133,7 +133,7 @@ function mapExchangeStandbyToFeedItem(
   }
 
   return {
-    __typename: 'TransactionExchange',
+    __typename: 'TokenExchange',
     type,
     hash: hash ?? '',
     timestamp,
@@ -163,7 +163,7 @@ function mapTransferStandbyToFeedItem(
   const { type, hash, status, timestamp, value, symbol, address, comment } = standbyTx
 
   return {
-    __typename: 'TransactionTransfer',
+    __typename: 'TokenTransfer',
     type,
     hash: hash ?? '',
     timestamp,
@@ -189,7 +189,7 @@ function mapStandbyTransactionToFeedItem(
   localCurrencyExchangeRate: string | null | undefined
 ) {
   return (standbyTx: StandbyTransaction): FeedItem => {
-    if (standbyTx.type === TransactionType.Exchange) {
+    if (standbyTx.type === TokenTransactionType.Exchange) {
       return mapExchangeStandbyToFeedItem(
         standbyTx,
         currency,
@@ -211,21 +211,21 @@ function mapStandbyTransactionToFeedItem(
 
 // TODO(jeanregisser): maybe move this to blockchain-api? and directly set the tx type to InviteSent for standbyTx
 function mapInvite(tx: FeedItem): FeedItem {
-  if (tx.__typename !== 'TransactionTransfer' || tx.comment !== SENTINEL_INVITE_COMMENT) {
+  if (tx.__typename !== 'TokenTransfer' || tx.comment !== SENTINEL_INVITE_COMMENT) {
     return tx
   }
 
-  if (tx.type === TransactionType.Sent) {
-    return { ...tx, type: TransactionType.InviteSent }
-  } else if (tx.type === TransactionType.Received) {
-    return { ...tx, type: TransactionType.InviteReceived }
+  if (tx.type === TokenTransactionType.Sent) {
+    return { ...tx, type: TokenTransactionType.InviteSent }
+  } else if (tx.type === TokenTransactionType.Received) {
+    return { ...tx, type: TokenTransactionType.InviteReceived }
   }
 
   return tx
 }
 
 function getTransactions(data: UserTransactionsQuery | undefined) {
-  return data?.transactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
+  return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
 }
 
 export class TransactionsList extends React.PureComponent<Props> {

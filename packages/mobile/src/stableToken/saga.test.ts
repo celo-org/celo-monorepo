@@ -2,7 +2,7 @@ import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableToken/actions'
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
@@ -75,7 +75,7 @@ describe('stableToken saga', () => {
       .put(
         addStandbyTransaction({
           id: TX_ID,
-          type: TransactionType.Sent,
+          type: TokenTransactionType.Sent,
           comment: COMMENT,
           status: TransactionStatus.Pending,
           value: BALANCE,
@@ -95,7 +95,7 @@ describe('stableToken saga', () => {
       .put(
         addStandbyTransaction({
           id: TX_ID,
-          type: TransactionType.Sent,
+          type: TokenTransactionType.Sent,
           comment: COMMENT,
           status: TransactionStatus.Pending,
           value: BALANCE,

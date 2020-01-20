@@ -5,7 +5,7 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -19,7 +19,7 @@ export interface NavigationPropsWrapper {
 }
 
 export interface ReviewProps {
-  type: TransactionType
+  type: TokenTransactionType
   timestamp: number
   header: string
 }
@@ -64,9 +64,9 @@ class TransactionReviewScreen extends React.PureComponent<Props> {
     return <ReviewHeader title={header} subtitle={dateTimeStatus} />
   }
 
-  renderCard = (type: TransactionType, confirmationProps: any) => {
+  renderCard = (type: TokenTransactionType, confirmationProps: any) => {
     switch (type) {
-      case TransactionType.Exchange:
+      case TokenTransactionType.Exchange:
         return <ExchangeConfirmationCard {...confirmationProps} />
       default:
         return <TransferConfirmationCard {...confirmationProps} />

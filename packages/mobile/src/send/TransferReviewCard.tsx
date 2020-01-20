@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
@@ -30,7 +30,7 @@ export interface OwnProps {
   fee?: BigNumber
   isLoadingFee?: boolean
   feeError?: Error
-  type: TransactionType
+  type: TokenTransactionType
   e164PhoneNumber?: string
   recipient?: Recipient
 }
@@ -55,7 +55,7 @@ function TransferReviewCard({
   const exchangeRate = new BigNumber(useExchangeRate() as string)
   const amountWithFees = value.plus(fee || 0)
   const adjustedFee =
-    type === TransactionType.InviteSent && fee
+    type === TokenTransactionType.InviteSent && fee
       ? fee.minus(getInvitationVerificationFeeInDollars())
       : fee
 
@@ -86,7 +86,7 @@ function TransferReviewCard({
               </Text>
             </>
           )}
-          {type === TransactionType.InviteSent && (
+          {type === TokenTransactionType.InviteSent && (
             <LineItemRow
               currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
               amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}

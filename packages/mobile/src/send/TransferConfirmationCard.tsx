@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { MoneyAmount, TransactionType } from 'src/apollo/types'
+import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
@@ -25,7 +25,7 @@ export interface TransferConfirmationCardProps {
   address?: string
   comment?: string | null
   amount: MoneyAmount
-  type: TransactionType
+  type: TokenTransactionType
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
   recipient?: Recipient
@@ -42,9 +42,9 @@ const onPressGoToFaq = () => {
 const renderTopSection = (props: Props) => {
   const { address, recipient, type, e164PhoneNumber } = props
   if (
-    type === TransactionType.VerificationFee ||
-    type === TransactionType.NetworkFee ||
-    type === TransactionType.Faucet
+    type === TokenTransactionType.VerificationFee ||
+    type === TokenTransactionType.NetworkFee ||
+    type === TokenTransactionType.Faucet
   ) {
     return <Image source={faucetIcon} style={style.icon} />
   } else {
@@ -65,10 +65,10 @@ const renderAmountSection = (props: Props) => {
   const { amount, type } = props
 
   switch (type) {
-    case TransactionType.InviteSent: // fallthrough
-    case TransactionType.InviteReceived:
+    case TokenTransactionType.InviteSent: // fallthrough
+    case TokenTransactionType.InviteReceived:
       return null
-    case TransactionType.NetworkFee:
+    case TokenTransactionType.NetworkFee:
       return (
         <CurrencyDisplay
           type={DisplayType.Big}
@@ -90,9 +90,9 @@ const renderBottomSection = (props: Props) => {
       ? CURRENCY_ENUM.GOLD
       : CURRENCY_ENUM.DOLLAR
 
-  if (type === TransactionType.VerificationFee) {
+  if (type === TokenTransactionType.VerificationFee) {
     return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
-  } else if (type === TransactionType.Faucet) {
+  } else if (type === TokenTransactionType.Faucet) {
     return (
       <Text style={style.pSmall}>
         {t('receiveFlow8:receivedAmountFromCelo.0')}
@@ -101,7 +101,7 @@ const renderBottomSection = (props: Props) => {
         {t('receiveFlow8:receivedAmountFromCelo.1')}
       </Text>
     )
-  } else if (type === TransactionType.NetworkFee) {
+  } else if (type === TokenTransactionType.NetworkFee) {
     return (
       <View>
         <Text style={style.pSmall}>
@@ -110,14 +110,17 @@ const renderBottomSection = (props: Props) => {
         </Text>
       </View>
     )
-  } else if (type === TransactionType.InviteSent || type === TransactionType.InviteReceived) {
+  } else if (
+    type === TokenTransactionType.InviteSent ||
+    type === TokenTransactionType.InviteReceived
+  ) {
     return (
       <View style={style.bottomContainer}>
         <View style={style.inviteLine}>
           <HorizontalLine />
         </View>
         <Text style={style.inviteTitle}>{t('inviteFlow11:inviteFee')}</Text>
-        {type === TransactionType.InviteSent ? (
+        {type === TokenTransactionType.InviteSent ? (
           <Text style={style.pSmall}>{t('inviteFlow11:whySendFees')}</Text>
         ) : (
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>

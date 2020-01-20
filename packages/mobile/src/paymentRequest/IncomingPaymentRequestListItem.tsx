@@ -8,7 +8,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import { PaymentRequestStatus } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -40,7 +40,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
         recipient,
         amount: new BigNumber(amount),
         recipientAddress: recipient.address,
-        type: TransactionType.PayRequest,
+        type: TokenTransactionType.PayRequest,
       },
       onConfirm: this.onPaymentSuccess,
       onCancel: this.onPaymentDecline,

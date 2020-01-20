@@ -13,7 +13,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
@@ -38,7 +38,7 @@ export interface ConfirmationInput {
   amount: BigNumber
   reason: string
   recipientAddress?: string | null
-  type: TransactionType
+  type: TokenTransactionType
 }
 
 interface StateProps {
@@ -138,9 +138,9 @@ class SendConfirmation extends React.Component<Props, State> {
     const { type } = this.getConfirmationInput()
     let title
 
-    if (type === TransactionType.PayRequest) {
+    if (type === TokenTransactionType.PayRequest) {
       title = t('payRequest')
-    } else if (type === TransactionType.InviteSent) {
+    } else if (type === TokenTransactionType.InviteSent) {
       title = t('inviteVerifyPayment')
     } else {
       title = t('reviewPayment')
@@ -188,7 +188,7 @@ class SendConfirmation extends React.Component<Props, State> {
 
     let primaryBtnInfo
     let secondaryBtnInfo
-    if (type === TransactionType.PayRequest) {
+    if (type === TokenTransactionType.PayRequest) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('global:pay'),

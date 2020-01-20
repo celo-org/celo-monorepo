@@ -66,7 +66,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
   data={
     Array [
       Object {
-        "__typename": "TransactionExchange",
+        "__typename": "TokenExchange",
         "amount": Object {
           "currencyCode": "cUSD",
           "localAmount": null,

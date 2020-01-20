@@ -1,4 +1,4 @@
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
@@ -86,31 +86,31 @@ export const navigateToPaymentTransferReview = (
 ) => {
   let headerText = ''
   switch (type) {
-    case TransactionType.Sent:
+    case TokenTransactionType.Sent:
       headerText = i18n.t('sendFlow7:sentPayment')
       break
-    case TransactionType.EscrowSent:
+    case TokenTransactionType.EscrowSent:
       headerText = i18n.t('sendFlow7:sentEscrowPayment')
       break
-    case TransactionType.Received:
+    case TokenTransactionType.Received:
       headerText = i18n.t('receiveFlow8:receivedPayment')
       break
-    case TransactionType.EscrowReceived:
+    case TokenTransactionType.EscrowReceived:
       headerText = i18n.t('receiveFlow8:receivedEscrowPayment')
       break
-    case TransactionType.VerificationFee:
+    case TokenTransactionType.VerificationFee:
       headerText = i18n.t('walletFlow5:verificationFee')
       break
-    case TransactionType.Faucet:
+    case TokenTransactionType.Faucet:
       headerText = i18n.t('receiveFlow8:receivedDollars')
       break
-    case TransactionType.InviteSent:
+    case TokenTransactionType.InviteSent:
       headerText = i18n.t('inviteFlow11:inviteComplete')
       break
-    case TransactionType.InviteReceived:
+    case TokenTransactionType.InviteReceived:
       headerText = i18n.t('inviteFlow11:inviteReceived')
       break
-    case TransactionType.NetworkFee:
+    case TokenTransactionType.NetworkFee:
       headerText = i18n.t('walletFlow5:networkFee')
       break
   }
@@ -131,7 +131,7 @@ export const navigateToExchangeReview = (
 ) => {
   navigate(Screens.TransactionReview, {
     reviewProps: {
-      type: TransactionType.Exchange,
+      type: TokenTransactionType.Exchange,
       timestamp,
       header: i18n.t('exchangeFlow9:exchange'),
     },

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { MockedProvider } from 'react-apollo/test-utils'
 import { render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import { TransactionType, UserTransactionsQuery } from 'src/apollo/types'
+import { TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import { TransactionFeed } from 'src/transactions/TransactionFeed'
@@ -14,7 +14,7 @@ jest.unmock('react-apollo')
 const standbyTransactions: StandbyTransaction[] = [
   {
     id: 'a-standby-tx-id',
-    type: TransactionType.Sent,
+    type: TokenTransactionType.Sent,
     comment: 'Eye for an Eye',
     status: TransactionStatus.Pending,
     value: '100',
@@ -26,7 +26,7 @@ const standbyTransactions: StandbyTransaction[] = [
 
 const failedStandbyTransactions: StandbyTransaction[] = [
   {
-    type: TransactionType.Exchange,
+    type: TokenTransactionType.Exchange,
     status: TransactionStatus.Failed,
     inSymbol: CURRENCY_ENUM.DOLLAR,
     inValue: '20',
@@ -41,7 +41,7 @@ const pendingStandbyTransactions: StandbyTransaction[] = [
   {
     id: 'a-standby-tx-id',
     hash: '0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353',
-    type: TransactionType.Sent,
+    type: TokenTransactionType.Sent,
     comment: 'Hi',
     status: TransactionStatus.Pending,
     value: '0.2',
@@ -52,12 +52,12 @@ const pendingStandbyTransactions: StandbyTransaction[] = [
 ]
 
 const mockQueryData: UserTransactionsQuery = {
-  transactions: {
+  tokenTransactions: {
     edges: [
       {
         node: {
-          __typename: 'TransactionTransfer',
-          type: TransactionType.Sent,
+          __typename: 'TokenTransfer',
+          type: TokenTransactionType.Sent,
           hash: '0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353',
           amount: {
             value: '-0.2',
@@ -75,8 +75,8 @@ const mockQueryData: UserTransactionsQuery = {
       },
       {
         node: {
-          __typename: 'TransactionExchange',
-          type: TransactionType.Exchange,
+          __typename: 'TokenExchange',
+          type: TokenTransactionType.Exchange,
           hash: '0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852',
           amount: {
             value: '0.994982275992944156',

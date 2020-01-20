@@ -2,14 +2,14 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const AVATAR_SIZE = 40
 
 interface Props {
-  type: TransactionType
+  type: TokenTransactionType
   recipient?: Recipient
   address?: string
 }
@@ -18,24 +18,24 @@ export default function TransferFeedIcon(props: Props) {
   const { recipient, address, type } = props
 
   switch (type) {
-    case TransactionType.VerificationFee: // fallthrough
-    case TransactionType.Faucet: // fallthrough
-    case TransactionType.InviteSent: // fallthrough
-    case TransactionType.NetworkFee: // fallthrough
-    case TransactionType.InviteReceived: {
+    case TokenTransactionType.VerificationFee: // fallthrough
+    case TokenTransactionType.Faucet: // fallthrough
+    case TokenTransactionType.InviteSent: // fallthrough
+    case TokenTransactionType.NetworkFee: // fallthrough
+    case TokenTransactionType.InviteReceived: {
       return <Image source={coinsIcon} style={styles.image} />
     }
-    case TransactionType.VerificationReward: {
+    case TokenTransactionType.VerificationReward: {
       return (
         <View style={styles.image}>
           <RewardIcon height={38} />
         </View>
       )
     }
-    case TransactionType.Received: // fallthrough
-    case TransactionType.Sent: // fallthrough
-    case TransactionType.EscrowSent:
-    case TransactionType.EscrowReceived:
+    case TokenTransactionType.Received: // fallthrough
+    case TokenTransactionType.Sent: // fallthrough
+    case TokenTransactionType.EscrowSent:
+    case TokenTransactionType.EscrowReceived:
     default: {
       return (
         <ContactCircle

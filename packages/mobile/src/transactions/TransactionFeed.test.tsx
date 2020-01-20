@@ -3,7 +3,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
 import { createMockStore } from 'test/utils'
@@ -12,9 +12,9 @@ jest.mock('src/utils/time.ts')
 
 const exchangeTransactions: FeedItem[] = [
   {
-    __typename: 'TransactionExchange',
+    __typename: 'TokenExchange',
     status: TransactionStatus.Complete,
-    type: TransactionType.Exchange,
+    type: TokenTransactionType.Exchange,
     amount: {
       value: '-30',
       currencyCode: 'cUSD',

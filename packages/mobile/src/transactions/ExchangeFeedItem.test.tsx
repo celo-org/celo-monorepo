@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ExchangeFeedItem } from 'src/transactions/ExchangeFeedItem'
 import { TransactionStatus } from 'src/transactions/reducer'
 import { createMockStore, getMockI18nProps } from 'test/utils'
@@ -27,8 +27,8 @@ describe('ExchangeFeedItem', () => {
       <Provider store={createMockStore({})}>
         <ExchangeFeedItem
           status={TransactionStatus.Complete}
-          __typename="TransactionExchange"
-          type={TransactionType.Exchange}
+          __typename="TokenExchange"
+          type={TokenTransactionType.Exchange}
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           makerAmount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}

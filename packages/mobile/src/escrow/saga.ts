@@ -5,7 +5,7 @@ import { StableToken } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
 import {
@@ -86,7 +86,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   yield put(
     addStandbyTransaction({
       id,
-      type: TransactionType.EscrowSent,
+      type: TokenTransactionType.EscrowSent,
       status: TransactionStatus.Pending,
       value,
       symbol: CURRENCY_ENUM.DOLLAR,

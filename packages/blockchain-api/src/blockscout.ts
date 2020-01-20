@@ -1,7 +1,13 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
-import { EventArgs, EventInterface, EventTypes, TransactionArgs, TransferEvent } from './schema'
+import {
+  EventArgs,
+  EventInterface,
+  EventTypes,
+  TokenTransactionArgs,
+  TransferEvent,
+} from './schema'
 import { formatCommentString, getContractAddresses } from './utils'
 
 // to get rid of 18 extra 0s in the values
@@ -56,7 +62,7 @@ export class BlockscoutAPI extends RESTDataSource {
     this.baseURL = BLOCKSCOUT_API
   }
 
-  async getTokenTransactions(args: EventArgs): Promise<BlockscoutTransaction[]> {
+  async getRawTokenTransactions(args: EventArgs): Promise<BlockscoutTransaction[]> {
     console.info('Getting token transactions', args)
     const params = {
       ...args,
@@ -113,6 +119,7 @@ export class BlockscoutAPI extends RESTDataSource {
     }
   }
 
+  // TODO(jeanregisser): this is now deprecated, remove once client changes have been merged
   // LIMITATION:
   // This function will only return Gold transfers that happened via the GoldToken
   // contract. Any native transfers of Gold will be omitted because of how blockscout
@@ -123,7 +130,7 @@ export class BlockscoutAPI extends RESTDataSource {
   // expect native transfers to be exceedingly rare, the work to handle this is being
   // skipped for now. TODO: (yerdua) [226]
   async getFeedEvents(args: EventArgs) {
-    const rawTransactions = await this.getTokenTransactions(args)
+    const rawTransactions = await this.getRawTokenTransactions(args)
     const events: EventInterface[] = []
     const userAddress = args.address.toLowerCase()
 
@@ -195,7 +202,7 @@ export class BlockscoutAPI extends RESTDataSource {
 
   async getFeedRewards(args: EventArgs) {
     const rewards: TransferEvent[] = []
-    const rawTransactions = await this.getTokenTransactions(args)
+    const rawTransactions = await this.getRawTokenTransactions(args)
     await this.ensureTokenAddresses()
     for (const t of rawTransactions) {
       // Only include verification rewards transfers
@@ -219,8 +226,17 @@ export class BlockscoutAPI extends RESTDataSource {
     return rewards.sort((a, b) => b.timestamp - a.timestamp)
   }
 
-  async getTransactions(args: TransactionArgs) {
-    const rawTransactions = await this.getTokenTransactions(args)
+  // LIMITATION:
+  // This function will only return Gold transfers that happened via the GoldToken
+  // contract. Any native transfers of Gold will be omitted because of how blockscout
+  // works. To get native transactions from blockscout, we'd need to use the param:
+  // "action: MODULE_ACTIONS.ACCOUNT.TX_LIST"
+  // However, the results returned from that API call do not have an easily-parseable
+  // representation of Token transfers, if they are included at all. Given that we
+  // expect native transfers to be exceedingly rare, the work to handle this is being
+  // skipped for now. TODO: (yerdua) [226]
+  async getTokenTransactions(args: TokenTransactionArgs) {
+    const rawTransactions = await this.getRawTokenTransactions(args)
     const events: any[] = []
     const userAddress = args.address.toLowerCase()
 
@@ -312,7 +328,7 @@ export class BlockscoutAPI extends RESTDataSource {
     })
 
     console.info(
-      `[Celo] getTransactions address=${args.address} token=${args.token} localCurrencyCode=${args.localCurrencyCode}
+      `[Celo] getTokenTransactions address=${args.address} token=${args.token} localCurrencyCode=${args.localCurrencyCode}
       } rawTransactionCount=${rawTransactions.length} eventCount=${events.length}`
     )
     return events

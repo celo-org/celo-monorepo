@@ -14,7 +14,7 @@ import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { TransactionType } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
@@ -173,7 +173,7 @@ export class InviteReview extends React.Component<Props, State> {
         <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
           <TransferReviewCard
             recipient={recipient}
-            type={TransactionType.InviteSent}
+            type={TokenTransactionType.InviteSent}
             address={recipient.address}
             value={getInvitationVerificationFeeInDollars()}
             e164PhoneNumber={recipient.e164PhoneNumber}

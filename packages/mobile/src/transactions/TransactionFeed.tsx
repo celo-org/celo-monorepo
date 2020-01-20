@@ -52,7 +52,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class TransactionFeed extends React.PureComponent<Props> {
   static fragments = {
     transaction: gql`
-      fragment TransactionFeed on Transaction {
+      fragment TransactionFeed on TokenTransaction {
         ...ExchangeItem
         ...TransferItem
       }
@@ -71,7 +71,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     const { addressToE164Number, invitees, recipientCache } = this.props
 
     switch (tx.__typename) {
-      case 'TransactionTransfer':
+      case 'TokenTransfer':
         return (
           <TransferFeedItem
             invitees={invitees}
@@ -81,7 +81,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
             {...tx}
           />
         )
-      case 'TransactionExchange':
+      case 'TokenExchange':
         return <ExchangeFeedItem {...tx} />
     }
 

@@ -70,7 +70,7 @@ export interface Query {
   __typename?: 'Query'
   events?: Maybe<Array<Maybe<Event>>>
   rewards?: Maybe<Array<Maybe<Transfer>>>
-  transactions?: Maybe<TransactionConnection>
+  tokenTransactions?: Maybe<TokenTransactionConnection>
   currencyConversion?: Maybe<ExchangeRate>
 }
 
@@ -92,7 +92,7 @@ export interface QueryRewardsArgs {
   offset?: Maybe<Scalars['Int']>
 }
 
-export interface QueryTransactionsArgs {
+export interface QueryTokenTransactionsArgs {
   address: Scalars['Address']
   token: Token
   localCurrencyCode?: Maybe<Scalars['String']>
@@ -113,29 +113,9 @@ export enum Token {
   CGld = 'cGLD',
 }
 
-export interface Transaction {
-  type: TransactionType
-  timestamp: Scalars['Timestamp']
-  block: Scalars['String']
-  amount: MoneyAmount
-  hash: Scalars['String']
-}
-
-export interface TransactionConnection {
-  __typename?: 'TransactionConnection'
-  edges: TransactionEdge[]
-  pageInfo: PageInfo
-}
-
-export interface TransactionEdge {
-  __typename?: 'TransactionEdge'
-  node?: Maybe<Transaction>
-  cursor: Scalars['String']
-}
-
-export type TransactionExchange = Transaction & {
-  __typename?: 'TransactionExchange'
-  type: TransactionType
+export type TokenExchange = TokenTransaction & {
+  __typename?: 'TokenExchange'
+  type: TokenTransactionType
   timestamp: Scalars['Timestamp']
   block: Scalars['String']
   amount: MoneyAmount
@@ -144,19 +124,27 @@ export type TransactionExchange = Transaction & {
   hash: Scalars['String']
 }
 
-export type TransactionTransfer = Transaction & {
-  __typename?: 'TransactionTransfer'
-  type: TransactionType
+export interface TokenTransaction {
+  type: TokenTransactionType
   timestamp: Scalars['Timestamp']
   block: Scalars['String']
   amount: MoneyAmount
-  address: Scalars['Address']
-  comment?: Maybe<Scalars['String']>
-  token: Token
   hash: Scalars['String']
 }
 
-export enum TransactionType {
+export interface TokenTransactionConnection {
+  __typename?: 'TokenTransactionConnection'
+  edges: TokenTransactionEdge[]
+  pageInfo: PageInfo
+}
+
+export interface TokenTransactionEdge {
+  __typename?: 'TokenTransactionEdge'
+  node?: Maybe<TokenTransaction>
+  cursor: Scalars['String']
+}
+
+export enum TokenTransactionType {
   Exchange = 'EXCHANGE',
   Received = 'RECEIVED',
   Sent = 'SENT',
@@ -169,6 +157,18 @@ export enum TransactionType {
   InviteReceived = 'INVITE_RECEIVED',
   PayRequest = 'PAY_REQUEST',
   NetworkFee = 'NETWORK_FEE',
+}
+
+export type TokenTransfer = TokenTransaction & {
+  __typename?: 'TokenTransfer'
+  type: TokenTransactionType
+  timestamp: Scalars['Timestamp']
+  block: Scalars['String']
+  amount: MoneyAmount
+  address: Scalars['Address']
+  comment?: Maybe<Scalars['String']>
+  token: Token
+  hash: Scalars['String']
 }
 
 export interface Transfer {
@@ -193,8 +193,8 @@ export interface ExchangeRateQuery {
 }
 
 export interface ExchangeItemFragment {
-  __typename: 'TransactionExchange'
-  type: TransactionType
+  __typename: 'TokenExchange'
+  type: TokenTransactionType
   hash: string
   timestamp: number
   amount: {
@@ -232,17 +232,17 @@ export interface ExchangeItemFragment {
   }
 }
 
-type TransactionFeed_TransactionExchange_Fragment = {
-  __typename?: 'TransactionExchange'
+type TransactionFeed_TokenExchange_Fragment = {
+  __typename?: 'TokenExchange'
 } & ExchangeItemFragment
 
-type TransactionFeed_TransactionTransfer_Fragment = {
-  __typename?: 'TransactionTransfer'
+type TransactionFeed_TokenTransfer_Fragment = {
+  __typename?: 'TokenTransfer'
 } & TransferItemFragment
 
 export type TransactionFeedFragment =
-  | TransactionFeed_TransactionExchange_Fragment
-  | TransactionFeed_TransactionTransfer_Fragment
+  | TransactionFeed_TokenExchange_Fragment
+  | TransactionFeed_TokenTransfer_Fragment
 
 export interface UserTransactionsQueryVariables {
   address: Scalars['Address']
@@ -252,21 +252,21 @@ export interface UserTransactionsQueryVariables {
 
 export interface UserTransactionsQuery {
   __typename?: 'Query'
-  transactions: Maybe<{
-    __typename?: 'TransactionConnection'
+  tokenTransactions: Maybe<{
+    __typename?: 'TokenTransactionConnection'
     edges: Array<{
-      __typename?: 'TransactionEdge'
+      __typename?: 'TokenTransactionEdge'
       node: Maybe<
-        | ({ __typename?: 'TransactionExchange' } & TransactionFeed_TransactionExchange_Fragment)
-        | ({ __typename?: 'TransactionTransfer' } & TransactionFeed_TransactionTransfer_Fragment)
+        | ({ __typename?: 'TokenExchange' } & TransactionFeed_TokenExchange_Fragment)
+        | ({ __typename?: 'TokenTransfer' } & TransactionFeed_TokenTransfer_Fragment)
       >
     }>
   }>
 }
 
 export interface TransferItemFragment {
-  __typename: 'TransactionTransfer'
-  type: TransactionType
+  __typename: 'TokenTransfer'
+  type: TokenTransactionType
   hash: string
   timestamp: number
   address: string
@@ -312,13 +312,13 @@ const result: IntrospectionResultData = {
       },
       {
         kind: 'INTERFACE',
-        name: 'Transaction',
+        name: 'TokenTransaction',
         possibleTypes: [
           {
-            name: 'TransactionExchange',
+            name: 'TokenExchange',
           },
           {
-            name: 'TransactionTransfer',
+            name: 'TokenTransfer',
           },
         ],
       },
