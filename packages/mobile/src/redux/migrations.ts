@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { PincodeType } from 'src/account/reducer'
 
 export const migrations = {
@@ -52,6 +53,17 @@ export const migrations = {
         hasSeenVerificationNux:
           state.identity.startedVerification || state.app.numberVerified || false,
         startedVerification: undefined,
+      },
+    }
+  },
+  5: (state: any) => {
+    return {
+      ...state,
+      localCurrency: {
+        ...state.localCurrency,
+        exchangeRate: state.localCurrency.exchangeRate
+          ? new BigNumber(state.localCurrency.exchangeRate).toString()
+          : undefined,
       },
     }
   },

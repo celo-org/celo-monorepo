@@ -760,12 +760,8 @@ exports[`BuildPage renders 1`] = `
                   "color": "rgba(255,255,255,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
                   "opacity": 1,
                   "textDecoration": "underline",
-                  "textRendering": "geometricPrecision",
                 }
               }
             >
