@@ -739,10 +739,12 @@ screen -r -S celo-validator
 You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop providing service.
 The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-*-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
 
+It is recommended to use the Docker stop timeout parameter `-t` when stopping the containers. This allows time, in this case 60 seconds, for the Celo nodes to flush recent chain data it keeps in memory into the data directories. Emitting this may cause your blockchain data to corrupt, requiring the node to start syncing from scratch.
+
 You can stop the `celo-validator` and `celo-proxy` containers running:
 
 ```bash
-docker stop celo-validator celo-proxy
+docker stop celo-validator celo-proxy -t 60
 ```
 
 And you can remove the containers (not the data dir) running:
