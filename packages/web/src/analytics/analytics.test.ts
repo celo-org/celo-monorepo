@@ -3,16 +3,6 @@ import { isBrowser } from 'src/utils/utils'
 jest.mock('src/utils/utils', () => ({
   isBrowser: jest.fn(),
 }))
-jest.mock('js-cookie', () => {
-  return {
-    get: function get() {
-      return true
-    },
-    set: function set() {
-      return null
-    },
-  }
-})
 
 // TODO cant mock out process.browser currently
 describe('analytics.track', () => {

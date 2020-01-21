@@ -2,7 +2,12 @@ import locales from '@celo/mobile/locales'
 import { currencyTranslations } from '@celo/utils/src/currencies'
 import hoistStatics from 'hoist-non-react-statics'
 import i18n, { LanguageDetectorModule } from 'i18next'
-import { initReactI18next, withTranslation as withTranslationI18Next } from 'react-i18next'
+import {
+  initReactI18next,
+  WithTranslation,
+  withTranslation as withTranslationI18Next,
+  WithTranslationProps,
+} from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
 import Logger from 'src/utils/Logger'
 
@@ -95,7 +100,10 @@ RNLocalize.addEventListener('change', () => {
 
 // Create HOC wrapper that hoists statics
 // https://react.i18next.com/latest/withtranslation-hoc#hoist-non-react-statics
-export const withTranslation = (namespace: Namespaces) => (component: React.ComponentType<any>) =>
-  hoistStatics(withTranslationI18Next(namespace)(component), component)
+export const withTranslation = (namespace: Namespaces) => <P extends WithTranslation>(
+  component: React.ComponentType<P>
+): React.ComponentType<Omit<P, keyof WithTranslation> & WithTranslationProps> =>
+  // cast as `any` here otherwise TypeScript complained
+  hoistStatics(withTranslationI18Next(namespace)(component), component as any)
 
 export default i18n
