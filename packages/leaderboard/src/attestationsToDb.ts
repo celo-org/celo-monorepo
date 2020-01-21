@@ -7,6 +7,7 @@ import Web3 from 'web3'
 const GoogleSpreadsheet = require('google-spreadsheet')
 
 function addressToBinary(a: string) {
+  a = a.toLowerCase()
   try {
     if (a.substr(0, 2) == '0x') return a.substr(2)
     else return a
@@ -31,6 +32,13 @@ async function readSheet() {
   const doc = new GoogleSpreadsheet(LEADERBOARD_SHEET)
   await client.connect()
 
+  try {
+    await client.query(
+      'CREATE type json_attestation AS (address char(40), requested integer, fulfilled integer)'
+    )
+  } catch (err) {
+    console.log('JSON type already exists')
+  }
   doc.getInfo(function(_err: any, info: any) {
     let sheet = info.worksheets[0]
     sheet.getCells(
@@ -138,7 +146,7 @@ async function getAttestations(kit: ContractKit, address: string) {
       filter: { issuer: address },
     })
   ).length
-  const res = { requested, fulfilled, address: addressToBinary(address) }
+  const res = { requested, fulfilled, address }
   console.log(res)
   return res
 }
@@ -160,8 +168,6 @@ async function storeData(data: any[]) {
   }
 }
 
-// CREATE type json_attestation AS (address char(40), requested integer, fulfilled integer);
-
 async function readAssoc(addresses: string[]) {
   const web3 = new Web3(LEADERBOARD_WEB3)
   const kit: ContractKit = newKitFromWeb3(web3)
@@ -169,6 +175,7 @@ async function readAssoc(addresses: string[]) {
   for (let address of addresses) {
     accounts = accounts.concat(await getClaimedAccounts(kit, address))
   }
+  accounts = dedup(accounts.map(addressToBinary))
   let data: any[] = []
   for (let account of accounts) {
     data.push(await getAttestations(kit, account))
