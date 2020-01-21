@@ -95,18 +95,14 @@ const Portrait = React.memo(function _Portrait({
       <Responsive medium={styles.mediumPerson} large={styles.largePerson}>
         <View style={styles.person}>
           <AspectRatio ratio={1}>
-            <Image source={source} onLoad={onLoad} style={styles.photo} />
+            <Image
+              accessibilityLabel={`Photo of ${name}`}
+              source={source}
+              onLoad={onLoad}
+              style={styles.photo}
+            />
           </AspectRatio>
-          <Text
-            style={[
-              fonts.p,
-              textStyles.italic,
-              styles.purposeText,
-              standardStyles.elementalMarginTop,
-            ]}
-          >
-            {purpose}
-          </Text>
+
           <View style={standardStyles.row}>
             <Text style={[fonts.p, textStyles.heavy, styles.name]}>{name}</Text>
             {url && (
@@ -118,10 +114,11 @@ const Portrait = React.memo(function _Portrait({
             )}
           </View>
 
-          <Text style={fonts.p}>
+          <Text style={fonts.legal}>
             {company.trim()}
             {team && `, ${team.trim()}`}
           </Text>
+          <Text style={[fonts.p, textStyles.italic, styles.purposeText]}>{purpose}</Text>
         </View>
       </Responsive>
     </>
@@ -140,14 +137,14 @@ function externalize(url: string) {
 // @ts-ignore
 const styles = StyleSheet.create({
   name: {
-    marginTop: 3,
+    marginTop: 8,
     marginRight: 5,
   },
   outLink: {
     paddingBottom: 1,
     justifyContent: 'flex-end',
   },
-  purposeText: { fontSize: 26, lineHeight: 28, minHeight: 60 },
+  purposeText: { fontSize: 26, lineHeight: 28, marginTop: 8 },
   photoListAuxMobile: {
     display: 'flex',
     justifyContent: 'center',

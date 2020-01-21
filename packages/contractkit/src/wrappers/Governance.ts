@@ -389,7 +389,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  private sortedQueue(queue: UpvoteRecord[]) {
+  sortedQueue(queue: UpvoteRecord[]) {
     return queue.sort((a, b) => a.upvotes.comparedTo(b.upvotes))
   }
 
@@ -535,6 +535,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
   isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToString))
+
+  /**
+   * Returns the number of validators required to reach a Byzantine quorum
+   */
+  byzantineQuorumValidators = proxyCall(
+    this.contract.methods.byzantineQuorumValidatorsInCurrentSet,
+    undefined,
+    valueToBigNumber
+  )
 
   /**
    * Returns the number of validators that whitelisted the hotfix

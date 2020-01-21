@@ -13,7 +13,7 @@ export default class Upvote extends BaseCommand {
     from: Flags.address({ required: true, description: "Upvoter's address" }),
   }
 
-  static examples = []
+  static examples = ['upvote --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
   async run() {
     const res = this.parse(Upvote)
