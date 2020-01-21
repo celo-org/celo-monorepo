@@ -8,8 +8,8 @@ let analytics: {
 
 let segmentPromise
 
-const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
-const RESPONDED_TO_CONSENT = '__responded_to_consent__'
+export const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
+export const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
 export async function canTrack() {
   return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME)
@@ -22,9 +22,7 @@ export async function showVisitorCookieConsent() {
 export async function initializeAnalytics() {
   if (!isBrowser() || !(await canTrack())) {
     return {
-      track: function track() {
-        return null
-      },
+      track: noTrack,
     }
   }
 
@@ -57,4 +55,8 @@ export default {
     const segment = await initializeAnalytics()
     return segment.track(key, properties, options)
   },
+}
+
+function noTrack() {
+  return null
 }
