@@ -62,7 +62,7 @@ export const builder = (yargs: Argv) => {
     })
     .option('timeToPollForTextMessages', {
       type: 'number',
-      description: 'How long to poll for text messages',
+      description: 'How long to poll for text messages in minutes',
       default: 3,
     })
     .option('index', {
