@@ -115,8 +115,7 @@ export class ExchangeReview extends React.Component<Props, State> {
       const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, makerToken, inputToken)
       makerAmount = getTakerAmount(inputAmount, exchangeRate)
     }
-    this.props.fetchExchangeRate(makerToken, makerAmount)
-    this.props.fetchTobinTax(makerAmount, makerToken)
+    return { makerToken, makerAmount }
   }
 
   getMakerAmount() {
@@ -133,7 +132,9 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.getExchangePropertiesFromNavProps()
+    const { makerToken, makerAmount } = this.getExchangePropertiesFromNavProps()
+    this.props.fetchTobinTax(makerAmount, makerToken)
+    this.props.fetchExchangeRate(makerToken, makerAmount)
   }
 
   getInputAmountInToken(token: CURRENCY_ENUM) {

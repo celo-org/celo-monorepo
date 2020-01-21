@@ -58,6 +58,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
       ])
 
       const tobinTaxFraction = yield call(reserve.methods.getOrComputeTobinTax().call)
+
       if (!tobinTaxFraction) {
         Logger.error(TAG, 'Unable to fetch tobin tax')
         throw new Error('Unable to fetch tobin tax')
@@ -73,11 +74,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
       tobinTax = 0
     }
 
-    Logger.debug(
-      TAG,
-      `Retrieved Tobin tax rate: 
-      ${tobinTax}`
-    )
+    Logger.debug(TAG, `Retrieved Tobin tax rate: ${tobinTax}`)
     yield put(setTobinTax(tobinTax.toString()))
   } catch (error) {
     Logger.error(TAG, 'Error fetching Tobin tax', error)
