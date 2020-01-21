@@ -13,6 +13,7 @@ import { RegistryInstance, StableTokenInstance } from 'types'
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const StableToken: Truffle.Contract<StableTokenInstance> = artifacts.require('StableToken')
+const EighteenMonthsInSeconds = 47340000
 
 // @ts-ignore
 // TODO(mcortesi): Use BN.js
@@ -78,7 +79,7 @@ contract('StableToken', (accounts: string[]) => {
       assert.isTrue(rate.eq(fixed1))
       assert.isTrue(factor.eq(fixed1))
       assert.equal(updatePeriod.toNumber(), SECONDS_IN_A_WEEK)
-      assert.equal(factorLastUpdated.toNumber(), initializationTime)
+      assert.equal(factorLastUpdated.toNumber(), initializationTime + EighteenMonthsInSeconds)
     })
 
     it('should not be callable again', async () => {
@@ -178,13 +179,17 @@ contract('StableToken', (accounts: string[]) => {
       beforeEach(async () => {
         await stableToken.setInflationParameters(inflationRate, SECONDS_IN_A_WEEK)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
+        await timeTravel(EighteenMonthsInSeconds, web3)
       })
 
       it('should update factor', async () => {
         await stableToken.transferWithComment(receiver, 5, comment)
         const [, factor, updatePeriod, lastUpdated] = await stableToken.getInflationParameters()
         assert.isTrue(factor.eq(inflationRate))
-        assert.equal(lastUpdated.toNumber(), initializationTime + updatePeriod.toNumber())
+        assert.equal(
+          lastUpdated.toNumber(),
+          initializationTime + EighteenMonthsInSeconds + updatePeriod.toNumber()
+        )
       })
 
       it('should emit InflationFactorUpdated event', async () => {
@@ -193,7 +198,7 @@ contract('StableToken', (accounts: string[]) => {
           event: 'InflationFactorUpdated',
           args: {
             factor: inflationRate,
-            lastUpdated: initializationTime + SECONDS_IN_A_WEEK,
+            lastUpdated: initializationTime + SECONDS_IN_A_WEEK + EighteenMonthsInSeconds,
           },
         })
       })
@@ -208,7 +213,7 @@ contract('StableToken', (accounts: string[]) => {
       const [rate, , updatePeriod, lastUpdated] = await stableToken.getInflationParameters()
       assert.isTrue(rate.eq(inflationRate))
       assert.equal(updatePeriod.toNumber(), newUpdatePeriod)
-      assert.equal(lastUpdated.toNumber(), initializationTime)
+      assert.equal(lastUpdated.toNumber(), initializationTime + EighteenMonthsInSeconds)
     })
 
     it('should emit an InflationParametersUpdated event', async () => {
@@ -231,6 +236,7 @@ contract('StableToken', (accounts: string[]) => {
       const newRate = toFixed(1)
       await stableToken.setInflationParameters(initialRate, SECONDS_IN_A_WEEK)
       await timeTravel(SECONDS_IN_A_WEEK, web3)
+      await timeTravel(EighteenMonthsInSeconds, web3)
       const res = await stableToken.setInflationParameters(newRate, SECONDS_IN_A_WEEK)
       const [rate, factor, , lastUpdated] = await stableToken.getInflationParameters()
       assertLogMatches2(res.logs[0], {
@@ -273,6 +279,7 @@ contract('StableToken', (accounts: string[]) => {
       beforeEach(async () => {
         await stableToken.setInflationParameters(toFixed(1005 / 1000), SECONDS_IN_A_WEEK)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
+        await timeTravel(EighteenMonthsInSeconds, web3)
       })
 
       it('should return depreciated balance value', async () => {
@@ -286,6 +293,7 @@ contract('StableToken', (accounts: string[]) => {
     beforeEach(async () => {
       await stableToken.setInflationParameters(toFixed(1005 / 1000), SECONDS_IN_A_WEEK)
       await timeTravel(SECONDS_IN_A_WEEK, web3)
+      await timeTravel(EighteenMonthsInSeconds, web3)
     })
 
     it('value 995 should correspond to roughly 1000 units after .005 depreciation', async () => {
@@ -306,6 +314,7 @@ contract('StableToken', (accounts: string[]) => {
     beforeEach(async () => {
       await stableToken.setInflationParameters(toFixed(1005 / 1000), SECONDS_IN_A_WEEK)
       await timeTravel(SECONDS_IN_A_WEEK, web3)
+      await timeTravel(EighteenMonthsInSeconds, web3)
     })
 
     it('1000 in units should be 995 in value after .005 depreciation', async () => {
@@ -384,6 +393,7 @@ contract('StableToken', (accounts: string[]) => {
         await stableToken.mint(sender, amount.times(2))
         await stableToken.setInflationParameters(inflationRate, SECONDS_IN_A_WEEK)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
+        await timeTravel(EighteenMonthsInSeconds, web3)
       })
 
       async function assertInflationUpdatedEvent(log, requestBlockTime, inflationPeriods = 1) {
@@ -395,27 +405,42 @@ contract('StableToken', (accounts: string[]) => {
 
       it('setInflationParameters', async () => {
         const res = await stableToken.setInflationParameters(fixed1, SECONDS_IN_A_WEEK)
-        await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
+        await assertInflationUpdatedEvent(
+          res.logs[0],
+          initializationTime + SECONDS_IN_A_WEEK + EighteenMonthsInSeconds
+        )
       })
 
       it('approve', async () => {
         const res = await stableToken.approve(receiver, amount)
-        await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
+        await assertInflationUpdatedEvent(
+          res.logs[0],
+          initializationTime + SECONDS_IN_A_WEEK + EighteenMonthsInSeconds
+        )
       })
 
       it('mint', async () => {
         const res = await stableToken.mint(sender, amountToMint)
-        await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
+        await assertInflationUpdatedEvent(
+          res.logs[0],
+          initializationTime + SECONDS_IN_A_WEEK + EighteenMonthsInSeconds
+        )
       })
 
       it('transferWithComment', async () => {
         const res = await stableToken.transferWithComment(receiver, amount, 'hi')
-        await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
+        await assertInflationUpdatedEvent(
+          res.logs[0],
+          initializationTime + SECONDS_IN_A_WEEK + EighteenMonthsInSeconds
+        )
       })
 
       it('burn', async () => {
         const res = await stableToken.mint(sender, amount)
-        await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
+        await assertInflationUpdatedEvent(
+          res.logs[0],
+          initializationTime + SECONDS_IN_A_WEEK + EighteenMonthsInSeconds
+        )
       })
 
       it('transferFrom', async () => {
@@ -424,14 +449,17 @@ contract('StableToken', (accounts: string[]) => {
         const res = await stableToken.transferFrom(sender, receiver, amount, { from: receiver })
         await assertInflationUpdatedEvent(
           res.logs[0],
-          initializationTime + SECONDS_IN_A_WEEK * 2,
+          initializationTime + SECONDS_IN_A_WEEK * 2 + EighteenMonthsInSeconds,
           2
         )
       })
 
       it('transfer', async () => {
         const res = await stableToken.transfer(receiver, 1)
-        await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
+        await assertInflationUpdatedEvent(
+          res.logs[0],
+          initializationTime + SECONDS_IN_A_WEEK + EighteenMonthsInSeconds
+        )
       })
     })
   })

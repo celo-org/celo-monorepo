@@ -61,6 +61,8 @@ contract StableToken is
 
   InflationState inflationState;
 
+  uint256 constant eighteenMonthsInSeconds = 47340000;
+
   /**
    * Only VM would be able to set the caller address to 0x0 unless someone
    * really has the private key for 0x0
@@ -142,7 +144,7 @@ contract StableToken is
     );
 
     inflationState.factor = FixidityLib.fixed1();
-    inflationState.factorLastUpdated = now;
+    inflationState.factorLastUpdated = now.add(eighteenMonthsInSeconds);
 
     emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
   }
