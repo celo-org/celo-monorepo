@@ -90,7 +90,7 @@ First, pull the Celo image as described [here](running-a-validator.md#pull-the-c
 ```bash
 # On all machines
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=121119
+export NETWORK_ID=200110
 docker pull $CELO_IMAGE
 ```
 
