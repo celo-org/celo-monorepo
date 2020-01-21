@@ -36,7 +36,7 @@ _See code: [packages/cli/src/commands/election/current.ts](https://github.com/ce
 
 ### List
 
-Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eleigible to elect validators.
+Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators.
 
 ```
 USAGE

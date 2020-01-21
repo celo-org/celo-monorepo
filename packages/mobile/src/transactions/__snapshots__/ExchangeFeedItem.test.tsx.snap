@@ -44,7 +44,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/transactions/ExchangeGreenGold.png",
+            "testUri": "../../../packages/mobile/src/images/exchangeGreenGold.png",
           }
         }
         style={
@@ -83,22 +83,30 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           exchange
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#FBCC5C",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "color": "#42D689",
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
-          10.00
+          -
+          $
+          1.33
         </Text>
       </View>
       <View
@@ -110,20 +118,24 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         }
       >
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-                "lineHeight": 20,
-              },
-              Object {
                 "color": "#42D689",
               },
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 20,
+                },
+                false,
+              ],
             ]
           }
         >
+          
           1.33
         </Text>
         <View
@@ -152,20 +164,24 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           </svg>
         </View>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-                "lineHeight": 20,
-              },
-              Object {
                 "color": "#FBCC5C",
               },
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 20,
+                },
+                false,
+              ],
             ]
           }
         >
+          
           10.00
         </Text>
       </View>
