@@ -205,36 +205,6 @@ async function getClaimedAccounts(kit: ContractKit, address: string) {
   }
 }
 
-/*
-async function getBTUs(kit: ContractKit, accounts: string[]) {
-  let sum = new BigNumber(0)
-  for (const address of accounts) {
-    try {
-      const balance = await kit.getTotalBalance(address)
-      sum = sum.plus(balance.total)
-    } catch (err) {
-      console.error('Error', err)
-    }
-  }
-  return sum.multipliedBy(new BigNumber('1e-18')).toString(10)
-}
-
-async function updateBTUs(kit: ContractKit, rows: string[][], sheets: any) {
-  let data = []
-  for (let item of rows) {
-    try {
-      let v = await getBTUs(kit, item)
-      console.log('BTU for', item[0], v)
-      data.push(v)
-    } catch (err) {
-      console.error('Cannot find BTU for', item[0], err)
-      data.push('')
-    }
-  }
-  makeRequest(sheets, 'E', data)
-}
-*/
-
 async function getAttestations(kit: ContractKit, address: string) {
   let attestations = await kit._web3Contracts.getAttestations()
   let req = (
