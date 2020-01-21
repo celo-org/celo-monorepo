@@ -287,15 +287,10 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
                   "opacity": 1,
                   "textDecoration": "underline",
-                  "textRendering": "geometricPrecision",
                 }
               }
             >
@@ -362,15 +357,10 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
                   "opacity": 1,
                   "textDecoration": "underline",
-                  "textRendering": "geometricPrecision",
                 }
               }
             >
@@ -679,15 +669,10 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
                   "opacity": 1,
                   "textDecoration": "underline",
-                  "textRendering": "geometricPrecision",
                 }
               }
             >
@@ -767,15 +752,10 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   role="link"
                   style={
                     Object {
-                      "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
                       "display": "inline",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
                       "opacity": 1,
                       "textDecoration": "underline",
-                      "textRendering": "geometricPrecision",
                     }
                   }
                 >
@@ -1442,15 +1422,10 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               role="link"
               style={
                 Object {
-                  "color": "rgba(46,51,56,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
                   "opacity": 1,
                   "textDecoration": "underline",
-                  "textRendering": "geometricPrecision",
                 }
               }
             >
