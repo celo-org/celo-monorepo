@@ -3,7 +3,7 @@ import * as React from 'react'
 import MobileMenu from './MobileMenu'
 
 describe(MobileMenu, () => {
-  xdescribe('when pressed', () => {
+  describe('when pressed', () => {
     it('shifts from open to closed', () => {
       const { getByTestId } = render(
         <MobileMenu
@@ -22,7 +22,9 @@ describe(MobileMenu, () => {
       const svgUp = getByTitle(getByTestId('toggle'), 'triangle').parentElement
       expect(svgUp.getAttribute('transform')).toEqual('rotate(0)')
 
-      fireEvent.click(getByTestId('toggle'))
+      // to get onPress to fire: see https://github.com/necolas/react-native-web/issues/1422
+      fireEvent.touchStart(getByTestId('toggle'))
+      fireEvent.touchEnd(getByTestId('toggle'))
 
       const svgDown = getByTitle(getByTestId('toggle'), 'triangle').parentElement
 
