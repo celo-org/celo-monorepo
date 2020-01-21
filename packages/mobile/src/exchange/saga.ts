@@ -10,6 +10,7 @@ import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToke
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
@@ -25,7 +26,7 @@ import {
   generateStandbyTransactionId,
   removeStandbyTransaction,
 } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
@@ -232,12 +233,12 @@ function* createStandbyTx(
   yield put(
     addStandbyTransaction({
       id: txId,
-      type: TransactionTypes.EXCHANGE,
+      type: TokenTransactionType.Exchange,
       status: TransactionStatus.Pending,
       inSymbol: makerToken,
-      inValue: makerAmount.toNumber(),
+      inValue: makerAmount.toString(),
       outSymbol: makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR,
-      outValue: takerAmount.toNumber(),
+      outValue: takerAmount.toString(),
       timestamp: Math.floor(Date.now() / 1000),
     })
   )

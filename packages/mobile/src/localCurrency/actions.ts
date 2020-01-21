@@ -13,7 +13,7 @@ export interface FetchCurrentRateAction {
 export interface FetchCurrentRateSuccessAction {
   type: Actions.FETCH_CURRENT_RATE_SUCCESS
   currencyCode: LocalCurrencyCode
-  exchangeRate: number
+  exchangeRate: string
   now: number
 }
 
@@ -38,7 +38,7 @@ export const fetchCurrentRate = (): FetchCurrentRateAction => ({
 
 export const fetchCurrentRateSuccess = (
   currencyCode: LocalCurrencyCode,
-  exchangeRate: number,
+  exchangeRate: string,
   now: number
 ): FetchCurrentRateSuccessAction => ({
   type: Actions.FETCH_CURRENT_RATE_SUCCESS,
