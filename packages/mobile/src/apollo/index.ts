@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import ApolloClient from 'apollo-boost'
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
-import introspectionQueryResultData from 'src/apollo/fragmentTypes.json'
+import introspectionQueryResultData from 'src/apollo/types'
 import config from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 
