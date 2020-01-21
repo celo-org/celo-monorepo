@@ -26,7 +26,6 @@ export default class ExchangeRateAPI extends RESTDataSource {
     currencyCode,
     timestamp,
   }: CurrencyConversionArgs): Promise<BigNumber> {
-    console.debug('Getting exchange rate', sourceCurrencyCode, currencyCode, timestamp)
     if (!currencyCode) {
       throw new Error('No currency code specified')
     }
@@ -39,7 +38,6 @@ export default class ExchangeRateAPI extends RESTDataSource {
 
   private async queryExchangeRate(sourceCurrencyCode: string, currencyCode: string, date: Date) {
     const pair = `${sourceCurrencyCode}/${currencyCode}`
-    console.debug('Querying exchange rate', pair, date)
     const path = `/historical`
     const params = {
       access_key: EXCHANGE_RATES_API_ACCESS_KEY,
@@ -56,7 +54,7 @@ export default class ExchangeRateAPI extends RESTDataSource {
     if (rate === undefined) {
       throw new Error(`No matching data for ${pair}`)
     }
-    console.debug('Retrieved rate', pair, rate)
+
     return rate
   }
 
