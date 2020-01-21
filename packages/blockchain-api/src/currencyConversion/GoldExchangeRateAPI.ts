@@ -40,8 +40,9 @@ function findClosestRate(
 }
 
 export default class GoldExchangeRateAPI<TContext = any> extends DataSource {
-  // TODO(jeanregisser): memoize results
-  // memoizedResults = new Map<string, Promise<any>>();
+  // This memoizes results for the current request only
+  // new datasources are instantiated for each new request
+  memoizedResults = new Map<string, Promise<BigNumber>>()
 
   initialize(config: DataSourceConfig<TContext>): void {
     // TODO(jeanregisser): keep config.cache
@@ -56,7 +57,18 @@ export default class GoldExchangeRateAPI<TContext = any> extends DataSource {
     const date = timestamp ? new Date(timestamp) : new Date()
 
     const pair = `${sourceCurrencyCode || CUSD}/${currencyCode}`
+    const cacheKey = `${pair}-${date.getTime()}`
 
+    let promise = this.memoizedResults.get(cacheKey)
+    if (!promise) {
+      promise = this.performRequest(pair, date)
+      this.memoizedResults.set(cacheKey, promise)
+    }
+
+    return promise
+  }
+
+  private async performRequest(pair: string, date: Date) {
     const ref = database.ref(`exchangeRates/${pair}`)
     const snapshot = await ref
       .orderByChild('timestamp')
