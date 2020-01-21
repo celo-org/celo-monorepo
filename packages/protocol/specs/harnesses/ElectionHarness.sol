@@ -103,12 +103,29 @@ contract ElectionHarness is Election {
 	function dHondWrapper(uint256 numGroups) public returns (uint256, bool)   {
 		return dHondt(electionGroups, numMembers, numMembersElected);
 	}
+	
 	function getNumMembers(uint256 groupId) public returns (uint256) {
 		return numMembers[groupId];
 	}
+	
 	function getNumMembersElected(uint256 groupId) public returns (uint256) {
 		return numMembersElected[groupId];
 	}
+	
+	function groupInGhostElectionGroups(address groupId) public returns (bool) {
+		for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+			if (electionGroups[i]==groupId)
+				return true;
+			
+		}
+		return false;
+	}
+	
+	function groupInElectionGroups(address groupId) public returns (bool) {
+
+		return votes.total.eligible.contains(groupId);
+	}
+	
 	
 }
 
