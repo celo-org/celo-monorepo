@@ -3,21 +3,21 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { PaymentRequestStatus } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
-  requester: Recipient
+  requestee: Recipient
   amount: string
   comment: string
   id: string
@@ -27,7 +27,7 @@ interface OwnProps {
 
 const AVATAR_SIZE = 40
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
@@ -56,27 +56,23 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
     ]
   }
 
-  isDisplayingNumber = () => {
-    return this.props.requester.displayId !== this.props.requester.displayName
-  }
-
   render() {
-    const { requester, t } = this.props
+    const { requestee, t } = this.props
     return (
       <View style={styles.container}>
         <BaseNotification
           icon={
             <ContactCircle
               size={AVATAR_SIZE}
-              address={requester.address}
-              name={requester.displayName}
-              thumbnailPath={getRecipientThumbnail(requester)}
+              address={requestee.address}
+              name={requestee.displayName}
+              thumbnailPath={getRecipientThumbnail(requestee)}
             >
               <Image source={unknownUserIcon} style={styles.unknownUser} />
             </ContactCircle>
           }
           title={t('outgoingPaymentRequestNotificationTitle', {
-            name: requester.displayName,
+            name: requestee.displayName,
             amount:
               CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
           })}
@@ -104,4 +100,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)
+export default withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)

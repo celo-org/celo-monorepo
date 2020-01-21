@@ -1,7 +1,7 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -10,7 +10,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -22,7 +22,7 @@ interface OwnProps {
   payment: EscrowedPayment
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 const TAG = 'EscrowedPaymentListItem'
 
@@ -69,7 +69,8 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
 
   getDisplayName() {
     const { payment } = this.props
-    return payment.recipientContact ? payment.recipientContact.displayName : payment.recipientPhone
+    // TODO(Rossy) Get contact number from recipient cache here
+    return payment.recipientPhone
   }
 
   render() {
@@ -111,5 +112,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
+  withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
 )

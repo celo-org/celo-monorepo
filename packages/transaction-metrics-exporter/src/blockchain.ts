@@ -1,6 +1,10 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
-import { newLogExplorer, ParsedBlock } from '@celo/contractkit/lib/explorer/log-explorer'
+import {
+  newBlockExplorer,
+  ParsedBlock,
+  ParsedTx,
+} from '@celo/contractkit/lib/explorer/block-explorer'
+import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
@@ -58,7 +62,14 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
     logger: consoleLogger,
     timeInBetweenMS: 5000,
     initialDelayMS: 5000,
-    pollCondition: async () => !(await kit.isListening()),
+    pollCondition: async () => {
+      try {
+        return !(await kit.isListening())
+      } catch (error) {
+        console.error(error)
+        return true
+      }
+    },
     onSuccess: () => endExporter({ reason: 'not-listening' }),
   })
 

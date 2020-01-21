@@ -74,9 +74,7 @@ async function verifyLocalSigning(web3: Web3, celoTransaction: CeloTx): Promise<
   if (celoTransaction.gatewayFeeRecipient != null) {
     debug(
       'Checking gateway fee recipient actual ' +
-        `${signedCeloTransaction.gatewayFeeRecipient} expected ${
-          celoTransaction.gatewayFeeRecipient
-        }`
+        `${signedCeloTransaction.gatewayFeeRecipient} expected ${celoTransaction.gatewayFeeRecipient}`
     )
     expect(signedCeloTransaction.gatewayFeeRecipient!.toLowerCase()).toEqual(
       celoTransaction.gatewayFeeRecipient.toLowerCase()

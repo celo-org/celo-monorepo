@@ -3,7 +3,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { EventTypeNames, HomeExchangeFragment } from 'src/apollo/types'
+import { HomeExchangeFragment } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { StandbyTransaction, TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import TransactionFeed, {
@@ -20,7 +20,7 @@ const standbyTransactions: StandbyTransaction[] = [
     type: TransactionTypes.SENT,
     comment: 'Eye for an Eye',
     status: TransactionStatus.Pending,
-    value: '100',
+    value: 100,
     symbol: CURRENCY_ENUM.DOLLAR,
     timestamp: 1542406112,
     address: '0072bvy2o23u',
@@ -30,9 +30,9 @@ const standbyTransactions: StandbyTransaction[] = [
     type: TransactionTypes.EXCHANGE,
     status: TransactionStatus.Pending,
     inSymbol: CURRENCY_ENUM.DOLLAR,
-    inValue: '20',
+    inValue: 20,
     outSymbol: CURRENCY_ENUM.GOLD,
-    outValue: '30',
+    outValue: 30,
     timestamp: 1542409112,
   },
   {
@@ -40,7 +40,7 @@ const standbyTransactions: StandbyTransaction[] = [
     type: TransactionTypes.NETWORK_FEE,
     comment: '',
     status: TransactionStatus.Pending,
-    value: '0.0001',
+    value: 0.0001,
     symbol: CURRENCY_ENUM.DOLLAR,
     timestamp: 1542406112,
     address: '0072bvy2o23u',
@@ -52,9 +52,9 @@ const failedExchange: StandbyTransaction[] = [
     type: TransactionTypes.EXCHANGE,
     status: TransactionStatus.Failed,
     inSymbol: CURRENCY_ENUM.DOLLAR,
-    inValue: '20',
+    inValue: 20,
     outSymbol: CURRENCY_ENUM.GOLD,
-    outValue: '30',
+    outValue: 30,
     timestamp: 1542409112,
     id: '0x00000000000000000001',
   },
@@ -62,7 +62,6 @@ const failedExchange: StandbyTransaction[] = [
 
 const exchangeEvents: HomeExchangeFragment[] = [
   {
-    __typename: EventTypeNames.Exchange,
     type: TransactionTypes.EXCHANGE,
     inValue: 30,
     outValue: 200,

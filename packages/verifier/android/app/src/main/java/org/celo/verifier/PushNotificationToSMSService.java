@@ -1,12 +1,12 @@
 package org.celo.verifier;
 
+import android.Manifest.permission;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.Manifest.permission;
+import android.content.pm.PackageManager;
 import android.os.Parcelable;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
@@ -14,9 +14,9 @@ import android.util.Log;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
@@ -189,11 +189,11 @@ public class PushNotificationToSMSService extends FirebaseMessagingService {
     Log.d(
       TAG,
       "Send sms to " +
-        phoneNumber +
-        " containing " +
-        message +
-        " fetched from messageId: " +
-        messageId
+      phoneNumber +
+      " containing " +
+      message +
+      " fetched from messageId: " +
+      messageId
     );
     try {
       // See SMSStatusBroadcastReceiver for how we track if SMS actually got sent or failed.
@@ -233,9 +233,7 @@ public class PushNotificationToSMSService extends FirebaseMessagingService {
       );
 
       // Broadcast array of all smsLogs from service to module so it can emit them to react native app
-        LocalBroadcastManager
-        .getInstance(getApplicationContext())
-        .sendBroadcast(smsLogIntent);
+      LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(smsLogIntent);
     } catch (Exception e) {
       Log.e(TAG, "Error sending SMS for message " + messageId);
       e.printStackTrace();

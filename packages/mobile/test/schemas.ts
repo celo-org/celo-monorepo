@@ -189,6 +189,10 @@ export const v4Schema = {
     acceptedAttestationCodes: [],
     verificationStatus: 0,
     hasSeenVerificationNux: false,
+    contactMappingProgress: {
+      current: 0,
+      total: 0,
+    },
   },
   account: {
     name: 'John Doe',
@@ -214,6 +218,14 @@ export const v4Schema = {
     dismissedInviteFriends: false,
     pincodeType: PincodeType.Unset,
     isSettingPin: false,
+  },
+  exchange: {
+    exchangeRatePair: null,
+    history: {
+      isLoading: false,
+      celoGoldExchangeRates: [],
+      lastTimeUpdated: 0,
+    },
   },
 }
 

@@ -129,7 +129,10 @@ export const mockContactWithPhone: MinimalContact = {
 export const mockContactWithPhone2: MinimalContact = {
   recordID: '2',
   displayName: 'Bob Bobson',
-  phoneNumbers: [{ label: 'home', number: mockE164Number }, { label: 'mobile', number: '100200' }],
+  phoneNumbers: [
+    { label: 'home', number: mockE164Number },
+    { label: 'mobile', number: '100200' },
+  ],
   thumbnailPath: '',
 }
 
@@ -138,7 +141,6 @@ export const mockContactList = [mockContactWithPhone2, mockContactWithPhone]
 export const mockEscrowedPayment: EscrowedPayment = {
   senderAddress: mockAccount2,
   recipientPhone: mockE164Number,
-  recipientContact: mockRecipient,
   paymentID: mockAccount,
   currency: SHORT_CURRENCIES.DOLLAR,
   amount: new BigNumber(10),

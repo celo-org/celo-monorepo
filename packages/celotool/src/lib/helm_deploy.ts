@@ -341,6 +341,18 @@ export async function retrieveIPAddress(name: string) {
   return address.replace(/\n*$/, '')
 }
 
+// returns the IP address of a resource internal to the cluster (ie 10.X.X.X)
+export async function retrieveClusterIPAddress(
+  resourceType: string,
+  resourceName: string,
+  namespace: string
+) {
+  const [address] = await execCmdWithExitOnFailure(
+    `kubectl get ${resourceType} ${resourceName} -n ${namespace} -o jsonpath={.spec.clusterIP}`
+  )
+  return address
+}
+
 export async function createStaticIPs(celoEnv: string) {
   console.info(`Creating static IPs for ${celoEnv}`)
 
@@ -427,7 +439,8 @@ export async function pollForBootnodeLoadBalancer(celoEnv: string) {
     await sleep(LOAD_BALANCER_POLL_INTERVAL)
   }
 
-  await sleep(1000 * 60 * 5)
+  console.info('Sleeping 1 minute...')
+  await sleep(1000 * 60) // 1 minute
 
   console.info(`\nReset all pods now that the bootnode load balancer has provisioned`)
   await execCmdWithExitOnFailure(`kubectl delete pod -n ${celoEnv} --selector=component=validators`)

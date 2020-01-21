@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -31,6 +32,24 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   mapping(address => Balances) private balances;
+
+  // Iterable map to store whitelisted identifiers.
+  // Necessary to allow iterating over whitelisted IDs to check ID's address at runtime.
+  mapping(bytes32 => bool) internal slashingMap;
+  bytes32[] public slashingWhitelist;
+
+  modifier onlySlasher {
+    require(
+      registry.isOneOf(slashingWhitelist, msg.sender),
+      "Caller is not a whitelisted slasher."
+    );
+    _;
+  }
+
+  function isSlasher(address slasher) external view returns (bool) {
+    return (registry.isOneOf(slashingWhitelist, slasher));
+  }
+
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -38,6 +57,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
+  event SlasherWhitelistAdded(string indexed slasherIdentifier);
+  event SlasherWhitelistRemoved(string indexed slasherIdentifier);
+  event AccountSlashed(
+    address indexed slashed,
+    uint256 penalty,
+    address indexed reporter,
+    uint256 reward
+  );
 
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
@@ -50,7 +77,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The unlocking period in seconds.
    */
   function setUnlockingPeriod(uint256 value) external onlyOwner {
-    require(value != unlockingPeriod);
+    require(value != unlockingPeriod, "Unlocking period not changed");
     unlockingPeriod = value;
     emit UnlockingPeriodSet(value);
   }
@@ -116,15 +143,16 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount of gold to unlock.
    */
   function unlock(uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
     Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
-    require(!getGovernance().isVoting(msg.sender));
+    require(!getGovernance().isVoting(msg.sender), "Account locked");
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 ||
-        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value)
+        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value),
+      "Trying to unlock too much gold"
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -138,11 +166,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The value to relock from the specified pending withdrawal.
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
     Balances storage account = balances[msg.sender];
-    require(index < account.pendingWithdrawals.length);
+    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-    require(value <= pendingWithdrawal.value);
+    require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
     if (value == pendingWithdrawal.value) {
       deletePendingWithdrawal(account.pendingWithdrawals, index);
     } else {
@@ -157,14 +185,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender));
+    require(getAccounts().isAccount(msg.sender), "Unknown account");
     Balances storage account = balances[msg.sender];
-    require(index < account.pendingWithdrawals.length);
+    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-    require(now >= pendingWithdrawal.timestamp);
+    require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
-    require(getGoldToken().transfer(msg.sender, value));
+    require(getGoldToken().transfer(msg.sender, value), "Transfer failed");
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -214,7 +242,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     view
     returns (uint256[] memory, uint256[] memory)
   {
-    require(getAccounts().isAccount(account));
+    require(getAccounts().isAccount(account), "Unknown account");
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
@@ -226,6 +254,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (values, timestamps);
   }
 
+  function getSlashingWhitelist() external view returns (bytes32[] memory) {
+    return slashingWhitelist;
+  }
+
   /**
    * @notice Deletes a pending withdrawal.
    * @param list The list of pending withdrawals from which to delete.
@@ -235,5 +267,84 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
     list.length = lastIndex;
+  }
+
+  /**
+   * @notice Adds `slasher` to whitelist of approved slashing addresses.
+   * @param slasherIdentifier Identifier to whitelist.
+   */
+  function addSlasher(string calldata slasherIdentifier) external onlyOwner {
+    bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
+    require(registry.getAddressFor(keyBytes) != address(0), "Identifier is not registered");
+    require(!slashingMap[keyBytes], "Cannot add slasher ID twice.");
+    slashingWhitelist.push(keyBytes);
+    slashingMap[keyBytes] = true;
+    emit SlasherWhitelistAdded(slasherIdentifier);
+  }
+
+  /**
+   * @notice Removes `slasher` from whitelist of approved slashing addresses.
+   * @param slasherIdentifier Identifier to remove from whitelist.
+   * @param index Index of the provided identifier in slashingWhiteList array.
+   */
+  function removeSlasher(string calldata slasherIdentifier, uint256 index) external onlyOwner {
+    bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
+    require(slashingMap[keyBytes], "Cannot remove slasher ID not yet added.");
+    require(index < slashingWhitelist.length, "Provided index exceeds whitelist bounds.");
+    slashingWhitelist[index] = slashingWhitelist[slashingWhitelist.length - 1];
+    slashingWhitelist.pop();
+    slashingMap[keyBytes] = false;
+    emit SlasherWhitelistRemoved(slasherIdentifier);
+  }
+
+  /**
+   * @notice Slashes `account` by reducing its nonvoting locked gold by `penalty`.
+   *         If there is not enough nonvoting locked gold to slash, calls into
+   *         `Election.slashVotes` to slash the remaining gold. If `account` does not have
+   *         `penalty` worth of locked gold, slashes `account`'s total locked gold.
+   *         Also sends `reward` gold to the reporter, and penalty-reward to the Community Fund.
+   * @param account Address of account being slashed.
+   * @param penalty Amount to slash account.
+   * @param reporter Address of account reporting the slasher.
+   * @param reward Reward to give reporter.
+   * @param lessers The groups receiving fewer votes than i'th group, or 0 if the i'th group has
+   *                the fewest votes of any validator group.
+   * @param greaters The groups receiving more votes than the i'th group, or 0 if the i'th group
+   *                 has the most votes of any validator group.
+   * @param indices The indices of the i'th group in `account`'s voting list.
+   * @dev Fails if `reward` is greater than `account`'s total locked gold.
+   */
+  function slash(
+    address account,
+    uint256 penalty,
+    address reporter,
+    uint256 reward,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external onlySlasher {
+    uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
+    require(maxSlash >= reward, "reward cannot exceed penalty.");
+    // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
+    {
+      uint256 nonvotingBalance = balances[account].nonvoting;
+      uint256 difference = 0;
+      // If not enough nonvoting, revoke the difference
+      if (nonvotingBalance < maxSlash) {
+        difference = maxSlash.sub(nonvotingBalance);
+        require(
+          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
+            difference,
+          "Cannot revoke enough voting gold."
+        );
+      }
+      // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
+      _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
+      _incrementNonvotingAccountBalance(reporter, reward);
+    }
+    address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    address payable communityFundPayable = address(uint160(communityFund));
+    communityFundPayable.transfer(maxSlash.sub(reward));
+    emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }

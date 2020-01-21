@@ -3,7 +3,7 @@ import throttle from 'lodash.throttle'
 import dynamic from 'next/dynamic'
 import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
-import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native'
+import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native'
 import BlueBanner, { styles as bannerStyle } from 'src/header/BlueBanner'
 import cssStyles from 'src/header/Header.3.scss'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -19,9 +19,9 @@ import OvalCoin from 'src/shared/OvalCoin'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
-const CookieConsent = dynamic((import('src/header/CookieConsent') as unknown) as Promise<
-  React.ComponentType
->)
+const CookieConsent = dynamic(
+  (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
+)
 
 const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 const DARK_PAGES = new Set([
@@ -42,8 +42,6 @@ type Props = OwnProps & I18nProps
 interface State {
   showDesktopMenu: boolean
   mobileMenuActive: boolean
-  mobileMenuFade: Animated.Value
-  menuFade: Animated.Value
   menuFaded: boolean
   belowFoldUpScroll: boolean
   isBannerShowing: boolean
@@ -74,19 +72,9 @@ export class Header extends React.PureComponent<Props, State> {
     }
 
     if (goingUp) {
-      this.setState({ menuFaded: false }, () => {
-        Animated.timing(this.state.menuFade, {
-          toValue: 1,
-          duration: 100,
-          easing: Easing.in(Easing.quad),
-        }).start()
-      })
+      this.setState({ menuFaded: false })
     } else if (belowFold) {
-      Animated.timing(this.state.menuFade, {
-        toValue: 0,
-        duration: 100,
-        easing: Easing.in(Easing.quad),
-      }).start(() => this.setState({ menuFaded: true }))
+      this.setState({ menuFaded: true })
     }
 
     this.lastScrollOffset = scrollOffset()
@@ -94,18 +82,9 @@ export class Header extends React.PureComponent<Props, State> {
 
   clickHamburger = debounce(() => {
     if (!this.state.mobileMenuActive) {
-      this.setState(
-        {
-          mobileMenuActive: true,
-        },
-        () => {
-          Animated.timing(this.state.mobileMenuFade, {
-            toValue: 1,
-            duration: 150,
-            easing: Easing.inOut(Easing.quad),
-          }).start()
-        }
-      )
+      this.setState({
+        mobileMenuActive: true,
+      })
     } else {
       this.closeMenu()
     }
@@ -116,8 +95,6 @@ export class Header extends React.PureComponent<Props, State> {
 
     this.state = {
       showDesktopMenu: false,
-      mobileMenuFade: new Animated.Value(0),
-      menuFade: new Animated.Value(1),
       menuFaded: false,
       mobileMenuActive: false,
       belowFoldUpScroll: false,
@@ -153,11 +130,7 @@ export class Header extends React.PureComponent<Props, State> {
     }
   }
   closeMenu = () => {
-    Animated.timing(this.state.mobileMenuFade, {
-      toValue: 0,
-      duration: 200,
-      easing: Easing.inOut(Easing.quad),
-    }).start(() => this.setState({ mobileMenuActive: false }))
+    this.setState({ mobileMenuActive: false })
   }
 
   isDarkMode = () => {
@@ -198,6 +171,7 @@ export class Header extends React.PureComponent<Props, State> {
     const isHomePage = this.props.router.pathname === menu.HOME.link
     return (
       <View
+        // @ts-ignore
         style={[
           styles.container,
           bannerStyle.slideDown,
@@ -215,116 +189,131 @@ export class Header extends React.PureComponent<Props, State> {
         {isHomePage && (
           <BlueBanner onVisibilityChange={this.toggleBanner} getHeight={this.setBannerHeight} />
         )}
-        {this.state.menuFaded || (
-          <Animated.View
-            style={[
-              styles.background,
-              {
-                backgroundColor: background,
-                opacity: this.state.menuFade,
-              },
-            ]}
-          />
-        )}
+
+        <View
+          // @ts-ignore
+          style={[
+            styles.background,
+            styles.fadeTransition,
+            this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
+            {
+              backgroundColor: background,
+            },
+          ]}
+        />
+
         <CookieConsent />
         <Responsive large={[styles.menuContainer, styles.largeMenuContainer]}>
           <View style={styles.menuContainer}>
             <Link href={'/'}>
               <View style={styles.logoLeftContainer}>
                 <View style={styles.logoContainer}>
-                  {!this.state.menuFaded ? (
-                    <>
-                      <Animated.View style={[{ opacity: this.state.menuFade }]}>
-                        {this.isDarkMode() ? (
-                          <LogoDarkBg
-                            height={30}
-                            allWhite={this.isTranslucent() && !this.state.belowFoldUpScroll}
-                          />
-                        ) : (
-                          <LogoLightBg height={30} />
-                        )}
-                      </Animated.View>
-                    </>
-                  ) : null}
+                  <>
+                    <View
+                      // @ts-ignore
+                      style={[
+                        styles.fadeTransition,
+                        this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
+                      ]}
+                    >
+                      {this.isDarkMode() ? (
+                        <LogoDarkBg
+                          height={30}
+                          allWhite={this.isTranslucent() && !this.state.belowFoldUpScroll}
+                        />
+                      ) : (
+                        <LogoLightBg height={30} />
+                      )}
+                    </View>
+                  </>
                 </View>
               </View>
             </Link>
-            {this.state.showDesktopMenu &&
-              !this.state.menuFaded && (
-                <Animated.View style={[styles.links, { opacity: this.state.menuFade }]}>
-                  {menuItems.map((item, index) => (
-                    <View key={index} style={styles.linkWrapper}>
-                      <Button
-                        kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                        href={item.link}
-                        text={t(item.name)}
-                      />
-                      {this.props.router.pathname === item.link && (
-                        <View style={styles.activeTab}>
-                          <OvalCoin color={colors.primary} size={10} />
-                        </View>
-                      )}
-                    </View>
-                  ))}
-                  <View style={[styles.linkWrapper]}>
+            {this.state.showDesktopMenu && (
+              <View
+                style={[
+                  styles.links,
+                  styles.fadeTransition as ViewStyle,
+                  this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
+                ]}
+              >
+                {menuItems.map((item, index) => (
+                  <View key={index} style={styles.linkWrapper}>
                     <Button
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                      href={'https://medium.com/CeloHQ'}
-                      text={t('blog')}
-                      target={'_blank'}
-                      iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
+                      href={item.link}
+                      text={t(item.name)}
                     />
+                    {this.props.router.pathname === item.link && (
+                      <View style={styles.activeTab}>
+                        <OvalCoin color={colors.primary} size={10} />
+                      </View>
+                    )}
                   </View>
-                  <View style={[styles.linkWrapper]}>
-                    <Button
-                      kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                      href={CeloLinks.gitHub}
-                      text={t('github')}
-                      target={'_blank'}
-                      iconRight={
-                        <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
-                      }
-                    />
-                  </View>
-                </Animated.View>
-              )}
+                ))}
+                <View style={[styles.linkWrapper]}>
+                  <Button
+                    kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
+                    href={'https://medium.com/CeloHQ'}
+                    text={t('blog')}
+                    target={'_blank'}
+                    iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
+                  />
+                </View>
+                <View style={[styles.linkWrapper]}>
+                  <Button
+                    kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
+                    href={CeloLinks.gitHub}
+                    text={t('github')}
+                    target={'_blank'}
+                    iconRight={
+                      <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
+                    }
+                  />
+                </View>
+              </View>
+            )}
           </View>
         </Responsive>
-        <Animated.View
-          style={[
-            styles.menuActive,
-            { opacity: this.state.mobileMenuFade },
-            !this.state.mobileMenuActive && styles.hidden,
-          ]}
-        >
+        <View style={[styles.menuActive, !this.state.mobileMenuActive && styles.hidden]}>
           <View style={styles.mobileOpenContainer}>
             <Footer isVertical={true} currentPage={this.props.router.pathname} />
           </View>
-        </Animated.View>
+        </View>
 
-        {!this.state.showDesktopMenu &&
-          !this.state.menuFaded && (
-            <Animated.View style={[styles.hamburger]}>
-              <div
-                className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
-                  this.state.mobileMenuActive ? cssStyles['is-active'] : ''
-                }`}
-                onClick={this.clickHamburger}
-              >
-                <div className={cssStyles['hamburger-box']}>
-                  <div className={cssStyles['hamburger-inner']} />
-                </div>
+        {!this.state.showDesktopMenu && !this.state.menuFaded && (
+          <View style={[styles.hamburger]}>
+            <div
+              className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
+                this.state.mobileMenuActive ? cssStyles['is-active'] : ''
+              }`}
+              onClick={this.clickHamburger}
+            >
+              <div className={cssStyles['hamburger-box']}>
+                <div className={cssStyles['hamburger-inner']} />
               </div>
-            </Animated.View>
-          )}
+            </div>
+          </View>
+        )}
       </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  fadeTransition: {
+    transitionProperty: 'opacity',
+    transitionDuration: '300ms',
+  },
+  menuVisible: {
+    opacity: 1,
+  },
+  menuInvisible: {
+    opacity: 0,
+    zIndex: -5,
+    visibility: 'hidden',
+  },
   container: {
-    // @ts-ignore
     position: 'fixed',
     left: 0,
     right: 0,
@@ -382,10 +371,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: '100vh',
     backgroundColor: colors.white,
-    // @ts-ignore
     overflowY: 'scroll',
   },
-  mobileMenuActive: { bottom: 0, height: 'auto' },
+  mobileMenuActive: {
+    bottom: 0,
+    top: 0,
+    height: 'auto',
+    position: 'absolute',
+    overflowY: 'hidden',
+  },
   activeTab: {
     position: 'absolute',
     height: 8,
@@ -411,14 +405,7 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   logoLeftVisible: {
-    // @ts-ignore
-    display: 'visible',
-  },
-  medium: {
     display: 'flex',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    paddingLeft: 10,
   },
 })
 

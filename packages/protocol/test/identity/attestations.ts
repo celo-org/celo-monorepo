@@ -86,7 +86,7 @@ contract('Attestations', (accounts: string[]) => {
     account: string,
     issuer: string
   ): Promise<[number, string, string]> {
-    const privateKey = accountPrivateKeys[accounts.indexOf(issuer)]
+    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer)
     const { v, r, s } = AttestationUtils.attestToIdentifier(phoneNumber, account, privateKey)
     return [v, r, s]
   }
@@ -148,6 +148,11 @@ contract('Attestations', (accounts: string[]) => {
         await unlockAndAuthorizeKey(
           KeyOffsets.VALIDATING_KEY_OFFSET,
           accountsInstance.authorizeValidatorSigner,
+          account
+        )
+        await unlockAndAuthorizeKey(
+          KeyOffsets.ATTESTING_KEY_OFFSET,
+          accountsInstance.authorizeAttestationSigner,
           account
         )
       })
@@ -386,6 +391,29 @@ contract('Attestations', (accounts: string[]) => {
 
   describe('#selectIssuers()', () => {
     let expectedRequestBlockNumber: number
+
+    describe('when half the validator set does not authorize an attestation key', () => {
+      const accountsThatOptedIn = accounts.slice(0, 5)
+
+      beforeEach(async () => {
+        await Promise.all(
+          accounts
+            .slice(5, 10)
+            .map(async (account) => accountsInstance.removeAttestationSigner({ from: account }))
+        )
+      })
+
+      it('does not select among those when requesting 5', async () => {
+        await attestations.request(phoneHash, 5, mockStableToken.address)
+        const requestBlockNumber = await web3.eth.getBlockNumber()
+        await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
+        await attestations.selectIssuers(phoneHash)
+
+        const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
+        assert.includeMembers(accountsThatOptedIn, attestationIssuers)
+      })
+    })
+
     describe('when attestations were requested', () => {
       beforeEach(async () => {
         await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
@@ -606,34 +634,6 @@ contract('Attestations', (accounts: string[]) => {
           account: caller,
           issuer,
         },
-      })
-    })
-
-    describe('when an attestor has been authorized', () => {
-      beforeEach(async () => {
-        const attestationKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer)
-        await unlockAndAuthorizeKey(
-          KeyOffsets.ATTESTING_KEY_OFFSET,
-          accountsInstance.authorizeAttestationSigner,
-          issuer
-        )
-        ;({ v, r, s } = AttestationUtils.attestToIdentifier(phoneNumber, caller, attestationKey))
-      })
-
-      it('should correctly complete the attestation', async () => {
-        let attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
-        assert.isEmpty(attestedAccounts)
-
-        await attestations.complete(phoneHash, v, r, s)
-        attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
-        assert.lengthOf(attestedAccounts, 1)
-        assert.equal(attestedAccounts[0], caller)
-      })
-
-      it('should mark the attestation by the issuer as complete', async () => {
-        await attestations.complete(phoneHash, v, r, s)
-        const [status] = await attestations.getAttestationState(phoneHash, caller, issuer)
-        assert.equal(status.toNumber(), 2)
       })
     })
 

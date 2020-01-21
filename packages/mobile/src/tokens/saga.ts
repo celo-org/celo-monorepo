@@ -41,7 +41,7 @@ export async function convertFromContractDecimals(value: BigNumber, token: CURRE
 
 export async function convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
   const weiPerUnit = await getWeiPerUnit(token)
-  return value.times(weiPerUnit)
+  return weiPerUnit.multipliedBy(value)
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
@@ -158,7 +158,7 @@ export function tokenTransferFactory({
           type: TransactionTypes.SENT,
           comment,
           status: TransactionStatus.Pending,
-          value: amount.toString(),
+          value: +amount,
           symbol: currency,
           timestamp: Math.floor(Date.now() / 1000),
           address: recipientAddress,

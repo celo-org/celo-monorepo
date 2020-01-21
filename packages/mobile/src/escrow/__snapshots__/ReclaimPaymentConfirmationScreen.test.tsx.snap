@@ -191,24 +191,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 }
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                John Doe
-              </Text>
               <View
                 style={
                   Object {
@@ -379,6 +361,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       style={
                         Object {
                           "height": 12,
+                          "tintColor": "#42D689",
                           "width": 12,
                         }
                       }
@@ -835,24 +818,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 }
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                John Doe
-              </Text>
               <View
                 style={
                   Object {
@@ -1023,6 +988,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       style={
                         Object {
                           "height": 12,
+                          "tintColor": "#42D689",
                           "width": 12,
                         }
                       }
@@ -1479,24 +1445,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 }
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                John Doe
-              </Text>
               <View
                 style={
                   Object {
@@ -1667,6 +1615,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       style={
                         Object {
                           "height": 12,
+                          "tintColor": "#42D689",
                           "width": 12,
                         }
                       }
