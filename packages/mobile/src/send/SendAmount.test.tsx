@@ -74,7 +74,7 @@ describe('SendAmount', () => {
             defaultCountryCode={'+1'}
             feeType={FeeType.SEND}
             localCurrencyCode={LocalCurrencyCode.MXN}
-            localCurrencyExchangeRate={1.33}
+            localCurrencyExchangeRate={'1.33'}
           />
         </Provider>
       )

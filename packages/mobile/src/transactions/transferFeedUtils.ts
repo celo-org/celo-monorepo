@@ -1,57 +1,57 @@
 import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
+import { TokenTransactionType } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
-import { TransactionTypes } from 'src/transactions/reducer'
 
 export function decryptComment(
-  comment: string | undefined,
+  comment: string | null | undefined,
   commentKey: Buffer | null,
-  type: TransactionTypes
+  type: TokenTransactionType
 ) {
   return comment && commentKey && features.USE_COMMENT_ENCRYPTION
     ? decryptCommentRaw(
         comment,
         commentKey,
-        type === TransactionTypes.SENT || type === TransactionTypes.ESCROW_SENT
+        type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
       ).comment
     : comment
 }
 
 export function getTransferFeedParams(
-  type: TransactionTypes,
+  type: TokenTransactionType,
   t: TFunction,
   invitees: Invitees,
   recipientCache: NumberToRecipient,
   address: string,
   addressToE164Number: AddressToE164NumberType,
-  comment: string,
+  comment: string | null,
   commentKey: Buffer | null
 ) {
   let info = decryptComment(comment, commentKey, type)
   let title, recipient
 
   switch (type) {
-    case TransactionTypes.VERIFICATION_FEE: {
+    case TokenTransactionType.VerificationFee: {
       title = t('feedItemVerificationFeeTitle')
       info = t('feedItemVerificationFeeInfo')
       break
     }
-    case TransactionTypes.NETWORK_FEE: {
+    case TokenTransactionType.NetworkFee: {
       title = t('feedItemNetworkFeeTitle')
       info = t('feedItemNetworkFeeInfo')
       break
     }
-    case TransactionTypes.VERIFICATION_REWARD: {
+    case TokenTransactionType.VerificationReward: {
       title = t('feedItemVerificationRewardTitle')
       info = t('feedItemVerificationRewardInfo')
       break
     }
-    case TransactionTypes.FAUCET: {
+    case TokenTransactionType.Faucet: {
       title = t('feedItemFaucetTitle')
       info = t('feedItemFaucetInfo', {
         context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
@@ -59,7 +59,7 @@ export function getTransferFeedParams(
       })
       break
     }
-    case TransactionTypes.INVITE_SENT: {
+    case TokenTransactionType.InviteSent: {
       const inviteeE164Number = invitees[address]
       const inviteeRecipient = recipientCache[inviteeE164Number]
       title = t('feedItemInviteSentTitle')
@@ -70,7 +70,7 @@ export function getTransferFeedParams(
       break
     }
 
-    case TransactionTypes.INVITE_RECEIVED: {
+    case TokenTransactionType.InviteReceived: {
       title = t('feedItemInviteReceivedTitle')
       info = t('feedItemInviteReceivedInfo')
       break
@@ -81,13 +81,13 @@ export function getTransferFeedParams(
 
       if (recipient) {
         title = recipient.displayName
-      } else if (type === TransactionTypes.RECEIVED) {
+      } else if (type === TokenTransactionType.Received) {
         title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
-      } else if (type === TransactionTypes.SENT) {
+      } else if (type === TokenTransactionType.Sent) {
         title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
-      } else if (type === TransactionTypes.ESCROW_SENT) {
+      } else if (type === TokenTransactionType.EscrowSent) {
         title = t('feedItemSentTitle', { context: 'escrowSent', address: shortAddr })
-      } else if (type === TransactionTypes.ESCROW_RECEIVED) {
+      } else if (type === TokenTransactionType.EscrowReceived) {
         title = t('feedItemReceivedTitle', { context: 'escrowRecieved', address: shortAddr })
       } else {
         // Fallback to just using the type
