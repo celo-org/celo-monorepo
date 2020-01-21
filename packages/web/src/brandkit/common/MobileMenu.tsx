@@ -38,7 +38,7 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
     const { pages, pathname } = this.props
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={this.toggleMenu}>
+        <TouchableOpacity testID="toggle" onPress={this.toggleMenu}>
           <View style={[standardStyles.row, styles.bar]}>
             <Text style={fonts.h6}>{pageTitleFromRoute(pathname)}</Text>
             <Triangle direction={this.state.isOpen ? Direction.up : Direction.down} />

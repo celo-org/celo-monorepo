@@ -5,7 +5,7 @@ import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persi
 export interface State {
   isLoading: boolean
   preferredCurrencyCode?: LocalCurrencyCode
-  exchangeRate?: number | null
+  exchangeRate?: string | null
   lastSuccessfulUpdate?: number
   fetchedCurrencyCode?: LocalCurrencyCode
 }
