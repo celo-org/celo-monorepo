@@ -124,7 +124,9 @@ rule withdraw(uint256 index)
 	uint length = sinvoke getPendingWithdrawalsLength(e.msg.sender);
 	require index < length;
 	require val	>0;
-	sinvoke withdraw(e,index);
+	env eNew;
+	require eNew.msg.sender == e.msg.sender;
+	sinvoke withdraw(eNew,index);
 	uint256 balance_ = sinvoke ercBalanceOf(e, e.msg.sender);
 	assert balance_ ==_balance;
 	assert false, "expecing withdraw to change balancae ";
