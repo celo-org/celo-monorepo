@@ -217,15 +217,10 @@ exports[`UserAgreement renders 1`] = `
             role="link"
             style={
               Object {
-                "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
                 "opacity": 1,
                 "textDecoration": "underline",
-                "textRendering": "geometricPrecision",
               }
             }
           >
@@ -268,15 +263,10 @@ You understand that you are participating in a test, and that the Celo Services 
             role="link"
             style={
               Object {
-                "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
                 "opacity": 1,
                 "textDecoration": "underline",
-                "textRendering": "geometricPrecision",
               }
             }
           >
@@ -324,15 +314,10 @@ The Company reserves the right in its sole and absolute discretion to terminate 
             role="link"
             style={
               Object {
-                "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
                 "opacity": 1,
                 "textDecoration": "underline",
-                "textRendering": "geometricPrecision",
               }
             }
           >
