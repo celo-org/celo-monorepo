@@ -2113,7 +2113,6 @@ exports[`About renders 1`] = `
         }
       >
         <div
-          aria-label="loading"
           className="css-view-1dbjc4n"
           style={
             Object {
@@ -2129,6 +2128,7 @@ exports[`About renders 1`] = `
           }
         >
           <div
+            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
