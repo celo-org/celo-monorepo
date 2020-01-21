@@ -41,6 +41,7 @@ if a user account voted for group than there is some pending or active votes for
 that group from this user
 */
 invariant userVotedHasLockedGoldInGroup(address account, address group) sinvoke userVotedFor(account,group) <=> (sinvoke getPendingVotesForGroupByAccount(group,account) > 0 || sinvoke getActiveVotesForGroupByAccount(group,account) > 0)
+
 /* make sure all functions are analyzed successfully */
 rule checkFunctionReachability(uint256 index,method f ) {
 	env eF;
@@ -57,6 +58,8 @@ rule checkFunctionReachability(uint256 index,method f ) {
 	sum of election.pending.forGroup[group].byAccount[account] for all groups/
 
 	is preserved by the election contract
+	question: what about the reward - it is passed only to the group?
+	
 	
 */
 rule totalPreserved( address account,  method f)
@@ -186,6 +189,27 @@ rule electValidatorReturnValues {
 	assert (validator1==0 &&  validator2==0 ) || (validator1!=validator2), "expecting different addresses as validators";
 }
 
+
+//todo -certora this require to handle the lsit correctly 
+rule ineligibileGroupRemoved(address group) {
+	env e;
+	sinvoke markGroupIneligible(e,group);
+	assert !sinvoke groupInElectionGroups(e,group);
+}
+
+
+rule ineligibileGroupCannotBeElected(address group, uint256 numGroups) {
+	env e;
+	sinvoke markGroupIneligible(e,group);
+	// safely assume that the group is not in the list
+	require !sinvoke groupInGhostElectionGroups(e,group);
+	uint256 groupIndex;
+	bool memberElected;
+	groupIndex,memberElected = sinvoke dHondWrapper(e,numGroups);
+	assert !memberElected  || groupIndex!=group, "ineligibile group should not be elected";
+}
+
+
 /* dHondt returns:
 1. a valid group id 
 2. if elected from a group-id than that group has at least as members as elected 
@@ -204,6 +228,36 @@ rule dHondtReturn(uint256 numGroups) {
 	assert sinvoke getNumMembersElected(e,groupIndex) <= sinvoke getNumMembers(e,groupIndex), "can not elect more than nominated";
 	assert sinvoke getNumMembersElected(e,anotherGroupIndex) <= sinvoke getNumMembers(e,anotherGroupIndex), "did not change other group";
 }
+
+
+
+
+//if revoke pending or active succeeds then the total number of votes for a group decreases by exactly “value”
+rule revokeDecreaseVotes(
+	address account, 
+	address group,
+	uint256 value, 
+    address lesser,
+    address greater,
+    uint256 index,
+	bool activeOrPending)
+{
+	env e;
+	require e.msg.sender == account;
+	uint256 totalvotesBefore = sinvoke getTotalVotesForGroup(e,group);
+	if (activeOrPending) {
+		sinvoke revokePending(e,group,value,lesser,greater,index);
+		}
+	else {
+		sinvoke revokeActive(e,group,value,lesser,greater,index);
+		}
+	uint256 totalvotesAfter = sinvoke getTotalVotesForGroup(e,group);
+	assert totalvotesAfter == totalvotesBefore - value, "when revoking expecting total votes to decrease accordingly";
+		
+}
+
+
+
 
 
 
