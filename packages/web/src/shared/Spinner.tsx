@@ -15,7 +15,7 @@ const DATA = {
 
 export default React.memo(function Spinner(props: Props) {
   return (
-    <View style={styles[props.size]}>
+    <View accessibilityLabel="loading" style={styles[props.size]}>
       <LottieBase data={DATA[props.color]} />
     </View>
   )
