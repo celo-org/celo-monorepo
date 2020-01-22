@@ -5,56 +5,14 @@ import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
 
-/**
- * Printer object to output marks in a grid to indicate signing status.
- */
-class MarkPrinter {
-  private previousBlockNumber: number | null = null
-
-  constructor(private width: number) {}
-
-  addMark(blockNumber: number, elected: boolean, signed: boolean) {
-    if (this.previousBlockNumber === null) {
-      const labelNumber = Math.floor(blockNumber / this.width) * this.width
-      this.previousBlockNumber = labelNumber - 1
-    }
-    if (blockNumber <= this.previousBlockNumber - 1) {
-      throw new Error(
-        `cannot add mark for ${blockNumber} which is not after ${this.previousBlockNumber}`
-      )
-    }
-
-    for (let i = this.previousBlockNumber + 1; i <= blockNumber; i++) {
-      if (i % this.width === 0) {
-        this.printLineLabel(i)
-      }
-      if (i < blockNumber) {
-        process.stdout.write(' ')
-      } else {
-        process.stdout.write(this.mark(elected, signed))
-      }
-    }
-    this.previousBlockNumber = blockNumber
-  }
-
-  done() {
-    process.stdout.write('\n', () => {})
-  }
-
-  private mark(elected: boolean, signed: boolean) {
-    return elected ? (signed ? chalk.green('.') : chalk.red('✘')) : chalk.yellow('~')
-  }
-
-  private printLineLabel(blockNumber: number, newline: boolean = true) {
-    if (newline) {
-      process.stdout.write('\n')
-    }
-    process.stdout.write(`${blockNumber} `.padStart(8, ' '))
-  }
-}
-
 export default class ValidatorHeartbeat extends BaseCommand {
-  static description = 'Display '
+  static description = `Display a graph of blocks and whether the given signer's signature is included in each. A green ${chalk.green(
+    "'.'"
+  )} indicates the signature is present in that block, a red ${chalk.red(
+    "'✘'"
+  )} indicates the signature is not present. A yellow ${chalk.yellow(
+    "'~'"
+  )} indicates the signer is not elected for that block.`
 
   static flags = {
     ...BaseCommand.flags,
@@ -74,16 +32,22 @@ export default class ValidatorHeartbeat extends BaseCommand {
       description: 'line width for printing marks',
       default: 40,
     }),
-    // TODO(victor): Fix this the follow flag functionality.
+    /* TODO(victor): Fix this the follow functionality.
     follow: flags.boolean({
       char: 'f',
       default: false,
       exclusive: ['at-block'],
       hidden: true,
     }),
+    */
   }
 
-  static examples = ['blocks --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631']
+  static examples = [
+    'heartbeat --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    'heartbeat --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    'heartbeat --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    'heartbeat --lookback 50 --width 10 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+  ]
 
   async run() {
     const res = this.parse(ValidatorHeartbeat)
@@ -127,10 +91,63 @@ export default class ValidatorHeartbeat extends BaseCommand {
           await subscription.unsubscribe()
         }
       }
-       */
+      */
     } finally {
-      // Print a final newline to complete the line.
-      printer.done()
+      await printer.done()
     }
+  }
+}
+
+/**
+ * Printer object to output marks in a grid to indicate signing status.
+ */
+// tslint:disable-next-line:max-classes-per-file
+class MarkPrinter {
+  private previousBlockNumber: number | null = null
+
+  constructor(private width: number) {}
+
+  addMark(blockNumber: number, elected: boolean, signed: boolean) {
+    if (this.previousBlockNumber === null) {
+      const labelNumber = Math.floor(blockNumber / this.width) * this.width
+      this.previousBlockNumber = labelNumber - 1
+    }
+    if (blockNumber <= this.previousBlockNumber - 1) {
+      throw new Error(
+        `cannot add mark for ${blockNumber} which is not after ${this.previousBlockNumber}`
+      )
+    }
+
+    for (let i = this.previousBlockNumber + 1; i <= blockNumber; i++) {
+      if (i % this.width === 0) {
+        this.printLineLabel(i)
+      }
+      if (i < blockNumber) {
+        process.stdout.write(' ')
+      } else {
+        process.stdout.write(this.mark(elected, signed))
+      }
+    }
+    this.previousBlockNumber = blockNumber
+  }
+
+  async done() {
+    // Print a final newline to complete the line.
+    return new Promise((resolve, reject) => {
+      process.stdout.write('\n', (err) => {
+        err ? reject(err) : resolve()
+      })
+    })
+  }
+
+  private mark(elected: boolean, signed: boolean) {
+    return elected ? (signed ? chalk.green('.') : chalk.red('✘')) : chalk.yellow('~')
+  }
+
+  private printLineLabel(blockNumber: number, newline: boolean = true) {
+    if (newline) {
+      process.stdout.write('\n')
+    }
+    process.stdout.write(`${blockNumber} `.padStart(8, ' '))
   }
 }
