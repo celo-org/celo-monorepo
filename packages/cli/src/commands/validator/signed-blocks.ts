@@ -129,7 +129,7 @@ class MarkPrinter {
   async done() {
     // Print a final newline to complete the line.
     return new Promise((resolve, reject) => {
-      process.stdout.write('\n', (err) => {
+      process.stdout.write('\n', (err: any) => {
         err ? reject(err) : resolve()
       })
     })
