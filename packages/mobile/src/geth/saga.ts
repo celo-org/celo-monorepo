@@ -23,7 +23,7 @@ import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { zeroSyncSelector } from 'src/web3/selectors'
+// import { zeroSyncSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -54,10 +54,6 @@ export function* waitForGethConnectivity() {
 }
 
 function* waitForGethInstance() {
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (false) {
-    return GethInitOutcomes.SUCCESS
-  }
   try {
     const gethInstance = yield call(getGeth)
     if (gethInstance == null) {
@@ -144,17 +140,12 @@ function createNewBlockChannel() {
 }
 
 function* monitorGeth() {
+  Logger.debug(`${TAG}@monitorGeth`, 'Starting new block channel')
   const newBlockChannel = yield createNewBlockChannel()
-
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (false) {
-    yield put(setGethConnected(true))
-    yield delay(GETH_MONITOR_DELAY)
-    return
-  }
 
   while (true) {
     try {
+      Logger.debug(`${TAG}@monitorGeth`, 'New block race')
       const { newBlock } = yield race({
         newBlock: take(newBlockChannel),
         timeout: delay(NEW_BLOCK_TIMEOUT),
@@ -165,23 +156,21 @@ function* monitorGeth() {
         yield delay(GETH_MONITOR_DELAY)
       } else {
         // Check whether reason for no new blocks is switch to zeroSync mode
-        const switchedToZeroSync = yield select(zeroSyncSelector)
-        if (false) {
-          yield put(setGethConnected(true))
-          return
-        } else {
-          Logger.error(
-            `${TAG}@monitorGeth`,
-            `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
-          )
-          yield put(setGethConnected(false))
-        }
+        Logger.error(
+          `${TAG}@monitorGeth`,
+          `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
+        )
+        yield put(setGethConnected(false))
       }
     } catch (error) {
       Logger.error(`${TAG}@monitorGeth`, error)
     } finally {
       if (yield cancelled()) {
-        newBlockChannel.close()
+        try {
+          newBlockChannel.close()
+        } catch (error) {
+          Logger.debug(`${TAG}@monitorGeth`, 'Could not close newBlockChannel', error)
+        }
       }
     }
   }
@@ -216,12 +205,15 @@ function* monitorAppState() {
 }
 
 function* cancelSaga(task: any) {
-  Logger.debug(`${TAG}@cancelSaga`, 'Cancelling geth related sags')
+  Logger.debug(`${TAG}@cancelSaga`, 'Cancelling geth related sags', JSON.stringify(task))
   yield cancel(task)
+  Logger.debug(`${TAG}@cancelSaga`, 'Cancelled tasks')
   yield put(setGethConnected(true))
+  Logger.debug(`${TAG}@cancelSaga`, 'Set geth connected to true')
 }
 
 export function* gethSaga() {
-  const gethRelated = yield all([call(initGethSaga), fork(monitorAppState), fork(monitorGeth)])
+  yield call(initGethSaga)
+  const gethRelated = yield all([fork(monitorAppState), fork(monitorGeth)])
   yield takeLatest(Actions.CANCEL_GETH_SAGA, cancelSaga, gethRelated)
 }

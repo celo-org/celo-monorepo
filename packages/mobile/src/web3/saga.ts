@@ -59,16 +59,9 @@ export function* checkWeb3SyncProgress() {
   while (true) {
     try {
       let syncProgress: boolean | Web3SyncProgress
-      const zeroSyncMode = yield select(zeroSyncSelector)
-      // tslint:disable-next-line: prefer-conditional-expression
-      if (zeroSyncMode) {
-        // In this mode, the check seems to fail with
-        // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
-        syncProgress = false
-      } else {
-        // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-        syncProgress = yield call(web3.eth.isSyncing)
-      }
+
+      // isSyncing returns a syncProgress object when it's still syncing, false otherwise
+      syncProgress = yield call(web3.eth.isSyncing)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
@@ -91,10 +84,6 @@ export function* checkWeb3SyncProgress() {
     } catch (error) {
       // Check if error caused by switch to zeroSyncMode
       // as if it is in zeroSyncMode it should have returned above
-      const switchedToZeroSyncMode = yield select(zeroSyncSelector)
-      if (switchedToZeroSyncMode) {
-        return true
-      }
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -132,8 +121,10 @@ export function* waitForWeb3Sync() {
 }
 
 export function* waitWeb3LastBlock() {
-  yield call(waitForGethConnectivity)
-  yield call(waitForWeb3Sync)
+  if (!(yield select(zeroSyncSelector))) {
+    yield call(waitForGethConnectivity)
+    yield call(waitForWeb3Sync)
+  }
 }
 
 export function* getOrCreateAccount() {
