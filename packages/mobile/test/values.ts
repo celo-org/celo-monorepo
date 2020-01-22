@@ -141,7 +141,6 @@ export const mockContactList = [mockContactWithPhone2, mockContactWithPhone]
 export const mockEscrowedPayment: EscrowedPayment = {
   senderAddress: mockAccount2,
   recipientPhone: mockE164Number,
-  recipientContact: mockRecipient,
   paymentID: mockAccount,
   currency: SHORT_CURRENCIES.DOLLAR,
   amount: new BigNumber(10),

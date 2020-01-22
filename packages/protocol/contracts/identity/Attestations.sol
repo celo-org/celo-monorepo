@@ -567,11 +567,17 @@ contract Attestations is
     uint256 currentIndex = 0;
     address validator;
     address issuer;
+    IAccounts accounts = getAccounts();
 
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorSignerAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = getAccounts().validatorSignerToAccount(validator);
+      issuer = accounts.validatorSignerToAccount(validator);
+
+      if (!accounts.hasAuthorizedAttestationSigner(issuer)) {
+        continue;
+      }
+
       Attestation storage attestation = state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't been already.

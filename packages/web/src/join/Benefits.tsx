@@ -9,8 +9,8 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
-function downloadBenefits() {
-  analytics.track(`benefits.pdf download`)
+async function downloadBenefits() {
+  await analytics.track(`benefits.pdf download`)
 }
 
 type Props = I18nProps
