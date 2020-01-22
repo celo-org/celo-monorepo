@@ -6,13 +6,8 @@ import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
 
 export default class ValidatorHeartbeat extends BaseCommand {
-  static description = `Display a graph of blocks and whether the given signer's signature is included in each. A green ${chalk.green(
-    "'.'"
-  )} indicates the signature is present in that block, a red ${chalk.red(
-    "'✘'"
-  )} indicates the signature is not present. A yellow ${chalk.yellow(
-    "'~'"
-  )} indicates the signer is not elected for that block.`
+  static description =
+    "Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block."
 
   static flags = {
     ...BaseCommand.flags,
