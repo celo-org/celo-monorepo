@@ -5,7 +5,7 @@ import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
 
-export default class ValidatorHeartbeat extends BaseCommand {
+export default class ValidatorSignedBlocks extends BaseCommand {
   static description =
     "Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block."
 
@@ -45,7 +45,7 @@ export default class ValidatorHeartbeat extends BaseCommand {
   ]
 
   async run() {
-    const res = this.parse(ValidatorHeartbeat)
+    const res = this.parse(ValidatorSignedBlocks)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
