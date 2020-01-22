@@ -16,6 +16,10 @@ export const setInitState = (state: InitializationState): SetInitState => ({
   state,
 })
 
+export const cancelGethSaga = () => ({
+  type: Actions.CANCEL_GETH_SAGA,
+})
+
 interface SetGethConnected {
   type: Actions.SET_GETH_CONNECTED
   connected: boolean

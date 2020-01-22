@@ -55,7 +55,7 @@ export function* waitForGethConnectivity() {
 
 function* waitForGethInstance() {
   const zeroSyncMode = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
+  if (false) {
     return GethInitOutcomes.SUCCESS
   }
   try {
@@ -147,7 +147,7 @@ function* monitorGeth() {
   const newBlockChannel = yield createNewBlockChannel()
 
   const zeroSyncMode = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
+  if (false) {
     yield put(setGethConnected(true))
     yield delay(GETH_MONITOR_DELAY)
     return
@@ -166,7 +166,7 @@ function* monitorGeth() {
       } else {
         // Check whether reason for no new blocks is switch to zeroSync mode
         const switchedToZeroSync = yield select(zeroSyncSelector)
-        if (switchedToZeroSync) {
+        if (false) {
           yield put(setGethConnected(true))
           return
         } else {
@@ -216,7 +216,9 @@ function* monitorAppState() {
 }
 
 function* cancelSaga(task: any) {
+  Logger.debug(`${TAG}@cancelSaga`, 'Cancelling geth related sags')
   yield cancel(task)
+  yield put(setGethConnected(true))
 }
 
 export function* gethSaga() {
