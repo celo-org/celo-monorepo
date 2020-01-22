@@ -61,6 +61,11 @@ export interface GroupMembership {
   group: Address
 }
 
+export interface MembershipHistoryExtraData {
+  lastRemovedFromGroupTimestamp: number
+  tail: number
+}
+
 /**
  * Contract for voting for validators and managing validator groups.
  */
@@ -263,6 +268,19 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     undefined,
     (res) =>
       zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
+  )
+
+  /**
+   * Returns extra data from the Validator's group membership history
+   * @param validator The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
+  getValidatorMembershipHistoryExtraData: (
+    validator: Address
+  ) => Promise<MembershipHistoryExtraData> = proxyCall(
+    this.contract.methods.getMembershipHistory,
+    undefined,
+    (res) => ({ lastRemovedFromGroupTimestamp: valueToInt(res[2]), tail: valueToInt(res[3]) })
   )
 
   /** Get the size (amount of members) of a ValidatorGroup */

@@ -298,6 +298,30 @@ class CheckBuilder {
     )
   }
 
+  isNotValidatorGroupMember = () => {
+    return this.addCheck(
+      `Account isn't a member of a validator group`,
+      this.withValidators(async (v, _signer, account) => {
+        const { affiliation } = await v.getValidator(account)
+        const { members } = await v.getValidatorGroup(affiliation!)
+        return !members.includes(account)
+      })
+    )
+  }
+
+  validatorDeregisterDurationPassed = () => {
+    return this.addCheck(
+      `Enough time has passed since the account was removed from a validator group`,
+      this.withValidators(async (v, _signer, account) => {
+        const { lastRemovedFromGroupTimestamp } = await v.getValidatorMembershipHistoryExtraData(
+          account
+        )
+        const { duration } = await v.getValidatorLockedGoldRequirements()
+        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now()
+      })
+    )
+  }
+
   async runChecks() {
     console.log(`Running Checks:`)
     let allPassed = true
