@@ -128,12 +128,6 @@ export const fontStyles = StyleSheet.create({
     fontFamily: HindSilguri.Regular,
     color: colors.darkSecondary,
   },
-  activityCurrency: {
-    fontSize: 16,
-    lineHeight: 20,
-    fontFamily: HindSilguri.SemiBold,
-    color: colors.dark,
-  },
   activityCurrencyReceived: {
     fontSize: 15,
     lineHeight: 20,
