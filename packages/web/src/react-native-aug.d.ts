@@ -7,6 +7,7 @@ declare module 'react-native' {
     display?: 'list-item' | 'inline' | 'none' | 'inline-flex' | 'flex'
     transitionProperty?: string
     transitionDuration?: string
+    gridArea?: string
   }
 
   interface ViewStyle {
@@ -20,6 +21,7 @@ declare module 'react-native' {
     animationIterationCount?: 'infinite' | number
     animationKeyframes?: unknown[]
     animationTimingFunction?: string
+    gridArea?: string
     gridRowGap?: string | number
     gridColumnGap?: string | number
     gridTemplateColumns?: string

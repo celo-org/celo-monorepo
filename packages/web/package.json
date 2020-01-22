@@ -18,7 +18,7 @@
     "test": "jest --coverage --runInBand"
   },
   "dependencies": {
-    "@celo/utils": "0.1.4",
+    "@celo/utils": "0.1.5",
     "@sentry/browser": "^5.10.2",
     "@sentry/node": "^5.10.2",
     "@zeit/next-sass": "^1.0.1",
