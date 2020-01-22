@@ -172,7 +172,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @return The median exchange rate for `token`.
    */
   function medianRate(address token) external view returns (uint256, uint256) {
-    return (rates[token].getMedianValue(), numRates(token));
+    return (
+      rates[token].getMedianValue(),
+      numRates(token) == 0 ? 0 : FixidityLib.fixed1().unwrap()
+    );
   }
 
   /**
@@ -241,7 +244,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     emit OracleReportRemoved(token, oracle);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian);
+      emit MedianUpdated(token, newMedian == 0 ? 0 : FixidityLib.fixed1().unwrap());
     }
   }
 }

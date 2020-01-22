@@ -274,7 +274,7 @@ contract('SortedOracles', (accounts: string[]) => {
       })
       const [actualMedianRate, numberOfRates] = await sortedOracles.medianRate(aToken)
       assertEqualBN(actualMedianRate, givenMedianRate)
-      assertEqualBN(numberOfRates.toNumber(), 1)
+      assertEqualBN(numberOfRates, toFixed(new BigNumber(1)))
     })
 
     it('should increase the number of timestamps', async () => {
