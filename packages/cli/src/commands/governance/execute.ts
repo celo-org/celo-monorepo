@@ -28,6 +28,6 @@ export default class Execute extends BaseCommand {
       .runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
-    await displaySendTx('executeTx', await governance.execute(id))
+    await displaySendTx('executeTx', await governance.execute(id), {}, 'ProposalExecuted')
   }
 }
