@@ -1,0 +1,1719 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ignores failed standby transactions 1`] = `
+<RCTScrollView
+  ItemSeparatorComponent={[Function]}
+  data={
+    Array [
+      Object {
+        "__typename": "TokenTransfer",
+        "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
+        "amount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "-0.2",
+          },
+          "value": "-0.2",
+        },
+        "comment": "Hi",
+        "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
+        "status": "Complete",
+        "timestamp": 1578530538,
+        "type": "SENT",
+      },
+      Object {
+        "__typename": "TokenExchange",
+        "amount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "0.994982275992944156",
+          },
+          "value": "0.994982275992944156",
+        },
+        "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
+        "makerAmount": Object {
+          "currencyCode": "cGLD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "10.06007113270411465777",
+            "value": "1.006007113270411465777",
+          },
+          "value": "0.1",
+        },
+        "status": "Complete",
+        "takerAmount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "0.994982275992944156",
+          },
+          "value": "0.994982275992944156",
+        },
+        "timestamp": 1578530498,
+        "type": "EXCHANGE",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={true}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": -1,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 20,
+                      },
+                    ],
+                  ]
+                }
+              >
+                -
+                $
+                0.20
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "marginTop": -2,
+                }
+              }
+            >
+              Hi
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Jan 9 global:at 12:42 AM
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": 3,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                exchange
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 15,
+                        "lineHeight": 20,
+                      },
+                    ],
+                  ]
+                }
+              >
+                
+                $
+                0.99
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#FBCC5C",
+                    },
+                    Array [
+                      Object {
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 16,
+                        "lineHeight": 20,
+                      },
+                      false,
+                    ],
+                  ]
+                }
+              >
+                
+                0.10
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 8,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 16,
+                        "lineHeight": 20,
+                      },
+                      false,
+                    ],
+                  ]
+                }
+              >
+                
+                0.99
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Jan 9 global:at 12:41 AM
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;
+
+exports[`ignores pending standby transactions that are completed in the response and removes them 1`] = `
+<RCTScrollView
+  ItemSeparatorComponent={[Function]}
+  data={
+    Array [
+      Object {
+        "__typename": "TokenTransfer",
+        "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
+        "amount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "-0.2",
+          },
+          "value": "-0.2",
+        },
+        "comment": "Hi",
+        "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
+        "status": "Complete",
+        "timestamp": 1578530538,
+        "type": "SENT",
+      },
+      Object {
+        "__typename": "TokenExchange",
+        "amount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "0.994982275992944156",
+          },
+          "value": "0.994982275992944156",
+        },
+        "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
+        "makerAmount": Object {
+          "currencyCode": "cGLD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "10.06007113270411465777",
+            "value": "1.006007113270411465777",
+          },
+          "value": "0.1",
+        },
+        "status": "Complete",
+        "takerAmount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "0.994982275992944156",
+          },
+          "value": "0.994982275992944156",
+        },
+        "timestamp": 1578530498,
+        "type": "EXCHANGE",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={true}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": -1,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 20,
+                      },
+                    ],
+                  ]
+                }
+              >
+                -
+                $
+                0.20
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "marginTop": -2,
+                }
+              }
+            >
+              Hi
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Jan 9 global:at 12:42 AM
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": 3,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                exchange
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 15,
+                        "lineHeight": 20,
+                      },
+                    ],
+                  ]
+                }
+              >
+                
+                $
+                0.99
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#FBCC5C",
+                    },
+                    Array [
+                      Object {
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 16,
+                        "lineHeight": 20,
+                      },
+                      false,
+                    ],
+                  ]
+                }
+              >
+                
+                0.10
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 8,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 16,
+                        "lineHeight": 20,
+                      },
+                      false,
+                    ],
+                  ]
+                }
+              >
+                
+                0.99
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Jan 9 global:at 12:41 AM
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "height": 0,
+        }
+      }
+    />
+  </View>
+</RCTScrollView>
+`;
+
+exports[`renders the received data along with the standby transactions 1`] = `
+<RCTScrollView
+  ItemSeparatorComponent={[Function]}
+  data={
+    Array [
+      Object {
+        "__typename": "TokenTransfer",
+        "address": "0072bvy2o23u",
+        "amount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "MXN",
+            "exchangeRate": "1.33",
+            "value": "-133",
+          },
+          "value": "-100",
+        },
+        "comment": "Eye for an Eye",
+        "hash": "",
+        "status": "Pending",
+        "timestamp": 1542406110,
+        "type": "SENT",
+      },
+      Object {
+        "__typename": "TokenTransfer",
+        "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
+        "amount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "-0.2",
+          },
+          "value": "-0.2",
+        },
+        "comment": "Hi",
+        "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
+        "status": "Complete",
+        "timestamp": 1578530538,
+        "type": "SENT",
+      },
+      Object {
+        "__typename": "TokenExchange",
+        "amount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "0.994982275992944156",
+          },
+          "value": "0.994982275992944156",
+        },
+        "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
+        "makerAmount": Object {
+          "currencyCode": "cGLD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "10.06007113270411465777",
+            "value": "1.006007113270411465777",
+          },
+          "value": "0.1",
+        },
+        "status": "Complete",
+        "takerAmount": Object {
+          "currencyCode": "cUSD",
+          "localAmount": Object {
+            "currencyCode": "USD",
+            "exchangeRate": "1",
+            "value": "0.994982275992944156",
+          },
+          "value": "0.994982275992944156",
+        },
+        "timestamp": 1578530498,
+        "type": "EXCHANGE",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={true}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": -1,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 20,
+                      },
+                    ],
+                  ]
+                }
+              >
+                -
+                $
+                133.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "marginTop": -2,
+                }
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 10:08 PM
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": -1,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 20,
+                      },
+                    ],
+                  ]
+                }
+              >
+                -
+                $
+                0.20
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "marginTop": -2,
+                }
+              }
+            >
+              Hi
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Jan 9 global:at 12:42 AM
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": 3,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                exchange
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 15,
+                        "lineHeight": 20,
+                      },
+                    ],
+                  ]
+                }
+              >
+                
+                $
+                0.99
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#FBCC5C",
+                    },
+                    Array [
+                      Object {
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 16,
+                        "lineHeight": 20,
+                      },
+                      false,
+                    ],
+                  ]
+                }
+              >
+                
+                0.10
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 8,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                    },
+                    Array [
+                      Object {
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 16,
+                        "lineHeight": 20,
+                      },
+                      false,
+                    ],
+                  ]
+                }
+              >
+                
+                0.99
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Jan 9 global:at 12:41 AM
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "height": 0,
+        }
+      }
+    />
+  </View>
+</RCTScrollView>
+`;

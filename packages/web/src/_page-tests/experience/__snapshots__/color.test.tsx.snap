@@ -121,12 +121,12 @@ exports[`Experience/Color renders 1`] = `
               />
               <path
                 d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-                fill="#FBCC5C"
+                fill="#35D07F"
                 style={Object {}}
               />
               <path
                 d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-                fill="#35D07F"
+                fill="#FBCC5C"
                 style={Object {}}
               />
               <path
@@ -702,6 +702,116 @@ exports[`Experience/Color renders 1`] = `
                 />
               </div>
               Typography
+            </a>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "MozTransitionProperty": "transform,",
+              "WebkitTransform": "scaleY(0)",
+              "WebkitTransformOrigin": "top",
+              "WebkitTransitionDuration": "500ms",
+              "WebkitTransitionProperty": "-webkit-transform,transform,",
+              "marginLeft": "20px",
+              "transform": "scaleY(0)",
+              "transformOrigin": "top",
+              "transitionDuration": "500ms",
+              "transitionProperty": "-webkit-transform,transform,",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "flexDirection": "row",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "msFlexDirection": "row",
+              "paddingBottom": "5px",
+              "paddingLeft": "5px",
+              "paddingRight": "5px",
+              "paddingTop": "5px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onResponderGrant={[Function]}
+            onResponderRelease={[Function]}
+          >
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+              data-focusable={true}
+              dir="auto"
+              href="/experience/brand/composition"
+              role="link"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexGrow": 0,
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "borderBottomColor": "rgba(0,0,0,0.00)",
+                  "borderLeftColor": "rgba(0,0,0,0.00)",
+                  "borderRightColor": "rgba(0,0,0,0.00)",
+                  "borderTopColor": "rgba(0,0,0,0.00)",
+                  "color": "rgba(46,51,56,1.00)",
+                  "cursor": "pointer",
+                  "display": "inline-flex",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "normal",
+                  "justifyContent": "center",
+                  "lineHeight": "16px",
+                  "msFlexAlign": "center",
+                  "msFlexPack": "center",
+                  "msFlexPositive": 0,
+                  "opacity": 1,
+                  "outlineColor": "transparent",
+                  "textAlign": "center",
+                  "textRendering": "geometricPrecision",
+                  "width": "fit-content",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "paddingRight": "8px",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "width": "12px",
+                    }
+                  }
+                />
+              </div>
+              Composition
             </a>
           </div>
         </div>
@@ -6023,15 +6133,10 @@ exports[`Experience/Color renders 1`] = `
                 role="link"
                 style={
                   Object {
-                    "color": "rgba(46,51,56,1.00)",
                     "cursor": "pointer",
                     "display": "inline",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "20px",
-                    "lineHeight": "28px",
                     "opacity": 1,
                     "textDecoration": "underline",
-                    "textRendering": "geometricPrecision",
                   }
                 }
               >

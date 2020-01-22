@@ -35,25 +35,33 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
   />
   <View
     style={
-      Object {
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "marginHorizontal": 25,
-        "marginTop": 15,
-      }
+      Array [
+        Object {
+          "alignItems": "flex-start",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+        },
+        undefined,
+      ]
     }
   >
     <Text
+      numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 24,
-            "textAlignVertical": "top",
           },
           Object {
             "color": "#81868B",
+            "fontSize": 28,
+            "lineHeight": 39,
+            "transform": Array [
+              Object {
+                "translateY": 3,
+              },
+            ],
           },
         ]
       }
@@ -61,18 +69,19 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
       $
     </Text>
     <Text
-      ellipsizeMode="tail"
       numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 48,
-            "lineHeight": 64,
+          },
+          Object {
+            "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
+            "fontSize": 48,
+            "lineHeight": 62,
           },
         ]
       }
@@ -248,25 +257,33 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
   </View>
   <View
     style={
-      Object {
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "marginHorizontal": 25,
-        "marginTop": 15,
-      }
+      Array [
+        Object {
+          "alignItems": "flex-start",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+        },
+        undefined,
+      ]
     }
   >
     <Text
+      numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 24,
-            "textAlignVertical": "top",
           },
           Object {
             "color": "#81868B",
+            "fontSize": 28,
+            "lineHeight": 39,
+            "transform": Array [
+              Object {
+                "translateY": 3,
+              },
+            ],
           },
         ]
       }
@@ -274,18 +291,19 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
       $
     </Text>
     <Text
-      ellipsizeMode="tail"
       numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 48,
-            "lineHeight": 64,
+          },
+          Object {
+            "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
+            "fontSize": 48,
+            "lineHeight": 62,
           },
         ]
       }
@@ -445,25 +463,33 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
   </View>
   <View
     style={
-      Object {
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "marginHorizontal": 25,
-        "marginTop": 15,
-      }
+      Array [
+        Object {
+          "alignItems": "flex-start",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+        },
+        undefined,
+      ]
     }
   >
     <Text
+      numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 24,
-            "textAlignVertical": "top",
           },
           Object {
             "color": "#81868B",
+            "fontSize": 28,
+            "lineHeight": 39,
+            "transform": Array [
+              Object {
+                "translateY": 3,
+              },
+            ],
           },
         ]
       }
@@ -471,18 +497,19 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
       $
     </Text>
     <Text
-      ellipsizeMode="tail"
       numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 48,
-            "lineHeight": 64,
+          },
+          Object {
+            "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
+            "fontSize": 48,
+            "lineHeight": 62,
           },
         ]
       }
@@ -642,25 +669,33 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
   </View>
   <View
     style={
-      Object {
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "marginHorizontal": 25,
-        "marginTop": 15,
-      }
+      Array [
+        Object {
+          "alignItems": "flex-start",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+        },
+        undefined,
+      ]
     }
   >
     <Text
+      numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 24,
-            "textAlignVertical": "top",
           },
           Object {
             "color": "#81868B",
+            "fontSize": 28,
+            "lineHeight": 39,
+            "transform": Array [
+              Object {
+                "translateY": 3,
+              },
+            ],
           },
         ]
       }
@@ -668,18 +703,19 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
       $
     </Text>
     <Text
-      ellipsizeMode="tail"
       numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 48,
-            "lineHeight": 64,
+          },
+          Object {
+            "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
+            "fontSize": 48,
+            "lineHeight": 62,
           },
         ]
       }
@@ -857,25 +893,33 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
   </View>
   <View
     style={
-      Object {
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "marginHorizontal": 25,
-        "marginTop": 15,
-      }
+      Array [
+        Object {
+          "alignItems": "flex-start",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+        },
+        undefined,
+      ]
     }
   >
     <Text
+      numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 24,
-            "textAlignVertical": "top",
           },
           Object {
             "color": "#81868B",
+            "fontSize": 28,
+            "lineHeight": 39,
+            "transform": Array [
+              Object {
+                "translateY": 3,
+              },
+            ],
           },
         ]
       }
@@ -883,18 +927,19 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
       $
     </Text>
     <Text
-      ellipsizeMode="tail"
       numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 48,
-            "lineHeight": 64,
+          },
+          Object {
+            "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
+            "fontSize": 48,
+            "lineHeight": 62,
           },
         ]
       }
@@ -958,25 +1003,33 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
   />
   <View
     style={
-      Object {
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "marginHorizontal": 25,
-        "marginTop": 15,
-      }
+      Array [
+        Object {
+          "alignItems": "flex-start",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+        },
+        undefined,
+      ]
     }
   >
     <Text
+      numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 24,
-            "textAlignVertical": "top",
           },
           Object {
             "color": "#81868B",
+            "fontSize": 28,
+            "lineHeight": 39,
+            "transform": Array [
+              Object {
+                "translateY": 3,
+              },
+            ],
           },
         ]
       }
@@ -984,18 +1037,19 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
       $
     </Text>
     <Text
-      ellipsizeMode="tail"
       numberOfLines={1}
       style={
         Array [
           Object {
-            "color": "#81868B",
             "fontFamily": "Hind-Regular",
-            "fontSize": 48,
-            "lineHeight": 64,
+          },
+          Object {
+            "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
+            "fontSize": 48,
+            "lineHeight": 62,
           },
         ]
       }

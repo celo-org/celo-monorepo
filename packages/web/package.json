@@ -15,10 +15,10 @@
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
-    "test": "jest --runInBand"
+    "test": "jest --coverage --runInBand"
   },
   "dependencies": {
-    "@celo/utils": "0.1.4",
+    "@celo/utils": "0.1.5",
     "@segment/in-eu": "^0.3.0",
     "@sentry/browser": "^5.10.2",
     "@sentry/node": "^5.10.2",
@@ -83,6 +83,7 @@
   "devDependencies": {
     "@firebase/app-types": "^0.5.0",
     "@sentry/types": "^5.10.0",
+    "@testing-library/react": "^9.4.0",
     "@types/airtable": "^0.5.7",
     "@types/hex-rgba": "^1.0.0",
     "@types/mailgun-js": "^0.22.3",
