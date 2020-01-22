@@ -59,7 +59,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
 
     await sortedOracles.report(
       stableToken.address,
-      new BigNumber(config.stableToken.goldPrice / 1),
+      toFixed(new BigNumber(config.stableToken.goldPrice).dividedBy(new BigNumber(1))),
       NULL_ADDRESS,
       NULL_ADDRESS
     )

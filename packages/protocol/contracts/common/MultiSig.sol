@@ -20,7 +20,6 @@ contract MultiSig is Initializable {
   event OwnerAddition(address indexed owner);
   event OwnerRemoval(address indexed owner);
   event RequirementChange(uint256 required);
-  event RequirementSet(uint256 required);
 
   /*
    *  Constants

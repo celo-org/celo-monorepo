@@ -117,7 +117,7 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(aToken, new BigNumber(1), NULL_ADDRESS, NULL_ADDRESS, {
+        await sortedOracles.report(aToken, toFixed(new BigNumber(1)), NULL_ADDRESS, NULL_ADDRESS, {
           from: anOracle,
         })
       })
@@ -132,7 +132,7 @@ contract('SortedOracles', (accounts: string[]) => {
           for (let i = 7; i > 3; i--) {
             const anotherOracle = accounts[i]
             await sortedOracles.addOracle(aToken, anotherOracle)
-            await sortedOracles.report(aToken, new BigNumber(2), anOracle, NULL_ADDRESS, {
+            await sortedOracles.report(aToken, toFixed(new BigNumber(2)), anOracle, NULL_ADDRESS, {
               from: anotherOracle,
             })
           }
@@ -174,7 +174,7 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(aToken, new BigNumber(10), NULL_ADDRESS, NULL_ADDRESS, {
+        await sortedOracles.report(aToken, toFixed(new BigNumber(10)), NULL_ADDRESS, NULL_ADDRESS, {
           from: anOracle,
         })
       })
@@ -256,85 +256,46 @@ contract('SortedOracles', (accounts: string[]) => {
   })
 
   describe('#report', () => {
-    function expectedMedianRateFromGiven(
-      givenNumerator: number | BigNumber,
-      givenDenominator: number | BigNumber
-    ): BigNumber {
-      return toFixed(new BigNumber(givenNumerator).dividedBy(new BigNumber(givenDenominator)))
-    }
-
-    const numerator = 5
-    const denominator = 1
-    const expectedMedianRate = expectedMedianRateFromGiven(numerator, denominator)
+    const givenMedianRate = toFixed(new BigNumber(5).dividedBy(new BigNumber(1)))
     beforeEach(async () => {
       await sortedOracles.addOracle(aToken, anOracle)
     })
 
     it('should increase the number of rates', async () => {
-      await sortedOracles.report(
-        aToken,
-        toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
-        NULL_ADDRESS,
-        NULL_ADDRESS,
-        {
-          from: anOracle,
-        }
-      )
+      await sortedOracles.report(aToken, givenMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
       assert.equal((await sortedOracles.numRates(aToken)).toNumber(), 1)
     })
 
     it('should set the median rate', async () => {
-      await sortedOracles.report(
-        aToken,
-        toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
-        NULL_ADDRESS,
-        NULL_ADDRESS,
-        {
-          from: anOracle,
-        }
-      )
+      await sortedOracles.report(aToken, givenMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
       const [actualMedianRate, numberOfRates] = await sortedOracles.medianRate(aToken)
-      assertEqualBN(actualMedianRate, expectedMedianRate)
+      assertEqualBN(actualMedianRate, givenMedianRate)
       assertEqualBN(numberOfRates.toNumber(), 1)
     })
 
     it('should increase the number of timestamps', async () => {
-      await sortedOracles.report(
-        aToken,
-        toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
-        NULL_ADDRESS,
-        NULL_ADDRESS,
-        {
-          from: anOracle,
-        }
-      )
+      await sortedOracles.report(aToken, givenMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
       assertEqualBN(await sortedOracles.numTimestamps(aToken), 1)
     })
 
     it('should set the median timestamp', async () => {
-      await sortedOracles.report(
-        aToken,
-        toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
-        NULL_ADDRESS,
-        NULL_ADDRESS,
-        {
-          from: anOracle,
-        }
-      )
+      await sortedOracles.report(aToken, givenMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
       const blockTimestamp = (await web3.eth.getBlock('latest')).timestamp
       assert.equal((await sortedOracles.medianTimestamp(aToken)).toNumber(), blockTimestamp)
     })
 
     it('should emit the OracleReported and MedianUpdated events', async () => {
-      const resp = await sortedOracles.report(
-        aToken,
-        toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
-        NULL_ADDRESS,
-        NULL_ADDRESS,
-        {
-          from: anOracle,
-        }
-      )
+      const resp = await sortedOracles.report(aToken, givenMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+        from: anOracle,
+      })
       assert.equal(resp.logs.length, 2)
       assertLogMatches2(resp.logs[0], {
         event: 'OracleReported',
@@ -342,7 +303,7 @@ contract('SortedOracles', (accounts: string[]) => {
           token: matchAddress(aToken),
           oracle: matchAddress(anOracle),
           timestamp: matchAny,
-          value: expectedMedianRate,
+          value: givenMedianRate,
         },
       })
 
@@ -350,64 +311,38 @@ contract('SortedOracles', (accounts: string[]) => {
         event: 'MedianUpdated',
         args: {
           token: matchAddress(aToken),
-          newMedian: expectedMedianRate,
+          newMedian: givenMedianRate,
         },
       })
     })
 
     it('should revert when called by a non-oracle', async () => {
-      await assertRevert(
-        sortedOracles.report(
-          aToken,
-          toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
-          NULL_ADDRESS,
-          NULL_ADDRESS
-        )
-      )
+      await assertRevert(sortedOracles.report(aToken, givenMedianRate, NULL_ADDRESS, NULL_ADDRESS))
     })
 
     describe('when there exists exactly one other report, made by this oracle', () => {
-      const newMedianRate = 12
-      const newExpectedMedianRate = expectedMedianRateFromGiven(newMedianRate, denominator)
+      const newExpectedMedianRate = toFixed(new BigNumber(12).dividedBy(new BigNumber(1)))
 
       beforeEach(async () => {
-        await sortedOracles.report(
-          aToken,
-          toFixed(new BigNumber(newMedianRate).dividedBy(new BigNumber(denominator))),
-          NULL_ADDRESS,
-          NULL_ADDRESS,
-          {
-            from: anOracle,
-          }
-        )
+        await sortedOracles.report(aToken, newExpectedMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
       })
       it('should reset the median rate', async () => {
         const [initialMedianRate] = await sortedOracles.medianRate(aToken)
         assertEqualBN(initialMedianRate, newExpectedMedianRate)
-        await sortedOracles.report(
-          aToken,
-          toFixed(new BigNumber(newMedianRate).dividedBy(new BigNumber(denominator))),
-          NULL_ADDRESS,
-          NULL_ADDRESS,
-          {
-            from: anOracle,
-          }
-        )
+        await sortedOracles.report(aToken, newExpectedMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
 
         const [actualMedianRate] = await sortedOracles.medianRate(aToken)
         assertEqualBN(actualMedianRate, newExpectedMedianRate)
       })
       it('should not change the number of total reports', async () => {
         const initialNumReports = await sortedOracles.numRates(aToken)
-        await sortedOracles.report(
-          aToken,
-          toFixed(new BigNumber(newMedianRate).dividedBy(new BigNumber(denominator))),
-          NULL_ADDRESS,
-          NULL_ADDRESS,
-          {
-            from: anOracle,
-          }
-        )
+        await sortedOracles.report(aToken, newExpectedMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
 
         assertEqualBN(initialNumReports, await sortedOracles.numRates(aToken))
       })
@@ -419,25 +354,22 @@ contract('SortedOracles', (accounts: string[]) => {
       const anOracleMedianRate2 = 3
       const anotherOracleMedianRate = 1
 
-      const anOracleExpectedMedianRate1 = expectedMedianRateFromGiven(
-        anOracleMedianRate1,
-        denominator
+      const anOracleExpectedMedianRate1 = toFixed(
+        new BigNumber(anOracleMedianRate1).dividedBy(new BigNumber(1))
       )
-      const anOracleExpectedMedianRate2 = expectedMedianRateFromGiven(
-        anOracleMedianRate2,
-        denominator
+      const anOracleExpectedMedianRate2 = toFixed(
+        new BigNumber(anOracleMedianRate2).dividedBy(new BigNumber(1))
       )
 
-      const anotherOracleExpectedMedianRate = expectedMedianRateFromGiven(
-        anotherOracleMedianRate,
-        denominator
+      const anotherOracleExpectedMedianRate = toFixed(
+        new BigNumber(anotherOracleMedianRate).dividedBy(new BigNumber(1))
       )
 
       beforeEach(async () => {
         sortedOracles.addOracle(aToken, anotherOracle)
         await sortedOracles.report(
           aToken,
-          toFixed(new BigNumber(anotherOracleMedianRate).dividedBy(new BigNumber(denominator))),
+          anotherOracleExpectedMedianRate,
           NULL_ADDRESS,
           NULL_ADDRESS,
           {
@@ -447,7 +379,7 @@ contract('SortedOracles', (accounts: string[]) => {
         await timeTravel(5, web3)
         await sortedOracles.report(
           aToken,
-          toFixed(new BigNumber(anOracleMedianRate1).dividedBy(new BigNumber(denominator))),
+          anOracleExpectedMedianRate1,
           anotherOracle,
           NULL_ADDRESS,
           {
@@ -465,7 +397,7 @@ contract('SortedOracles', (accounts: string[]) => {
       it('updates the list of rates correctly', async () => {
         await sortedOracles.report(
           aToken,
-          toFixed(new BigNumber(anOracleMedianRate2).dividedBy(new BigNumber(denominator))),
+          anOracleExpectedMedianRate2,
           anotherOracle,
           NULL_ADDRESS,
           {
@@ -479,15 +411,9 @@ contract('SortedOracles', (accounts: string[]) => {
 
       it('updates the latest timestamp', async () => {
         const initialTimestamps = await sortedOracles.getTimestamps(aToken)
-        await sortedOracles.report(
-          aToken,
-          toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
-          anotherOracle,
-          NULL_ADDRESS,
-          {
-            from: anOracle,
-          }
-        )
+        await sortedOracles.report(aToken, givenMedianRate, anotherOracle, NULL_ADDRESS, {
+          from: anOracle,
+        })
         const resultTimestamps = await sortedOracles.getTimestamps(aToken)
 
         // the second timestamp, belonging to anotherOracle should be unchanged

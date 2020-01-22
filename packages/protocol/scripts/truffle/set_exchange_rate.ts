@@ -2,6 +2,7 @@
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { BigNumber } from 'bignumber.js'
 import { SortedOraclesInstance, StableTokenInstance } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const fs = require('fs')
 const parse = require('csv-parser')
@@ -135,7 +136,7 @@ module.exports = async (callback: (error?: any) => number) => {
     // Report it
     await oracles.report(
       stableToken.address,
-      numerator.dividedBy(denominator),
+      toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
       lesserKey,
       greaterKey
     )
