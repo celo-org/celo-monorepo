@@ -92,7 +92,12 @@ export class ContractKit {
     const goldBalance = await goldToken.balanceOf(address)
     const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
-    const pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
+    let pending = new BigNumber(0)
+    try {
+      pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
+    } catch (err) {
+      // Just means that it's not an account
+    }
     return {
       gold: goldBalance,
       lockedGold: lockedBalance,
