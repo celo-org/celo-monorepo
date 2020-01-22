@@ -16,7 +16,9 @@ import {
   Actions,
   ExchangeTokensAction,
   FetchExchangeRateAction,
+  FetchTobinTaxAction,
   setExchangeRate,
+  setTobinTax,
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -42,11 +44,48 @@ const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 100000000000000000
 const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000)
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
+export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
+  try {
+    let tobinTax
+    if (makerToken === CURRENCY_ENUM.GOLD) {
+      yield call(getConnectedAccount)
+
+      // Using native web3 contract wrapper since contractkit
+      // hasn't yet implemented tobin tax interface
+      const reserve = yield call([
+        contractKit._web3Contracts,
+        contractKit._web3Contracts.getReserve,
+      ])
+
+      const tobinTaxFraction = yield call(reserve.methods.getOrComputeTobinTax().call)
+
+      if (!tobinTaxFraction) {
+        Logger.error(TAG, 'Unable to fetch tobin tax')
+        throw new Error('Unable to fetch tobin tax')
+      }
+
+      // Tobin tax represents % tax on gold transfer, stored as fraction tuple
+      tobinTax = tobinTaxFraction['0'] / tobinTaxFraction['1']
+      if (tobinTax > 0) {
+        tobinTax = makerAmount.times(tobinTax).toString()
+      }
+    } else {
+      // Tobin tax only charged for gold transfers
+      tobinTax = 0
+    }
+
+    Logger.debug(TAG, `Retrieved Tobin tax rate: ${tobinTax}`)
+    yield put(setTobinTax(tobinTax.toString()))
+  } catch (error) {
+    Logger.error(TAG, 'Error fetching Tobin tax', error)
+    yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
+  }
+}
+
 export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
   const { makerToken, makerAmount } = action
-
   try {
     yield call(getConnectedAccount)
 
@@ -245,6 +284,10 @@ function* createStandbyTx(
   return txId
 }
 
+export function* watchFetchTobinTax() {
+  yield takeLatest(Actions.FETCH_TOBIN_TAX, doFetchTobinTax)
+}
+
 export function* watchFetchExchangeRate() {
   yield takeLatest(Actions.FETCH_EXCHANGE_RATE, doFetchExchangeRate)
 }
@@ -256,5 +299,6 @@ export function* watchExchangeTokens() {
 
 export function* exchangeSaga() {
   yield spawn(watchFetchExchangeRate)
+  yield spawn(watchFetchTobinTax)
   yield spawn(watchExchangeTokens)
 }
