@@ -226,6 +226,7 @@ export const v4Schema = {
       celoGoldExchangeRates: [],
       lastTimeUpdated: 0,
     },
+    tobinTax: '0',
   },
 }
 
