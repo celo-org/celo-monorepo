@@ -142,8 +142,8 @@ spec:
         - "-c"
         - |-
           set -euo pipefail
-          # Delete the private key as it is no longer needed
-          rm /root/.celo/pkey
+          # Don't delete the private key as it is still needed
+          #rm /root/.celo/pkey
 
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
