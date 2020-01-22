@@ -30,6 +30,6 @@ export default class ApproveHotfix extends BaseCommand {
       .hotfixNotExecuted(hash)
       .runChecks()
 
-    await displaySendTx('approveTx', governance.approveHotfix(hash))
+    await displaySendTx('approveTx', governance.approveHotfix(hash), {})
   }
 }

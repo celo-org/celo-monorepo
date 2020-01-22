@@ -1,4 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
+import { parseDecodedParams } from '@celo/contractkit/lib/utils/web3-utils'
 import { CLIError } from '@oclif/errors'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -26,14 +27,18 @@ export async function displaySendTx<A>(
   if (displayEventName && txReceipt.events) {
     Object.entries(txReceipt.events)
       .filter(([eventName]) => eventName === displayEventName)
-      .forEach(([, log]) => printValueMap(log.returnValues))
+      .forEach(([eventName, log]) => {
+        const { params } = parseDecodedParams(log.returnValues)
+        console.log(chalk.magenta.bold(`${eventName}:`))
+        printValueMap(params, chalk.magenta)
+      })
   }
 }
 
-export function printValueMap(valueMap: Record<string, any>) {
+export function printValueMap(valueMap: Record<string, any>, color = chalk.red.bold) {
   console.log(
     Object.keys(valueMap)
-      .map((key) => chalk`{red.bold ${key}:} ${valueMap[key]}`)
+      .map((key) => color(`${key}: `) + valueMap[key])
       .join('\n')
   )
 }
