@@ -204,16 +204,10 @@ function* monitorAppState() {
   }
 }
 
-function* cancelSaga(task: any) {
-  Logger.debug(`${TAG}@cancelSaga`, 'Cancelling geth related sags', JSON.stringify(task))
-  yield cancel(task)
-  Logger.debug(`${TAG}@cancelSaga`, 'Cancelled tasks')
-  yield put(setGethConnected(true))
-  Logger.debug(`${TAG}@cancelSaga`, 'Set geth connected to true')
-}
-
 export function* gethSaga() {
   yield call(initGethSaga)
-  const gethRelated = yield all([fork(monitorAppState), fork(monitorGeth)])
-  yield takeLatest(Actions.CANCEL_GETH_SAGA, cancelSaga, gethRelated)
+  const gethRelatedSagas = yield all([fork(monitorAppState), fork(monitorGeth)])
+  yield take(Actions.CANCEL_GETH_SAGA)
+  yield cancel(gethRelatedSagas)
+  yield put(setGethConnected(true))
 }
