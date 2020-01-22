@@ -25,9 +25,5 @@ interface IAccounts {
   function getName(address) external view returns (string memory);
 
   function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
-  function authorizeValidatorSigner(address, uint8, bytes32, bytes32) external;
-  function authorizeValidatorSigner(address, bytes calldata, uint8, bytes32, bytes32) external;
-  function authorizeAttestationSigner(address, uint8, bytes32, bytes32) external;
-
   function createAccount() external returns (bool);
 }

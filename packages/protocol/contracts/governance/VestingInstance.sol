@@ -122,9 +122,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     require(vestingMaxPausePeriod > 0, "maximum pause period must be greater than zero");
     require(vestingBeneficiary != address(0), "Beneficiary is the zero address");
     require(vestingRevoker != address(0), "Revoker is the zero address");
-    require(registryAddress != address(0), "Registry address cannot be the genesis address");
-    require(vestingNumPeriods.mul(vestAmountPerPeriod) > 0, "Total vested amount has overflown");
-    require(vestingCliff <= vestingPeriodSec, "Vesting cliff is longer than vesting duration");
+    require(registryAddress != address(0), "Registry address cannot be the zero address");
+    require(vestingNumPeriods.mul(vestAmountPerPeriod) > 0, "Total vested amount has overflowed");
     require(
       vestingStartTime.add(vestingNumPeriods.mul(vestingPeriodSec)) > block.timestamp,
       "Vesting end time must be in the future"
