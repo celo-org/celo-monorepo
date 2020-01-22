@@ -285,6 +285,8 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--consoleformat=term',
     '--nat',
     'extip:127.0.0.1',
+    '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
+    '--vmodule', 'eth/*=5,p2p=4,consensus/*=5'
   ]
 
   if (rpcport) {
