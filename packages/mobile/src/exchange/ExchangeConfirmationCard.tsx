@@ -18,6 +18,7 @@ export interface ExchangeConfirmationCardProps {
   makerAmount: MoneyAmount
   takerAmount: MoneyAmount
   fee?: string
+  tobinTax?: string
   exchangeRate?: BigNumber
   newDollarBalance?: BigNumber
   newGoldBalance?: BigNumber
@@ -68,7 +69,7 @@ const renderNewBalances = (
 }
 
 export function ExchangeConfirmationCard(props: Props) {
-  const { t, newDollarBalance, newGoldBalance, makerAmount, takerAmount, fee } = props
+  const { t, newDollarBalance, newGoldBalance, makerAmount, takerAmount, fee, tobinTax } = props
 
   // TODO: improve this with a generic helper
   const makerToken =
@@ -100,7 +101,7 @@ export function ExchangeConfirmationCard(props: Props) {
         />
         <LineItemRow
           currencySymbol={takerToken}
-          amount={'0.01'}
+          amount={tobinTax}
           title={t('exchangeFee')}
           titleIcon={<FeeIcon isExchange={true} />}
         />
