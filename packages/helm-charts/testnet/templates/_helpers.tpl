@@ -262,7 +262,7 @@ spec:
 
           {{ if .proxy }}
           VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
-          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }}"
+          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }} --proxy.allowprivateip"
           {{ else }}
           ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
           RPC_APIS=${RPC_APIS},txpool
