@@ -363,15 +363,10 @@ exports[`PastEventsPage renders 1`] = `
             role="link"
             style={
               Object {
-                "color": "rgba(46,51,56,1.00)",
                 "cursor": "pointer",
                 "display": "inline",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
                 "opacity": 1,
                 "textDecoration": "underline",
-                "textRendering": "geometricPrecision",
               }
             }
           >
@@ -466,6 +461,7 @@ exports[`PastEventsPage renders 1`] = `
               }
             >
               <div
+                aria-label="loading"
                 className="css-view-1dbjc4n"
                 style={
                   Object {

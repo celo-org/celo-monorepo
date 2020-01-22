@@ -284,7 +284,7 @@ export default class Privacy extends React.Component {
           <P>
             You may also contact us to address and resolve concerns you may have about our use of
             your Personal Data. Please contact us at{' '}
-            <Link href="mailto:privacy@celo.org">privacy@celo.org</Link>.
+            <Link href="mailto:privacy@celo.org"><a>privacy@celo.org</a></Link>.
           </P>
         </SideTitledSection>
         <SideTitledSection span={Spans.three4th} title="Changes To This Privacy Policy">
