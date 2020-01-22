@@ -14,6 +14,7 @@ import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { TokenTransactionType } from 'src/apollo/types'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
@@ -25,7 +26,6 @@ import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { TransactionTypes } from 'src/transactions/reducer'
 
 interface State {
   amountIsValid: boolean
@@ -173,7 +173,7 @@ export class InviteReview extends React.Component<Props, State> {
         <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
           <TransferReviewCard
             recipient={recipient}
-            type={TransactionTypes.INVITE_SENT}
+            type={TokenTransactionType.InviteSent}
             address={recipient.address}
             value={getInvitationVerificationFeeInDollars()}
             e164PhoneNumber={recipient.e164PhoneNumber}

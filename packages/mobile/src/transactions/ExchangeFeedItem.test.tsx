@@ -2,9 +2,9 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ExchangeFeedItem } from 'src/transactions/ExchangeFeedItem'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 describe('ExchangeFeedItem', () => {
@@ -27,14 +27,13 @@ describe('ExchangeFeedItem', () => {
       <Provider store={createMockStore({})}>
         <ExchangeFeedItem
           status={TransactionStatus.Complete}
-          type={'EXCHANGE' as TransactionTypes.EXCHANGE}
+          __typename="TokenExchange"
+          type={TokenTransactionType.Exchange}
           hash={'0x'}
-          inValue={1}
-          outValue={10}
-          outSymbol={CURRENCY_ENUM.GOLD}
-          inSymbol={CURRENCY_ENUM.DOLLAR}
+          amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
+          makerAmount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
+          takerAmount={{ value: '10', currencyCode: 'cGLD', localAmount: null }}
           timestamp={1}
-          showGoldAmount={true}
           {...getMockI18nProps()}
         />
       </Provider>
