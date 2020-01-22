@@ -23,7 +23,6 @@ import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-// import { zeroSyncSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -128,6 +127,7 @@ export function* initGethSaga() {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
     deleteChainDataAndRestartApp()
   } else {
+    // In the case of a network error, prompt forno switch
     navigateToError('networkConnectionFailed')
   }
 }
@@ -140,27 +140,30 @@ function createNewBlockChannel() {
 }
 
 function* monitorGeth() {
-  Logger.debug(`${TAG}@monitorGeth`, 'Starting new block channel')
   const newBlockChannel = yield createNewBlockChannel()
 
+  let repeatedTimeouts = 0
   while (true) {
     try {
-      Logger.debug(`${TAG}@monitorGeth`, 'New block race')
       const { newBlock } = yield race({
         newBlock: take(newBlockChannel),
         timeout: delay(NEW_BLOCK_TIMEOUT),
       })
       if (newBlock) {
+        repeatedTimeouts = 0
         Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
         yield put(setGethConnected(true))
         yield delay(GETH_MONITOR_DELAY)
       } else {
-        // Check whether reason for no new blocks is switch to zeroSync mode
+        repeatedTimeouts += 1
         Logger.error(
           `${TAG}@monitorGeth`,
           `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
         )
         yield put(setGethConnected(false))
+        if (repeatedTimeouts > 5) {
+          // TODO(anna) if this happens five times, switch to forno
+        }
       }
     } catch (error) {
       Logger.error(`${TAG}@monitorGeth`, error)
@@ -169,7 +172,11 @@ function* monitorGeth() {
         try {
           newBlockChannel.close()
         } catch (error) {
-          Logger.debug(`${TAG}@monitorGeth`, 'Could not close newBlockChannel', error)
+          Logger.debug(
+            `${TAG}@monitorGeth`,
+            'Could not close newBlockChannel. May already be closed.',
+            error
+          )
         }
       }
     }

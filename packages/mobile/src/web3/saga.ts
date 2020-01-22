@@ -465,13 +465,8 @@ export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG, 'Switching to zeroSync from geth..')
   try {
     yield put(setZeroSyncMode(true))
-    Logger.debug(TAG, 'About to switch provider')
-
     switchWeb3ProviderForSyncMode(true)
-
-    Logger.debug(TAG, 'About to cancel saga')
     yield put(cancelGethSaga())
-    Logger.debug(TAG, 'About to stop geth')
     yield call(stopGethIfInitialized)
 
     // Ensure web3 sync state is updated with new zeroSync state.
