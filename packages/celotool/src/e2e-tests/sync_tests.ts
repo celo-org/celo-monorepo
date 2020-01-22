@@ -162,4 +162,12 @@ describe('sync tests', function(this: any) {
       assert.fail('Reset validator did not propose any new blocks')
     })
   })
+
+  describe('when the validator and txFeeRecipient flags are set', () => {
+    let web3: any
+    // Produce blocks
+    // Verify txFeeRecipient
+    // Verify block signing
+    it('should sign consensus messages under validator address', async function(this: any) {})
+  })
 })
