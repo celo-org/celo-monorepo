@@ -6,7 +6,6 @@ import { cli } from 'cli-ux'
 import { Block } from 'web3/eth/types'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
 
@@ -66,39 +65,6 @@ export default class ValidatorStatus extends BaseCommand {
     'status --all --lookback 100',
   ]
 
-  requireSynced = true
-
-  private async getStatus(
-    signer: Address,
-    blocks: Block[],
-    electionCache: ElectionResultsCache,
-    frontRunnerSigners: Address[]
-  ): Promise<ValidatorStatusEntry> {
-    const accounts = await this.kit.contracts.getAccounts()
-    const validator = await accounts.signerToAccount(signer)
-    const name = (await accounts.getName(validator)) || ''
-    const proposedCount = blocks.filter((b) => b.miner === signer).length
-    let signatures = 0
-    let eligible = 0
-    for (const block of blocks) {
-      if (await electionCache.elected(signer, block.number)) {
-        eligible++
-        if (await electionCache.signed(signer, block)) {
-          signatures++
-        }
-      }
-    }
-    return {
-      name,
-      address: validator,
-      signer,
-      elected: await electionCache.elected(signer, blocks[0].number),
-      frontRunner: frontRunnerSigners.some(eqAddress.bind(null, signer)),
-      proposed: proposedCount,
-      signatures: signatures / eligible, // may be NaN
-    }
-  }
-
   async run() {
     const res = this.parse(ValidatorStatus)
     const accounts = await this.kit.contracts.getAccounts()
@@ -131,7 +97,7 @@ export default class ValidatorStatus extends BaseCommand {
     // Fetch the blocks to consider for signature percentages.
     const latest = await this.web3.eth.getBlock('latest')
     let blocks: Block[]
-    if (res.flags.lookback > 1) {
+    if (res.flags.lookback! > 1) {
       cli.action.start(`Fetching ${res.flags.lookback} blocks`)
       blocks = await concurrentMap(10, [...Array(res.flags.lookback).keys()], (i) =>
         this.web3.eth.getBlock(latest.number - i)
@@ -141,6 +107,7 @@ export default class ValidatorStatus extends BaseCommand {
       blocks = [latest]
     }
 
+    cli.action.start(`Calculating status information`)
     const epochSize = await validators.getEpochSize()
     const electionCache = new ElectionResultsCache(election, epochSize.toNumber())
     const frontRunnerSigners = await election.electValidatorSigners()
@@ -148,7 +115,39 @@ export default class ValidatorStatus extends BaseCommand {
     const validatorStatuses = await concurrentMap(10, signers, (s) =>
       this.getStatus(s, blocks, electionCache, frontRunnerSigners)
     )
+    cli.action.stop()
 
     cli.table(validatorStatuses, statusTable, { 'no-truncate': res.flags['no-truncate'] })
+  }
+
+  private async getStatus(
+    signer: Address,
+    blocks: Block[],
+    electionCache: ElectionResultsCache,
+    frontRunnerSigners: Address[]
+  ): Promise<ValidatorStatusEntry> {
+    const accounts = await this.kit.contracts.getAccounts()
+    const validator = await accounts.signerToAccount(signer)
+    const name = (await accounts.getName(validator)) || ''
+    const proposedCount = blocks.filter((b) => b.miner === signer).length
+    let signatures = 0
+    let eligible = 0
+    for (const block of blocks) {
+      if (await electionCache.elected(signer, block.number)) {
+        eligible++
+        if (await electionCache.signed(signer, block)) {
+          signatures++
+        }
+      }
+    }
+    return {
+      name,
+      address: validator,
+      signer,
+      elected: await electionCache.elected(signer, blocks[0].number),
+      frontRunner: frontRunnerSigners.some(eqAddress.bind(null, signer)),
+      proposed: proposedCount,
+      signatures: signatures / eligible, // may be NaN
+    }
   }
 }
