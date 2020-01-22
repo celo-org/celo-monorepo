@@ -10,8 +10,10 @@ metadata:
     component: ethstats
   annotations:
     kubernetes.io/tls-acme: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/permanent-redirect: "https://{{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($http_upgrade != "websocket") {
+        return 301 https://{{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org/;
+      }
 spec:
   tls:
   - hosts:
