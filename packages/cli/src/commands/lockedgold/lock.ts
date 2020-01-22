@@ -47,7 +47,9 @@ export default class Lock extends BaseCommand {
     for (const txo of txos) {
       await displaySendTx('relock', txo, { from: address })
     }
-    const tx = lockedGold.lock()
-    await displaySendTx('lock', tx, { value: lockValue.toFixed() })
+    if (lockValue.gt(new BigNumber(0))) {
+      const tx = lockedGold.lock()
+      await displaySendTx('lock', tx, { value: lockValue.toFixed() })
+    }
   }
 }

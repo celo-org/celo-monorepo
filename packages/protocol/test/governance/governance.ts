@@ -75,6 +75,15 @@ interface Transaction {
 // hard coded in ganache
 const EPOCH = 100
 
+async function mineToNextEpoch(web3) {
+  const bn = web3.eth.getBlockNumber()
+  if (bn % EPOCH < 50) {
+    await mineBlocks(EPOCH + 20, web3)
+  } else {
+    await mineBlocks(EPOCH - 20, web3)
+  }
+}
+
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
@@ -2083,7 +2092,7 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when hotfix is passing', () => {
       beforeEach(async () => {
-        await mineBlocks(EPOCH, web3)
+        await mineToNextEpoch(web3)
         await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       })
 
@@ -2116,7 +2125,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should succeed for epoch != preparedEpoch', async () => {
         await governance.prepareHotfix(hotfixHashStr)
-        await mineBlocks(EPOCH, web3)
+        await mineToNextEpoch(web3)
         await governance.prepareHotfix(hotfixHashStr)
       })
     })
@@ -2138,7 +2147,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when hotfix not prepared for current epoch', async () => {
-      await mineBlocks(EPOCH, web3)
+      await mineToNextEpoch(web3)
       await governance.approveHotfix(hotfixHashStr, { from: approver })
       await assertRevert(executeHotfixTx())
     })
@@ -2149,14 +2158,14 @@ contract('Governance', (accounts: string[]) => {
       await accountsInstance.createAccount({ from: accounts[2] })
       await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       await governance.prepareHotfix(hotfixHashStr, { from: accounts[2] })
-      await mineBlocks(EPOCH, web3)
+      await mineToNextEpoch(web3)
       await assertRevert(executeHotfixTx())
     })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
         await governance.approveHotfix(hotfixHashStr, { from: approver })
-        await mineBlocks(EPOCH, web3)
+        await mineToNextEpoch(web3)
         await governance.addValidator(accounts[2])
         await accountsInstance.createAccount({ from: accounts[2] })
         await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })

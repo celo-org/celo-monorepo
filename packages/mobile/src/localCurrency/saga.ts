@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
 import { call, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { apolloClient } from 'src/apollo'
+import { ExchangeRateQuery, ExchangeRateQueryVariables } from 'src/apollo/types'
 import {
   Actions,
   fetchCurrentRate,
@@ -14,35 +15,26 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'localCurrency/saga'
 
-export async function fetchExchangeRate(symbol: string): Promise<number> {
-  const response = await apolloClient.query({
+export async function fetchExchangeRate(currencyCode: string): Promise<string> {
+  const response = await apolloClient.query<ExchangeRateQuery, ExchangeRateQueryVariables>({
     query: gql`
-    {    
-      currencyConversion(currencyCode: "${symbol}") {
-        rate
+      query ExchangeRate($currencyCode: String!) {
+        currencyConversion(currencyCode: $currencyCode) {
+          rate
+        }
       }
-    }
-  `,
+    `,
+    variables: { currencyCode },
     fetchPolicy: 'network-only',
     errorPolicy: 'all',
   })
 
-  const { data } = response
-  if (typeof data !== 'object') {
-    throw new Error(`Invalid response data ${data}`)
-  }
-
-  const { currencyConversion } = data
-  if (typeof currencyConversion !== 'object') {
-    throw new Error(`Invalid response data ${data}`)
-  }
-
-  const { rate } = currencyConversion
+  const rate = response.data.currencyConversion?.rate
   if (typeof rate !== 'number' && typeof rate !== 'string') {
-    throw new Error(`Invalid response data ${data}`)
+    throw new Error(`Invalid response data ${response.data}`)
   }
 
-  return new BigNumber(rate).toNumber()
+  return new BigNumber(rate).toString()
 }
 
 export function* fetchLocalCurrencyRateSaga() {
