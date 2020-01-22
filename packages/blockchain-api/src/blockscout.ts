@@ -1,7 +1,13 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
-import { EventArgs, EventInterface, EventTypes, TransferEvent } from './schema'
+import {
+  EventArgs,
+  EventInterface,
+  EventTypes,
+  TokenTransactionArgs,
+  TransferEvent,
+} from './schema'
 import { formatCommentString, getContractAddresses } from './utils'
 
 // to get rid of 18 extra 0s in the values
@@ -27,6 +33,9 @@ export interface BlockscoutTransaction {
   value: string
   txreceipt_status: string
   transactionIndex: string
+  tokenSymbol: string
+  tokenName: string
+  tokenDecimal: string
   to: string
   timeStamp: string
   nonce: string
@@ -53,7 +62,7 @@ export class BlockscoutAPI extends RESTDataSource {
     this.baseURL = BLOCKSCOUT_API
   }
 
-  async getTokenTransactions(args: EventArgs): Promise<BlockscoutTransaction[]> {
+  async getRawTokenTransactions(args: EventArgs): Promise<BlockscoutTransaction[]> {
     console.info('Getting token transactions', args)
     const params = {
       ...args,
@@ -110,6 +119,7 @@ export class BlockscoutAPI extends RESTDataSource {
     }
   }
 
+  // TODO(jeanregisser): this is now deprecated, remove once client changes have been merged
   // LIMITATION:
   // This function will only return Gold transfers that happened via the GoldToken
   // contract. Any native transfers of Gold will be omitted because of how blockscout
@@ -120,12 +130,13 @@ export class BlockscoutAPI extends RESTDataSource {
   // expect native transfers to be exceedingly rare, the work to handle this is being
   // skipped for now. TODO: (yerdua) [226]
   async getFeedEvents(args: EventArgs) {
-    const rawTransactions = await this.getTokenTransactions(args)
+    const rawTransactions = await this.getRawTokenTransactions(args)
     const events: EventInterface[] = []
     const userAddress = args.address.toLowerCase()
 
     // Mapping to figure out what event each raw transaction belongs to
     const txHashToEventTransactions = new Map<string, any>()
+
     for (const tx of rawTransactions) {
       const currentTX = txHashToEventTransactions.get(tx.hash) || []
       currentTX.push(tx)
@@ -191,7 +202,7 @@ export class BlockscoutAPI extends RESTDataSource {
 
   async getFeedRewards(args: EventArgs) {
     const rewards: TransferEvent[] = []
-    const rawTransactions = await this.getTokenTransactions(args)
+    const rawTransactions = await this.getRawTokenTransactions(args)
     await this.ensureTokenAddresses()
     for (const t of rawTransactions) {
       // Only include verification rewards transfers
@@ -213,6 +224,116 @@ export class BlockscoutAPI extends RESTDataSource {
       `[Celo] getFeedRewards address=${args.address} startblock=${args.startblock} endblock=${args.endblock} rawTransactionCount=${rawTransactions.length} rewardsCount=${rewards.length}`
     )
     return rewards.sort((a, b) => b.timestamp - a.timestamp)
+  }
+
+  // LIMITATION:
+  // This function will only return Gold transfers that happened via the GoldToken
+  // contract. Any native transfers of Gold will be omitted because of how blockscout
+  // works. To get native transactions from blockscout, we'd need to use the param:
+  // "action: MODULE_ACTIONS.ACCOUNT.TX_LIST"
+  // However, the results returned from that API call do not have an easily-parseable
+  // representation of Token transfers, if they are included at all. Given that we
+  // expect native transfers to be exceedingly rare, the work to handle this is being
+  // skipped for now. TODO: (yerdua) [226]
+  async getTokenTransactions(args: TokenTransactionArgs) {
+    const rawTransactions = await this.getRawTokenTransactions(args)
+    const events: any[] = []
+    const userAddress = args.address.toLowerCase()
+
+    // Mapping to figure out what event each raw transaction belongs to
+    const txHashToEventTransactions = new Map<string, any>()
+    for (const tx of rawTransactions) {
+      const currentTX = txHashToEventTransactions.get(tx.hash) || []
+      currentTX.push(tx)
+      txHashToEventTransactions.set(tx.hash, currentTX)
+    }
+
+    await this.ensureTokenAddresses()
+    // Generate final events
+    txHashToEventTransactions.forEach((transactions: BlockscoutTransaction[], txhash: string) => {
+      // Exchange events have two corresponding transactions (in and out)
+      if (transactions.length === 2) {
+        let inEvent: BlockscoutTransaction, outEvent: BlockscoutTransaction
+        if (transactions[0].from.toLowerCase() === userAddress) {
+          inEvent = transactions[0]
+          outEvent = transactions[1]
+        } else {
+          inEvent = transactions[1]
+          outEvent = transactions[0]
+        }
+
+        // Find the event related to the queried token
+        const tokenEvent = [inEvent, outEvent].find((event) => event.tokenSymbol === args.token)
+        if (tokenEvent) {
+          const timestamp = new BigNumber(inEvent.timeStamp).toNumber() * 1000
+          events.push({
+            type: EventTypes.EXCHANGE,
+            timestamp,
+            block: inEvent.blockNumber,
+            amount: {
+              // Signed amount relative to the account currency
+              value: new BigNumber(tokenEvent.value)
+                .multipliedBy(tokenEvent === inEvent ? -1 : 1)
+                .dividedBy(WEI_PER_GOLD)
+                .toString(),
+              currencyCode: tokenEvent.tokenSymbol,
+              timestamp,
+            },
+            makerAmount: {
+              value: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toString(),
+              currencyCode: inEvent.tokenSymbol,
+              timestamp,
+            },
+            takerAmount: {
+              value: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toString(),
+              currencyCode: outEvent.tokenSymbol,
+              timestamp,
+            },
+            hash: txhash,
+          })
+        }
+
+        // Otherwise, it's a regular token transfer
+      } else {
+        const event = transactions[0]
+        const comment = event.input ? formatCommentString(event.input) : ''
+        const eventToAddress = event.to.toLowerCase()
+        const eventFromAddress = event.from.toLowerCase()
+        const [type, address] = resolveTransferEventType(
+          userAddress,
+          eventToAddress,
+          eventFromAddress,
+          this.getAttestationAddress(),
+          this.getEscrowAddress()
+        )
+        const timestamp = new BigNumber(event.timeStamp).toNumber() * 1000
+        events.push({
+          type,
+          timestamp,
+          block: event.blockNumber,
+          amount: {
+            // Signed amount relative to the account currency
+            value: new BigNumber(event.value)
+              .multipliedBy(eventFromAddress === userAddress ? -1 : 1)
+              .dividedBy(WEI_PER_GOLD)
+              .toString(),
+            currencyCode: event.tokenSymbol,
+            timestamp,
+          },
+          address,
+          comment,
+          hash: txhash,
+        })
+      }
+    })
+
+    console.info(
+      `[Celo] getTokenTransactions address=${args.address} token=${args.token} localCurrencyCode=${args.localCurrencyCode}
+      } rawTransactionCount=${rawTransactions.length} eventCount=${events.length}`
+    )
+    return events
+      .filter((event) => event.amount.currencyCode === args.token)
+      .sort((a, b) => b.timestamp - a.timestamp)
   }
 }
 

@@ -79,6 +79,10 @@ const people: Backer[] = [
     photo: require('./andromeda.jpg'),
   },
   {
+    name: 'Valor',
+    photo: require('./valor.jpg'),
+  },
+  {
     name: 'Keisuke Honda',
   },
   {

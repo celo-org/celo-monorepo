@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 
 export function convertDollarsToLocalAmount(
   amount: BigNumber.Value | null,
-  exchangeRate: number | null | undefined
+  exchangeRate: BigNumber.Value | null | undefined
 ) {
   if (!amount || !exchangeRate) {
     return null
@@ -13,7 +13,7 @@ export function convertDollarsToLocalAmount(
 
 export function convertLocalAmountToDollars(
   amount: BigNumber.Value | null,
-  exchangeRate: number | null | undefined
+  exchangeRate: BigNumber.Value | null | undefined
 ) {
   if (!amount || !exchangeRate) {
     return null
