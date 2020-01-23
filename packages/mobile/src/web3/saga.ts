@@ -14,11 +14,13 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
-import { cancelGethSaga } from 'src/geth/actions'
+import { cancelGethSaga, setZeroSyncPrompted } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { initGethSaga, waitForGethConnectivity } from 'src/geth/saga'
-import { navigateToError } from 'src/navigator/NavigationService'
+import { promptZeroSyncIfNeededSelector } from 'src/geth/selectors'
+import { navigate, navigateToError } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
@@ -51,11 +53,14 @@ const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
+const SWITCH_TO_ZERO_SYNC_TIMEOUT = 15000 // TODO(anna) adjust param
+const WEB3_MONITOR_DELAY = 100
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
 
+  let syncLoops = 0
   while (true) {
     try {
       let syncProgress: boolean | Web3SyncProgress
@@ -79,11 +84,15 @@ export function* checkWeb3SyncProgress() {
       } else {
         throw new Error('Invalid syncProgress type')
       }
-
-      yield delay(100) // wait 100ms while web3 syncs then check again
+      yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
+      syncLoops += 1
+      if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_ZERO_SYNC_TIMEOUT) {
+        if (yield select(promptZeroSyncIfNeededSelector)) {
+          yield put(setZeroSyncPrompted())
+          navigate(Screens.DataSaver, { promptModalVisible: true })
+        }
+      }
     } catch (error) {
-      // Check if error caused by switch to zeroSyncMode
-      // as if it is in zeroSyncMode it should have returned above
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -107,7 +116,6 @@ export function* waitForWeb3Sync() {
     if (timeout || !syncComplete) {
       Logger.error(TAG, 'Could not complete sync')
       navigateToError('web3FailedToSync')
-      // TODO(anna) prompt switch to forno
       return false
     }
 
@@ -115,7 +123,6 @@ export function* waitForWeb3Sync() {
   } catch (error) {
     Logger.error(TAG, 'checkWeb3Sync', error)
     navigateToError('errorDuringSync')
-    // TODO(anna) prompt switch to forno
     return false
   }
 }

@@ -136,6 +136,9 @@ export class JoinCelo extends React.Component<Props, State> {
       return
     }
 
+    // Allow zero sync prompt after user has gone through Welcome screen
+    // TODO anna
+
     this.props.setPhoneNumber(e164Number, countryCode)
     this.props.setName(name)
     this.goToNextScreen()

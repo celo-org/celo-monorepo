@@ -124,7 +124,8 @@ export class DataSaver extends React.Component<Props, State> {
     this.hideSwitchOnModal()
   }
 
-  onPressSwitchModal = () => {
+  onPressPromptModal = () => {
+    this.setState({ promptModalVisible: false })
     this.handleZeroSyncToggle(true)
   }
 
@@ -157,14 +158,12 @@ export class DataSaver extends React.Component<Props, State> {
         </SettingsSwitchItem>
         <WarningModal
           isVisible={this.state.promptModalVisible}
-          header={'Switch Connection Mode?'} // TODO translations
-          body={
-            'We’ve noticed you’re having some trouble connecting. We recommend enabling Data Saver mode to allow you to keep using the Celo Wallet with intermittent connection.'
-          }
-          continueTitle={'Switch To Data Saver'}
-          cancelTitle={'Go Back'}
+          header={t('promptZeroSyncModal.header')}
+          body={t('promptZeroSyncModal.body')}
+          continueTitle={t('promptZeroSyncModal.switchToDataSaver')}
+          cancelTitle={t('global:goBack')}
           onCancel={this.hidePromptModal}
-          onContinue={this.onPressSwitchModal}
+          onContinue={this.onPressPromptModal}
         />
         <WarningModal
           isVisible={this.state.switchOffModalVisible}

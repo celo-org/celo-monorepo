@@ -19,7 +19,7 @@ import {
   getGeth,
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
-import { isGethConnectedSelector, switchToZeroSyncPromptedSelector } from 'src/geth/selectors'
+import { isGethConnectedSelector, promptZeroSyncIfNeededSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
@@ -31,7 +31,6 @@ const TAG = 'geth/saga'
 const INIT_GETH_TIMEOUT = 15000
 const NEW_BLOCK_TIMEOUT = 30000
 const GETH_MONITOR_DELAY = 5000
-const SWITCH_TO_FORNO_TIMEOUT = 15000 // TODO(anna) adjust param
 
 enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
@@ -130,7 +129,7 @@ export function* initGethSaga() {
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
-    if (!(yield select(switchToZeroSyncPromptedSelector))) {
+    if (yield select(promptZeroSyncIfNeededSelector)) {
       yield put(setZeroSyncPrompted())
       navigate(Screens.DataSaver, { promptModalVisible: true })
     } else {
@@ -168,12 +167,6 @@ function* monitorGeth() {
           `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
         )
         yield put(setGethConnected(false))
-        if (consecutiveBlockTimeouts * NEW_BLOCK_TIMEOUT > SWITCH_TO_FORNO_TIMEOUT) {
-          if (!(yield select(switchToZeroSyncPromptedSelector))) {
-            yield put(setZeroSyncPrompted())
-            navigate(Screens.DataSaver, { promptModalVisible: true })
-          }
-        }
       }
     } catch (error) {
       Logger.error(`${TAG}@monitorGeth`, error)
