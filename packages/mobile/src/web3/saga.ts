@@ -14,10 +14,10 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
-import { cancelGethSaga, setZeroSyncPrompted } from 'src/geth/actions'
+import { cancelGethSaga, setPromptZeroSync } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
-import { initGethSaga, waitForGethConnectivity } from 'src/geth/saga'
+import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { promptZeroSyncIfNeededSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -53,7 +53,7 @@ const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
-const SWITCH_TO_ZERO_SYNC_TIMEOUT = 15000 // TODO(anna) adjust param
+const SWITCH_TO_ZERO_SYNC_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to zeroSync
 const WEB3_MONITOR_DELAY = 100
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
@@ -86,10 +86,12 @@ export function* checkWeb3SyncProgress() {
       }
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
-      if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_ZERO_SYNC_TIMEOUT) {
+      if (true) {
+        // syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_ZERO_SYNC_TIMEOUT) {
         if (yield select(promptZeroSyncIfNeededSelector)) {
-          yield put(setZeroSyncPrompted())
+          yield put(setPromptZeroSync(false))
           navigate(Screens.DataSaver, { promptModalVisible: true })
+          return true
         }
       }
     } catch (error) {
@@ -453,7 +455,9 @@ export function* switchToGethFromZeroSync() {
       return
     }
 
-    yield call(initGethSaga)
+    yield spawn(gethSaga)
+
+    // yield call(initGethSaga)
     switchWeb3ProviderForSyncMode(false)
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
@@ -487,26 +491,30 @@ export function* switchToZeroSyncFromGeth() {
 }
 
 export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
-  Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
-  if (action.zeroSyncMode) {
-    yield call(switchToZeroSyncFromGeth)
-  } else {
-    yield call(switchToGethFromZeroSync)
-  }
-  // Unlock account to ensure private keys are accessible in new mode
-  try {
-    const account = yield call(getConnectedUnlockedAccount)
-    Logger.debug(
-      TAG + '@toggleZeroSyncMode',
-      `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
-    )
-  } catch (e) {
-    // Rollback if private keys aren't accessible in new mode
+  if ((yield select(zeroSyncSelector)) !== action.zeroSyncMode) {
+    Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
     if (action.zeroSyncMode) {
-      yield call(switchToGethFromZeroSync)
-    } else {
       yield call(switchToZeroSyncFromGeth)
+    } else {
+      yield call(switchToGethFromZeroSync)
     }
+    // Unlock account to ensure private keys are accessible in new mode
+    try {
+      const account = yield call(getConnectedUnlockedAccount)
+      Logger.debug(
+        TAG + '@toggleZeroSyncMode',
+        `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
+      )
+    } catch (e) {
+      // Rollback if private keys aren't accessible in new mode
+      if (action.zeroSyncMode) {
+        yield call(switchToGethFromZeroSync)
+      } else {
+        yield call(switchToZeroSyncFromGeth)
+      }
+    }
+  } else {
+    Logger.debug(TAG + '@toggleZeroSyncMode', ` already in desired state: ${action.zeroSyncMode}`)
   }
 }
 export function* watchZeroSyncMode() {

@@ -92,10 +92,12 @@ export class DataSaver extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const promptModalVisible = this.props.navigation.getParam('promptModalVisible', '')
-    this.setState({
-      promptModalVisible,
-    })
+    const promptModalVisible = this.props.navigation.getParam('promptModalVisible')
+    if (promptModalVisible) {
+      this.setState({
+        promptModalVisible,
+      })
+    }
   }
 
   showSwitchOffModal = () => {
@@ -125,11 +127,12 @@ export class DataSaver extends React.Component<Props, State> {
   }
 
   onPressPromptModal = () => {
-    this.setState({ promptModalVisible: false })
-    this.handleZeroSyncToggle(true)
+    this.props.toggleZeroSyncMode(true)
+    navigateBack()
   }
 
   hidePromptModal = () => {
+    this.props.toggleZeroSyncMode(false)
     navigateBack()
   }
 

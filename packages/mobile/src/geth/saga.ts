@@ -12,7 +12,7 @@ import {
   select,
   take,
 } from 'redux-saga/effects'
-import { Actions, setGethConnected, setInitState, setZeroSyncPrompted } from 'src/geth/actions'
+import { Actions, setGethConnected, setInitState, setPromptZeroSync } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
@@ -130,7 +130,7 @@ export function* initGethSaga() {
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptZeroSyncIfNeededSelector)) {
-      yield put(setZeroSyncPrompted())
+      yield put(setPromptZeroSync(false))
       navigate(Screens.DataSaver, { promptModalVisible: true })
     } else {
       navigateToError('networkConnectionFailed')
@@ -148,7 +148,6 @@ function createNewBlockChannel() {
 function* monitorGeth() {
   const newBlockChannel = yield createNewBlockChannel()
 
-  let consecutiveBlockTimeouts = 0
   while (true) {
     try {
       const { newBlock } = yield race({
@@ -156,12 +155,10 @@ function* monitorGeth() {
         timeout: delay(NEW_BLOCK_TIMEOUT),
       })
       if (newBlock) {
-        consecutiveBlockTimeouts = 0
         Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
         yield put(setGethConnected(true))
         yield delay(GETH_MONITOR_DELAY)
       } else {
-        consecutiveBlockTimeouts += 1
         Logger.error(
           `${TAG}@monitorGeth`,
           `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
