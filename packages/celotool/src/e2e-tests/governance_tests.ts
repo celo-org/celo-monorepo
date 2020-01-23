@@ -450,11 +450,6 @@ describe('governance tests', () => {
       const authWeb31 = 'ws://localhost:8559'
       const authWeb32 = 'ws://localhost:8561'
 
-      if (verbose) {
-        console.log('authWeb31', authWeb31)
-        console.log('authWeb32', authWeb32)
-      }
-
       const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
 
       await Promise.all(authorizedWeb3s.map((w) => waitToFinishSyncing(w)))
