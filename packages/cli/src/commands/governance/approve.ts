@@ -22,6 +22,11 @@ export default class Approve extends BaseCommand {
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
 
+    // in case target is queued
+    if (await governance.isQueued(id)) {
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+    }
+
     await newCheckBuilder(this)
       .isApprover(account)
       .proposalExists(id)
@@ -29,6 +34,6 @@ export default class Approve extends BaseCommand {
       .proposalInStage(id, 'Approval')
       .runChecks()
 
-    await displaySendTx('approveTx', await governance.approve(id))
+    await displaySendTx('approveTx', await governance.approve(id), {}, 'ProposalApproved')
   }
 }
