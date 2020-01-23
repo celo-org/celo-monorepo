@@ -12,11 +12,13 @@ export enum InitializationState {
 export interface State {
   initialized: InitializationState
   connected: boolean
+  switchToZeroSyncPrompted: boolean
 }
 
 const initialState: State = {
   initialized: InitializationState.NOT_YET_INITIALIZED,
   connected: false,
+  switchToZeroSyncPrompted: false,
 }
 
 export function gethReducer(state: State = initialState, action: ActionTypes) {
@@ -28,6 +30,12 @@ export function gethReducer(state: State = initialState, action: ActionTypes) {
         ...state,
         connected: action.connected,
       }
+    case Actions.SET_ZERO_SYNC_PROMPTED:
+      return {
+        ...state,
+        switchToZeroSyncPrompted: true,
+      }
+
     default:
       return state
   }

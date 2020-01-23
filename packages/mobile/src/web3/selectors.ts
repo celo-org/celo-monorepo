@@ -7,5 +7,6 @@ export const currentAccountInWeb3KeystoreSelector = (state: RootState) =>
 export const zeroSyncSelector = (state: RootState) => state.web3.zeroSyncMode
 export const gethStartedThisSessionSelector = (state: RootState) =>
   state.web3.gethStartedThisSession
+export const dataSaverPromptedSelector = (state: RootState) => state.web3.gethStartedThisSession
 
 export const privateCommentKeySelector = (state: RootState) => state.web3.commentKey

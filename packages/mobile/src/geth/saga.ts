@@ -11,16 +11,17 @@ import {
   race,
   select,
   take,
-  takeLatest,
 } from 'redux-saga/effects'
-import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
+import { Actions, setGethConnected, setInitState, setZeroSyncPrompted } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
   getGeth,
 } from 'src/geth/geth'
-import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
-import { navigateToError } from 'src/navigator/NavigationService'
+import { InitializationState } from 'src/geth/reducer'
+import { isGethConnectedSelector, switchToZeroSyncPromptedSelector } from 'src/geth/selectors'
+import { navigate, navigateToError } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 
@@ -30,6 +31,7 @@ const TAG = 'geth/saga'
 const INIT_GETH_TIMEOUT = 15000
 const NEW_BLOCK_TIMEOUT = 30000
 const GETH_MONITOR_DELAY = 5000
+const SWITCH_TO_FORNO_TIMEOUT = 15000 // TODO(anna) adjust param
 
 enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
@@ -127,8 +129,13 @@ export function* initGethSaga() {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
     deleteChainDataAndRestartApp()
   } else {
-    // In the case of a network error, prompt forno switch
-    navigateToError('networkConnectionFailed')
+    // Suggest switch to forno for network-related errors
+    if (!(yield select(switchToZeroSyncPromptedSelector))) {
+      yield put(setZeroSyncPrompted())
+      navigate(Screens.DataSaver, { promptModalVisible: true })
+    } else {
+      navigateToError('networkConnectionFailed')
+    }
   }
 }
 
@@ -142,7 +149,7 @@ function createNewBlockChannel() {
 function* monitorGeth() {
   const newBlockChannel = yield createNewBlockChannel()
 
-  let repeatedTimeouts = 0
+  let consecutiveBlockTimeouts = 0
   while (true) {
     try {
       const { newBlock } = yield race({
@@ -150,19 +157,22 @@ function* monitorGeth() {
         timeout: delay(NEW_BLOCK_TIMEOUT),
       })
       if (newBlock) {
-        repeatedTimeouts = 0
+        consecutiveBlockTimeouts = 0
         Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
         yield put(setGethConnected(true))
         yield delay(GETH_MONITOR_DELAY)
       } else {
-        repeatedTimeouts += 1
+        consecutiveBlockTimeouts += 1
         Logger.error(
           `${TAG}@monitorGeth`,
           `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
         )
         yield put(setGethConnected(false))
-        if (repeatedTimeouts > 5) {
-          // TODO(anna) if this happens five times, switch to forno
+        if (consecutiveBlockTimeouts * NEW_BLOCK_TIMEOUT > SWITCH_TO_FORNO_TIMEOUT) {
+          if (!(yield select(switchToZeroSyncPromptedSelector))) {
+            yield put(setZeroSyncPrompted())
+            navigate(Screens.DataSaver, { promptModalVisible: true })
+          }
         }
       }
     } catch (error) {
