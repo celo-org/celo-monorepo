@@ -1,8 +1,9 @@
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
-import Sentry from '../fullstack/sentry'
 import airtableInit from '../server/airtable'
+import Sentry from '../server/sentry'
 import { abort } from '../src/utils/abortableFetch'
+import cache from './cache'
 const TABLE_NAME = 'Community Calendar'
 // Intermediate step Event With all String Values
 interface IncomingEvent {
@@ -58,8 +59,8 @@ export interface RawAirTableEvent {
 
 export default async function getFormattedEvents() {
   const eventData = await Promise.race([
-    fetchEventsFromAirtable(),
-    abort('Events from Airtable', 1000),
+    cache('events-list-at', fetchEventsFromAirtable),
+    abort('Events from Airtable', 2000),
   ])
   return splitEvents(normalizeEvents(eventData as RawAirTableEvent[]))
 }

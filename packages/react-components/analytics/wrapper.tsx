@@ -40,7 +40,7 @@ export default function Initializer(CeloAnalytics: CeloAnalyticsType, Logger: Re
             // We need a cast because:
             // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/32355
             // https://github.com/Microsoft/TypeScript/issues/28938#issuecomment-450636046
-            {...composedComponentProps as ComposedComponentProps}
+            {...(composedComponentProps as ComposedComponentProps)}
           />
         )
       }

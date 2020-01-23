@@ -8,7 +8,7 @@ COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"$HOME/.celo/network"}
 
 export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node:baklava"}
-export NETWORK_ID=${4:-"121119"}
+export NETWORK_ID=${4:-"200110"}
 export NETWORK_NAME=${5:-"baklava"}
 export DEFAULT_PASSWORD=${6:-"1234"}
 export CELO_IMAGE_ATTESTATION=${7:-"us.gcr.io/celo-testnet/celo-monorepo@sha256:90ea6739f9d239218245b5dce30e1bb5f05ac8dbc59f8e6f315502635c05ccb1"}
@@ -24,6 +24,9 @@ export TWILIO_MESSAGING_SERVICE_SID=MG00000000000000000000000000000000
 export TWILIO_ACCOUNT_SID=AC00000000000000000000000000000000
 export TWILIO_BLACKLIST=""
 export TWILIO_AUTH_TOKEN="ffffffffffffffffffffffffffffffff"
+
+# If the value is true, the script will print the CELO_* environment variables
+export FORCE_PRINT_ENV=true
 
 HOSTNAME=$(hostname)
 export ETHSTATS_ARG="$HOSTNAME@$NETWORK_NAME-ethstats.celo-testnet.org"
@@ -79,11 +82,11 @@ make_status_requests () {
 
 initialize_geth () {
 
-    echo -e "\tDownload genesis.json and static-nodes.json to the container"
-    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
-    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
+    echo -e "\tInitializing container"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget -nv https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget -nv https://storage.googleapis.com/env_bootnodes/$NETWORK_NAME -O /root/.celo/bootnodes"
     
-    docker run -v $PWD:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
+    docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 }
 
 #### Main 
@@ -98,7 +101,7 @@ if [[ $COMMAND == *"help"* ]]; then
 
     echo -e "Options:"
     echo -e "$0 <COMMAND> <DATA_DIR> <CELO_IMAGE> <NETWORK_ID> <NETWORK_NAME> <PASSWORD>"
-    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, register-metadata, run-fullnode, status, print-env, get-cooking. Default: pull,accounts,run-validator,run-proxy,status"
+    echo -e "\t - Command; comma separated list of actions to execute. Options are: help, pull, clean, accounts, run-validator, run-proxy, run-attestation, register-metadata, run-fullnode, status, print-env, get-cooking, stop-validating. Default: pull,accounts,run-validator,run-proxy,status"
     echo -e "\t - Data Dir; Local folder where will be created the data dir for the nodes. Default: $HOME/.celo/network"
     echo -e "\t - Celo Image; Image to download"
     echo -e "\t - Celo Network; Docker image network to use (typically alfajores or baklava, but you can use a commit). "
@@ -196,8 +199,9 @@ if [[ $COMMAND == *"run-proxy"* ]]; then
     docker rm -f celo-proxy || echo -e "Containers removed"
 
     initialize_geth
-    
-    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --ethstats=proxy-$ETHSTATS_ARG
+    export BOOTNODE_ENODES=$(docker run -v $PWD:/root/.celo --rm --entrypoint cat $CELO_IMAGE /root/.celo/bootnodes)
+
+    screen -S celo-proxy -d -m docker run --name celo-proxy --restart always -p 30313:30303 -p 30313:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --bootnodes $BOOTNODE_ENODES --ethstats=proxy-$ETHSTATS_ARG
     
     sleep 5s
    
@@ -230,6 +234,29 @@ if [[ $COMMAND == *"run-validator"* ]]; then
     echo -e "The Validator should be starting. You can attach to it running 'screen -r -S celo-validator'\n"
     
 fi
+
+
+if [[ $COMMAND == *"stop-validating"* ]]; then
+
+    echo -e "* Let's stop of validate ..."
+
+    if [ -z ${CELO_VALIDATOR_ADDRESS+x} ]; then echo "CELO_VALIDATOR_ADDRESS is unset"; exit 1; fi
+    if [ -z ${CELO_VALIDATOR_GROUP_ADDRESS+x} ]; then echo "CELO_VALIDATOR_GROUP_ADDRESS is unset"; exit 1; fi
+
+    
+    echo -e "\tDe-registering Validator $CELO_VALIDATOR_ADDRESS"
+    $CELOCLI validator:deaffiliate --from $CELO_VALIDATOR_ADDRESS
+    $CELOCLI validator:deregister --from $CELO_VALIDATOR_ADDRESS
+    
+    $CELOCLI election:revoke --from $CELO_VALIDATOR_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+    $CELOCLI election:revoke --from $CELO_VALIDATOR_GROUP_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value 10000000000000000000000
+
+    echo -e "\tDeregister validator group:"
+    $CELOCLI validatorgroup:deregister --from $CELO_VALIDATOR_GROUP_ADDRESS
+    
+    docker stop celo-validator celo-proxy
+fi
+
 
 if [[ $COMMAND == *"run-attestation"* ]]; then
 
@@ -327,6 +354,8 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
 
     docker rm -f celo-fullnode || echo -e "Container removed"
 
+    export BOOTNODE_ENODES=$(docker run -v $PWD:/root/.celo --rm --entrypoint cat $CELO_IMAGE /root/.celo/bootnodes)
+
     if [ -z ${CELO_ACCOUNT_ADDRESS+x} ]; then 
         echo "CELO_ACCOUNT_ADDRESS is unset, creating account";
         export CELO_ACCOUNT_ADDRESS=$(docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c " printf '%s\n' $DEFAULT_PASSWORD $DEFAULT_PASSWORD | geth account new " |tail -1| cut -d'{' -f 2| tr -cd "[:alnum:]\n" )
@@ -334,14 +363,13 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
         echo "CELO_ACCOUNT_ADDRESS is set to '$CELO_ACCOUNT_ADDRESS'"; 
     fi
 
-    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/static_nodes/o/$NETWORK_NAME?alt=media -O /root/.celo/static-nodes.json"
-
-    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget -nv https://storage.googleapis.com/env_bootnodes/$NETWORK_NAME -O /root/.celo/bootnodes"
+    docker run -v $PWD:/root/.celo --entrypoint /bin/sh -it $CELO_IMAGE -c "wget -nv https://www.googleapis.com/storage/v1/b/genesis_blocks/o/$NETWORK_NAME?alt=media -O /root/.celo/genesis.json"
     docker run -v $PWD:/root/.celo $CELO_IMAGE init /root/.celo/genesis.json
 
     echo -e "\tStarting the Full Node"
 
-    screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,txpool --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --ethstats=fullnode-$ETHSTATS_ARG
+    screen -S celo-fullnode -d -m docker run --name celo-fullnode --restart always -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal,txpool --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --bootnodes $BOOTNODE_ENODES
     
     sleep 2s
 
@@ -357,7 +385,7 @@ if [[ $COMMAND == *"run-fullnode"* ]]; then
     echo -e "\t 'screen -r -S celo-fullnode'\n"
 fi
 
-if [[ $COMMAND == *"print-env"* ]]; then
+if [[ $COMMAND == *"print-env"* ]] || [[ $FORCE_PRINT_ENV == *"true"* ]]; then
 
     echo -e "\n************************************************************************\n"
     echo -e "Celo Environment Variables (copy to validator-config.rc to re-use them!):\n\n"

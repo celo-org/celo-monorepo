@@ -8,6 +8,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
+import * as _ from 'lodash'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
@@ -168,55 +169,99 @@ contract('SortedOracles', (accounts: string[]) => {
       assert.isFalse(await sortedOracles.isOracle(aToken, anOracle))
     })
 
-    describe('when a report has been made', () => {
+    describe('when there is more than one report made', () => {
+      const anotherOracle = accounts[6]
+
+      beforeEach(async () => {
+        await sortedOracles.report(aToken, 1, 1, NULL_ADDRESS, NULL_ADDRESS, { from: anOracle })
+
+        await sortedOracles.addOracle(aToken, anotherOracle)
+        await sortedOracles.report(aToken, 5, 1, anOracle, NULL_ADDRESS, {
+          from: anotherOracle,
+        })
+      })
+
+      it('should decrease the number of rates', async () => {
+        await sortedOracles.removeOracle(aToken, anotherOracle, 1)
+        assert.equal((await sortedOracles.numRates(aToken)).toNumber(), 1)
+      })
+
+      it('should decrease the number of timestamps', async () => {
+        await sortedOracles.removeOracle(aToken, anotherOracle, 1)
+        assert.equal((await sortedOracles.numTimestamps(aToken)).toNumber(), 1)
+      })
+
+      it('should emit the OracleRemoved, OracleReportRemoved and MedianUpdated events', async () => {
+        const resp = await sortedOracles.removeOracle(aToken, anotherOracle, 1)
+        assert.equal(resp.logs.length, 3)
+        assertLogMatches2(resp.logs[0], {
+          event: 'OracleReportRemoved',
+          args: {
+            oracle: matchAddress(anotherOracle),
+            token: matchAddress(aToken),
+          },
+        })
+
+        const medianUpdatedEvent = _.find(resp.logs, {
+          event: 'MedianUpdated',
+        })
+        assert.exists(medianUpdatedEvent)
+
+        assertLogMatches2(resp.logs[2], {
+          event: 'OracleRemoved',
+          args: {
+            token: matchAddress(aToken),
+            oracleAddress: matchAddress(anotherOracle),
+          },
+        })
+      })
+    })
+
+    describe('when there is a single report left', () => {
       beforeEach(async () => {
         await sortedOracles.report(aToken, 10, 1, NULL_ADDRESS, NULL_ADDRESS, {
           from: anOracle,
         })
       })
 
-      it('should decrease the number of rates', async () => {
+      it('should not decrease the number of rates', async () => {
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        assert.equal((await sortedOracles.numRates(aToken)).toNumber(), 0)
+        assert.equal((await sortedOracles.numRates(aToken)).toNumber(), 1)
       })
 
-      it('should reset the median rate', async () => {
+      it('should not reset the median rate', async () => {
+        const [actualNumeratorBefore] = await sortedOracles.medianRate(aToken)
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        const [actualNumerator] = await sortedOracles.medianRate(aToken)
-        assert.equal(actualNumerator.toNumber(), 0)
+        const [actualNumeratorAfter] = await sortedOracles.medianRate(aToken)
+        assert.equal(actualNumeratorBefore.toNumber(), actualNumeratorAfter.toNumber())
       })
 
-      it('should decrease the number of timestamps', async () => {
+      it('should not decrease the number of timestamps', async () => {
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        assert.equal((await sortedOracles.numTimestamps(aToken)).toNumber(), 0)
+        assert.equal((await sortedOracles.numTimestamps(aToken)).toNumber(), 1)
       })
 
-      it('should reset the median timestamp', async () => {
+      it('should not reset the median timestamp', async () => {
+        const medianTimestampBefore = await sortedOracles.medianTimestamp(aToken)
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        assert.equal((await sortedOracles.medianTimestamp(aToken)).toNumber(), 0)
+        const medianTimestampAfter = await sortedOracles.medianTimestamp(aToken)
+        assert.equal(medianTimestampBefore.toNumber(), medianTimestampAfter.toNumber())
       })
 
-      it('should emit the OracleReportRemoved and MedianUpdated events', async () => {
+      it('should not emit the OracleReportRemoved and MedianUpdated events, but the OracleRemoved', async () => {
         const resp = await sortedOracles.removeOracle(aToken, anOracle, 0)
-        assert.equal(resp.logs.length, 3)
-        assertLogMatches2(resp.logs[0], {
+
+        const oracleReportRemovedEvent = _.find(resp.logs, {
           event: 'OracleReportRemoved',
-          args: {
-            oracle: matchAddress(anOracle),
-            token: matchAddress(aToken),
-          },
         })
+        assert.equal(oracleReportRemovedEvent, undefined)
 
-        assertLogMatches2(resp.logs[1], {
+        const medianUpdatedEvent = _.find(resp.logs, {
           event: 'MedianUpdated',
-          args: {
-            token: matchAddress(aToken),
-            numerator: new BigNumber(0),
-            denominator: new BigNumber(0),
-          },
         })
+        assert.equal(medianUpdatedEvent, undefined)
 
-        assertLogMatches2(resp.logs[2], {
+        assertLogMatches2(resp.logs[0], {
           event: 'OracleRemoved',
           args: {
             token: matchAddress(aToken),

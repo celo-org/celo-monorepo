@@ -5,10 +5,11 @@ import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { contractKit, web3 } from 'src/web3/contracts'
@@ -155,7 +156,7 @@ export function tokenTransferFactory({
       yield put(
         addStandbyTransaction({
           id: txId,
-          type: TransactionTypes.SENT,
+          type: TokenTransactionType.Sent,
           comment,
           status: TransactionStatus.Pending,
           value: amount.toString(),

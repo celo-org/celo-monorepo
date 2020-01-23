@@ -38,7 +38,9 @@ export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gr
 3.  Compile the project and start the bundler with
 
     ```bash
-    yarn run dev
+    yarn run dev:android
+    OR
+    yarn run dev:ios
     ```
 
     This will build the app in a device (physical or emulated) and open a
@@ -184,7 +186,11 @@ Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug
 
 On android, the wallet app uses the SMS Retriever API to automatically input codes during phone number verification.
 
-The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever]. Note, the signature will need to be computed using the signing key from the google play dashboard.
+The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever].
+The hash depends on both the bundle id and the signing certificate. Since we use Google Play signing, we need to download the certificate.
+
+1.  Go to the play console for the relevant app, Release management > App signing, and download the App signing certificate.
+2.  Use this script to generate the hash code: https://github.com/michalbrz/sms-retriever-hash-generator
 
 ## Generating GraphQL Types
 

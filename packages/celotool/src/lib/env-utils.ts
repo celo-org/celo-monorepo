@@ -97,6 +97,13 @@ export enum envVar {
   VALIDATOR_ZERO_GENESIS_BALANCE = 'VALIDATOR_ZERO_GENESIS_BALANCE',
   VALIDATORS = 'VALIDATORS',
   VM_BASED = 'VM_BASED',
+  VOTING_BOTS = 'VOTING_BOTS',
+  VOTING_BOT_BALANCE = 'VOTING_BOT_BALANCE',
+  VOTING_BOT_CHANGE_BASELINE = 'VOTING_BOT_CHANGE_BASELINE',
+  VOTING_BOT_CRON_SCHEDULE = 'VOTING_BOT_CRON_SCHEDULE',
+  VOTING_BOT_EXPLORE_PROBABILITY = 'VOTING_BOT_EXPLORE_PROBABILITY',
+  VOTING_BOT_SCORE_SENSITIVITY = 'VOTING_BOT_SCORE_SENSITIVITY',
+  VOTING_BOT_WAKE_PROBABILITY = 'VOTING_BOT_WAKE_PROBABILITY',
 }
 
 export enum EnvTypes {
@@ -177,9 +184,7 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 export async function doCheckOrPromptIfStagingOrProduction() {
   if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      `You are about to apply a possibly irreversible action on a production env: ${
-        process.env.CELOTOOL_CELOENV
-      }. Are you sure?`
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }

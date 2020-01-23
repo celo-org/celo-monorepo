@@ -99,9 +99,6 @@ export const headerArea = {
   },
 }
 
-export default connect<null, DispatchProps>(
-  null,
-  {
-    setTopLevelNavigator,
-  }
-)(NavigatorWrapper)
+export default connect<null, DispatchProps>(null, {
+  setTopLevelNavigator,
+})(NavigatorWrapper)

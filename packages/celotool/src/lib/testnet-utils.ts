@@ -3,6 +3,7 @@ import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/ge
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
+import * as path from 'path'
 import sleep from 'sleep-promise'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
@@ -48,15 +49,16 @@ export async function getGenesisBlockFromGoogleStorage(networkName: string) {
 export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
-  const nodesJsonData: string[] | null = await retryCmd(() =>
+  const nodesData: string[] | null = await retryCmd(() =>
     getEnodesWithExternalIPAddresses(networkName)
   )
-  if (nodesJsonData === null) {
+  if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  console.debug('Static nodes are ' + nodesJsonData + '\n')
+  const nodesJson = JSON.stringify(nodesData)
+  console.debug('Static nodes are ' + nodesJson + '\n')
   await uploadDataToGoogleStorage(
-    nodesJsonData,
+    nodesJson,
     staticNodesBucketName,
     networkName,
     true,
@@ -161,6 +163,10 @@ export function uploadDataToGoogleStorage(
   contentType: string
 ) {
   const localTmpFilePath = `/tmp/${googleStorageBucketName}-${googleStorageFileName}`
+  // @ts-ignore The expected type of this is not accurate
+  fs.mkdirSync(path.dirname(localTmpFilePath), {
+    recursive: true,
+  })
   fs.writeFileSync(localTmpFilePath, data)
   return uploadFileToGoogleStorage(
     localTmpFilePath,

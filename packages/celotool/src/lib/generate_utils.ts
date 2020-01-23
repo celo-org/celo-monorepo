@@ -1,5 +1,4 @@
 // @ts-ignore
-import { config } from '@celo/protocol/migrationsConfig'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
@@ -32,6 +31,7 @@ export enum AccountType {
   PRICE_ORACLE = 6,
   PROXY = 7,
   ATTESTATION_BOT = 8,
+  VOTING_BOT = 9,
 }
 
 export enum ConsensusType {
@@ -59,6 +59,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'price_oracle',
   'proxy',
   'attestation_bot',
+  'voting_bot',
 ]
 
 export const add0x = (str: string) => {
@@ -102,16 +103,16 @@ export const privateKeyToAddress = (privateKey: string) => {
 export const privateKeyToStrippedAddress = (privateKey: string) =>
   strip0x(privateKeyToAddress(privateKey))
 
-const validatorZeroBalance = fetchEnvOrFallback(
-  envVar.VALIDATOR_ZERO_GENESIS_BALANCE,
-  '103010030000000000000000000'
-) // 103,010,030 CG
-const validatorBalance = fetchEnvOrFallback(
-  envVar.VALIDATOR_GENESIS_BALANCE,
-  '10011000000000000000000'
-) // 10,011 CG
-const faucetBalance = fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
-const oracleBalance = fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
+const validatorZeroBalance = () =>
+  fetchEnvOrFallback(envVar.VALIDATOR_ZERO_GENESIS_BALANCE, '103010030000000000000000000') // 103,010,030 CG
+const validatorBalance = () =>
+  fetchEnvOrFallback(envVar.VALIDATOR_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
+const faucetBalance = () =>
+  fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
+const oracleBalance = () =>
+  fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
+const votingBotBalance = () =>
+  fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '10000000000000000000000') // 10,000 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -128,7 +129,7 @@ export const getValidators = (mnemonic: string, n: number) => {
     return {
       address: strip0x(privateKeyToAddress(key)),
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-      balance: i === 0 ? validatorZeroBalance : validatorBalance,
+      balance: i === 0 ? validatorZeroBalance() : validatorBalance(),
     }
   })
 }
@@ -157,7 +158,7 @@ export const getFaucetedAccounts = (mnemonic: string) => {
     AccountType.FAUCET,
     mnemonic,
     numFaucetAccounts,
-    faucetBalance
+    faucetBalance()
   )
 
   const numLoadTestAccounts = parseInt(fetchEnvOrFallback(envVar.LOAD_TEST_CLIENTS, '0'), 10)
@@ -165,17 +166,25 @@ export const getFaucetedAccounts = (mnemonic: string) => {
     AccountType.LOAD_TESTING_ACCOUNT,
     mnemonic,
     numLoadTestAccounts,
-    faucetBalance
+    faucetBalance()
   )
 
   const oracleAccounts = getFaucetedAccountsFor(
     AccountType.PRICE_ORACLE,
     mnemonic,
     1,
-    oracleBalance
+    oracleBalance()
   )
 
-  return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts]
+  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
+  const votingBotAccounts = getFaucetedAccountsFor(
+    AccountType.VOTING_BOT,
+    mnemonic,
+    numVotingBotAccounts,
+    votingBotBalance()
+  )
+
+  return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts, ...votingBotAccounts]
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
@@ -212,6 +221,17 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
       })
     }
   }
+
+  // Allocate voting bot account(s)
+  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
+  initialAccounts.concat(
+    getStrippedAddressesFor(AccountType.VOTING_BOT, mnemonic, numVotingBotAccounts).map((addr) => {
+      return {
+        address: addr,
+        balance: fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '100000000000000000000'),
+      }
+    })
+  )
 
   return generateGenesis({
     validators,

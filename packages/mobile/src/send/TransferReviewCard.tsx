@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
@@ -19,7 +20,6 @@ import {
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 export interface OwnProps {
@@ -30,7 +30,7 @@ export interface OwnProps {
   fee?: BigNumber
   isLoadingFee?: boolean
   feeError?: Error
-  type: TransactionTypes
+  type: TokenTransactionType
   e164PhoneNumber?: string
   recipient?: Recipient
 }
@@ -52,10 +52,10 @@ function TransferReviewCard({
 }: OwnProps & WithTranslation) {
   const localCurrencyCode = useLocalCurrencyCode()
   const localValue = useDollarsToLocalAmount(value)
-  const exchangeRate = new BigNumber(useExchangeRate() as number)
+  const exchangeRate = new BigNumber(useExchangeRate() as string)
   const amountWithFees = value.plus(fee || 0)
   const adjustedFee =
-    type === TransactionTypes.INVITE_SENT && fee
+    type === TokenTransactionType.InviteSent && fee
       ? fee.minus(getInvitationVerificationFeeInDollars())
       : fee
 
@@ -71,23 +71,22 @@ function TransferReviewCard({
         {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
         <HorizontalLine />
         <View style={style.feeContainer}>
-          {!!localCurrencyCode &&
-            localValue && (
-              <>
-                <LineItemRow
-                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={getMoneyDisplayValue(value)}
-                  title={t('amountInCelloDollars')}
-                />
-                <Text style={style.localValueHint}>
-                  {t('localValueHint', {
-                    localValue: getMoneyDisplayValue(exchangeRate),
-                    localCurrencyCode,
-                  })}
-                </Text>
-              </>
-            )}
-          {type === TransactionTypes.INVITE_SENT && (
+          {!!localCurrencyCode && localValue && (
+            <>
+              <LineItemRow
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={getMoneyDisplayValue(value)}
+                title={t('amountInCelloDollars')}
+              />
+              <Text style={style.localValueHint}>
+                {t('localValueHint', {
+                  localValue: getMoneyDisplayValue(exchangeRate),
+                  localCurrencyCode,
+                })}
+              </Text>
+            </>
+          )}
+          {type === TokenTransactionType.InviteSent && (
             <LineItemRow
               currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
               amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
