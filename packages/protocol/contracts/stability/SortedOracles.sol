@@ -107,11 +107,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function removeExpiredReports(address token, uint256 n) external {
     require(token != address(0) && n < timestamps[token].getNumElements());
     for (uint256 i = 0; i < n; i++) {
-      address oldest = timestamps[token].getTail();
-      uint256 timestamp = timestamps[token].getValue(oldest);
-      // solhint-disable-next-line not-rely-on-time
-      if (now.sub(timestamp) >= reportExpirySeconds) {
-        removeReport(token, oldest);
+      (bool isExpired, address oldestAddress) = isOldestReportExpired(token);
+      if (isExpired) {
+        removeReport(token, oldestAddress);
       } else {
         break;
       }
@@ -121,16 +119,17 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   /**
    * @notice Check if last report is expired.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @return bool isExpired and the address of the last report
    */
-  function isReportActive(address token) external view returns (bool) {
+  function isOldestReportExpired(address token) public view returns (bool, address) {
     require(token != address(0));
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
     if (now.sub(timestamp) >= reportExpirySeconds) {
-      return false;
+      return (true, oldest);
     }
-    return true;
+    return (false, oldest);
   }
 
   /**

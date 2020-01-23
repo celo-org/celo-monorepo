@@ -9,6 +9,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
 
@@ -158,30 +159,37 @@ contract('SortedOracles', (accounts: string[]) => {
     })
   })
 
-  describe('#isReportActive', () => {
+  describe('#isOldestReportExpired', () => {
     beforeEach(async () => {
       await sortedOracles.addOracle(aToken, anOracle)
     })
 
-    it('should return false if there are no reports', async () => {
-      let isReportActive = await sortedOracles.isReportActive(aToken)
-      assert.isNotTrue(isReportActive)
+    it('should return true if there are no reports', async () => {
+      let isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+      assert.isTrue(isReportExpired[0])
     })
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(aToken, 1, 1, NULL_ADDRESS, NULL_ADDRESS, { from: anOracle })
+        await sortedOracles.report(
+          aToken,
+          toFixed(new BigNumber(1)),
+          1,
+          NULL_ADDRESS,
+          NULL_ADDRESS,
+          { from: anOracle }
+        )
       })
 
-      it('should return true if report is not expired', async () => {
-        let isReportActive = await sortedOracles.isReportActive(aToken)
-        assert.isTrue(isReportActive)
-      })
-
-      it('should return false if report is expired', async () => {
+      it('should return true if report is expired', async () => {
         await timeTravel(aReportExpiry, web3)
-        let isReportActive = await sortedOracles.isReportActive(aToken)
-        assert.isNotTrue(isReportActive)
+        let isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+        assert.isTrue(isReportExpired[0])
+      })
+
+      it('should return false if report is not expired', async () => {
+        let isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+        assert.isNotTrue(isReportExpired[0])
       })
     })
   })

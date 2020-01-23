@@ -341,13 +341,13 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     ISortedOracles sortedOracles = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     );
-    bool isLastBucketValid = sortedOracles.isReportActive(stable);
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(stable);
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
     bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
-    return timePassed && enoughReports && medianReportRecent && isLastBucketValid;
+    return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
   function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {

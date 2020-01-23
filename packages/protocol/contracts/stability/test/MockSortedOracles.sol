@@ -31,7 +31,7 @@ contract MockSortedOracles {
     return (numerators[token], DENOMINATOR);
   }
 
-  function isReportActive(address token) external view returns (bool) {
-    return now >= medianTimestamp[token];
+  function isOldestReportExpired(address token) public view returns (bool, address) {
+    return (false, token);
   }
 }
