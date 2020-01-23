@@ -86,8 +86,7 @@ export function* checkWeb3SyncProgress() {
       }
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
-      if (true) {
-        // syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_ZERO_SYNC_TIMEOUT) {
+      if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_ZERO_SYNC_TIMEOUT) {
         if (yield select(promptZeroSyncIfNeededSelector)) {
           yield put(setPromptZeroSync(false))
           navigate(Screens.DataSaver, { promptModalVisible: true })
