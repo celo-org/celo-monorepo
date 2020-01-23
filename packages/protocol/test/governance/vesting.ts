@@ -291,7 +291,7 @@ contract('Vesting', (accounts: string[]) => {
       assertEqualBN(vestAmountPerPeriod, vestingDefaultSchedule.vestAmountPerPeriod)
     })
 
-    it('should set vesting period per sec to vesting instance', async () => {
+    it('should set vesting period to vesting instance', async () => {
       const [
         vestingNumPeriods,
         vestAmountPerPeriod,
@@ -366,13 +366,13 @@ contract('Vesting', (accounts: string[]) => {
       assertEqualBN(vestedBalanceAtRevoke, 0)
     })
 
-    it('should revert when vesting beneficiary is the genesis address', async () => {
+    it('should revert when vesting beneficiary is the null address', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingBeneficiary = NULL_ADDRESS
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
     })
 
-    it('should revert when vesting revoker is the genesis address', async () => {
+    it('should revert when vesting revoker is the null address', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingRevoker = NULL_ADDRESS
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
@@ -409,13 +409,13 @@ contract('Vesting', (accounts: string[]) => {
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
     })
 
-    it('should revert when vesting period per sec is zero', async () => {
+    it('should revert when vesting period is zero', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingPeriodSec = 0
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
     })
 
-    it('should revert when vesting cliff is longer than vesting period per sec', async () => {
+    it('should revert when vesting cliff is longer than vesting period', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingCliff = 4 * MONTH
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
@@ -1478,7 +1478,6 @@ contract('Vesting', (accounts: string[]) => {
     let initialVestingAmount
 
     beforeEach(async () => {
-      vestingDefaultSchedule.vestingCliff = 0
       vestingDefaultSchedule.vestingStartTime = Math.round(Date.now() / 1000)
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -1502,7 +1501,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     describe('#when not revoked', () => {
-      it('should revert since beneficiary should not be able to withdraw anything within the first quarter under current test constellation', async () => {
+      it('should revert since beneficiary should not be able to withdraw anything within the first quarter', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 2.9 * MONTH
         await timeTravel(timeToTravel, web3)
@@ -1518,7 +1517,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('beneficiary should be able to withdraw a quarter of the vested amount right after beginning of first quarter under current test constellation', async () => {
+      it('should allow the beneficiary to withdraw a quarter of the vested amount right after the beginning of the first quarter', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 3 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1533,7 +1532,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('beneficiary should be able to withdraw half the vested amount right after beginning of second quarter under current test constellation', async () => {
+      it('should allow the beneficiary to withdraw half the vested amount when half of the vesting periods have passed', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 6 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1548,7 +1547,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('beneficiary should be able to withdraw three quarters of the vested amount right after beginning of third quarter under current test constellation', async () => {
+      it('should allow the beneficiary to withdraw three quarters of the vested amount right after the beginning of the third quarter', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 9 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1563,7 +1562,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('beneficiary should be able to withdraw the entire amount right after end of the vesting period under current test constellation', async () => {
+      it('should allow the beneficiary to withdraw the entire amount right after the end of the vesting period', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 12 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1593,7 +1592,7 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     describe('#when revoked', () => {
-      it('beneficiary should be able to withdraw up to the vestedBalanceAtRevoke under current test constellation', async () => {
+      it('should allow the beneficiary to withdraw up to the vestedBalanceAtRevoke', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 6 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1609,7 +1608,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('should revert if beneficiary attempts to withdraw more than vestedBalanceAtRevoke under current test constellation', async () => {
+      it('should revert if beneficiary attempts to withdraw more than vestedBalanceAtRevoke', async () => {
         const timeToTravel = 6 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
         await vestingInstance.revoke({ from: revoker })
@@ -1621,7 +1620,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('should selfdestruct if beneficiary withdraws the entire amount under current test constellation', async () => {
+      it('should selfdestruct if beneficiary withdraws the entire amount', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 12 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1651,7 +1650,6 @@ contract('Vesting', (accounts: string[]) => {
     let initialVestingAmount
 
     beforeEach(async () => {
-      vestingDefaultSchedule.vestingCliff = 0
       vestingDefaultSchedule.vestingStartTime = Math.round(Date.now() / 1000)
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -1661,35 +1659,35 @@ contract('Vesting', (accounts: string[]) => {
       )
     })
 
-    it('should return zero if before cliff start time under current test constellation', async () => {
+    it('should return zero if before cliff start time', async () => {
       const timeToTravel = 0.5 * HOUR
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = 0
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return a quarter of the vested amount right after beginning of first quarter under current test constellation', async () => {
+    it('should return a quarter of the vested amount right after the beginning of the first quarter', async () => {
       const timeToTravel = 3 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount.div(4)
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return half the vested amount right after beginning of second quarter under current test constellation', async () => {
+    it('should return half the vested amount right the beginning of the second quarter', async () => {
       const timeToTravel = 6 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount.div(2)
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return three quarters of the vested amount right after beginning of third quarter under current test constellation', async () => {
+    it('should return three quarters of the vested amount right after the beginning of the third quarter', async () => {
       const timeToTravel = 9 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount.multipliedBy(3).div(4)
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return the entire amount right after end of the vesting period under current test constellation', async () => {
+    it('should return the entire amount right after the end of the vesting period', async () => {
       const timeToTravel = 12 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount
