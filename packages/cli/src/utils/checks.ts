@@ -1,11 +1,14 @@
 import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { eqAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
+import { printValueMap } from './cli'
 
 export interface CommandCheck {
   name: string
@@ -78,10 +81,60 @@ class CheckBuilder {
     }
   }
 
+  withGovernance<A>(f: (accounts: GovernanceWrapper) => A): () => Promise<Resolve<A>> {
+    return async () => {
+      const governance = await this.kit.contracts.getGovernance()
+      return f(governance) as Resolve<A>
+    }
+  }
+
   addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
     this.checks.push(check(name, predicate, errorMessage))
     return this
   }
+
+  isApprover = (account: Address) =>
+    this.addCheck(
+      `${account} is approver address`,
+      this.withGovernance(async (g) => eqAddress(await g.getApprover(), account))
+    )
+
+  proposalExists = (proposalID: string) =>
+    this.addCheck(
+      `${proposalID} is an existing proposal`,
+      this.withGovernance((g) => g.proposalExists(proposalID))
+    )
+
+  proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
+    this.addCheck(
+      `${proposalID} is in stage ${stage}`,
+      this.withGovernance(async (g) => {
+        const match = (await g.getProposalStage(proposalID)) === stage
+        if (!match) {
+          const waitTimes = await g.timeUntilStages(proposalID)
+          printValueMap(waitTimes)
+        }
+        return match
+      })
+    )
+
+  proposalIsPassing = (proposalID: string) =>
+    this.addCheck(
+      `Proposal ${proposalID} is passing corresponding constitutional quorum`,
+      this.withGovernance((g) => g.isProposalPassing(proposalID))
+    )
+
+  hotfixIsPassing = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix ${hash} is whitelisted by quorum of validators`,
+      this.withGovernance((g) => g.isHotfixPassing(hash))
+    )
+
+  hotfixNotExecuted = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix ${hash} is not already executed`,
+      this.withGovernance(async (g) => !(await g.getHotfixRecord(hash)).executed)
+    )
 
   canSign = (account: Address) =>
     this.addCheck('Account can sign', async () => {
@@ -171,6 +224,17 @@ class CheckBuilder {
       })
     )
 
+  isVoteSignerOrAccount = () =>
+    this.addCheck(
+      `${this.signer!} is vote signer or registered account`,
+      this.withAccounts(async (accs) => {
+        return accs.voteSignerToAccount(this.signer!).then(
+          () => true,
+          () => false
+        )
+      })
+    )
+
   isAccount = (address: Address) =>
     this.addCheck(
       `${address} is a registered Account`,
@@ -187,6 +251,12 @@ class CheckBuilder {
         .then((balance) => balance.gte(value))
     )
   }
+
+  exceedsProposalMinDeposit = (deposit: BigNumber) =>
+    this.addCheck(
+      `Deposit is greater than or equal to governance proposal minDeposit`,
+      this.withGovernance(async (g) => deposit.gte(await g.minDeposit()))
+    )
 
   hasEnoughLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')

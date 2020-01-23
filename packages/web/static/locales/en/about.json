@@ -46,7 +46,7 @@
   "value2Text": "We believe that people live primarily in connection to one another. We recognize that individuals are healthier and happier when they are members of a strong social community with meaningful relationships – that is, when they are living within a healthy and happy whole. We embrace values that strengthen community.",
   "teamTitle": "Contributors",
   "teamCopy": "Meet the contributors working on Celo from around the world. Our collective experience ranges from public and private sector, technology, nonprofits, and NGOs.",
-  "celoBackersText": "Celo is supported by over 40 companies and individuals, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order",
+  "celoBackersText": "Celo is supported by over {{count}} companies and individuals, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order",
   "theoryOfChangeTitle": "Theory Of Change",
   "theoryOfChangeText": "A theory of change is a framework that describes how short-term actions will lead to long-term social impact. Celo’s aim is to create the conditions for prosperity, defined as: people fulfilling basic needs, growing along their own unique paths, and supporting each other. All of Celo’s projects have a specific hypothesis that tie our activities to one or more of these indicators of prosperity."
 }

@@ -106,5 +106,8 @@
   "processing": "Processing",
   "moreWithCount": "+{{count }} more",
   "unknown": "Unknown",
-  "emptyList": "Empty list"
+  "emptyList": "Empty list",
+  "timeframes": {
+    "30d": "30 days"
+  }
 }

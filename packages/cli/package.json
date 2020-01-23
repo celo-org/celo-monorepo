@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.32-beta3",
+  "version": "0.0.34-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -26,13 +26,13 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test:reset": "yarn --cwd ../protocol devchain generate .devchain --migration_override ../dev-utils/src/migration-override.json",
+    "test:reset": "yarn --cwd ../protocol devchain generate .devchain --migration_override ../dev-utils/src/migration-override.json --upto 22",
     "test:livechain": "yarn --cwd ../protocol devchain run .devchain",
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.2.8-dev",
-    "@celo/utils": "0.1.5-dev",
+    "@celo/contractkit": "0.2.10-dev",
+    "@celo/utils": "0.1.6-dev",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
@@ -89,6 +89,9 @@
       },
       "exchange": {
         "description": "Exchange Celo Dollars and Celo Gold via the stability mechanism"
+      },
+      "governance": {
+        "description": "Interact with on-chain governance proposals and hotfixes"
       },
       "lockedgold": {
         "description": "View and manage locked Celo Gold"

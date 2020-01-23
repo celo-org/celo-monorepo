@@ -8,6 +8,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
+import { checkVerification } from 'src/identity/verification'
 import {
   Actions,
   backupPhraseEmpty,
@@ -74,7 +75,12 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     // Set redeem invite complete so user isn't brought back into nux flow
     yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
-    navigate(Screens.VerificationEducationScreen)
+
+    // Check if the account was verified
+    const isVerified = yield call(checkVerification)
+
+    navigate(isVerified ? Screens.WalletHome : Screens.VerificationEducationScreen)
+
     yield put(importBackupPhraseSuccess())
   } catch (error) {
     Logger.error(TAG + '@importBackupPhraseSaga', 'Error importing backup phrase', error)
