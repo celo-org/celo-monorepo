@@ -15,7 +15,6 @@ import { colors, fonts, standardStyles } from 'src/styles'
 
 const { brandImagery } = hashNav
 
-// TODO in v 1.1
 const KeyImageryWrapped = withNamespaces(NameSpaces.brand)(
   React.memo(function KeyImagery({ t }: I18nProps) {
     return (
@@ -44,10 +43,10 @@ export default KeyImageryWrapped
 const Overview = React.memo(
   withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
     return (
-      <>
+      <View>
         <PageHeadline title={t('keyImagery.title')} headline={t('keyImagery.headline')} />
         <CCLicense textI18nKey="keyImagery.license" />
-      </>
+      </View>
     )
   })
 )
@@ -58,7 +57,7 @@ function useIlloSize() {
     case ScreenSizes.DESKTOP:
       return 340
     case ScreenSizes.MOBILE:
-      return '100%'
+      return 345
     case ScreenSizes.TABLET:
       return 222
   }
@@ -68,9 +67,11 @@ const Illustrations = React.memo(
   withNamespaces(NameSpaces.brand)(function _Illustrations({ t }: I18nProps) {
     const size = useIlloSize()
     return (
-      <View style={[brandStyles.gap, standardStyles.blockMarginTopTablet]}>
-        <H2 style={standardStyles.elementalMarginBottom}>{t('keyImagery.illoTitle')}</H2>
-        <Text style={fonts.p}>{t('keyImagery.illoText')}</Text>
+      <View style={standardStyles.blockMarginTopTablet}>
+        <H2 style={[brandStyles.gap, standardStyles.elementalMarginBottom]}>
+          {t('keyImagery.illoTitle')}
+        </H2>
+        <Text style={[brandStyles.gap, fonts.p]}>{t('keyImagery.illoText')}</Text>
         <Fetch query="/brand/api/assets/Illustrations">
           {({ loading, data, error }) => {
             if (loading) {
@@ -82,7 +83,7 @@ const Illustrations = React.memo(
             }
 
             return (
-              <View style={[brandStyles.tiling, { justifyContent: 'space-between' }]}>
+              <View style={[brandStyles.tiling, styles.illustrationsArea]}>
                 {data.map((illo) => (
                   <Showcase
                     ratio={1.3}
@@ -107,9 +108,11 @@ const Illustrations = React.memo(
 const AbstractGraphics = React.memo(
   withNamespaces(NameSpaces.brand)(function _AbstractGraphics({ t }: I18nProps) {
     return (
-      <View style={[brandStyles.gap, standardStyles.sectionMarginTop]}>
-        <H2 style={standardStyles.elementalMarginBottom}>{t('keyImagery.abstractTitle')}</H2>
-        <Text style={fonts.p}>{t('keyImagery.abstractText')}</Text>
+      <View style={standardStyles.sectionMarginTop}>
+        <H2 style={[brandStyles.gap, standardStyles.elementalMarginBottom]}>
+          {t('keyImagery.abstractTitle')}
+        </H2>
+        <Text style={[brandStyles.gap, fonts.p]}>{t('keyImagery.abstractText')}</Text>
         <Fetch query="/brand/api/assets/Abstract Graphics">
           {({ loading, data, error }) => {
             if (loading) {
@@ -162,5 +165,8 @@ const SomethingsWrong = withNamespaces(NameSpaces.brand)(function _SomethingsWro
 const styles = StyleSheet.create({
   fillSpace: {
     minHeight: '60vh',
+  },
+  illustrationsArea: {
+    justifyContent: 'space-between',
   },
 })
