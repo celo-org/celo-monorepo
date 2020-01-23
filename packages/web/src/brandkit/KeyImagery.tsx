@@ -33,7 +33,7 @@ const KeyImageryWrapped = withNamespaces(NameSpaces.brand)(
             children: <Illustrations />,
           },
           { id: brandImagery.graphics, children: <AbstractGraphics /> },
-        ]} { }
+        ]}
       />
     )
   })
