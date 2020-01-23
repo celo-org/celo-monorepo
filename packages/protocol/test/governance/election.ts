@@ -713,7 +713,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#revokeActive', () => {
+  describe.only('#revokeActive', () => {
     const voter = accounts[0]
     const group = accounts[1]
     const value = 1000
@@ -729,6 +729,8 @@ contract('Election', (accounts: string[]) => {
         await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
         await mineBlocks(EPOCH, web3)
         await election.activate(group)
+        // Distribute some rewards to test rounding errors.
+        await election.distributeEpochRewards(group, 1, NULL_ADDRESS, NULL_ADDRESS)
       })
 
       describe('when the revoked value is less than the active votes', () => {
