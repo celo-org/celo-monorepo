@@ -456,7 +456,6 @@ export function* switchToGethFromZeroSync() {
 
     yield spawn(gethSaga)
 
-    // yield call(initGethSaga)
     switchWeb3ProviderForSyncMode(false)
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
