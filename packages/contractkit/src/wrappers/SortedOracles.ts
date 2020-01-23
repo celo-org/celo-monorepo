@@ -57,7 +57,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.medianRate(tokenAddress).call()
     return {
-      rate: toBigNumber(response[0]).div(toBigNumber(response[1])),
+      rate: toFixed(toBigNumber(response[0]).div(toBigNumber(response[1]))),
     }
   }
 
@@ -149,21 +149,16 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.getRates(tokenAddress).call()
     const rates: OracleRate[] = []
-    const denominator = await this.getInternalDenominator()
 
     for (let i = 0; i < response[0].length; i++) {
       const medRelIndex = parseInt(response[2][i], 10)
       rates.push({
         address: response[0][i],
-        rate: toBigNumber(response[1][i]).div(denominator),
+        rate: toFixed(toBigNumber(response[1][i]).div(toBigNumber(response[2][i]))),
         medianRelation: medRelIndex,
       })
     }
     return rates
-  }
-
-  private async getInternalDenominator(): Promise<BigNumber> {
-    return toBigNumber(await this.contract.methods.getDenominator().call())
   }
 
   private async findLesserAndGreaterKeys(
