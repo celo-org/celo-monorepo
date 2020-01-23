@@ -8,6 +8,8 @@ export default function sentryConfig() {
     environment: publicRuntimeConfig.ENV,
     ignoreErrors: [
       "The fetching process for the media resource was aborted by the user agent at the user's request.",
+      /chrome-extension/,
+      /moz-extension/,
     ],
   }
 }
