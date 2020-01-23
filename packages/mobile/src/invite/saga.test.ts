@@ -20,29 +20,11 @@ import { watchRedeemInvite, watchSendInvite, withdrawFundsFromTempAccount } from
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
-import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
+import { createMockStore, mockContractKitBalance } from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
 
 const mockFetch = fetch as FetchMock
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
-const mockBalance = jest.fn()
-
-jest.mock('@celo/walletkit', () => {
-  const { createMockContract } = require('test/utils')
-  return {
-    ...jest.requireActual('@celo/walletkit'),
-    getAttestationsContract: async () =>
-      createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
-    getStableTokenContract: jest.fn(async () =>
-      createMockContract({
-        balanceOf: mockBalance,
-        transfer: () => null,
-        transferWithComment: () => null,
-        decimals: () => '10',
-      })
-    ),
-  }
-})
 
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),
@@ -53,37 +35,36 @@ jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
 
-jest.mock('src/web3/contracts', () => ({
-  web3: {
-    eth: {
-      accounts: {
-        privateKeyToAccount: () =>
-          '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-        wallet: {
-          add: () => null,
+jest.mock('src/web3/contracts', () => {
+  const contractKit = require('@celo/contractkit')
+  return {
+    contractKit: contractKit.newKitFromWeb3(),
+    web3: {
+      eth: {
+        accounts: {
+          privateKeyToAccount: () =>
+            '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+          wallet: {
+            add: () => null,
+          },
+          create: () => ({
+            address: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+            privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+          }),
         },
-        create: () => ({
-          address: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-          privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-        }),
+        personal: {
+          importRawKey: () => '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+          unlockAccount: async () => true,
+        },
       },
-      personal: {
-        importRawKey: () => '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-        unlockAccount: async () => true,
+      utils: {
+        fromWei: (x: any) => x / 1e18,
+        sha3: (x: any) => `a sha3 hash`,
       },
     },
-    utils: {
-      fromWei: (x: any) => x / 1e18,
-      sha3: (x: any) => `a sha3 hash`,
-    },
-  },
-  contractKit: {
-    contracts: {
-      getStableToken: () => mockContractKitContract,
-    },
-  },
-  isZeroSyncMode: () => false,
-}))
+    isZeroSyncMode: () => false,
+  }
+})
 
 SendIntentAndroid.sendSms = jest.fn()
 
