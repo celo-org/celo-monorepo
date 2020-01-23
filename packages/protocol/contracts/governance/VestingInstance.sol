@@ -193,7 +193,6 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   function refundAndFinalize() external nonReentrant onlyRevokerAndRevoked {
     require(getRemainingLockedBalance() == 0, "Some of the vested gold is still locked");
     uint256 beneficiaryAmount = vestedBalanceAtRevoke.sub(totalWithdrawn);
-    require(beneficiaryAmount > 0, "beneficiary amount is zero");
     require(
       getGoldToken().transfer(beneficiary, beneficiaryAmount),
       "Transfer of gold to beneficiary failed"

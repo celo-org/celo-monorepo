@@ -403,21 +403,9 @@ contract('Vesting', (accounts: string[]) => {
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
     })
 
-    it('should revert when vesting amount per period is greater than total vesting amout', async () => {
-      const vestingSchedule = _.clone(vestingDefaultSchedule)
-      vestingSchedule.vestAmountPerPeriod = ONE_GOLDTOKEN.times(2)
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
-    })
-
     it('should revert when vesting period is zero', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingPeriodSec = 0
-      await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
-    })
-
-    it('should revert when vesting cliff is longer than vesting period', async () => {
-      const vestingSchedule = _.clone(vestingDefaultSchedule)
-      vestingSchedule.vestingCliff = 4 * MONTH
       await assertRevert(createNewVestingInstanceTx(vestingSchedule, web3))
     })
 
@@ -1478,12 +1466,21 @@ contract('Vesting', (accounts: string[]) => {
     let initialVestingAmount
 
     beforeEach(async () => {
-      vestingDefaultSchedule.vestingStartTime = Math.round(Date.now() / 1000)
-      await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
+      const vestingSchedule = _.clone(vestingDefaultSchedule)
+      vestingSchedule.vestingStartTime = Math.round(Date.now() / 1000)
+      await createNewVestingInstanceTx(vestingSchedule, web3)
       vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
       vestingInstance = await VestingInstance.at(vestingInstanceAddress)
-      initialVestingAmount = vestingDefaultSchedule.vestAmountPerPeriod.multipliedBy(
-        vestingDefaultSchedule.vestingNumPeriods
+      initialVestingAmount = vestingSchedule.vestAmountPerPeriod.multipliedBy(
+        vestingSchedule.vestingNumPeriods
+      )
+    })
+
+    it('should revert before the vesting cliff has passed', async () => {
+      const timeToTravel = 0.5 * HOUR
+      await timeTravel(timeToTravel, web3)
+      await assertRevert(
+        vestingInstance.withdraw(initialVestingAmount.div(20), { from: beneficiary })
       )
     })
 
@@ -1517,7 +1514,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('should allow the beneficiary to withdraw a quarter of the vested amount right after the beginning of the first quarter', async () => {
+      it('should allow the beneficiary to withdraw 25% of the vested amount right after the beginning of the first quarter', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 3 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1532,7 +1529,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('should allow the beneficiary to withdraw half the vested amount when half of the vesting periods have passed', async () => {
+      it('should allow the beneficiary to withdraw 50% the vested amount when half of the vesting periods have passed', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 6 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1547,7 +1544,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('should allow the beneficiary to withdraw three quarters of the vested amount right after the beginning of the third quarter', async () => {
+      it('should allow the beneficiary to withdraw 75% of the vested amount right after the beginning of the third quarter', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 9 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1562,7 +1559,7 @@ contract('Vesting', (accounts: string[]) => {
         )
       })
 
-      it('should allow the beneficiary to withdraw the entire amount right after the end of the vesting period', async () => {
+      it('should allow the beneficiary to withdraw 100% of the amount right after the end of the vesting period', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 12 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
@@ -1650,12 +1647,13 @@ contract('Vesting', (accounts: string[]) => {
     let initialVestingAmount
 
     beforeEach(async () => {
-      vestingDefaultSchedule.vestingStartTime = Math.round(Date.now() / 1000)
-      await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
+      const vestingSchedule = _.clone(vestingDefaultSchedule)
+      vestingSchedule.vestingStartTime = Math.round(Date.now() / 1000)
+      await createNewVestingInstanceTx(vestingSchedule, web3)
       vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
       vestingInstance = await VestingInstance.at(vestingInstanceAddress)
-      initialVestingAmount = vestingDefaultSchedule.vestAmountPerPeriod.multipliedBy(
-        vestingDefaultSchedule.vestingNumPeriods
+      initialVestingAmount = vestingSchedule.vestAmountPerPeriod.multipliedBy(
+        vestingSchedule.vestingNumPeriods
       )
     })
 
@@ -1666,28 +1664,28 @@ contract('Vesting', (accounts: string[]) => {
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return a quarter of the vested amount right after the beginning of the first quarter', async () => {
+    it('should return 25% of the vested amount right after the beginning of the first quarter', async () => {
       const timeToTravel = 3 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount.div(4)
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return half the vested amount right the beginning of the second quarter', async () => {
+    it('should return 50% the vested amount right the beginning of the second quarter', async () => {
       const timeToTravel = 6 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount.div(2)
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return three quarters of the vested amount right after the beginning of the third quarter', async () => {
+    it('should return 75% of the vested amount right after the beginning of the third quarter', async () => {
       const timeToTravel = 9 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount.multipliedBy(3).div(4)
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return the entire amount right after the end of the vesting period', async () => {
+    it('should return 100% of the amount right after the end of the vesting period', async () => {
       const timeToTravel = 12 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount
