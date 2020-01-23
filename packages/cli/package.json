@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.32-beta3",
+  "version": "0.0.34-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -31,8 +31,8 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.2.8-dev",
-    "@celo/utils": "0.1.5-dev",
+    "@celo/contractkit": "0.2.10-dev",
+    "@celo/utils": "0.1.6-dev",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
