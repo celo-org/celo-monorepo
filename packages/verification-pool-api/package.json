@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "^0.1.5",
-    "@celo/utils": "0.1.4",
+    "@celo/utils": "0.1.5",
     "bignumber.js": "^7.2.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",

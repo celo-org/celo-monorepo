@@ -1,5 +1,6 @@
 {
   "learnMore": "Saber más",
+  "equalToAmount": "Igual a {{amount}}",
   "whatIsGold": "Puede elegir guardar sus {{CeloDollars}} en Celo Oro",
   "manageCelo": "Administrar {{CeloDollars}}",
   "activity": "Actividad",
@@ -34,6 +35,6 @@
   "loadingExchangeRate": "Cargando Tasa de Cambio...",
   "errorRefreshingRate": "No se pudo actualizar el tipo de cambio",
   "exchangeRateChange": "El tipo de cambio ha cambiado, por favor vuelva a intentarlo",
-  "feeExchangeEducation":
-    "Cuando haces un cambio una pequeña comisión adicional se destina al mantenimiento del valor estable del Celo Dollar. Para saber más sobre las comisiones de Celo visita las FAQ."
+  "feeExchangeEducation": "Cuando haces un cambio una pequeña comisión adicional se destina al mantenimiento del valor estable del Celo Dollar. Para saber más sobre las comisiones de Celo visita las FAQ.",
+  "goldPrice": "Precio de oro"
 }

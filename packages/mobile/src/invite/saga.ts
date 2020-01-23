@@ -1,6 +1,5 @@
 import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { getEscrowContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -39,7 +38,7 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, web3 } from 'src/web3/contracts'
+import { addLocalAccount, contractKit, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
@@ -54,11 +53,11 @@ export async function getInviteTxGas(
   amount: string,
   comment: string
 ) {
-  const escrowContract = await getEscrowContract(web3)
+  const escrowContract = await contractKit.contracts.getEscrow()
   return getSendTxGas(account, currency, {
     amount,
     comment,
-    recipientAddress: escrowContract._address,
+    recipientAddress: escrowContract.address,
   })
 }
 

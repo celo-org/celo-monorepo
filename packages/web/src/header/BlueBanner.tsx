@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
-import Sentry from '../../fullstack/sentry'
+import { getSentry } from 'src/utils/sentry'
 
 interface Props {
   link: string
@@ -20,7 +20,11 @@ export class BlueBanner extends React.PureComponent<Props> {
   }
   render() {
     return (
-      <View ref={this.ref} style={[styles.container, this.props.isVisible && styles.isVisible]}>
+      <View
+        testID={'banner'}
+        ref={this.ref}
+        style={[styles.container, this.props.isVisible && styles.isVisible]}
+      >
         <View style={styles.insideContainer}>
           <Text
             accessibilityRole="link"
@@ -111,6 +115,7 @@ export default class Announcement extends React.Component<AnnouncementProps, Sta
 
       this.props.onVisibilityChange(visible)
     } catch (e) {
+      const Sentry = await getSentry()
       Sentry.captureException(e)
     }
   }

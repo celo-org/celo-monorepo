@@ -1,6 +1,6 @@
 import { PincodeType } from 'src/account/reducer'
 import { migrations } from 'src/redux/migrations'
-import { v0Schema, v1Schema, v2Schema, v3Schema, vNeg1Schema } from 'test/schemas'
+import { v0Schema, v1Schema, v2Schema, v3Schema, v4Schema, vNeg1Schema } from 'test/schemas'
 
 describe('Redux persist migrations', () => {
   it('work for v-1 to v0', () => {
@@ -67,5 +67,17 @@ describe('Redux persist migrations', () => {
     const migratedSchema = migrations[4](v3Stub)
     expect(migratedSchema.identity.startedVerification).toBeUndefined()
     expect(migratedSchema.identity.hasSeenVerificationNux).toBeTruthy()
+  })
+
+  it('work for v4 to v5', () => {
+    const v4Stub = {
+      ...v4Schema,
+      localCurrency: {
+        ...v4Schema.localCurrency,
+        exchangeRate: 1.33,
+      },
+    }
+    const migratedSchema = migrations[5](v4Stub)
+    expect(migratedSchema.localCurrency.exchangeRate).toEqual('1.33')
   })
 })

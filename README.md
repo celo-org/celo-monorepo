@@ -26,7 +26,7 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 [![docs](https://img.shields.io/badge/docs-up-green)](https://docs.celo.org/)
 [![Youtube](https://img.shields.io/badge/YouTube%20channel-up-green)](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 [![forum](https://img.shields.io/badge/forum-up-green)](https://forum.celo.org)
-[![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.gg/JvJ66Wc)
+[![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.gg/RfHQKtY)
 [![Twitter CeloDevs](https://img.shields.io/twitter/follow/celodevs?style=social)](https://twitter.com/celodevs)
 [![Twitter CeloHQ](https://img.shields.io/twitter/follow/celohq?style=social)](https://twitter.com/celohq)
 [![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/CeloHQ?style=social)](https://www.reddit.com/r/CeloHQ/)
@@ -45,7 +45,7 @@ Contents:
 
 - [Celo's Mission - Prosperity for All](#mission)
 - [The Celo Stack](#stack)
-- [Documentation](#documentation)
+- [Documentation](#docs)
 - [Issues](#issues)
 - [Repo Structure](#repo)
 - [Contributing](#contributing)
@@ -136,7 +136,7 @@ Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOW
 
 Feel free to jump on the Celo 🚂🚋🚋🚋. Improvements and contributions are highly encouraged! 🙏👊
 
-See the [contributing guide](CONTRIBUTING.md) for details on how to participate.
+See the [contributing guide](https://docs.celo.org/community/contributing) for details on how to participate.
 [![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/1%20hour%20tasks)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)
 
 Not yet ready to contribute but do like the project? Support Celo with a ⭐ or share the love in a [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fcelo.org%2F)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DkKggE5OvyhE&via=celohq&text=Checkout%20celo%21%20Love%20what%20they%20are%20building.&hashtags=celo)

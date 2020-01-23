@@ -18,6 +18,8 @@ interface ValidatorsExecArgv extends CeloEnvArgv {
   docker: string
   cmd: string
   only: number
+  from: number
+  to: number
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -41,6 +43,17 @@ export const builder = (argv: yargs.Argv) => {
       type: 'number',
       description: 'Index of the only node to exec on',
       default: null,
+    })
+    .option('from', {
+      type: 'number',
+      description: 'Index of the node to start on when exec-ing over a range',
+      default: 0,
+    })
+    .option('to', {
+      type: 'number',
+      description:
+        'Index of the node to end on when exec-ing over a range (not inclusive). Defaults to the max index for the nodeType',
+      default: -1,
     })
 }
 
@@ -69,9 +82,17 @@ export const handler = async (argv: ValidatorsExecArgv) => {
   // happen in parallel
   const instanceNames = []
   if (argv.only === null) {
+    let to: number = argv.to
+
+    if (to < 0) {
+      to = getNodeCount(argv.nodeType)
+    }
+
     const nodeCount = getNodeCount(argv.nodeType)
     console.info(`Node Count: ${nodeCount}`)
-    for (let i = 0; i < nodeCount; i++) {
+    console.info(`From Index: ${argv.from}`)
+    console.info(`To Index: ${to}`)
+    for (let i = argv.from; i < to; i++) {
       const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, i)
       instanceNames.push(instanceName)
     }
@@ -101,13 +122,13 @@ async function runSshCommand(instanceName: string, cmd: string) {
 function getNodeCount(nodeType: string) {
   switch (nodeType) {
     case 'validator':
-      return fetchEnv(envVar.VALIDATORS)
+      return parseInt(fetchEnv(envVar.VALIDATORS), 10)
     case 'tx-node':
-      return fetchEnv(envVar.TX_NODES)
+      return parseInt(fetchEnv(envVar.TX_NODES), 10)
     case 'bootnode':
       return 1
     case 'proxy':
-      return fetchEnv(envVar.PROXIED_VALIDATORS)
+      return parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
     default:
       throw new Error('Invalid node type')
   }

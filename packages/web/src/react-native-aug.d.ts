@@ -7,6 +7,7 @@ declare module 'react-native' {
     display?: 'list-item' | 'inline' | 'none' | 'inline-flex' | 'flex'
     transitionProperty?: string
     transitionDuration?: string
+    gridArea?: string
   }
 
   interface ViewStyle {
@@ -20,12 +21,16 @@ declare module 'react-native' {
     animationIterationCount?: 'infinite' | number
     animationKeyframes?: unknown[]
     animationTimingFunction?: string
-    scrollPadding?: number
+    gridArea?: string
+    gridRowGap?: string | number
+    gridColumnGap?: string | number
+    gridTemplateColumns?: string
     cursor?: string
-    display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item' | 'block'
+    display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item' | 'block' | 'grid'
     fill?: string
     filter?: string
     mixBlendMode?: 'multiply' | 'screen'
+    scrollPadding?: number
   }
 
   interface ImageProps {

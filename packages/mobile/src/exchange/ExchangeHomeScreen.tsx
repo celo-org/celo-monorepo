@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import BigNumber from 'bignumber.js'
@@ -8,16 +9,16 @@ import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import AccountOverview from 'src/components/AccountOverview'
 import { fetchExchangeRate } from 'src/exchange/actions'
-import Activity from 'src/exchange/Activity'
-import ExchangeRate from 'src/exchange/ExchangeRate'
+import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
+import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import TransactionsList from 'src/transactions/TransactionsList'
 import { getRateForMakerToken } from 'src/utils/currencyExchange'
 
 interface StateProps {
@@ -62,21 +63,21 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t, exchangeRate } = this.props
+    const { t } = this.props
 
     return (
       <SafeAreaView style={styles.background}>
         <ScrollContainer
-          heading={t('exchange')}
+          heading={t('global:gold')}
           testID="ExchangeScrollView"
           stickyHeaderIndices={[2]}
         >
           <DisconnectBanner />
           <View>
-            <AccountOverview testID="ExchangeAccountOverview" />
-            <View style={styles.lowerTop}>
-              <ExchangeRate rate={exchangeRate} makerToken={CURRENCY_ENUM.DOLLAR} />
-            </View>
+            <CeloGoldOverview testID="ExchangeAccountOverview" />
+            <ItemSeparator />
+            <CeloGoldHistoryChart />
+            <ItemSeparator />
             <View style={styles.buttonContainer}>
               <Button
                 text={t('buy')}
@@ -97,7 +98,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
           </View>
           <SectionHeadNew text={t('goldActivity')} />
           <View style={styles.activity}>
-            <Activity />
+            <TransactionsList currency={CURRENCY_ENUM.GOLD} />
           </View>
         </ScrollContainer>
       </SafeAreaView>
