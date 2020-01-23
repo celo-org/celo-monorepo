@@ -23,6 +23,7 @@ export const TYPE_PATH = `${ROOT}/typography`
 
 export const IMAGERY_PATH = `${ROOT}/key-imagery`
 export const ICONS_PATH = `${ROOT}/icons`
+export const COMPOSITION_PATH = `${ROOT}/composition`
 
 const PAGES = [
   {
@@ -59,10 +60,20 @@ const PAGES = [
     ],
   },
   {
+    title: 'Composition',
+    href: COMPOSITION_PATH,
+
+    sections: [
+      { title: 'Overview', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.overview}` },
+      { title: 'The Grid', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.grid}` },
+    ],
+  },
+  {
     title: 'Icons',
     href: ICONS_PATH,
     sections: [],
   },
+
   // {
   //   title: 'Key Imagery',
   //   href: IMAGERY_PATH,

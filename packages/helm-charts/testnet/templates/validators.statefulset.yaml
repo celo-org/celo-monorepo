@@ -48,7 +48,7 @@ spec:
 {{ include "common.init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command:
           - bash
           - "-c"
@@ -136,14 +136,14 @@ spec:
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command: ["/bin/sh"]
         args:
         - "-c"
         - |-
           set -euo pipefail
-          # Delete the private key as it is no longer needed
-          rm /root/.celo/pkey
+          # For idempotency, don't delete the private key.
+          # rm /root/.celo/pkey
 
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
@@ -151,7 +151,7 @@ spec:
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
 
           PROXIED_FLAGS=""
-          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` --nodiscover"
+          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` --nodiscover --proxy.allowprivateip"
 
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"

@@ -1,0 +1,29 @@
+overwrite: true
+schema: 'http://0.0.0.0:8080'
+documents: 'src/**/*.{ts,tsx}'
+generates:
+  src/apollo/types.ts:
+    plugins:
+      - 'add': |
+          /* 
+           * THIS FILE HAS BEEN GENERATED. DO NOT EDIT IT DIRECTLY. 
+           * 
+           * REGENERATE WITH:
+           * `yarn run build:gen-graphql-types`
+           */
+      - 'typescript'
+      - 'typescript-operations'
+      # Not using typescript-react-apollo for now
+      # since it duplicates gql expressions into the generated file
+      # - 'typescript-react-apollo'
+      - 'fragment-matcher'
+    config:
+      preResolveTypes: true
+      scalars:
+        Timestamp: number
+        Address: string
+        Decimal: string
+hooks:
+  afterAllFileWrite:
+    - tslint --fix
+    - prettier --write
