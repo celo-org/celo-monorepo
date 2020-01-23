@@ -23,12 +23,10 @@ import {
   privateKeyToPublicKey,
   Validator,
 } from './generate_utils'
-import { retrieveIPAddress } from './helm_deploy'
+import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { execCmd, execCmdWithExitOnFailure, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
-import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
-import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
