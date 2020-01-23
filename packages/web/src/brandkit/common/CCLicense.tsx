@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { withNamespaces } from 'react-i18next'
 import { Text } from 'react-native'
 
 import { brandStyles } from 'src/brandkit/common/constants'
-import { I18nProps, NameSpaces, Trans } from 'src/i18n'
+import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 
 import InlineAnchor from 'src/shared/InlineAnchor'
 import { CeloLinks } from 'src/shared/menu-items'

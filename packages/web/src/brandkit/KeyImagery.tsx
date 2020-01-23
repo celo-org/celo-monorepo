@@ -8,6 +8,7 @@ import PageHeadline from 'src/brandkit/common/PageHeadline'
 import Showcase from 'src/brandkit/common/Showcase'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import { hashNav } from 'src/shared/menu-items'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
@@ -19,7 +20,7 @@ const KeyImageryWrapped = withNamespaces(NameSpaces.brand)(
   React.memo(function KeyImagery({ t }: I18nProps) {
     return (
       <Page
-        title={'keyImagery.title'}
+        title={t('keyImagery.title')}
         metaDescription={t('keyImagery.headline')}
         path={IMAGERY_PATH}
         sections={[
@@ -32,7 +33,7 @@ const KeyImageryWrapped = withNamespaces(NameSpaces.brand)(
             children: <Illustrations />,
           },
           { id: brandImagery.graphics, children: <AbstractGraphics /> },
-        ]}
+        ]} { }
       />
     )
   })
@@ -51,8 +52,21 @@ const Overview = React.memo(
   })
 )
 
+function useIlloSize() {
+  const screen = useScreenSize()
+  switch (screen) {
+    case ScreenSizes.DESKTOP:
+      return 340
+    case ScreenSizes.MOBILE:
+      return '100%'
+    case ScreenSizes.TABLET:
+      return 222
+  }
+}
+
 const Illustrations = React.memo(
   withNamespaces(NameSpaces.brand)(function _Illustrations({ t }: I18nProps) {
+    const size = useIlloSize()
     return (
       <View style={[brandStyles.gap, standardStyles.blockMarginTopTablet]}>
         <H2 style={standardStyles.elementalMarginBottom}>{t('keyImagery.illoTitle')}</H2>
@@ -68,17 +82,17 @@ const Illustrations = React.memo(
             }
 
             return (
-              <View style={brandStyles.tiling}>
+              <View style={[brandStyles.tiling, { justifyContent: 'space-between' }]}>
                 {data.map((illo) => (
                   <Showcase
-                    ratio={1}
+                    ratio={1.3}
                     key={illo.name}
                     description={illo.description}
                     name={illo.name}
                     preview={{ uri: illo.preview }}
                     uri={illo.uri}
                     loading={false}
-                    size={220}
+                    size={size}
                   />
                 ))}
               </View>
@@ -93,10 +107,10 @@ const Illustrations = React.memo(
 const AbstractGraphics = React.memo(
   withNamespaces(NameSpaces.brand)(function _AbstractGraphics({ t }: I18nProps) {
     return (
-      <View style={[brandStyles.gap, standardStyles.blockMarginTop]}>
+      <View style={[brandStyles.gap, standardStyles.sectionMarginTop]}>
         <H2 style={standardStyles.elementalMarginBottom}>{t('keyImagery.abstractTitle')}</H2>
         <Text style={fonts.p}>{t('keyImagery.abstractText')}</Text>
-        <Fetch query="/brand/api/assets/Illustrations">
+        <Fetch query="/brand/api/assets/Abstract Graphics">
           {({ loading, data, error }) => {
             if (loading) {
               return <Loading />
@@ -117,7 +131,7 @@ const AbstractGraphics = React.memo(
                     preview={{ uri: illo.preview }}
                     uri={illo.uri}
                     loading={false}
-                    size={340}
+                    size={'100%'}
                   />
                 ))}
               </View>

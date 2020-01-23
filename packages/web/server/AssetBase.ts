@@ -36,7 +36,6 @@ function fetchAssets(sheet: AssetSheet) {
     })
     .all()
     .then((records) => {
-      console.log(records)
       return records.map((r) => normalize(r.fields))
     })
 }
@@ -58,7 +57,7 @@ function normalize(asset: Fields) {
 }
 
 function getPreview(asset: Fields) {
-  const previewField = asset[ASSSET_FIELD_LIGHT] || asset.Preview
+  const previewField = asset.Preview || asset[ASSSET_FIELD_LIGHT]
 
   return (
     (previewField &&
