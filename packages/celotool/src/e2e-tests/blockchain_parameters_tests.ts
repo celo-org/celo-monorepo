@@ -5,11 +5,13 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
 import { assert } from 'chai'
+import yargs from 'yargs'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const rpcURL = 'http://localhost:8545'
+const gethRepoPath = yargs.argv.localgeth as string
 
 describe('Blockchain parameters tests', function(this: any) {
   this.timeout(0)
@@ -18,7 +20,7 @@ describe('Blockchain parameters tests', function(this: any) {
   let parameters: BlockchainParametersWrapper
 
   const gethConfig: GethRunConfig = {
-    gethRepoPath: '../../../celo-blockchain',
+    gethRepoPath,
     migrateTo: 18,
     migrate: true,
     runPath: TMP_PATH,

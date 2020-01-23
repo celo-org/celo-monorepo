@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
+import yargs from 'yargs'
 import { initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
@@ -7,6 +8,7 @@ import { getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
+const gethRepoPath = yargs.argv.localgeth as string
 
 describe('sync tests', function(this: any) {
   this.timeout(0)
@@ -15,7 +17,7 @@ describe('sync tests', function(this: any) {
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
-    gethRepoPath: '../../../celo-blockchain',
+    gethRepoPath,
     migrate: true,
     verbosity: 1,
     instances: [],
