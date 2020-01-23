@@ -210,9 +210,9 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       (e: EventLog): AccountSlashed => ({
         epochNumber,
         slashed: e.returnValues.slashed,
-        penalty: e.returnValues.penalty,
+        penalty: valueToBigNumber(e.returnValues.penalty),
         reporter: e.returnValues.reporter,
-        reward: e.returnValues.reward,
+        reward: valueToBigNumber(e.returnValues.reward),
       })
     )
   }

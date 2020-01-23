@@ -69,6 +69,7 @@ export default class Show extends BaseCommand {
     let validatorGroupRewards: ValidatorReward[] = []
     let accountsSlashed: AccountSlashed[] = []
 
+    cli.action.start(`Calculating rewards`)
     // Accumulate the rewards from each epoch
     for (
       let epochNumber = Math.max(0, currentEpoch - epochs);
@@ -142,6 +143,7 @@ export default class Show extends BaseCommand {
         )
       }
     }
+    cli.action.stop()
 
     // At the end of each epoch: R, the total amount of rewards in gold to be allocated to stakers
     // for this epoch is programmatically derived from considering the tradeoff between paying rewards

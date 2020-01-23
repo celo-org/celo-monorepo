@@ -112,6 +112,7 @@ export default class ValidatorStatus extends BaseCommand {
       this.getStatus(s, blocks, electionCache, frontRunnerSigners)
     )
     cli.action.stop()
+
     cli.table(validatorStatuses, statusTable, { 'no-truncate': !res.flags.truncate })
   }
 
