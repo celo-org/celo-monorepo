@@ -236,7 +236,6 @@ describe('governance tests', () => {
     const encryptedKeystore = JSON.parse(Buffer.from(encryptedKeystore64, 'base64').toString())
     // The validator group ID is the validator group keystore encrypted with validator 0's
     // private key.
-    // @ts-ignore
     const encryptionKey = `0x${gethConfig.instances[0].privateKey}`
     const decryptedKeystore = web3.eth.accounts.decrypt(encryptedKeystore, encryptionKey)
     return decryptedKeystore.privateKey
