@@ -103,7 +103,10 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
         ? makerAmountInWei
         : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
 
-    const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
+    const exchange: ExchangeWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getExchange,
+    ])
 
     const [dollarMakerExchangeRate, goldMakerExchangeRate]: [BigNumber, BigNumber] = yield all([
       call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
@@ -175,9 +178,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const updatedExchangeRate: BigNumber = yield call(
       // Updating with actual makerAmount, rather than conservative estimate displayed
-      exchangeContract.getExchangeRate,
+      [exchangeContract, exchangeContract.getExchangeRate],
       convertedMakerAmount,
-      makerToken !== CURRENCY_ENUM.GOLD
+      sellGold
     )
 
     const exceedsExpectedSize =
