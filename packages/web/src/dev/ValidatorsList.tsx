@@ -1,12 +1,13 @@
 import { BigNumber } from 'bignumber.js'
 import * as React from 'react'
-import { Clipboard, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import css from 'src/dev/ValidatorsList.scss'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
+import { formatNumber, cutAddress, copyToClipboad, weiToDecimal } from 'src/utils/utils'
 
 interface ValidatorsListProps {
   data: any
@@ -14,24 +15,12 @@ interface ValidatorsListProps {
 }
 
 export interface State {
-  expanded?: number
+  expanded: number | undefined
 }
 
 class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nProps, State> {
   state = {
     expanded: undefined,
-  }
-
-  cutAddress(address: string) {
-    return address.toUpperCase().replace(/^0x([a-f0-9]{4}).+([a-f0-9]{4})$/i, '0x$1...$2')
-  }
-
-  formatNumber(n: number, decimals: number = Infinity) {
-    return isNaN(+n) ? 'n/a' : (+n).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  }
-
-  copyAddress(address: string) {
-    Clipboard.setString(address)
   }
 
   expand(expanded: number) {
@@ -54,8 +43,8 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
         return {
           name: (gName || '').length <= 20 ? gName : `${gName.substr(0, 17)}...`,
           address: group.address,
-          usd: group.usd / 10 ** 18,
-          gold: group.lockedGold / 10 ** 18,
+          usd: weiToDecimal(group.usd),
+          gold: weiToDecimal(group.lockedGold),
           votes: new BigNumber(votes)
             .dividedBy(totalVotes)
             .multipliedBy(100)
@@ -71,8 +60,8 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             return {
               name: (name || '').length <= 20 ? name : `${name.substr(0, 17)}...`,
               address,
-              usd: usd / 10 ** 18,
-              gold: lockedGold / 10 ** 18,
+              usd: weiToDecimal(usd),
+              gold: weiToDecimal(lockedGold),
               elected: elected === latestBlock,
               online: online === latestBlock,
               uptime: (+score * 100) / 10 ** 24,
@@ -157,26 +146,15 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                       {group.online}
                     </td>
                     <td>
-                      {this.cutAddress(group.address)}
-                      <span
-                        className={css.copy}
-                        onClick={this.copyAddress.bind(this, group.address)}
-                      >
+                      {cutAddress(group.address)}
+                      <span className={css.copy} onClick={copyToClipboad.bind(this, group.address)}>
                         copy
                       </span>
                     </td>
-                    <td className={css['table__cell--center']}>
-                      {this.formatNumber(group.votes, 2)}%
-                    </td>
-                    <td className={css['table__cell--center']}>
-                      {this.formatNumber(group.usd, 2)}
-                    </td>
-                    <td className={css['table__cell--center']}>
-                      {this.formatNumber(group.gold, 2)}
-                    </td>
-                    <td className={css['table__cell--center']}>
-                      {this.formatNumber(group.uptime, 1)}%
-                    </td>
+                    <td className={css['table__cell--center']}>{formatNumber(group.votes, 2)}%</td>
+                    <td className={css['table__cell--center']}>{formatNumber(group.usd, 2)}</td>
+                    <td className={css['table__cell--center']}>{formatNumber(group.gold, 2)}</td>
+                    <td className={css['table__cell--center']}>{formatNumber(group.uptime, 1)}%</td>
                   </tr>
                   {i === expanded && (
                     <tr>
@@ -225,22 +203,22 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                                       />
                                     </td>
                                     <td>
-                                      {this.cutAddress(validator.address)}
+                                      {cutAddress(validator.address)}
                                       <span
                                         className={css.copy}
-                                        onClick={this.copyAddress.bind(this, validator.address)}
+                                        onClick={copyToClipboad.bind(this, validator.address)}
                                       >
                                         copy
                                       </span>
                                     </td>
                                     <td className={css['table__cell--center']}>
-                                      {this.formatNumber(validator.usd, 2)}
+                                      {formatNumber(validator.usd, 2)}
                                     </td>
                                     <td className={css['table__cell--center']}>
-                                      {this.formatNumber(validator.gold, 2)}
+                                      {formatNumber(validator.gold, 2)}
                                     </td>
                                     <td className={css['table__cell--center']}>
-                                      {this.formatNumber(validator.uptime, 1)}%
+                                      {formatNumber(validator.uptime, 1)}%
                                     </td>
                                   </tr>
                                 ))}

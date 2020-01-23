@@ -1,4 +1,5 @@
 import NetworkSpeed from 'network-speed'
+import { Clipboard } from 'react-native'
 
 export function randomIntegerInRange(min: number, max: number) {
   return Math.round(Math.random() * (max - min + 1)) + min
@@ -105,4 +106,20 @@ export function getDeviceMemory(): MemoryGB {
 
 export function isBrowser() {
   return process.browser
+}
+
+export function cutAddress(address: string) {
+  return address.toUpperCase().replace(/^0x([a-f0-9]{4}).+([a-f0-9]{4})$/i, '0x$1...$2')
+}
+
+export function formatNumber(n: number, decimals: number = Infinity) {
+  return isNaN(+n) ? 'n/a' : (+n).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+export function copyToClipboad(text: string) {
+  Clipboard.setString(text)
+}
+
+export function weiToDecimal(number: number) {
+  return number / 10 ** 18
 }
