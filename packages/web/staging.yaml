@@ -3,8 +3,8 @@ env: standard
 service: website-staging
 instance_class: F2
 env_variables:
-  NODE_ENV: "production"
-  DEPLOY_ENV: "staging"
+  NODE_ENV: 'production'
+  DEPLOY_ENV: 'staging'
 
 handlers:
   - url: /_next/static
@@ -12,6 +12,9 @@ handlers:
 
   - url: /static
     static_dir: static
+
+  - url: /public
+    static_dir: public
 
   - url: /.*
     script: auto
