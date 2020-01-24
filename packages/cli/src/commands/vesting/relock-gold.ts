@@ -60,7 +60,7 @@ export default class RelockGold extends BaseCommand {
       )
       .runChecks()
 
-    const txos = await vestingInstance.relockGold(vestingInstance.address, relockValue)
+    const txos = await vestingInstance.relockGold(relockValue)
     for (const txo of txos) {
       await displaySendTx('relock', txo, { from: await vestingInstance.getBeneficiary() })
     }

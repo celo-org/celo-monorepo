@@ -1,9 +1,12 @@
 import { NULL_ADDRESS } from '@celo/contractkit'
 import { Address } from '@celo/utils/lib/address'
+import { flags } from '@oclif/command'
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Withdraw extends BaseCommand {
   static description = 'Withdraws gold from vesting instance as per vesting schedule.'
@@ -11,6 +14,7 @@ export default class Withdraw extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
+    value: flags.string({ ...LockedGoldArgs.valueArg, required: true }),
   }
 
   static args = []
@@ -22,6 +26,7 @@ export default class Withdraw extends BaseCommand {
   async run() {
     const res = this.parse(Withdraw)
     const address: Address = res.flags.from
+    const value = new BigNumber(res.flags.value)
 
     this.kit.defaultAccount = address
 
@@ -39,7 +44,7 @@ export default class Withdraw extends BaseCommand {
       )
       .runChecks()
 
-    await displaySendTx('withdraw', vestingInstance.withdraw(), {
+    await displaySendTx('withdraw', vestingInstance.withdraw(value.toFixed()), {
       from: await vestingInstance.getBeneficiary(),
     })
   }
