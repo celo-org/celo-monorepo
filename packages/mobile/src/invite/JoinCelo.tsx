@@ -16,6 +16,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
+import { setPromptZeroSync } from 'src/geth/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -33,6 +34,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
+  setPromptZeroSync: typeof setPromptZeroSync
   showError: typeof showError
   hideAlert: typeof hideAlert
   setPhoneNumber: typeof setPhoneNumber
@@ -49,6 +51,7 @@ interface State {
 }
 
 const mapDispatchToProps = {
+  setPromptZeroSync,
   setPhoneNumber,
   setName,
   showError,
@@ -136,6 +139,7 @@ export class JoinCelo extends React.Component<Props, State> {
       return
     }
 
+    this.props.setPromptZeroSync(true) // Allow zero sync prompt after Welcome screen
     this.props.setPhoneNumber(e164Number, countryCode)
     this.props.setName(name)
     this.goToNextScreen()
