@@ -1,5 +1,13 @@
+import chalk from 'chalk'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
+
+export const table = {
+  index: {},
+  votes: {},
+  name: {},
+  address: {},
+}
 
 export default class ElectionCompare extends BaseCommand {
   static description =
@@ -10,7 +18,6 @@ export default class ElectionCompare extends BaseCommand {
   }
 
   async run() {
-    // const res = this.parse(ElectionCompare)
     cli.action.start('Running mock election')
 
     const accounts = await this.kit.contracts.getAccounts()
@@ -35,11 +42,9 @@ export default class ElectionCompare extends BaseCommand {
 
     const sorted = elected.sort((a, b) => b.votes - a.votes)
 
-    for (let i = 0; i < sorted.length; i++) {
-      console.log(i + 1, sorted[i].name, sorted[i].address, sorted[i].votes)
-      if (i === 99) {
-        console.log('-------------------------------------------------------------------')
-      }
-    }
+    cli.table(
+      sorted.map((a, i) => ({ ...a, index: i < 100 ? i + 1 : chalk.gray((i + 1).toString()) })),
+      table
+    )
   }
 }
