@@ -319,7 +319,7 @@ jobs:
             set -euo pipefail
             yarn run jetify
             cd packages/mobile/android
-            ENVFILE=.env.test ./gradlew assembleDebug
+            ENVFILE=.env ./gradlew assembleDebug
             cd -
 
   mobile-test:
