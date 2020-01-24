@@ -1,0 +1,8 @@
+{
+  "mode": "modules",
+  "exclude": ["**/generated/*.ts", "**/*+(index|.test).ts"],
+  "excludeNotExported": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "ignoreCompilerErrors": true
+}
