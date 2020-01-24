@@ -472,9 +472,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       (e: EventLog, index: number): ValidatorReward => ({
         epochNumber,
         validator: validator[index],
-        validatorPayment: e.returnValues.validatorPayment,
+        validatorPayment: valueToBigNumber(e.returnValues.validatorPayment),
         group: validatorGroup[index],
-        groupPayment: e.returnValues.groupPayment,
+        groupPayment: valueToBigNumber(e.returnValues.groupPayment),
       })
     )
   }

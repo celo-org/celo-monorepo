@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
@@ -406,7 +406,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       (e: EventLog, index: number): GroupVoterReward => ({
         epochNumber,
         group: validatorGroup[index],
-        groupVoterPayment: e.returnValues.value,
+        groupVoterPayment: valueToBigNumber(e.returnValues.value),
       })
     )
   }
@@ -421,7 +421,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const voter = await this.getVoter(address, blockNumber)
     const activeVoterVotes: Record<string, BigNumber> = {}
     for (const vote of voter.votes) {
-      const group: string = vote.group.toLowerCase()
+      const group: string = normalizeAddress(vote.group)
       activeVoterVotes[group] = vote.active
     }
     const activeGroupVotes: Record<string, BigNumber> = await concurrentValuesMap(
@@ -432,13 +432,15 @@ export class ElectionWrapper extends BaseWrapper<Election> {
 
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
     const voterRewards = groupVoterRewards.filter(
-      (e: GroupVoterReward) => e.group.address.toLowerCase() in activeVoterVotes
+      (e: GroupVoterReward) => normalizeAddress(e.group.address) in activeVoterVotes
     )
     return voterRewards.map(
       (e: GroupVoterReward): VoterReward => ({
         address,
         addressPayment: e.groupVoterPayment.times(
-          activeVoterVotes[e.group.address].dividedBy(activeGroupVotes[e.group.address])
+          activeVoterVotes[normalizeAddress(e.group.address)].dividedBy(
+            activeGroupVotes[normalizeAddress(e.group.address)]
+          )
         ),
         group: e.group,
         epochNumber: e.epochNumber,
