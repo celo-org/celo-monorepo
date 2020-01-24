@@ -1,9 +1,11 @@
 // Not intended for publication.  Used only as scaffolding to develop contractkit.
+import { Address } from '@celo/contractkit'
 import { mapAddressListDataOnto } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
+import { displaySendTx } from '../../utils/cli'
 
 export default class Slasher extends BaseCommand {
   static description = 'Slashes for downtime'
@@ -73,12 +75,13 @@ export default class Slasher extends BaseCommand {
               console.info(`Validator:${i}: "${validator.name}" missing from block ${blockNumber}`)
             } else if (blockNumber - validatorDownSince[i] >= slashableDowntime) {
               const downtime = blockNumber - validatorDownSince[i]
-              validatorDownSince[i] = -1
               const validator = await validators.getValidatorFromSigner(validatorSigners[i])
               console.info(
                 `Validator:${i}: "${validator.name}" slashing for downtime=${downtime} at ${blockNumber}`
               )
-              await downtimeSlasher.slashEndSignerIndex(blockNumber, i)
+              const slashTx = await downtimeSlasher.slashEndSignerIndex(blockNumber, i)
+              await displaySendTx('slashing', slashTx)
+              validatorDownSince[i] = -1
             }
           }
         }

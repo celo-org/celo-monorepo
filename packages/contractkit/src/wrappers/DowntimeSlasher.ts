@@ -52,11 +52,12 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     validatorAddress: Address,
     startBlock: number
   ): Promise<CeloTransactionObject<void>> {
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidator(validatorAddress)
     return this.slashStartSignerIndex(
       startBlock,
-      findAddressIndex(validator.signer, await validators.getValidatorSignerAddressSet(startBlock))
+      findAddressIndex(validator.signer, await election.getValidatorSigners(startBlock))
     )
   }
 
@@ -69,8 +70,9 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     startBlock: number,
     startSignerIndex: number
   ): Promise<CeloTransactionObject<void>> {
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const signer = await validators.validatorSignerAddressFromSet(startSignerIndex, startBlock)
+    const signer = await election.validatorSignerAddressFromSet(startSignerIndex, startBlock)
     const startEpoch = await this.kit.getEpochNumberOfBlock(startBlock)
     // Follows DowntimeSlasher.getEndBlock()
     const endBlock = startBlock + (await this.slashableDowntime()) - 1
@@ -78,7 +80,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const endSignerIndex =
       startEpoch === endEpoch
         ? startSignerIndex
-        : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(endBlock))
+        : findAddressIndex(signer, await election.getValidatorSigners(endBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator, startBlock, startSignerIndex, endSignerIndex)
   }
@@ -92,8 +94,9 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     endBlock: number,
     endSignerIndex: number
   ): Promise<CeloTransactionObject<void>> {
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const signer = await validators.validatorSignerAddressFromSet(endSignerIndex, endBlock)
+    const signer = await election.validatorSignerAddressFromSet(endSignerIndex, endBlock)
     const endEpoch = await this.kit.getEpochNumberOfBlock(endBlock)
     // Reverses DowntimeSlasher.getEndBlock()
     const startBlock = endBlock - (await this.slashableDowntime()) + 1
@@ -101,7 +104,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const startSignerIndex =
       startEpoch === endEpoch
         ? endSignerIndex
-        : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(startBlock))
+        : findAddressIndex(signer, await election.getValidatorSigners(startBlock))
     const validator = await validators.getValidatorFromSigner(signer)
     return this.slash(validator, startBlock, startSignerIndex, endSignerIndex)
   }

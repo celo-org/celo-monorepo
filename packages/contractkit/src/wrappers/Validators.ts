@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
-import { range, zip } from '@celo/utils/lib/collections'
+import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3/types'
@@ -499,40 +499,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const signerAddresses = await this.currentSignerSet()
     const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
     return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
-  }
-
-  /**
-   * Gets the size of the validator set that must sign the given block number.
-   * @param blockNumber Block number to retrieve the validator set from.
-   * @return Size of the validator set.
-   */
-  numberValidatorsInSet: (blockNumber: number) => Promise<number> = proxyCall(
-    this.contract.methods.numberValidatorsInSet,
-    undefined,
-    valueToInt
-  )
-
-  /**
-   * Gets a validator address from the validator set at the given block number.
-   * @param index Index of requested validator in the validator set.
-   * @param blockNumber Block number to retrieve the validator set from.
-   * @return Address of validator at the requested index.
-   */
-  validatorSignerAddressFromSet: (
-    signerIndex: number,
-    blockNumber: number
-  ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
-
-  /**
-   * Returns the signers for block `blockNumber`.
-   * @param blockNumber Block number to retrieve signers for.
-   * @return Address of each signer in the validator set.
-   */
-  async getValidatorSignerAddressSet(blockNumber: number): Promise<Address[]> {
-    const numValidators = await this.numberValidatorsInSet(blockNumber)
-    return concurrentMap(10, range(0, numValidators, 1), (i) =>
-      this.validatorSignerAddressFromSet(i, blockNumber)
-    )
   }
 
   /**

@@ -27,11 +27,14 @@ _See code: [packages/cli/src/commands/rewards/show.ts](https://github.com/celo-o
 
 ### Slasher
 
-Mines for slashable downtime
+Slashes for downtime
 
 ```
 USAGE
   $ celocli rewards:slasher
+
+OPTIONS
+  --slashableDowntime=slashableDowntime  Downtime to slash for
 
 EXAMPLE
   slasher
