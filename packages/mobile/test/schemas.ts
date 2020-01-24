@@ -63,7 +63,6 @@ export const vNeg1Schema = {
   geth: {
     initialized: 'INITIALIZED',
     connected: true,
-    promptZeroSyncIfNeeded: false,
   },
   identity: {
     attestationCodes: [],
@@ -236,6 +235,10 @@ export const v5Schema = {
   localCurrency: {
     ...v4Schema.localCurrency,
     exchangeRate: '1.33',
+  },
+  geth: {
+    ...v4Schema.geth,
+    promptZeroSyncIfNeeded: false,
   },
 }
 
