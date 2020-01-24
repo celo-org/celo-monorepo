@@ -7,6 +7,8 @@ export const table = {
   votes: {},
   name: {},
   address: {},
+  groupName: {},
+  affiliation: {},
 }
 
 export default class ElectionCompare extends BaseCommand {
@@ -30,11 +32,18 @@ export default class ElectionCompare extends BaseCommand {
 
     for (const el of groups) {
       const group = await validators.getValidatorGroup(el.address, false)
+      const groupName = await accounts.getName(el.address)
       const votes = el.votes.shiftedBy(-18).toNumber()
       for (let i = 0; i < group.members.length; i++) {
         const member = group.members[i]
         const name = await accounts.getName(member)
-        elected.push({ address: member, name, votes: votes / (i + 1) })
+        elected.push({
+          address: member,
+          name,
+          votes: votes / (i + 1),
+          affiliation: el.address,
+          groupName,
+        })
       }
     }
 

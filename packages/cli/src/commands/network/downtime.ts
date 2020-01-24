@@ -80,7 +80,7 @@ export default class Analyze extends BaseCommand {
     for (let i = block; i <= endBlock; i++) {
       const bitmap = new BigNumber(
         // @ts-ignore
-        await slasher.methods.getParentSealBitmap(i + 1).call({}, endBlock + 2)
+        await slasher.methods.getParentSealBitmap(i + 1).call({}, i + 2)
       )
       const binary = bitmap.toString(2)
       const epoch = parseInt(await slasher.methods.getEpochNumberOfBlock(i).call(), 10)
