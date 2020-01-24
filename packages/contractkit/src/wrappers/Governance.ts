@@ -342,11 +342,12 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
-   * Returns the proposal dequeue as list of proposal IDs.
+   * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
-    arrayObject.map(valueToBigNumber)
-  )
+  async getDequeue() {
+    const dequeue = await this.contract.methods.getDequeue().call()
+    return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
+  }
 
   /**
    * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
