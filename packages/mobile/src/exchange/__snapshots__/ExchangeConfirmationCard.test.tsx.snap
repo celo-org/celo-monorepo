@@ -381,18 +381,6 @@ exports[`renders correctly with giant numbers 1`] = `
           />
         </View>
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 20,
-          }
-        }
-      >
-        0.01
-      </Text>
     </View>
   </View>
   <View
@@ -908,18 +896,6 @@ exports[`renders correctly with no exchange rate 1`] = `
           />
         </View>
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 20,
-          }
-        }
-      >
-        0.01
-      </Text>
     </View>
   </View>
   <View

@@ -60,7 +60,7 @@ export interface RawAirTableEvent {
 export default async function getFormattedEvents() {
   const eventData = await Promise.race([
     cache('events-list-at', fetchEventsFromAirtable),
-    abort('Events from Airtable', 1000),
+    abort('Events from Airtable', 2000),
   ])
   return splitEvents(normalizeEvents(eventData as RawAirTableEvent[]))
 }

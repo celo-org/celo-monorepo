@@ -52,6 +52,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
     this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.COMPLETED)
     Logger.showMessage(this.props.t('requestPaid'))
     CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
+    navigate(Screens.WalletHome)
   }
 
   onPaymentDecline = () => {
