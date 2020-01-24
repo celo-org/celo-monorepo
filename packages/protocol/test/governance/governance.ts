@@ -1382,6 +1382,10 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
+    it.only('should revert when the index is out of bounds', async () => {
+      await assertRevert(governance.approve(proposalId, index + 1))
+    })
+
     it('should revert if the proposal id does not match the index', async () => {
       await governance.propose(
         [transactionSuccess1.value],
@@ -1530,6 +1534,10 @@ contract('Governance', (accounts: string[]) => {
     it('should revert when the account weight is 0', async () => {
       await mockLockedGold.setAccountTotalLockedGold(account, 0)
       await assertRevert(governance.vote(proposalId, index, value))
+    })
+
+    it.only('should revert when the index is out of bounds', async () => {
+      await assertRevert(governance.vote(proposalId, index + 1, value))
     })
 
     it('should revert if the proposal id does not match the index', async () => {
@@ -1724,6 +1732,10 @@ contract('Governance', (accounts: string[]) => {
               participationBaseline: expectedParticipationBaseline,
             },
           })
+        })
+
+        it.only('should revert when the index is out of bounds', async () => {
+          await assertRevert(governance.execute(proposalId, index + 1))
         })
       })
 

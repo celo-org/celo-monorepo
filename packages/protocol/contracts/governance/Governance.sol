@@ -1056,6 +1056,7 @@ contract Governance is
     uint256 proposalId,
     uint256 index
   ) private view returns (bool) {
+    require(index < dequeued.length);
     return proposal.exists() && dequeued[index] == proposalId;
   }
 
