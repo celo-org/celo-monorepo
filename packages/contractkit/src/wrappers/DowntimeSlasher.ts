@@ -10,6 +10,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { Validator } from './Validators'
 
 /**
  * Contract handling slashing for Validator downtime
@@ -79,7 +80,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
         ? startSignerIndex
         : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(endBlock))
     const validator = await validators.getValidatorFromSigner(signer)
-    return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
+    return this.slash(validator, startBlock, startSignerIndex, endSignerIndex)
   }
 
   /**
@@ -102,7 +103,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
         ? endSignerIndex
         : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(startBlock))
     const validator = await validators.getValidatorFromSigner(signer)
-    return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
+    return this.slash(validator, startBlock, startSignerIndex, endSignerIndex)
   }
 
   /**
@@ -113,7 +114,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    * @param endSignerIndex Validator index at the last block.
    */
   async slash(
-    validator: Address,
+    validator: Validator,
     startBlock: number,
     startSignerIndex: number,
     endSignerIndex: number
@@ -123,7 +124,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const membership = await validators.getValidatorMembershipHistoryIndex(validator, startBlock)
     const lockedGold = await this.kit.contracts.getLockedGold()
     const slashValidator = await lockedGold.computeParametersForSlashing(
-      validator,
+      validator.address,
       incentives.penalty
     )
     const slashGroup = await lockedGold.computeParametersForSlashing(

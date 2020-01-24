@@ -69,8 +69,14 @@ contract UsingPrecompiles {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
-    uint256 sz = getEpochSize();
-    return blockNumber.sub(1) / sz;
+    uint256 epochSize = getEpochSize();
+    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    uint256 epochNumber = blockNumber / epochSize;
+    if (blockNumber % epochSize == 0) {
+      return epochNumber;
+    } else {
+      return epochNumber + 1;
+    }
   }
 
   /**

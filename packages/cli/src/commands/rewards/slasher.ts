@@ -2,13 +2,15 @@
 import { mapAddressListDataOnto } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 
 export default class Slasher extends BaseCommand {
-  static description = 'Mines for slashable downtime'
+  static description = 'Slashes for downtime'
 
   static flags = {
     ...BaseCommand.flags,
+    slashableDowntime: flags.integer({ description: 'Downtime to slash for' }),
   }
 
   static args = []
@@ -16,13 +18,16 @@ export default class Slasher extends BaseCommand {
   static examples = ['slasher']
 
   async run() {
-    this.parse(Slasher)
+    const res = this.parse(Slasher)
     const validators = await this.kit.contracts.getValidators()
     const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
-    const slashableDowntime = await downtimeSlasher.slashableDowntime()
+    const slashableDowntime =
+      res.flags.slashableDowntime || (await downtimeSlasher.slashableDowntime())
+    let validatorSigners: Address[] = []
     let validatorDownSince: number[] = []
     let blockNumber = (await this.kit.web3.eth.getBlockNumber()) - 1
     let epochNumber = -2
+    console.info(`Slashing for downtime >= ${slashableDowntime} ...`)
 
     while (true) {
       const newBlockNumber = await this.kit.web3.eth.getBlockNumber()
@@ -35,6 +40,7 @@ export default class Slasher extends BaseCommand {
           console.info(`New epoch: ${epochNumber}`)
           const oldEpochSigners = await validators.getValidatorSignerAddressSet(blockNumber - 1)
           const newEpochSigners = await validators.getValidatorSignerAddressSet(blockNumber)
+          validatorSigners = newEpochSigners
           validatorDownSince = await mapAddressListDataOnto(
             validatorDownSince,
             oldEpochSigners,
@@ -47,21 +53,31 @@ export default class Slasher extends BaseCommand {
         console.info(`New block: ${blockNumber}`)
 
         const istanbulExtra = parseBlockExtraData(block.extraData)
-        const round = istanbulExtra.aggregatedSeal.round.toNumber()
-        console.info(`Round: ${round}`)
+        const seal = istanbulExtra.aggregatedSeal
 
         for (let i = 0; i < validatorDownSince.length; i++) {
-          const validatorUp = bitIsSet(istanbulExtra.aggregatedSeal.bitmap, i)
+          const validatorUp = bitIsSet(seal.bitmap, i)
           if (validatorUp) {
             if (validatorDownSince[i] >= 0) {
+              const downtime = blockNumber - validatorDownSince[i]
               validatorDownSince[i] = -1
+              const validator = await validators.getValidatorFromSigner(validatorSigners[i])
+              console.info(
+                `Validator:${i}: "${validator.name}" back at block ${blockNumber}, downtime=${downtime}`
+              )
             }
           } else {
             if (validatorDownSince[i] < 0) {
               validatorDownSince[i] = blockNumber
+              const validator = await validators.getValidatorFromSigner(validatorSigners[i])
+              console.info(`Validator:${i}: "${validator.name}" missing from block ${blockNumber}`)
             } else if (blockNumber - validatorDownSince[i] >= slashableDowntime) {
+              const downtime = blockNumber - validatorDownSince[i]
               validatorDownSince[i] = -1
-              console.info(`Slashing signer index ${i} for downtime through block ${blockNumber}`)
+              const validator = await validators.getValidatorFromSigner(validatorSigners[i])
+              console.info(
+                `Validator:${i}: "${validator.name}" slashing for downtime=${downtime} at ${blockNumber}`
+              )
               await downtimeSlasher.slashEndSignerIndex(blockNumber, i)
             }
           }

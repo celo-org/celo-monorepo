@@ -98,10 +98,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     const validators = await this.kit.contracts.getValidators()
     const signer = await validators.validatorSignerAddressFromSet(signerIndex, blockNumber)
     const validator = await validators.getValidatorFromSigner(signer)
-    const membership = await validators.getValidatorMembershipHistoryIndex(
-      validator.address,
-      blockNumber
-    )
+    const membership = await validators.getValidatorMembershipHistoryIndex(validator, blockNumber)
     const lockedGold = await this.kit.contracts.getLockedGold()
     const slashValidator = await lockedGold.computeParametersForSlashing(
       validator.address,

@@ -54,6 +54,7 @@ export interface ValidatorsConfig {
   groupLockedGoldRequirements: LockedGoldRequirements
   validatorLockedGoldRequirements: LockedGoldRequirements
   maxGroupSize: BigNumber
+  membershipHistoryLength: BigNumber
 }
 
 export interface GroupMembership {
@@ -114,11 +115,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidatorLockedGoldRequirements(),
       this.getGroupLockedGoldRequirements(),
       this.contract.methods.maxGroupSize().call(),
+      this.contract.methods.membershipHistoryLength().call(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
       maxGroupSize: valueToBigNumber(res[2]),
+      membershipHistoryLength: valueToBigNumber(res[3]),
     }
   }
 
@@ -539,13 +542,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @return Group and membership history index for `validator`.
    */
   async getValidatorMembershipHistoryIndex(
-    validator: Address,
+    validator: Validator,
     blockNumber?: number
   ): Promise<{ group: Address; historyIndex: number }> {
     const blockEpoch = await this.kit.getEpochNumberOfBlock(
       blockNumber || (await this.kit.web3.eth.getBlockNumber())
     )
-    const membershipHistory = await this.getValidatorMembershipHistory(validator)
+    const account = await this.validatorSignerToAccount(validator.signer)
+    const membershipHistory = await this.getValidatorMembershipHistory(account)
     const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
     const group = membershipHistory[historyIndex].group
     return { group, historyIndex }
