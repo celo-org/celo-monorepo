@@ -203,7 +203,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice Revoke the vesting scheme
+   * @notice Revoke the vesting schedule
    */
   function revoke() external nonReentrant onlyRevoker onlyRevocable {
     require(!isRevoked(), "Vesting already revoked");

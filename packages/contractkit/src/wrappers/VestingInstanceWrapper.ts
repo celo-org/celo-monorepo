@@ -1,5 +1,4 @@
 import { Signature } from '@celo/utils/lib/signatureUtils'
-import { toFixed } from '@celo/utils/src/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { VestingInstance } from '../generated/types/VestingInstance'
@@ -17,10 +16,9 @@ import {
   tupleParser,
 } from './BaseWrapper'
 
-export interface VestingScheme {
-  vestingAmount: BigNumber
+export interface VestingSchedule {
+  vestingNumPeriods: BigNumber
   vestingAmountPerPeriod: BigNumber
-  vestingPeriods: number
   vestingPeriodSec: number
   vestingStartTime: number
   vestingCliffStartTime: number
@@ -32,19 +30,14 @@ export interface VestingScheme {
 export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   /**
    * Returns the underlying vesting scheme of the vesting instance
-   * @return A VestingScheme.
+   * @return A VestingSchedule.
    */
-  async getVestingScheme(): Promise<VestingScheme> {
+  async getVestingSchedule(): Promise<VestingSchedule> {
     const vestingSchedule = await this.contract.methods.vestingSchedule().call()
-    const vestingPeriods = toFixed(
-      toBigNumber(vestingSchedule.vestingAmount).div(
-        toBigNumber(vestingSchedule.vestAmountPerPeriod)
-      )
-    )
+
     return {
-      vestingAmount: toBigNumber(vestingSchedule.vestingAmount),
+      vestingNumPeriods: toBigNumber(vestingSchedule.vestingNumPeriods),
       vestingAmountPerPeriod: toBigNumber(vestingSchedule.vestAmountPerPeriod),
-      vestingPeriods: toNumber(vestingPeriods.toString()),
       vestingPeriodSec: toNumber(vestingSchedule.vestingPeriodSec),
       vestingStartTime: toNumber(vestingSchedule.vestingStartTime),
       vestingCliffStartTime: toNumber(vestingSchedule.vestingCliffStartTime),
@@ -64,17 +57,21 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getRevoker: () => Promise<Address> = proxyCall(this.contract.methods.revoker)
 
   /**
-   * Returns the address of the refund destination
-   * @return The address of the refund destination.
+   * Returns the total withdrawn amount from the vesting contract
+   * @return The total withdrawn amount from the vesting contract
    */
-  getRefundDestination: () => Promise<Address> = proxyCall(this.contract.methods.refundDestination)
+  getTotalWithdrawn: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.totalWithdrawn,
+    undefined,
+    toBigNumber
+  )
 
   /**
-   * Returns the currently withdrawn by the beneficiary amount
-   * @return The currently withdrawn amount.
+   * Returns the vested instance balance at revoke time
+   * @return The vested instance balance at revoke time
    */
-  getCurrentlyWithdrawn: () => Promise<BigNumber> = proxyCall(
-    this.contract.methods.currentlyWithdrawn,
+  getVestedBalanceAtRevoke: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.vestedBalanceAtRevoke,
     undefined,
     toBigNumber
   )
@@ -83,7 +80,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * Indicates if the vesting has been paused or not
    * @return A boolean indicating paused vesting (true) or unpaused(false).
    */
-  isPaused: () => Promise<boolean> = proxyCall(this.contract.methods.paused)
+  isPaused: () => Promise<boolean> = proxyCall(this.contract.methods.isPaused)
 
   /**
    * Indicates if the vesting is revocable or not
@@ -95,7 +92,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * Indicates if the vesting is revoked or not
    * @return A boolean indicating revoked vesting (true) or non-revoked(false).
    */
-  isRevoked: () => Promise<boolean> = proxyCall(this.contract.methods.revoked)
+  isRevoked: () => Promise<boolean> = proxyCall(this.contract.methods.isRevoked)
 
   /**
    * Returns the time at which the vesting was revoked
@@ -110,29 +107,74 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getPauseEndTime: () => Promise<string> = proxyCall(this.contract.methods.pauseEndTime)
 
   /**
-   * Returns the withdrawable amount at a specified timestamp.
-   * @param timestamp The timestamp in question.
-   * @return The amount which could be withdrawn at that timestamp.
+   * Returns maximum pause period in seconds
+   * @return The maximum pause period in seconds
    */
-  getWithdrawableAmountAtTimestamp: (timestamp: string | number) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getWithdrawableAmountAtTimestamp,
+  getMaxPausePeriod: () => Promise<string> = proxyCall(this.contract.methods.maxPausePeriod)
+
+  /**
+   * Returns the total balance of the vesting instance
+   * @return The total vesting instance balance
+   */
+  getTotalBalance: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getTotalBalance,
     undefined,
     toBigNumber
   )
 
   /**
-   * Returns the total vesting instance balance (locked and non-locked gold)
-   * @return the total vesting instance balance (locked and non-locked gold)
+   * Returns the the sum of locked and unlocked gold in the vesting instance
+   * @return The remaining total vesting instance balance
    */
-  getVestingInstanceTotalBalance: () => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getVestingInstanceTotalBalance,
+  getRemainingTotalBalance: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getRemainingTotalBalance,
     undefined,
     toBigNumber
   )
 
   /**
-   * Pause a vesting instance
-   * @param pausePeriod The duration of the pause period in seconds
+   * Returns the remaining unlocked gold balance in the vesting instance
+   * @return The available unlocked vesting instance gold balance
+   */
+  getRemainingUnlockedBalance: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getRemainingUnlockedBalance,
+    undefined,
+    toBigNumber
+  )
+
+  /**
+   * Returns the remaining locked gold balance in the vesting instance
+   * @return The remaining locked vesting instance gold balance
+   */
+  getRemainingLockedBalance: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getRemainingLockedBalance,
+    undefined,
+    toBigNumber
+  )
+
+  /**
+   * Returns the initial vesting amount in the vesting instance
+   * @return The initial vesting amount
+   */
+  getInitialVestingAmount: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getInitialVestingAmount,
+    undefined,
+    toBigNumber
+  )
+
+  /**
+   * Returns the total amount that has already vested up to now
+   * @return The already vested amount up to the point of call
+   */
+  getCurrentVestedTotalAmount: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getCurrentVestedTotalAmount,
+    undefined,
+    toBigNumber
+  )
+
+  /**
+   * Pause the gold withdrawal in a vesting instance
+   * @param pausePeriod the period for which the withdrawal shall be paused
    * @return A CeloTransactionObject
    */
   async pauseVesting(pausePeriod: string | number): Promise<CeloTransactionObject<void>> {
@@ -140,17 +182,24 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   }
 
   /**
-   * Revoke a vesting instance
-   * @param pausePeriod The timestamp at which the revoking is to take place
+   * Revoke a vesting schedule
    * @return A CeloTransactionObject
    */
-  async revokeVesting(revokeTimestamp: string | number): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(this.kit, this.contract.methods.revoke(revokeTimestamp))
+  async revokeVesting(): Promise<CeloTransactionObject<void>> {
+    return toTransactionObject(this.kit, this.contract.methods.revoke())
+  }
+
+  /**
+   * Refund revoker and beneficiary after the vesting has been revoked.
+   * @return A CeloTransactionObject
+   */
+  async refundAndFinalize(): Promise<CeloTransactionObject<void>> {
+    return toTransactionObject(this.kit, this.contract.methods.refundAndFinalize())
   }
 
   /**
    * Locks gold to be used for voting.
-   * @param value The amount of gold to lock.
+   * @param value The amount of gold to lock
    */
   lockGold: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
@@ -160,7 +209,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
 
   /**
    * Unlocks gold that becomes withdrawable after the unlocking period.
-   * @param value The amount of gold to unlock.
+   * @param value The amount of gold to unlock
    */
   unlockGold: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
@@ -178,17 +227,16 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   }
 
   /**
-   * Relocks gold that has been unlocked but not withdrawn.
-   * @param value The value to relock from pending withdrawals.
+   * Relocks gold in the vesting instance that has been unlocked but not withdrawn.
+   * @param value The total value to relock
    */
-  async relockGold(
-    account: Address,
-    value: NumberLike
-  ): Promise<Array<CeloTransactionObject<void>>> {
+  async relockGold(value: NumberLike): Promise<Array<CeloTransactionObject<void>>> {
     const lockedGoldContract = await this.kit.contracts.getLockedGold()
-    const pendingWithdrawals = await lockedGoldContract.getPendingWithdrawals(account)
+    const pendingWithdrawals = await lockedGoldContract.getPendingWithdrawals(
+      this.contract._address
+    )
     // Ensure there are enough pending withdrawals to relock.
-    const totalValue = await this.getPendingWithdrawalsTotalValue(account)
+    const totalValue = await this.getPendingWithdrawalsTotalValue(this.contract._address)
     if (totalValue.isLessThan(value)) {
       throw new Error(`Not enough pending withdrawals to relock ${value}`)
     }
@@ -218,7 +266,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   }
 
   /**
-   * Relocks gold that has been unlocked but not withdrawn.
+   * Relocks gold in the vesting instance that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock from.
    * @param value The value to relock from the specified pending withdrawal.
    */
@@ -229,18 +277,24 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   )
 
   /**
-   * Withdraw gold that has been unlocked but not withdrawn.
-   * @param index The index of the pending withdrawal to relock.
+   * Withdraw gold in the vesting instance that has been unlocked but not withdrawn.
+   * @param index The index of the pending locked gold withdrawal
    */
-  withdrawLockedGold: (index: string | number) => CeloTransactionObject<void> = proxySend(
+  withdrawLockedGold: (index: number) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.withdrawLockedGold
+    this.contract.methods.withdrawLockedGold,
+    tupleParser(parseNumber)
   )
 
   /**
-   * Withdraws gold that has been vested by the contract.
+   * Transfer gold from the vesting back to beneficiary.
+   * @param value The requested gold amount
    */
-  withdraw: () => CeloTransactionObject<void> = proxySend(this.kit, this.contract.methods.withdraw)
+  withdraw: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.withdraw,
+    tupleParser(parseNumber)
+  )
 
   /**
    * Beneficiary creates an account on behalf of the vesting contract.
@@ -300,6 +354,87 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s
       )
+    )
+  }
+
+  /**
+   * Activates any activatable pending votes.
+   * @param account The account with pending votes to activate.
+   */
+  async activate(account: Address): Promise<CeloTransactionObject<void>> {
+    return toTransactionObject(this.kit, this.contract.methods.activate(account))
+  }
+
+  /**
+   * Revokes pending votes
+   * @param account The account to revoke from.
+   * @param validatorGroup The group to revoke the vote for.
+   * @param value The amount of gold to revoke.
+   */
+  async revokePending(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<CeloTransactionObject<void>> {
+    const electionContract = await this.kit.contracts.getElection()
+    const groups = await electionContract.getGroupsVotedForByAccount(account)
+    const index = groups.indexOf(group)
+    const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
+      group,
+      value.times(-1)
+    )
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.revokePending(group, value.toFixed(), lesser, greater, index)
+    )
+  }
+
+  /**
+   * Revokes active votes
+   * @param account The account to revoke from.
+   * @param validatorGroup The group to revoke the vote for.
+   * @param value The amount of gold to revoke.
+   */
+  async revokeActive(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<CeloTransactionObject<void>> {
+    const electionContract = await this.kit.contracts.getElection()
+    const groups = await electionContract.getGroupsVotedForByAccount(account)
+    const index = groups.indexOf(group)
+    const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
+      group,
+      value.times(-1)
+    )
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
+    )
+  }
+
+  /**
+   * Increments the number of total and pending votes for `group`.
+   * @param validatorGroup The validator group to vote for.
+   * @param value The amount of gold to use to vote.
+   */
+  async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<void>> {
+    if (this.kit.defaultAccount == null) {
+      throw new Error(`missing kit.defaultAccount`)
+    }
+
+    const electionContract = await this.kit.contracts.getElection()
+
+    const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
+      validatorGroup,
+      value
+    )
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.vote(validatorGroup, value.toFixed(), lesser, greater)
     )
   }
 }

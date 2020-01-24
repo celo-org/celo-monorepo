@@ -5,14 +5,14 @@ import { VestingInstanceWrapper } from './VestingInstanceWrapper'
 
 interface VestingInstanceInitData {
   vestingBeneficiary: string
-  vestingAmount: number | string
+  vestingNumPeriods: number | string
   vestingCliff: number | string
   vestingStartTime: number | string
   vestingPeriodSec: number | string
   vestAmountPerPeriod: number | string
   vestingRevokable: boolean
   vestingRevoker: string
-  vestingRefundDestination: string
+  vestingMaxPausePeriod: number | string
 }
 
 /**
@@ -31,14 +31,14 @@ export class VestingFactoryWrapper extends BaseWrapper<VestingFactory> {
       this.kit,
       this.contract.methods.createVestingInstance(
         initData.vestingBeneficiary,
-        initData.vestingAmount,
+        initData.vestingNumPeriods,
         initData.vestingCliff,
         initData.vestingStartTime,
         initData.vestingPeriodSec,
         initData.vestAmountPerPeriod,
         initData.vestingRevokable,
         initData.vestingRevoker,
-        initData.vestingRefundDestination
+        initData.vestingMaxPausePeriod
       )
     )
   }
