@@ -1,13 +1,21 @@
 import { ContractKit } from '@celo/contractkit/lib'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import { Args, Flags } from '../../utils/command'
+// import { Args, Flags } from '../../utils/command'
 
-const epochIndex: any = {}
+export const table = {
+  down: {},
+  total: {},
+  percent: {},
+  name: {},
+  address: {},
+}
+const epochValidators: any = {}
 
-async function findIndex(kit: ContractKit, address: string, block: number, epoch: number) {
-  if (epochIndex[epoch] !== undefined) return epochIndex[epoch]
+async function getEpochValidators(kit: ContractKit, block: number, epoch: number) {
+  if (epochValidators[epoch] !== undefined) return epochValidators[epoch]
 
   const election = await kit._web3Contracts.getElection()
   const accounts = await kit._web3Contracts.getAccounts()
@@ -15,18 +23,15 @@ async function findIndex(kit: ContractKit, address: string, block: number, epoch
   // @ts-ignore
   const signers = await election.methods.getCurrentValidatorSigners().call({}, block)
 
-  let acc = 0
+  const acc = []
   for (const it of signers) {
     const addr = await accounts.methods.signerToAccount(it).call()
-    // console.log(it, '->', addr)
-    if (addr === address) {
-      epochIndex[epoch] = acc
-      return acc
-    }
-    acc++
+    acc.push(addr)
   }
 
-  return -1
+  epochValidators[epoch] = acc
+
+  return acc
 }
 
 function printBitmap(str: string) {
@@ -43,13 +48,13 @@ export default class Analyze extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    start: flags.integer({ ...Flags.block, required: true }),
-    end: flags.integer({ ...Flags.block, required: true }),
+    start: flags.integer({ description: 'First block', required: true }),
+    end: flags.integer({ description: 'Last block', required: true }),
   }
 
-  static args = [Args.address('address')]
+  static args = []
 
-  static examples = ['analyze 0x5409ed021d9299bf6814279a6a1411a7e866a631 --start 12300 --end 13300']
+  static examples = ['downtime --start 12300 --end 13300']
 
   async run() {
     const res = this.parse(Analyze)
@@ -61,37 +66,54 @@ export default class Analyze extends BaseCommand {
     // const election = await kit._web3Contracts.getElection()
 
     const endBlock = res.flags.end
+    const accounts = await kit.contracts.getAccounts()
 
     const startEpoch = parseInt(await slasher.methods.getEpochNumberOfBlock(block).call(), 10)
     const endEpoch = parseInt(await slasher.methods.getEpochNumberOfBlock(endBlock).call(), 10)
 
     console.log(
-      `starting at block ${block} (epoch ${startEpoch}), ending at ${endBlock} (epoch ${endEpoch})`
+      `Starting at block ${block} (epoch ${startEpoch}), ending at ${endBlock} (epoch ${endEpoch})`
     )
 
-    const address = res.args.address
+    const stats: any = {}
 
-    const startIndex = await findIndex(kit, address, block, startEpoch)
-    const endIndex = await findIndex(kit, address, endBlock, endEpoch)
-
-    console.log('start index', startIndex, 'end index', endIndex)
-
-    let acc1 = 0
-    let acc2 = 0
-
-    for (let i = block; i < endBlock; i++) {
+    for (let i = block; i <= endBlock; i++) {
       const bitmap = new BigNumber(
         // @ts-ignore
-        await slasher.methods.getParentSealBitmap(i + 1).call({}, endBlock + 10)
+        await slasher.methods.getParentSealBitmap(i + 1).call({}, endBlock + 2)
       )
       const binary = bitmap.toString(2)
       const epoch = parseInt(await slasher.methods.getEpochNumberOfBlock(i).call(), 10)
-      const idx = await findIndex(kit, address, i, epoch)
-      const down = binary.charAt(binary.length - 1 - idx) === '0'
-      acc1 += down ? 0 : 1
-      acc2 += down ? 1 : 0
-      console.log(epoch, i, printBitmap(binary), idx, down ? 'down' : 'up')
+      const prevEpoch = parseInt(await slasher.methods.getEpochNumberOfBlock(i - 1).call(), 10)
+      const validators: string[] = await getEpochValidators(kit, i, epoch)
+      let downValidators = 0
+      validators.map((v, idx) => {
+        const down = binary.charAt(binary.length - 1 - idx) === '0'
+        stats[v] = stats[v] || { down: 0, total: 0, address: v }
+        stats[v].down += down ? 1 : 0
+        stats[v].total++
+        downValidators += down ? 1 : 0
+      })
+      console.log(
+        epoch,
+        i,
+        printBitmap(binary),
+        downValidators,
+        epoch !== prevEpoch ? 'EPOCH CHANGE' : ''
+      )
     }
-    console.log('up', acc1, 'down', acc2)
+    const lst: any[] = await Promise.all(
+      Object.values(stats).map(async (a: any) => ({
+        ...a,
+        percent: a.down / a.total,
+        name: await accounts.getName(a.address),
+      }))
+    )
+    const sorted = lst.sort((a, b) => a.percent - b.percent)
+    const percentString = (a: number) => Math.round(a * 100) + '%'
+    cli.table(
+      sorted.map((a) => ({ ...a, percent: percentString(a.percent) })),
+      table
+    )
   }
 }
