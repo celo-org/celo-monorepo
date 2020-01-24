@@ -34,6 +34,12 @@ export function gethReducer(state: State = initialState, action: ActionTypes) {
         ...state,
         connected: action.connected,
       }
+    case Actions.SET_PROMPT_ZERO_SYNC:
+      return {
+        ...state,
+        promptZeroSyncIfNeeded: action.promptIfNeeded,
+      }
+
     default:
       return state
   }

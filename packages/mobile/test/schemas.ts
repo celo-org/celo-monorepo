@@ -324,6 +324,10 @@ export const v1Schema = {
     ...v0Schema.account,
     retryVerificationWithForno: true,
   },
+  geth: {
+    ...v4Schema.geth,
+    promptZeroSyncIfNeeded: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
