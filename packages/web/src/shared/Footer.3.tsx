@@ -127,6 +127,8 @@ const Navigation = React.memo(function _Navigation({
   )
 })
 
+const YEAR = new Date().getFullYear()
+
 const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
   return (
     <View style={styles.details}>
@@ -148,7 +150,7 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
         </Text>
       </Responsive>
       <Responsive medium={[textStyles.left, fonts.legal]}>
-        <Text style={[textStyles.center, fonts.legal]}>{t('copyRight')}</Text>
+        <Text style={[textStyles.center, fonts.legal]}>{t('copyRight', { year: YEAR })}</Text>
       </Responsive>
     </View>
   )
