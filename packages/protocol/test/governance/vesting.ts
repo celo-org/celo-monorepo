@@ -232,8 +232,7 @@ contract('Vesting', (accounts: string[]) => {
         beneficiary: newVestingInstanceBeneficiary,
         atAddress: newVestingInstanceAddress,
       })
-      vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
-      assert.equal(newVestingInstanceAddress, vestingInstanceAddress)
+      assert.equal(newVestingInstanceAddress, vestingInstance.address)
     })
 
     it('should revert when vesting factory has insufficient balance to create new instance', async () => {
@@ -244,8 +243,6 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should have associated funds with a schedule upon creation', async () => {
-      vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
-      vestingInstance = await VestingInstance.at(vestingInstanceAddress)
       const allocatedFunds = await goldTokenInstance.balanceOf(vestingInstance.address)
       assertEqualBN(
         allocatedFunds,
@@ -256,15 +253,11 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set a beneficiary to vesting instance', async () => {
-      vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
-      vestingInstance = await VestingInstance.at(vestingInstanceAddress)
       const vestingBeneficiary = await vestingInstance.beneficiary()
       assert.equal(vestingBeneficiary, vestingDefaultSchedule.vestingBeneficiary)
     })
 
     it('should set a revoker to vesting instance', async () => {
-      vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
-      vestingInstance = await VestingInstance.at(vestingInstanceAddress)
       const vestingRevoker = await vestingInstance.revoker()
       assert.equal(vestingRevoker, vestingDefaultSchedule.vestingRevoker)
     })
@@ -1671,7 +1664,7 @@ contract('Vesting', (accounts: string[]) => {
       assertEqualBN(await vestingInstance.getCurrentVestedTotalAmount(), expectedWithdrawalAmount)
     })
 
-    it('should return 50% the vested amount right the beginning of the second quarter', async () => {
+    it('should return 50% the vested amount right after the beginning of the second quarter', async () => {
       const timeToTravel = 6 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialVestingAmount.div(2)
