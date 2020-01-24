@@ -1,8 +1,43 @@
 import { NULL_ADDRESS } from '@celo/contractkit'
+import { toNumber } from '@celo/contractkit/src/wrappers/BaseWrapper'
+import { VestingSchedule } from '@celo/contractkit/src/wrappers/VestingInstanceWrapper'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+
+export interface PausedState {
+  isPaused: boolean
+  pauseEndTime?: number
+}
+
+export interface RevokedState {
+  isRevoked: boolean
+  revokeTime?: number
+  vestedBalanceAtRevoke?: string
+}
+
+export interface BalanceState {
+  totalWithdrawn: string
+  totalBalance: string
+  remainingTotalBalance: string
+  remainingUnlockedBalance: string
+  remainingLockedBalance: string
+  initialVestingAmount: string
+  currentVestedTotalAmount: string
+}
+
+export interface VestingInstanceInfo {
+  vestingInstanceAddress: string
+  beneficiary: string
+  revoker: string
+  isRevokable: boolean
+  vestingSchedule: VestingSchedule
+  maxPausePeriod: string
+  pausedStateData: PausedState
+  revokedStateData: RevokedState
+  balanceStateData: BalanceState
+}
 
 export default class VestingInfo extends BaseCommand {
   static description = 'Get info on a vesting instance contract.'
@@ -28,18 +63,43 @@ export default class VestingInfo extends BaseCommand {
       )
       .runChecks()
 
-    const instanceAddressInfo = {
-      beneficiary: flags.beneficiary,
-      vestingInstanceAddress: vestingInstance.address,
-      revoker: await vestingInstance.getRevoker(),
-      refunder: await vestingInstance.getRefundDestination(),
-      currentlyWithdrawn: await vestingInstance.getCurrentlyWithdrawn(),
-      vestingInstanceTotalBalance: await vestingInstance.getVestingInstanceTotalBalance(),
+    const pausedStateData: PausedState = {
       isPaused: await vestingInstance.isPaused(),
-      isRevokable: await vestingInstance.isRevokable(),
-      isRevoked: await vestingInstance.isRevoked(),
-      vestingScheme: await vestingInstance.getVestingScheme(),
     }
-    printValueMapRecursive(instanceAddressInfo)
+
+    if (pausedStateData.isPaused)
+      pausedStateData.pauseEndTime = toNumber(await vestingInstance.getPauseEndTime())
+
+    const revokedStateData: RevokedState = {
+      isRevoked: await vestingInstance.isRevoked(),
+    }
+
+    if (revokedStateData.isRevoked) {
+      revokedStateData.revokeTime = toNumber(await vestingInstance.getRevokeTime())
+      revokedStateData.vestedBalanceAtRevoke = (await vestingInstance.getVestedBalanceAtRevoke()).toString()
+    }
+
+    const balanceStateData: BalanceState = {
+      totalWithdrawn: (await vestingInstance.getTotalWithdrawn()).toString(),
+      totalBalance: (await vestingInstance.getTotalBalance()).toString(),
+      remainingTotalBalance: (await vestingInstance.getRemainingTotalBalance()).toString(),
+      remainingUnlockedBalance: (await vestingInstance.getRemainingUnlockedBalance()).toString(),
+      remainingLockedBalance: (await vestingInstance.getRemainingLockedBalance()).toString(),
+      initialVestingAmount: (await vestingInstance.getInitialVestingAmount()).toString(),
+      currentVestedTotalAmount: (await vestingInstance.getCurrentVestedTotalAmount()).toString(),
+    }
+
+    const vestingInstanceInfo: VestingInstanceInfo = {
+      vestingInstanceAddress: vestingInstance.address,
+      beneficiary: flags.beneficiary,
+      revoker: await vestingInstance.getRevoker(),
+      isRevokable: await vestingInstance.isRevokable(),
+      vestingSchedule: await vestingInstance.getVestingSchedule(),
+      maxPausePeriod: await vestingInstance.getMaxPausePeriod(),
+      pausedStateData: pausedStateData,
+      revokedStateData: revokedStateData,
+      balanceStateData: balanceStateData,
+    }
+    printValueMapRecursive(vestingInstanceInfo)
   }
 }
