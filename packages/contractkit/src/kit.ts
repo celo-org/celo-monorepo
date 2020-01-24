@@ -268,7 +268,7 @@ export class ContractKit {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
     // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber == 0) {
+    if (epochNumber === 0) {
       // No first block for epoch 0
       return 0
     }
@@ -279,7 +279,7 @@ export class ContractKit {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
     // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber == 0) {
+    if (epochNumber === 0) {
       return 0
     }
     const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
@@ -291,7 +291,7 @@ export class ContractKit {
     const epochSize = (await validators.getEpochSize()).toNumber()
     // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     const epochNumber = Math.floor(blockNumber / epochSize)
-    if (blockNumber % epochSize == 0) {
+    if (blockNumber % epochSize === 0) {
       return epochNumber
     } else {
       return epochNumber + 1

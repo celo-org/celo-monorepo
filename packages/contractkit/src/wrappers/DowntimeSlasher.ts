@@ -46,7 +46,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   /**
    * Slash a Validator for downtime.
    * @param validator Validator to slash for downtime.
-   * @param startBlock First block of the downtime.
+   * @param startBlock First block of the downtime, undefined if using endBlock.
    * @param endBlock Last block of the downtime.
    */
   async slashValidator(
@@ -128,7 +128,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    * @param startSignerIndex Validator index at the first block.
    * @param endSignerIndex Validator index at the last block.
    */
-  async slash(
+  private async slash(
     validator: Validator,
     startBlock: number,
     startSignerIndex: number,

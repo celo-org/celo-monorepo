@@ -86,7 +86,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
    * @param headerA First double signed block header.
    * @param headerB Second double signed block header.
    */
-  async slash(
+  private async slash(
     signerIndex: number,
     headerA: string,
     headerB: string
