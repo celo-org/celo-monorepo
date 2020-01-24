@@ -717,20 +717,21 @@ contract('Election', (accounts: string[]) => {
     const voter = accounts[0]
     const group = accounts[1]
     const value = 1000
+    const rewards = 1
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-        await mockLockedGold.setTotalLockedGold(value)
+        await mockLockedGold.setTotalLockedGold(value - rewards)
         await mockValidators.setNumRegisteredValidators(1)
-        await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
-        await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+        await mockLockedGold.incrementNonvotingAccountBalance(voter, value - rewards)
+        await election.vote(group, value - rewards, NULL_ADDRESS, NULL_ADDRESS)
         await mineBlocks(EPOCH, web3)
         await election.activate(group)
         // Distribute some rewards to test rounding errors.
-        await election.distributeEpochRewards(group, 1, NULL_ADDRESS, NULL_ADDRESS)
+        await election.distributeEpochRewards(group, rewards, NULL_ADDRESS, NULL_ADDRESS)
       })
 
       describe('when the revoked value is less than the active votes', () => {
