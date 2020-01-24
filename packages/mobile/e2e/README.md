@@ -4,17 +4,19 @@
 
 These are the End-to-End (e2e) tests for the wallet mobile app. They run an emulator and simulate a user clicking through the app.
 
-## Running the tests locally
+## Setting up the VM
 
-First install the emulator as described in the [mobile readme](../README.md).
+First install the emulator as described in the [SETUP readme](../../../SETUP.md#optional-install-an-android-emulator).
 
-```bash
-yarn test:build-e2e #To build the java parts
-yarn test:run-e2e #packages the react native parts of the app, launches the emulator and runs the tests
-```
+By default, the e2e scripts will assume the VM name of `Nexus_5X_API_28_x86` recommended in the instructions but you can rename the VM as you like.
 
-After making small changes to the app or adding new tests you can rerun the tests without rebuilding first.
-When the tests are running, they will automatically try to enter `123456` as the pin code when needed. You will have to set this pin code in the settings of the emulator.
+Next, to improve reliability of the tests, configure the VM as described in the [Detox best practices doc](https://github.com/wix/Detox/blob/master/docs/Introduction.AndroidEmulatorsBestPractices.md).
+
+## Running the tests
+
+Simply run `yarn test:e2e:android` or `yarn test:e2e:ios`
+
+The run_e2e.sh script will take care of configuring and building the app for you.
 
 ## Adding a test
 

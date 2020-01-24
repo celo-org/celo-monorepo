@@ -9,7 +9,8 @@ set -euo pipefail
 # -p: Platform (android or ios)
 # -v (Optional): Name of virual machine to run
 # -f (Optional): Fast (skip build step)
-# -r (Optional): Use release build (by default uses debug)
+# -r (Optional): Use release build (by default uses debug) 
+# TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 
 PLATFORM=""
 VD_NAME="Nexus_5X_API_28_x86"
@@ -75,20 +76,14 @@ if [ $PLATFORM = "android" ]; then
   echo "Starting the emulator"
   $ANDROID_SDK_ROOT/emulator/emulator -avd $VD_NAME -no-boot-anim &
 
-  echo "Ran startup command"
-  #TODO need this?
-  # echo "Restarting the adb server"
-  # adb kill-server && adb start-server
-  #adb reverse tcp:8081 tcp:8081
-
   echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
   until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
   do
     sleep 3 
   done
 
-  #adb reverse tcp:8081 tcp:8081
   CELO_TEST_CONFIG=e2e yarn detox test -c $CONFIG_NAME -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose
+  STATUS=$?
 
 elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
@@ -100,59 +95,11 @@ else
   exit 1
 fi
 
-
 echo "Done test, cleaning up"
 yarn react-native-kill-packager
 
 echo "Closing emulator (if active)"
-#TODO doesn't work
-kill -s 9 `ps -a | grep "$VD_NAME" | grep -v "grep"  | awk '{print $1}'`
+adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
 
-
-
-
-#bash ./scripts/unlock.sh
-# adb reconnect
-# if [ $? -ne 0 ]
-# then
-#   exit 1
-# fi
-
-# echo "Waiting for emulator to unlock..."
-# # TODO: improve this to actually poll if the screen is unlocked
-# # https://stackoverflow.com/questions/35275828/is-there-a-way-to-check-if-android-device-screen-is-locked-via-adb
-# sleep 3
-# echo "Emulator unlocked!"
-
-# # sometimes the emulator locks itself after boot
-# # this prevents that
-# bash ./scripts/unlock.sh
-
-
-
-
-# yarn test:detox
-# STATUS=$?
-
-#  # Retry on fail logic
-# if [ $STATUS -ne 0 ]; then
-#    echo "It failed once, let's try again"
-#    yarn test:detox
-#    STATUS=$?
-# fi
-
-# if [ $STATUS -ne 0 ]; then
-#    # TODO: upload e2e_run.log and attach the link
-#    echo "Test failed"
-# else
-#    echo "Test passed"
-# fi
-
-
-# echo "Closing emulator"
-# kill -s 9 `ps -a | grep "Nexus_5X_API_28_x86" | grep -v "grep"  | awk '{print $1}'`
-
-# echo "Closing pidcat"
-# kill -s 9 `ps -a | grep "pidcat" | grep -v "grep"  | awk '{print $1}'`
-
-# exit $STATUS
+echo "Exiting with test result status $STATUS"
+exit $STATUS

@@ -26,6 +26,7 @@
     "test:watch": "yarn test --watch --maxWorkers=4",
     "test:verbose": "export TZ=UTC && jest --verbose",
     "test:e2e:android": "./scripts/run_e2e.sh -p android",
+    "test:e2e:ios": "./scripts/run_e2e.sh -p ios",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
     "deploy:update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt"
