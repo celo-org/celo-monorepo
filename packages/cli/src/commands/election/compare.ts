@@ -38,7 +38,8 @@ export default class ElectionCompare extends BaseCommand {
       for (let i = 0; i < group.members.length; i++) {
         const member = group.members[i]
         const name = await accounts.getName(member)
-        const score = (await validators.getValidator(member)).score + '%'
+        const score =
+          (await validators.getValidator(member)).score.multipliedBy(100).toFixed(1) + '%'
         elected.push({
           address: member,
           name,
