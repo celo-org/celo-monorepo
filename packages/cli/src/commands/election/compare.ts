@@ -5,6 +5,7 @@ import { BaseCommand } from '../../base'
 export const table = {
   index: {},
   votes: {},
+  score: {},
   name: {},
   address: {},
   groupName: {},
@@ -37,12 +38,14 @@ export default class ElectionCompare extends BaseCommand {
       for (let i = 0; i < group.members.length; i++) {
         const member = group.members[i]
         const name = await accounts.getName(member)
+        const score = (await validators.getValidator(member)).score + '%'
         elected.push({
           address: member,
           name,
-          votes: votes / (i + 1),
+          votes: Math.round(votes / (i + 1)),
           affiliation: el.address,
           groupName,
+          score,
         })
       }
     }
