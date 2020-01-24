@@ -134,15 +134,20 @@ export default class Show extends BaseCommand {
         const epochAccountsSlashed = await lockedGold.getAccountsSlashed(epochNumber)
         const address = res.flags.voter || res.flags.validator || res.flags.group
         accountsSlashed = accountsSlashed.concat(
-          address
-            ? epochAccountsSlashed.filter(
-                (e: AccountSlashed) =>
-                  eqAddress(e.slashed, address) || eqAddress(e.reporter, address)
-              )
-            : epochAccountsSlashed
+          address ? filterAccountsSlashed(epochAccountsSlashed, address) : epochAccountsSlashed
         )
       }
     }
+
+    // Slashing rewards are available before the current epoch ends
+    if (res.flags.slashing) {
+      const epochAccountsSlashed = await lockedGold.getAccountsSlashed(currentEpoch)
+      const address = res.flags.voter || res.flags.validator || res.flags.group
+      accountsSlashed = accountsSlashed.concat(
+        address ? filterAccountsSlashed(epochAccountsSlashed, address) : epochAccountsSlashed
+      )
+    }
+
     cli.action.stop()
 
     // At the end of each epoch: R, the total amount of rewards in gold to be allocated to stakers
@@ -276,4 +281,10 @@ function averageValidatorScore(validators: Validator[]): BigNumber {
   return validators
     .reduce((sumScore: BigNumber, v: Validator) => sumScore.plus(v.score), new BigNumber(0))
     .dividedBy(validators.length || 1)
+}
+
+function filterAccountsSlashed(accountsSlashed: AccountSlashed[], address: Address) {
+  return accountsSlashed.filter(
+    (e: AccountSlashed) => eqAddress(e.slashed, address) || eqAddress(e.reporter, address)
+  )
 }

@@ -8,15 +8,17 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
+import { Flags } from '../../utils/command'
 
 export default class Slasher extends BaseCommand {
   static description = 'Slashes for downtime'
 
   static flags = {
     ...BaseCommand.flags,
+    from: Flags.address({ required: true, description: "Slasher's address" }),
     dryRun: flags.boolean({ description: 'Dry run' }),
     slashableDowntime: flags.integer({ description: 'Downtime to slash for' }),
-    slashValidator: flags.string({ description: 'Slash validator address' }),
+    slashValidator: Flags.address({ description: 'Slash validator address' }),
     forDowntimeEndingAtBlock: flags.integer({
       description: 'Slash validator for downtime ending at block',
     }),
@@ -28,12 +30,16 @@ export default class Slasher extends BaseCommand {
 
   async run() {
     const res = this.parse(Slasher)
-    const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
+    this.kit.defaultAccount = res.flags.from
+    const checkBuilder = newCheckBuilder(this, res.flags.from)
+    checkBuilder.isSignerOrAccount()
+    if (res.flags.slashValidator) {
+      checkBuilder.isValidator(res.flags.slashValidator)
+    }
+    checkBuilder.runChecks()
 
+    const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
     if (res.flags.slashValidator && res.flags.forDowntimeEndingAtBlock) {
-      await newCheckBuilder(this)
-        .isValidator(res.flags.slashValidator)
-        .runChecks()
       const validators = await this.kit.contracts.getValidators()
       const validator = await validators.getValidator(res.flags.slashValidator)
       await this.slashValidatorForDowntimeEndingAtBlock(
@@ -42,6 +48,9 @@ export default class Slasher extends BaseCommand {
         res.flags.dryRun
       )
     } else {
+      await newCheckBuilder(this, res.flags.from)
+        .isSignerOrAccount()
+        .runChecks()
       const slashableDowntime =
         res.flags.slashableDowntime || (await downtimeSlasher.slashableDowntime())
       await this.slasher(slashableDowntime, res.flags.dryRun)
