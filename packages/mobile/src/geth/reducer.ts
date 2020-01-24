@@ -1,5 +1,4 @@
 import { Actions, ActionTypes } from 'src/geth/actions'
-import { RootState } from 'src/redux/reducers'
 
 export enum InitializationState {
   NOT_YET_INITIALIZED = 'NOT_YET_INITIALIZED',

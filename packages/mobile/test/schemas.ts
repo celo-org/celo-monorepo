@@ -63,6 +63,7 @@ export const vNeg1Schema = {
   geth: {
     initialized: 'INITIALIZED',
     connected: true,
+    promptZeroSyncIfNeeded: false,
   },
   identity: {
     attestationCodes: [],
