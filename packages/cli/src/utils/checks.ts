@@ -3,10 +3,12 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { eqAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
+import { printValueMap } from './cli'
 
 export interface CommandCheck {
   name: string
@@ -94,7 +96,7 @@ class CheckBuilder {
   isApprover = (account: Address) =>
     this.addCheck(
       `${account} is approver address`,
-      this.withGovernance(async (g) => (await g.getApprover()) === account)
+      this.withGovernance(async (g) => eqAddress(await g.getApprover(), account))
     )
 
   proposalExists = (proposalID: string) =>
@@ -106,7 +108,14 @@ class CheckBuilder {
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
     this.addCheck(
       `${proposalID} is in stage ${stage}`,
-      this.withGovernance(async (g) => (await g.getProposalStage(proposalID)) === stage)
+      this.withGovernance(async (g) => {
+        const match = (await g.getProposalStage(proposalID)) === stage
+        if (!match) {
+          const waitTimes = await g.timeUntilStages(proposalID)
+          printValueMap(waitTimes)
+        }
+        return match
+      })
     )
 
   proposalIsPassing = (proposalID: string) =>

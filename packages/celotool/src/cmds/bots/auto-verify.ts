@@ -35,6 +35,7 @@ interface AutoVerifyArgv extends BotsArgv {
   attestationMax: number
   celoProvider: string
   index: number
+  timeToPollForTextMessages: number
 }
 
 export const builder = (yargs: Argv) => {
@@ -46,7 +47,7 @@ export const builder = (yargs: Argv) => {
     })
     .option('inBetweenWaitSeconds', {
       type: 'number',
-      description: 'Betweeen each attsetation how long to wait',
+      description: 'Between each attestation how long to wait',
       required: true,
     })
     .option('attestationMax', {
@@ -58,6 +59,11 @@ export const builder = (yargs: Argv) => {
       type: 'string',
       description: 'The node to use',
       default: 'http://localhost:8545',
+    })
+    .option('timeToPollForTextMessages', {
+      type: 'number',
+      description: 'How long to poll for text messages in minutes',
+      default: 3,
     })
     .option('index', {
       type: 'number',
@@ -170,7 +176,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress,
         attestationsToComplete,
         txParams,
-        logger
+        logger,
+        argv.timeToPollForTextMessages
       )
 
       const sleepTime = Math.random() * argv.inBetweenWaitSeconds
@@ -191,8 +198,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
   }
 }
 
-const TIME_TO_WAIT_FOR_ATTESTATIONS_IN_MINUTES = 10
-const POLLING_WAIT = 3000
+const POLLING_WAIT = 300
 
 async function pollForMessagesAndCompleteAttestations(
   attestations: AttestationsWrapper,
@@ -201,13 +207,13 @@ async function pollForMessagesAndCompleteAttestations(
   account: Address,
   attestationsToComplete: ActionableAttestation[],
   txParams: CeloTransactionParams = {},
-  logger: Logger
+  logger: Logger,
+  timeToPollForTextMessages: number
 ) {
   const startDate = moment()
   logger.info({ pollingWait: POLLING_WAIT }, 'Poll for the attestation code')
   while (
-    moment.duration(moment().diff(startDate)).asMinutes() <
-      TIME_TO_WAIT_FOR_ATTESTATIONS_IN_MINUTES &&
+    moment.duration(moment().diff(startDate)).asMinutes() < timeToPollForTextMessages &&
     attestationsToComplete.length > 0
   ) {
     const messages = await fetchLatestMessagesFromToday(client, phoneNumber, 100)

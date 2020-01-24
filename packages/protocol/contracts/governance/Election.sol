@@ -832,7 +832,12 @@ contract Election is
     while (totalNumMembersElected < electableValidators.max) {
       uint256 groupIndex = 0;
       bool memberElected = false;
-      (groupIndex, memberElected) = dHondt(electionGroups, numMembers, numMembersElected);
+      (groupIndex, memberElected) = dHondt(
+        electionGroups,
+        numMembers,
+        totalNumMembersElected,
+        numMembersElected
+      );
 
       if (memberElected) {
         numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
@@ -841,7 +846,7 @@ contract Election is
         break;
       }
     }
-    require(totalNumMembersElected >= electableValidators.min, "Not enough elected groups");
+    require(totalNumMembersElected >= electableValidators.min, "Not enough elected validators");
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
@@ -870,12 +875,16 @@ contract Election is
   function dHondt(
     address[] memory electionGroups,
     uint256[] memory numMembers,
+    uint256 totalNumMembersElected,
     uint256[] memory numMembersElected
   ) private view returns (uint256, bool) {
     bool memberElected = false;
     uint256 groupIndex = 0;
     FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
     for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+      if (i > totalNumMembersElected) {
+        break;
+      }
       address group = electionGroups[i];
       // Only consider groups with members left to be elected.
       if (numMembers[i] > numMembersElected[i]) {

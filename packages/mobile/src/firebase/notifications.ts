@@ -8,7 +8,8 @@ import {
   TransferNotificationData,
 } from 'src/account/types'
 import { showMessage } from 'src/alert/actions'
-import { resolveCurrency } from 'src/geth/consts'
+import { TokenTransactionType } from 'src/apollo/types'
+import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
@@ -18,7 +19,6 @@ import {
   navigateToPaymentTransferReview,
   navigateToRequestedPaymentReview,
 } from 'src/transactions/actions'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
@@ -45,7 +45,7 @@ function* handlePaymentRequested(
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
     recipientAddress: targetRecipient.address,
-    type: TransactionTypes.PAY_REQUEST,
+    type: TokenTransactionType.PayRequest,
   })
 }
 
@@ -59,17 +59,20 @@ function* handlePaymentReceived(
     const recipientCache = yield select(recipientCacheSelector)
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const address = transferNotification.sender.toLowerCase()
+    const currency = resolveCurrency(transferNotification.currency)
 
     navigateToPaymentTransferReview(
-      TransactionTypes.RECEIVED,
+      TokenTransactionType.Received,
       new BigNumber(transferNotification.timestamp).toNumber(),
       {
-        value: divideByWei(transferNotification.value),
-        currency: resolveCurrency(transferNotification.currency),
+        amount: {
+          value: divideByWei(transferNotification.value).toString(),
+          currencyCode: CURRENCIES[currency].code,
+        },
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,
         recipient: getRecipientFromAddress(address, addressToE164Number, recipientCache),
-        type: TransactionTypes.RECEIVED,
+        type: TokenTransactionType.Received,
       }
     )
   }

@@ -13,7 +13,7 @@ export default class Approve extends BaseCommand {
     from: Flags.address({ required: true, description: "Approver's address" }),
   }
 
-  static examples = []
+  static examples = ['approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
   async run() {
     const res = this.parse(Approve)
@@ -22,6 +22,11 @@ export default class Approve extends BaseCommand {
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
 
+    // in case target is queued
+    if (await governance.isQueued(id)) {
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+    }
+
     await newCheckBuilder(this)
       .isApprover(account)
       .proposalExists(id)
@@ -29,6 +34,6 @@ export default class Approve extends BaseCommand {
       .proposalInStage(id, 'Approval')
       .runChecks()
 
-    await displaySendTx('approveTx', await governance.approve(id))
+    await displaySendTx('approveTx', await governance.approve(id), {}, 'ProposalApproved')
   }
 }

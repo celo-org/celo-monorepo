@@ -23,13 +23,13 @@ const DefaultConfig = {
     blockGasLimit: 20000000,
   },
   doubleSigningSlasher: {
-    reward: '10000000000000000000', // 10 cGLD
-    penalty: '1000000000000000000000', // 1000 cGLD
+    reward: '20000000000000000000', // 20 cGLD
+    penalty: '100000000000000000000', // 100 cGLD
   },
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
-    penalty: '1000000000000000000000', // 1000 cGLD
-    slashableDowntime: 5,
+    penalty: '20000000000000000000', // 20 cGLD
+    slashableDowntime: 480,
   },
   election: {
     minElectableValidators: '22',
@@ -52,14 +52,14 @@ const DefaultConfig = {
     },
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
-    frozen: true,
+    frozen: false,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * 60, // 5 minutes
     minimumReports: 1,
-    frozen: true,
+    frozen: false,
   },
   gasPriceMinimum: {
     minimumFloor: 1000000000,
