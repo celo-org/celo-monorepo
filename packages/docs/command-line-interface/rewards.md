@@ -34,7 +34,10 @@ USAGE
   $ celocli rewards:slasher
 
 OPTIONS
-  --slashableDowntime=slashableDowntime  Downtime to slash for
+  --dryRun                                             Dry run
+  --forDowntimeEndingAtBlock=forDowntimeEndingAtBlock  Slash validator for downtime ending at block
+  --slashValidator=slashValidator                      Slash validator address
+  --slashableDowntime=slashableDowntime                Downtime to slash for
 
 EXAMPLE
   slasher
