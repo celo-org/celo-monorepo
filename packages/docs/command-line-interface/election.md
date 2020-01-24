@@ -23,6 +23,17 @@ EXAMPLES
 
 _See code: [packages/cli/src/commands/election/activate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)_
 
+### Compare
+
+Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.
+
+```
+USAGE
+  $ celocli election:compare
+```
+
+_See code: [packages/cli/src/commands/election/compare.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/compare.ts)_
+
 ### Current
 
 Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.
