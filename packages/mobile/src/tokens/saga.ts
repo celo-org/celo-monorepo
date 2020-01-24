@@ -119,8 +119,6 @@ export async function createTransaction(
   const decimalFactor = new BigNumber(10).pow(decimalBigNum.toNumber())
   const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor).toFixed(0)
 
-  console.log(contract)
-
   const tx = contract.transferWithComment(
     recipientAddress,
     convertedAmount.toString(),
