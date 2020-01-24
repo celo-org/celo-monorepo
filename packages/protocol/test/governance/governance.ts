@@ -2169,20 +2169,10 @@ contract('Governance', (accounts: string[]) => {
         await governance.addValidator(accounts[2])
         await accountsInstance.createAccount({ from: accounts[2] })
         await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
-        console.log(
-          'prepare',
-          (await governance.getEpochNumber()).toString(),
-          await web3.eth.getBlockNumber()
-        )
         await governance.prepareHotfix(hotfixHashStr)
       })
 
       it('should execute the hotfix tx', async () => {
-        console.log(
-          'execute',
-          (await governance.getEpochNumber()).toString(),
-          await web3.eth.getBlockNumber()
-        )
         await executeHotfixTx()
         assert.equal(await testTransactions.getValue(1).valueOf(), 1)
       })
