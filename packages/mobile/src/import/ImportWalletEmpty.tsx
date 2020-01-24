@@ -2,17 +2,18 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { backupIcon } from 'src/images/Images'
 import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -24,7 +25,7 @@ interface StateProps {
   isImportingWallet: boolean
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
+type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -48,7 +49,7 @@ export class ImportWalletEmpty extends React.Component<Props> {
   }
 
   onPressTryAnotherKey = () => {
-    navigateBack()
+    navigate(Screens.ImportWallet, { clean: true })
   }
 
   render() {
@@ -114,9 +115,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    importBackupPhrase,
-  }
-)(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWalletEmpty))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  importBackupPhrase,
+})(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWalletEmpty))

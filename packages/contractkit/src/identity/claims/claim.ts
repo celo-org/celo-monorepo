@@ -1,13 +1,13 @@
 import { hashMessage } from '@celo/utils/lib/signatureUtils'
 import * as t from 'io-ts'
 import { ContractKit } from '../../kit'
-import { AccountClaim, AccountClaimType, MetadataURLGetter, verifyAccountClaim } from './account'
+import { AccountClaim, AccountClaimType } from './account'
 import {
   AttestationServiceURLClaim,
   AttestationServiceURLClaimType,
   validateAttestationServiceUrl,
 } from './attestation-service-url'
-import { KeybaseClaim, KeybaseClaimType, verifyKeybaseClaim } from './keybase'
+import { KeybaseClaim, KeybaseClaimType } from './keybase'
 import { ClaimTypes, now, SignatureType, TimestampType } from './types'
 
 const DomainClaimType = t.type({
@@ -47,39 +47,15 @@ export type Claim =
 export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOMAIN
   ? DomainClaim
   : K extends typeof ClaimTypes.NAME
-    ? NameClaim
-    : K extends typeof ClaimTypes.KEYBASE
-      ? KeybaseClaim
-      : K extends typeof ClaimTypes.ATTESTATION_SERVICE_URL
-        ? AttestationServiceURLClaim
-        : AccountClaim
+  ? NameClaim
+  : K extends typeof ClaimTypes.KEYBASE
+  ? KeybaseClaim
+  : K extends typeof ClaimTypes.ATTESTATION_SERVICE_URL
+  ? AttestationServiceURLClaim
+  : AccountClaim
 
 export const isOfType = <K extends ClaimTypes>(type: K) => (data: Claim): data is ClaimPayload<K> =>
   data.type === type
-
-/**
- * Verifies a claim made by an account, i.e. whether a claim can be verified to be correct
- * @param claim The claim to verify
- * @param address The address that is making the claim
- * @param metadataURLGetter A function that can retrieve the metadata URL for a given account address,
- *                          should be Accounts.getMetadataURL()
- * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
- */
-export async function verifyClaim(
-  claim: Claim,
-  address: string,
-  metadataURLGetter: MetadataURLGetter
-) {
-  switch (claim.type) {
-    case ClaimTypes.KEYBASE:
-      return verifyKeybaseClaim(claim, address)
-    case ClaimTypes.ACCOUNT:
-      return verifyAccountClaim(claim, address, metadataURLGetter)
-    default:
-      break
-  }
-  return
-}
 
 /**
  * Validates a claim made by an account, i.e. whether the claim is usable

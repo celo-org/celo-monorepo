@@ -2,12 +2,14 @@ import { Address } from '@celo/utils/lib/address'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { Block, Transaction } from 'web3/eth/types'
 import { ContractKit } from '../kit'
+import { parseDecodedParams } from '../utils/web3-utils'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 export interface CallDetails {
   contract: string
   function: string
-  parameters: Record<string, any>
+  paramMap: Record<string, any>
+  argList: any[]
 }
 
 export interface ParsedTx {
@@ -93,23 +95,15 @@ export class BlockExplorer {
       return null
     }
 
-    const parameters: Record<string, any> = abi.decodeParameters(
-      matchedAbi.inputs!,
-      encodedParameters
+    const { args, params } = parseDecodedParams(
+      abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
-
-    // remove number & number keys
-    delete parameters.__length__
-    Object.keys(parameters).forEach((key) => {
-      if (Number.parseInt(key, 10) >= 0) {
-        delete parameters[key]
-      }
-    })
 
     const callDetails: CallDetails = {
       contract: contractMapping.details.name,
       function: matchedAbi.name!,
-      parameters,
+      paramMap: params,
+      argList: args,
     }
 
     return {

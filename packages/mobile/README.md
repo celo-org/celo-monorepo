@@ -38,7 +38,9 @@ export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gr
 3.  Compile the project and start the bundler with
 
     ```bash
-    yarn run dev
+    yarn run dev:android
+    OR
+    yarn run dev:ios
     ```
 
     This will build the app in a device (physical or emulated) and open a
@@ -93,11 +95,13 @@ that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.
 the new network name and settings, then rebuild the app. Note that this will assume the testnets
 have a corresponding `/blockchain-api` and `/notification-service` set up.
 
-### Running Wallet app in ZeroSync mode
+### Running Wallet app in zero sync (Data Saver) mode
 
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
-To run the wallet in zero sync mode, using a trusted node rather than the local geth node as a provider, turn it on from the Celo Lite page in settings or update the zero sync initially enabled parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org/`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
+To run the wallet in zero sync (Data Saver) mode, using a trusted node rather than the local geth node as a provider, turn it on from the Data Saver page in settings or update the `ZERO_SYNC_ENABLED_INITIALLY` parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
+
+To debug network requests in zero sync mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
 
 ## Testing
 
@@ -182,7 +186,11 @@ Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug
 
 On android, the wallet app uses the SMS Retriever API to automatically input codes during phone number verification.
 
-The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever]. Note, the signature will need to be computed using the signing key from the google play dashboard.
+The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever].
+The hash depends on both the bundle id and the signing certificate. Since we use Google Play signing, we need to download the certificate.
+
+1.  Go to the play console for the relevant app, Release management > App signing, and download the App signing certificate.
+2.  Use this script to generate the hash code: https://github.com/michalbrz/sms-retriever-hash-generator
 
 ## Generating GraphQL Types
 

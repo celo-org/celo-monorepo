@@ -90,7 +90,7 @@ library LinkedList {
    */
   function remove(List storage list, bytes32 key) public {
     Element storage element = list.elements[key];
-    require(key != bytes32(0) && contains(list, key));
+    require(key != bytes32(0) && contains(list, key), "key not in list");
     if (element.previousKey != bytes32(0)) {
       Element storage previousElement = list.elements[element.previousKey];
       previousElement.nextKey = element.nextKey;
@@ -116,7 +116,10 @@ library LinkedList {
    * @param nextKey The key of the element that comes after the updated element.
    */
   function update(List storage list, bytes32 key, bytes32 previousKey, bytes32 nextKey) public {
-    require(key != bytes32(0) && key != previousKey && key != nextKey && contains(list, key));
+    require(
+      key != bytes32(0) && key != previousKey && key != nextKey && contains(list, key),
+      "key on in list"
+    );
     remove(list, key);
     insert(list, key, previousKey, nextKey);
   }
@@ -137,7 +140,7 @@ library LinkedList {
    * @dev Reverts if n is greater than the number of elements in the list.
    */
   function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
-    require(n <= list.numElements);
+    require(n <= list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     bytes32 key = list.head;
     for (uint256 i = 0; i < n; i++) {

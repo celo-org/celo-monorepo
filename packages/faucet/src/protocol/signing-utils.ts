@@ -1,11 +1,8 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
-// @ts-ignore
-import { bytes, hash, nat, RLP } from 'eth-lib'
+import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
 // @ts-ignore
 import * as helpers from 'web3-core-helpers'
-// @ts-ignore
-import * as Account from 'web3-eth-accounts/node_modules/eth-lib/lib/account'
 
 import Web3 = require('web3')
 

@@ -1,6 +1,6 @@
-import { generateGenesisFromEnv } from 'src/lib/generate_utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
@@ -22,9 +22,9 @@ export async function removeHelmRelease(celoEnv: string) {
 export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Upgrading helm release ${releaseName(celoEnv)}`)
 
-  const upgradeCmdArgs = `${releaseName(
-    celoEnv
-  )} ${helmChartPath} --namespace ${celoEnv} ${(await helmParameters(celoEnv)).join(' ')}`
+  const upgradeCmdArgs = `${releaseName(celoEnv)} ${helmChartPath} --namespace ${celoEnv} ${(
+    await helmParameters(celoEnv)
+  ).join(' ')}`
 
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     await execCmdWithExitOnFailure(`helm upgrade --debug --dry-run ${upgradeCmdArgs}`)
@@ -36,7 +36,8 @@ export async function upgradeHelmChart(celoEnv: string) {
 async function helmParameters(celoEnv: string) {
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
-
+  const genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
+  const genesisFileJsonB64 = Buffer.from(JSON.stringify(genesis)).toString('base64')
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set celotool.image.repository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
@@ -45,7 +46,6 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.image.repository=${fetchEnv(
       envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY
     )}`,
-    `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
     `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
@@ -58,7 +58,7 @@ async function helmParameters(celoEnv: string) {
     // TODO(nambrot): Hardcode for now, couldn't figure out how to make it work dynamically
     // DB is exposed as ClusterIP service only
     `--set global.postgresql.postgresqlPassword=password`,
-    `--set geth.genesisFile=${Buffer.from(generateGenesisFromEnv()).toString('base64')}`,
+    `--set geth.genesisFile=${genesisFileJsonB64}`,
     `--set geth.staticNodes="${staticNodesJsonB64}"`,
     `--set geth.genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,

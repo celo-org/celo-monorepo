@@ -41,6 +41,7 @@ e2e-defaults: &e2e-defaults
 general:
   artifacts:
     - "mobile/coverage"
+    - "web/coverage"
     - "protocol/coverage"
 
 jobs:
@@ -116,9 +117,8 @@ jobs:
             # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
-            yarn build --scope docs
             yarn build --scope @celo/walletkit
-            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit
+            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit --ignore @celo/web
 
       - run:
           name: Check licenses
@@ -173,7 +173,7 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
       - run:
-          name: Creace Android Virtual Device (AVD)
+          name: Create Android Virtual Device (AVD)
           command: |
             avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
             # Copy device configuarion, adv for some reason doesn't
@@ -289,6 +289,22 @@ jobs:
           command: |
             mkdir -p test-results/jest
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: packages/web/coverage
+          destination: web/coverage
+
+      - run:
+          name: copy
+          command: |
+            mkdir -p packages/web/web/coverage
+            cp -r packages/web/coverage packages/web/web/
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F web
 
   mobile-test-build-app:
     <<: *android-defaults
@@ -407,15 +423,6 @@ jobs:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
 
-      - run:
-          name: Install and test the npm package
-          command: |
-            set -euo pipefail
-            cd packages/contractkit
-            yarn pack
-            cd /tmp
-            npm install ~/app/packages/contractkit/*.tgz
-
   walletkit-test:
     <<: *defaults
     steps:
@@ -436,15 +443,6 @@ jobs:
             set -euo pipefail
             yarn --cwd=packages/walletkit build alfajoresstaging
             yarn --cwd=packages/walletkit test
-
-      - run:
-          name: Install and test the npm package
-          command: |
-            set -euo pipefail
-            cd packages/walletkit
-            yarn pack
-            cd /tmp
-            npm install ~/app/packages/walletkit/*.tgz
 
   cli-test:
     <<: *defaults
@@ -548,6 +546,26 @@ jobs:
             set -e
             cd packages/celotool
             ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+
+  end-to-end-geth-slashing-test:
+    <<: *e2e-defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            cd packages/celotool
+            ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
@@ -676,10 +694,6 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - end-to-end-mobile-test:
-          requires:
-            - install_dependencies
-            - mobile-test-build-app
       - lint-checks:
           requires:
             - install_dependencies
@@ -719,6 +733,10 @@ workflows:
             - lint-checks
             - contractkit-test
       - end-to-end-geth-blockchain-parameters-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-slashing-test:
           requires:
             - lint-checks
             - contractkit-test

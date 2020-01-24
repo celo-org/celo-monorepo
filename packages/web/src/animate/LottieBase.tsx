@@ -1,7 +1,8 @@
 import lottie, { AnimationItem } from 'lottie-web'
 import * as React from 'react'
 interface Props {
-  path: string
+  path?: string
+  data?: object
 }
 
 export default class LottieBase extends React.Component<Props> {
@@ -15,7 +16,8 @@ export default class LottieBase extends React.Component<Props> {
       renderer: 'canvas',
       loop: true,
       autoplay: true,
-      path: `/static/lottieFiles/${this.props.path}`,
+      animationData: this.props.data,
+      path: this.props.path ? `/lottieFiles/${this.props.path}` : undefined,
     })
   }
 

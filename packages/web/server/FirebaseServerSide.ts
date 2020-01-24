@@ -2,7 +2,7 @@ import * as firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/database'
 import getConfig from 'next/config'
-import Sentry from '../fullstack/sentry'
+import Sentry from '../server/sentry'
 import {
   Address,
   E164Number,

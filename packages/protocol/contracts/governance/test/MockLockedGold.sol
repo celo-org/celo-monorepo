@@ -20,12 +20,13 @@ contract MockLockedGold is ILockedGold {
   mapping(address => address) public authorizedValidators;
   mapping(address => address) public authorizedBy;
   uint256 private totalLockedGold;
+  mapping(address => bool) public slashingWhitelist;
 
   function incrementNonvotingAccountBalance(address account, uint256 value) external {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].add(value);
   }
 
-  function decrementNonvotingAccountBalance(address account, uint256 value) external {
+  function decrementNonvotingAccountBalance(address account, uint256 value) public {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
   }
 
@@ -42,5 +43,25 @@ contract MockLockedGold is ILockedGold {
   }
   function getTotalLockedGold() external view returns (uint256) {
     return totalLockedGold;
+  }
+  function slash(
+    address account,
+    uint256 penalty,
+    address,
+    uint256,
+    address[] calldata,
+    address[] calldata,
+    uint256[] calldata
+  ) external {
+    accountTotalLockedGold[account] = accountTotalLockedGold[account].sub(penalty);
+  }
+  function addSlasher(address slasher) external {
+    slashingWhitelist[slasher] = true;
+  }
+  function removeSlasher(address slasher) external {
+    slashingWhitelist[slasher] = false;
+  }
+  function isSlasher(address slasher) external view returns (bool) {
+    return slashingWhitelist[slasher];
   }
 }
