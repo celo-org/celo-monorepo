@@ -7,12 +7,12 @@ export enum Actions {
   SET_PROMPT_ZERO_SYNC = 'GETH/SET_PROMPT_ZERO_SYNC',
 }
 
-interface SetInitState {
+interface SetInitStateAction {
   type: Actions.SET_INIT_STATE
   state: InitializationState
 }
 
-export const setInitState = (state: InitializationState): SetInitState => ({
+export const setInitState = (state: InitializationState): SetInitStateAction => ({
   type: Actions.SET_INIT_STATE,
   state,
 })
@@ -21,24 +21,24 @@ export const cancelGethSaga = () => ({
   type: Actions.CANCEL_GETH_SAGA,
 })
 
-interface SetPromptZeroSync {
+interface SetPromptZeroSyncAction {
   type: Actions.SET_PROMPT_ZERO_SYNC
   promptIfNeeded: boolean
 }
 
-export const setPromptZeroSync = (promptIfNeeded: boolean): SetPromptZeroSync => ({
+export const setPromptZeroSync = (promptIfNeeded: boolean): SetPromptZeroSyncAction => ({
   type: Actions.SET_PROMPT_ZERO_SYNC,
   promptIfNeeded,
 })
 
-interface SetGethConnected {
+interface SetGethConnectedAction {
   type: Actions.SET_GETH_CONNECTED
   connected: boolean
 }
 
-export const setGethConnected = (connected: boolean): SetGethConnected => ({
+export const setGethConnected = (connected: boolean): SetGethConnectedAction => ({
   type: Actions.SET_GETH_CONNECTED,
   connected,
 })
 
-export type ActionTypes = SetInitState | SetGethConnected | SetPromptZeroSync
+export type ActionTypes = SetInitStateAction | SetGethConnectedAction | SetPromptZeroSyncAction
