@@ -2,7 +2,7 @@ import { createSelector } from 'reselect'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { DAYS_TO_BACKUP, DAYS_TO_DELAY } from 'src/backup/utils'
 import { BALANCE_OUT_OF_SYNC_THRESHOLD } from 'src/config'
-import { isGethConnectedSelector } from 'src/geth/reducer'
+import { isGethConnectedSelector } from 'src/geth/selectors'
 import { RootState } from 'src/redux/reducers'
 import { timeDeltaInDays, timeDeltaInSeconds } from 'src/utils/time'
 
