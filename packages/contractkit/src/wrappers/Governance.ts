@@ -431,9 +431,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    const queue = upvoteRecord.proposalID.isZero()
-      ? await this.getQueue()
-      : (await this.withUpvoteRevoked(upvoter)).queue
+    const recordQueued = await this.isQueued(upvoteRecord.proposalID)
+    const queue = recordQueued
+      ? (await this.withUpvoteRevoked(upvoter)).queue
+      : await this.getQueue()
+    console.log(queue)
     const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
     return this.lesserAndGreater(proposalID, upvoteQueue)
   }
