@@ -24,23 +24,3 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/rewards/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/rewards/show.ts)_
-
-### Slasher
-
-Slashes for downtime
-
-```
-USAGE
-  $ celocli rewards:slasher
-
-OPTIONS
-  --dryRun                                             Dry run
-  --forDowntimeEndingAtBlock=forDowntimeEndingAtBlock  Slash validator for downtime ending at block
-  --slashValidator=slashValidator                      Slash validator address
-  --slashableDowntime=slashableDowntime                Downtime to slash for
-
-EXAMPLE
-  slasher
-```
-
-_See code: [packages/cli/src/commands/rewards/slasher.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/rewards/slasher.ts)_
