@@ -52,14 +52,18 @@ export default class VideoModal extends React.Component<Props, State> {
     this.close()
   }
 
+  playerHeight = () => {
+    return this.state.height > this.state.width ? this.state.width * 0.75 : this.state.height
+  }
+
   render() {
     const opts = {
-      height: this.state.height,
+      height: this.playerHeight(),
       width: this.state.width,
       playerVars: {
         // https://developers.google.com/youtube/player_parameters
         autoplay: 1,
-        // controls: 0,
+        controls: 1,
         playsinline: 1,
         modestbranding: 1,
       },
@@ -77,8 +81,8 @@ export default class VideoModal extends React.Component<Props, State> {
               position: absolute;
               bottom: 60px;
               left: 0;
-              width: 100%;
-              height: calc(90% - 100px)
+              width: calc(100% - 5px);
+              height: calc(90% - 60px);
             }
 
             .ReactModal__Overlay {
@@ -126,11 +130,25 @@ export default class VideoModal extends React.Component<Props, State> {
             <Text onPress={this.close} style={styles.closeButton}>
               <EX size={30} />
             </Text>
-            <YouTube videoId={this.props.videoID} opts={opts} onEnd={this.onEnd} />
+            <YouTube
+              videoId={this.props.videoID}
+              opts={opts}
+              onError={console.error}
+              onReady={onReady}
+              onEnd={this.onEnd}
+            />
           </ReactModal>
         )}
       </>
     )
+  }
+}
+// todo is this right?
+async function onReady(opts) {
+  try {
+    opts.target.playVideo()
+  } catch (e) {
+    console.log(e)
   }
 }
 
@@ -146,8 +164,8 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 40,
-    right: 40,
+    top: 30,
+    right: 30,
     height: 30,
     width: 30,
   },
@@ -170,16 +188,16 @@ const htmlStyles = {
     cursor: 'pointer',
   },
   modalContent: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'black',
     display: 'flex',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     border: 0,
-    width: '100%',
-    position: 'static',
-    top: 'inherit',
-    bottom: 'inherit',
+    position: 'absolute',
+    overflow: 'hidden',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
     padding: 0,
   },
 }
