@@ -23,7 +23,7 @@ export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer)
 export interface ProposalTransactionJSON {
   contract: CeloContract
   function: string
-  params: Record<string, any>
+  args: any[]
   value: string
 }
 
@@ -39,7 +39,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
     return {
       contract: parsedTx.callDetails.contract as CeloContract,
       function: parsedTx.callDetails.function,
-      params: parsedTx.callDetails.paramMap,
+      args: parsedTx.callDetails.argList,
       value: parsedTx.tx.value,
     }
   })
