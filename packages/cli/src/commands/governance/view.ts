@@ -1,4 +1,4 @@
-import { proposalToJSON } from '@celo/contractkit/src/governance/proposals'
+import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
