@@ -120,9 +120,9 @@ contract StableToken is
     // solhint-disable-next-line not-rely-on-time
     inflationState.factorLastUpdated = now;
 
-    require(initialBalanceAddresses.length == initialBalanceValues.length);
+    require(initialBalanceAddresses.length == initialBalanceValues.length, "Array length mismatch");
     for (uint256 i = 0; i < initialBalanceAddresses.length; i = i.add(1)) {
-      require(_mint(initialBalanceAddresses[i], initialBalanceValues[i]));
+      require(_mint(initialBalanceAddresses[i], initialBalanceValues[i]), "mint failed");
     }
     setRegistry(registryAddress);
   }
@@ -203,10 +203,10 @@ contract StableToken is
    * @param value The amount of StableToken to mint.
    */
   function mint(address to, uint256 value) external updateInflationFactor returns (bool) {
-    // Only the Exchange and Validators contracts are authorized to mint.
     require(
       msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
-        msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID)
+        msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID),
+      "Only the Exchange and Validators contracts are authorized to mint"
     );
     return _mint(to, value);
   }

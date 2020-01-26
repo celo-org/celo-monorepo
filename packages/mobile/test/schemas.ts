@@ -48,8 +48,8 @@ export const vNeg1Schema = {
     isReady: false,
     syncProgress: 0,
     syncProgressData: {
-      currentBlock: 0,
-      highestBlock: 0,
+      currentBlock: 100,
+      highestBlock: 100,
       startBlock: 0,
     },
     latestBlockNumber: 0,
@@ -59,6 +59,10 @@ export const vNeg1Schema = {
     gasPriceLastUpdated: 0,
     zeroSyncMode: false,
     gethStartedThisSession: true,
+  },
+  geth: {
+    initialized: 'INITIALIZED',
+    connected: true,
   },
   identity: {
     attestationCodes: [],
@@ -125,8 +129,8 @@ export const v0Schema = {
     ...vNeg1Schema.web3,
     syncProgress: {
       startingBlock: 0,
-      currentBlock: 0,
-      highestBlock: 0,
+      currentBlock: 100,
+      highestBlock: 100,
     },
   },
   localCurrency: {
@@ -185,9 +189,59 @@ export const v4Schema = {
     acceptedAttestationCodes: [],
     verificationStatus: 0,
     hasSeenVerificationNux: false,
+    contactMappingProgress: {
+      current: 0,
+      total: 0,
+    },
+  },
+  account: {
+    name: 'John Doe',
+    e164PhoneNumber: '+14155556666',
+    defaultCountryCode: '+1',
+    contactDetails: {
+      contactId: 'contactId',
+      thumbnailPath: null,
+    },
+    devModeActive: false,
+    devModeClickCount: 0,
+    photosNUXClicked: false,
+    pincodeSet: false,
+    accountCreationTime: 99999999999999,
+    incomingPaymentRequests: [],
+    outgoingPaymentRequests: [],
+    showFakeData: false,
+    backupCompleted: false,
+    socialBackupCompleted: false,
+    backupDelayedTime: 0,
+    dismissedGetVerified: false,
+    dismissedEarnRewards: false,
+    dismissedInviteFriends: false,
+    pincodeType: PincodeType.Unset,
+    isSettingPin: false,
+  },
+  exchange: {
+    exchangeRatePair: null,
+    history: {
+      isLoading: false,
+      celoGoldExchangeRates: [],
+      lastTimeUpdated: 0,
+    },
+    tobinTax: '0',
+  },
+}
+
+export const v5Schema = {
+  ...v4Schema,
+  localCurrency: {
+    ...v4Schema.localCurrency,
+    exchangeRate: '1.33',
+  },
+  geth: {
+    ...v4Schema.geth,
+    promptZeroSyncIfNeeded: false,
   },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v4Schema as Partial<RootState>
+  return v5Schema as Partial<RootState>
 }

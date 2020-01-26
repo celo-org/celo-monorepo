@@ -15,12 +15,15 @@ USAGE
 OPTIONS
   -r, --role=vote|validator|attestation                (required) Role to delegate
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
-  --pop=pop                                            (required) Proof-of-possession of the signer key
+
+  --signature=signature                                (required) Signature (a.k.a proof-of-possession) of the signer
+                                                       key
+
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
 EXAMPLE
   authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
-  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
 ```
@@ -43,7 +46,7 @@ _See code: [packages/cli/src/commands/account/balance.ts](https://github.com/cel
 
 ### Claim-account
 
-Claim another account in a local metadata file
+Claim another account, and optionally its public key, and add the claim to a local metadata file
 
 ```
 USAGE
@@ -56,18 +59,19 @@ OPTIONS
   --address=address                                  (required) The address of the account you want to claim
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
-  --publicKey=publicKey                              The public key of the account if you want others to encrypt
-                                                     messages to you
+  --publicKey=publicKey                              The public key of the account that others may use to send you
+                                                     encrypted messages
 
 EXAMPLE
-  claim-account ~/metadata.json --address test.com --from 0x0
+  claim-account ~/metadata.json --address 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --from
+  0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/claim-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-account.ts)_
 
 ### Claim-attestation-service-url
 
-Claim the URL of the attestation service in a local metadata file
+Claim the URL of the attestation service and add the claim to a local metadata file
 
 ```
 USAGE
@@ -78,17 +82,18 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
-  --url=htttps://www.celo.org                        (required) The url you want to claim
+  --url=https://www.celo.org                         (required) The url you want to claim
 
 EXAMPLE
-  claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from 0x0
+  claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from
+  0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/claim-attestation-service-url.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-attestation-service-url.ts)_
 
 ### Claim-domain
 
-Change the domain in a local metadata file
+Claim a domain and add the claim to a local metadata file
 
 ```
 USAGE
@@ -102,14 +107,14 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
 EXAMPLE
-  claim-domain ~/metadata.json --domain test.com --from 0x0
+  claim-domain ~/metadata.json --domain test.com --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/claim-domain.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-domain.ts)_
 
 ### Claim-keybase
 
-Claim a keybase username in a local metadata file
+Claim a keybase username and add the claim to a local metadata file
 
 ```
 USAGE
@@ -123,14 +128,14 @@ OPTIONS
   --username=username                                (required) The keybase username you want to claim
 
 EXAMPLE
-  claim-keybase ~/metadata.json --from 0x0 --username test
+  claim-keybase ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --username myusername
 ```
 
 _See code: [packages/cli/src/commands/account/claim-keybase.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-keybase.ts)_
 
 ### Claim-name
 
-Change the name in a local metadata file
+Claim a name and add the claim to a local metadata file
 
 ```
 USAGE
@@ -144,14 +149,14 @@ OPTIONS
   --name=name                                        (required) The name you want to claim
 
 EXAMPLE
-  change-name ~/metadata.json --from 0x0 --name myname
+  claim-name ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --name myname
 ```
 
 _See code: [packages/cli/src/commands/account/claim-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-name.ts)_
 
 ### Create-metadata
 
-Create an empty metadata file
+Create an empty identity metadata file. Use this metadata file to store claims attesting to ownership of off-chain resources. Claims can be generated with the account:claim-\* commands.
 
 ```
 USAGE
@@ -164,14 +169,14 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
 EXAMPLE
-  create-metadata ~/metadata.json --from 0x0
+  create-metadata ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/create-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/create-metadata.ts)_
 
 ### Get-metadata
 
-Show information about an address
+Show information about an address. Retreives the metadata URL for an account from the on-chain, then fetches the metadata file off-chain and verifies proofs as able.
 
 ```
 USAGE
@@ -186,23 +191,9 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/get-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/get-metadata.ts)_
 
-### Isvalidator
-
-Check whether a given address is elected to be validating in the current epoch
-
-```
-USAGE
-  $ celocli account:isvalidator ADDRESS
-
-EXAMPLE
-  isvalidator 0x5409ed021d9299bf6814279a6a1411a7e866a631
-```
-
-_See code: [packages/cli/src/commands/account/isvalidator.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/isvalidator.ts)_
-
 ### New
 
-Creates a new account
+Creates a new account locally and print out the key information. Save this information for local transaction signing or import into a Celo node.
 
 ```
 USAGE
@@ -256,7 +247,7 @@ _See code: [packages/cli/src/commands/account/register.ts](https://github.com/ce
 
 ### Register-metadata
 
-Register metadata about an address
+Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims
 
 ```
 USAGE
@@ -264,13 +255,59 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
-  --url=htttps://www.celo.org                        (required) The url to the metadata you want to register
+  --url=https://www.celo.org                         (required) The url to the metadata you want to register
 
 EXAMPLE
-  register-metadata --url https://www.celo.org --from 0x0
+  register-metadata --url https://www.mywebsite.com/celo-metadata --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
 _See code: [packages/cli/src/commands/account/register-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-metadata.ts)_
+
+### Set-name
+
+Sets the name of a registered account on-chain. An account's name is an optional human readable identifier
+
+```
+USAGE
+  $ celocli account:set-name
+
+OPTIONS
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --name=name                                           (required)
+
+EXAMPLE
+  set-name --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
+```
+
+_See code: [packages/cli/src/commands/account/set-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-name.ts)_
+
+### Show
+
+Show information for an account, including name, authorized vote, validator, and attestation signers, the URL at which account metadata is hosted, the address the account is using with the mobile wallet, and a public key that can be used to encrypt information for the account.
+
+```
+USAGE
+  $ celocli account:show ADDRESS
+
+EXAMPLE
+  show 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show.ts)_
+
+### Show-claimed-accounts
+
+Show information about claimed accounts
+
+```
+USAGE
+  $ celocli account:show-claimed-accounts ADDRESS
+
+EXAMPLE
+  show-claimed-accounts 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/show-claimed-accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/show-claimed-accounts.ts)_
 
 ### Show-metadata
 
@@ -295,14 +332,16 @@ Unlock an account address to send transactions or validate blocks
 
 ```
 USAGE
-  $ celocli account:unlock
+  $ celocli account:unlock ACCOUNT
+
+ARGUMENTS
+  ACCOUNT  Account address
 
 OPTIONS
-  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
   --password=password
 
 EXAMPLE
-  unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
 _See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_

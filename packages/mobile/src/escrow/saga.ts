@@ -1,9 +1,11 @@
+import { ensureLeading0x } from '@celo/utils/src/address'
 import { getEscrowContract, getStableTokenContract } from '@celo/walletkit'
 import { Escrow } from '@celo/walletkit/lib/types/Escrow'
 import { StableToken } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
 import {
@@ -30,7 +32,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
@@ -84,7 +86,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   yield put(
     addStandbyTransaction({
       id,
-      type: TransactionTypes.SENT,
+      type: TokenTransactionType.EscrowSent,
       status: TransactionStatus.Pending,
       value,
       symbol: CURRENCY_ENUM.DOLLAR,
@@ -144,7 +146,7 @@ function* withdrawFromEscrow() {
     signature = signature.slice(2)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = web3.utils.hexToNumber(signature.slice(128, 130))
+    const v = web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
 
     const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
@@ -243,13 +245,11 @@ function* doFetchSentPayments() {
     const sentPaymentsRaw = yield all(
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
-
     const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
       const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
-
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue

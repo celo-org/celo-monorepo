@@ -4,7 +4,7 @@ Celo is open source and we welcome open participation. We strive to be an open a
 
 ### Getting started
 
-Find an area that is of interest and you would like to help with. Look for issues that are tagged as "help wanted" and “1 hour tasks” to get started. If you’d like to dig deeper, feel free to look at other labels and TODO’s in code comments. If there’s an issue you’re interested in contributing to or taking over, assign yourself to it and add a comment with your plans to address and target timeline. If there’s already someone assigned to it, please check with them before adding yourself to the assignee list.
+Find an area that is of interest and you would like to help with. Look for issues that are tagged as "[good first issue](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)", "[help wanted](https://github.com/celo-org/celo-monorepo/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)" and "[1 hour tasks](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)" to get started. If you’d like to dig deeper, feel free to look at other labels and TODO’s in code comments. If there’s an issue you’re interested in contributing to or taking over, assign yourself to it and add a comment with your plans to address and target timeline. If there’s already someone assigned to it, please check with them before adding yourself to the assignee list.
 
 Tasks range from minor to major improvements. Based on your interests, skillset, and level of comfort with the code-base feel free to contribute where you see appropriate. Our only ask is that you follow the guidelines below to ensure a smooth and effective collaboration.
 

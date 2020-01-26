@@ -1,7 +1,7 @@
 PODS:
   - Analytics (3.7.0)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.173)
+  - CeloBlockchain (0.0.247)
   - Crashlytics (3.13.4):
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
@@ -304,6 +304,8 @@ PODS:
     - React
   - react-native-contacts (5.0.0):
     - React
+  - react-native-fast-crypto (1.8.2):
+    - React
   - react-native-geth (0.1.0-development):
     - CeloBlockchain
     - React
@@ -387,7 +389,7 @@ PODS:
     - React
   - RNFS (2.14.1):
     - React
-  - RNGestureHandler (1.4.1):
+  - RNGestureHandler (1.5.2):
     - React
   - RNLocalize (1.3.0):
     - React
@@ -408,11 +410,11 @@ PODS:
     - React
   - RNSVG (9.11.1):
     - React
-  - Segment-Firebase (2.4.0):
+  - Segment-Firebase (2.5.0):
     - Analytics (~> 3.2)
     - Firebase/Core (~> 5.0)
-    - Segment-Firebase/Core (= 2.4.0)
-  - Segment-Firebase/Core (2.4.0):
+    - Segment-Firebase/Core (= 2.5.0)
+  - Segment-Firebase/Core (2.5.0):
     - Analytics (~> 3.2)
     - Firebase/Core (~> 5.0)
   - Sentry (4.4.0):
@@ -449,6 +451,7 @@ DEPENDENCIES:
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
   - react-native-contacts (from `../../../node_modules/react-native-contacts`)
+  - "react-native-fast-crypto (from `../../../node_modules/@celo/react-native-fast-crypto`)"
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
@@ -488,6 +491,7 @@ DEPENDENCIES:
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
   - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
+  - Segment-Firebase (from `https://github.com/celo-org/analytics-ios-integration-firebase.git`, commit `e849d040239a7e56e02df96aabc0851e56a4cb19`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -512,7 +516,6 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - Protobuf
-    - Segment-Firebase
     - Sentry
 
 EXTERNAL SOURCES:
@@ -556,6 +559,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-config"
   react-native-contacts:
     :path: "../../../node_modules/react-native-contacts"
+  react-native-fast-crypto:
+    :path: "../../../node_modules/@celo/react-native-fast-crypto"
   react-native-geth:
     :path: "../../../node_modules/react-native-geth"
   react-native-keep-awake:
@@ -632,13 +637,21 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-share"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
+  Segment-Firebase:
+    :commit: e849d040239a7e56e02df96aabc0851e56a4cb19
+    :git: https://github.com/celo-org/analytics-ios-integration-firebase.git
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
+
+CHECKOUT OPTIONS:
+  Segment-Firebase:
+    :commit: e849d040239a7e56e02df96aabc0851e56a4cb19
+    :git: https://github.com/celo-org/analytics-ios-integration-firebase.git
 
 SPEC CHECKSUMS:
   Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: 6c7de89c718d54424ad9f49a37372656d9833451
+  CeloBlockchain: bb746f8a319e53229e68009adaf14c804bdf79d0
   Crashlytics: 2dfd686bcb918dc10ee0e76f7f853fe42c7bd552
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
@@ -676,6 +689,7 @@ SPEC CHECKSUMS:
   react-native-camera: ccbcbe683c621b9a4270e86e3a46bb9609121186
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
+  react-native-fast-crypto: 1e9d58d1723de0a225b56a5f86b161afea3dbbf6
   react-native-geth: b643560e11512a3c0b1d78df929cb9f2409cf4a2
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: 7e37dfbe93ff0d4c7df346b738854dbed533e86f
@@ -704,7 +718,7 @@ SPEC CHECKSUMS:
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFirebase: ac0de8b24c6f91ae9459575491ed6a77327619c6
   RNFS: a8fbe7060fa49157d819466404794ad9c58e58cf
-  RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa
+  RNGestureHandler: 946a7691e41df61e2c4b1884deab41a4cdc3afff
   RNLocalize: cebb57c3c1e5479806204ce135b26bdd79d17e8a
   RNPermissions: 9525b0f4d209fdf9a373d52d1492ae2943e691e5
   RNRandomBytes: e5680396032547c8ceb494768532459dc6911b76
@@ -714,10 +728,10 @@ SPEC CHECKSUMS:
   RNSentry: e57b6acd2424e185ba2e23ef78aa2186a40e83e0
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
   RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
-  Segment-Firebase: cac4b742228ef74d50ed886f3fc731e4bc8b7d29
+  Segment-Firebase: 5ab5aa1e962148c60e5582734ad68b320c647cef
   Sentry: 26650184fe71eb7476dfd2737acb5ea6cc64b4b1
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: 0d3a8018c6a563abba8559d74620bf8b8b370fe8
+PODFILE CHECKSUM: 9053f905f52fe68c96c88fd161260e9d6081607f
 
 COCOAPODS: 1.7.5

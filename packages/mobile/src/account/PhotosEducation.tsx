@@ -48,8 +48,5 @@ export class PhotosEducation extends React.Component<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    { photosNUXCompleted }
-  )(PhotosEducation)
+  connect<{}, DispatchProps>(null, { photosNUXCompleted })(PhotosEducation)
 )

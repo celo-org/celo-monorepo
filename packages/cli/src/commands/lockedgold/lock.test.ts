@@ -17,6 +17,8 @@ testWithGanache('lockedgold:lock cmd', (web3: Web3) => {
     await Lock.run(['--from', account, '--value', '100'])
     await Unlock.run(['--from', account, '--value', '50'])
     await Lock.run(['--from', account, '--value', '75'])
+    await Unlock.run(['--from', account, '--value', '50'])
+    await Lock.run(['--from', account, '--value', '50'])
     const pendingWithdrawalsTotalValue = await lockedGold.getPendingWithdrawalsTotalValue(account)
     expect(pendingWithdrawalsTotalValue.toFixed()).toBe('0')
   })

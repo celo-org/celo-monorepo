@@ -9,4 +9,14 @@ interface ILockedGold {
   function unlock(uint256) external;
   function relock(uint256, uint256) external;
   function withdraw(uint256) external;
+  function slash(
+    address account,
+    uint256 penalty,
+    address reporter,
+    uint256 reward,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external;
+  function isSlasher(address) external view returns (bool);
 }

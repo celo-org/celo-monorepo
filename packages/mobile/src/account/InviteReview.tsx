@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -14,8 +14,9 @@ import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { TokenTransactionType } from 'src/apollo/types'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { InviteBy, sendInvite } from 'src/invite/actions'
@@ -25,13 +26,12 @@ import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { TransactionTypes } from 'src/transactions/reducer'
 
 interface State {
   amountIsValid: boolean
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
+type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
 
 interface StateProps {
   inviteInProgress: boolean
@@ -173,7 +173,7 @@ export class InviteReview extends React.Component<Props, State> {
         <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
           <TransferReviewCard
             recipient={recipient}
-            type={TransactionTypes.INVITE_SENT}
+            type={TokenTransactionType.InviteSent}
             address={recipient.address}
             value={getInvitationVerificationFeeInDollars()}
             e164PhoneNumber={recipient.e164PhoneNumber}
@@ -206,5 +206,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.inviteFlow11)(InviteReview))
+  )(withTranslation(Namespaces.inviteFlow11)(InviteReview))
 )

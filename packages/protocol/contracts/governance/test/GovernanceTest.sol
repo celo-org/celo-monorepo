@@ -10,7 +10,7 @@ contract GovernanceTest is Governance {
     return validatorSet.length;
   }
 
-  function validatorAddressFromCurrentSet(uint256 index) public view returns (address) {
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
     return validatorSet[index];
   }
 

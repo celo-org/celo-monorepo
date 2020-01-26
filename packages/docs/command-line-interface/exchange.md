@@ -13,13 +13,16 @@ USAGE
   $ celocli exchange:dollars
 
 OPTIONS
-  --commission=commission                             (required)
-  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The minimum value of Celo Gold to receive in return
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) The address with Celo Dollars to exchange
-  --value=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The value of Celo Dollars to exchange for Celo Gold
+  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Gold to receive in
+                                                     return
 
-EXAMPLE
-  dollars --value 10000000000000 --for 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Dollars to exchange
+
+  --value=10000000000000000000000                    (required) The value of Celo Dollars to exchange for Celo Gold
+
+EXAMPLES
+  dollars --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+  dollars --value 10000000000000 --forAtLeast 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
 _See code: [packages/cli/src/commands/exchange/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/dollars.ts)_
@@ -33,13 +36,16 @@ USAGE
   $ celocli exchange:gold
 
 OPTIONS
-  --commission=commission                             (required)
-  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The minimum value of Celo Dollars to receive in return
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) The address with Celo Gold to exchange
-  --value=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The value of Celo Gold to exchange for Celo Dollars
+  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Dollars to receive
+                                                     in return
 
-EXAMPLE
-  gold --value 5000000000000 --for 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Gold to exchange
+
+  --value=10000000000000000000000                    (required) The value of Celo Gold to exchange for Celo Dollars
+
+EXAMPLES
+  gold --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+  gold --value 5000000000000 --forAtLeast 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
 _See code: [packages/cli/src/commands/exchange/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/gold.ts)_

@@ -1,19 +1,5 @@
-import BigNumber from 'bignumber.js'
-import { keccak256 } from 'ethereumjs-util'
-import {
-  AccountsContract,
-  AccountsInstance,
-  GovernanceTestContract,
-  GovernanceTestInstance,
-  MockLockedGoldContract,
-  MockLockedGoldInstance,
-  RegistryContract,
-  RegistryInstance,
-  TestTransactionsContract,
-  TestTransactionsInstance,
-} from 'types'
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertBalance,
   assertEqualBN,
@@ -25,11 +11,30 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
+import { zip } from '@celo/utils/src/collections'
+import BigNumber from 'bignumber.js'
+import { keccak256 } from 'ethereumjs-util'
+import {
+  AccountsContract,
+  AccountsInstance,
+  GovernanceTestContract,
+  GovernanceTestInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
+  TestTransactionsContract,
+  TestTransactionsInstance,
+} from 'types'
 
 const Governance: GovernanceTestContract = artifacts.require('GovernanceTest')
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
 
@@ -70,12 +75,22 @@ interface Transaction {
 // hard coded in ganache
 const EPOCH = 100
 
+async function mineToNextEpoch(web3) {
+  const bn = web3.eth.getBlockNumber()
+  if (bn % EPOCH < 50) {
+    await mineBlocks(EPOCH + 20, web3)
+  } else {
+    await mineBlocks(EPOCH - 20, web3)
+  }
+}
+
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceTestInstance
   let accountsInstance: AccountsInstance
   let mockLockedGold: MockLockedGoldInstance
+  let mockValidators: MockValidatorsInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
   const nullFunctionId = '0x00000000'
@@ -103,12 +118,14 @@ contract('Governance', (accounts: string[]) => {
   let transactionSuccess1: Transaction
   let transactionSuccess2: Transaction
   let transactionFail: Transaction
-  let proposalHash: Buffer
-  let proposalHashStr: string
+  let salt: string
+  let hotfixHash: Buffer
+  let hotfixHashStr: string
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
+    mockValidators = await MockValidators.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
     await governance.initialize(
@@ -128,6 +145,8 @@ contract('Governance', (accounts: string[]) => {
     )
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount()
     await mockLockedGold.setAccountTotalLockedGold(account, weight)
     await mockLockedGold.setTotalLockedGold(weight)
@@ -164,18 +183,20 @@ contract('Governance', (accounts: string[]) => {
         'hex'
       ),
     }
-    proposalHash = keccak256(
+    salt = '0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0'
+    hotfixHash = keccak256(
       web3.eth.abi.encodeParameters(
-        ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
+        ['uint256[]', 'address[]', 'bytes', 'uint256[]', 'bytes32'],
         [
           [String(transactionSuccess1.value)],
           [transactionSuccess1.destination.toString()],
           transactionSuccess1.data,
           [String(transactionSuccess1.data.length)],
+          salt,
         ]
       )
     ) as Buffer
-    proposalHashStr = '0x' + proposalHash.toString('hex')
+    hotfixHashStr = '0x' + hotfixHash.toString('hex')
   })
 
   describe('#initialize()', () => {
@@ -642,7 +663,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            threshold: threshold,
+            threshold,
           },
         })
       })
@@ -675,7 +696,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            threshold: threshold,
+            threshold,
           },
         })
       })
@@ -777,7 +798,7 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: timestamp,
+            timestamp,
             transactionCount: 0,
           },
         })
@@ -842,7 +863,7 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: timestamp,
+            timestamp,
             transactionCount: 1,
           },
         })
@@ -915,7 +936,7 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: timestamp,
+            timestamp,
             transactionCount: 2,
           },
         })
@@ -1039,10 +1060,10 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        const otherAccount = accounts[1]
-        await accountsInstance.createAccount({ from: otherAccount })
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount, weight)
-        await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
+        const otherAccount1 = accounts[1]
+        await accountsInstance.createAccount({ from: otherAccount1 })
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, weight)
+        await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount1 })
         await timeTravel(queueExpiry, web3)
       })
 
@@ -1055,7 +1076,10 @@ contract('Governance', (accounts: string[]) => {
         await governance.upvote(proposalId, 0, 0)
         assert.isFalse(await governance.isQueued(proposalId))
         const [proposalIds] = await governance.getQueue()
-        assert.notInclude(proposalIds.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          proposalIds.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should emit the ProposalExpired event', async () => {
@@ -1105,11 +1129,11 @@ contract('Governance', (accounts: string[]) => {
     describe('when the previously upvoted proposal is in the queue and expired', () => {
       const upvotedProposalId = 2
       // Expire the upvoted proposal without dequeueing it.
-      const queueExpiry = 60
+      const queueExpiry1 = 60
       beforeEach(async () => {
         await governance.setQueueExpiry(60)
         await governance.upvote(proposalId, 0, 0)
-        await timeTravel(queueExpiry, web3)
+        await timeTravel(queueExpiry1, web3)
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1423,7 +1447,10 @@ contract('Governance', (accounts: string[]) => {
       it('should remove the proposal ID from dequeued', async () => {
         await governance.approve(proposalId, index)
         const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          dequeued.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should add the index to empty indices', async () => {
@@ -1597,7 +1624,10 @@ contract('Governance', (accounts: string[]) => {
       it('should remove the proposal ID from dequeued', async () => {
         await governance.vote(proposalId, index, value)
         const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          dequeued.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should add the index to empty indices', async () => {
@@ -1897,7 +1927,10 @@ contract('Governance', (accounts: string[]) => {
       it('should remove the proposal ID from dequeued', async () => {
         await governance.execute(proposalId, index)
         const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+        assert.notInclude(
+          dequeued.map((x) => x.toNumber()),
+          proposalId
+        )
       })
 
       it('should add the index to empty indices', async () => {
@@ -1928,13 +1961,13 @@ contract('Governance', (accounts: string[]) => {
 
   describe('#approveHotfix()', () => {
     it('should mark the hotfix record approved when called by approver', async () => {
-      await governance.approveHotfix(proposalHashStr, { from: approver })
-      const [approved, ,] = await governance.getHotfixRecord.call(proposalHashStr)
+      await governance.approveHotfix(hotfixHashStr, { from: approver })
+      const [approved, ,] = await governance.getHotfixRecord.call(hotfixHashStr)
       assert.isTrue(approved)
     })
 
     it('should emit the HotfixApproved event', async () => {
-      const resp = await governance.approveHotfix(proposalHashStr, { from: approver })
+      const resp = await governance.approveHotfix(hotfixHashStr, { from: approver })
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
@@ -1943,11 +1976,11 @@ contract('Governance', (accounts: string[]) => {
           hash: matchAny,
         },
       })
-      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(hotfixHash))
     })
 
     it('should revert when called by non-approver', async () => {
-      await assertRevert(governance.approveHotfix(proposalHashStr, { from: accounts[2] }))
+      await assertRevert(governance.approveHotfix(hotfixHashStr, { from: accounts[2] }))
     })
   })
 
@@ -1959,7 +1992,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should emit the HotfixWhitelist event', async () => {
-      const resp = await governance.whitelistHotfix(proposalHashStr, { from: accounts[3] })
+      const resp = await governance.whitelistHotfix(hotfixHashStr, { from: accounts[3] })
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
@@ -1969,7 +2002,54 @@ contract('Governance', (accounts: string[]) => {
           whitelister: accounts[3],
         },
       })
-      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+      assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(hotfixHash))
+    })
+  })
+
+  describe('#hotfixWhitelistValidatorTally', () => {
+    const newHotfixHash = '0x' + keccak256('celo bug fix').toString('hex')
+
+    const validators = zip(
+      (_account, signer) => ({ account: _account, signer }),
+      accounts.slice(2, 6),
+      accounts.slice(6, 10)
+    )
+
+    beforeEach(async () => {
+      await concurrentMap(5, validators, async (validator) => {
+        await accountsInstance.createAccount({ from: validator.account })
+        const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
+        await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
+          from: validator.account,
+        })
+        await mockValidators.setValidator(validator.account)
+        // add signers for mock precompile
+        await governance.addValidator(validator.signer)
+      })
+    })
+
+    const whitelistFrom = (t: keyof typeof validators[0]) =>
+      concurrentMap(5, validators, (v) => governance.whitelistHotfix(newHotfixHash, { from: v[t] }))
+
+    const checkTally = async () => {
+      const tally = await governance.hotfixWhitelistValidatorTally(newHotfixHash)
+      assert.equal(tally.toNumber(), validators.length)
+    }
+
+    it('should count validator accounts that have whitelisted', async () => {
+      await whitelistFrom('account')
+      await checkTally()
+    })
+
+    it('should count authorized validator signers that have whitelisted', async () => {
+      await whitelistFrom('signer')
+      await checkTally()
+    })
+
+    it('should not double count validator account and authorized signer accounts', async () => {
+      await whitelistFrom('signer')
+      await whitelistFrom('account')
+      await checkTally()
     })
   })
 
@@ -1977,23 +2057,25 @@ contract('Governance', (accounts: string[]) => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
       await governance.addValidator(accounts[3])
+      await accountsInstance.createAccount({ from: accounts[2] })
+      await accountsInstance.createAccount({ from: accounts[3] })
     })
 
     it('should return false when hotfix has not been whitelisted', async () => {
-      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      const passing = await governance.isHotfixPassing.call(hotfixHashStr)
       assert.isFalse(passing)
     })
 
     it('should return false when hotfix has been whitelisted but not by quorum', async () => {
-      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
-      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
+      const passing = await governance.isHotfixPassing.call(hotfixHashStr)
       assert.isFalse(passing)
     })
 
     it('should return true when hotfix is whitelisted by quorum', async () => {
-      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
-      await governance.whitelistHotfix(proposalHashStr, { from: accounts[3] })
-      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
+      await governance.whitelistHotfix(hotfixHashStr, { from: accounts[3] })
+      const passing = await governance.isHotfixPassing.call(hotfixHashStr)
       assert.isTrue(passing)
     })
   })
@@ -2001,27 +2083,28 @@ contract('Governance', (accounts: string[]) => {
   describe('#prepareHotfix()', () => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
+      await accountsInstance.createAccount({ from: accounts[2] })
     })
 
     it('should revert when hotfix is not passing', async () => {
-      await assertRevert(governance.prepareHotfix(proposalHashStr))
+      await assertRevert(governance.prepareHotfix(hotfixHashStr))
     })
 
     describe('when hotfix is passing', () => {
       beforeEach(async () => {
-        await mineBlocks(EPOCH, web3)
-        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
+        await mineToNextEpoch(web3)
+        await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       })
 
       it('should mark the hotfix record prepared epoch', async () => {
-        await governance.prepareHotfix(proposalHashStr)
-        const [, , preparedEpoch] = await governance.getHotfixRecord.call(proposalHashStr)
+        await governance.prepareHotfix(hotfixHashStr)
+        const [, , preparedEpoch] = await governance.getHotfixRecord.call(hotfixHashStr)
         const currEpoch = new BigNumber(await governance.getEpochNumber())
         assertEqualBN(preparedEpoch, currEpoch)
       })
 
       it('should emit the HotfixPrepared event', async () => {
-        const resp = await governance.prepareHotfix(proposalHashStr)
+        const resp = await governance.prepareHotfix(hotfixHashStr)
         const currEpoch = new BigNumber(await governance.getEpochNumber())
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
@@ -2032,18 +2115,18 @@ contract('Governance', (accounts: string[]) => {
             epoch: currEpoch,
           },
         })
-        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(hotfixHash))
       })
 
       it('should revert when epoch == preparedEpoch', async () => {
-        await governance.prepareHotfix(proposalHashStr)
-        await assertRevert(governance.prepareHotfix(proposalHashStr))
+        await governance.prepareHotfix(hotfixHashStr)
+        await assertRevert(governance.prepareHotfix(hotfixHashStr))
       })
 
       it('should succeed for epoch != preparedEpoch', async () => {
-        await governance.prepareHotfix(proposalHashStr)
-        await mineBlocks(EPOCH, web3)
-        await governance.prepareHotfix(proposalHashStr)
+        await governance.prepareHotfix(hotfixHashStr)
+        await mineToNextEpoch(web3)
+        await governance.prepareHotfix(hotfixHashStr)
       })
     })
   })
@@ -2055,7 +2138,8 @@ contract('Governance', (accounts: string[]) => {
         [transactionSuccess1.destination],
         // @ts-ignore bytes type
         transactionSuccess1.data,
-        [transactionSuccess1.data.length]
+        [transactionSuccess1.data.length],
+        salt
       )
 
     it('should revert when hotfix not approved', async () => {
@@ -2063,27 +2147,29 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when hotfix not prepared for current epoch', async () => {
-      await mineBlocks(EPOCH, web3)
-      await governance.approveHotfix(proposalHashStr, { from: approver })
+      await mineToNextEpoch(web3)
+      await governance.approveHotfix(hotfixHashStr, { from: approver })
       await assertRevert(executeHotfixTx())
     })
 
     it('should revert when hotfix prepared but not for current epoch', async () => {
-      await governance.approveHotfix(proposalHashStr, { from: approver })
+      await governance.approveHotfix(hotfixHashStr, { from: approver })
       await governance.addValidator(accounts[2])
-      await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
-      await governance.prepareHotfix(proposalHashStr, { from: accounts[2] })
-      await mineBlocks(EPOCH, web3)
+      await accountsInstance.createAccount({ from: accounts[2] })
+      await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
+      await governance.prepareHotfix(hotfixHashStr, { from: accounts[2] })
+      await mineToNextEpoch(web3)
       await assertRevert(executeHotfixTx())
     })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
-        await governance.approveHotfix(proposalHashStr, { from: approver })
-        await mineBlocks(EPOCH, web3)
+        await governance.approveHotfix(hotfixHashStr, { from: approver })
+        await mineToNextEpoch(web3)
         await governance.addValidator(accounts[2])
-        await governance.whitelistHotfix(proposalHashStr, { from: accounts[2] })
-        await governance.prepareHotfix(proposalHashStr)
+        await accountsInstance.createAccount({ from: accounts[2] })
+        await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
+        await governance.prepareHotfix(hotfixHashStr)
       })
 
       it('should execute the hotfix tx', async () => {
@@ -2093,7 +2179,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should mark the hotfix record as executed', async () => {
         await executeHotfixTx()
-        const [, executed] = await governance.getHotfixRecord.call(proposalHashStr)
+        const [, executed] = await governance.getHotfixRecord.call(hotfixHashStr)
         assert.isTrue(executed)
       })
 
@@ -2107,7 +2193,7 @@ contract('Governance', (accounts: string[]) => {
             hash: matchAny,
           },
         })
-        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(proposalHash))
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.hash), 'hex').equals(hotfixHash))
       })
 
       it('should not be executable again', async () => {
