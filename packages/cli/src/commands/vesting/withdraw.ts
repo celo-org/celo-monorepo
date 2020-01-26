@@ -9,7 +9,7 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Withdraw extends BaseCommand {
-  static description = 'Withdraws gold from vesting instance as per vesting schedule.'
+  static description = 'Transfers gold from the vesting back to beneficiary.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -25,27 +25,26 @@ export default class Withdraw extends BaseCommand {
 
   async run() {
     const res = this.parse(Withdraw)
-    const address: Address = res.flags.from
+    const beneficiary: Address = res.flags.from
     const value = new BigNumber(res.flags.value)
-
-    this.kit.defaultAccount = address
+    this.kit.defaultAccount = beneficiary
 
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingInstance = await vestingFactory.getVestedAt(res.flags.from)
+    const vestingInstance = await vestingFactory.getVestedAt(beneficiary)
 
     await newCheckBuilder(this)
       .addCheck(
-        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        `No vested instance found under the given beneficiary ${beneficiary}`,
         () => vestingInstance.address !== NULL_ADDRESS
       )
       .addCheck(
         `Vested instance has a different beneficiary`,
-        async () => (await vestingInstance.getBeneficiary()) === res.flags.from
+        async () => (await vestingInstance.getBeneficiary()) === beneficiary
       )
       .runChecks()
 
-    await displaySendTx('withdraw', vestingInstance.withdraw(value.toFixed()), {
-      from: await vestingInstance.getBeneficiary(),
+    await displaySendTx('withdrawTx', vestingInstance.withdraw(value.toFixed()), {
+      from: beneficiary,
     })
   }
 }

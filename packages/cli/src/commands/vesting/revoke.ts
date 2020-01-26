@@ -5,7 +5,7 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Revoke extends BaseCommand {
-  static description = 'Revoke the vesting for a certain duration'
+  static description = 'Revoke the vesting instance'
 
   static flags = {
     ...BaseCommand.flags,
@@ -21,22 +21,28 @@ export default class Revoke extends BaseCommand {
 
   async run() {
     const res = this.parse(Revoke)
-    this.kit.defaultAccount = res.flags.from
+    const beneficiary = res.flags.beneficiary
+    const revoker = res.flags.from
+    this.kit.defaultAccount = revoker
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingInstance = await vestingFactory.getVestedAt(res.flags.beneficiary)
+    const vestingInstance = await vestingFactory.getVestedAt(beneficiary)
 
     await newCheckBuilder(this)
       .addCheck(
-        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        `No vested instance found under the given beneficiary ${beneficiary}`,
         () => vestingInstance.address !== NULL_ADDRESS
       )
       .addCheck(
         `Vested instance has a different revoker`,
-        async () => (await vestingInstance.getRevoker()) === res.flags.from
+        async () => (await vestingInstance.getRevoker()) === revoker
+      )
+      .addCheck(
+        `Vesting instance is not revocable`,
+        async () => (await vestingInstance.isRevokable()) === true
       )
       .runChecks()
 
     const tx = await vestingInstance.revokeVesting()
-    await displaySendTx('revokeVestingTx', tx, { from: await vestingInstance.getRevoker() })
+    await displaySendTx('revokeVestingTx', tx, { from: revoker })
   }
 }

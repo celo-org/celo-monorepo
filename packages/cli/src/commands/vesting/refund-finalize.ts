@@ -9,30 +9,32 @@ export default class RefundFinalize extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
-    revoker: Flags.address({ required: true, description: 'Revoker of the vesting' }),
+    from: Flags.address({ required: true, description: 'Revoker of the vesting' }),
+    beneficiary: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
   }
 
   static args = []
 
   static examples = [
-    'refund-finalize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --revoker 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95',
+    'refund-finalize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --beneficiary 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95',
   ]
 
   async run() {
     const res = this.parse(RefundFinalize)
-    this.kit.defaultAccount = res.flags.revoker
+    const beneficiary = res.flags.beneficiary
+    const revoker = res.flags.from
+    this.kit.defaultAccount = revoker
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingInstance = await vestingFactory.getVestedAt(res.flags.from)
+    const vestingInstance = await vestingFactory.getVestedAt(beneficiary)
 
     await newCheckBuilder(this)
       .addCheck(
-        `No vesting instance found under the given beneficiary ${res.flags.from}`,
+        `No vesting instance found under the given beneficiary ${beneficiary}`,
         () => vestingInstance.address !== NULL_ADDRESS
       )
       .addCheck(
         `Vesting instance has a different revoker`,
-        async () => (await vestingInstance.getRevoker()) === res.flags.revoker
+        async () => (await vestingInstance.getRevoker()) === revoker
       )
       .addCheck(
         `Vesting instance is not revoked yet`,
@@ -41,6 +43,6 @@ export default class RefundFinalize extends BaseCommand {
       .runChecks()
 
     const tx = await vestingInstance.refundAndFinalize()
-    await displaySendTx('refundAndFinalizeTx', tx, { from: await vestingInstance.getRevoker() })
+    await displaySendTx('refundAndFinalizeTx', tx, { from: revoker })
   }
 }

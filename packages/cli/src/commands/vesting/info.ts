@@ -39,7 +39,7 @@ export interface VestingInstanceInfo {
   balanceStateData: BalanceState
 }
 
-export default class VestingInfo extends BaseCommand {
+export default class Info extends BaseCommand {
   static description = 'Get info on a vesting instance contract.'
 
   static flags = {
@@ -51,7 +51,7 @@ export default class VestingInfo extends BaseCommand {
 
   async run() {
     // tslint:disable-next-line
-    const { flags } = this.parse(VestingInfo)
+    const { flags } = this.parse(Info)
     this.kit.defaultAccount = flags.beneficiary
     const vestingFactory = await this.kit.contracts.getVestingFactory()
     const vestingInstance = await vestingFactory.getVestedAt(flags.beneficiary)

@@ -6,7 +6,7 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Pause extends BaseCommand {
-  static description = 'Pause the vesting for a certain duration'
+  static description = 'Pause the gold withdrawal of a vesting instance for a certain duration'
 
   static flags = {
     ...BaseCommand.flags,
@@ -26,26 +26,34 @@ export default class Pause extends BaseCommand {
 
   async run() {
     const res = this.parse(Pause)
-    this.kit.defaultAccount = res.flags.from
+    const beneficiary = res.flags.beneficiary
+    const revoker = res.flags.from
+    this.kit.defaultAccount = revoker
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingInstance = await vestingFactory.getVestedAt(res.flags.beneficiary)
+    const vestingInstance = await vestingFactory.getVestedAt(beneficiary)
+
+    const maxPausePeriod = parseInt(await vestingInstance.getMaxPausePeriod(), 10)
 
     await newCheckBuilder(this)
       .addCheck(
-        `Pause duration must be greater than zero ${res.flags.pauseduration}`,
-        () => res.flags.pauseduration > 0
+        `Pause duration must be greater than zero and less than the ${maxPausePeriod}`,
+        () => res.flags.pauseduration > 0 && res.flags.pauseduration < maxPausePeriod
       )
       .addCheck(
-        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        `No vested instance found under the given beneficiary ${beneficiary}`,
         () => vestingInstance.address !== NULL_ADDRESS
       )
       .addCheck(
         `Vested instance has a different revoker`,
-        async () => (await vestingInstance.getRevoker()) === res.flags.from
+        async () => (await vestingInstance.getRevoker()) === revoker
+      )
+      .addCheck(
+        `Vesting instance is not revocable`,
+        async () => (await vestingInstance.isRevokable()) === true
       )
       .runChecks()
 
     const tx = await vestingInstance.pauseVesting(res.flags.pauseduration)
-    await displaySendTx('pauseVestingTx', tx, { from: await vestingInstance.getRevoker() })
+    await displaySendTx('pauseVestingTx', tx, { from: revoker })
   }
 }
