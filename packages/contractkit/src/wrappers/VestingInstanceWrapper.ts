@@ -6,14 +6,13 @@ import { PendingWithdrawal } from '../wrappers/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  NumberLike,
-  parseNumber,
   proxyCall,
   proxySend,
-  toBigNumber,
-  toNumber,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
+  valueToString,
 } from './BaseWrapper'
 
 export interface VestingSchedule {
@@ -36,11 +35,11 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
     const vestingSchedule = await this.contract.methods.vestingSchedule().call()
 
     return {
-      vestingNumPeriods: toBigNumber(vestingSchedule.vestingNumPeriods),
-      vestingAmountPerPeriod: toBigNumber(vestingSchedule.vestAmountPerPeriod),
-      vestingPeriodSec: toNumber(vestingSchedule.vestingPeriodSec),
-      vestingStartTime: toNumber(vestingSchedule.vestingStartTime),
-      vestingCliffStartTime: toNumber(vestingSchedule.vestingCliffStartTime),
+      vestingNumPeriods: valueToBigNumber(vestingSchedule.vestingNumPeriods),
+      vestingAmountPerPeriod: valueToBigNumber(vestingSchedule.vestAmountPerPeriod),
+      vestingPeriodSec: valueToInt(vestingSchedule.vestingPeriodSec),
+      vestingStartTime: valueToInt(vestingSchedule.vestingStartTime),
+      vestingCliffStartTime: valueToInt(vestingSchedule.vestingCliffStartTime),
     }
   }
 
@@ -63,7 +62,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getTotalWithdrawn: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.totalWithdrawn,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -73,7 +72,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getVestedBalanceAtRevoke: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.vestedBalanceAtRevoke,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -119,7 +118,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getTotalBalance: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.getTotalBalance,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -129,7 +128,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getRemainingTotalBalance: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.getRemainingTotalBalance,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -139,7 +138,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getRemainingUnlockedBalance: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.getRemainingUnlockedBalance,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -149,7 +148,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getRemainingLockedBalance: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.getRemainingLockedBalance,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -159,7 +158,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getInitialVestingAmount: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.getInitialVestingAmount,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -169,7 +168,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
   getCurrentVestedTotalAmount: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.getCurrentVestedTotalAmount,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   /**
@@ -201,20 +200,20 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * Locks gold to be used for voting.
    * @param value The amount of gold to lock
    */
-  lockGold: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
+  lockGold: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.lockGold,
-    tupleParser(parseNumber)
+    tupleParser(valueToString)
   )
 
   /**
    * Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock
    */
-  unlockGold: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
+  unlockGold: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.unlockGold,
-    tupleParser(parseNumber)
+    tupleParser(valueToString)
   )
 
   async getPendingWithdrawalsTotalValue(account: Address) {
@@ -230,7 +229,7 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * Relocks gold in the vesting instance that has been unlocked but not withdrawn.
    * @param value The total value to relock
    */
-  async relockGold(value: NumberLike): Promise<Array<CeloTransactionObject<void>>> {
+  async relockGold(value: BigNumber.Value): Promise<Array<CeloTransactionObject<void>>> {
     const lockedGoldContract = await this.kit.contracts.getLockedGold()
     const pendingWithdrawals = await lockedGoldContract.getPendingWithdrawals(
       this.contract._address
@@ -270,30 +269,30 @@ export class VestingInstanceWrapper extends BaseWrapper<VestingInstance> {
    * @param index The index of the pending withdrawal to relock from.
    * @param value The value to relock from the specified pending withdrawal.
    */
-  _relock: (index: number, value: NumberLike) => CeloTransactionObject<void> = proxySend(
+  _relock: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.relockGold,
-    tupleParser(parseNumber, parseNumber)
+    tupleParser(valueToString, valueToString)
   )
 
   /**
    * Withdraw gold in the vesting instance that has been unlocked but not withdrawn.
    * @param index The index of the pending locked gold withdrawal
    */
-  withdrawLockedGold: (index: number) => CeloTransactionObject<void> = proxySend(
+  withdrawLockedGold: (index: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.withdrawLockedGold,
-    tupleParser(parseNumber)
+    tupleParser(valueToString)
   )
 
   /**
    * Transfer gold from the vesting back to beneficiary.
    * @param value The requested gold amount
    */
-  withdraw: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
+  withdraw: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.withdraw,
-    tupleParser(parseNumber)
+    tupleParser(valueToString)
   )
 
   /**

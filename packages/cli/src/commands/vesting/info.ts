@@ -1,5 +1,5 @@
 import { NULL_ADDRESS } from '@celo/contractkit'
-import { toNumber } from '@celo/contractkit/src/wrappers/BaseWrapper'
+import { valueToInt } from '@celo/contractkit/src/wrappers/BaseWrapper'
 import { VestingSchedule } from '@celo/contractkit/src/wrappers/VestingInstanceWrapper'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
@@ -68,15 +68,17 @@ export default class Info extends BaseCommand {
     }
 
     if (pausedStateData.isPaused)
-      pausedStateData.pauseEndTime = toNumber(await vestingInstance.getPauseEndTime())
+      pausedStateData.pauseEndTime = valueToInt(await vestingInstance.getPauseEndTime())
 
     const revokedStateData: RevokedState = {
       isRevoked: await vestingInstance.isRevoked(),
     }
 
     if (revokedStateData.isRevoked) {
-      revokedStateData.revokeTime = toNumber(await vestingInstance.getRevokeTime())
-      revokedStateData.vestedBalanceAtRevoke = (await vestingInstance.getVestedBalanceAtRevoke()).toString()
+      revokedStateData.revokeTime = valueToInt(await vestingInstance.getRevokeTime())
+      revokedStateData.vestedBalanceAtRevoke = (
+        await vestingInstance.getVestedBalanceAtRevoke()
+      ).toString()
     }
 
     const balanceStateData: BalanceState = {

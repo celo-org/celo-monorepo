@@ -73,7 +73,7 @@ export default class LockGold extends BaseCommand {
     for (const txo of txos) {
       await displaySendTx('relockGoldTx', txo, { from: isRevoked ? revoker : beneficiary })
     }
-    const tx = vestingInstance.lockGold(lockValue.toFixed())
+    const tx = vestingInstance.lockGold(lockValue)
 
     await displaySendTx('lockGoldTx', tx, {
       from: isRevoked ? revoker : beneficiary,
