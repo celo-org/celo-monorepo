@@ -12,6 +12,7 @@ export default class AuthorizeVoter extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Beneficiary of the vesting' }),
+    revoker: Flags.address({ required: true, description: 'Revoker of the vesting' }),
     signer: Flags.address({
       required: true,
       description: 'The signer key that is to be used for voting through the vesting instance',
@@ -25,24 +26,30 @@ export default class AuthorizeVoter extends BaseCommand {
   static args = []
 
   static examples = [
-    'authorize-voter --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
+    'authorize-voter --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --revoker 0x5409ED021D9299bf6814279A6A1411A7e866A631 --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
   ]
 
   async run() {
     const res = this.parse(AuthorizeVoter)
-    this.kit.defaultAccount = res.flags.from
+    const beneficiary = res.flags.from
+    const revoker = res.flags.revoker
+    this.kit.defaultAccount = beneficiary
     const vestingFactory = await this.kit.contracts.getVestingFactory()
-    const vestingInstance = await vestingFactory.getVestedAt(this.kit.defaultAccount)
+    const vestingInstance = await vestingFactory.getVestedAt(beneficiary)
 
     await newCheckBuilder(this)
       .isAccount(vestingInstance.address)
       .addCheck(
-        `No vested instance found under the given beneficiary ${res.flags.from}`,
+        `No vesting instance found under the given beneficiary ${beneficiary}`,
         () => vestingInstance.address !== NULL_ADDRESS
       )
       .addCheck(
-        `Vested instance has a different beneficiary`,
-        async () => (await vestingInstance.getBeneficiary()) === res.flags.from
+        `Vesting instance has a different beneficiary`,
+        async () => (await vestingInstance.getBeneficiary()) === beneficiary
+      )
+      .addCheck(
+        `Vesting instance has a different revoker`,
+        async () => (await vestingInstance.getRevoker()) === revoker
       )
       .runChecks()
 
@@ -53,7 +60,8 @@ export default class AuthorizeVoter extends BaseCommand {
       res.flags.pop
     )
 
+    const isRevoked = await vestingInstance.isRevoked()
     const tx = await vestingInstance.authorizeVoteSigner(res.flags.signer, sig)
-    await displaySendTx('authorizeVoterTx', tx, { from: await vestingInstance.getBeneficiary() })
+    await displaySendTx('authorizeVoterTx', tx, { from: isRevoked ? revoker : beneficiary })
   }
 }

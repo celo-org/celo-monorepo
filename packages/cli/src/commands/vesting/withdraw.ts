@@ -9,7 +9,7 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Withdraw extends BaseCommand {
-  static description = 'Transfers gold from the vesting back to beneficiary.'
+  static description = 'Transfers gold from the vesting instance back to beneficiary.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -34,11 +34,11 @@ export default class Withdraw extends BaseCommand {
 
     await newCheckBuilder(this)
       .addCheck(
-        `No vested instance found under the given beneficiary ${beneficiary}`,
+        `No vesting instance found under the given beneficiary ${beneficiary}`,
         () => vestingInstance.address !== NULL_ADDRESS
       )
       .addCheck(
-        `Vested instance has a different beneficiary`,
+        `Vesting instance has a different beneficiary`,
         async () => (await vestingInstance.getBeneficiary()) === beneficiary
       )
       .runChecks()

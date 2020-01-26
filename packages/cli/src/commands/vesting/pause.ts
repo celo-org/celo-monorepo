@@ -40,11 +40,11 @@ export default class Pause extends BaseCommand {
         () => res.flags.pauseduration > 0 && res.flags.pauseduration < maxPausePeriod
       )
       .addCheck(
-        `No vested instance found under the given beneficiary ${beneficiary}`,
+        `No vesting instance found under the given beneficiary ${beneficiary}`,
         () => vestingInstance.address !== NULL_ADDRESS
       )
       .addCheck(
-        `Vested instance has a different revoker`,
+        `Vesting instance has a different revoker`,
         async () => (await vestingInstance.getRevoker()) === revoker
       )
       .addCheck(
