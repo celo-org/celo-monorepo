@@ -263,57 +263,27 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting number of periods to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [vestingNumPeriods, , , , ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestingNumPeriods, vestingDefaultSchedule.vestingNumPeriods)
     })
 
     it('should set vesting amount per period to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, vestAmountPerPeriod, , , ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestAmountPerPeriod, vestingDefaultSchedule.vestAmountPerPeriod)
     })
 
     it('should set vesting period to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, , vestingPeriodSec, , ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestingPeriodSec, vestingDefaultSchedule.vestingPeriodSec)
     })
 
     it('should set vesting start time to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, , , vestingStartTime, ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestingStartTime, vestingDefaultSchedule.vestingStartTime)
     })
 
     it('should set vesting cliff to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, , , , vestingCliffStartTime] = await vestingInstance.vestingSchedule()
       const vestingCliffStartTimeComputed = new BigNumber(
         vestingDefaultSchedule.vestingStartTime
       ).plus(vestingDefaultSchedule.vestingCliff)
