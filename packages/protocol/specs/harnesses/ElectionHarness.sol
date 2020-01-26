@@ -100,32 +100,52 @@ contract ElectionHarness is Election {
 	address[]  public electionGroups;
 	uint256[]  public numMembers;
 	uint256[] public numMembersElected = new uint256[](2000);
-	function dHondWrapper(uint256 numGroups) public returns (uint256, bool)   {
+	function dHondWrapper() public returns (uint256, bool)   {
 		return dHondt(electionGroups, numMembers, numMembersElected);
 	}
 	
+	function getNumGroups() public returns (uint256) {
+		return electionGroups.length;
+	}
 	function getNumMembers(uint256 groupId) public returns (uint256) {
 		return numMembers[groupId];
 	}
+	
 	
 	function getNumMembersElected(uint256 groupId) public returns (uint256) {
 		return numMembersElected[groupId];
 	}
 	
-	function groupInGhostElectionGroups(address groupId) public returns (bool) {
+	function groupInGhostElectionGroups(address group) public returns (bool) {
 		for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-			if (electionGroups[i]==groupId)
+			if (electionGroups[i]==group)
 				return true;
 			
 		}
 		return false;
 	}
 	
+	function getGroupIdInElection(address group) public returns (uint256) {
+		for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+			if (electionGroups[i]==group)
+				return i;
+			
+		}
+		assert(false);
+	}
+	
+	function getGroupFromGroupId(uint256 groupId) public returns (address) {
+		return electionGroups[groupId];
+	}
+	
+	
 	function groupInElectionGroups(address groupId) public returns (bool) {
 
 		return votes.total.eligible.contains(groupId);
 	}
 	
-	
+	function votesForGroup(address groupId) public returns (uint256) {
+		return votes.total.eligible.getValue(groupId);
+	}
 }
 

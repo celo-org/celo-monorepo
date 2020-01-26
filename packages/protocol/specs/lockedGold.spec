@@ -127,7 +127,7 @@ rule withdraw(uint256 index)
 	sinvoke withdraw(e,index);
 	uint256 balance_ = sinvoke ercBalanceOf(e, e.msg.sender);
 	assert balance_ ==_balance;
-	assert false, "expecing withdraw to change balancae ";
+	//assert false, "expecing withdraw to change balancae ";
 	
 
 }

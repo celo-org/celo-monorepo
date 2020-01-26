@@ -119,7 +119,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock.
    */
-  function unlock(uint256 value) public nonReentrant {
+  function unlock(uint256 value) external  nonReentrant {
     require(getAccounts().isAccount(msg.sender));
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
