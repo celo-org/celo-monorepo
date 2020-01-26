@@ -853,18 +853,14 @@ contract('Vesting', (accounts: string[]) => {
           )
         })
 
-        it(`should revert if the ${
-          authorizationTestDescriptions[key].me
-        } is an account`, async () => {
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(
             authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
           )
         })
 
-        it(`should revert if the ${
-          authorizationTestDescriptions[key].me
-        } is already authorized`, async () => {
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is already authorized`, async () => {
           const otherAccount = accounts[5]
           const otherSig = await getParsedSignatureOfAddress(
             web3,
