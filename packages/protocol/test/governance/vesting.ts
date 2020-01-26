@@ -1021,14 +1021,6 @@ contract('Vesting', (accounts: string[]) => {
       const vestingInstance = await VestingInstance.at(vestingInstanceAddress)
       await assertRevert(vestingInstance.revoke({ from: revoker }))
     })
-
-    it('should revert if vesting is paused', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
-      const vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
-      const vestingInstance = await VestingInstance.at(vestingInstanceAddress)
-      await assertRevert(vestingInstance.pause(366 * DAY, { from: revoker }))
-      await assertRevert(vestingInstance.revoke({ from: revoker }))
-    })
   })
 
   describe('#getInitialVestingAmount()', () => {
@@ -1450,6 +1442,7 @@ contract('Vesting', (accounts: string[]) => {
     it('should revert when paused', async () => {
       const timeToTravel = 3 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
+      await vestingInstance.pause(300 * DAY, { from: revoker })
       const expectedWithdrawalAmount = initialVestingAmount.div(4)
       await assertRevert(vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary }))
     })
