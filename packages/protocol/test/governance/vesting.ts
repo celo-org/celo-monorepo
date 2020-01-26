@@ -263,57 +263,27 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should set vesting number of periods to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [vestingNumPeriods, , , , ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestingNumPeriods, vestingDefaultSchedule.vestingNumPeriods)
     })
 
     it('should set vesting amount per period to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, vestAmountPerPeriod, , , ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestAmountPerPeriod, vestingDefaultSchedule.vestAmountPerPeriod)
     })
 
     it('should set vesting period to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, , vestingPeriodSec, , ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestingPeriodSec, vestingDefaultSchedule.vestingPeriodSec)
     })
 
     it('should set vesting start time to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, , , vestingStartTime, ,] = await vestingInstance.vestingSchedule()
       assertEqualBN(vestingStartTime, vestingDefaultSchedule.vestingStartTime)
     })
 
     it('should set vesting cliff to vesting instance', async () => {
-      const [
-        vestingNumPeriods,
-        vestAmountPerPeriod,
-        vestingPeriodSec,
-        vestingStartTime,
-        vestingCliffStartTime,
-      ] = await vestingInstance.vestingSchedule()
+      const [, , , , vestingCliffStartTime] = await vestingInstance.vestingSchedule()
       const vestingCliffStartTimeComputed = new BigNumber(
         vestingDefaultSchedule.vestingStartTime
       ).plus(vestingDefaultSchedule.vestingCliff)
@@ -883,18 +853,14 @@ contract('Vesting', (accounts: string[]) => {
           )
         })
 
-        it(`should revert if the ${
-          authorizationTestDescriptions[key].me
-        } is an account`, async () => {
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(
             authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
           )
         })
 
-        it(`should revert if the ${
-          authorizationTestDescriptions[key].me
-        } is already authorized`, async () => {
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is already authorized`, async () => {
           const otherAccount = accounts[5]
           const otherSig = await getParsedSignatureOfAddress(
             web3,
@@ -1049,14 +1015,6 @@ contract('Vesting', (accounts: string[]) => {
       await createNewVestingInstanceTx(vestingSchedule, web3)
       const vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
       const vestingInstance = await VestingInstance.at(vestingInstanceAddress)
-      await assertRevert(vestingInstance.revoke({ from: revoker }))
-    })
-
-    it('should revert if vesting is paused', async () => {
-      await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
-      const vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
-      const vestingInstance = await VestingInstance.at(vestingInstanceAddress)
-      await assertRevert(vestingInstance.pause(366 * DAY, { from: revoker }))
       await assertRevert(vestingInstance.revoke({ from: revoker }))
     })
   })
@@ -1480,6 +1438,7 @@ contract('Vesting', (accounts: string[]) => {
     it('should revert when paused', async () => {
       const timeToTravel = 3 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
+      await vestingInstance.pause(300 * DAY, { from: revoker })
       const expectedWithdrawalAmount = initialVestingAmount.div(4)
       await assertRevert(vestingInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary }))
     })

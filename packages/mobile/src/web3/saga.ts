@@ -16,9 +16,8 @@ import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
-import { initGethSaga } from 'src/geth/saga'
+import { initGethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
@@ -49,7 +48,7 @@ const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
 const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
-export const SYNC_TIMEOUT = 3 * 60 * 1000 // 3 minutes
+export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
@@ -129,6 +128,11 @@ export function* waitForWeb3Sync() {
   }
 }
 
+export function* waitWeb3LastBlock() {
+  yield call(waitForGethConnectivity)
+  yield call(waitForWeb3Sync)
+}
+
 export function* getOrCreateAccount() {
   const account = yield select(currentAccountSelector)
   if (account) {
@@ -148,7 +152,7 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const privateKey = mnemonicToSeedHex(mnemonic)
+    const privateKey = yield call(mnemonicToSeedHex, mnemonic)
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
@@ -353,7 +357,7 @@ export function* unlockAccount(account: string) {
 // Wait for geth to be connected and account ready
 export function* getConnectedAccount() {
   yield call(waitWeb3LastBlock)
-  const account: string = yield getAccount()
+  const account: string = yield call(getAccount)
   return account
 }
 
@@ -489,11 +493,20 @@ export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
     yield call(switchToGethFromZeroSync)
   }
   // Unlock account to ensure private keys are accessible in new mode
-  const account = yield call(getConnectedUnlockedAccount)
-  Logger.debug(
-    TAG + '@toggleZeroSyncMode',
-    `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
-  )
+  try {
+    const account = yield call(getConnectedUnlockedAccount)
+    Logger.debug(
+      TAG + '@toggleZeroSyncMode',
+      `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
+    )
+  } catch (e) {
+    // Rollback if private keys aren't accessible in new mode
+    if (action.zeroSyncMode) {
+      yield call(switchToGethFromZeroSync)
+    } else {
+      yield call(switchToZeroSyncFromGeth)
+    }
+  }
 }
 export function* watchZeroSyncMode() {
   yield takeLatest(Actions.TOGGLE_IS_ZERO_SYNC, toggleZeroSyncMode)
@@ -501,4 +514,5 @@ export function* watchZeroSyncMode() {
 
 export function* web3Saga() {
   yield spawn(watchZeroSyncMode)
+  yield spawn(waitWeb3LastBlock)
 }

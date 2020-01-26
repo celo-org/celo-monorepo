@@ -10,7 +10,7 @@ import { colors, fonts, standardStyles } from 'src/styles'
 type Props = I18nProps
 
 function After({ t }) {
-  return <Text style={fonts.h5}>{t('stayConnectedThanks')}</Text>
+  return <Text style={fonts.h6}>{t('stayConnectedThanks')}</Text>
 }
 
 class HomeEmail extends React.PureComponent<Props> {

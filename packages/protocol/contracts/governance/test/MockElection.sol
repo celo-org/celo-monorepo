@@ -48,34 +48,30 @@ contract MockElection is IElection {
     return electedValidators;
   }
 
-  function vote(address group, uint256 value, address lesser, address greater)
-    external
-    returns (bool)
-  {
+  function vote(address, uint256, address, address) external returns (bool) {
     return true;
   }
 
-  function activate(address group) external returns (bool) {
+  function activate(address) external returns (bool) {
     return true;
   }
 
-  function revokeActive(
-    address group,
+  function revokeActive(address, uint256, address, address, uint256) external returns (bool) {
+    return true;
+  }
+
+  function revokePending(address, uint256, address, address, uint256) external returns (bool) {
+    return true;
+  }
+
+  function forceDecrementVotes(
+    address,
     uint256 value,
-    address lesser,
-    address greater,
-    uint256 index
-  ) external returns (bool) {
-    return true;
-  }
-
-  function revokePending(
-    address group,
-    uint256 value,
-    address lesser,
-    address greater,
-    uint256 index
-  ) external returns (bool) {
-    return true;
+    address[] calldata,
+    address[] calldata,
+    uint256[] calldata
+  ) external returns (uint256) {
+    this.setActiveVotes(this.getActiveVotes() - value);
+    return value;
   }
 }

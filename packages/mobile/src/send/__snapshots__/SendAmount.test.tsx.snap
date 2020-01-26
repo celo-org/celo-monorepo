@@ -256,6 +256,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "color": "#42D689",
               }
             }
+            lng="en"
             numberOfDecimals={2}
             onBlur={[Function]}
             onChangeText={[Function]}
@@ -327,7 +328,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-            for
+            global:for
           </Text>
         </View>
         <View
@@ -375,7 +376,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "padding": 8,
               }
             }
-            title="for"
+            title="global:for"
             underlineColorAndroid="transparent"
             value=""
           />

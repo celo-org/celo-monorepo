@@ -8,6 +8,9 @@ interface IAccounts {
   function signerToAccount(address) external view returns (address);
   function getValidatorSigner(address) external view returns (address);
   function getAttestationSigner(address) external view returns (address);
+  function hasAuthorizedVoteSigner(address) external view returns (bool);
+  function hasAuthorizedValidatorSigner(address) external view returns (bool);
+  function hasAuthorizedAttestationSigner(address) external view returns (bool);
 
   function setAccountDataEncryptionKey(bytes calldata) external;
   function setMetadataURL(string calldata) external;

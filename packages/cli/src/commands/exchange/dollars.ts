@@ -1,4 +1,3 @@
-import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
@@ -13,27 +12,27 @@ export default class ExchangeDollars extends BaseCommand {
       required: true,
       description: 'The address with Celo Dollars to exchange',
     }),
-    value: Flags.address({
+    value: Flags.wei({
       required: true,
       description: 'The value of Celo Dollars to exchange for Celo Gold',
     }),
-    for: Flags.address({
-      required: true,
-      description: 'The minimum value of Celo Gold to receive in return',
+    forAtLeast: Flags.wei({
+      description: 'Optional, the minimum value of Celo Gold to receive in return',
+      default: new BigNumber(0),
     }),
-    commission: flags.string({ required: true }),
   }
 
   static args = []
 
   static examples = [
-    'dollars --value 10000000000000 --for 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'dollars --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'dollars --value 10000000000000 --forAtLeast 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
   ]
 
   async run() {
     const res = this.parse(ExchangeDollars)
-    const sellAmount = new BigNumber(res.flags.value)
-    const minBuyAmount = new BigNumber(res.flags.for)
+    const sellAmount = res.flags.value
+    const minBuyAmount = res.flags.forAtLeast
 
     this.kit.defaultAccount = res.flags.from
     const stableToken = await this.kit.contracts.getStableToken()
@@ -41,7 +40,7 @@ export default class ExchangeDollars extends BaseCommand {
 
     await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toFixed()))
 
-    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount.toFixed(), false)
+    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount!.toFixed(), false)
     await displaySendTx('exchange', exchangeTx)
   }
 }

@@ -11,4 +11,11 @@ interface IElection {
   function activate(address) external returns (bool);
   function revokeActive(address, uint256, address, address, uint256) external returns (bool);
   function revokePending(address, uint256, address, address, uint256) external returns (bool);
+  function forceDecrementVotes(
+    address,
+    uint256,
+    address[] calldata,
+    address[] calldata,
+    uint256[] calldata
+  ) external returns (uint256);
 }

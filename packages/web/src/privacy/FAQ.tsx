@@ -98,12 +98,11 @@ const FAQs = [
     q: 'What is the Celo Rewards app?',
     a: (
       <>
-        The Celo Rewards app is a way for any user to earn more Celo Gold in the system. The user
-        can do that by actively participating in the verification process of other users. If you
-        download the app and have spare capacity to send text messages, then you can earn additional
-        value for sending those verification text messages. Please note that your carrier may apply
-        charges to send those messages. The app is available{' '}
-        <Button text="here" href="https://celo.org/rewards" kind={BTN.INLINE} />.
+        The Celo Rewards app is a proof of concept for the identity protocol that would allow for any user
+        to earn more Celo Gold in the system by actively participating in the verification process of other
+        users. Users of the app with spare capacity to send text messages, could earn additional value for
+        sending those verification text messages. Read more about the identity protocol{' '}
+        <Button text="here" href="https://docs.celo.org/celo-codebase/protocol/identity" kind={BTN.INLINE} />
       </>
     ),
   },

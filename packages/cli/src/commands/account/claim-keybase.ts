@@ -18,7 +18,7 @@ import { commandExists, execCmdWithError, execWith0Exit } from '../../utils/exec
 import { ClaimCommand } from '../../utils/identity'
 
 export default class ClaimKeybase extends ClaimCommand {
-  static description = 'Claim a keybase username in a local metadata file'
+  static description = 'Claim a keybase username and add the claim to a local metadata file'
   static flags = {
     ...ClaimCommand.flags,
     username: flags.string({
@@ -27,7 +27,9 @@ export default class ClaimKeybase extends ClaimCommand {
     }),
   }
   static args = ClaimCommand.args
-  static examples = ['claim-keybase ~/metadata.json --from 0x0 --username test']
+  static examples = [
+    'claim-keybase ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --username myusername',
+  ]
   self = ClaimKeybase
 
   async run() {

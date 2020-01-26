@@ -1,73 +1,79 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SimpleNotification renders correctly 1`] = `
-<View
-  style={
-    Array [
-      Object {
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "padding": 16,
-        "width": "100%",
-      },
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-    ]
-  }
->
+<View>
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "flexDirection": "column",
-        "paddingRight": 16,
-      }
+      Array [
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "padding": 16,
+          "width": "100%",
+        },
+        Object {
+          "elevation": 2,
+          "shadowColor": "black",
+          "shadowOffset": Object {
+            "height": 1,
+            "width": 0,
+          },
+          "shadowOpacity": 0.3,
+          "shadowRadius": 1.6,
+        },
+      ]
     }
   >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/placeholder.png",
-        }
-      }
+    <View
       style={
         Object {
-          "height": 30,
-          "width": 30,
-        }
-      }
-    />
-  </View>
-  <View
-    style={
-      Object {
-        "flex": 1,
-        "justifyContent": "space-between",
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Bold",
-          "fontSize": 14,
-          "lineHeight": 18,
+          "alignItems": "center",
+          "paddingRight": 16,
         }
       }
     >
-      Test
-    </Text>
-    <View>
+      <Image
+        resizeMode="contain"
+        source={
+          Object {
+            "testUri": "../../../packages/mobile/src/images/placeholder.png",
+          }
+        }
+        style={
+          Object {
+            "height": 30,
+            "width": 30,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        Test
+      </Text>
       <View
         style={
           Object {
             "justifyContent": "space-between",
-            "minHeight": 70,
+            "minHeight": 60,
+            "paddingTop": 8,
           }
         }
       >
@@ -95,7 +101,7 @@ exports[`SimpleNotification renders correctly 1`] = `
           style={
             Object {
               "flexDirection": "row",
-              "marginTop": 15,
+              "marginTop": 5,
             }
           }
         >

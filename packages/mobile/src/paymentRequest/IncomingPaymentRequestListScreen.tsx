@@ -1,28 +1,23 @@
-import colors from '@celo/react-components/styles/colors'
-import { componentStyles } from '@celo/react-components/styles/styles'
-import variables from '@celo/react-components/styles/variables'
-import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import React from 'react'
+import { WithTranslation } from 'react-i18next'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
-import i18n, { Namespaces } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import {
+  NotificationList,
+  titleWithBalanceNavigationOptions,
+  useBalanceInNavigationParam,
+} from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
-import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
-import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
-
-const { contentPadding } = variables
 
 interface StateProps {
   dollarBalance: string | null
@@ -43,70 +38,46 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
 })
 
-type Props = WithNamespaces & StateProps & DispatchProps
+type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
 
-export class IncomingPaymentRequestListScreen extends React.Component<Props> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-    headerTitle: i18n.t('paymentRequestFlow:incomingPaymentRequests'),
-  })
+export const listItemRenderer = (params: {
+  recipientCache: NumberToRecipient
+  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
+}) => (request: PaymentRequest, key: number | undefined = undefined) => {
+  const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
 
-  renderRequest = (request: PaymentRequest, key: number, allRequests: PaymentRequest[]) => {
-    const { recipientCache } = this.props
-    const requester = getRecipientFromPaymentRequest(request, recipientCache)
-
-    return (
-      <View key={key}>
-        <IncomingPaymentRequestListItem
-          id={request.uid || ''}
-          amount={request.amount}
-          updatePaymentRequestStatus={this.props.updatePaymentRequestStatus}
-          requester={requester}
-          comment={request.comment}
-        />
-        {key < allRequests.length - 1 && <View style={styles.separator} />}
-      </View>
-    )
-  }
-
-  render() {
-    return (
-      <SafeAreaView style={styles.container}>
-        <DisconnectBanner />
-        <PaymentRequestBalance dollarBalance={this.props.dollarBalance} />
-        {this.props.paymentRequests.length > 0 ? (
-          <ScrollView>
-            <View style={[componentStyles.roundedBorder, styles.scrollArea]}>
-              {this.props.paymentRequests.map(this.renderRequest)}
-            </View>
-          </ScrollView>
-        ) : (
-          <PaymentRequestListEmpty />
-        )}
-      </SafeAreaView>
-    )
-  }
+  return (
+    <IncomingPaymentRequestListItem
+      key={key}
+      id={request.uid || ''}
+      amount={request.amount}
+      updatePaymentRequestStatus={params.updatePaymentRequestStatus}
+      requester={requester}
+      comment={request.comment}
+    />
+  )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.background,
-    flex: 1,
-  },
-  separator: {
-    borderBottomColor: colors.darkLightest,
-    borderBottomWidth: 1,
-    marginLeft: 50,
-  },
-  scrollArea: {
-    margin: contentPadding,
-  },
-})
+const IncomingPaymentRequestListScreen = (props: Props) => {
+  const { recipientCache, dollarBalance, navigation } = props
+  useBalanceInNavigationParam(dollarBalance, navigation)
+  return (
+    <NotificationList
+      items={props.paymentRequests}
+      listItemRenderer={listItemRenderer({
+        updatePaymentRequestStatus: props.updatePaymentRequestStatus,
+        recipientCache,
+      })}
+      dollarBalance={props.dollarBalance}
+    />
+  )
+}
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    updatePaymentRequestStatus,
-    fetchPhoneAddresses,
-  }
-)(withNamespaces(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))
+IncomingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationOptions(
+  i18n.t('walletFlow5:incomingPaymentRequests')
+)
+
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  updatePaymentRequestStatus,
+  fetchPhoneAddresses,
+})(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

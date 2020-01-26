@@ -45,6 +45,11 @@ target "celo" do
   pod "Firebase/Database"
   pod "GoogleUtilities", "~> 5.3.7"
 
+  # Using a custom fork so we can have a specific bug fix (crash when firebase already initialized)
+  # without upgrading to firebase 6
+  # TODO: remove this once we upgrade to Firebase >= 6
+  pod "Segment-Firebase", :git => "https://github.com/celo-org/analytics-ios-integration-firebase.git", :commit => "e849d040239a7e56e02df96aabc0851e56a4cb19"
+
   target "celoTests" do
     inherit! :search_paths
   end

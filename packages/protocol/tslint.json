@@ -6,6 +6,11 @@
   },
   "rules": {
     "no-global-arrow-functions": false,
-    "no-floating-promises": true
+    "no-floating-promises": true,
+    "ban": [
+      true,
+      { "name": ["describe", "only"], "message": "don't focus tests" },
+      { "name": ["it", "only"], "message": "don't focus tests" }
+    ]
   }
 }

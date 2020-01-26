@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
@@ -7,97 +8,158 @@ import { createMockStore } from 'test/utils'
 import { mockPaymentRequests } from 'test/values'
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 1000
+const RECENT_BACKUP_TIME = new Date().getTime() - TWO_DAYS_MS
+const EXPIRED_BACKUP_TIME = RECENT_BACKUP_TIME - DAYS_TO_BACKUP
 
-const storeData = {
+const storeDataNotificationsEnabled = {
+  goldToken: { educationCompleted: false },
+  account: {
+    backupCompleted: false,
+    dismissedEarnRewards: false,
+    dismissedInviteFriends: false,
+    dismissedGetVerified: false,
+    accountCreationTime: EXPIRED_BACKUP_TIME,
+    incomingPaymentRequests: mockPaymentRequests,
+  },
+}
+
+const storeDataNotificationsDisabled = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
     dismissedEarnRewards: true,
     dismissedInviteFriends: true,
-    accountCreationTime: new Date().getTime() - TWO_DAYS_MS,
-    paymentRequests: [],
+    dismissedGetVerified: true,
+    accountCreationTime: RECENT_BACKUP_TIME,
+    incomingPaymentRequests: [],
   },
 }
 
 describe('NotificationBox', () => {
-  it('Simple test', () => {
-    // const store = createMockStore(storeData)
+  it('renders correctly for with all notifications', () => {
     const store = createMockStore({
-      ...storeData,
+      ...storeDataNotificationsEnabled,
+    })
+    const tree = renderer.create(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('renders backup when backup is late', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
       account: {
         backupCompleted: false,
+        accountCreationTime: EXPIRED_BACKUP_TIME,
       },
     })
-    const tree = renderer.create(
+    const { getByText } = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(getByText('backupKeyFlow6:backupKeyNotification')).toBeTruthy()
   })
 
-  it('Backup too late test', () => {
+  it('renders educations when not complete yet', () => {
     const store = createMockStore({
-      ...storeData,
-      account: {
-        accountCreationTime: new Date().getTime() - DAYS_TO_BACKUP - TWO_DAYS_MS,
-      },
-    })
-    const tree = renderer.create(
-      <Provider store={store}>
-        <NotificationBox />
-      </Provider>
-    )
-    expect(tree).toMatchSnapshot()
-  })
-
-  it('Educations not completed yet', () => {
-    const store = createMockStore({
-      ...storeData,
+      ...storeDataNotificationsDisabled,
       goldToken: { educationCompleted: false },
       account: {
-        backupCompleted: false,
+        ...storeDataNotificationsDisabled.account,
         dismissedEarnRewards: false,
         dismissedInviteFriends: false,
-        ...storeData.account,
       },
     })
-    const tree = renderer.create(
+    const { getByText } = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(getByText('exchangeFlow9:whatIsGold')).toBeTruthy()
+    expect(getByText('inviteFlow11:inviteFriendsToCelo')).toBeTruthy()
   })
 
-  it('Incoming Payment Requests exist', () => {
+  it('renders incoming payment request when they exist', () => {
     const store = createMockStore({
-      ...storeData,
+      ...storeDataNotificationsDisabled,
       account: {
-        ...storeData.account,
+        ...storeDataNotificationsDisabled.account,
+        incomingPaymentRequests: [mockPaymentRequests[0]],
+      },
+    })
+    const { getByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(getByText('incomingPaymentRequestNotificationTitle')).toBeTruthy()
+  })
+
+  it('renders incoming payment requests when they exist', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      account: {
+        ...storeDataNotificationsDisabled.account,
         incomingPaymentRequests: mockPaymentRequests,
       },
     })
-    const tree = renderer.create(
+    const { getByText } = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(getByText('incomingPaymentRequests')).toBeTruthy()
   })
-  it('Outgoing Payment Requests exist', () => {
+
+  it('renders outgoing payment requests when they exist', () => {
     const store = createMockStore({
-      ...storeData,
+      ...storeDataNotificationsDisabled,
       account: {
-        ...storeData.account,
+        ...storeDataNotificationsDisabled.account,
         outgoingPaymentRequests: mockPaymentRequests,
       },
     })
-    const tree = renderer.create(
+    const { getByText } = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(getByText('outgoingPaymentRequests')).toBeTruthy()
+  })
+
+  it('renders outgoing payment request when they exist', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      account: {
+        ...storeDataNotificationsDisabled.account,
+        outgoingPaymentRequests: [mockPaymentRequests[0]],
+      },
+    })
+    const { getByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(getByText('outgoingPaymentRequestNotificationTitle')).toBeTruthy()
+  })
+
+  it('renders verification reminder when not verified', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      account: {
+        ...storeDataNotificationsDisabled.account,
+        dismissedGetVerified: false,
+      },
+    })
+    const { getByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(getByText('nuxVerification2:notification.title')).toBeTruthy()
   })
 })

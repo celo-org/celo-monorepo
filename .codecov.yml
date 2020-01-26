@@ -7,6 +7,11 @@ coverage:
         flags: mobile
         threshold: 40%
         target: 10%
+      web:
+        paths: "packages/web/"
+        flags: web
+        threshold: 5%
+        target: 70%
       protocol:
         paths: "packages/protocol/"
         flags: protocol
