@@ -236,6 +236,10 @@ export const v5Schema = {
     ...v4Schema.localCurrency,
     exchangeRate: '1.33',
   },
+  geth: {
+    ...v4Schema.geth,
+    promptZeroSyncIfNeeded: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

@@ -8,8 +8,9 @@ import {
 
 export type Address = string
 
-export const eqAddress = (a: Address, b: Address) =>
-  trimLeading0x(a).toLowerCase() === trimLeading0x(b).toLowerCase()
+export const eqAddress = (a: Address, b: Address) => normalizeAddress(a) === normalizeAddress(b)
+
+export const normalizeAddress = (a: Address) => trimLeading0x(a).toLowerCase()
 
 export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.slice(2) : input)
 
