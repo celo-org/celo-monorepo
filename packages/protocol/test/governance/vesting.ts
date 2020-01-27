@@ -9,7 +9,6 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
-import { upperFirst } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
@@ -832,7 +831,7 @@ contract('Vesting', (accounts: string[]) => {
         authorizationTest = authorizationTests[key]
       })
 
-      describe(`#authorize${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+      describe(`#authorize${_.upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
         const authorized = accounts[4] // the account that is to be authorized for whatever role
         let sig: any
 
