@@ -248,7 +248,7 @@ export class TransactionsList extends React.PureComponent<Props> {
     // new balance from the contract
     if (this.props.dollarBalanceLastFetch) {
       const newBalance = transactions.reduce((acc, tx) => {
-        if (tx.timestamp > this.props.dollarBalanceLastFetch!) {
+        if (tx.timestamp * 1000 > this.props.dollarBalanceLastFetch!) {
           return acc.plus(tx.amount.value)
         }
         return acc
