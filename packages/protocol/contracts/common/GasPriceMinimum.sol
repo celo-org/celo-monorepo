@@ -79,11 +79,14 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
       ISortedOracles sortedOracles = ISortedOracles(
         registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
       );
-      uint256 rate;
+      uint256 rateNumerator;
       uint256 rateDenominator;
-      (rate, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      FixidityLib.Fraction memory ratio = FixidityLib.newFixedFraction(rate, rateDenominator);
-      return (FixidityLib.newFixed(gasPriceMinimum)).multiply(ratio).fromFixed();
+      (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
+      FixidityLib.Fraction memory rate = FixidityLib.newFixedFraction(
+        rateNumerator,
+        rateDenominator
+      );
+      return (FixidityLib.newFixed(gasPriceMinimum)).multiply(rate).fromFixed();
     }
   }
 

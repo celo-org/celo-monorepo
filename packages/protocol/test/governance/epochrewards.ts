@@ -416,7 +416,7 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return one', async () => {
-        assertEqualBN(await epochRewards.getRewardsMultiplier(), toFixed(new BigNumber(1)))
+        assertEqualBN(await epochRewards.getRewardsMultiplier(), toFixed(1))
       })
     })
 

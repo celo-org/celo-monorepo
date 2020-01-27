@@ -117,7 +117,7 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(aToken, toFixed(new BigNumber(1)), NULL_ADDRESS, NULL_ADDRESS, {
+        await sortedOracles.report(aToken, toFixed(1), NULL_ADDRESS, NULL_ADDRESS, {
           from: anOracle,
         })
       })
@@ -132,7 +132,7 @@ contract('SortedOracles', (accounts: string[]) => {
           for (let i = 7; i > 3; i--) {
             const anotherOracle = accounts[i]
             await sortedOracles.addOracle(aToken, anotherOracle)
-            await sortedOracles.report(aToken, toFixed(new BigNumber(2)), anOracle, NULL_ADDRESS, {
+            await sortedOracles.report(aToken, toFixed(2), anOracle, NULL_ADDRESS, {
               from: anotherOracle,
             })
           }
@@ -174,7 +174,7 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(aToken, toFixed(new BigNumber(10)), NULL_ADDRESS, NULL_ADDRESS, {
+        await sortedOracles.report(aToken, toFixed(10), NULL_ADDRESS, NULL_ADDRESS, {
           from: anOracle,
         })
       })
@@ -256,7 +256,7 @@ contract('SortedOracles', (accounts: string[]) => {
   })
 
   describe('#report', () => {
-    const givenMedianRate = toFixed(new BigNumber(5).dividedBy(new BigNumber(1)))
+    const givenMedianRate = toFixed(5)
     beforeEach(async () => {
       await sortedOracles.addOracle(aToken, anOracle)
     })
@@ -274,7 +274,7 @@ contract('SortedOracles', (accounts: string[]) => {
       })
       const [actualMedianRate, numberOfRates] = await sortedOracles.medianRate(aToken)
       assertEqualBN(actualMedianRate, givenMedianRate)
-      assertEqualBN(numberOfRates, toFixed(new BigNumber(1)))
+      assertEqualBN(numberOfRates, toFixed(1))
     })
 
     it('should increase the number of timestamps', async () => {
@@ -321,7 +321,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     describe('when there exists exactly one other report, made by this oracle', () => {
-      const newExpectedMedianRate = toFixed(new BigNumber(12).dividedBy(new BigNumber(1)))
+      const newExpectedMedianRate = toFixed(12)
 
       beforeEach(async () => {
         await sortedOracles.report(aToken, newExpectedMedianRate, NULL_ADDRESS, NULL_ADDRESS, {
@@ -350,63 +350,31 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when there are multiple reports, the most recent one done by this oracle', () => {
       const anotherOracle = accounts[6]
-      const anOracleMedianRate1 = 2
-      const anOracleMedianRate2 = 3
-      const anotherOracleMedianRate = 1
-
-      const anOracleExpectedMedianRate1 = toFixed(
-        new BigNumber(anOracleMedianRate1).dividedBy(new BigNumber(1))
-      )
-      const anOracleExpectedMedianRate2 = toFixed(
-        new BigNumber(anOracleMedianRate2).dividedBy(new BigNumber(1))
-      )
-
-      const anotherOracleExpectedMedianRate = toFixed(
-        new BigNumber(anotherOracleMedianRate).dividedBy(new BigNumber(1))
-      )
 
       beforeEach(async () => {
         sortedOracles.addOracle(aToken, anotherOracle)
-        await sortedOracles.report(
-          aToken,
-          anotherOracleExpectedMedianRate,
-          NULL_ADDRESS,
-          NULL_ADDRESS,
-          {
-            from: anotherOracle,
-          }
-        )
+        await sortedOracles.report(aToken, toFixed(1), NULL_ADDRESS, NULL_ADDRESS, {
+          from: anotherOracle,
+        })
         await timeTravel(5, web3)
-        await sortedOracles.report(
-          aToken,
-          anOracleExpectedMedianRate1,
-          anotherOracle,
-          NULL_ADDRESS,
-          {
-            from: anOracle,
-          }
-        )
+        await sortedOracles.report(aToken, toFixed(2), anotherOracle, NULL_ADDRESS, {
+          from: anOracle,
+        })
         await timeTravel(5, web3)
 
         // confirm the setup worked
         const initialRates = await sortedOracles.getRates(aToken)
-        assertEqualBN(initialRates['1'][0], anOracleExpectedMedianRate1)
-        assertEqualBN(initialRates['1'][1], anotherOracleExpectedMedianRate)
+        assertEqualBN(initialRates['1'][0], toFixed(2))
+        assertEqualBN(initialRates['1'][1], toFixed(1))
       })
 
       it('updates the list of rates correctly', async () => {
-        await sortedOracles.report(
-          aToken,
-          anOracleExpectedMedianRate2,
-          anotherOracle,
-          NULL_ADDRESS,
-          {
-            from: anOracle,
-          }
-        )
+        await sortedOracles.report(aToken, toFixed(3), anotherOracle, NULL_ADDRESS, {
+          from: anOracle,
+        })
         const resultRates = await sortedOracles.getRates(aToken)
-        assertEqualBN(resultRates['1'][0], anOracleExpectedMedianRate2)
-        assertEqualBN(resultRates['1'][1], anotherOracleExpectedMedianRate)
+        assertEqualBN(resultRates['1'][0], toFixed(3))
+        assertEqualBN(resultRates['1'][1], toFixed(1))
       })
 
       it('updates the latest timestamp', async () => {

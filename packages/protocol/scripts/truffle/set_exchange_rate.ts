@@ -136,7 +136,7 @@ module.exports = async (callback: (error?: any) => number) => {
     // Report it
     await oracles.report(
       stableToken.address,
-      toFixed(new BigNumber(numerator).dividedBy(new BigNumber(denominator))),
+      toFixed(numerator.dividedBy(denominator)),
       lesserKey,
       greaterKey
     )
