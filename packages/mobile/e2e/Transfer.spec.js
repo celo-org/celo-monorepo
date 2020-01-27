@@ -93,28 +93,6 @@ describe('Transfer Works', () => {
     await sleep(10000)
   })
 
-  it.skip('NUX->ImportContacts', async () => {
-    await device.launchApp({ permissions: { contacts: 'YES' } })
-
-    await waitFor(element(by.id('ImportContactsPermissionTitle')))
-      .toBeVisible()
-      .withTimeout(1000)
-
-    await waitFor(element(by.id('importContactsEnable')))
-      .toBeVisible()
-      .withTimeout(1000)
-
-    await waitFor(element(by.id('importContactsSkip')))
-      .toBeVisible()
-      .withTimeout(1000)
-
-    if (ENABLE_CONTACT_IMPORT) {
-      await element(by.id('importContactsEnable')).tap()
-    } else {
-      await element(by.id('importContactsSkip')).tap()
-    }
-  })
-
   it.skip('NUX->VerifyEducation', async () => {
     await waitFor(element(by.id('VerifyEducationHeader')))
       .toBeVisible()
