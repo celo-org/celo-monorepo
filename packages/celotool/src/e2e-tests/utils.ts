@@ -279,6 +279,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--rpcvhosts=*',
     '--networkid',
     NetworkId.toString(),
+    '--gcmode=archive', // Needed to retrieve historical state
     '--verbosity',
     '4',
     '--consoleoutput=stdout', // Send all logs to stdout
@@ -286,7 +287,8 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--nat',
     'extip:127.0.0.1',
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
-    '--vmodule', 'eth/*=5,p2p=4,consensus/*=5'
+    '--vmodule',
+    'eth/*=5,p2p=4,consensus/*=5',
   ]
 
   if (rpcport) {
