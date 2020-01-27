@@ -221,6 +221,7 @@ describe('Transfer tests', function(this: any) {
         port: 30303,
         rpcport: 8545,
         validator: validatorAddress,
+        txFeeRecipient: validatorAddress,
       },
     ],
   }
