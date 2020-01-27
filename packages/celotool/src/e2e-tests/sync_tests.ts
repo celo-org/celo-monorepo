@@ -44,7 +44,7 @@ describe('sync tests', function(this: any) {
 
   after(hooks.after)
 
-  const syncModes = ['full', 'fast', 'light', 'ultralight']
+  const syncModes = ['full', 'fast', 'light', 'lightest']
   for (const syncmode of syncModes) {
     describe(`when syncing with a ${syncmode} node`, () => {
       let syncInstance: GethInstanceConfig
@@ -55,7 +55,7 @@ describe('sync tests', function(this: any) {
           syncmode,
           port: 30313,
           rpcport: 8555,
-          lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
+          lightserv: syncmode !== 'light' && syncmode !== 'lightest',
           peers: [8553],
         }
         await initAndStartGeth(hooks.gethBinaryPath, syncInstance)

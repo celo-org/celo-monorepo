@@ -481,8 +481,8 @@ describe('Transfer tests', function(this: any) {
 
         describe('Transfer CeloGold >', () => {
           describe('with feeCurrency = CeloGold >', () => {
-            if (syncMode === 'light' || syncMode === 'ultralight') {
-              describe('when running in light/ultralight sync mode', () => {
+            if (syncMode === 'light' || syncMode === 'lightest') {
+              describe('when running in light/lightest sync mode', () => {
                 const recipient = (choice: string) => {
                   switch (choice) {
                     case 'peer':
