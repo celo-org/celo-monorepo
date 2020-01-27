@@ -17,9 +17,9 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
     uint256 vestAmountPerPeriod;
     // durations in secs. of one period
     uint256 vestingPeriodSec;
-    // timestamp for the starting point of the vesting. Timestamp is expressed in UNIX time, the same units as block.timestamp.
+    // timestamp for the starting point of the vesting. Timestamp is expressed in UNIX time
     uint256 vestingStartTime;
-    // timestamp for the cliff starting point. Timestamp is expressed in UNIX time, the same units as block.timestamp.
+    // timestamp for the cliff starting point. Timestamp is expressed in UNIX time
     uint256 vestingCliffStartTime;
   }
 
@@ -336,7 +336,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev The v,r and s signature should be a signed message by the beneficiary being the authorized address
+   * @dev The v,r and s signature should be a signed message by the beneficiary
+   *  encrypting the authorized address
    */
   function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external
@@ -347,7 +348,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   }
 
   /**
-   * @notice A wrapper setter function for a convenience Setter for the dataEncryptionKey and wallet address for an account
+   * @notice A convenience wrapper setter for the name, dataEncryptionKey
+   *  and wallet address for an account
    * @param name A string to set as the name of the account
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account

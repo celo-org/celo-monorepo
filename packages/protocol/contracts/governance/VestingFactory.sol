@@ -29,7 +29,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
    * @param vestingCliff duration in seconds of the cliff in which tokens will begin to vest
    * @param vestingStartTime the time (as Unix time) at which point vesting starts
    * @param vestingPeriodSec duration in seconds of the period in which the tokens will vest
-   * @param vestAmountPerPeriod the vesting amound per period where period is the vestingAmount distributed over the vestingPeriodSec
+   * @param vestAmountPerPeriod the vesting amound per period
    * @param vestingRevokable whether the vesting is revocable or not
    * @param vestingRevoker address of the person revoking the vesting
    * @param vestingMaxPausePeriod maximum pause period in seconds
