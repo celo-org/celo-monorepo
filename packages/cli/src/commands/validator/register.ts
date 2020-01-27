@@ -29,6 +29,8 @@ export default class ValidatorRegister extends BaseCommand {
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
       .canSignValidatorTxs()
+      .isNotValidator()
+      .isNotValidatorGroup()
       .signerMeetsValidatorBalanceRequirements()
       .runChecks()
 
