@@ -85,7 +85,7 @@ function blockEpoch(blockNumber) {
 }
 
 // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-function getFirstBlockNumberForEpoch(epochNumber: number) {
+export function getFirstBlockNumberForEpoch(epochNumber: number) {
   if (epochNumber === 0) {
     // No first block for epoch 0
     return 0

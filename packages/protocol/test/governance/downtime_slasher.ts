@@ -13,6 +13,7 @@ import {
   TestDowntimeSlasherContract,
   TestDowntimeSlasherInstance,
 } from 'types'
+import { getFirstBlockNumberForEpoch } from './validators'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -161,7 +162,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       await slasher.setNumberValidators(2)
       // when epoch-2 changes to epoch-1, the validator to be slashed is down, but our signer number changes
       // another validator is up around the epoch change
-      changeBlock = (epoch - 1) * 100 - 3
+      changeBlock = getFirstBlockNumberForEpoch(epoch - 1) - 3
       async function prepareBlock(bn) {
         const parentEpoch = (await slasher.getEpochNumberOfBlock(bn - 1)).toNumber()
         await slasher.setParentSealBitmap(bn, parentEpoch === epoch - 2 ? bitmap3 : bitmap2)
