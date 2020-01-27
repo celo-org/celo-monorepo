@@ -6,9 +6,11 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { toggleZeroSyncMode } from 'src/web3/actions'
 
@@ -21,7 +23,7 @@ interface DispatchProps {
   toggleZeroSyncMode: typeof toggleZeroSyncMode
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 const mapDispatchToProps = {
   toggleZeroSyncMode,
@@ -37,6 +39,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 interface State {
   switchOffModalVisible: boolean
   switchOnModalVisible: boolean
+  promptModalVisible: boolean
 }
 
 interface ModalProps {
@@ -85,6 +88,16 @@ export class DataSaver extends React.Component<Props, State> {
   state = {
     switchOffModalVisible: false,
     switchOnModalVisible: false,
+    promptModalVisible: false,
+  }
+
+  componentDidMount() {
+    const promptModalVisible = this.props.navigation.getParam('promptModalVisible')
+    if (promptModalVisible) {
+      this.setState({
+        promptModalVisible,
+      })
+    }
   }
 
   showSwitchOffModal = () => {
@@ -113,6 +126,16 @@ export class DataSaver extends React.Component<Props, State> {
     this.hideSwitchOnModal()
   }
 
+  onPressPromptModal = () => {
+    this.props.toggleZeroSyncMode(true)
+    navigateBack()
+  }
+
+  hidePromptModal = () => {
+    this.props.toggleZeroSyncMode(false)
+    navigateBack()
+  }
+
   handleZeroSyncToggle = (zeroSyncMode: boolean) => {
     if (!zeroSyncMode && this.props.gethStartedThisSession) {
       // Starting geth a second time this app session which will
@@ -136,6 +159,15 @@ export class DataSaver extends React.Component<Props, State> {
         >
           <Text style={fontStyles.body}>{t('enableDataSaver')}</Text>
         </SettingsSwitchItem>
+        <WarningModal
+          isVisible={this.state.promptModalVisible}
+          header={t('promptZeroSyncModal.header')}
+          body={t('promptZeroSyncModal.body')}
+          continueTitle={t('promptZeroSyncModal.switchToDataSaver')}
+          cancelTitle={t('global:goBack')}
+          onCancel={this.hidePromptModal}
+          onContinue={this.onPressPromptModal}
+        />
         <WarningModal
           isVisible={this.state.switchOffModalVisible}
           header={t('restartModalSwitchOff.header')}
