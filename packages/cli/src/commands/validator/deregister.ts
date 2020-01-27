@@ -24,6 +24,8 @@ export default class ValidatorDeregister extends BaseCommand {
       .isSignerOrAccount()
       .canSignValidatorTxs()
       .signerAccountIsValidator()
+      .isNotValidatorGroupMember()
+      .validatorDeregisterDurationPassed()
       .runChecks()
 
     const validator = await validators.signerToAccount(res.flags.from)
