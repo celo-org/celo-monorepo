@@ -32,9 +32,9 @@ describe(watchFetchCurrentRate, () => {
     await expectSaga(watchFetchCurrentRate)
       .provide([
         [select(getLocalCurrencyCode), LocalCurrencyCode.MXN],
-        [matchers.call.fn(fetchExchangeRate), 1.33],
+        [matchers.call.fn(fetchExchangeRate), '1.33'],
       ])
-      .put(fetchCurrentRateSuccess(LocalCurrencyCode.MXN, 1.33, now))
+      .put(fetchCurrentRateSuccess(LocalCurrencyCode.MXN, '1.33', now))
       .dispatch(fetchCurrentRate())
       .run()
   })

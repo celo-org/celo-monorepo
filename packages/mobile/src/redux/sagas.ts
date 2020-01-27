@@ -34,6 +34,7 @@ const loggerBlacklist = [
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   'IDENTITY/FETCH_PHONE_ADDRESSES',
   'INVITE/REDEEM_INVITE',
+  'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
 ]
 
 function* loggerSaga() {

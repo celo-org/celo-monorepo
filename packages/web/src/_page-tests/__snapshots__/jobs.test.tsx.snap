@@ -5302,13 +5302,18 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         allLocations
                       </label>
                       <svg
+                        aria-label="[title]"
                         fill="none"
                         height="14"
+                        role="img"
                         style={Object {}}
                         transform="rotate(0)"
                         viewBox="0 0 14 8"
                         width="14"
                       >
+                        <title>
+                          triangle
+                        </title>
                         <path
                           clipRule="evenodd"
                           d="M7 8L0 0H14L7 8Z"
@@ -5629,13 +5634,18 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         allDepartments
                       </label>
                       <svg
+                        aria-label="[title]"
                         fill="none"
                         height="14"
+                        role="img"
                         style={Object {}}
                         transform="rotate(0)"
                         viewBox="0 0 14 8"
                         width="14"
                       >
+                        <title>
+                          triangle
+                        </title>
                         <path
                           clipRule="evenodd"
                           d="M7 8L0 0H14L7 8Z"
@@ -5888,13 +5898,18 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         allCommitments
                       </label>
                       <svg
+                        aria-label="[title]"
                         fill="none"
                         height="14"
+                        role="img"
                         style={Object {}}
                         transform="rotate(0)"
                         viewBox="0 0 14 8"
                         width="14"
                       >
+                        <title>
+                          triangle
+                        </title>
                         <path
                           clipRule="evenodd"
                           d="M7 8L0 0H14L7 8Z"
@@ -12603,13 +12618,18 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                         allLocations
                       </label>
                       <svg
+                        aria-label="[title]"
                         fill="none"
                         height="14"
+                        role="img"
                         style={Object {}}
                         transform="rotate(0)"
                         viewBox="0 0 14 8"
                         width="14"
                       >
+                        <title>
+                          triangle
+                        </title>
                         <path
                           clipRule="evenodd"
                           d="M7 8L0 0H14L7 8Z"
@@ -12930,13 +12950,18 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                         allDepartments
                       </label>
                       <svg
+                        aria-label="[title]"
                         fill="none"
                         height="14"
+                        role="img"
                         style={Object {}}
                         transform="rotate(0)"
                         viewBox="0 0 14 8"
                         width="14"
                       >
+                        <title>
+                          triangle
+                        </title>
                         <path
                           clipRule="evenodd"
                           d="M7 8L0 0H14L7 8Z"
@@ -13121,13 +13146,18 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                         allCommitments
                       </label>
                       <svg
+                        aria-label="[title]"
                         fill="none"
                         height="14"
+                        role="img"
                         style={Object {}}
                         transform="rotate(0)"
                         viewBox="0 0 14 8"
                         width="14"
                       >
+                        <title>
+                          triangle
+                        </title>
                         <path
                           clipRule="evenodd"
                           d="M7 8L0 0H14L7 8Z"

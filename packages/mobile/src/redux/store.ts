@@ -11,7 +11,7 @@ const persistConfig: any = {
   key: 'root',
   version: 4, // default is -1, increment as we make migrations
   storage: AsyncStorage,
-  blacklist: ['home', 'geth', 'exchange', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
+  blacklist: ['home', 'geth', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
   stateReconciler: autoMergeLevel2,
   migrate: createMigrate(migrations, { debug: true }),
 }

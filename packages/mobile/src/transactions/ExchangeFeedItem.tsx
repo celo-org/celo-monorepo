@@ -4,161 +4,45 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
+import gql from 'graphql-tag'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { HomeExchangeFragment } from 'src/apollo/types'
-import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
-import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import {
-  useExchangeRate,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
+import { ExchangeItemFragment } from 'src/apollo/types'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { Namespaces } from 'src/i18n'
+import { exchangeGoldGreen, exchangeGreenGold } from 'src/images/Images'
 import { navigateToExchangeReview } from 'src/transactions/actions'
-import { ExchangeStandby, TransactionStatus } from 'src/transactions/reducer'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
-type Props = (HomeExchangeFragment | ExchangeStandby) &
-  WithTranslation & {
-    status?: TransactionStatus
-    showGoldAmount: boolean
-  }
-
-type ExchangeInputProps = Props & {
-  localCurrencyCode: LocalCurrencyCode | null
-  localCurrencySymbol: LocalCurrencySymbol | null
-  localExchangeRate: number | null | undefined
-}
-type ExchangeProps =
-  | ReturnType<typeof getDollarExchangeProps>
-  | ReturnType<typeof getGoldExchangeProps>
-
-function getLocalAmount(
-  dollarAmount: BigNumber.Value,
-  localExchangeRate: number | null | undefined
-) {
-  const localAmount = convertDollarsToLocalAmount(dollarAmount, localExchangeRate)
-  if (!localAmount) {
-    return null
-  }
-
-  return localAmount.toString()
+type Props = ExchangeItemFragment & {
+  status: TransactionStatus
 }
 
-function getDollarExchangeProps({
-  inValue: dollarAmount,
-  outValue: goldAmount,
-  localCurrencyCode,
-  localCurrencySymbol,
-  localExchangeRate,
-}: ExchangeInputProps) {
-  const localAmount = getLocalAmount(dollarAmount, localExchangeRate)
-  return {
-    icon: require('src/transactions/ExchangeGreenGold.png'),
-    dollarAmount,
-    dollarDirection: '-',
-    localCurrencyCode,
-    localCurrencySymbol,
-    localAmount,
-    goldAmount,
-    goldDirection: '',
-    inValue: localCurrencyCode ? localAmount : dollarAmount,
-    inColor: colors.celoGreen,
-    outValue: goldAmount,
-    outColor: colors.celoGold,
-  }
-}
-
-function getGoldExchangeProps({
-  inValue: goldAmount,
-  outValue: dollarAmount,
-  localCurrencyCode,
-  localCurrencySymbol,
-  localExchangeRate,
-}: ExchangeInputProps) {
-  const localAmount = getLocalAmount(dollarAmount, localExchangeRate)
-  return {
-    icon: require('src/transactions/ExchangeGoldGreen.png'),
-    dollarAmount,
-    dollarDirection: '',
-    localCurrencyCode,
-    localCurrencySymbol,
-    localAmount,
-    goldAmount,
-    goldDirection: '-',
-    inValue: goldAmount,
-    inColor: colors.celoGold,
-    outValue: localCurrencyCode ? localAmount : dollarAmount,
-    outColor: colors.celoGreen,
-  }
-}
-
-function getGoldAmountProps({ goldAmount: amount, goldDirection: amountDirection }: ExchangeProps) {
-  return {
-    amount,
-    amountDirection,
-    amountColor: colors.celoGold,
-    displayAmount: `${amountDirection}${getMoneyDisplayValue(amount)}`,
-  }
-}
-
-function getDollarAmountProps({
-  dollarAmount,
-  dollarDirection: amountDirection,
-  localCurrencyCode,
-  localCurrencySymbol,
-  localAmount,
-}: ExchangeProps) {
-  const amount = localCurrencyCode ? localAmount : dollarAmount
-  return {
-    amount,
-    amountDirection,
-    amountColor: colors.celoGreen,
-    displayAmount: amount
-      ? `${amountDirection}${localCurrencySymbol + getMoneyDisplayValue(amount)}`
-      : '-',
-  }
-}
-
+// TODO(jeanregisser): ExchangeFeedItem and TransferFeedItem renders are very similar, we should use the same building blocks
+// so the parts that need to be identical stay the same as we change the code (main layout)
 export function ExchangeFeedItem(props: Props) {
-  const { showGoldAmount, inSymbol, status, timestamp, t, i18n } = props
-
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
-  const localExchangeRate = useExchangeRate()
+  const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+  const { amount, makerAmount, takerAmount, status, timestamp } = props
 
   const onPress = () => {
     navigateToExchangeReview(timestamp, {
-      makerToken: resolveCurrency(inSymbol),
-      makerAmount: new BigNumber(props.inValue),
-      takerAmount: new BigNumber(props.outValue),
+      makerAmount,
+      takerAmount,
     })
   }
 
-  const inCurrency = resolveCurrency(inSymbol)
-  const exchangeInputProps = { ...props, localCurrencyCode, localCurrencySymbol, localExchangeRate }
-  const exchangeProps =
-    inCurrency === CURRENCY_ENUM.DOLLAR
-      ? getDollarExchangeProps(exchangeInputProps)
-      : getGoldExchangeProps(exchangeInputProps)
-  const amountProps = showGoldAmount
-    ? getGoldAmountProps(exchangeProps)
-    : getDollarAmountProps(exchangeProps)
-
-  const { inValue, outValue } = exchangeProps
-  const { displayAmount, amountDirection, amountColor } = amountProps
-
+  const icon =
+    makerAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      ? exchangeGoldGreen
+      : exchangeGreenGold
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
-
-  const { inColor, outColor, icon } = exchangeProps
-  const inStyle = { color: isPending ? colors.gray : inColor }
-  const outStyle = { color: isPending ? colors.gray : outColor }
+  const exchangeStyle = [styles.exchangeCurrency, isPending && { color: colors.gray }]
+  const isSent = new BigNumber(amount.value).isNegative()
 
   return (
     <Touchable onPress={onPress}>
@@ -169,30 +53,20 @@ export function ExchangeFeedItem(props: Props) {
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={fontStyles.bodySmallSemiBold}>{t('exchange')}</Text>
-            <Text
+            <CurrencyDisplay
+              amount={amount}
               style={[
-                amountDirection === '-'
-                  ? fontStyles.activityCurrencySent
-                  : {
-                      ...fontStyles.activityCurrencyReceived,
-                      color: amountColor,
-                    },
                 styles.amount,
+                isSent ? fontStyles.activityCurrencySent : fontStyles.activityCurrencyReceived,
               ]}
-            >
-              {displayAmount}
-            </Text>
+            />
           </View>
           <View style={styles.exchangeContainer}>
-            <Text style={[fontStyles.activityCurrency, inStyle]}>
-              {inValue ? getMoneyDisplayValue(inValue) : '-'}
-            </Text>
+            <CurrencyDisplay amount={makerAmount} hideSymbol={true} style={exchangeStyle} />
             <View style={styles.arrow}>
               <ExchangeArrow />
             </View>
-            <Text style={[fontStyles.activityCurrency, outStyle]}>
-              {outValue ? getMoneyDisplayValue(outValue) : '-'}
-            </Text>
+            <CurrencyDisplay amount={takerAmount} hideSymbol={true} style={exchangeStyle} />
           </View>
           <View style={styles.statusContainer}>
             {isPending && (
@@ -215,6 +89,44 @@ export function ExchangeFeedItem(props: Props) {
       </View>
     </Touchable>
   )
+}
+
+ExchangeFeedItem.fragments = {
+  exchange: gql`
+    fragment ExchangeItem on TokenExchange {
+      __typename
+      type
+      hash
+      amount {
+        value
+        currencyCode
+        localAmount {
+          value
+          currencyCode
+          exchangeRate
+        }
+      }
+      timestamp
+      takerAmount {
+        value
+        currencyCode
+        localAmount {
+          value
+          currencyCode
+          exchangeRate
+        }
+      }
+      makerAmount {
+        value
+        currencyCode
+        localAmount {
+          value
+          currencyCode
+          exchangeRate
+        }
+      }
+    }
+  `,
 }
 
 const styles = StyleSheet.create({
@@ -251,10 +163,13 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   exchangeContainer: {
-    // alignSelf: 'flex-start',
     alignItems: 'center',
     flexDirection: 'row',
-    // justifyContent: 'flex-end',
+  },
+  exchangeCurrency: {
+    ...fontStyles.semiBold,
+    fontSize: 16,
+    lineHeight: 20,
   },
   statusContainer: {
     flex: 1,
@@ -278,13 +193,6 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: colors.darkSecondary,
   },
-  localAmount: {
-    marginLeft: 'auto',
-    paddingLeft: 10,
-    fontSize: 14,
-    lineHeight: 18,
-    color: colors.lightGray,
-  },
 })
 
-export default withTranslation(Namespaces.walletFlow5)(React.memo(ExchangeFeedItem))
+export default ExchangeFeedItem
