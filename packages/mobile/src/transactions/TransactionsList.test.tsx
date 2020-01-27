@@ -186,7 +186,7 @@ it('updates balance if new transactions arrive', async () => {
     },
   })
 
-  const { getByType, toJSON } = render(
+  const { getByType } = render(
     <Provider store={store}>
       <MockedProvider mocks={mocks} addTypename={false}>
         <TransactionsList currency={CURRENCY_ENUM.DOLLAR} />
@@ -196,7 +196,7 @@ it('updates balance if new transactions arrive', async () => {
 
   expect(store.getActions()).toEqual([])
 
-  const feed = await waitForElement(() => getByType(TransactionFeed))
+  await waitForElement(() => getByType(TransactionFeed))
 
   expect(store.getActions()).toEqual([
     { type: 'STABLE_TOKEN/FETCH_BALANCE' },
