@@ -10,7 +10,7 @@ set -euo pipefail
 # -n (Optional): Name of the network to run on 
 # -f (Optional): Fast (skip steps not required unless network or depedencies changes)
 # -r (Optional): Hot Reload (Restore nav state on reload, useful for UI dev-ing)
-# -b (Optional): Just configure and build, skip running 
+# -b (Optional): Just configure and build sdk, skip running 
 
 NETWORK=""
 PLATFORM=""

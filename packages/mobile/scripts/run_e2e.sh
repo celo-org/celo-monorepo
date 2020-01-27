@@ -39,14 +39,14 @@ yarn react-native-kill-packager || echo "Failed to kill package manager, proceed
 if [ $PLATFORM = "android" ]; then
   echo "Using platform android"
 
-  if [ -z $ANDROID_SDK_ROOT ]; then
+  if [ -z $ANDROID_HOME ]; then
     echo "No Android SDK root set"
     exit 1
   fi
 
-  if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$VD_NAME$) ]]; then
+  if [[ ! $($ANDROID_HOME/emulator/emulator -list-avds | grep ^$VD_NAME$) ]]; then
     echo "AVD $VD_NAME not installed. Please install it or change the detox configuration in package.json"
-    echo "You can see the list of available installed devices with $ANDROID_SDK_ROOT/emulator/emulator -list-avds"
+    echo "You can see the list of available installed devices with $ANDROID_HOME/emulator/emulator -list-avds"
     exit 1
   fi
 
@@ -74,7 +74,7 @@ if [ $PLATFORM = "android" ]; then
   fi
 
   echo "Starting the emulator"
-  $ANDROID_SDK_ROOT/emulator/emulator -avd $VD_NAME -no-boot-anim &
+  $ANDROID_HOME/emulator/emulator -avd $VD_NAME -no-boot-anim &
 
   echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
   until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
@@ -84,6 +84,9 @@ if [ $PLATFORM = "android" ]; then
 
   CELO_TEST_CONFIG=e2e yarn detox test -c $CONFIG_NAME -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose
   STATUS=$?
+
+  echo "Closing emulator (if active)"
+  adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
 
 elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
@@ -97,9 +100,6 @@ fi
 
 echo "Done test, cleaning up"
 yarn react-native-kill-packager
-
-echo "Closing emulator (if active)"
-adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
 
 echo "Exiting with test result status $STATUS"
 exit $STATUS

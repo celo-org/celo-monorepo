@@ -123,7 +123,7 @@ See [`src/identity/verification.test.ts`] for an example.
 ### E2E testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
-must have the proper emulator set up. Follow the instrutions in `e2e/README.md`.
+must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
 
 Once setup is done, you can run the tests with `yarn test:e2e:android`
 
