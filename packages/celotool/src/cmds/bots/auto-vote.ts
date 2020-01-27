@@ -19,20 +19,29 @@ export const describe = 'for each of the voting bot accounts, vote for the best 
 
 interface SimulateVotingArgv {
   celoProvider: string
+  excludedGroups?: string
 }
 
 export const builder = (yargs: Argv) => {
-  return yargs.option('celoProvider', {
-    type: 'string',
-    description: 'The node to use',
-    default: 'http://localhost:8545',
-  })
+  return yargs
+    .option('celoProvider', {
+      type: 'string',
+      description: 'The node to use',
+      default: 'http://localhost:8545',
+    })
+    .option('excludedGroups', {
+      type: 'string',
+      description: 'A comma separated list of groups to exclude from voting eligibility',
+    })
 }
 
 export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
   try {
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     const numBotAccounts = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
+
+    const excludedGroups: string[] =
+      argv.excludedGroups && argv.excludedGroups.length > 0 ? argv.excludedGroups.split(',') : []
 
     const kit = newKit(argv.celoProvider)
     const election = await kit.contracts.getElection()
@@ -90,12 +99,9 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
           if (exploreProbability.isGreaterThan(Math.random())) {
             console.info('Vote Method: unweighted random choice of unelected')
             randomlySelectedGroup = getUnweightedRandomChoice(
-              unelectedGroups.filter((k) => {
-                const capacity = groupCapacities.get(k)
-                return (
-                  capacity && capacity.isGreaterThan(0) && (!currentGroup || !currentGroup.match(k))
-                )
-              })
+              unelectedGroups.filter((k) =>
+                shouldBeConsidered(k, currentGroup, excludedGroups, groupCapacities)
+              )
             )
             if (randomlySelectedGroup === NULL_ADDRESS) {
               console.info('No unelected groups available, falling back to weighted-by-score')
@@ -109,12 +115,9 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
             console.info('Vote Method: weighted random choice among those with scores')
             randomlySelectedGroup = getWeightedRandomChoice(
               groupWeights,
-              [...groupCapacities.keys()].filter((k) => {
-                const capacity = groupCapacities.get(k)
-                return (
-                  capacity && capacity.isGreaterThan(0) && (!currentGroup || !currentGroup.match(k))
-                )
-              })
+              [...groupCapacities.keys()].filter((k) =>
+                shouldBeConsidered(k, currentGroup, excludedGroups, groupCapacities)
+              )
             )
           }
 
@@ -315,4 +318,19 @@ function shouldChangeVote(
   const totalProbability = scaledProbability.plus(baseChangeProbability)
 
   return totalProbability.isGreaterThan(Math.random())
+}
+
+function shouldBeConsidered(
+  groupAddress: string,
+  currentGroup: string | undefined,
+  excludedGroups: string[],
+  groupCapacities: Map<string, BigNumber>
+): boolean {
+  const capacity = groupCapacities.get(groupAddress)
+  return !!(
+    !excludedGroups.includes(groupAddress) &&
+    capacity &&
+    capacity.isGreaterThan(0) &&
+    (!currentGroup || !currentGroup.match(groupAddress))
+  )
 }

@@ -9,8 +9,9 @@ import { ensure0x } from 'src/lib/utils'
 
 const helmChartPath = '../helm-charts/voting-bot'
 
-export async function installHelmChart(celoEnv: string) {
-  const params = await helmParameters(celoEnv)
+export async function installHelmChart(celoEnv: string, excludedGroups?: string[]) {
+  const params = await helmParameters(celoEnv, excludedGroups)
+  console.info(params)
   return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, params)
 }
 export async function removeHelmRelease(celoEnv: string) {
@@ -68,7 +69,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
   }
 }
 
-function helmParameters(celoEnv: string) {
+function helmParameters(celoEnv: string, excludedGroups?: string[]) {
   return [
     `--set celoProvider=${getFornoUrl(celoEnv)}`,
     `--set cronSchedule="${fetchEnv(envVar.VOTING_BOT_CRON_SCHEDULE)}"`,
@@ -79,6 +80,7 @@ function helmParameters(celoEnv: string) {
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set votingBot.changeBaseline="${fetchEnv(envVar.VOTING_BOT_CHANGE_BASELINE)}"`,
     `--set votingBot.count=${fetchEnv(envVar.VOTING_BOTS)}`,
+    `--set-string votingBot.excludedGroups="${excludedGroups}"`, // TODO: make this actually handle a string with commas :(
     `--set votingBot.exploreProbability="${fetchEnv(envVar.VOTING_BOT_EXPLORE_PROBABILITY)}"`,
     `--set votingBot.scoreSensitivity="${fetchEnv(envVar.VOTING_BOT_SCORE_SENSITIVITY)}"`,
     `--set votingBot.wakeProbability="${fetchEnv(envVar.VOTING_BOT_WAKE_PROBABILITY)}"`,

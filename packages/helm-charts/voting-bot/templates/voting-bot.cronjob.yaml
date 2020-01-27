@@ -27,6 +27,8 @@ spec:
 
                 $CELOTOOL bots auto-vote --celoProvider {{ .Values.celoProvider }}
             env:
+            - name: EXCLUDED_GROUPS
+              value: {{ .Values.votingBot.excludeGroups | quote }}
             - name: MNEMONIC
               valueFrom:
                 secretKeyRef:
