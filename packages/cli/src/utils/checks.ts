@@ -221,6 +221,18 @@ class CheckBuilder {
       )
     )
 
+  isNotValidator = () =>
+    this.addCheck(
+      `${this.signer!} is not a registered Validator`,
+      this.withValidators((v, _signer, account) => negate(v.isValidator(account)))
+    )
+
+  isNotValidatorGroup = () =>
+    this.addCheck(
+      `${this.signer!} is not a registered ValidatorGroup`,
+      this.withValidators((v, _signer, account) => negate(v.isValidatorGroup(account)))
+    )
+
   signerMeetsValidatorBalanceRequirements = () =>
     this.addCheck(
       `Signer's account has enough locked gold for registration`,
