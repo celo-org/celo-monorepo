@@ -5,6 +5,8 @@ import YouTube from 'react-youtube'
 import AspectRatio from 'src/shared/AspectRatio'
 import EX from 'src/shared/EX'
 import PlayCircle from 'src/shared/PlayCircle'
+import { getSentry } from 'src/utils/sentry'
+
 interface Props {
   videoID: string
   previewImage?: string
@@ -133,7 +135,6 @@ export default class VideoModal extends React.Component<Props, State> {
             <YouTube
               videoId={this.props.videoID}
               opts={opts}
-              onError={console.error}
               onReady={onReady}
               onEnd={this.onEnd}
             />
@@ -143,12 +144,16 @@ export default class VideoModal extends React.Component<Props, State> {
     )
   }
 }
-// todo is this right?
-async function onReady(opts) {
+
+async function onReady({ target }) {
+  const Sentry = await getSentry()
   try {
-    opts.target.playVideo()
+    Sentry.addBreadcrumb({
+      message: 'Playing About Page Video',
+    })
+    target.playVideo()
   } catch (e) {
-    console.log(e)
+    Sentry.captureException(e)
   }
 }
 
