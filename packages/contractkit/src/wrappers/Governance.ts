@@ -346,6 +346,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   async getDequeue() {
     const dequeue = await this.contract.methods.getDequeue().call()
+    // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
     return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
   }
 
@@ -432,10 +433,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
     const recordQueued = await this.isQueued(upvoteRecord.proposalID)
+    // if existing upvote exists in queue, revoke it before applying new upvote
     const queue = recordQueued
       ? (await this.withUpvoteRevoked(upvoter)).queue
       : await this.getQueue()
-    console.log(queue)
     const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
     return this.lesserAndGreater(proposalID, upvoteQueue)
   }
