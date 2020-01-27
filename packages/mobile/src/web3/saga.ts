@@ -14,11 +14,11 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
-import { cancelGethSaga, setPromptZeroSync } from 'src/geth/actions'
+import { cancelGethSaga, setPromptForno } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
-import { promptZeroSyncIfNeededSelector } from 'src/geth/selectors'
+import { promptFornoIfNeededSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
@@ -31,9 +31,9 @@ import {
   getLatestBlock,
   setAccount,
   setAccountInWeb3Keystore,
-  SetIsZeroSyncAction,
+  SetIsFornoAction,
   setPrivateCommentKey,
-  setZeroSyncMode,
+  setFornoMode,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
@@ -42,7 +42,7 @@ import {
   currentAccountInWeb3KeystoreSelector,
   currentAccountSelector,
   gethStartedThisSessionSelector,
-  zeroSyncSelector,
+  fornoSelector,
 } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
@@ -53,7 +53,7 @@ const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
-const SWITCH_TO_ZERO_SYNC_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to zeroSync
+const SWITCH_TO_FORNO_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to forno
 const WEB3_MONITOR_DELAY = 100
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
@@ -86,9 +86,9 @@ export function* checkWeb3SyncProgress() {
       }
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
-      if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_ZERO_SYNC_TIMEOUT) {
-        if (yield select(promptZeroSyncIfNeededSelector)) {
-          yield put(setPromptZeroSync(false))
+      if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
+        if (yield select(promptFornoIfNeededSelector)) {
+          yield put(setPromptForno(false))
           navigate(Screens.DataSaver, { promptModalVisible: true })
           return true
         }
@@ -129,7 +129,7 @@ export function* waitForWeb3Sync() {
 }
 
 export function* waitWeb3LastBlock() {
-  if (!(yield select(zeroSyncSelector))) {
+  if (!(yield select(fornoSelector))) {
     yield call(waitForGethConnectivity)
     yield call(waitForWeb3Sync)
   }
@@ -184,13 +184,13 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     }
 
     // Save the account to a local file on the disk.
-    // This is done for all sync modes, to allow users to switch into zeroSync mode.
+    // This is done for all sync modes, to allow users to switch into forno mode.
     // Note that if geth is running it saves the key using web3.personal.
     const account = getAccountAddressFromPrivateKey(privateKey)
     yield call(savePrivateKeyToLocalDisk, account, privateKey, pincode)
 
-    const zeroSyncMode = yield select(zeroSyncSelector)
-    if (zeroSyncMode) {
+    const fornoMode = yield select(fornoSelector)
+    if (fornoMode) {
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
       addLocalAccount(web3, privateKey)
     } else {
@@ -322,7 +322,7 @@ async function isLocked(address: string) {
   return false
 }
 
-let accountAlreadyAddedInZeroSyncMode = false
+let accountAlreadyAddedInFornoMode = false
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
@@ -333,15 +333,15 @@ export function* unlockAccount(account: string) {
     }
 
     const pincode = yield call(getPincode)
-    const zeroSyncMode = yield select(zeroSyncSelector)
-    if (zeroSyncMode) {
-      if (accountAlreadyAddedInZeroSyncMode) {
+    const fornoMode = yield select(fornoSelector)
+    if (fornoMode) {
+      if (accountAlreadyAddedInFornoMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
         Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in Geth free mode`)
         const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
         addLocalAccount(web3, privateKey)
-        accountAlreadyAddedInZeroSyncMode = true
+        accountAlreadyAddedInFornoMode = true
       }
       return true
     } else {
@@ -378,10 +378,10 @@ export function* getConnectedUnlockedAccount() {
 export function* addAccountToWeb3Keystore(key: string, currentAccount: string, pincode: string) {
   let account: string
   Logger.debug(TAG + '@addAccountToWeb3Keystore', `using key ${key} for account ${currentAccount}`)
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
-    // web3.eth.personal is not accessible in zeroSync mode
-    throw new Error('Cannot add account to Web3 keystore while in zeroSync mode')
+  const fornoMode = yield select(fornoSelector)
+  if (fornoMode) {
+    // web3.eth.personal is not accessible in forno mode
+    throw new Error('Cannot add account to Web3 keystore while in forno mode')
   }
   try {
     // @ts-ignore
@@ -436,11 +436,11 @@ export function* ensureAccountInWeb3Keystore() {
   }
 }
 
-export function* switchToGethFromZeroSync() {
-  Logger.debug(TAG, 'Switching to geth from zeroSync..')
+export function* switchToGethFromForno() {
+  Logger.debug(TAG, 'Switching to geth from forno..')
   try {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
-    yield put(setZeroSyncMode(false))
+    yield put(setFornoMode(false))
 
     if (gethAlreadyStartedThisSession) {
       // Call any method on web3 to avoid a persist state issue
@@ -460,66 +460,66 @@ export function* switchToGethFromZeroSync() {
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
 
-    // After switching off zeroSync mode, ensure key is stored in web3.personal
+    // After switching off forno mode, ensure key is stored in web3.personal
     // Note that this must happen after the sync mode is switched
-    // as the web3.personal where the key is stored is not available in zeroSync mode
+    // as the web3.personal where the key is stored is not available in forno mode
     yield call(ensureAccountInWeb3Keystore)
   } catch (e) {
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to geth from zeroSync')
+    Logger.error(TAG + '@switchToGethFromForno', 'Error switching to geth from forno')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
   }
 }
 
-export function* switchToZeroSyncFromGeth() {
-  Logger.debug(TAG, 'Switching to zeroSync from geth..')
+export function* switchToFornoFromGeth() {
+  Logger.debug(TAG, 'Switching to forno from geth..')
   try {
-    yield put(setZeroSyncMode(true))
+    yield put(setFornoMode(true))
     switchWeb3ProviderForSyncMode(true)
     yield put(cancelGethSaga())
     yield call(stopGethIfInitialized)
 
-    // Ensure web3 sync state is updated with new zeroSync state.
+    // Ensure web3 sync state is updated with new forno state.
     // This prevents a false positive "geth disconnected"
     // when blocks stop syncing.
     yield call(waitForWeb3Sync)
   } catch (e) {
-    Logger.error(TAG + '@switchToGethFromZeroSync', 'Error switching to zeroSync from geth')
+    Logger.error(TAG + '@switchToGethFromForno', 'Error switching to forno from geth')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
   }
 }
 
-export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
-  if ((yield select(zeroSyncSelector)) !== action.zeroSyncMode) {
-    Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
-    if (action.zeroSyncMode) {
-      yield call(switchToZeroSyncFromGeth)
+export function* toggleFornoMode(action: SetIsFornoAction) {
+  if ((yield select(fornoSelector)) !== action.fornoMode) {
+    Logger.debug(TAG + '@toggleFornoMode', ` to: ${action.fornoMode}`)
+    if (action.fornoMode) {
+      yield call(switchToFornoFromGeth)
     } else {
-      yield call(switchToGethFromZeroSync)
+      yield call(switchToGethFromForno)
     }
     // Unlock account to ensure private keys are accessible in new mode
     try {
       const account = yield call(getConnectedUnlockedAccount)
       Logger.debug(
-        TAG + '@toggleZeroSyncMode',
-        `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
+        TAG + '@toggleFornoMode',
+        `Switched to ${action.fornoMode} and able to unlock account ${account}`
       )
     } catch (e) {
       // Rollback if private keys aren't accessible in new mode
-      if (action.zeroSyncMode) {
-        yield call(switchToGethFromZeroSync)
+      if (action.fornoMode) {
+        yield call(switchToGethFromForno)
       } else {
-        yield call(switchToZeroSyncFromGeth)
+        yield call(switchToFornoFromGeth)
       }
     }
   } else {
-    Logger.debug(TAG + '@toggleZeroSyncMode', ` already in desired state: ${action.zeroSyncMode}`)
+    Logger.debug(TAG + '@toggleFornoMode', ` already in desired state: ${action.fornoMode}`)
   }
 }
-export function* watchZeroSyncMode() {
-  yield takeLatest(Actions.TOGGLE_IS_ZERO_SYNC, toggleZeroSyncMode)
+export function* watchFornoMode() {
+  yield takeLatest(Actions.TOGGLE_IS_FORNO, toggleFornoMode)
 }
 
 export function* web3Saga() {
-  yield spawn(watchZeroSyncMode)
+  yield spawn(watchFornoMode)
   yield spawn(waitWeb3LastBlock)
 }

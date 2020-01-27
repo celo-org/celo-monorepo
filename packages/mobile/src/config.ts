@@ -58,8 +58,8 @@ export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true
 export const PROMOTE_REWARDS_APP = false
 export const SHOW_TESTNET_BANNER = stringToBoolean(Config.SHOW_TESTNET_BANNER || 'false')
 export const SHOW_GET_INVITE_LINK = stringToBoolean(Config.SHOW_GET_INVITE_LINK || 'false')
-export const ZERO_SYNC_ENABLED_INITIALLY = Config.ZERO_SYNC_ENABLED_INITIALLY
-  ? stringToBoolean(Config.ZERO_SYNC_ENABLED_INITIALLY)
+export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
+  ? stringToBoolean(Config.FORNO_ENABLED_INITIALLY)
   : false
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()

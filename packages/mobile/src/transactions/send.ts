@@ -12,7 +12,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { zeroSyncSelector } from 'src/web3/selectors'
+import { fornoSelector } from 'src/web3/selectors'
 import { TransactionObject } from 'web3/eth/types'
 
 const TAG = 'transactions/send'
@@ -70,8 +70,8 @@ export function* sendTransactionPromises(
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
   const stableToken = yield call(getStableTokenContract, web3)
   // This if-else case is temprary and will disappear once we move from `walletkit` to `contractkit`.
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
+  const fornoMode = yield select(fornoSelector)
+  if (fornoMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
     // ensures that we get a more meaningful error if the forno server is down, which
     // can happen with networks without SLA guarantees like `integration`.

@@ -238,7 +238,11 @@ export const v5Schema = {
   },
   geth: {
     ...v4Schema.geth,
-    promptZeroSyncIfNeeded: false,
+    promptFornoIfNeeded: false,
+  },
+  web3: {
+    ...v4Schema.web3,
+    fornoMode: false,
   },
 }
 
