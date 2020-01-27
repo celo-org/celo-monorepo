@@ -74,8 +74,23 @@ const DAY = 24 * HOUR
 // Hard coded in ganache.
 const EPOCH = 100
 
+// Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
 function blockEpoch(blockNumber) {
-  return Math.floor((blockNumber - 1) / EPOCH)
+  const epochNumber = Math.floor(blockNumber / EPOCH)
+  if (blockNumber % EPOCH === 0) {
+    return epochNumber
+  } else {
+    return epochNumber + 1
+  }
+}
+
+// Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+function getFirstBlockNumberForEpoch(epochNumber: number) {
+  if (epochNumber === 0) {
+    // No first block for epoch 0
+    return 0
+  }
+  return (epochNumber - 1) * EPOCH + 1
 }
 
 contract('Validators', (accounts: string[]) => {
@@ -1911,7 +1926,7 @@ contract('Validators', (accounts: string[]) => {
         for (let i = 0; i < numTests; i++) {
           const blockNumber = await web3.eth.getBlockNumber()
           const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+          const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
           let group = groups[0]
@@ -1950,7 +1965,7 @@ contract('Validators', (accounts: string[]) => {
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
           const blockNumber = await web3.eth.getBlockNumber()
           const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+          const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
           await validators.affiliate(groups[i])
@@ -1986,7 +2001,7 @@ contract('Validators', (accounts: string[]) => {
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
           const blockNumber = await web3.eth.getBlockNumber()
           const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+          const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
           await validators.affiliate(groups[i])
@@ -2225,7 +2240,7 @@ contract('Validators', (accounts: string[]) => {
         for (let i = 1; i < totalEpochs; i++) {
           const blockNumber = await web3.eth.getBlockNumber()
           const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+          const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
           await mineBlocks(blocksUntilNextEpoch, web3)
 
           if (i % gapSize === 0) {
