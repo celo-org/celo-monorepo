@@ -194,7 +194,7 @@ async function updateNames(kit: ContractKit, addresses: any[], sheets: any) {
   makeRequest(sheets, 'D', data)
 }
 
-async function getClaimedAccounts(kit: ContractKit, address: string) {
+async function getClaimedAccountsFlat(kit: ContractKit, address: string) {
   if (!address) return []
   try {
     const metadata = await getMetadata(kit, address)
@@ -204,6 +204,22 @@ async function getClaimedAccounts(kit: ContractKit, address: string) {
     console.error('Error', err)
     return [address]
   }
+}
+
+function normalizeAddress(a: string) {
+  const lower = a.toLowerCase()
+  if (lower.substr(0, 2) === '0x') {
+    return lower
+  } else return '0x' + lower
+}
+
+async function getClaimedAccountsRec2(kit: ContractKit, address: string) {
+  let lst = await getClaimedAccountsFlat(kit, address)
+  let acc: string[] = []
+  for (const el of lst) {
+    acc = acc.concat(await getClaimedAccountsFlat(kit, el))
+  }
+  return dedup(acc.map(normalizeAddress))
 }
 
 async function getBTUs(kit: ContractKit, accounts: string[]) {
@@ -286,7 +302,7 @@ function main() {
     //    let accounts = await Promise.all(addresses.map((address) => getClaimedAccounts(kit, address)))
     let accounts = []
     for (let address of addresses) {
-      accounts.push(await getClaimedAccounts(kit, address))
+      accounts.push(await getClaimedAccountsRec2(kit, address))
     }
     updateBTUs(kit, accounts, sheets)
     updateAttestations(kit, accounts, sheets)
