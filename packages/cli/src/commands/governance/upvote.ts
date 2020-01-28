@@ -29,6 +29,6 @@ export default class Upvote extends BaseCommand {
       .runChecks()
 
     const account = await (await this.kit.contracts.getAccounts()).voteSignerToAccount(signer)
-    await displaySendTx('upvoteTx', await governance.upvote(id, account))
+    await displaySendTx('upvoteTx', await governance.upvote(id, account), {}, 'ProposalUpvoted')
   }
 }

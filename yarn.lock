@@ -2410,6 +2410,13 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@babel/runtime@^7.7.6":
+  version "7.8.3"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.8.3.tgz#0811944f73a6c926bb2ad35e918dcc1bfab279f1"
+  integrity sha512-fVHx1rzEmwB130VTkLnxR+HmxcTjGzH12LYQcFFoBwakMd3aOMD4OsRN7tGG/UOYE2ektgFrS8uACAoRk1CY0w==
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/template@^7.0.0", "@babel/template@^7.1.0", "@babel/template@^7.1.2":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.1.2.tgz#090484a574fef5a2d2d7726a674eceda5c5b5644"
@@ -2632,10 +2639,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@0.0.247":
-  version "0.0.247"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.247.tgz#7e9119bb7b3c5c4b1d12ba5f8aa6b1fd20fb38f2"
-  integrity sha512-dGaARMtqc8ZYMEz/x79rP8ewJTDD88NxbthqYNCPkoYNSlgCLMd6SEVHI6IipYK2+wAMskILLW4De0v3Ia0Lzw==
+"@celo/client@0.0.266":
+  version "0.0.266"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.266.tgz#0b37b3d1d1981cad6c9a235b33d9331810c718d1"
+  integrity sha512-fKjtPXeVnsf+1+5Tt+H2HeUPjNiv2L4Cgd3UH/e1oqlV1Oy/Pnp/9A0blHBqkUXRCF7RD/MRxyQyyI88FN1fEw==
 
 "@celo/contractkit@0.1.5":
   version "0.1.5"
@@ -2672,13 +2679,13 @@
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
-"@celo/contractkit@0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.4.tgz#bbe0e1d10cb8f936f43433fbd81c1b1a2d21c47d"
-  integrity sha512-bDpxaeN5WXXFx0/ayrjI89MHkB5WwlL5WAGN3A1RXyX2h1Ycs+sK2+6Z19X4Cps7kKMKF+O3oiEabYSn1Qdpfw==
+"@celo/contractkit@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.9.tgz#98c61e2f6a7f5d47dab43d1cf6b04c48d05acc13"
+  integrity sha512-CTepT44iDJM+0grRHsfdPqL0qMUmQ3Syu6BAnG1oBW9MA31796lRYs/QSRmfw3mzoHyDbJsnwKy0mCDQhDahiw==
   dependencies:
     "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "^0.1.0"
+    "@celo/utils" "0.1.5"
     "@types/debug" "^4.1.5"
     bignumber.js "^7.2.0"
     cross-fetch "3.0.4"
@@ -2736,14 +2743,6 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/react-native-fast-crypto@^1.8.2":
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/@celo/react-native-fast-crypto/-/react-native-fast-crypto-1.8.2.tgz#7563e73a47c9ce22407e0ceb4d6406078872795f"
-  integrity sha512-yb8TNnfVU6dWEWc2x8oNyF4mIzerXcS/Gv6ETRi5lM8bz1RyJUrX87mxTPhDJp0vdwtX0bnXRBjycgpPEPSPAA==
-  dependencies:
-    buffer "^5.0.8"
-    rfc4648 "^1.0.0"
-
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
@@ -2768,7 +2767,29 @@
     lodash "^4.17.14"
     web3-utils "1.0.0-beta.37"
 
-"@celo/utils@0.1.4", "@celo/utils@^0.1.0":
+"@celo/utils@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.5.tgz#aa5b5a939104dbc32f17d9c51a2ba2322f98de64"
+  integrity sha512-lrEbo+HMxU+A1hhd49/XZUSqUWdNeYHUjQKS3mCNxeK5lAH86aZAlkybjwIdvL/JWwjtRFFOBKsOBMb+/n/3tw==
+  dependencies:
+    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
+    bigi "^1.1.0"
+    bignumber.js "^7.2.0"
+    bls12377js "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
+    bn.js "4.11.8"
+    buffer-reverse "^1.0.1"
+    country-data "^0.0.31"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.4.1"
+    ethereumjs-util "^5.2.0"
+    futoin-hkdf "^1.0.3"
+    google-libphonenumber "^3.2.4"
+    keccak256 "^1.0.0"
+    lodash "^4.17.14"
+    numeral "^2.0.6"
+    web3-utils "1.0.0-beta.37"
+
+"@celo/utils@^0.1.0":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.4.tgz#c117441d21699a371da03fcb5d9960ec30eba0f6"
   integrity sha512-pIvLQVjKTpsUon2N/3kPrASF2ndTf3Bf+KhC9cE1P5DPl5R5L/pKIHy5gb4Z89IZt93gWb8/0/h3JQbA+MLGNw==
@@ -5310,13 +5331,6 @@
   resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-1.1.0-beta.2.tgz#30d8a41624193d5d54e7a65af81a3e8ac492aa16"
   integrity sha512-HQNjGxBl7rJJbgcj0jjgAGWLHiViGBK72rqSfyBHBz9DpD1y57RtsRmshl4gScRvsuvy3Ig0TLUZRufSjpxM7w==
 
-"@segment/in-eu@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@segment/in-eu/-/in-eu-0.3.0.tgz#b7d452a2f7e3a29461c0774f4d1570c7e8448ca8"
-  integrity sha512-np6ves6pLi1nkKjQHXk3FBQJmu+C7Gs6n3UYM0TzHsIdZOz1Cfu636cuc+iidBRfE6S+3w0W8AD7F4hpicuUnw==
-  dependencies:
-    jstz "^2.0.0"
-
 "@sentry/apm@5.10.2":
   version "5.10.2"
   resolved "https://registry.yarnpkg.com/@sentry/apm/-/apm-5.10.2.tgz#41a401b3964b68514439f8a595b12c6fd05ab21a"
@@ -5497,6 +5511,11 @@
     xcode "2.0.0"
     yargs "^12.0.2"
 
+"@sheerun/mutationobserver-shim@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@sheerun/mutationobserver-shim/-/mutationobserver-shim-0.3.2.tgz#8013f2af54a2b7d735f71560ff360d3a8176a87b"
+  integrity sha512-vTCdPp/T/Q3oSqwHmZ5Kpa9oI7iLtGl3RQaA/NyLHikvcrPxACkkKVr/XzkSPJWXHRhKGzVvb0urJsbMlRxi1Q==
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -5668,6 +5687,27 @@
   integrity sha512-XIB2XbzHTN6ieIjfIMV9hlVcfPU26s2vafYWQcZHWXHOxiaRZYEDKEwdl129Zyg50+foYV2jCgtrqSA6qNuNSA==
   dependencies:
     defer-to-connect "^1.0.1"
+
+"@testing-library/dom@^6.11.0":
+  version "6.11.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-6.11.0.tgz#962a38f1a721fdb7c9e35e7579e33ff13a00eda4"
+  integrity sha512-Pkx9LMIGshyNbfmecjt18rrAp/ayMqGH674jYER0SXj0iG9xZc+zWRjk2Pg9JgPBDvwI//xGrI/oOQkAi4YEew==
+  dependencies:
+    "@babel/runtime" "^7.6.2"
+    "@sheerun/mutationobserver-shim" "^0.3.2"
+    "@types/testing-library__dom" "^6.0.0"
+    aria-query "3.0.0"
+    pretty-format "^24.9.0"
+    wait-for-expect "^3.0.0"
+
+"@testing-library/react@^9.4.0":
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-9.4.0.tgz#b021ac8cb987c8dc54c6841875f745bf9b2e88e5"
+  integrity sha512-XdhDWkI4GktUPsz0AYyeQ8M9qS/JFie06kcSnUVcpgOwFjAu9vhwR83qBl+lw9yZWkbECjL8Hd+n5hH6C0oWqg==
+  dependencies:
+    "@babel/runtime" "^7.7.6"
+    "@testing-library/dom" "^6.11.0"
+    "@types/testing-library__react" "^9.1.2"
 
 "@types/accepts@^1.3.5":
   version "1.3.5"
@@ -6385,6 +6425,13 @@
   resolved "https://registry.yarnpkg.com/@types/react-css-modules/-/react-css-modules-4.6.2.tgz#ff6451cb848d5e49c074ce9820bb52073e028f82"
   integrity sha512-jRgAsH//g6BHS/cINR90HE2GJWGZe5tLYilxFMY1zTns4BvQ8DUXMQg5333HVSGoj7bjkDLK/whrgfzdAattHg==
 
+"@types/react-dom@*":
+  version "16.9.4"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.9.4.tgz#0b58df09a60961dcb77f62d4f1832427513420df"
+  integrity sha512-fya9xteU/n90tda0s+FtN5Ym4tbgxpq/hb/Af24dvs6uYnYn+fspaxw5USlw0R8apDNwxsqumdRoCoKitckQqw==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-google-recaptcha@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/react-google-recaptcha/-/react-google-recaptcha-1.1.1.tgz#7dd2a4dd15d38d8059a2753cd4a7e3485c9bb3ea"
@@ -6547,6 +6594,21 @@
   integrity sha512-GibTh4OTkal71btYe2fpZP/rVHIPnnUsYphEaoywVHo+mo2a/LhlOFkIm5wdN0H0DA0Hx8x+tKgCYMD9elHu5w==
   dependencies:
     "@types/superagent" "*"
+
+"@types/testing-library__dom@*", "@types/testing-library__dom@^6.0.0":
+  version "6.11.1"
+  resolved "https://registry.yarnpkg.com/@types/testing-library__dom/-/testing-library__dom-6.11.1.tgz#6058a6ac391db679f7c60dbb27b81f0620de2dd9"
+  integrity sha512-ImChHtQqmjwraRLqBC2sgSQFtczeFvBmBcfhTYZn/3KwXbyD07LQykEQ0xJo7QHc1GbVvf7pRyGaIe6PkCdxEw==
+  dependencies:
+    pretty-format "^24.3.0"
+
+"@types/testing-library__react@^9.1.2":
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/@types/testing-library__react/-/testing-library__react-9.1.2.tgz#e33af9124c60a010fc03a34eff8f8a34a75c4351"
+  integrity sha512-CYaMqrswQ+cJACy268jsLAw355DZtPZGt3Jwmmotlcu8O/tkoXBI6AeZ84oZBJsIsesozPKzWzmv/0TIU+1E9Q==
+  dependencies:
+    "@types/react-dom" "*"
+    "@types/testing-library__dom" "*"
 
 "@types/tough-cookie@*":
   version "2.3.4"
@@ -8040,6 +8102,14 @@ argv@^0.0.2:
   resolved "https://registry.yarnpkg.com/argv/-/argv-0.0.2.tgz#ecbd16f8949b157183711b1bda334f37840185ab"
   integrity sha1-7L0W+JSbFXGDcRsb2jNPN4QBhas=
 
+aria-query@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/aria-query/-/aria-query-3.0.0.tgz#65b3fcc1ca1155a8c9ae64d6eee297f15d5133cc"
+  integrity sha1-ZbP8wcoRVajJrmTW7uKX8V1RM8w=
+  dependencies:
+    ast-types-flow "0.0.7"
+    commander "^2.11.0"
+
 armlet@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/armlet/-/armlet-2.7.0.tgz#21c4f9884de17fd75785d8468a669c0f12b01370"
@@ -8384,6 +8454,11 @@ assign-symbols@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
   integrity sha1-WWZ/QfrdTyDMvCu5a41Pf3jsA2c=
+
+ast-types-flow@0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/ast-types-flow/-/ast-types-flow-0.0.7.tgz#f70b735c6bca1a5c9c22d982c3e39e7feba3bdad"
+  integrity sha1-9wtzXGvKGlycItmCw+Oef+ujva0=
 
 ast-types@0.x.x:
   version "0.12.2"
@@ -11583,6 +11658,11 @@ commander@4.1.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-4.1.0.tgz#545983a0603fe425bc672d66c9e3c89c42121a83"
   integrity sha512-NIQrwvv9V39FHgGFm36+U9SMQzbiHvU79k+iADraJTpmrFFfx7Ds0IvDoAdZsDrknlkRk14OYoWXb57uTh7/sw==
 
+commander@^2.11.0:
+  version "2.20.3"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
+  integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
+
 commander@^2.19.0:
   version "2.19.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
@@ -13283,10 +13363,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
-detox@^14.5.0:
-  version "14.5.0"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-14.5.0.tgz#cc96b41a2b76a029ef26be861fb04f69fe70c965"
-  integrity sha512-6LH/Aw/0pnf5llCY5rZICxVK1uoAmV+OZzGPQogpE3ZqxPkViFkg/SHsQqOn1M1Iswia7SzfSgu2KfKMNFXvRA==
+detox@^15.0.0:
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-15.0.0.tgz#1b4a4133d2de1a9ac6918c061306cc348090b580"
+  integrity sha512-mnF+3FoTP0ruqmYSJOEWQ5mmDYp3igD/CytBnhOupYHzTrzgIKl7F5+qnIg6SXIA+ANqgfQvy6bAiXI/26CSrQ==
   dependencies:
     "@babel/core" "^7.4.5"
     bunyan "^1.8.12"
@@ -21252,11 +21332,6 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jstz@^2.0.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/jstz/-/jstz-2.1.1.tgz#fff3373a518fa7cce69299930466f5a2b980389d"
-  integrity sha512-8hfl5RD6P7rEeIbzStBz3h4f+BQHfq/ABtoU6gXKQv5OcZhnmrIpG7e1pYaZ8hS9e0mp+bxUj08fnDUbKctYyA==
-
 jsx-ast-utils@^2.0.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-2.2.1.tgz#4d4973ebf8b9d2837ee91a8208cc66f3a2776cfb"
@@ -27328,7 +27403,7 @@ pretty-format@^24.0.0:
     ansi-regex "^4.0.0"
     ansi-styles "^3.2.0"
 
-pretty-format@^24.7.0, pretty-format@^24.9.0:
+pretty-format@^24.3.0, pretty-format@^24.7.0, pretty-format@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-24.9.0.tgz#12fac31b37019a4eea3c11aa9a959eb7628aa7c9"
   integrity sha512-00ZMZUiHaJrNfk33guavqgvfJS30sLYf0f8+Srklv0AMPodGGHcoHgksZ3OThYnIvOd+8yMCn0YiEOogjlgsnA==
@@ -28348,13 +28423,13 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@git://github.com/celo-org/react-native-bip39#8d00738":
+"react-native-bip39@git://github.com/celo-org/react-native-bip39#b31a8ff":
   version "2.2.0"
-  resolved "git://github.com/celo-org/react-native-bip39#8d007387fc8bcc18a2d0e2344ec986a0c6f15834"
+  resolved "git://github.com/celo-org/react-native-bip39#b31a8ffc6a6c4393178e5a173ecbc966fbfcf92c"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"
-    react-native-fast-crypto "^1.8.1"
+    react-native-fast-crypto "git+https://github.com/celo-org/react-native-fast-crypto#3946f9"
     react-native-secure-randombytes "^2.2.3"
     unorm "^1.3.3"
 
@@ -28424,10 +28499,9 @@ react-native-exit-app@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-native-exit-app/-/react-native-exit-app-1.1.0.tgz#5ec082152974240e2d6a93f1608efb49a4385f21"
   integrity sha512-Spne19zfMfJvnUTX909EHUqWMk69rATtLJq9XMBGpNSHhx0M7v5yetx2Z87egBhLOqQm+CWfD/oxWzDG8rbIQA==
 
-react-native-fast-crypto@^1.8.1:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/react-native-fast-crypto/-/react-native-fast-crypto-1.8.1.tgz#9b59d7eb4bcb19f99c62695df9ea4f683bb1e52c"
-  integrity sha512-5Cym09wcYSDXS7+QFg5oWGuW4rz2DyaU09YTeGxn3Qc+rqc01VQ5T6ruW4dWv7bIULtyBcJ2ovTkXTtbsDl3uA==
+"react-native-fast-crypto@git+https://github.com/celo-org/react-native-fast-crypto#3946f9":
+  version "1.8.3"
+  resolved "git+https://github.com/celo-org/react-native-fast-crypto#3946f918ff314455a6d55fdb49ecc0f1f5bc2ac2"
   dependencies:
     buffer "^5.0.8"
     rfc4648 "^1.0.0"
@@ -35015,6 +35089,11 @@ w3c-hr-time@^1.0.1:
   integrity sha1-gqwr/2PZUOqeMYmlimViX+3xkEU=
   dependencies:
     browser-process-hrtime "^0.1.2"
+
+wait-for-expect@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/wait-for-expect/-/wait-for-expect-3.0.1.tgz#ec204a76b0038f17711e575720aaf28505ac7185"
+  integrity sha512-3Ha7lu+zshEG/CeHdcpmQsZnnZpPj/UsG3DuKO8FskjuDbkx3jE3845H+CuwZjA2YWYDfKMU2KhnCaXMLd3wVw==
 
 walkdir@^0.3.0, walkdir@^0.3.2:
   version "0.3.2"

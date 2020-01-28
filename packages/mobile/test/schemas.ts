@@ -226,6 +226,7 @@ export const v4Schema = {
       celoGoldExchangeRates: [],
       lastTimeUpdated: 0,
     },
+    tobinTax: '0',
   },
 }
 
@@ -234,6 +235,10 @@ export const v5Schema = {
   localCurrency: {
     ...v4Schema.localCurrency,
     exchangeRate: '1.33',
+  },
+  geth: {
+    ...v4Schema.geth,
+    promptZeroSyncIfNeeded: false,
   },
 }
 
