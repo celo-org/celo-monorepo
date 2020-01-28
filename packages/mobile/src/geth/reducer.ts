@@ -1,5 +1,4 @@
 import { Actions, ActionTypes } from 'src/geth/actions'
-import { RootState } from 'src/redux/reducers'
 
 export enum InitializationState {
   NOT_YET_INITIALIZED = 'NOT_YET_INITIALIZED',
@@ -12,11 +11,13 @@ export enum InitializationState {
 export interface State {
   initialized: InitializationState
   connected: boolean
+  promptZeroSyncIfNeeded: boolean
 }
 
 const initialState: State = {
   initialized: InitializationState.NOT_YET_INITIALIZED,
   connected: false,
+  promptZeroSyncIfNeeded: false,
 }
 
 export function gethReducer(state: State = initialState, action: ActionTypes) {
@@ -28,10 +29,13 @@ export function gethReducer(state: State = initialState, action: ActionTypes) {
         ...state,
         connected: action.connected,
       }
+    case Actions.SET_PROMPT_ZERO_SYNC:
+      return {
+        ...state,
+        promptZeroSyncIfNeeded: action.promptIfNeeded,
+      }
+
     default:
       return state
   }
 }
-
-export const isGethConnectedSelector = (state: RootState) =>
-  state.geth.initialized === InitializationState.INITIALIZED && state.geth.connected
