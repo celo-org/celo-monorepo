@@ -318,7 +318,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @notice Returns the total target epoch rewards for voters.
    * @return the total target epoch rewards for voters.
    */
-  function getTargetEpochRewards() public view returns (uint256) {
+  function getTargetVoterRewards() public view returns (uint256) {
     return
       FixidityLib
         .newFixed(getElection().getActiveVotes())
@@ -344,7 +344,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return The target increase in gold w/out the rewards multiplier.
    */
   function _getTargetGoldSupplyIncrease() internal view returns (uint256) {
-    uint256 targetEpochRewards = getTargetEpochRewards();
+    uint256 targetEpochRewards = getTargetVoterRewards();
     uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
     uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
     // increase /= (1 - fraction) st the final community reward is fraction * increase
@@ -428,7 +428,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       return (0, 0, 0);
     }
 
-    uint256 targetVoterReward = getTargetEpochRewards();
+    uint256 targetVoterReward = getTargetVoterRewards();
     uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
     return (

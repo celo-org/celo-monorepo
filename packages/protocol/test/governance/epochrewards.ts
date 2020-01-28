@@ -420,7 +420,7 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe('#getTargetEpochRewards()', () => {
+  describe('#getTargetVoterRewards()', () => {
     describe('when there are active votes', () => {
       const activeVotes = 1000000
       beforeEach(async () => {
@@ -429,7 +429,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
       it('should return a percentage of the active votes', async () => {
         const expected = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
-        assertEqualBN(await epochRewards.getTargetEpochRewards(), expected)
+        assertEqualBN(await epochRewards.getTargetVoterRewards(), expected)
       })
     })
   })
@@ -457,7 +457,7 @@ contract('EpochRewards', (accounts: string[]) => {
     const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
     let targetEpochReward: BigNumber
     beforeEach(async () => {
-      targetEpochReward = await epochRewards.getTargetEpochRewards()
+      targetEpochReward = await epochRewards.getTargetVoterRewards()
       targetEpochReward = targetEpochReward.plus(
         await epochRewards.getTargetTotalEpochPaymentsInGold()
       )
