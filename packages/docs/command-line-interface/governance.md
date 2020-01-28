@@ -159,9 +159,11 @@ USAGE
 
 OPTIONS
   --proposalID=proposalID  (required) UUID of proposal to view
+  --raw                    Display proposal in raw bytes format
 
-EXAMPLE
+EXAMPLES
   view --proposalID 99
+  view --proposalID 99 --raw
 ```
 
 _See code: [packages/cli/src/commands/governance/view.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/view.ts)_

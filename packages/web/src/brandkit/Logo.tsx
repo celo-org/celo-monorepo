@@ -50,7 +50,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <Button
             kind={BTN.PRIMARY}
             text={t('logo.overviewBtn')}
-            href="/static/assets/CeloLogoPackage.zip"
+            href="/assets/CeloLogoPackage.zip"
           />
           <Text style={[fonts.h5, standardStyles.blockMarginTop]}>{t('licenseTitle')}</Text>
           <Text
@@ -73,28 +73,28 @@ const Overview = withNamespaces(NameSpaces.brand)(
             hasBorder={true}
             logoType={Logos.light}
             background={colors.white}
-            href="/static/assets/CeloColorLogo.zip"
+            href="/assets/CeloColorLogo.zip"
             caption={t('logo.fullColorOnLightCaption')}
           />
           <LogoExample
             hasBorder={false}
             logoType={Logos.dark}
             background={colors.dark}
-            href="/static/assets/CeloColorLogoReverse.zip"
+            href="/assets/CeloColorLogoReverse.zip"
             caption={t('logo.fullColorOnDarkCaption')}
           />
           <LogoExample
             hasBorder={true}
             logoType={Logos.black}
             background={colors.white}
-            href="/static/assets/CeloMonochromeLogo.zip"
+            href="/assets/CeloMonochromeLogo.zip"
             caption={t('logo.monochromeCaption')}
           />
           <LogoExample
             hasBorder={false}
             logoType={Logos.white}
             background={colors.dark}
-            href="/static/assets/CeloMonochromeLogoReverse.zip"
+            href="/assets/CeloMonochromeLogoReverse.zip"
             caption={t('logo.monochromeInverseCaption')}
           />
         </View>
@@ -103,7 +103,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
             {t('logo.glyphTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
-          <DownloadButton uri="/static/assets/CeloGlyphs.zip" />
+          <DownloadButton uri="/assets/CeloGlyphs.zip" />
           <View style={[styles.tiling, standardStyles.elementalMarginTop]}>
             <View
               style={[
