@@ -40,10 +40,10 @@ export class ElectionResultsCache {
 
   /**
    * Returns true if the given signer is present in the parent aggregated seal of the given block.
-   * @param signer Validator signer address to check if presnt in the block.
+   * @param signer Validator signer address to check if present in the block.
    * @param block The block to check for a signature on.
    */
-  async signed(signer: Address, block: Block): Promise<boolean> {
+  async signedParent(signer: Address, block: Block): Promise<boolean> {
     const electedSigners = await this.electedSigners(block.number)
     const signerIndex = electedSigners.map(eqAddress.bind(null, signer)).indexOf(true)
     if (signerIndex < 0) {
