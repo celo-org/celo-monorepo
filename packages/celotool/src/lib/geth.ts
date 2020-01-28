@@ -653,12 +653,9 @@ export const runGethNodes = async ({
 }) => {
   const validatorsFilePath = `${gethConfig.runPath}/nodes.json`
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
-  const validatorEnodes =
-    validatorInstances.length > 0
-      ? validatorPrivateKeys.map((x: any, i: number) => {
-          return getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-        })
-      : []
+  const validatorEnodes = validatorPrivateKeys.map((x: string, i: number) => {
+    return getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
+  })
 
   const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
 
