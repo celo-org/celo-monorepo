@@ -1041,7 +1041,7 @@ exports[`Experience/Logo renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="/static/assets/CeloLogoPackage.zip"
+                  href="/assets/CeloLogoPackage.zip"
                   role="link"
                   style={
                     Object {
@@ -1365,7 +1365,7 @@ exports[`Experience/Logo renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="/static/assets/CeloColorLogo.zip"
+                    href="/assets/CeloColorLogo.zip"
                     role="link"
                     style={
                       Object {
@@ -1544,7 +1544,7 @@ exports[`Experience/Logo renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="/static/assets/CeloColorLogoReverse.zip"
+                    href="/assets/CeloColorLogoReverse.zip"
                     role="link"
                     style={
                       Object {
@@ -1731,7 +1731,7 @@ exports[`Experience/Logo renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="/static/assets/CeloMonochromeLogo.zip"
+                    href="/assets/CeloMonochromeLogo.zip"
                     role="link"
                     style={
                       Object {
@@ -1910,7 +1910,7 @@ exports[`Experience/Logo renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="/static/assets/CeloMonochromeLogoReverse.zip"
+                    href="/assets/CeloMonochromeLogoReverse.zip"
                     role="link"
                     style={
                       Object {
@@ -2048,7 +2048,7 @@ exports[`Experience/Logo renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="/static/assets/CeloGlyphs.zip"
+                  href="/assets/CeloGlyphs.zip"
                   role="link"
                   style={
                     Object {
