@@ -32,4 +32,3 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
 }
 
 export const stableTokenBalanceSelector = (state: RootState) => state.stableToken.balance
-export const stableTokenBalanceLastFetchSelector = (state: RootState) => state.stableToken.lastFetch

@@ -172,35 +172,8 @@ it('ignores pending standby transactions that are completed in the response and 
   expect(toJSON()).toMatchSnapshot()
 
   expect(store.getActions()).toEqual([
-    { type: 'STABLE_TOKEN/FETCH_BALANCE' },
+    { type: 'HOME/REFRESH_BALANCES' },
     { type: 'TRANSACTIONS/REMOVE_STANDBY_TRANSACTION', idx: 'a-standby-tx-id' },
-  ])
-})
-
-it('updates balance if new transactions arrive', async () => {
-  const store = createMockStore({
-    transactions: { standbyTransactions: [] },
-    stableToken: {
-      balance: '0.7',
-      lastFetch: 1578530500000,
-    },
-  })
-
-  const { getByType } = render(
-    <Provider store={store}>
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionsList currency={CURRENCY_ENUM.DOLLAR} />
-      </MockedProvider>
-    </Provider>
-  )
-
-  expect(store.getActions()).toEqual([])
-
-  await waitForElement(() => getByType(TransactionFeed))
-
-  expect(store.getActions()).toEqual([
-    { type: 'STABLE_TOKEN/FETCH_BALANCE' },
-    { type: 'STABLE_TOKEN/SET_BALANCE', balance: '0.5' },
   ])
 })
 

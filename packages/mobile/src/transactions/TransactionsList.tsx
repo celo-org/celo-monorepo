@@ -11,15 +11,11 @@ import {
   UserTransactionsQueryVariables,
 } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { refreshAllBalances } from 'src/home/actions'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { RootState } from 'src/redux/reducers'
-import { fetchDollarBalance, setBalance } from 'src/stableToken/actions'
-import {
-  stableTokenBalanceLastFetchSelector,
-  stableTokenBalanceSelector,
-} from 'src/stableToken/reducer'
 import { removeStandbyTransaction } from 'src/transactions/actions'
 import {
   ExchangeStandby,
@@ -43,14 +39,11 @@ interface StateProps {
   standbyTransactions: StandbyTransaction[]
   localCurrencyCode: LocalCurrencyCode | null
   localCurrencyExchangeRate: string | null | undefined
-  dollarBalance: string | null
-  dollarBalanceLastFetch: number | null
 }
 
 interface DispatchProps {
   removeStandbyTransaction: typeof removeStandbyTransaction
-  fetchDollarBalance: typeof fetchDollarBalance
-  setBalance: typeof setBalance
+  refreshAllBalances: typeof refreshAllBalances
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -79,8 +72,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   standbyTransactions: state.transactions.standbyTransactions,
   localCurrencyCode: getLocalCurrencyCode(state),
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
-  dollarBalance: stableTokenBalanceSelector(state),
-  dollarBalanceLastFetch: stableTokenBalanceLastFetchSelector(state),
 })
 
 function resolveAmount(
@@ -239,22 +230,9 @@ export class TransactionsList extends React.PureComponent<Props> {
     if (transactions.length < 1) {
       return
     }
-    // Transaction list has changed and we need to update the balance.
-    this.props.fetchDollarBalance()
+    // Transaction list has changed and we need to refresh the balances
+    this.props.refreshAllBalances()
 
-    // For good UX we want new transactions appear at the same time we update
-    // balance. To achieve this we optimistically re-calculate balance,
-    // based on the new transactions and show it to a user until we have
-    // new balance from the contract
-    if (this.props.dollarBalanceLastFetch) {
-      const newBalance = transactions.reduce((acc, tx) => {
-        if (tx.timestamp * 1000 > this.props.dollarBalanceLastFetch!) {
-          return acc.plus(tx.amount.value)
-        }
-        return acc
-      }, new BigNumber(this.props.dollarBalance || 0))
-      this.props.setBalance(newBalance.toString())
-    }
     const queryDataTxHashes = new Set(transactions.map((tx) => tx?.hash))
     const inQueryTxs = (tx: StandbyTransaction) =>
       tx.hash && queryDataTxHashes.has(tx.hash) && tx.status !== TransactionStatus.Failed
@@ -322,6 +300,5 @@ export class TransactionsList extends React.PureComponent<Props> {
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
   removeStandbyTransaction,
-  fetchDollarBalance,
-  setBalance,
+  refreshAllBalances,
 })(TransactionsList)
