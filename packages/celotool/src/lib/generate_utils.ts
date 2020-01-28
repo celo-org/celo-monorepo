@@ -92,7 +92,7 @@ export const generatePublicKey = (mnemonic: string, accountType: AccountType, in
 export const generateAddress = (mnemonic: string, accountType: AccountType, index: number) =>
   privateKeyToAddress(generatePrivateKey(mnemonic, accountType, index))
 
-export const privateKeyToPublicKey = (privateKey: string) => {
+export const privateKeyToPublicKey = (privateKey: string): string => {
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
   const ecPublicKey: string = ecPrivateKey.getPublic('hex')
   return ecPublicKey.slice(2)
@@ -126,7 +126,7 @@ export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: n
 export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
-export const getValidatorsInformation = (mnemonic: string, n: number) => {
+export const getValidatorsInformation = (mnemonic: string, n: number): Validator[] => {
   return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {

@@ -647,8 +647,8 @@ export const runGethNodes = async ({
   verbose,
 }: {
   gethConfig: GethRunConfig
-  validators: any[]
-  validatorPrivateKeys: any
+  validators: Validator[]
+  validatorPrivateKeys: string[]
   verbose: boolean
 }) => {
   const validatorsFilePath = `${gethConfig.runPath}/nodes.json`
