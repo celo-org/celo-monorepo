@@ -85,7 +85,7 @@ export const builder = (argv: yargs.Argv) => {
     })
     .option('purge', {
       type: 'boolean',
-      description: 'purge',
+      description: 'This will purge the data directory before starting.',
       default: false,
     })
     .option('ethstats', {
