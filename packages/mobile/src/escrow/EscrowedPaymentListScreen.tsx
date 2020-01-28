@@ -9,7 +9,6 @@ import { getReclaimableEscrowPayments } from 'src/escrow/saga'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
@@ -22,7 +21,6 @@ import { RootState } from 'src/redux/reducers'
 interface StateProps {
   dollarBalance: string | null
   sentEscrowedPayments: EscrowedPayment[]
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
   recipientCache: NumberToRecipient
 }
 
@@ -34,7 +32,6 @@ interface DispatchProps {
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
   sentEscrowedPayments: getReclaimableEscrowPayments(state.escrow.sentEscrowedPayments),
-  e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
   recipientCache: recipientCacheSelector(state),
 })
 

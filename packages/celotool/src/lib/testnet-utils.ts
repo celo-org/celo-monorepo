@@ -3,6 +3,7 @@ import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/ge
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
+import * as path from 'path'
 import sleep from 'sleep-promise'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
@@ -162,6 +163,10 @@ export function uploadDataToGoogleStorage(
   contentType: string
 ) {
   const localTmpFilePath = `/tmp/${googleStorageBucketName}-${googleStorageFileName}`
+  // @ts-ignore The expected type of this is not accurate
+  fs.mkdirSync(path.dirname(localTmpFilePath), {
+    recursive: true,
+  })
   fs.writeFileSync(localTmpFilePath, data)
   return uploadFileToGoogleStorage(
     localTmpFilePath,

@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
+import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
@@ -163,6 +164,16 @@ contract Governance is
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
   event HotfixExecuted(bytes32 indexed hash);
+
+  modifier hotfixNotExecuted(bytes32 hash) {
+    require(!hotfixes[hash].executed, "hotfix already executed");
+    _;
+  }
+
+  modifier onlyApprover() {
+    require(msg.sender == approver, "msg.sender not approver");
+    _;
+  }
 
   function() external payable {} // solhint-disable no-empty-blocks
 
@@ -556,7 +567,7 @@ contract Governance is
    * @param index The index of the proposal ID in `dequeued`.
    * @return Whether or not the approval was made successfully.
    */
-  function approve(uint256 proposalId, uint256 index) external returns (bool) {
+  function approve(uint256 proposalId, uint256 index) external onlyApprover returns (bool) {
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
@@ -565,7 +576,6 @@ contract Governance is
       deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
-    require(msg.sender == approver, "Only approver can approve");
     require(!proposal.isApproved(), "Proposal already approved");
     require(stage == Proposals.Stage.Approval, "Proposal not in approval stage");
     proposal.approved = true;
@@ -654,9 +664,7 @@ contract Governance is
    * @notice Whitelists the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
-  function approveHotfix(bytes32 hash) external {
-    require(!hotfixes[hash].executed, "hotfix already executed");
-    require(msg.sender == approver, "Not approver");
+  function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyApprover {
     hotfixes[hash].approved = true;
     emit HotfixApproved(hash);
   }
@@ -674,8 +682,7 @@ contract Governance is
    * @notice Whitelists the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
-  function whitelistHotfix(bytes32 hash) external {
-    require(!hotfixes[hash].executed, "hotfix already executed");
+  function whitelistHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
     hotfixes[hash].whitelisted[msg.sender] = true;
     emit HotfixWhitelisted(hash, msg.sender);
   }
@@ -684,8 +691,7 @@ contract Governance is
    * @notice Gives hotfix a prepared epoch for execution.
    * @param hash The hash of the hotfix to be prepared.
    */
-  function prepareHotfix(bytes32 hash) external {
-    require(!hotfixes[hash].executed, "hotfix already executed");
+  function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
     require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
     uint256 epoch = getEpochNumber();
     require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
@@ -699,7 +705,7 @@ contract Governance is
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
-   * @param salt Secret associated with hotfix which guarantees uniqueness of hash.
+   * @param salt Arbitrary salt associated with hotfix which guarantees uniqueness of hash.
    * @dev Reverts if hotfix is already executed, not approved, or not prepared for current epoch.
    */
   function executeHotfix(
@@ -914,9 +920,10 @@ contract Governance is
   function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
+    IAccounts accounts = getAccounts();
     for (uint256 idx = 0; idx < n; idx++) {
       address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
-      address validatorAccount = getAccounts().validatorSignerToAccount(validatorSigner);
+      address validatorAccount = accounts.validatorSignerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
         isHotfixWhitelistedBy(hash, validatorAccount)

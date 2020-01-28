@@ -41,6 +41,7 @@ e2e-defaults: &e2e-defaults
 general:
   artifacts:
     - "mobile/coverage"
+    - "web/coverage"
     - "protocol/coverage"
 
 jobs:
@@ -288,6 +289,22 @@ jobs:
           command: |
             mkdir -p test-results/jest
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: packages/web/coverage
+          destination: web/coverage
+
+      - run:
+          name: copy
+          command: |
+            mkdir -p packages/web/web/coverage
+            cp -r packages/web/coverage packages/web/web/
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F web
 
   mobile-test-build-app:
     <<: *android-defaults

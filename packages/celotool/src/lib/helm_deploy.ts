@@ -341,6 +341,18 @@ export async function retrieveIPAddress(name: string) {
   return address.replace(/\n*$/, '')
 }
 
+// returns the IP address of a resource internal to the cluster (ie 10.X.X.X)
+export async function retrieveClusterIPAddress(
+  resourceType: string,
+  resourceName: string,
+  namespace: string
+) {
+  const [address] = await execCmdWithExitOnFailure(
+    `kubectl get ${resourceType} ${resourceName} -n ${namespace} -o jsonpath={.spec.clusterIP}`
+  )
+  return address
+}
+
 export async function createStaticIPs(celoEnv: string) {
   console.info(`Creating static IPs for ${celoEnv}`)
 

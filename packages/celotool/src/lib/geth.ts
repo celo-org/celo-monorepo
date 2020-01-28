@@ -14,8 +14,7 @@ import { TransactionReceipt } from 'web3/types'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
-import { retrieveIPAddress } from './helm_deploy'
-import { execCmd } from './utils'
+import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
@@ -67,7 +66,12 @@ const retrieveBootnodeIPAddress = async (namespace: string) => {
     const outputs = await getTestnetOutputs(namespace)
     return outputs.bootnode_ip_address.value
   } else {
-    return retrieveIPAddress(`${namespace}-bootnode`)
+    const resourceName = `${namespace}-bootnode`
+    if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
+      return retrieveIPAddress(resourceName)
+    } else {
+      return retrieveClusterIPAddress('service', resourceName, namespace)
+    }
   }
 }
 
@@ -93,11 +97,11 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
       if (getExternalIP) {
         address = txAddresses[index]
       } else {
-        address = (
-          await execCmd(
-            `kubectl get service/${namespace}-service-${index} --namespace ${namespace} -o jsonpath='{.spec.clusterIP}'`
-          )
-        )[0]
+        address = await retrieveClusterIPAddress(
+          'service',
+          `${namespace}-service-${index}`,
+          namespace
+        )
         if (address.length === 0) {
           console.error('IP address is empty for transaction node')
           throw new Error('IP address is empty for transaction node')
