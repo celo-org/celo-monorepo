@@ -25,11 +25,8 @@
     "test:ci": "yarn test --coverage --runInBand",
     "test:watch": "yarn test --watch --maxWorkers=4",
     "test:verbose": "export TZ=UTC && jest --verbose",
-    "test:build-e2e": "bash ./scripts/build_e2e.sh",
-    "test:run-e2e": "bash ./scripts/run_e2e.sh",
-    "test:dry-run-e2e": "yarn dev:emulator && cd android && yarn test:build-e2e && yarn test:run-e2e",
-    "test:detox": "CELO_TEST_CONFIG=e2e detox test -c android.emu.debug -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose",
-    "test:unlock": "./scripts/unlock.sh",
+    "test:e2e:android": "./scripts/run_e2e.sh -p android",
+    "test:e2e:ios": "./scripts/run_e2e.sh -p ios",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
     "deploy:update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt"
@@ -40,10 +37,10 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "0.0.247",
+    "@celo/client": "0.0.266",
     "@celo/contractkit": "0.2.10-dev",
     "@celo/react-components": "1.0.0",
-    "@celo/react-native-fast-crypto": "^1.8.2",
+    "react-native-fast-crypto": "git+https://github.com/celo-org/react-native-fast-crypto#3946f9",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
     "@celo/utils": "0.1.6-dev",
     "@celo/walletkit": "^0.0.15",
@@ -81,7 +78,7 @@
     "react-i18next": "^11.2.7",
     "react-native": "^0.61.2",
     "react-native-android-open-settings": "^1.3.0",
-    "react-native-bip39": "git://github.com/celo-org/react-native-bip39#8d00738",
+    "react-native-bip39": "git://github.com/celo-org/react-native-bip39#b31a8ff",
     "react-native-camera": "^3.7.1",
     "react-native-clock-sync": "^1.0.0",
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
@@ -163,7 +160,7 @@
     "@types/utf8": "^2.1.6",
     "@types/web3": "^1.0.18",
     "babel-core": "7.0.0-bridge.0",
-    "detox": "^14.5.0",
+    "detox": "^15.0.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "enzyme-to-json": "^3.3.5",
@@ -189,7 +186,7 @@
     "configurations": {
       "android.emu.debug": {
         "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
-        "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "build": "cd android && ENVFILE=.env.test ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
         "name": "Nexus_5X_API_28_x86",
         "__comment": "Nexus_5X_API_28_x86 is currently harcoded but it should be the result from $ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1`"
