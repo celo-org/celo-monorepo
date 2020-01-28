@@ -80,7 +80,7 @@ export const builder = (argv: yargs.Argv) => {
     })
     .option('verbose', {
       type: 'boolean',
-      description: 'Verbose',
+      description: 'Command verbosity flag',
       default: false,
     })
     .option('purge', {
