@@ -484,7 +484,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidator(e.returnValues.validator, blockNumber)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, true, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
