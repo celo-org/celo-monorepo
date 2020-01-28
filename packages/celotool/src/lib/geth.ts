@@ -593,6 +593,20 @@ export const onLoadTestTxResult = async (
   })
 }
 
+/**
+ * This method sends ERC20 tokens
+ *
+ * @param kit instance of the contract kit
+ * @param token the token contract to use
+ * @param from sender to send the token from
+ * @param to receiver that gets the tokens
+ * @param amount the amount of tokens to be sent
+ * @param password the password of the account to use
+ * @param txParams additional transaction parameters
+ * @param onTransactionHash callback, fired when the transaction has is generated
+ * @param onReceipt callback, fired when the receipt is returned
+ * @param onError callback, fired in case of an error, containing the error
+ */
 export const transferERC20Token = async (
   kit: ContractKit,
   token: GoldTokenWrapper | StableTokenWrapper,
