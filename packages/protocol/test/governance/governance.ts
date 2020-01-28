@@ -1382,7 +1382,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it.only('should revert when the index is out of bounds', async () => {
+    it('should revert when the index is out of bounds', async () => {
       await assertRevert(governance.approve(proposalId, index + 1))
     })
 
@@ -1536,7 +1536,7 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.vote(proposalId, index, value))
     })
 
-    it.only('should revert when the index is out of bounds', async () => {
+    it('should revert when the index is out of bounds', async () => {
       await assertRevert(governance.vote(proposalId, index + 1, value))
     })
 
@@ -1734,7 +1734,7 @@ contract('Governance', (accounts: string[]) => {
           })
         })
 
-        it.only('should revert when the index is out of bounds', async () => {
+        it('should revert when the index is out of bounds', async () => {
           await assertRevert(governance.execute(proposalId, index + 1))
         })
       })
