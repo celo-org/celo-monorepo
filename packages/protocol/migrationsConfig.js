@@ -95,6 +95,8 @@ const DefaultConfig = {
     goldBalance: 100000000,
     tobinTaxStalenessThreshold: 60 * 60, // 1 hour
     dailySpendingRatio: '1000000000000000000000000', // 100%
+    initialSpendableGold: 0,
+    daysUtilRemainingGoldUnfrozen: 0,
   },
   stableToken: {
     decimals: 18,

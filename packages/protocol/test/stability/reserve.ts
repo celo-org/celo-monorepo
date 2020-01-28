@@ -45,7 +45,13 @@ contract('Reserve', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
-    await reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+    await reserve.initialize(
+      registry.address,
+      aTobinTaxStalenessThreshold,
+      aDailySpendingRatio,
+      0,
+      0
+    )
   })
 
   describe('#initialize()', () => {
@@ -66,7 +72,7 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not be callable again', async () => {
       await assertRevert(
-        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio, 0, 0)
       )
     })
   })

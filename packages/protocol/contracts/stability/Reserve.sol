@@ -1,6 +1,7 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -41,6 +42,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 public spendingLimit;
   FixidityLib.Fraction private spendingRatio;
 
+  uint256 public frozenReserveGoldDays;
+  uint256 public frozenReserveGoldStartValue;
+  uint256 public unfrozenReserveGoldStartValue;
+  uint256 public unfrozenReserveGoldStartDay;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address token);
@@ -62,16 +68,25 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
+   * @param _initialSpendableGold Amount of reserve balance initially spendable (for rebalancing).
+   * @param _daysUtilRemainingGoldUnfrozen Number of days until the reserve balance is unfrozen.
    */
   function initialize(
     address registryAddress,
     uint256 _tobinTaxStalenessThreshold,
-    uint256 _spendingRatio
+    uint256 _spendingRatio,
+    uint256 _initialSpendableGold,
+    uint256 _daysUtilRemainingGoldUnfrozen
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
+    setUnfrozenReserveGoldParameters(
+      address(this).balance,
+      _initialSpendableGold,
+      _daysUtilRemainingGoldUnfrozen
+    );
   }
 
   /**
@@ -100,6 +115,23 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function getDailySpendingRatio() public view onlyOwner returns (uint256) {
     return spendingRatio.unwrap();
+  }
+
+  /**
+   * @notice Set the unfrozen reserve gold rate and the initial conditions on transferGold().
+   * @param initialGold Amount of cGLD allocated to the reserve at launch.
+   * @param initialSpendableGold Amount of cGLD transferable by reserve spenders at launch.
+   * @param daysUntilUnfrozen The remaining cGLD becomez unfrozen linearly over daysUntilUnfrozen.
+   */
+  function setUnfrozenReserveGoldParameters(
+    uint256 initialGold,
+    uint256 initialSpendableGold,
+    uint256 daysUntilUnfrozen
+  ) public onlyOwner {
+    frozenReserveGoldDays = daysUntilUnfrozen;
+    frozenReserveGoldStartValue = initialGold;
+    unfrozenReserveGoldStartValue = initialSpendableGold;
+    unfrozenReserveGoldStartDay = now / 1 days;
   }
 
   /**
@@ -229,6 +261,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
+    require(value < getUnfrozenReserveGoldTransferable(), "Exceeded unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
       uint256 balance = getReserveGoldBalance();
@@ -276,6 +309,37 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
     return reserveGoldBalance;
+  }
+
+  /**
+   * @return The currently unfrozen reserve balance plus the balance of otherReserveAddresses
+   */
+  function getUnfrozenReserveGoldBalance() public view returns (uint256) {
+    uint256 transferableBalance = address(this).balance;
+    return getReserveGoldBalance() - transferableBalance + getUnfrozenReserveGoldTransferable();
+  }
+
+  function getUnfrozenReserveGoldTransferable() public view returns (uint256) {
+    uint256 currentDay = now / 1 days;
+    uint256 daysOld = currentDay - unfrozenReserveGoldStartDay;
+    uint256 transferableBalance = address(this).balance;
+    if (daysOld >= frozenReserveGoldDays) return transferableBalance;
+    uint256 additionalBalance = Math.max(
+      0,
+      transferableBalance - frozenReserveGoldStartValue - unfrozenReserveGoldStartValue
+    );
+    uint256 frozenBalance = transferableBalance - additionalBalance;
+    return Math.min(frozenBalance, getUnfrozenReserveGoldLimit(daysOld)) + additionalBalance;
+  }
+
+  function getUnfrozenReserveGoldLimit(uint256 daysOld) public view returns (uint256) {
+    FixidityLib.Fraction memory unfrozenReserveGoldRate = FixidityLib.newFixedFraction(
+      frozenReserveGoldStartValue,
+      frozenReserveGoldDays
+    );
+    return
+      unfrozenReserveGoldStartValue +
+      FixidityLib.newFixed(daysOld).multiply(unfrozenReserveGoldRate).fromFixed();
   }
 
   /*
