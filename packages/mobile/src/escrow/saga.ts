@@ -130,7 +130,7 @@ function* withdrawFromEscrow() {
     if (fornoMode) {
       Logger.info(
         TAG + '@withdrawFromEscrow',
-        'Geth free mode is on, no need to unlock the temporary account'
+        'Forno mode is on, no need to unlock the temporary account'
       )
     } else {
       // Unlock temporary account

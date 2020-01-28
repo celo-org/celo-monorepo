@@ -31,9 +31,9 @@ import {
   getLatestBlock,
   setAccount,
   setAccountInWeb3Keystore,
+  setFornoMode,
   SetIsFornoAction,
   setPrivateCommentKey,
-  setFornoMode,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
@@ -41,8 +41,8 @@ import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/c
 import {
   currentAccountInWeb3KeystoreSelector,
   currentAccountSelector,
-  gethStartedThisSessionSelector,
   fornoSelector,
+  gethStartedThisSessionSelector,
 } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
@@ -338,7 +338,7 @@ export function* unlockAccount(account: string) {
       if (accountAlreadyAddedInFornoMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
-        Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in Geth free mode`)
+        Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in forno mode`)
         const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
         addLocalAccount(web3, privateKey)
         accountAlreadyAddedInFornoMode = true

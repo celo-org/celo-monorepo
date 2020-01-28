@@ -71,11 +71,10 @@ function getHttpProvider(url: string): Provider {
 function getWeb3(): Web3 {
   Logger.info(
     `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyFornoMode()}`
+    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
   )
 
   if (isInitiallyFornoMode()) {
-    // Geth free mode
     const url = DEFAULT_FORNO_URL
     Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
     return new Web3(getHttpProvider(url))
