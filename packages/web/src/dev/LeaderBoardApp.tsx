@@ -50,4 +50,4 @@ class LeaderBoardApp extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces(NameSpaces.dev)(LeaderBoardApp)
+export default withNamespaces('dev')(LeaderBoardApp)

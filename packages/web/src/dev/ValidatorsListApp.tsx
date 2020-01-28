@@ -7,7 +7,7 @@ import * as React from 'react'
 import { ApolloProvider, Query } from 'react-apollo'
 import ShowApolloError from 'src/dev/ShowApolloError'
 import ValidatorsList from 'src/dev/ValidatorsList'
-import { I18nProps, withNamespaces, NameSpaces } from 'src/i18n'
+import { I18nProps, withNamespaces } from 'src/i18n'
 
 function createApolloClient() {
   return new ApolloClient({
@@ -84,4 +84,4 @@ class ValidatorsListApp extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces(NameSpaces.dev)(ValidatorsListApp)
+export default withNamespaces('dev')(ValidatorsListApp)
