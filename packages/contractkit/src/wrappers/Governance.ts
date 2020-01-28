@@ -342,11 +342,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
-   * Returns the proposal dequeue as list of proposal IDs.
+   * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
-    arrayObject.map(valueToBigNumber)
-  )
+  async getDequeue() {
+    const dequeue = await this.contract.methods.getDequeue().call()
+    // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
+    return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
+  }
 
   /**
    * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
@@ -430,9 +432,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    const queue = upvoteRecord.proposalID.isZero()
-      ? await this.getQueue()
-      : (await this.withUpvoteRevoked(upvoter)).queue
+    const recordQueued = await this.isQueued(upvoteRecord.proposalID)
+    // if existing upvote exists in queue, revoke it before applying new upvote
+    const queue = recordQueued
+      ? (await this.withUpvoteRevoked(upvoter)).queue
+      : await this.getQueue()
     const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
     return this.lesserAndGreater(proposalID, upvoteQueue)
   }
