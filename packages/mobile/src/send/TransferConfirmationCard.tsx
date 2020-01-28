@@ -1,27 +1,21 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
-import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
-import { CURRENCIES } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
-import {
-  useDollarsToLocalAmount,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
 
@@ -29,10 +23,9 @@ const iconSize = 40
 
 export interface TransferConfirmationCardProps {
   address?: string
-  comment?: string
-  value: BigNumber
-  currency: CURRENCY_ENUM
-  type: TransactionTypes
+  comment?: string | null
+  amount: MoneyAmount
+  type: TokenTransactionType
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
   recipient?: Recipient
@@ -49,9 +42,9 @@ const onPressGoToFaq = () => {
 const renderTopSection = (props: Props) => {
   const { address, recipient, type, e164PhoneNumber } = props
   if (
-    type === TransactionTypes.VERIFICATION_FEE ||
-    type === TransactionTypes.NETWORK_FEE ||
-    type === TransactionTypes.FAUCET
+    type === TokenTransactionType.VerificationFee ||
+    type === TokenTransactionType.NetworkFee ||
+    type === TokenTransactionType.Faucet
   ) {
     return <Image source={faucetIcon} style={style.icon} />
   } else {
@@ -66,57 +59,49 @@ const renderTopSection = (props: Props) => {
   }
 }
 
-const renderAmountSection = (props: Props) => {
-  const { currency, type, value } = props
+const formatNetworkFee = (value: BigNumber.Value) => getNetworkFeeDisplayValue(value, true)
 
-  // tslint:disable react-hooks-nesting
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
-  const localValue = useDollarsToLocalAmount(value) || 0
-  // tslint:enable react-hooks-nesting
-  const transactionValue = getMoneyDisplayValue(
-    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode ? localValue : value
-  )
+const renderAmountSection = (props: Props) => {
+  const { amount, type } = props
 
   switch (type) {
-    case TransactionTypes.INVITE_SENT: // fallthrough
-    case TransactionTypes.INVITE_RECEIVED:
+    case TokenTransactionType.InviteSent: // fallthrough
+    case TokenTransactionType.InviteReceived:
       return null
-    case TransactionTypes.NETWORK_FEE:
+    case TokenTransactionType.NetworkFee:
       return (
-        <MoneyAmount
-          symbol={CURRENCIES[currency].symbol}
-          amount={getNetworkFeeDisplayValue(value, true)}
+        <CurrencyDisplay
+          type={DisplayType.Big}
+          amount={amount}
+          formatAmount={formatNetworkFee}
+          useColors={false}
         />
       )
     default:
-      return (
-        <MoneyAmount
-          symbol={
-            (currency === CURRENCY_ENUM.DOLLAR && localCurrencySymbol) ||
-            CURRENCIES[currency].symbol
-          }
-          amount={transactionValue}
-        />
-      )
+      return <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
   }
 }
 
 const renderBottomSection = (props: Props) => {
-  const { t, currency, comment, type, value } = props
+  const { t, amount, comment, type } = props
 
-  if (type === TransactionTypes.VERIFICATION_FEE) {
+  const currency =
+    amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      ? CURRENCY_ENUM.GOLD
+      : CURRENCY_ENUM.DOLLAR
+
+  if (type === TokenTransactionType.VerificationFee) {
     return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
-  } else if (type === TransactionTypes.FAUCET) {
+  } else if (type === TokenTransactionType.Faucet) {
     return (
       <Text style={style.pSmall}>
         {t('receiveFlow8:receivedAmountFromCelo.0')}
         {CURRENCIES[currency].symbol}
-        {getMoneyDisplayValue(props.value)}
+        {getMoneyDisplayValue(amount.value)}
         {t('receiveFlow8:receivedAmountFromCelo.1')}
       </Text>
     )
-  } else if (type === TransactionTypes.NETWORK_FEE) {
+  } else if (type === TokenTransactionType.NetworkFee) {
     return (
       <View>
         <Text style={style.pSmall}>
@@ -125,20 +110,23 @@ const renderBottomSection = (props: Props) => {
         </Text>
       </View>
     )
-  } else if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
+  } else if (
+    type === TokenTransactionType.InviteSent ||
+    type === TokenTransactionType.InviteReceived
+  ) {
     return (
       <View style={style.bottomContainer}>
         <View style={style.inviteLine}>
           <HorizontalLine />
         </View>
         <Text style={style.inviteTitle}>{t('inviteFlow11:inviteFee')}</Text>
-        {type === TransactionTypes.INVITE_SENT ? (
+        {type === TokenTransactionType.InviteSent ? (
           <Text style={style.pSmall}>{t('inviteFlow11:whySendFees')}</Text>
         ) : (
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+        <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
       </View>
     )
   } else if (comment) {

@@ -1,6 +1,5 @@
 import mockButton from '@celo/react-components/components/Button'
 import * as React from 'react'
-import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
@@ -32,7 +31,7 @@ describe('InviteReview', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  describe('On Invite', () => {
+  it('sends an invite and hides the alert when pressing the invite button', async () => {
     const hideAlert = jest.fn()
     hideAlert.mockName('hideAlert')
     const sendInvite = jest.fn()
@@ -55,13 +54,8 @@ describe('InviteReview', () => {
       </Provider>
     )
 
-    it('clears the Error', async () => {
-      fireEvent.press(inviteReview.getByTestId('inviteWhatsApp'))
-      expect(hideAlert).toHaveBeenCalled()
-    })
-    it('sends Invite', async () => {
-      fireEvent.press(inviteReview.getByTestId('inviteWhatsApp'))
-      expect(sendInvite).toHaveBeenCalledWith('John Doe', '+14155550000', 'WhatsApp')
-    })
+    fireEvent.press(inviteReview.getByTestId('inviteWhatsApp'))
+    expect(hideAlert).toHaveBeenCalled()
+    expect(sendInvite).toHaveBeenCalledWith('John Doe', '+14155550000', 'WhatsApp')
   })
 })
