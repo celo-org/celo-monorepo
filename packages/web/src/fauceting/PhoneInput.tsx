@@ -107,7 +107,6 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
 
   onInputChange = (_, { newValue }: { newValue: string }) => {
     this.onChangeCountryQuery(newValue)
-
     // use Set Immediate to avoid typing lag
     setImmediate(() => {
       const country = COUNTRIES.getCountry(newValue)
