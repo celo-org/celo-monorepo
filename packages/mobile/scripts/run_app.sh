@@ -1,26 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ====================================
-# Configure and run the mobile app
-# ====================================
+# ========================================
+# Configure, build, and run the mobile app
+# ========================================
 
 # Flags:
-# -n: Name of the network to run on
 # -p: Platform (android or ios)
-# -f: Fast (skip steps not required unless network or depedencies changes)
-# -r: Hot Reload (Restore nav state on reload)
+# -n (Optional): Name of the network to run on 
+# -f (Optional): Fast (skip steps not required unless network or depedencies changes)
+# -r (Optional): Hot Reload (Restore nav state on reload, useful for UI dev-ing)
+# -b (Optional): Just configure and build sdk, skip running 
 
 NETWORK=""
 PLATFORM=""
 FAST=false
 HOT_RELOAD=false
-while getopts 'n:p:fr' flag; do
+BUILD_ONLY=false
+while getopts 'p:n:frb' flag; do
   case "${flag}" in
-    n) NETWORK="$OPTARG" ;;
     p) PLATFORM="$OPTARG" ;;
+    n) NETWORK="$OPTARG" ;;
     f) FAST=true ;;
     r) HOT_RELOAD=true ;;
+    b) BUILD_ONLY=true ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -44,14 +47,8 @@ ENV_FILENAME="${ENVFILE:-.env}"
 export $(grep -v '^#' $ENV_FILENAME | xargs)
 
 if [ -z "$NETWORK" ]; then
-  echo "No network set."
-  read -p "Use $DEFAULT_TESTNET network set in .env file (y/n)? "
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    NETWORK=$DEFAULT_TESTNET
-  else 
-    echo "No network chosen. Exiting."
-    exit 1
-  fi
+  echo "No network set, using $DEFAULT_TESTNET network set in .env file."
+  NETWORK=$DEFAULT_TESTNET
 fi
 
 # Set DEFAULT_TESTNET in .env file
@@ -71,7 +68,6 @@ rm -f $ENV_FILENAME.bak
 rm -f $ANDROID_GSERVICES_PATH.bak
 rm -f $IOS_GSERVICES_PATH.bak
 
-
 # Build Wallet Kit for env
 if [ "$FAST" = false ]; then
   echo "Building sdk for testnet $NETWORK"
@@ -83,17 +79,22 @@ fi
 if [ $PLATFORM = "android" ]; then
   echo "Using platform android"
 
-  NUM_DEVICES=`adb devices -l | wc -l`
-  if [ $NUM_DEVICES -lt 3 ]; then 
-    echo "No android devices found"
-    exit 1
-  fi
-
   # Run jettify to fix non-android-x compatible libs
   if [ "$FAST" = false ]; then
     echo "Jetifying react native libraries"
     cd ../../ && yarn run jetify && cd packages/mobile
     echo "Jetified"
+  fi
+
+  if [ "$BUILD_ONLY" = true ]; then
+    echo "Build only enabled, stopping here."
+    exit 0
+  fi
+
+  NUM_DEVICES=`adb devices -l | wc -l`
+  if [ $NUM_DEVICES -lt 3 ]; then 
+    echo "No android devices found"
+    exit 1
   fi
 
   if [ $MACHINE = "Mac" ]; then
@@ -114,6 +115,13 @@ elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
   # TODO have iOS build and start from command line
   echo -e "\nFor now ios must be build and run from xcode\nStarting RN bundler\n"
+
+
+  if [ "$BUILD_ONLY" = true ]; then
+    echo "Build only enabled, stopping here."
+    exit 0
+  fi
+
   yarn react-native start 
 
 else
