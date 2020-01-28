@@ -684,7 +684,7 @@ describe('governance tests', () => {
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )
           assert.isFalse(targetVotingYield.isZero())
-          const expectdVoterRewards = activeVotes
+          const expectedVoterRewards = activeVotes
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
 
@@ -692,23 +692,23 @@ describe('governance tests', () => {
           const communityRewardFrac = new BigNumber(
             await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber)
           )
-          const expectedInfraReward = expectdVoterRewards
+          const expectedInfraReward = expectedVoterRewards
             .plus(maxPotentialValidatorReward)
             .times(fromFixed(communityRewardFrac))
             .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
 
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const expectedGoldTotalSupplyChange = expectedInfraReward
-            .plus(expectdVoterRewards)
+            .plus(expectedVoterRewards)
             .plus(stableTokenSupplyChange.div(exchangeRate))
           // Check TS calc'd rewards against solidity calc'd rewards
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
-          assertAlmostEqual(expectdVoterRewards, totalVoterRewards)
+          assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
           assertAlmostEqual(expectedInfraReward, totalCommunityReward)
           // Check TS calc'd rewards against what happened
-          await assertVotesChanged(blockNumber, expectdVoterRewards)
-          await assertLockedGoldBalanceChanged(blockNumber, expectdVoterRewards)
+          await assertVotesChanged(blockNumber, expectedVoterRewards)
+          await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
           await assertGovernanceBalanceChanged(
             blockNumber,
             expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
