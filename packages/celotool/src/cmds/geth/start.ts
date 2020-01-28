@@ -75,7 +75,7 @@ export const builder = (argv: yargs.Argv) => {
     })
     .option('verbosity', {
       type: 'number',
-      description: 'Verbosity level',
+      description: 'Geth Verbosity level',
       default: 5,
     })
     .option('verbose', {
