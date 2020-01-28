@@ -63,9 +63,9 @@ export const builder = (argv: yargs.Argv) => {
       description: 'WS-RPC server listening port',
       default: 8546,
     })
-    .option('amount', {
+    .option('instances', {
       type: 'number',
-      description: 'Amount of nodes to run',
+      description: 'Number of instances to run',
       default: 1,
     })
     .option('with-proxy', {
