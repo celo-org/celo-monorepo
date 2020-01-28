@@ -37,6 +37,7 @@ export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const findAddressIndex = (address: Address, addresses: Address[]) =>
   addresses.findIndex((x) => eqAddress(x, address))
 
+// Returns an array of indices mapping the entries of oldAddress[] to newAddress[]
 export const mapAddressListOnto = (oldAddress: Address[], newAddress: Address[]) => {
   const oldAddressIndex: Array<{
     address: Address
@@ -68,6 +69,8 @@ export const mapAddressListOnto = (oldAddress: Address[], newAddress: Address[])
   return res
 }
 
+// Returns data[] reordered by mapAddressListOnto(), and initiaValue for any entry of
+// oldAddress[] not present in newAddress[].
 export function mapAddressListDataOnto<T>(
   data: T[],
   oldAddress: Address[],

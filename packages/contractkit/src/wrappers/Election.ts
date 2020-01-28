@@ -1,6 +1,7 @@
 import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
-import { range, zip } from '@celo/utils/lib/collections'
+import { zip } from '@celo/utils/lib/collections'
+import { range } from 'lodash'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3/types'
 import { Address, NULL_ADDRESS } from '../base'
