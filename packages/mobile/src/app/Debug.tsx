@@ -41,7 +41,6 @@ export class Debug extends React.Component<RootState, State> {
 
   updateLatestBlock = async () => {
     const latestBlock = await getLatestBlock()
-    Logger.debug('updateLatestBlock', JSON.stringify(latestBlock))
     this.setState({
       latestBlockNumber: (latestBlock && latestBlock.number) || 0,
     })
