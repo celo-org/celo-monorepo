@@ -14,10 +14,13 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
+import { cancelGethSaga, setPromptZeroSync } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
-import { initGethSaga, waitForGethConnectivity } from 'src/geth/saga'
-import { navigateToError } from 'src/navigator/NavigationService'
+import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
+import { promptZeroSyncIfNeededSelector } from 'src/geth/selectors'
+import { navigate, navigateToError } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
@@ -50,24 +53,20 @@ const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
+const SWITCH_TO_ZERO_SYNC_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to zeroSync
+const WEB3_MONITOR_DELAY = 100
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
 
+  let syncLoops = 0
   while (true) {
     try {
       let syncProgress: boolean | Web3SyncProgress
-      const zeroSyncMode = yield select(zeroSyncSelector)
-      // tslint:disable-next-line: prefer-conditional-expression
-      if (zeroSyncMode) {
-        // In this mode, the check seems to fail with
-        // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
-        syncProgress = false
-      } else {
-        // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-        syncProgress = yield call(web3.eth.isSyncing)
-      }
+
+      // isSyncing returns a syncProgress object when it's still syncing, false otherwise
+      syncProgress = yield call(web3.eth.isSyncing)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
@@ -85,15 +84,16 @@ export function* checkWeb3SyncProgress() {
       } else {
         throw new Error('Invalid syncProgress type')
       }
-
-      yield delay(100) // wait 100ms while web3 syncs then check again
-    } catch (error) {
-      // Check if error caused by switch to zeroSyncMode
-      // as if it is in zeroSyncMode it should have returned above
-      const switchedToZeroSyncMode = yield select(zeroSyncSelector)
-      if (switchedToZeroSyncMode) {
-        return true
+      yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
+      syncLoops += 1
+      if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_ZERO_SYNC_TIMEOUT) {
+        if (yield select(promptZeroSyncIfNeededSelector)) {
+          yield put(setPromptZeroSync(false))
+          navigate(Screens.DataSaver, { promptModalVisible: true })
+          return true
+        }
       }
+    } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
@@ -129,8 +129,10 @@ export function* waitForWeb3Sync() {
 }
 
 export function* waitWeb3LastBlock() {
-  yield call(waitForGethConnectivity)
-  yield call(waitForWeb3Sync)
+  if (!(yield select(zeroSyncSelector))) {
+    yield call(waitForGethConnectivity)
+    yield call(waitForWeb3Sync)
+  }
 }
 
 export function* getOrCreateAccount() {
@@ -452,7 +454,8 @@ export function* switchToGethFromZeroSync() {
       return
     }
 
-    yield call(initGethSaga)
+    yield spawn(gethSaga)
+
     switchWeb3ProviderForSyncMode(false)
     // Ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
@@ -471,9 +474,9 @@ export function* switchToZeroSyncFromGeth() {
   Logger.debug(TAG, 'Switching to zeroSync from geth..')
   try {
     yield put(setZeroSyncMode(true))
-    yield call(stopGethIfInitialized)
-
     switchWeb3ProviderForSyncMode(true)
+    yield put(cancelGethSaga())
+    yield call(stopGethIfInitialized)
 
     // Ensure web3 sync state is updated with new zeroSync state.
     // This prevents a false positive "geth disconnected"
@@ -486,26 +489,30 @@ export function* switchToZeroSyncFromGeth() {
 }
 
 export function* toggleZeroSyncMode(action: SetIsZeroSyncAction) {
-  Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
-  if (action.zeroSyncMode) {
-    yield call(switchToZeroSyncFromGeth)
-  } else {
-    yield call(switchToGethFromZeroSync)
-  }
-  // Unlock account to ensure private keys are accessible in new mode
-  try {
-    const account = yield call(getConnectedUnlockedAccount)
-    Logger.debug(
-      TAG + '@toggleZeroSyncMode',
-      `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
-    )
-  } catch (e) {
-    // Rollback if private keys aren't accessible in new mode
+  if ((yield select(zeroSyncSelector)) !== action.zeroSyncMode) {
+    Logger.debug(TAG + '@toggleZeroSyncMode', ` to: ${action.zeroSyncMode}`)
     if (action.zeroSyncMode) {
-      yield call(switchToGethFromZeroSync)
-    } else {
       yield call(switchToZeroSyncFromGeth)
+    } else {
+      yield call(switchToGethFromZeroSync)
     }
+    // Unlock account to ensure private keys are accessible in new mode
+    try {
+      const account = yield call(getConnectedUnlockedAccount)
+      Logger.debug(
+        TAG + '@toggleZeroSyncMode',
+        `Switched to ${action.zeroSyncMode} and able to unlock account ${account}`
+      )
+    } catch (e) {
+      // Rollback if private keys aren't accessible in new mode
+      if (action.zeroSyncMode) {
+        yield call(switchToGethFromZeroSync)
+      } else {
+        yield call(switchToZeroSyncFromGeth)
+      }
+    }
+  } else {
+    Logger.debug(TAG + '@toggleZeroSyncMode', ` already in desired state: ${action.zeroSyncMode}`)
   }
 }
 export function* watchZeroSyncMode() {
