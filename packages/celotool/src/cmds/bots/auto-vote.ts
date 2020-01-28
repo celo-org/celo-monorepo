@@ -19,7 +19,7 @@ export const describe = 'for each of the voting bot accounts, vote for the best 
 
 interface SimulateVotingArgv {
   celoProvider: string
-  excludedGroups?: string
+  excludedGroups?: string[]
 }
 
 export const builder = (yargs: Argv) => {
@@ -32,6 +32,12 @@ export const builder = (yargs: Argv) => {
     .option('excludedGroups', {
       type: 'string',
       description: 'A comma separated list of groups to exclude from voting eligibility',
+      coerce: (addresses: string) => {
+        return addresses
+          .split(',')
+          .filter((a) => a.length > 0)
+          .map(ensure0x)
+      },
     })
 }
 
@@ -40,8 +46,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     const numBotAccounts = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
 
-    const excludedGroups: string[] =
-      argv.excludedGroups && argv.excludedGroups.length > 0 ? argv.excludedGroups.split(',') : []
+    const excludedGroups: string[] = argv.excludedGroups || []
 
     const kit = newKit(argv.celoProvider)
     const election = await kit.contracts.getElection()

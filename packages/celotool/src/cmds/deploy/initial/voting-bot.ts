@@ -8,14 +8,14 @@ export const command = 'voting-bot'
 export const describe = 'deploy voting-bot'
 
 interface VotingBotArgv extends InitialArgv {
-  excludedGroups: string[]
+  excludedGroups?: string[]
 }
 
 export const builder = (argv: yargs.Argv) => {
-  return argv.option('exclude-groups', {
+  return argv.option('excludedGroups', {
     type: 'string',
     description: 'Addresses of Validator Group(s) that the bot should not vote for.',
-    coerce: (addresses): string[] => {
+    coerce: (addresses) => {
       return addresses.split(',').map(ensure0x)
     },
   })

@@ -70,7 +70,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
 }
 
 function helmParameters(celoEnv: string, excludedGroups?: string[]) {
-  return [
+  const params = [
     `--set celoProvider=${getFornoUrl(celoEnv)}`,
     `--set cronSchedule="${fetchEnv(envVar.VOTING_BOT_CRON_SCHEDULE)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
@@ -80,11 +80,15 @@ function helmParameters(celoEnv: string, excludedGroups?: string[]) {
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set votingBot.changeBaseline="${fetchEnv(envVar.VOTING_BOT_CHANGE_BASELINE)}"`,
     `--set votingBot.count=${fetchEnv(envVar.VOTING_BOTS)}`,
-    `--set-string votingBot.excludedGroups="${excludedGroups}"`, // TODO: make this actually handle a string with commas :(
     `--set votingBot.exploreProbability="${fetchEnv(envVar.VOTING_BOT_EXPLORE_PROBABILITY)}"`,
     `--set votingBot.scoreSensitivity="${fetchEnv(envVar.VOTING_BOT_SCORE_SENSITIVITY)}"`,
     `--set votingBot.wakeProbability="${fetchEnv(envVar.VOTING_BOT_WAKE_PROBABILITY)}"`,
   ]
+
+  if (excludedGroups && excludedGroups.length > 0) {
+    params.push(`--set votingBot.excludedGroups="${excludedGroups.join('\\,')}"`)
+  }
+  return params
 }
 
 function releaseName(celoEnv: string) {

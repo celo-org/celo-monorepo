@@ -25,10 +25,8 @@ spec:
               - |
                 CELOTOOL="/celo-monorepo/packages/celotool/bin/celotooljs.sh";
 
-                $CELOTOOL bots auto-vote --celoProvider {{ .Values.celoProvider }}
+                $CELOTOOL bots auto-vote --celoProvider {{ .Values.celoProvider }} --excludedGroups {{ .Values.votingBot.excludedGroups }}
             env:
-            - name: EXCLUDED_GROUPS
-              value: {{ .Values.votingBot.excludeGroups | quote }}
             - name: MNEMONIC
               valueFrom:
                 secretKeyRef:
