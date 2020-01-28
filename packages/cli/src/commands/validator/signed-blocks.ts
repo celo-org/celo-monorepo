@@ -59,9 +59,9 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     const printer = new MarkPrinter(res.flags.width!)
     try {
       for (const block of blocks) {
-        const elected = await electionCache.elected(res.flags.signer, block.number)
-        const signed = elected && (await electionCache.signed(res.flags.signer, block))
-        printer.addMark(block.number, elected, signed)
+        const elected = await electionCache.elected(res.flags.signer, block.number - 1)
+        const signed = elected && (await electionCache.signedParent(res.flags.signer, block))
+        printer.addMark(block.number - 1, elected, signed)
       }
 
       // TODO(victor) Fix the follow flag functionality.
