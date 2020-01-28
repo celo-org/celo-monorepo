@@ -13,7 +13,6 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { toggleFornoMode } from 'src/web3/actions'
-import Logger from 'src/utils/Logger'
 
 interface StateProps {
   fornoEnabled: boolean
@@ -110,45 +109,34 @@ export class DataSaver extends React.Component<Props, State> {
   }
 
   onPressToggleWithSwitchOffModal = () => {
-    Logger.debug('onPressToggleWithSwitchOffModal')
-
     this.props.toggleFornoMode(false)
     this.hideSwitchOffModal()
   }
 
   showSwitchOnModal = () => {
-    Logger.debug('showSwitchOnModal')
-
     this.setState({ switchOnModalVisible: true })
   }
 
   hideSwitchOnModal = () => {
-    Logger.debug('hideSwitchOnModal')
-
     this.setState({ switchOnModalVisible: false })
   }
 
   onPressToggleWithSwitchOnModal = () => {
-    Logger.debug('onPressToggleWithSwitchOnModal')
-
     this.props.toggleFornoMode(true)
     this.hideSwitchOnModal()
   }
 
   onPressPromptModal = () => {
-    Logger.debug('onPressPromptModal')
     this.props.toggleFornoMode(true)
     navigateBack()
   }
 
   hidePromptModal = () => {
-    Logger.debug('hidePromptModal')
     this.props.toggleFornoMode(false)
     navigateBack()
   }
 
   handleFornoToggle = (fornoMode: boolean) => {
-    Logger.debug('handleFornoToggle', `fornoMode: ${fornoMode}`)
     if (!fornoMode) {
       if (this.props.gethStartedThisSession) {
         // Starting geth a second time this app session which will

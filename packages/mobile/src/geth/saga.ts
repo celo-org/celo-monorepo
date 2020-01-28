@@ -24,7 +24,7 @@ import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { isInitiallyFornoMode } from 'src/web3/contracts'
+import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -221,7 +221,7 @@ export function* gethSaga() {
 }
 
 export function* gethSagaIfNecessary() {
-  if (!isInitiallyFornoMode) {
+  if (!(yield select(fornoSelector))) {
     yield call(gethSaga)
   }
 }

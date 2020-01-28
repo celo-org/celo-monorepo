@@ -42,15 +42,15 @@ class DisconnectBanner extends React.PureComponent<Props> {
 
   render() {
     const { t, appConnected, appSynced, fornoEnabled } = this.props
-    const appSyncedIfNeeded = appSynced || fornoEnabled
+    const appSyncedIfNecessary = appSynced || fornoEnabled
 
     // App's connected: show nothing
-    if (appConnected && appSyncedIfNeeded) {
+    if (appConnected && appSyncedIfNecessary) {
       return null
     }
 
     // App's connected, was synced, and now resyncing to new blocks: show nothing
-    if (appConnected && !appSyncedIfNeeded && DisconnectBanner.hasAppSynced) {
+    if (appConnected && !appSyncedIfNecessary && DisconnectBanner.hasAppSynced) {
       return null
     }
 

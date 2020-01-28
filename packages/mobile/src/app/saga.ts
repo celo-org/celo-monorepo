@@ -155,7 +155,7 @@ export function* navigatePinProtected(action: NavigatePinProtected) {
       navigate(action.routeName, action.params)
       yield put(finishPinVerification())
     } else {
-      // TODO: Implement PIN protection for forno (fornoMode)
+      // TODO: Implement PIN protection for forno mode
       navigate(action.routeName, action.params)
     }
   } catch (error) {
