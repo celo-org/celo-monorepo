@@ -30,6 +30,17 @@
     "darkLogoBackgroundText": "",
     "backgroundDoNotAndDo": "Do not overlay any of the logos of glyphs on top of images. Do not overlay the two-color logo ontop of unpreferred light colors."
   },
+  "composition": {
+    "title": "Composition",
+    "headline": "Digital and print compositions fit within a grid that designers seldom break.",
+    "alignmentTitle": "Alignment",
+    "alignmentText": "Though there are many permutations of ways to organize typography and visual elements, we recommend the following alignment styles.",
+    "gridTitle": "The Grid",
+    "gridText": "Celo’s Design is anchored around a 4 part grid system where labels, titles, form UI and visual elements exist on the left while large bodies of content exist on the right.\n\nBetween each section of the grid, there is a gutter that organizes the hierarchy and comprehension of content.",
+    "alignmentExampleTitle": "What we care about",
+    "alignmentExampleSubtitle": "Innovating on Money",
+    "alignmentExampleText": "We recognize that the features of money, like the features of any widely used technology, have a considerable impact on society."
+  },
   "color": {
     "title": "Color",
     "headline": "The Celo color palette consistes of primary brand colors, accent colors, and grays.",

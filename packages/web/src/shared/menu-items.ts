@@ -115,7 +115,10 @@ export const hashNav = {
   home: { partnerships: 'partnerships' },
   brandLogo: { overview: 'overview', space: 'space-and-sizing', backgrounds: 'backgrounds' },
   brandColor: { overview: 'overview', backgrounds: 'background-colors' },
-  brandTypography: { overview: 'overview', scale: 'type-scale' },
+  brandComposition: {
+    overview: 'overview',
+    grid: 'grid',
+  },
   brandImagery: {
     overview: 'overview',
     illustrations: 'illustrations',
@@ -124,6 +127,7 @@ export const hashNav = {
   brandIcons: {
     overview: 'overview',
   },
+  brandTypography: { overview: 'overview', scale: 'type-scale' },
 }
 
 export default menuItems

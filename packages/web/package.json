@@ -15,11 +15,10 @@
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
-    "test": "jest --runInBand"
+    "test": "jest --coverage --runInBand"
   },
   "dependencies": {
-    "@celo/utils": "0.1.4",
-    "@segment/in-eu": "^0.3.0",
+    "@celo/utils": "0.1.5",
     "@sentry/browser": "^5.10.2",
     "@sentry/node": "^5.10.2",
     "@zeit/next-sass": "^1.0.1",
@@ -83,6 +82,7 @@
   "devDependencies": {
     "@firebase/app-types": "^0.5.0",
     "@sentry/types": "^5.10.0",
+    "@testing-library/react": "^9.4.0",
     "@types/airtable": "^0.5.7",
     "@types/hex-rgba": "^1.0.0",
     "@types/mailgun-js": "^0.22.3",
@@ -96,13 +96,13 @@
     "babel-plugin-react-css-modules": "^5.2.6",
     "babel-plugin-react-native-web": "^0.11.7",
     "cross-env": "^5.1.6",
-    "node-sass": "^4.13.0",
+    "ignore-loader": "~0.1.2",
     "jest-canvas-mock": "^2.2.0",
     "jest-fetch-mock": "^3.0.0",
+    "node-sass": "^4.13.0",
     "nodemon": "^2.0.2",
     "postcss-scss": "^2.0.0",
     "react-native-svg": "^9.13.6",
-    "ignore-loader": "~0.1.2",
     "webpack": "4.41.2"
   }
 }

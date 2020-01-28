@@ -69,7 +69,8 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
 
   getDisplayName() {
     const { payment } = this.props
-    return payment.recipientContact ? payment.recipientContact.displayName : payment.recipientPhone
+    // TODO(Rossy) Get contact number from recipient cache here
+    return payment.recipientPhone
   }
 
   render() {

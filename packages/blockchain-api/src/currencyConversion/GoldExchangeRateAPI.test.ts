@@ -93,4 +93,18 @@ describe('GoldExchangeRateAPI', () => {
     ).rejects.toThrow('No matching data for cUSD/ABC')
     expect(mockOnce).toHaveBeenCalledTimes(1)
   })
+
+  it('should memoize the result with the given input params', async () => {
+    snapshot.val.mockReturnValue(MOCK_DATA_CUSD_CGLD)
+    const params = {
+      sourceCurrencyCode: 'cUSD',
+      currencyCode: 'cGLD',
+      timestamp: 1575294235653,
+    }
+    const result = await goldExchangeRateAPI.getExchangeRate(params)
+    const result2 = await goldExchangeRateAPI.getExchangeRate(params)
+    expect(result).toEqual(new BigNumber(0.2))
+    expect(result2).toEqual(result)
+    expect(mockOnce).toHaveBeenCalledTimes(1)
+  })
 })

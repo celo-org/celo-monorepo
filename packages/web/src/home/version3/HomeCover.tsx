@@ -37,6 +37,10 @@ class HomeCover extends React.PureComponent<Props, State> {
     this.setState({ playing: false })
   }
 
+  setStill = () => {
+    this.setState({ mode: Mode.graphic, playing: false })
+  }
+
   componentDidMount = async () => {
     const goodConnection = await hasGoodConnection()
 
@@ -58,7 +62,12 @@ class HomeCover extends React.PureComponent<Props, State> {
           <View style={styles.animationBackground}>
             <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
               <View style={styles.animationWrapper}>
-                <HomeAnimation onLoaded={this.onLoaded} onFinished={this.onFinished} mode={mode} />
+                <HomeAnimation
+                  onLoaded={this.onLoaded}
+                  onFinished={this.onFinished}
+                  onError={this.setStill}
+                  mode={mode}
+                />
               </View>
             </Responsive>
           </View>

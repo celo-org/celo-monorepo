@@ -1,8 +1,7 @@
 {
   "at": "a",
   "yourClockIsBroke": "La fecha y hora de tu teléfono son incorrectos",
-  "adjustYourClock":
-    "Ajusta tu reloj para leer la hora automáticamente y vuelva a intentarlo. Si el problema persiste, puede que sea necesario reiniciar la aplicación",
+  "adjustYourClock": "Ajusta tu reloj para leer la hora automáticamente y vuelva a intentarlo. Si el problema persiste, puede que sea necesario reiniciar la aplicación",
   "adjustDate": "Arreglar hora",
   "submit": "Enviar",
   "continue": "Continuar",
@@ -31,8 +30,7 @@
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
   "receivedPayment": "Pago recibido",
-  "readOnlyState":
-    "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
+  "readOnlyState": "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getStarted": "Primeros pasos",
   "manageCeloDollars": "Administrar {{CeloDollars}}",
   "sendCeloDollars": "Enviar {{CeloDollars}}",
@@ -91,10 +89,8 @@
   "appHasToBeUpdated": "La aplicación tiene que ser actualizada",
   "thisVersionIsInsecure": "Esta versión es insegura.",
   "update": "Actualizar",
-  "qrFailedNoAddress":
-    "Código QR no se pudo leer. Motivo: no se encontró la dirección de el monedero.",
-  "qrFailedInvalidAddress":
-    "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
+  "qrFailedNoAddress": "Código QR no se pudo leer. Motivo: no se encontró la dirección de el monedero.",
+  "qrFailedInvalidAddress": "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
   "corruptedChainDeleted": "Se ha borrado información corrupta, por favor reinicie la applicación",
   "web3FailedToSync": "Fallo la sincronización, por favor verifica tu conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
@@ -105,7 +101,10 @@
   "or": "o",
   "accepted": "Aceptado",
   "processing": "Procesando",
-  "moreWithCount": "~~+{{count }} more",
-  "unknown": "~~Unknown",
-  "emptyList": "~~Empty list"
+  "moreWithCount": "+{{count }} más",
+  "unknown": "Desconocido",
+  "emptyList": "Lista vacía",
+  "timeframes": {
+    "30d": "30 dias"
+  }
 }

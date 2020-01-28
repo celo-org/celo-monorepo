@@ -1,6 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
 import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
+import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 
 const numeral = require('numeral')
 
@@ -16,6 +17,19 @@ export const getMoneyDisplayValue = (
   const symbol = CURRENCIES[currency].symbol
   const formattedValue = numeral(roundDown(value, decimals, roundingTolerance).toNumber()).format(
     '0,0.' + '0'.repeat(decimals)
+  )
+  return includeSymbol ? symbol + formattedValue : formattedValue
+}
+
+export const getLocalCurrencyDisplayValue = (
+  value: BigNumber.Value,
+  currency: LocalCurrencyCode,
+  includeSymbol: boolean = false,
+  roundingTolerance: number = 1
+): string => {
+  const symbol = LocalCurrencySymbol[currency]
+  const formattedValue = numeral(roundDown(value, 2, roundingTolerance).toNumber()).format(
+    '0,0.' + '0'.repeat(2)
   )
   return includeSymbol ? symbol + formattedValue : formattedValue
 }
