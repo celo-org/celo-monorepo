@@ -570,7 +570,7 @@ async function helmParameters(celoEnv: string) {
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
-    `--set geth.proxiedValidators=${fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')}`,
+    ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
   ]
@@ -653,13 +653,11 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
   const bootnodeName = `${celoEnv}-bootnode`
-  const proxyName = `${celoEnv}-proxy`
 
   // scale down nodes
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
-  // allow to fail for the cases where a testnet does not include the proxy statefulset yet
-  await scaleResource(celoEnv, 'StatefulSet', proxyName, 0, true)
+  await scaleProxies(celoEnv, 0)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
@@ -670,16 +668,52 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  // assumes 1 proxy per proxied validator
-  const numProxies = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
 
   // Note(trevor): helm upgrade only compares the current chart to the
   // previously deployed chart when deciding what needs changing, so we need
   // to manually scale up to account for when a node count is the same
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, numTxNodes)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, numValdiators)
-  await scaleResource(celoEnv, 'StatefulSet', proxyName, numProxies)
+  await scaleProxies(celoEnv)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
+}
+
+// scaleProxies scales all proxy statefulsets to have `replicas` replicas.
+// If `replicas` is undefined, proxies will be scaled to their intended
+// replica counts
+async function scaleProxies(celoEnv: string, replicas?: number) {
+  if (replicas !== undefined) {
+    const statefulsetNames = await getProxyStatefulsets(celoEnv)
+    for (const name of statefulsetNames) {
+      await scaleResource(celoEnv, 'StatefulSet', name, replicas)
+    }
+  } else {
+    const proxiesPerValidator = getProxiesPerValidator()
+    let i = 0
+    for (const proxyCount of proxiesPerValidator) {
+      // allow to fail for the cases where a testnet does not include the proxy statefulset yet
+      await scaleResource(
+        celoEnv,
+        'StatefulSet',
+        `${celoEnv}-validators-${i}-proxy`,
+        proxyCount,
+        true
+      )
+      i++
+    }
+  }
+}
+
+async function getProxyStatefulsets(celoEnv: string) {
+  const [output] = await execCmd(
+    `kubectl get statefulsets --selector=component=proxy --no-headers -o custom-columns=":metadata.name" -n ${celoEnv}`
+  )
+  console.log('proxy', output, !output, output.split('\n'))
+  if (!output) {
+    return []
+  }
+
+  return output.split('\n').filter((name) => name)
 }
 
 export async function removeHelmRelease(celoEnv: string) {
@@ -688,6 +722,31 @@ export async function removeHelmRelease(celoEnv: string) {
 
 export function makeHelmParameters(map: { [key: string]: string }) {
   return entries(map).map(([key, value]) => `--set ${key}=${value}`)
+}
+
+function setHelmArray(paramName: string, arr: any[]) {
+  return arr.map((value, i) => `--set ${paramName}[${i}]=${value}`)
+}
+
+// Reads the envVar VALDIATOR_PROXY_COUNTS, which indicates how many validators
+// have a certain number of proxies in the format:
+// <# of validators>:<proxy count>;<# of validators>:<proxy count>;...
+// For example, VALDIATOR_PROXY_COUNTS='2:1,3:2' will give [1,1,2,2,2]
+// The resulting array does not necessarily have the same length as the total
+// number of validators because non-proxied validators are not represented in the array
+function getProxiesPerValidator() {
+  const arr = []
+  const valProxyCountsStr = fetchEnv(envVar.VALDIATOR_PROXY_COUNTS)
+  const splitValProxyCountStrs = valProxyCountsStr.split(',')
+  for (const valProxyCount of splitValProxyCountStrs) {
+    const [valCountStr, proxyCountStr] = valProxyCount.split(':')
+    const valCount = parseInt(valCountStr, 10)
+    const proxyCount = parseInt(proxyCountStr, 10)
+    for (let i = 0; i < valCount; i++) {
+      arr.push(proxyCount)
+    }
+  }
+  return arr
 }
 
 export async function deleteFromCluster(celoEnv: string) {

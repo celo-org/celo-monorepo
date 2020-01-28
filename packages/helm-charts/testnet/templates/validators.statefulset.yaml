@@ -28,7 +28,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Gi
+          storage: 10Gi
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
@@ -79,36 +79,29 @@ spec:
             echo -n "Generating Bootnode enode for the validator: "
             cat /root/.celo/bootnodeEnode
 
-            if [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]; then
-              PROXY_INTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_PROXY_INTERNAL_${RID}_SERVICE_HOST
-              echo "PROXY_INTERNAL_IP_ENV_VAR=$PROXY_INTERNAL_IP_ENV_VAR"
-              PROXY_INTERNAL_IP=`eval "echo \\${${PROXY_INTERNAL_IP_ENV_VAR}}"`
+            # Put the proxies per validator array into a comma separated string
+            # so we can index it at runtime
+            PROXIES_PER_VALIDATOR={{ join "," .Values.geth.proxiesPerValidator }}
+            PROXY_COUNT=`echo -n $PROXIES_PER_VALIDATOR | cut -d ',' -f $((RID + 1))`
+            echo -n $PROXY_COUNT > /root/.celo/proxyCount
 
-              # we can't get the external IP of a service from an environment variable,
-              # so we use the IP address that was allocated for this validator that is
-              # being used by the proxy found in /root/.celo/externalIpAddress
-              if [ -s /root/.celo/externalIpAddress ]; then
-                echo "Proxy external IP from /root/.celo/externalIpAddress: "
-                PROXY_EXTERNAL_IP=`cat /root/.celo/externalIpAddress`
-              else
-                # otherwise use the internal proxy service IP address
-                PROXY_EXTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_PROXY_INTERNAL_${RID}_SERVICE_HOST
-                echo "Proxy external IP from PROXY_EXTERNAL_IP_ENV_VAR=$PROXY_EXTERNAL_IP_ENV_VAR"
-                PROXY_EXTERNAL_IP=`eval "echo \\${${PROXY_EXTERNAL_IP_ENV_VAR}}"`
-              fi
+            # If this validator is meant to be proxied
+            if [[ ! -z "$PROXY_COUNT" ]]; then
+              # Clear the proxy enode file because it's persisted
+              rm -f /root/.celo/proxyEnodeUrlPairs
+              # Generate all proxy enode urls and put them into /root/.celo/proxyEnodeUrlPairs
+              PROXY_INDEX=0
+              while [ $PROXY_INDEX -lt $PROXY_COUNT ]; do
+                if [ $PROXY_INDEX -gt 0 ]; then
+                  echo -n "," >> /root/.celo/proxyEnodeUrlPairs
+                fi
 
-              echo "Proxy internal IP: $PROXY_INTERNAL_IP_ENV_VAR=$PROXY_INTERNAL_IP"
-              echo "Proxy external IP: $PROXY_EXTERNAL_IP_ENV_VAR=$PROXY_EXTERNAL_IP"
+                # gives us PROXY_ENODE_URL_PAIR
+                {{ include "celo.proxyenodeurlpair" . | indent 16 }}
+                echo -n $PROXY_ENODE_URL_PAIR >> /root/.celo/proxyEnodeUrlPairs
 
-              PROXY_ENODE_ADDRESS=`celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType proxy --index $RID`
-              PROXY_INTERNAL_ENODE=enode://${PROXY_ENODE_ADDRESS}@${PROXY_INTERNAL_IP}:30503
-              PROXY_EXTERNAL_ENODE=enode://${PROXY_ENODE_ADDRESS}@${PROXY_EXTERNAL_IP}:30303
-
-              echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"
-              echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
-
-              echo $PROXY_INTERNAL_ENODE > /root/.celo/proxyInternalEnode
-              echo $PROXY_EXTERNAL_ENODE > /root/.celo/proxyExternalEnode
+                PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
+              done
             fi
         env:
         - name: POD_IP
@@ -151,7 +144,8 @@ spec:
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
 
           PROXIED_FLAGS=""
-          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` --nodiscover --proxy.allowprivateip"
+          PROXY_COUNT=`cat /root/.celo/proxyCount`
+          [ ! -z $PROXY_COUNT ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpairs=`cat /root/.celo/proxyEnodeUrlPairs` --nodiscover --proxy.allowprivateip"
 
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
