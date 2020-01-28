@@ -14,7 +14,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
-import { cancelGethSaga, setPromptForno } from 'src/geth/actions'
+import { Actions as GethActions, cancelGethSaga, setPromptForno } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
@@ -119,7 +119,6 @@ export function* waitForWeb3Sync() {
       navigateToError('web3FailedToSync')
       return false
     }
-
     return true
   } catch (error) {
     Logger.error(TAG, 'checkWeb3Sync', error)
@@ -455,9 +454,9 @@ export function* switchToGethFromForno() {
     }
 
     yield spawn(gethSaga)
-
     switchWeb3ProviderForSyncMode(false)
-    // Ensure web3 is fully synced using new provider
+    yield take(GethActions.SET_GETH_CONNECTED)
+    // Once geth connnected, ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
 
     // After switching off forno mode, ensure key is stored in web3.personal

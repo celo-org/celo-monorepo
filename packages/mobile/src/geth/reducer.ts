@@ -34,7 +34,6 @@ export function gethReducer(state: State = initialState, action: ActionTypes) {
         ...state,
         promptFornoIfNeeded: action.promptIfNeeded,
       }
-
     default:
       return state
   }
