@@ -1,5 +1,6 @@
 import React from 'react'
 import { WithTranslation } from 'react-i18next'
+import { View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
@@ -47,14 +48,15 @@ export const listItemRenderer = (params: {
   const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
 
   return (
-    <IncomingPaymentRequestListItem
-      key={key}
-      id={request.uid || ''}
-      amount={request.amount}
-      updatePaymentRequestStatus={params.updatePaymentRequestStatus}
-      requester={requester}
-      comment={request.comment}
-    />
+    <View key={key}>
+      <IncomingPaymentRequestListItem
+        id={request.uid || ''}
+        amount={request.amount}
+        updatePaymentRequestStatus={params.updatePaymentRequestStatus}
+        requester={requester}
+        comment={request.comment}
+      />
+    </View>
   )
 }
 
