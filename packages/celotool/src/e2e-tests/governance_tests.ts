@@ -692,26 +692,26 @@ describe('governance tests', () => {
           const communityRewardFrac = new BigNumber(
             await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber)
           )
-          const expectedInfraReward = expectedVoterRewards
+          const expectedCommunityReward = expectedVoterRewards
             .plus(maxPotentialValidatorReward)
             .times(fromFixed(communityRewardFrac))
             .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
 
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
-          const expectedGoldTotalSupplyChange = expectedInfraReward
+          const expectedGoldTotalSupplyChange = expectedCommunityReward
             .plus(expectedVoterRewards)
             .plus(stableTokenSupplyChange.div(exchangeRate))
           // Check TS calc'd rewards against solidity calc'd rewards
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
           assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
-          assertAlmostEqual(expectedInfraReward, totalCommunityReward)
+          assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
           // Check TS calc'd rewards against what happened
           await assertVotesChanged(blockNumber, expectedVoterRewards)
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
           await assertGovernanceBalanceChanged(
             blockNumber,
-            expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
+            expectedCommunityReward.plus(await blockBaseGasFee(blockNumber))
           )
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
