@@ -48,19 +48,21 @@ export async function waitToFinishSyncing(web3: any) {
   }
 }
 
-// TODO(joshua): Pick a good percentage that works and is acceptably close
-export function assertAlmostEqual(actual: BigNumber, expected: BigNumber, pct: number = 0.5) {
+export function assertAlmostEqual(
+  actual: BigNumber,
+  expected: BigNumber,
+  delta: BigNumber = new BigNumber(10).pow(12).times(5)
+) {
   if (expected.isZero()) {
     assert.equal(actual.toFixed(), expected.toFixed())
   } else {
-    const isCloseTo = expected
-      .div(actual)
-      .minus(1)
+    const isCloseTo = actual
+      .minus(expected)
       .abs()
-      .lte(new BigNumber(pct).div(new BigNumber(100)))
+      .lte(delta)
     assert(
       isCloseTo,
-      `expected ${actual.toString()} (actual) to almost equal ${expected.toString()} with +/- ${pct.toString()}% of the actual value.`
+      `expected ${actual.toString()} to almost equal ${expected.toString()} +/- ${delta.toString()}`
     )
   }
 }
