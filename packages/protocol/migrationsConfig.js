@@ -32,7 +32,7 @@ const DefaultConfig = {
     slashableDowntime: 480,
   },
   election: {
-    minElectableValidators: '22',
+    minElectableValidators: '10',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
     electabilityThreshold: 1 / 1000,
