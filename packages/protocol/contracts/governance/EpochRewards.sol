@@ -431,13 +431,14 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 targetVoterReward = getTargetVoterRewards();
     uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
-    uint256 targetCommunityReward = FixidityLib.newFixed(targetGoldSupplyIncrease).multiply(
-      communityRewardFraction
-    );
     return (
       FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
       FixidityLib.newFixed(targetVoterReward).multiply(rewardsMultiplier).fromFixed(),
-      FixidityLib.newFixed(targetCommunityReward).multiply(rewardsMultiplier).fromFixed()
+      FixidityLib
+        .newFixed(targetGoldSupplyIncrease)
+        .multiply(communityRewardFraction)
+        .multiply(rewardsMultiplier)
+        .fromFixed()
     );
   }
 }
