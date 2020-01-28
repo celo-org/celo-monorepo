@@ -7281,7 +7281,6 @@ exports[`Community renders 1`] = `
           "WebkitFlexDirection": "column",
           "alignSelf": "center",
           "flexDirection": "column",
-          "marginTop": "30px",
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",

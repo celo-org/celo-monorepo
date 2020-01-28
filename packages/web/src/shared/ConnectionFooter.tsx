@@ -34,12 +34,12 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
         <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('conductText')}</Text>
         <Button kind={BTN.PRIMARY} text={t('conductBtn')} />
       </BookLayout>
-      <BookLayout label={t('experienceLabel')}>
+      <BookLayout label={t('experienceLabel')} isWide={true}>
         <View style={styles.engageArea}>
           <BrandChannel isDarkMode={false} />
         </View>
       </BookLayout>
-      <BookLayout label={t('socialLabel')} isWide={true}>
+      <BookLayout label={t('socialLabel')} isWide={true} tightTop={true}>
         <View style={styles.engageArea}>
           <TwitterChannel isDarkMode={false} />
           <GitHubChannel isDarkMode={false} />
