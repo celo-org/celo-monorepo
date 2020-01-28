@@ -714,54 +714,69 @@ contract('Election', (accounts: string[]) => {
   })
 
   describe('#revokeActive', () => {
-    const voter = accounts[0]
-    const group = accounts[1]
-    const value = 1000
+    const voter0 = accounts[0]
+    const voter1 = accounts[1]
+    const group = accounts[2]
+    const voteValue0 = 1000
+    const reward0 = 111
+    const voteValue1 = 1000
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group, [accounts[9]])
         await registry.setAddressFor(CeloContractName.Validators, accounts[0])
         await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-        await mockLockedGold.setTotalLockedGold(value)
+        await mockLockedGold.setTotalLockedGold(voteValue0 + voteValue1)
         await mockValidators.setNumRegisteredValidators(1)
-        await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
-        await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
+        await mockLockedGold.incrementNonvotingAccountBalance(voter0, voteValue0)
+        await mockLockedGold.incrementNonvotingAccountBalance(voter1, voteValue1)
+        // Gives 1000 units to voter 0
+        await election.vote(group, voteValue0, NULL_ADDRESS, NULL_ADDRESS)
         await mineBlocks(EPOCH, web3)
         await election.activate(group)
+
+        // Makes those 1000 units represent 1111 votes.
+        await election.distributeEpochRewards(group, reward0, NULL_ADDRESS, NULL_ADDRESS)
+
+        // Gives 900 units to voter 1.
+        // Revoking the 1111 votes would cause getActiveVotesUnitsDelta to return 999 units rather
+        // than 1000 units.
+        await election.vote(group, voteValue1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1 })
+        await mineBlocks(EPOCH, web3)
+        await election.activate(group, { from: voter1 })
       })
 
       describe('when the revoked value is less than the active votes', () => {
         const index = 0
-        const revokedValue = value - 1
-        const remaining = value - revokedValue
+        const revokedValue = voteValue0 + reward0 - 1
+        const remaining = 1
         let resp: any
         beforeEach(async () => {
           resp = await election.revokeActive(group, revokedValue, NULL_ADDRESS, NULL_ADDRESS, index)
         })
 
         it("should decrement the account's active votes for the group", async () => {
-          assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), remaining)
+          assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter0), remaining)
         })
 
         it("should decrement the account's total votes for the group", async () => {
-          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter0), remaining)
         })
 
         it("should decrement the account's total votes", async () => {
-          assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
+          assertEqualBN(await election.getTotalVotesByAccount(voter0), remaining)
         })
 
         it('should decrement the total votes for the group', async () => {
-          assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
+          assertEqualBN(await election.getTotalVotesForGroup(group), remaining + voteValue1)
         })
 
         it('should decrement the total votes', async () => {
-          assertEqualBN(await election.getTotalVotes(), remaining)
+          assertEqualBN(await election.getTotalVotes(), remaining + voteValue1)
         })
 
         it("should increment the account's nonvoting locked gold balance", async () => {
-          assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), revokedValue)
+          assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter0), revokedValue)
         })
 
         it('should emit the ValidatorGroupVoteRevoked event', async () => {
@@ -770,7 +785,7 @@ contract('Election', (accounts: string[]) => {
           assertContainSubset(log, {
             event: 'ValidatorGroupVoteRevoked',
             args: {
-              account: voter,
+              account: voter0,
               group,
               value: new BigNumber(revokedValue),
             },
@@ -781,12 +796,38 @@ contract('Election', (accounts: string[]) => {
       describe('when the revoked value is equal to the active votes', () => {
         describe('when the correct index is provided', () => {
           const index = 0
+          const remaining = 0
+          const revokedValue = voteValue0 + reward0
           beforeEach(async () => {
-            await election.revokeActive(group, value, NULL_ADDRESS, NULL_ADDRESS, index)
+            await election.revokeActive(group, revokedValue, NULL_ADDRESS, NULL_ADDRESS, index)
+          })
+
+          it("should decrement the account's active votes for the group", async () => {
+            assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter0), remaining)
+          })
+
+          it("should decrement the account's total votes for the group", async () => {
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter0), remaining)
+          })
+
+          it("should decrement the account's total votes", async () => {
+            assertEqualBN(await election.getTotalVotesByAccount(voter0), remaining)
+          })
+
+          it('should decrement the total votes for the group', async () => {
+            assertEqualBN(await election.getTotalVotesForGroup(group), remaining + voteValue1)
+          })
+
+          it('should decrement the total votes', async () => {
+            assertEqualBN(await election.getTotalVotes(), remaining + voteValue1)
+          })
+
+          it("should increment the account's nonvoting locked gold balance", async () => {
+            assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter0), revokedValue)
           })
 
           it('should remove the group to the list of groups the account has voted for', async () => {
-            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
+            assert.deepEqual(await election.getGroupsVotedForByAccount(voter0), [])
           })
         })
 
@@ -794,7 +835,7 @@ contract('Election', (accounts: string[]) => {
           const index = 1
           it('should revert', async () => {
             await assertRevert(
-              election.revokeActive(group, value, NULL_ADDRESS, NULL_ADDRESS, index)
+              election.revokeActive(group, voteValue0 + reward0, NULL_ADDRESS, NULL_ADDRESS, index)
             )
           })
         })
@@ -804,7 +845,13 @@ contract('Election', (accounts: string[]) => {
         const index = 0
         it('should revert', async () => {
           await assertRevert(
-            election.revokeActive(group, value + 1, NULL_ADDRESS, NULL_ADDRESS, index)
+            election.revokeActive(
+              group,
+              voteValue0 + reward0 + 1,
+              NULL_ADDRESS,
+              NULL_ADDRESS,
+              index
+            )
           )
         })
       })
