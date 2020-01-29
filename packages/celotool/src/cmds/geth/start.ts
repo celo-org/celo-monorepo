@@ -8,9 +8,9 @@ import {
   privateKeyToPublicKey,
 } from '../../lib/generate_utils'
 import { getEnodeAddress, runGethNodes } from '../../lib/geth'
+import { GethInstanceConfig } from '../../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../../lib/interfaces/geth-run-config'
 import { GethArgv } from '../geth'
-import { GethInstanceConfig } from '../../lib/interfaces/geth-instance-config'
 
 export const command = 'start'
 export const describe = 'command for running geth'
