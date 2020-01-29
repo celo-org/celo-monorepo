@@ -10,22 +10,23 @@ interface Props {
   endBlock?: boolean
   startBlock?: boolean
   isWide?: boolean
+  tightTop?: boolean
 }
 
-function BookLayout({ label, children, nativeID, endBlock, startBlock, isWide }: Props) {
+function BookLayout({ label, children, nativeID, endBlock, startBlock, isWide, tightTop }: Props) {
   const margins = {
     desktop: [
-      standardStyles.blockMarginTop,
+      !tightTop && standardStyles.blockMarginTop,
       startBlock && standardStyles.sectionMarginTop,
       endBlock && standardStyles.sectionMarginBottom,
     ],
     tablet: [
-      standardStyles.blockMarginTopTablet,
+      !tightTop && standardStyles.blockMarginTopTablet,
       startBlock && standardStyles.sectionMarginTopTablet,
       endBlock && standardStyles.sectionMarginBottomTablet,
     ],
     mobile: [
-      standardStyles.blockMarginTopMobile,
+      !tightTop && standardStyles.blockMarginTopMobile,
       startBlock && standardStyles.sectionMarginTopMobile,
       endBlock && standardStyles.sectionMarginBottomMobile,
     ],
