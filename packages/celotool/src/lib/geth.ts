@@ -668,13 +668,15 @@ export const runGethNodes = async ({
     fs.mkdirSync(gethConfig.runPath, { recursive: true })
   }
 
-  console.log(gethConfig.runPath)
+  await writeGenesis(gethConfig, validators, verbose)
 
-  await writeGenesis(gethConfig, validators)
+  if (verbose) {
+    console.log('eNodes', JSON.stringify(validatorEnodes, null, 2))
 
-  console.log('eNodes', JSON.stringify(validatorEnodes, null, 2))
+    const validatorAddresses = validators.map((validator) => validator.address)
+    console.log('Validators', JSON.stringify(validatorAddresses, null, 2))
+  }
 
-  console.log(validators.map((validator) => validator.address))
   fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
 
   let validatorIndex = 0
@@ -722,7 +724,9 @@ export async function initAndStartGeth(
 ) {
   const datadir = getDatadir(gethConfig.runPath, instance)
 
-  console.info(`geth:${instance.name}: init datadir ${datadir}`)
+  if (verbose) {
+    console.info(`geth:${instance.name}: init datadir ${datadir}`)
+  }
 
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   await init(gethBinaryPath, datadir, genesisPath, verbose)
@@ -812,17 +816,18 @@ export async function getEnode(peer: string, ws: boolean = false) {
 
 export async function addStaticPeers(datadir: string, peers: string[], verbose: boolean) {
   const staticPeersPath = `${datadir}/static-nodes.json`
-  if (verbose || true) {
+  if (verbose) {
     console.log(`Writing static peers to ${staticPeersPath}`)
   }
 
   const enodes = await Promise.all(peers.map((peer) => getEnode(peer)))
   const enodesString = JSON.stringify(enodes, null, 2)
-  fs.writeFileSync(staticPeersPath, enodesString)
 
-  if (verbose || true) {
-    console.log(enodesString)
+  if (verbose) {
+    console.log('eNodes', enodesString)
   }
+
+  fs.writeFileSync(staticPeersPath, enodesString)
 }
 
 export async function addProxyPeer(
@@ -849,6 +854,8 @@ export async function startGeth(
 ) {
   if (verbose) {
     console.log('starting geth with config', JSON.stringify(instance, null, 2))
+  } else {
+    console.log(`${instance.name}: starting.`)
   }
 
   const datadir = getDatadir(gethConfig.runPath, instance)
@@ -983,7 +990,7 @@ export async function startGeth(
         `geth:${instance.name}: jsonRPC port ${rpcport} didn't open after ${secondsToWait} seconds`
       )
       process.exit(1)
-    } else {
+    } else if (verbose) {
       console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
     }
   }
@@ -995,15 +1002,20 @@ export async function startGeth(
         `geth:${instance.name}: ws port ${wsport} didn't open after ${secondsToWait} seconds`
       )
       process.exit(1)
-    } else {
+    } else if (verbose) {
       console.info(`geth:${instance.name}: ws port open ${wsport}`)
     }
   }
 
+  console.log(
+    `${instance.name}: running. RPC: ${rpcport} WS: ${wsport}`,
+    proxyport ? `PROXY: ${proxyport}` : ''
+  )
+
   return instance
 }
 
-export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[]) {
+export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[], verbose: boolean) {
   const genesis: string = generateGenesis({
     validators,
     epoch: 10,
@@ -1014,9 +1026,16 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[])
   })
 
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
-  console.log('writing genesis')
+
+  if (verbose) {
+    console.log('writing genesis')
+  }
+
   fs.writeFileSync(genesisPath, genesis)
-  console.log(`wrote   genesis to ${genesisPath}`)
+
+  if (verbose) {
+    console.log(`wrote   genesis to ${genesisPath}`)
+  }
 }
 
 export async function snapshotDatadir(
@@ -1103,7 +1122,7 @@ export async function connectValidatorPeers(gethConfig: GethRunConfig, verbose: 
     .map(({ wsport, rpcport }) => {
       const url = `${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`
       if (verbose) {
-        console.log(url)
+        console.log('Node url', url)
       }
       return new Admin(url)
     })

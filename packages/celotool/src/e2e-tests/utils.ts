@@ -203,7 +203,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 
-    await writeGenesis(gethConfig, validators)
+    await writeGenesis(gethConfig, validators, verbose)
 
     let bootnodeEnode: string = ''
 
