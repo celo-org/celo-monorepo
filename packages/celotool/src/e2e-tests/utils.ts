@@ -246,9 +246,17 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export async function addStaticPeers(datadir: string, ports: number[]) {
+export async function addStaticPeerFile(datadir: string, ports: number[]) {
   const enodes = await Promise.all(ports.map((port) => getEnode(port)))
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
+}
+
+export async function addStaticPeers(instance: GethInstanceConfig, ports: number[]) {
+  const enodes = await Promise.all(ports.map((port) => getEnode(port)))
+  const admin = new Admin(`http://localhost:${instance.rpcport}`)
+  for (const enode of enodes) {
+    admin.addPeer(enode)
+  }
 }
 
 export function sleep(seconds: number) {
@@ -285,6 +293,8 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--consoleformat=term',
     '--nat',
     'extip:127.0.0.1',
+    '--announce.gossipperiod=3600',
+    '--vmodule=consensus/istanbul/*=5',
   ]
 
   if (rpcport) {
@@ -431,13 +441,13 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
     await importPrivateKey(gethBinaryPath, instance)
   }
   if (instance.peers) {
-    await addStaticPeers(datadir, instance.peers)
+    await addStaticPeerFile(datadir, instance.peers)
   }
   return startGeth(gethBinaryPath, instance)
 }
 
 // Add validator 0 as a peer of each other validator.
-async function connectValidatorPeers(gethConfig: GethTestConfig) {
+/* async function connectValidatorPeers(gethConfig: GethTestConfig) {
   const admins = gethConfig.instances
     .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
     .map(
@@ -457,7 +467,7 @@ async function connectValidatorPeers(gethConfig: GethTestConfig) {
       )
     })
   )
-}
+} */
 
 export function getContext(gethConfig: GethTestConfig) {
   const mnemonic =
@@ -487,7 +497,7 @@ export function getContext(gethConfig: GethTestConfig) {
       }
       await initAndStartGeth(gethBinaryPath, instance)
     }
-    await connectValidatorPeers(gethConfig)
+    // await connectValidatorPeers(gethConfig)
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
         validatorPrivateKeys,
@@ -525,7 +535,7 @@ export function getContext(gethConfig: GethTestConfig) {
         return startGeth(gethBinaryPath, instance)
       })
     )
-    await connectValidatorPeers(gethConfig)
+    // await connectValidatorPeers(gethConfig)
   }
 
   const after = () => killGeth()
