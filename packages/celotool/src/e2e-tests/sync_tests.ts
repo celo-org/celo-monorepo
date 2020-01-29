@@ -7,7 +7,7 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
-const verbose = false
+const verbose = true
 const gethRepoPath = yargs.argv.localgeth as string
 
 describe('sync tests', function(this: any) {
@@ -68,7 +68,9 @@ describe('sync tests', function(this: any) {
       rpcport: 8553,
       peers: ['8545'],
     }
-    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
+
+    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
+
     const web3 = new Web3('http://localhost:8553')
     await waitToFinishSyncing(web3)
   })
