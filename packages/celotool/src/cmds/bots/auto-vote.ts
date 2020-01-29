@@ -3,14 +3,18 @@
 // network that will judge the validator groups, and vote accordingly.
 import { ContractKit, newKit } from '@celo/contractkit'
 import { Address } from '@celo/contractkit/lib/base'
-import { NULL_ADDRESS } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  eqAddress,
+  normalizeAddress,
+  NULL_ADDRESS,
+  privateKeyToAddress,
+} from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
-import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { groupBy, mapValues } from 'lodash'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
-import { ensure0x } from 'src/lib/utils'
 import { Argv } from 'yargs'
 
 export const command = 'auto-vote'
@@ -36,7 +40,7 @@ export const builder = (yargs: Argv) => {
         return addresses
           .split(',')
           .filter((a) => a.length > 0)
-          .map(ensure0x)
+          .map(normalizeAddressWith0x)
       },
     })
 }
@@ -76,7 +80,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     const unelectedGroups = Object.keys(groupCapacities).filter((k) => !groupScores.has(k))
 
     for (const key of botKeysVotingThisRound) {
-      const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
+      const botAccount = ensureLeading0x(privateKeyToAddress(key))
 
       kit.addAccount(key)
       kit.defaultAccount = botAccount
@@ -87,7 +91,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         // Note: though this returns an array, the bot process only ever chooses one group,
         // so this takes a shortcut and only looks at the first in the response
         const currentVote = (await election.getVoter(botAccount)).votes[0]
-        const currentGroup = currentVote ? currentVote.group : undefined
+        const currentGroup = currentVote ? normalizeAddressWith0x(currentVote.group) : undefined
 
         // Handle the case where the group the bot is currently voting for does not have a score
         if (
@@ -170,8 +174,9 @@ async function castVote(
     await concurrentMap(10, revokeTxs, (tx) => {
       return tx.sendAndWaitForReceipt({ from: botAccount })
     })
-    const oldCapacity = groupCapacities.get(vote.group)!
-    groupCapacities.set(vote.group, oldCapacity.plus(vote.pending.plus(vote.active)))
+    const group = normalizeAddressWith0x(vote.group)
+    const oldCapacity = groupCapacities.get(group)!
+    groupCapacities.set(group, oldCapacity.plus(vote.pending.plus(vote.active)))
   }
 
   const groupCapacity = groupCapacities.get(voteForGroup)!
@@ -183,26 +188,6 @@ async function castVote(
   groupCapacities.set(voteForGroup, groupCapacity.minus(voteAmount))
 }
 
-// NOTE: commented out because this relies on an unpublished contract kit version
-// // After saturation, explore never-elected-Validator-Groups in FIFO order.
-// // @ts-ignore: declared but its value is never read.
-// async function getNextNeverElectedValidatorGroup(kit: ContractKit): Promise<Address> {
-//   const validators = await kit.contracts.getValidators()
-//   const groups = await validators.getRegisteredValidatorGroups()
-//   // Sort Validator Groups by max(ValidatorGroup.sizeHistory), e.g. last Validator.member update timestamp.
-//   groups.sort((a, b) => a.membersUpdated - b.membersUpdated)
-//   for (const group of groups) {
-//     const groupValidators: Validator[] = await concurrentMap(10, group.members, (member) =>
-//       validators.getValidator(member)
-//     )
-//     // If no member validator has a score then this group hasn't been elected since group.membersUpdated
-//     if (0 === groupValidators.reduce((a, b) => a.plus(b.score), new BigNumber(0)).toNumber()) {
-//       return group.address
-//     }
-//   }
-//   return NULL_ADDRESS
-// }
-
 async function calculateInitialGroupCapacities(kit: ContractKit): Promise<Map<string, BigNumber>> {
   console.info('Determining which groups have capacity for more votes')
 
@@ -213,7 +198,7 @@ async function calculateInitialGroupCapacities(kit: ContractKit): Promise<Map<st
   for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
     const vgv = await election.getValidatorGroupVotes(groupAddress)
     if (vgv.eligible) {
-      groupCapacities.set(groupAddress, vgv.capacity)
+      groupCapacities.set(normalizeAddressWith0x(groupAddress), vgv.capacity)
     }
   }
 
@@ -232,7 +217,9 @@ async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNu
     })
   ).filter((v) => !!v.affiliation) // Skip unaffiliated
 
-  const validatorsByGroup = groupBy(validatorAccounts, (validator) => validator.affiliation)
+  const validatorsByGroup = groupBy(validatorAccounts, (validator) =>
+    normalizeAddressWith0x(validator.affiliation!)
+  )
 
   const validatorGroupScores = mapValues(validatorsByGroup, (vals) => {
     const scoreSum = vals.reduce((a, b) => a.plus(b.score), new BigNumber(0))
@@ -298,7 +285,7 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
 
   await concurrentMap(10, botKeys, async (key) => {
     kit.addAccount(key)
-    const account = ensure0x(getAccountAddressFromPrivateKey(key))
+    const account = ensureLeading0x(privateKeyToAddress(key))
     if (!(await election.hasActivatablePendingVotes(account))) {
       try {
         const activateTxs = await election.activate(account)
@@ -331,11 +318,16 @@ function shouldBeConsidered(
   excludedGroups: string[],
   groupCapacities: Map<string, BigNumber>
 ): boolean {
-  const capacity = groupCapacities.get(groupAddress)
+  const normalizedGroupAddress = normalizeAddressWith0x(groupAddress)
+  const capacity = groupCapacities.get(normalizedGroupAddress)
   return !!(
-    !excludedGroups.includes(groupAddress) &&
+    !excludedGroups.includes(normalizedGroupAddress) &&
     capacity &&
     capacity.isGreaterThan(0) &&
-    (!currentGroup || !currentGroup.match(groupAddress))
+    (!currentGroup || !eqAddress(currentGroup, normalizedGroupAddress))
   )
+}
+
+function normalizeAddressWith0x(address: string): string {
+  return ensureLeading0x(normalizeAddress(address))
 }
