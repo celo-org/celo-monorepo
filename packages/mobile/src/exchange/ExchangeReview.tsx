@@ -61,8 +61,8 @@ type Props = StateProps & WithTranslation & DispatchProps & NavigationInjectedPr
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
-  tobinTax: getMoneyDisplayValue(state.exchange.tobinTax || 0),
-  fee: getMoneyDisplayValue(0),
+  tobinTax: state.exchange.tobinTax || '0',
+  fee: '0',
   appConnected: isAppConnected(state),
 })
 
@@ -192,20 +192,24 @@ export class ExchangeReview extends React.Component<Props, State> {
                   <Text style={styles.exchangeBodyText}>{t('exchangeFee')}</Text>
                   <FeeIcon tintColor={colors.lightGray} isExchange={true} />
                 </View>
-                <Text style={styles.exchangeBodyText}>{tobinTax}</Text>
+                <Text style={styles.exchangeBodyText}>{getMoneyDisplayValue(tobinTax)}</Text>
               </View>
               <View style={styles.feeRowContainer}>
                 <View style={styles.feeTextWithIconContainer}>
                   <Text style={styles.exchangeBodyText}>{t('securityFee')}</Text>
                   <FeeIcon tintColor={colors.lightGray} />
                 </View>
-                <Text style={styles.exchangeBodyText}>{fee}</Text>
+                <Text style={styles.exchangeBodyText}>{getMoneyDisplayValue(fee)}</Text>
               </View>
               <HorizontalLine />
               <View style={styles.rowContainer}>
                 <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
                 <Text style={fontStyles.bodyBold}>
-                  {getMoneyDisplayValue(dollarAmount.plus(fee), CURRENCY_ENUM.DOLLAR, true)}
+                  {getMoneyDisplayValue(
+                    dollarAmount.plus(tobinTax).plus(fee),
+                    CURRENCY_ENUM.DOLLAR,
+                    true
+                  )}
                 </Text>
               </View>
             </View>
