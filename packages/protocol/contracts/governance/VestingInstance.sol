@@ -280,7 +280,7 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
   function getCurrentVestedTotalAmount() public view returns (uint256) {
-    if (block.timestamp < vestingSchedule.vestingCliffStartTime) {
+    if (block.timestamp < vestingSchedule.vestingCliffTime) {
       return 0;
     }
     uint256 totalBalance = getTotalBalance();

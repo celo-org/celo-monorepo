@@ -147,7 +147,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#initialize()', () => {
+  describe('#initialize', () => {
     it('should set the owner', async () => {
       const vestingFactoryOwner: string = await vestingFactoryInstance.owner()
       assert.equal(vestingFactoryOwner, owner)
@@ -163,7 +163,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#setRegistry()', () => {
+  describe('#setRegistry', () => {
     const anAddress: string = accounts[2]
 
     it('should set the registry when called by the owner', async () => {
@@ -176,7 +176,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#payable()', () => {
+  describe('#payable', () => {
     it('should accept gold transfer by default from anyone', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       const vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -186,10 +186,10 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#vesting - creation()', () => {
-    let vestingInstanceAddress
-    let vestingInstance
-    let newVestingInstanceTx
+  describe('#creation', () => {
+    let newVestingInstanceTx: any
+    let vestingInstanceAddress: any
+    let vestingInstance: any
 
     beforeEach(async () => {
       newVestingInstanceTx = await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
@@ -289,7 +289,7 @@ contract('Vesting', (accounts: string[]) => {
       assertEqualBN(vestingCliffStartTime, vestingCliffStartTimeComputed)
     })
 
-    it('should set revokable flag to vesting instance', async () => {
+    it('should set revocable flag to vesting instance', async () => {
       const vestingRevocable = await vestingInstance.revocable()
       assert.equal(vestingRevocable, vestingDefaultSchedule.vestingRevocable)
     })
@@ -381,8 +381,8 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#createAccount', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+    let vestingInstanceAddress: any
+    let vestingInstance: any
 
     beforeEach(async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
@@ -428,8 +428,8 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#setAccount', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+    let vestingInstanceAddress: any
+    let vestingInstance: any
     const accountName = 'name'
     const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
     const walletAddress = beneficiary
@@ -552,8 +552,8 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#setAccountName', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+    let vestingInstanceAddress: any
+    let vestingInstance: any
     const accountName = 'name'
 
     beforeEach(async () => {
@@ -608,8 +608,8 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#setAccountWalletAddress', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+    let vestingInstanceAddress: any
+    let vestingInstance: any
     const walletAddress = beneficiary
 
     beforeEach(async () => {
@@ -684,8 +684,8 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#setAccountMetadataURL', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+    let vestingInstanceAddress: any
+    let vestingInstance: any
     const metadataURL = 'meta'
 
     beforeEach(async () => {
@@ -747,9 +747,9 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#setAccountDataEncryptionKey()', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+  describe('#setAccountDataEncryptionKey', () => {
+    let vestingInstanceAddress: any
+    let vestingInstance: any
     const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
     const longDataEncryptionKey =
       '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
@@ -922,7 +922,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#pause()', () => {
+  describe('#pause', () => {
     it('revoker should be able to pause the vesting', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       const vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -959,7 +959,7 @@ contract('Vesting', (accounts: string[]) => {
       await assertRevert(vestingInstance.pause(301 * DAY, { from: revoker }))
     })
 
-    it('should revert when revoker attempts to pause a non-revokable vesting', async () => {
+    it('should revert when revoker attempts to pause a non-revocable vesting', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingRevocable = false
       await createNewVestingInstanceTx(vestingSchedule, web3)
@@ -977,7 +977,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#revoke()', () => {
+  describe('#revoke', () => {
     it('revoker should be able to revoke the vesting', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       const vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -1008,7 +1008,7 @@ contract('Vesting', (accounts: string[]) => {
       await assertRevert(vestingInstance.revoke({ from: revoker }))
     })
 
-    it('should revert if vesting is non-revokable', async () => {
+    it('should revert if vesting is non-revocable', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingRevocable = false
       await createNewVestingInstanceTx(vestingSchedule, web3)
@@ -1018,7 +1018,7 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#getInitialVestingAmount()', () => {
+  describe('#getInitialVestingAmount', () => {
     it('# should always return the initial vesting amount at the time of construction', async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
       const vestingInstanceAddress = await vestingFactoryInstance.vestings(beneficiary)
@@ -1033,9 +1033,9 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#refundAndFinalize()', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+  describe('#refundAndFinalize', () => {
+    let vestingInstanceAddress: any
+    let vestingInstance: any
 
     beforeEach(async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
@@ -1046,17 +1046,17 @@ contract('Vesting', (accounts: string[]) => {
       await timeTravel(timeToTravel, web3)
     })
 
-    it('# should only be callable by revoker and when revoked', async () => {
+    it('should only be callable by revoker and when revoked', async () => {
       await vestingInstance.revoke({ from: revoker })
       await vestingInstance.refundAndFinalize({ from: revoker })
     })
 
-    it('# should revert when revoked but called by a non-revoker', async () => {
+    it('should revert when revoked but called by a non-revoker', async () => {
       await vestingInstance.revoke({ from: revoker })
       await assertRevert(vestingInstance.refundAndFinalize({ from: accounts[5] }))
     })
 
-    it('# should revert when non-revoked but called by a revoker', async () => {
+    it('should revert when non-revoked but called by a revoker', async () => {
       await assertRevert(vestingInstance.refundAndFinalize({ from: revoker }))
     })
 
@@ -1065,7 +1065,7 @@ contract('Vesting', (accounts: string[]) => {
         await vestingInstance.revoke({ from: revoker })
       })
 
-      it('# should revert when any of the gold is still locked', async () => {
+      it('should revert when any of the gold is still locked', async () => {
         await vestingInstance.createAccount({ from: revoker })
         await vestingInstance.lockGold(await vestingInstance.getRemainingUnlockedBalance(), {
           from: revoker,
@@ -1073,7 +1073,7 @@ contract('Vesting', (accounts: string[]) => {
         await assertRevert(vestingInstance.refundAndFinalize({ from: revoker }))
       })
 
-      it('# should transfer gold proportions to both beneficiary and revoker when no gold locked', async () => {
+      it('should transfer gold proportions to both beneficiary and revoker when no gold locked', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const revokerBalanceBefore = await goldTokenInstance.balanceOf(revoker)
         const vestedBalanceAtRevoke = await vestingInstance.vestedBalanceAtRevoke()
@@ -1102,7 +1102,7 @@ contract('Vesting', (accounts: string[]) => {
         assertEqualBN(contractBalanceAfterFinalize, 0)
       })
 
-      it('# should destruct vesting instance after finalizing and prevent calling further actions', async () => {
+      it('should destruct vesting instance after finalizing and prevent calling further actions', async () => {
         await vestingInstance.refundAndFinalize({ from: revoker })
         try {
           await vestingInstance.getRemainingUnlockedBalance()
@@ -1115,10 +1115,10 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#lockGold()', () => {
-    let vestingInstanceAddress = null
-    let vestingInstance = null
+  describe('#lockGold', () => {
     let lockAmount = null
+    let vestingInstanceAddress: any
+    let vestingInstance: any
 
     beforeEach(async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
@@ -1170,10 +1170,10 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#unlockGold()', () => {
-    let vestingInstanceAddress
-    let vestingInstance
-    let lockAmount
+  describe('#unlockGold', () => {
+    let lockAmount: any
+    let vestingInstanceAddress: any
+    let vestingInstance: any
 
     beforeEach(async () => {
       await createNewVestingInstanceTx(vestingDefaultSchedule, web3)
@@ -1251,9 +1251,9 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#withdrawLockedGold()', () => {
-    let vestingInstanceAddress
-    let vestingInstance
+  describe('#withdrawLockedGold', () => {
+    let vestingInstanceAddress: any
+    let vestingInstance: any
     const value = 1000
     const index = 0
 
@@ -1303,11 +1303,11 @@ contract('Vesting', (accounts: string[]) => {
     })
   })
 
-  describe('#relockGold()', () => {
+  describe('#relockGold', () => {
+    let vestingInstanceAddress: any
+    let vestingInstance: any
     const pendingWithdrawalValue = 1000
     const index = 0
-    let vestingInstanceAddress
-    let vestingInstance
 
     beforeEach(async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1411,9 +1411,9 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#withdraw', () => {
-    let vestingInstanceAddress
-    let vestingInstance
-    let initialVestingAmount
+    let initialVestingAmount: any
+    let vestingInstanceAddress: any
+    let vestingInstance: any
 
     beforeEach(async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
@@ -1448,7 +1448,7 @@ contract('Vesting', (accounts: string[]) => {
       await assertRevert(vestingInstance.withdraw(new BigNumber(0), { from: beneficiary }))
     })
 
-    describe('#when not revoked', () => {
+    describe('when not revoked', () => {
       it('should revert since beneficiary should not be able to withdraw anything within the first quarter', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 2.9 * MONTH
@@ -1539,7 +1539,7 @@ contract('Vesting', (accounts: string[]) => {
       })
     })
 
-    describe('#when revoked', () => {
+    describe('when revoked', () => {
       it('should allow the beneficiary to withdraw up to the vestedBalanceAtRevoke', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 6 * MONTH + 1 * DAY
@@ -1593,9 +1593,9 @@ contract('Vesting', (accounts: string[]) => {
   })
 
   describe('#getCurrentVestedTotalAmount', () => {
-    let vestingInstanceAddress
-    let vestingInstance
-    let initialVestingAmount
+    let vestingInstanceAddress: any
+    let vestingInstance: any
+    let initialVestingAmount: any
 
     beforeEach(async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
