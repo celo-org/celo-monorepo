@@ -252,10 +252,8 @@ android {
     packagingOptions {
         exclude 'META-INF/-no-jdk.kotlin_module'
         exclude 'META-INF/androidx.exifinterface_exifinterface.version'
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst '**/libjsc.so'
+        pickFirst '**/libc++_shared.so'
     }
 
     

@@ -1,8 +1,9 @@
-import { memo } from 'react'
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
+import DrawCoin from 'src/icons/DrawCoin'
 import LinkedIn from 'src/icons/LinkedIn'
 import Octocat from 'src/icons/Octocat'
 import { TweetLogo as TwitterLogo } from 'src/icons/TwitterLogo'
@@ -24,7 +25,7 @@ interface ExternalChannelProps {
   alignCenter?: boolean
 }
 
-export const Channel = memo(function _Channel(props: ChannelProps & ExternalChannelProps) {
+export const Channel = React.memo(function _Channel(props: ChannelProps & ExternalChannelProps) {
   const openExternalLinkInNewTab = props.link.includes('//') ? '_blank' : undefined
   return (
     <Fade bottom={true} distance="20px" delay={200}>
@@ -103,7 +104,7 @@ export function TwitterChannel({ alignCenter, isDarkMode }: ExternalChannelProps
   )
 }
 
-export const GitHubChannel = memo(function _GitHubChannel({
+export const GitHubChannel = React.memo(function _GitHubChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {
@@ -119,7 +120,23 @@ export const GitHubChannel = memo(function _GitHubChannel({
   )
 })
 
-export const DiscordChannel = memo(function _DiscordChannel({
+export const BrandChannel = React.memo(function _BrandChannel({
+  alignCenter,
+  isDarkMode,
+}: ExternalChannelProps) {
+  return (
+    <Channel
+      isDarkMode={isDarkMode}
+      alignCenter={alignCenter}
+      title={'Brand'}
+      link={menuItems.BRAND.link}
+      icon={<DrawCoin size={45} />}
+      text={'Build On Celo'}
+    />
+  )
+})
+
+export const DiscordChannel = React.memo(function _DiscordChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {
@@ -135,7 +152,7 @@ export const DiscordChannel = memo(function _DiscordChannel({
   )
 })
 
-export const LinkedInChannel = memo(function _LinkedInChannel({
+export const LinkedInChannel = React.memo(function _LinkedInChannel({
   isDarkMode,
   alignCenter,
 }: ExternalChannelProps) {
@@ -151,7 +168,7 @@ export const LinkedInChannel = memo(function _LinkedInChannel({
   )
 })
 
-export const ForumChannel = memo(function _ForumChannel({
+export const ForumChannel = React.memo(function _ForumChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {
@@ -167,7 +184,7 @@ export const ForumChannel = memo(function _ForumChannel({
   )
 })
 
-export const EventsChannel = memo(function _EventsChannel({
+export const EventsChannel = React.memo(function _EventsChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {

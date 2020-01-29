@@ -1,4 +1,13 @@
 {
+  "downtimeSlasher": {
+    "slashableDowntime": 60
+  },
+  "epochRewards": {
+    "frozen": false
+  },
+  "exchange": {
+    "frozen": false
+  },
   "stableToken": {
     "initialBalances": {
       "addresses": [

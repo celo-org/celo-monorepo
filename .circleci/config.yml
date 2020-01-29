@@ -41,6 +41,7 @@ e2e-defaults: &e2e-defaults
 general:
   artifacts:
     - "mobile/coverage"
+    - "web/coverage"
     - "protocol/coverage"
 
 jobs:
@@ -289,6 +290,22 @@ jobs:
             mkdir -p test-results/jest
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: packages/web/coverage
+          destination: web/coverage
+
+      - run:
+          name: copy
+          command: |
+            mkdir -p packages/web/web/coverage
+            cp -r packages/web/coverage packages/web/web/
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F web
+
   mobile-test-build-app:
     <<: *android-defaults
     resource_class: large
@@ -530,6 +547,26 @@ jobs:
             cd packages/celotool
             ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
+  end-to-end-geth-slashing-test:
+    <<: *e2e-defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            cd packages/celotool
+            ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
@@ -696,6 +733,10 @@ workflows:
             - lint-checks
             - contractkit-test
       - end-to-end-geth-blockchain-parameters-test:
+          requires:
+            - lint-checks
+            - contractkit-test
+      - end-to-end-geth-slashing-test:
           requires:
             - lint-checks
             - contractkit-test

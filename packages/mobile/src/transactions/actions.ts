@@ -1,10 +1,11 @@
+import { TokenTransactionType } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
-import { StandbyTransaction, TransactionTypes } from 'src/transactions/reducer'
+import { StandbyTransaction } from 'src/transactions/reducer'
 import { web3 } from 'src/web3/contracts'
 
 export enum Actions {
@@ -85,31 +86,31 @@ export const navigateToPaymentTransferReview = (
 ) => {
   let headerText = ''
   switch (type) {
-    case TransactionTypes.SENT:
+    case TokenTransactionType.Sent:
       headerText = i18n.t('sendFlow7:sentPayment')
       break
-    case TransactionTypes.ESCROW_SENT:
+    case TokenTransactionType.EscrowSent:
       headerText = i18n.t('sendFlow7:sentEscrowPayment')
       break
-    case TransactionTypes.RECEIVED:
+    case TokenTransactionType.Received:
       headerText = i18n.t('receiveFlow8:receivedPayment')
       break
-    case TransactionTypes.ESCROW_RECEIVED:
+    case TokenTransactionType.EscrowReceived:
       headerText = i18n.t('receiveFlow8:receivedEscrowPayment')
       break
-    case TransactionTypes.VERIFICATION_FEE:
+    case TokenTransactionType.VerificationFee:
       headerText = i18n.t('walletFlow5:verificationFee')
       break
-    case TransactionTypes.FAUCET:
+    case TokenTransactionType.Faucet:
       headerText = i18n.t('receiveFlow8:receivedDollars')
       break
-    case TransactionTypes.INVITE_SENT:
+    case TokenTransactionType.InviteSent:
       headerText = i18n.t('inviteFlow11:inviteComplete')
       break
-    case TransactionTypes.INVITE_RECEIVED:
+    case TokenTransactionType.InviteReceived:
       headerText = i18n.t('inviteFlow11:inviteReceived')
       break
-    case TransactionTypes.NETWORK_FEE:
+    case TokenTransactionType.NetworkFee:
       headerText = i18n.t('walletFlow5:networkFee')
       break
   }
@@ -130,7 +131,7 @@ export const navigateToExchangeReview = (
 ) => {
   navigate(Screens.TransactionReview, {
     reviewProps: {
-      type: TransactionTypes.EXCHANGE,
+      type: TokenTransactionType.Exchange,
       timestamp,
       header: i18n.t('exchangeFlow9:exchange'),
     },

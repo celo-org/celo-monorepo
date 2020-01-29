@@ -9,7 +9,7 @@ import { randomIntegerInRange } from 'src/utils/utils'
 import Svg from 'svgs'
 
 const COLORS = [colors.greenScreen, colors.blueScreen, colors.redScreen, colors.purpleScreen]
-
+const STILL_COLORS = [colors.lightBlue, colors.redScreen, colors.purple, colors.greenScreen]
 const DURATION_MS = 1700
 const PAUSE = 200 // milliseconds between coins fading in and out
 
@@ -50,14 +50,11 @@ export default class FullCircle extends React.PureComponent<Props, State> {
     color: colors.greenScreen,
   }
 
-  componentWillMount = () => {
-    if (this.props.init) {
-      this.props.init()
-    }
-  }
-
   componentDidMount = () => {
     if (!this.props.stillMode) {
+      if (this.props.init) {
+        this.props.init()
+      }
       this.clock = setTimeout(() => this.setPlaying(), WAIT_TO_PLAY_MS)
     } else {
       this.setStill()
@@ -92,7 +89,9 @@ export default class FullCircle extends React.PureComponent<Props, State> {
 
   render() {
     let colorIndex = -1
-    const colorArray = shuffleSeed.shuffle(COLORS, this.state.lastPlayingIndex)
+    const colorArray = this.props.stillMode
+      ? STILL_COLORS
+      : shuffleSeed.shuffle(COLORS, this.state.lastPlayingIndex)
     return (
       <Svg width="100%" height="100%" viewBox="0 0 717 750" fill="none">
         {VECTORS.map((path, index) => {
@@ -230,15 +229,20 @@ interface RingStyle {
 function ringStyle({ color, playing, duration, lightBackground, stillMode }: RingStyle) {
   const styleArray: ViewStyle[] = [
     styles.normal,
-    lightBackground ? baseCoinStyleLight : baseCoinStyle,
+    stillMode
+      ? { stroke: '#CFCFCF', mixBlendMode: 'multiply' }
+      : lightBackground
+      ? baseCoinStyleLight
+      : baseCoinStyle,
   ]
 
   if (stillMode && playing) {
     styleArray.push({
-      opacity: 0.95,
+      opacity: 0.9,
       fill: color,
       // @ts-ignore
       stroke: color,
+      mixBlendMode: 'multiply',
     })
   } else if (playing) {
     styleArray.push(styles.animatedBase, {

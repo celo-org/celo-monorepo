@@ -13,6 +13,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { TokenTransactionType } from 'src/apollo/types'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
@@ -30,7 +31,6 @@ import { sendPaymentOrInvite } from 'src/send/actions'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 export interface ConfirmationInput {
@@ -38,7 +38,7 @@ export interface ConfirmationInput {
   amount: BigNumber
   reason: string
   recipientAddress?: string | null
-  type: TransactionTypes
+  type: TokenTransactionType
 }
 
 interface StateProps {
@@ -138,9 +138,9 @@ class SendConfirmation extends React.Component<Props, State> {
     const { type } = this.getConfirmationInput()
     let title
 
-    if (type === TransactionTypes.PAY_REQUEST) {
+    if (type === TokenTransactionType.PayRequest) {
       title = t('payRequest')
-    } else if (type === TransactionTypes.INVITE_SENT) {
+    } else if (type === TokenTransactionType.InviteSent) {
       title = t('inviteVerifyPayment')
     } else {
       title = t('reviewPayment')
@@ -188,7 +188,7 @@ class SendConfirmation extends React.Component<Props, State> {
 
     let primaryBtnInfo
     let secondaryBtnInfo
-    if (type === TransactionTypes.PAY_REQUEST) {
+    if (type === TokenTransactionType.PayRequest) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('global:pay'),

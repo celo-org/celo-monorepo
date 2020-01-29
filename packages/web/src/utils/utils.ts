@@ -22,12 +22,16 @@ interface Speeds {
 }
 
 export async function getNetworkDownloadSpeed() {
-  const testNetworkSpeed = new NetworkSpeed()
-  const fileSize = 5000000
-  const baseUrl = `http://eu.httpbin.org/stream-bytes/${fileSize}`
+  try {
+    const testNetworkSpeed = new NetworkSpeed()
+    const byteSize = 2000
+    const baseUrl = `https://eu.httpbin.org/stream-byteSize/${byteSize}`
 
-  const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, fileSize)
-  return speed
+    const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, byteSize)
+    return speed
+  } catch (e) {
+    return { mbps: '0', kbps: '0', bps: '0' }
+  }
 }
 
 const MIN_MB_FOR_FAST = 5
@@ -71,14 +75,15 @@ async function multiPartCheck() {
     getNetworkDownloadSpeed(),
     getNetworkDownloadSpeed(),
   ])
-  const averageSped =
+
+  const averageSpeed =
     multiPart
       .map((speeds) => speeds.mbps)
       .reduce((previous, current) => {
         return Number(previous) + Number(current)
       }, 0) / 3
 
-  return isFast(averageSped)
+  return isFast(averageSpeed)
 }
 
 const MAX_TIME_MS = 1000
@@ -96,4 +101,8 @@ type MemoryGB = 0.25 | 0.5 | 1 | 2 | 4 | 8
 export function getDeviceMemory(): MemoryGB {
   // only available on chrome / android browser assume 4 if we dont know
   return (navigator.deviceMemory as MemoryGB) || 4
+}
+
+export function isBrowser() {
+  return process.browser
 }
