@@ -1118,14 +1118,11 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
 }
 
 // Add validator 0 as a peer of each other validator.
-export async function connectValidatorPeers(gethConfig: GethRunConfig, verbose: boolean) {
+export async function connectValidatorPeers(gethConfig: GethRunConfig) {
   const admins = gethConfig.instances
     .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
     .map(({ wsport, rpcport }) => {
       const url = `${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`
-      if (verbose) {
-        console.log('Node url', url)
-      }
       return new Admin(url)
     })
 

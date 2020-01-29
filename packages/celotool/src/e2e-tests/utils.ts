@@ -262,7 +262,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
     }
 
-    await connectValidatorPeers(gethConfig, true)
+    await connectValidatorPeers(gethConfig)
 
     // Give validators time to connect to each other
     await sleep(60, true)
@@ -317,7 +317,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         return startGeth(gethConfig, gethBinaryPath, instance, verbose)
       })
     )
-    await connectValidatorPeers(gethConfig, true)
+    await connectValidatorPeers(gethConfig)
   }
 
   const after = () => killGeth()
