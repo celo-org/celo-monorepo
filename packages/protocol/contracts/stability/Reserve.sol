@@ -67,25 +67,21 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
-   * @param _initialSpendableGold Amount of reserve balance initially spendable (for rebalancing).
-   * @param _daysUntilRemainingGoldUnfrozen Number of days until the reserve balance is unfrozen.
+   * @param _frozenGold The balance of reserve gold that is frozen.
+   * @param _frozenDays The number of days during which the frozen gold thaws.
    */
   function initialize(
     address registryAddress,
     uint256 _tobinTaxStalenessThreshold,
     uint256 _spendingRatio,
-    uint256 _initialSpendableGold,
-    uint256 _daysUntilRemainingGoldUnfrozen
+    uint256 _frozenGold,
+    uint256 _frozenDays
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
-    setFrozenReserveGold(
-      address(this).balance,
-      _initialSpendableGold,
-      _daysUntilRemainingGoldUnfrozen
-    );
+    setFrozenGold(_frozenGold, _frozenDays);
   }
 
   /**
@@ -117,19 +113,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Set the unfrozen reserve gold rate and the initial conditions on transferGold().
-   * @param initialGold Amount of cGLD allocated to the reserve at launch.
-   * @param initialSpendableGold Amount of cGLD transferable by reserve spenders at launch.
-   * @param daysUntilUnfrozen The remaining cGLD becomes unfrozen linearly over daysUntilUnfrozen.
+   * @notice Sets the balance of reserve gold frozen from transfer.
+   * @param frozenGold The amount of cGLD frozen.
+   * @param frozenDays The number of days the frozen cGLD thaws over.
    */
-  function setFrozenReserveGold(
-    uint256 initialGold,
-    uint256 initialSpendableGold,
-    uint256 daysUntilUnfrozen
-  ) public onlyOwner {
-    frozenReserveGoldStartBalance = (initialGold - initialSpendableGold);
+  function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
+    require(frozenGold <= address(this).balance);
+    frozenReserveGoldStartBalance = frozenGold;
     frozenReserveGoldStartDay = now / 1 days;
-    frozenReserveGoldDays = daysUntilUnfrozen;
+    frozenReserveGoldDays = frozenDays;
   }
 
   /**

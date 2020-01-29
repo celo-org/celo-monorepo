@@ -19,8 +19,8 @@ const initializeArgs = async (): Promise<[string, number, string, number, number
     registry.address,
     config.reserve.tobinTaxStalenessThreshold,
     config.reserve.dailySpendingRatio,
-    config.reserve.initialSpendableGold,
-    config.reserve.daysUntilRemainingGoldUnfrozen,
+    config.reserve.frozenGold,
+    config.reserve.frozenDays,
   ]
 }
 
