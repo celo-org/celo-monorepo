@@ -13,7 +13,7 @@ describe('Blockchain parameters tests', function(this: any) {
   let parameters: BlockchainParametersWrapper
 
   const gethConfig: GethTestConfig = {
-    migrateTo: 18,
+    migrateTo: 19,
     instances: [
       { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
     ],
