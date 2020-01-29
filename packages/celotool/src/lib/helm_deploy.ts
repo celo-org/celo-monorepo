@@ -67,7 +67,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 
   try {
     await execCmd(
-      `gcloud sql instances create ${instanceName} --gce-zone ${fetchEnv(
+      `gcloud sql instances create ${instanceName} --zone ${fetchEnv(
         envVar.KUBERNETES_CLUSTER_ZONE
       )} --database-version POSTGRES_9_6 --cpu 1 --memory 4G`
     )
@@ -79,7 +79,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   if (envType !== EnvTypes.DEVELOPMENT) {
     try {
       await execCmdWithExitOnFailure(
-        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --gce-zone ${fetchEnv(
+        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --zone ${fetchEnv(
           envVar.KUBERNETES_CLUSTER_ZONE
         )}`
       )
