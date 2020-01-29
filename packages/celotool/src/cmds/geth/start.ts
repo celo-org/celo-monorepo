@@ -21,7 +21,7 @@ interface StartArgv extends GethArgv {
   wsport: number
   verbosity: number
   verbose: boolean
-  amount: number
+  instances: number
   purge: boolean
   withProxy: boolean
   ethstats: string
@@ -116,7 +116,7 @@ export const handler = async (argv: StartArgv) => {
   const mining = argv.mining
   const minerGasPrice = argv.minerGasPrice
   const network = 'local'
-  const numNodes = argv.amount
+  const instances = argv.instances
 
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
@@ -141,7 +141,7 @@ export const handler = async (argv: StartArgv) => {
     },
   }
 
-  for (let x = 0; x < numNodes; x++) {
+  for (let x = 0; x < instances; x++) {
     gethConfig.instances.push({
       gethRunConfig: gethConfig,
       name: `${x}-node`,
@@ -168,8 +168,8 @@ export const handler = async (argv: StartArgv) => {
     }
   }
 
-  const validators = getValidatorsInformation(mnemonic, numNodes)
-  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numNodes)
+  const validators = getValidatorsInformation(mnemonic, instances)
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, instances)
 
   await runGethNodes({
     gethConfig,
