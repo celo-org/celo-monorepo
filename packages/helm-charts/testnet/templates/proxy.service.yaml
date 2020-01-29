@@ -1,5 +1,7 @@
 {{ range $validatorIndex, $proxyCount := .Values.geth.proxiesPerValidator }}
 
+{{ $proxyIpAddresses := (splitList "/" (index $.Values.geth.proxy_ip_addresses_per_validator_array $validatorIndex)) }}
+
 {{ range $index, $e := until ($proxyCount | int) }}
 
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "ClusterIP" "svc_name" (print "validators-" $validatorIndex "-proxy-internal") "node_name" (print "validators-" $validatorIndex "-proxy") "name_suffix" "" "component_label" "proxy" "load_balancer_ip" "" ) }}
@@ -20,7 +22,7 @@
 {{ end }}
 ---
 {{ if $.Values.geth.static_ips }}
-{{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
+{{ $loadBalancerIP := index $proxyIpAddresses $index }}
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" (print "validators-" $validatorIndex "-proxy") "component_label" "proxy" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
   - name: discovery

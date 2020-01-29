@@ -366,8 +366,8 @@ PROXY_INTERNAL_IP=`eval "echo \\${${PROXY_INTERNAL_IP_ENV_VAR}}"`
 # so we use the IP address that was allocated for this validator that is
 # being used by the proxy found in /root/.celo/externalIpAddress
 if [ -s /root/.celo/externalIpAddress ]; then
-  echo "Proxy external IP from /root/.celo/externalIpAddress: "
-  PROXY_EXTERNAL_IP=`cat /root/.celo/externalIpAddress`
+  echo "Proxy external IP from PROXY_IPS=$PROXY_IPS: "
+  PROXY_EXTERNAL_IP=`echo -n $PROXY_IPS | cut -d '/' -f $((PROXY_INDEX + 1))`
 else
   # otherwise use the internal proxy service IP address
   PROXY_EXTERNAL_IP=$PROXY_INTERNAL_IP

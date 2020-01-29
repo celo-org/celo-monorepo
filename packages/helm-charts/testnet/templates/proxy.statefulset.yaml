@@ -1,6 +1,8 @@
 {{ range $index, $proxyCount := .Values.geth.proxiesPerValidator }}
 
-{{ include "celo.full-node-statefulset" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "name" (print "validators-" $index "-proxy") "component_label" "proxy" "replicas" $proxyCount "proxy" true "service_ip_env_var_prefix" (printf "%s%s%d%s" ($.Release.Namespace | upper) "_VALIDATORS_" $index "_PROXY_INTERNAL_") "mnemonic_account_type" "proxy" "validator_index" $index "geth_flags" "--proxy.proxy --proxy.internalendpoint :30503" "ip_addresses" $.Values.geth.validator_ip_addresses ) }}
+{{ $proxyIpAddresses := (index $.Values.geth.proxy_ip_addresses_per_validator_array $index) }}
+
+{{ include "celo.full-node-statefulset" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "name" (print "validators-" $index "-proxy") "component_label" "proxy" "replicas" $proxyCount "proxy" true "service_ip_env_var_prefix" (printf "%s%s%d%s" ($.Release.Namespace | upper) "_VALIDATORS_" $index "_PROXY_INTERNAL_") "mnemonic_account_type" "proxy" "validator_index" $index "geth_flags" "--proxy.proxy --proxy.internalendpoint :30503" "ip_addresses" $proxyIpAddresses ) }}
 
 ---
 
