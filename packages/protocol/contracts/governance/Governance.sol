@@ -1056,6 +1056,7 @@ contract Governance is
     uint256 proposalId,
     uint256 index
   ) private view returns (bool) {
+    require(index < dequeued.length, "Provided index greater than dequeue length.");
     return proposal.exists() && dequeued[index] == proposalId;
   }
 
@@ -1083,6 +1084,7 @@ contract Governance is
    * @param proposal The proposal struct.
    * @param proposalId The ID of the proposal to delete.
    * @param index The index of the proposal ID in `dequeued`.
+   * @dev Must always be preceded by `isDequeuedProposal`, which checks `index`.
    */
   function deleteDequeuedProposal(
     Proposals.Proposal storage proposal,
