@@ -2639,10 +2639,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@0.0.247":
-  version "0.0.247"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.247.tgz#7e9119bb7b3c5c4b1d12ba5f8aa6b1fd20fb38f2"
-  integrity sha512-dGaARMtqc8ZYMEz/x79rP8ewJTDD88NxbthqYNCPkoYNSlgCLMd6SEVHI6IipYK2+wAMskILLW4De0v3Ia0Lzw==
+"@celo/client@0.0.266":
+  version "0.0.266"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.266.tgz#0b37b3d1d1981cad6c9a235b33d9331810c718d1"
+  integrity sha512-fKjtPXeVnsf+1+5Tt+H2HeUPjNiv2L4Cgd3UH/e1oqlV1Oy/Pnp/9A0blHBqkUXRCF7RD/MRxyQyyI88FN1fEw==
 
 "@celo/contractkit@0.1.5":
   version "0.1.5"
@@ -17416,7 +17416,7 @@ gitbook-plugin-lunr@^1.2.0:
     html-entities "1.2.0"
     lunr "0.5.12"
 
-gitbook-plugin-page-ref@^0.0.6:
+gitbook-plugin-page-ref@0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/gitbook-plugin-page-ref/-/gitbook-plugin-page-ref-0.0.6.tgz#58e8d7bd056efe22e17e063bc01c4bc07594cc26"
   integrity sha512-PSJl+IwSbjbtMxS/nrZY9uCxYsLPbzGtm4SdXhDTL4PI49VsFGPRWQPu39UwsLpQUCbc/Q/BbItlMRZTKFHuIw==
@@ -19145,17 +19145,17 @@ i18next-xhr-backend@^3.0.0:
   dependencies:
     "@babel/runtime" "^7.5.5"
 
-i18next@^18.0.1:
-  version "18.0.1"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-18.0.1.tgz#10841209f6983df4d8e367204da403d8cbc609cf"
-  integrity sha512-KWd9qMFXw0qjxF7cTAqQselPCYoHfaLvBs8c6JcNzaQKVxbAlE/wv9EZXPy+JlKUcXCT0qgjcmxrJjmbnEp60A==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
-
 i18next@^19.0.2:
   version "19.0.2"
   resolved "https://registry.yarnpkg.com/i18next/-/i18next-19.0.2.tgz#d72502ef031403572703f2e9f013cae005265444"
   integrity sha512-fBa43Ann2udP1CQAz3IQpOZ1dGAkmi3mMfzisOhH17igneSRbvZ7P2RNbL+L1iRYKMufBmVwnC7G3gqcyviZ9g==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+
+i18next@^19.0.3:
+  version "19.1.0"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-19.1.0.tgz#fe1a1da3d208872946307c7d2d115da45d46159f"
+  integrity sha512-ISbmukX4L6Dz0QoH9+EW1AnBw7j+NRLoMu9uLPMaNSSTP9Eie9/oUL0dOyWX15baB3gYOpkHJpGZRHOqcnl0ew==
   dependencies:
     "@babel/runtime" "^7.3.1"
 
@@ -24172,15 +24172,15 @@ nexmo@2.4.2:
     request "^2.88.0"
     uuid "^2.0.2"
 
-next-i18next@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/next-i18next/-/next-i18next-2.1.1.tgz#fb669b57b42efe95242af98a892be85096e2371a"
-  integrity sha512-Mbeb73SK9ozNBQIp8Fp/Fb51Xw7Tx/1m4rNHFnkTEupztrMCHBdKsG0t7L4k4VWwchW+a2sJ284nxSxtFSHOaw==
+next-i18next@^4.0.1:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/next-i18next/-/next-i18next-4.1.0.tgz#dcb5afba1254551b5ced34ef2e40b38203babdb6"
+  integrity sha512-i02CxQdLzUg1ny3FNFZ0QXoBu8Yn5SkNt1lctcUYUQNWw/xBGfN+WhuDAM8Vcifhb5bAcJeo3nX7ELMG2PyhBw==
   dependencies:
     core-js "^2"
     detect-node "^2.0.4"
     hoist-non-react-statics "^3.2.0"
-    i18next "^18.0.1"
+    i18next "^19.0.3"
     i18next-browser-languagedetector "^4.0.0"
     i18next-express-middleware "^1.5.0"
     i18next-node-fs-backend "^2.1.0"

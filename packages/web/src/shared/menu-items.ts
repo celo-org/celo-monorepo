@@ -78,6 +78,7 @@ export enum CeloLinks {
   tutorial = 'https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client',
   buildWalletDocs = 'https://docs.celo.org/celo-codebase/wallet/intro',
   stakeOffTerms = '/stake-off/terms',
+  youtube = 'https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw',
 }
 
 export const languageOptions = {
