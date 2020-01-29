@@ -350,7 +350,7 @@ export const generateGenesis = ({
     'packages/protocol/build/contracts/Proxy.json'
   )
 
-  if (validators) {
+  if (validators && validators.length > 0) {
     for (const contract of contracts) {
       genesis.alloc[contract] = {
         code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
