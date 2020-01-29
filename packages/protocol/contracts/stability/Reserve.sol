@@ -42,7 +42,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 public spendingLimit;
   FixidityLib.Fraction private spendingRatio;
 
-  uint256 public frozenReserveGoldStartValue;
+  uint256 public frozenReserveGoldStartBalance;
   uint256 public frozenReserveGoldStartDay;
   uint256 public frozenReserveGoldDays;
 
@@ -81,7 +81,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
-    setFrozenReserveGoldParameters(
+    setFrozenReserveGold(
       address(this).balance,
       _initialSpendableGold,
       _daysUntilRemainingGoldUnfrozen
@@ -122,14 +122,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param initialSpendableGold Amount of cGLD transferable by reserve spenders at launch.
    * @param daysUntilUnfrozen The remaining cGLD becomes unfrozen linearly over daysUntilUnfrozen.
    */
-  function setFrozenReserveGoldParameters(
+  function setFrozenReserveGold(
     uint256 initialGold,
     uint256 initialSpendableGold,
     uint256 daysUntilUnfrozen
   ) public onlyOwner {
-    frozenReserveGoldStartValue = (initialGold - initialSpendableGold);
-    frozenReserveGoldDays = daysUntilUnfrozen;
+    frozenReserveGoldStartBalance = (initialGold - initialSpendableGold);
     frozenReserveGoldStartDay = now / 1 days;
+    frozenReserveGoldDays = daysUntilUnfrozen;
   }
 
   /**
@@ -259,7 +259,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
-    require(value <= getUnfrozenReserveGoldAvailable(), "Exceeding unfrozen reserves");
+    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
       uint256 balance = getReserveGoldBalance();
@@ -301,12 +301,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return assetAllocationWeights;
   }
 
-  function getReserveGoldAvailable() public view returns (uint256) {
-    return address(this).balance;
+  function getUnfrozenBalance() public view returns (uint256) {
+    uint256 balance = address(this).balance;
+    uint256 frozenReserveGold = getFrozenReserveGoldBalance();
+    return balance > frozenReserveGold ? balance - frozenReserveGold : 0;
   }
 
   function getReserveGoldBalance() public view returns (uint256) {
-    uint256 reserveGoldBalance = getReserveGoldAvailable();
+    uint256 reserveGoldBalance = address(this).balance;
     for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
       reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
@@ -314,21 +316,21 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function getUnfrozenReserveGoldBalance() public view returns (uint256) {
-    uint256 availableBalance = getReserveGoldAvailable();
-    return getReserveGoldBalance() - availableBalance + getUnfrozenReserveGoldAvailable();
+    uint256 reserveGoldBalance = getUnfrozenBalance();
+    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+      reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
+    }
+    return reserveGoldBalance;
   }
 
-  function getUnfrozenReserveGoldAvailable() public view returns (uint256) {
+  function getFrozenReserveGoldBalance() public view returns (uint256) {
     uint256 currentDay = now / 1 days;
-    uint256 reserveDaysOld = currentDay - frozenReserveGoldStartDay;
-    uint256 availableBalance = getReserveGoldAvailable();
-    if (reserveDaysOld >= frozenReserveGoldDays) return availableBalance;
-
-    uint256 frozenReserveGold = frozenReserveGoldStartValue -
-      (reserveDaysOld * frozenReserveGoldStartValue) /
+    uint256 frozenDays = currentDay - frozenReserveGoldStartDay;
+    if (frozenDays >= frozenReserveGoldDays) return 0;
+    return
+      frozenReserveGoldStartBalance -
+      (frozenReserveGoldStartBalance * frozenDays) /
       frozenReserveGoldDays;
-
-    return availableBalance > frozenReserveGold ? availableBalance - frozenReserveGold : 0;
   }
 
   /*
