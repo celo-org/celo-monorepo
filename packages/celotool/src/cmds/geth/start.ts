@@ -36,7 +36,7 @@ export const builder = (argv: yargs.Argv) => {
     })
     .option('sync-mode', {
       choices: ['full', 'fast', 'light', 'ultralight'],
-      demandOption: true,
+      default: 'full',
     })
     .option('mining', {
       type: 'boolean',
