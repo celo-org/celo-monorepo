@@ -6,7 +6,7 @@ import {
   assertLogMatches2,
   assertRevert,
   matchAny,
-  mineBlocks,
+  mineToNextEpoch,
   NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
@@ -70,18 +70,6 @@ interface Transaction {
   value: number
   destination: string
   data: Buffer
-}
-
-// hard coded in ganache
-const EPOCH = 100
-
-async function mineToNextEpoch(web3) {
-  const bn = web3.eth.getBlockNumber()
-  if (bn % EPOCH < 50) {
-    await mineBlocks(EPOCH + 20, web3)
-  } else {
-    await mineBlocks(EPOCH - 20, web3)
-  }
 }
 
 // TODO(asa): Test dequeueProposalsIfReady
