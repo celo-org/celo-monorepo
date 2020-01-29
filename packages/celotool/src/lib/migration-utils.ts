@@ -1,12 +1,15 @@
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
   generatePrivateKey,
   getAddressesFor,
+  getFaucetedAccounts,
   getPrivateKeysFor,
   privateKeyToAddress,
 } from './generate_utils'
 import { ensure0x } from './utils'
+
+const DEFAULT_FAUCET_CUSD_WEI = '60000000000000000000000' /* 60k Celo Dollars */
 
 export function minerForEnv() {
   return privateKeyToAddress(
@@ -32,22 +35,32 @@ function getAttestationKeys() {
 
 export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const faucetAccounts = getAddressesFor(AccountType.FAUCET, mnemonic, 2)
-  const attestationBotAccount = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 1)
+  const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
+  const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 10)
+  const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
+
+  const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
+
   return {
-    validators: {
-      validatorKeys: validatorKeys(),
-      attestationKeys: getAttestationKeys(),
+    election: {
+      minElectableValidators: '1',
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
     },
     stableToken: {
       initialBalances: {
-        addresses: [...faucetAccounts, ...attestationBotAccount],
-        values: [
-          ...faucetAccounts.map(() => '60000000000000000000000' /* 60k Celo Dollars */),
-          ...attestationBotAccount.map(() => '10000000000000000000000' /* 10k Celo Dollars */),
-        ],
+        addresses: initialAddresses,
+        values: initialAddresses.map(() => initialBalance),
       },
       oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
+    },
+    validators: {
+      validatorKeys: validatorKeys(),
+      attestationKeys: getAttestationKeys(),
     },
   }
 }

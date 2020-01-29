@@ -14,9 +14,9 @@ import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
-const LayersIllo = dynamic((import('src/dev/LayersIllo') as unknown) as Promise<
-  React.ComponentType<LayerIlloProps>
->)
+const LayersIllo = dynamic(
+  (import('src/dev/LayersIllo') as unknown) as Promise<React.ComponentType<LayerIlloProps>>
+)
 
 enum Levels {
   apps,
@@ -256,7 +256,6 @@ const styles = StyleSheet.create({
   container: { overflow: 'hidden', flexWrap: 'wrap' },
   tabletContainer: { justifyContent: 'flex-end' },
   sticky: {
-    // @ts-ignore
     position: 'fixed',
     top: HEADER_HEIGHT,
     zIndex: 10,
@@ -276,4 +275,5 @@ const styles = StyleSheet.create({
     transitionProperty: 'opacity',
     transitionDuration: '100ms',
   },
+  base: {},
 })

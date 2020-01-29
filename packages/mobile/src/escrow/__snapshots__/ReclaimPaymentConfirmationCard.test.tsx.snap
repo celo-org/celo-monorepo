@@ -192,7 +192,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         "alignItems": "stretch",
         "justifyContent": "center",
         "marginBottom": 10,
-        "marginTop": 10,
       }
     }
   >
@@ -310,6 +309,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             style={
               Object {
                 "height": 12,
+                "tintColor": "#42D689",
                 "width": 12,
               }
             }

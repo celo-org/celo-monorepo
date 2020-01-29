@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
@@ -6,6 +7,7 @@ import BookLayout from 'src/layout/BookLayout'
 import { GridRow } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import {
+  BrandChannel,
   DiscordChannel,
   EventsChannel,
   ForumChannel,
@@ -32,7 +34,12 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
         <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('conductText')}</Text>
         <Button kind={BTN.PRIMARY} text={t('conductBtn')} />
       </BookLayout>
-      <BookLayout label={t('socialLabel')} isWide={true}>
+      <BookLayout label={t('experienceLabel')} isWide={true}>
+        <View style={styles.engageArea}>
+          <BrandChannel isDarkMode={false} />
+        </View>
+      </BookLayout>
+      <BookLayout label={t('socialLabel')} isWide={true} tightTop={true}>
         <View style={styles.engageArea}>
           <TwitterChannel isDarkMode={false} />
           <GitHubChannel isDarkMode={false} />
@@ -41,7 +48,11 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
           <EventsChannel isDarkMode={false} />
         </View>
         <View>
-          <Image source={{ uri: require('src/dev/devNews.png') }} style={styles.emailLogo} />
+          <Image
+            resizeMode="contain"
+            source={{ uri: require('src/dev/devNews.png') }}
+            style={styles.emailLogo}
+          />
           <View style={styles.form}>
             <H3 style={styles.formTitle}>{t('stayConnected')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>

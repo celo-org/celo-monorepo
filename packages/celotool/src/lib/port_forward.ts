@@ -10,29 +10,22 @@ function sleep(ms: number) {
 export const defaultPortsString = '8545:8545 8546:8546 9200:9200'
 
 const PORT_CONTROL_CMD = 'nc -z 127.0.0.1 8545'
-
-function getDefaultComponent() {
-  if (fetchEnv(envVar.VALIDATORS) === 'og') {
-    return 'gethminer1'
-  } else {
-    return 'validators'
-  }
-}
+const DEFAULT_COMPONENT = 'validators'
 
 async function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
   if (isVmBased()) {
-    return Promise.resolve(getVmPortForwardCmd(celoEnv, ports))
+    return Promise.resolve(getVmPortForwardCmd(celoEnv, component, ports))
   } else {
     return getKubernetesPortForwardCmd(celoEnv, component, ports)
   }
 }
 
-function getVmPortForwardCmd(celoEnv: string, ports = defaultPortsString) {
+function getVmPortForwardCmd(celoEnv: string, machine = 'validator-0', ports = defaultPortsString) {
   const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   // this command expects port mappings to be of the form `[localPort]:localhost:[remotePort]`
   const portMappings = ports.replace(/:/g, ':localhost:').split(' ')
   const portsWithFlags = portMappings.map((mapping) => `-L ${mapping}`).join(' ')
-  return `gcloud compute ssh --zone ${zone} ${celoEnv}-validator-0 -- -N ${portsWithFlags}`
+  return `gcloud compute ssh --zone ${zone} ${celoEnv}-${machine} -- -N ${portsWithFlags}`
 }
 
 async function getKubernetesPortForwardCmd(
@@ -41,7 +34,7 @@ async function getKubernetesPortForwardCmd(
   ports = defaultPortsString
 ) {
   if (!component) {
-    component = getDefaultComponent()
+    component = DEFAULT_COMPONENT
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   const portForwardArgs = await getPortForwardArgs(celoEnv, component, ports)
@@ -50,7 +43,7 @@ async function getKubernetesPortForwardCmd(
 
 async function getPortForwardArgs(celoEnv: string, component?: string, ports = defaultPortsString) {
   if (!component) {
-    component = getDefaultComponent()
+    component = DEFAULT_COMPONENT
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   const podName = await execCmd(

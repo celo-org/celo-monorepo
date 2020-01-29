@@ -1,7 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -9,7 +9,7 @@ import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import BackupIcon from 'src/icons/BackupIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -26,7 +26,7 @@ interface DispatchProps {
   setPincode: typeof setPincode
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -151,5 +151,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxNamePin1)(PincodeEducation))
+  )(withTranslation(Namespaces.nuxNamePin1)(PincodeEducation))
 )

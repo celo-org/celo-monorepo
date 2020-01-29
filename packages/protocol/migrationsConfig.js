@@ -1,6 +1,7 @@
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')
+const lodash = require('lodash')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
@@ -13,13 +14,22 @@ const DefaultConfig = {
     selectIssuersWaitBlocks: 4,
   },
   blockchainParameters: {
-    gasForNonGoldCurrencies: 166000,
+    gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
       major: 1,
       minor: 8,
       patch: 23,
     },
     blockGasLimit: 20000000,
+  },
+  doubleSigningSlasher: {
+    reward: '20000000000000000000', // 20 cGLD
+    penalty: '100000000000000000000', // 100 cGLD
+  },
+  downtimeSlasher: {
+    reward: '10000000000000000000', // 10 cGLD
+    penalty: '20000000000000000000', // 20 cGLD
+    slashableDowntime: 480,
   },
   election: {
     minElectableValidators: '22',
@@ -42,15 +52,17 @@ const DefaultConfig = {
     },
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
+    frozen: false,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * 60, // 5 minutes
     minimumReports: 1,
+    frozen: false,
   },
   gasPriceMinimum: {
-    initialMinimum: 10000,
+    minimumFloor: 1000000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
   },
@@ -68,7 +80,7 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   lockedGold: {
-    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
+    unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days divided by 24 to accelerate for Stake off
   },
   oracles: {
     reportExpiry: 10 * 60, // 10 minutes
@@ -82,6 +94,7 @@ const DefaultConfig = {
   reserve: {
     goldBalance: 100000000,
     tobinTaxStalenessThreshold: 60 * 60, // 1 hour
+    dailySpendingRatio: '1000000000000000000000000', // 100%
   },
   stableToken: {
     decimals: 18,
@@ -99,11 +112,11 @@ const DefaultConfig = {
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold per validator
-      duration: 60 * 24 * 60 * 60, // 60 days
+      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
     },
     validatorLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold
-      duration: 60 * 24 * 60 * 60, // 60 days
+      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
     },
     validatorScoreParameters: {
       exponent: 10,
@@ -111,6 +124,8 @@ const DefaultConfig = {
     },
     membershipHistoryLength: 60,
     maxGroupSize: '5',
+    // 30 Days divided by 24 to accelerate for Stake off
+    slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24,
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
@@ -149,18 +164,17 @@ const linkedLibraries = {
 }
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['migration_override', 'build_directory'],
   default: {
     build_directory: path.join(__dirname, 'build'),
   },
+  string: ['migration_override', 'build_directory'],
 })
 
-const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-const config = {}
+const config = DefaultConfig
 
-for (const key of Object.keys(DefaultConfig)) {
-  config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
-}
+const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
+// use lodash merge to deeply override defaults
+lodash.merge(config, migrationOverride)
 
 module.exports = {
   build_directory: argv.build_directory,

@@ -189,6 +189,10 @@ export const v4Schema = {
     acceptedAttestationCodes: [],
     verificationStatus: 0,
     hasSeenVerificationNux: false,
+    contactMappingProgress: {
+      current: 0,
+      total: 0,
+    },
   },
   account: {
     name: 'John Doe',
@@ -209,13 +213,35 @@ export const v4Schema = {
     backupCompleted: false,
     socialBackupCompleted: false,
     backupDelayedTime: 0,
+    dismissedGetVerified: false,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     pincodeType: PincodeType.Unset,
     isSettingPin: false,
   },
+  exchange: {
+    exchangeRatePair: null,
+    history: {
+      isLoading: false,
+      celoGoldExchangeRates: [],
+      lastTimeUpdated: 0,
+    },
+    tobinTax: '0',
+  },
+}
+
+export const v5Schema = {
+  ...v4Schema,
+  localCurrency: {
+    ...v4Schema.localCurrency,
+    exchangeRate: '1.33',
+  },
+  geth: {
+    ...v4Schema.geth,
+    promptZeroSyncIfNeeded: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v4Schema as Partial<RootState>
+  return v5Schema as Partial<RootState>
 }

@@ -4,6 +4,7 @@ import {
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { notEmpty } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Logger, { createLogger, stdSerializers } from 'bunyan'
 import { createStream } from 'bunyan-gke-stackdriver'
@@ -14,7 +15,6 @@ import {
   fetchLatestMessagesFromToday,
   findValidCode,
   getPhoneNumber,
-  printAndIgnoreRequestErrors,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
 } from 'src/lib/attestation'
@@ -34,6 +34,8 @@ interface AutoVerifyArgv extends BotsArgv {
   inBetweenWaitSeconds: number
   attestationMax: number
   celoProvider: string
+  index: number
+  timeToPollForTextMessages: number
 }
 
 export const builder = (yargs: Argv) => {
@@ -45,7 +47,7 @@ export const builder = (yargs: Argv) => {
     })
     .option('inBetweenWaitSeconds', {
       type: 'number',
-      description: 'Betweeen each attsetation how long to wait',
+      description: 'Between each attestation how long to wait',
       required: true,
     })
     .option('attestationMax', {
@@ -57,6 +59,16 @@ export const builder = (yargs: Argv) => {
       type: 'string',
       description: 'The node to use',
       default: 'http://localhost:8545',
+    })
+    .option('timeToPollForTextMessages', {
+      type: 'number',
+      description: 'How long to poll for text messages in minutes',
+      default: 3,
+    })
+    .option('index', {
+      type: 'number',
+      description: 'The index of the account to use',
+      default: 0,
     })
 }
 
@@ -70,7 +82,9 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     const kit = newKit(argv.celoProvider)
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     // This really should be the ATTESTATION_BOT key, but somehow we can't get it to have cUSD
-    const clientKey = ensure0x(generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0))
+    const clientKey = ensure0x(
+      generatePrivateKey(mnemonic, AccountType.ATTESTATION_BOT, argv.index)
+    )
     const clientAddress = privateKeyToAddress(clientKey)
     logger = logger.child({ address: clientAddress })
     kit.addAccount(clientKey)
@@ -94,6 +108,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       fetchEnv(envVar.TWILIO_ADDRESS_SID),
       argv.attestationMax
     )
+
+    const nonCompliantIssuersAlreadyLogged: string[] = []
 
     logger = logger.child({ phoneNumber })
     logger.info('Initialized phone number')
@@ -120,7 +136,19 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress
       )
 
+      const nonCompliantIssuers = await attestations.getNonCompliantIssuers(
+        phoneNumber,
+        clientAddress
+      )
+      nonCompliantIssuers
+        .filter((_) => !nonCompliantIssuersAlreadyLogged.includes(_))
+        .forEach((issuer) => {
+          logger.info({ issuer }, 'Did not run the attestation service')
+          nonCompliantIssuersAlreadyLogged.push(issuer)
+        })
+
       logger.info({ attestationsToComplete }, 'Reveal to issuers')
+
       const possibleErrors = await requestAttestationsFromIssuers(
         attestationsToComplete,
         attestations,
@@ -132,7 +160,14 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         { possibleErrors: possibleErrors.filter((_) => _ && _.known).length },
         'Reveal errors'
       )
-      printAndIgnoreRequestErrors(possibleErrors)
+
+      possibleErrors.filter(notEmpty).forEach((error) => {
+        if (error.known) {
+          logger.info({ ...error }, 'Error while requesting from attestation service')
+        } else {
+          logger.info({ ...error }, 'Unknown error while revealing to issuer')
+        }
+      })
 
       await pollForMessagesAndCompleteAttestations(
         attestations,
@@ -141,7 +176,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         clientAddress,
         attestationsToComplete,
         txParams,
-        logger
+        logger,
+        argv.timeToPollForTextMessages
       )
 
       const sleepTime = Math.random() * argv.inBetweenWaitSeconds
@@ -162,8 +198,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
   }
 }
 
-const TIME_TO_WAIT_FOR_ATTESTATIONS_IN_MINUTES = 10
-const POLLING_WAIT = 3000
+const POLLING_WAIT = 300
 
 async function pollForMessagesAndCompleteAttestations(
   attestations: AttestationsWrapper,
@@ -172,13 +207,13 @@ async function pollForMessagesAndCompleteAttestations(
   account: Address,
   attestationsToComplete: ActionableAttestation[],
   txParams: CeloTransactionParams = {},
-  logger: Logger
+  logger: Logger,
+  timeToPollForTextMessages: number
 ) {
   const startDate = moment()
   logger.info({ pollingWait: POLLING_WAIT }, 'Poll for the attestation code')
   while (
-    moment.duration(moment().diff(startDate)).asMinutes() <
-      TIME_TO_WAIT_FOR_ATTESTATIONS_IN_MINUTES &&
+    moment.duration(moment().diff(startDate)).asMinutes() < timeToPollForTextMessages &&
     attestationsToComplete.length > 0
   ) {
     const messages = await fetchLatestMessagesFromToday(client, phoneNumber, 100)

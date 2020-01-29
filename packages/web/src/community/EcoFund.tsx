@@ -54,7 +54,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ecoFund.description')}</Text>
           <View style={[standardStyles.row, standardStyles.elementalMargin, standardStyles.wrap]}>
             <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
+              <Text style={[fonts.h6, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
               <Image
                 resizeMode="contain"
                 accessibilityLabel="Polychain"
@@ -63,7 +63,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               />
             </View>
             <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
+              <Text style={[fonts.h6, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
               <View style={[standardStyles.row, styles.limitedPartners]}>
                 <Rings color={colors.dark} height={40} />
                 <Image
@@ -114,6 +114,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               <FormContainer
                 key={Tables.Applicants}
                 route={`/ecosystem/${Tables.Applicants}`}
+                // @ts-ignore
                 blankForm={blankApplicationForm}
                 validateWith={invalidApplicationFields}
               >
@@ -156,6 +157,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               <FormContainer
                 key={Tables.Recommendations}
                 route={`/ecosystem/${Tables.Recommendations}`}
+                // @ts-ignore
                 blankForm={blankRecForm}
                 validateWith={invalidRecFields}
               >

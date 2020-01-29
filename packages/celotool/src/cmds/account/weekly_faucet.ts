@@ -32,7 +32,7 @@ export const handler = async (argv: WeeklyFaucetArgv) => {
     const [output] = await execCmd(
       `yarn --cwd ../protocol run weekly-faucet -n ${argv.celoEnv} -f ${
         argv.file
-      } -b ${getBlockchainApiUrl(argv)}`
+      } -b ${getBlockchainApiUrl(argv.celoEnv)}`
     )
     console.log(output)
   }

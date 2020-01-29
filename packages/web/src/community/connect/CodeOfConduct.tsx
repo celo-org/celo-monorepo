@@ -1,8 +1,7 @@
 import * as React from 'react'
 import LazyLoad from 'react-lazyload'
-import Fade from 'react-reveal/Fade'
-
 import { StyleSheet, View } from 'react-native'
+import Fade from 'react-reveal/Fade'
 import { H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -10,7 +9,6 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { G, Path } from 'src/shared/svg'
-
 import { colors, standardStyles, textStyles } from 'src/styles'
 import Svg from 'svgs'
 
@@ -127,7 +125,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   animationBase: {
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'ease-in-out',
     animationFillMode: 'both',
   },

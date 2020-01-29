@@ -1,4 +1,3 @@
-import { I18nProps } from 'next-i18next'
 import * as React from 'react'
 import {
   Image,
@@ -10,7 +9,7 @@ import {
 } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
-import { NameSpaces, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
@@ -144,7 +143,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
     <View style={styles.paragraphArea}>
       <H3 style={standardStyles.elementalMarginBottom}>{props.noun}</H3>
       <H4 style={standardStyles.elementalMarginBottom}>{props.verb}</H4>
-      <Text style={fonts.h5}>{props.network}</Text>
+      <Text style={fonts.h6}>{props.network}</Text>
       <Fade fraction={0.5} bottom={true} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
           <Image style={styles.graphic} source={props.image} resizeMode="contain" />
@@ -199,7 +198,7 @@ const Aside = React.memo(function _Aside({
         </Fade>
       </View>
       <View style={[styles.asideContent, isMobile && styles.asideContentMobile]}>
-        <Text style={fonts.h5}>{title}</Text>
+        <Text style={fonts.h6}>{title}</Text>
         <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{text}</Text>
         <Button kind={BTN.NAKED} text={btnText} href={href} size={SIZE.small} />
       </View>

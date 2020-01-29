@@ -1,5 +1,5 @@
-import { stripHexLeader } from '@celo/utils/src/address'
-import { extractAttestationCodeFromMessage } from '@celo/walletkit'
+import { hexToBuffer } from '@celo/utils/src/address'
+import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import * as React from 'react'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
@@ -54,7 +54,7 @@ function getRecodedAttestationValue(attestationCode: AttestationCode) {
     if (!attestationCode.code || attestationCode.code === ATTESTATION_CODE_PLACEHOLDER) {
       return ''
     }
-    return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
+    return hexToBuffer(attestationCode.code).toString('base64')
   } catch (error) {
     Logger.warn('VerificationCodeRow', 'Could not recode verification code to base64')
     return ''

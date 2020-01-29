@@ -647,7 +647,7 @@ exports[`Account renders correctly 1`] = `
                   }
                 }
               >
-                celoLite
+                dataSaver
               </Text>
             </View>
             <View
@@ -1755,7 +1755,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   }
                 }
               >
-                celoLite
+                dataSaver
               </Text>
             </View>
             <View
@@ -2127,7 +2127,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             }
           >
             <Text>
-              Revoke Number Verification
+              Toggle verification done
             </Text>
           </View>
         </View>

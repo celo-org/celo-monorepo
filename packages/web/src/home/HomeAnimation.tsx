@@ -1,15 +1,24 @@
 import * as React from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { createElement } from 'react-native-web'
+import HomeOracle from 'src/home/HomeOracle'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Responsive from 'src/shared/Responsive'
-import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { standardStyles } from 'src/styles'
+
 const Video = React.forwardRef((props, ref) => createElement('video', { ...props, ref }))
 const Source = (props) => createElement('source', props)
-
-interface Props {
+export interface Props {
+  mode: Mode
   onLoaded: () => void
   onFinished: () => void
+  onError: () => void
+}
+export enum Mode {
+  'wait',
+  'transition',
+  'video',
+  'graphic',
 }
 
 class HomeAnimation extends React.Component<Props & ScreenProps> {
@@ -17,12 +26,16 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   started = false
 
   videoLoaded = () => {
-    if (this.video) {
-      if (!this.started) {
-        this.props.onLoaded()
-        this.video.play()
+    try {
+      if (this.video) {
+        if (!this.started) {
+          this.props.onLoaded()
+          this.video.play()
+        }
+        this.started = true
       }
-      this.started = true
+    } catch {
+      this.props.onError()
     }
   }
 
@@ -55,13 +68,30 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   }
 
   render() {
+    const { mode } = this.props
+    if (mode === Mode.graphic || mode === Mode.wait || mode === Mode.transition) {
+      return (
+        <Responsive
+          large={[
+            styles.still,
+            standardStyles.centered,
+            mode === Mode.transition && styles.fadeOut,
+          ]}
+        >
+          <View style={[styles.stillMobile, mode === Mode.transition && styles.fadeOut]}>
+            <HomeOracle />
+          </View>
+        </Responsive>
+      )
+    }
+
     return (
       <Responsive large={styles.video}>
         {/*
         // @ts-ignore */}
         <Video
           ref={this.videoRef}
-          style={styles.videoMedium}
+          style={styles.videoSmall}
           preload={'auto'}
           muted={true}
           playsInline={true}
@@ -75,16 +105,39 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
 
 export default withScreenSize(HomeAnimation)
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
+  fadeOut: {
+    animationFillMode: 'both',
+    animationDelay: '2700ms',
+    animationDuration: '300ms',
+    animationKeyframes: [
+      {
+        from: {
+          opacity: 1,
+        },
+        to: {
+          opacity: 0.1,
+        },
+      },
+    ],
+  },
+  still: {
+    height: '70vh',
+    justifyContent: 'center',
+  },
+  stillMobile: {
+    height: '100%',
+    paddingTop: 50,
+    justifyContent: 'center',
+  },
   video: {
-    height: '80vh',
+    height: '75vh',
     width: '100vw',
     objectFit: 'contain',
   },
-  videoMedium: {
+  videoSmall: {
     width: '100vw',
     objectFit: 'contain',
-    marginBottom: 400,
-    marginTop: HEADER_HEIGHT,
+    marginTop: 50,
   },
 })

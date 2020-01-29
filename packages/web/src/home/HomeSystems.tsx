@@ -2,6 +2,7 @@ import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import analytics from 'src/analytics/analytics'
 import { H2 } from 'src/fonts/Fonts'
 import Cyclone from 'src/home/Cyclone'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -12,7 +13,6 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import analytics from '../analytics/analytics'
 const builtOn = require('src/home/version3/builtOn.png')
 const groupVerify = require('src/home/version3/groupVerify.png')
 const mobileFirst = require('src/home/version3/mobileFirst.png')
@@ -20,14 +20,14 @@ const mobileFirst = require('src/home/version3/mobileFirst.png')
 type Props = I18nProps & ScreenProps
 
 const trackPaper = (name) => {
-  analytics.track(`${name} opened`)
+  return analytics.track(`${name} opened`)
 }
 
-const onWhitePaperPress = () => {
-  trackPaper('white_paper')
+const onWhitePaperPress = async () => {
+  await trackPaper('white_paper')
 }
-const onStabilityPress = () => {
-  trackPaper('stability')
+const onStabilityPress = async () => {
+  await trackPaper('stability')
 }
 
 class HomeSystems extends React.PureComponent<Props> {
@@ -170,7 +170,7 @@ class HomeSystems extends React.PureComponent<Props> {
                         t={t}
                         screen={screen}
                         onPress={onWhitePaperPress}
-                        href="https://storage.googleapis.com/celo_whitepapers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf"
+                        href="/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf"
                       />
                     </View>
                   </Responsive>
@@ -208,7 +208,7 @@ class HomeSystems extends React.PureComponent<Props> {
                         t={t}
                         screen={screen}
                         onPress={onStabilityPress}
-                        href="https://storage.googleapis.com/celo_whitepapers/Celo_Stability_Analysis.pdf"
+                        href="/papers/Celo_Stability_Analysis.pdf"
                       />
                     </View>
                   </Responsive>
