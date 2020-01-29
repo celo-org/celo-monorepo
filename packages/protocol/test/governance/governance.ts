@@ -789,6 +789,7 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(proposal.deposit, minDeposit)
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 0)
+        assert.equal(proposal.descriptionUrl, descriptionUrl)
       })
 
       it('should emit the ProposalQueued event', async () => {
@@ -828,6 +829,7 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(proposal.deposit, minDeposit)
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 1)
+        assert.equal(proposal.descriptionUrl, descriptionUrl)
       })
 
       it('should register the proposal transactions', async () => {
