@@ -1008,7 +1008,9 @@ export async function startGeth(
   }
 
   console.log(
-    `${instance.name}: running. RPC: ${rpcport} WS: ${wsport}`,
+    `${instance.name}: running.`,
+    rpcport ? `RPC: ${rpcport}` : '',
+    wsport ? `WS: ${wsport}` : '',
     proxyport ? `PROXY: ${proxyport}` : ''
   )
 
