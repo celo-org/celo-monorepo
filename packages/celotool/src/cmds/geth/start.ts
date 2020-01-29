@@ -143,7 +143,6 @@ export const handler = async (argv: StartArgv) => {
 
   for (let x = 0; x < instances; x++) {
     gethConfig.instances.push({
-      gethRunConfig: gethConfig,
       name: `${x}-node`,
       validating: mining,
       validatingGasPrice: minerGasPrice,
@@ -156,7 +155,6 @@ export const handler = async (argv: StartArgv) => {
 
     if (withProxy) {
       gethConfig.instances.push({
-        gethRunConfig: gethConfig,
         name: `${x}-proxy`,
         validating: false,
         isProxy: true,

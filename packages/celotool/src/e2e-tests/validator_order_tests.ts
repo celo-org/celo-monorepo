@@ -27,7 +27,6 @@ describe('governance tests', () => {
   }
 
   gethConfig.instances = _.range(VALIDATORS).map((i) => ({
-    gethRunConfig: gethConfig,
     name: `validator${i}`,
     validating: true,
     syncmode: 'full',

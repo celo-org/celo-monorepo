@@ -18,51 +18,44 @@ describe('attestations tests', () => {
     networkId: 1101,
     network: 'local',
     migrate: true,
-    instances: [],
+    instances: [
+      {
+        name: 'validator0',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
+      {
+        name: 'validator1',
+        validating: true,
+        syncmode: 'full',
+        port: 30305,
+        rpcport: 8547,
+      },
+      {
+        name: 'validator2',
+        validating: true,
+        syncmode: 'full',
+        port: 30307,
+        rpcport: 8549,
+      },
+      {
+        name: 'validator3',
+        validating: true,
+        syncmode: 'full',
+        port: 30309,
+        rpcport: 8551,
+      },
+      {
+        name: 'validator4',
+        validating: true,
+        syncmode: 'full',
+        port: 30311,
+        rpcport: 8553,
+      },
+    ],
   }
-
-  gethConfig.instances = [
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator0',
-      validating: true,
-      syncmode: 'full',
-      port: 30303,
-      rpcport: 8545,
-    },
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator1',
-      validating: true,
-      syncmode: 'full',
-      port: 30305,
-      rpcport: 8547,
-    },
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator2',
-      validating: true,
-      syncmode: 'full',
-      port: 30307,
-      rpcport: 8549,
-    },
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator3',
-      validating: true,
-      syncmode: 'full',
-      port: 30309,
-      rpcport: 8551,
-    },
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator4',
-      validating: true,
-      syncmode: 'full',
-      port: 30311,
-      rpcport: 8553,
-    },
-  ]
 
   const context: any = getContext(gethConfig)
   let contractKit: ContractKit

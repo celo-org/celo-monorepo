@@ -16,6 +16,7 @@ import { getHooks, killInstance, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const gethRepoPath = yargs.argv.localgeth as string
+const verbose = false
 
 /**
  * Helper Class to change StableToken Inflation in tests
@@ -89,11 +90,16 @@ const stableTokenTransferGasCost = 20325
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
   update(): Promise<void>
+
   delta(address: string, token: CeloToken): BigNumber
+
   current(address: string, token: CeloToken): BigNumber
+
   initial(address: string, token: CeloToken): BigNumber
+
   debugPrint(address: string, token: CeloToken): void
 }
+
 async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<BalanceWatcher> {
   const stableToken = await kit.contracts.getStableToken()
   const goldToken = await kit.contracts.getGoldToken()
@@ -171,19 +177,16 @@ describe('Transfer tests', function(this: any) {
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
-    instances: [],
+    instances: [
+      {
+        name: 'validator',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
+    ],
   }
-
-  gethConfig.instances = [
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator',
-      validating: true,
-      syncmode: 'full',
-      port: 30303,
-      rpcport: 8545,
-    },
-  ]
 
   const hooks = getHooks(gethConfig)
   after(hooks.after)
@@ -214,7 +217,7 @@ describe('Transfer tests', function(this: any) {
       etherbase: FeeRecipientAddress,
       peers: ['8545'],
     }
-    await initAndStartGeth(hooks.gethBinaryPath, fullInstance, true)
+    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -237,9 +240,9 @@ describe('Transfer tests', function(this: any) {
     }
     // Spin up the node to run transfers as.
     currentGethInstance = await initAndStartGeth(
+      gethConfig,
       hooks.gethBinaryPath,
       {
-        gethRunConfig: gethConfig,
         name: syncmode,
         validating: false,
         syncmode,

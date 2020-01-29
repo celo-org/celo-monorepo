@@ -27,19 +27,16 @@ describe('Blockchain parameters tests', function(this: any) {
     keepData: false,
     networkId: 1101,
     network: 'local',
-    instances: [],
+    instances: [
+      {
+        name: 'validator',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
+    ],
   }
-
-  gethConfig.instances = [
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator',
-      validating: true,
-      syncmode: 'full',
-      port: 30303,
-      rpcport: 8545,
-    },
-  ]
 
   const hooks = getHooks(gethConfig)
   before(hooks.before)

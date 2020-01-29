@@ -48,43 +48,37 @@ describe('slashing tests', function(this: any) {
     networkId: 1101,
     runPath: TMP_PATH,
     migrate: true,
-    instances: [],
+    instances: [
+      {
+        name: 'validator0',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
+      {
+        name: 'validator1',
+        validating: true,
+        syncmode: 'full',
+        port: 30305,
+        rpcport: 8547,
+      },
+      {
+        name: 'validator2',
+        validating: true,
+        syncmode: 'full',
+        port: 30307,
+        rpcport: 8549,
+      },
+      {
+        name: 'validator3',
+        validating: true,
+        syncmode: 'full',
+        port: 30309,
+        rpcport: 8551,
+      },
+    ],
   }
-
-  gethConfigDown.instances = [
-    {
-      gethRunConfig: gethConfigDown,
-      name: 'validator0',
-      validating: true,
-      syncmode: 'full',
-      port: 30303,
-      rpcport: 8545,
-    },
-    {
-      gethRunConfig: gethConfigDown,
-      name: 'validator1',
-      validating: true,
-      syncmode: 'full',
-      port: 30305,
-      rpcport: 8547,
-    },
-    {
-      gethRunConfig: gethConfigDown,
-      name: 'validator2',
-      validating: true,
-      syncmode: 'full',
-      port: 30307,
-      rpcport: 8549,
-    },
-    {
-      gethRunConfig: gethConfigDown,
-      name: 'validator3',
-      validating: true,
-      syncmode: 'full',
-      port: 30309,
-      rpcport: 8551,
-    },
-  ]
 
   const gethConfig: GethRunConfig = {
     gethRepoPath: '../../../celo-blockchain',
@@ -92,20 +86,17 @@ describe('slashing tests', function(this: any) {
     networkId: 1101,
     runPath: TMP_PATH,
     migrate: true,
-    instances: [],
+    instances: gethConfigDown.instances.concat([
+      // Validator 4 will be down in the downtime test
+      {
+        name: 'validator4',
+        validating: true,
+        syncmode: 'full',
+        port: 30311,
+        rpcport: 8553,
+      },
+    ]),
   }
-
-  gethConfig.instances = gethConfigDown.instances.concat([
-    // Validator 4 will be down in the downtime test
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator4',
-      validating: true,
-      syncmode: 'full',
-      port: 30311,
-      rpcport: 8553,
-    },
-  ])
 
   const context: any = getContext(gethConfig)
   const contextDown: any = getContext(gethConfigDown)

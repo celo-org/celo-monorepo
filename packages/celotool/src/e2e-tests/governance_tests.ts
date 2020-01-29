@@ -120,53 +120,46 @@ describe('governance tests', () => {
     verbosity: 0,
     networkId: 1101,
     network: 'local',
-    instances: [],
+    instances: [
+      // Validators 0 and 1 are swapped in and out of the group.
+      {
+        name: 'validator0',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
+      {
+        name: 'validator1',
+        validating: true,
+        syncmode: 'full',
+        port: 30305,
+        rpcport: 8547,
+      },
+      // Validator 2 will authorize a validating key every other epoch.
+      {
+        name: 'validator2',
+        validating: true,
+        syncmode: 'full',
+        port: 30307,
+        rpcport: 8549,
+      },
+      {
+        name: 'validator3',
+        validating: true,
+        syncmode: 'full',
+        port: 30309,
+        rpcport: 8551,
+      },
+      {
+        name: 'validator4',
+        validating: true,
+        syncmode: 'full',
+        port: 30311,
+        rpcport: 8553,
+      },
+    ],
   }
-
-  gethConfig.instances = [
-    // Validators 0 and 1 are swapped in and out of the group.
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator0',
-      validating: true,
-      syncmode: 'full',
-      port: 30303,
-      rpcport: 8545,
-    },
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator1',
-      validating: true,
-      syncmode: 'full',
-      port: 30305,
-      rpcport: 8547,
-    },
-    // Validator 2 will authorize a validating key every other epoch.
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator2',
-      validating: true,
-      syncmode: 'full',
-      port: 30307,
-      rpcport: 8549,
-    },
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator3',
-      validating: true,
-      syncmode: 'full',
-      port: 30309,
-      rpcport: 8551,
-    },
-    {
-      gethRunConfig: gethConfig,
-      name: 'validator4',
-      validating: true,
-      syncmode: 'full',
-      port: 30311,
-      rpcport: 8553,
-    },
-  ]
 
   const context: any = getContext(gethConfig)
 
@@ -350,7 +343,6 @@ describe('governance tests', () => {
 
       const additionalNodes: GethInstanceConfig[] = [
         {
-          gethRunConfig: gethConfig,
           name: 'validatorGroup',
           validating: false,
           syncmode: 'full',
@@ -364,7 +356,7 @@ describe('governance tests', () => {
 
       await Promise.all(
         additionalNodes.map((nodeConfig: GethInstanceConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, verbose)
+          initAndStartGeth(gethConfig, context.hooks.gethBinaryPath, nodeConfig, verbose)
         )
       )
 
@@ -397,7 +389,7 @@ describe('governance tests', () => {
 
       await Promise.all(
         additionalValidatingNodes.map((nodeConfig: GethInstanceConfig) =>
-          initAndStartGeth(context.hooks.gethBinaryPath, nodeConfig, verbose)
+          initAndStartGeth(gethConfig, context.hooks.gethBinaryPath, nodeConfig, verbose)
         )
       )
 

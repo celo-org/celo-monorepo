@@ -670,7 +670,7 @@ export const runGethNodes = async ({
 
   console.log(gethConfig.runPath)
 
-  await writeGenesis(validators, gethConfig)
+  await writeGenesis(gethConfig, validators)
 
   console.log('eNodes', JSON.stringify(validatorEnodes, null, 2))
 
@@ -688,24 +688,24 @@ export const runGethNodes = async ({
       validatorIndex++
     }
 
-    await initAndStartGeth(gethBinaryPath, instance, verbose)
+    await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
   }
 }
 
-function getInstanceDir(instance: GethInstanceConfig) {
-  return path.join(instance.gethRunConfig.runPath, instance.name)
+function getInstanceDir(runPath: string, instance: GethInstanceConfig) {
+  return path.join(runPath, instance.name)
 }
 
-function getSnapshotdir(instance: GethInstanceConfig) {
-  return path.join(getInstanceDir(instance), 'snapshot')
+function getSnapshotdir(runPath: string, instance: GethInstanceConfig) {
+  return path.join(getInstanceDir(runPath, instance), 'snapshot')
 }
 
 export function importGenesis(genesisPath: string) {
   return JSON.parse(fs.readFileSync(genesisPath).toString())
 }
 
-function getDatadir(instance: GethInstanceConfig) {
-  const dir = path.join(getInstanceDir(instance), 'datadir')
+function getDatadir(runPath: string, instance: GethInstanceConfig) {
+  const dir = path.join(getInstanceDir(runPath, instance), 'datadir')
   // @ts-ignore
   fs.mkdirSync(dir, { recursive: true })
   return dir
@@ -715,26 +715,27 @@ function getDatadir(instance: GethInstanceConfig) {
  * @returns Promise<number> the geth pid number
  */
 export async function initAndStartGeth(
+  gethConfig: GethRunConfig,
   gethBinaryPath: string,
   instance: GethInstanceConfig,
   verbose: boolean
 ) {
-  const datadir = getDatadir(instance)
+  const datadir = getDatadir(gethConfig.runPath, instance)
 
   console.info(`geth:${instance.name}: init datadir ${datadir}`)
 
-  const genesisPath = path.join(instance.gethRunConfig.runPath, 'genesis.json')
+  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   await init(gethBinaryPath, datadir, genesisPath, verbose)
 
   if (instance.privateKey) {
-    await importPrivateKey(gethBinaryPath, instance, verbose)
+    await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
   }
 
   if (instance.peers) {
     await addStaticPeers(datadir, instance.peers, verbose)
   }
 
-  return startGeth(gethBinaryPath, instance, verbose)
+  return startGeth(gethConfig, gethBinaryPath, instance, verbose)
 }
 
 export async function init(
@@ -754,11 +755,12 @@ export async function init(
 }
 
 export async function importPrivateKey(
+  getConfig: GethRunConfig,
   gethBinaryPath: string,
   instance: GethInstanceConfig,
   verbose: boolean
 ) {
-  const keyFile = path.join(getDatadir(instance), 'key.txt')
+  const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
 
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
 
@@ -770,7 +772,7 @@ export async function importPrivateKey(
     'account',
     'import',
     '--datadir',
-    getDatadir(instance),
+    getDatadir(getConfig.runPath, instance),
     '--password',
     '/dev/null',
     keyFile,
@@ -823,11 +825,15 @@ export async function addStaticPeers(datadir: string, peers: string[], verbose: 
   }
 }
 
-export async function addProxyPeer(gethBinaryPath: string, instance: GethInstanceConfig) {
+export async function addProxyPeer(
+  runPath: string,
+  gethBinaryPath: string,
+  instance: GethInstanceConfig
+) {
   if (instance.proxies) {
     await spawnCmdWithExitOnFailure(gethBinaryPath, [
       '--datadir',
-      getDatadir(instance),
+      getDatadir(runPath, instance),
       'attach',
       '--exec',
       `istanbul.addProxy('${instance.proxies[0]!}', '${instance.proxies[1]!}')`,
@@ -836,18 +842,16 @@ export async function addProxyPeer(gethBinaryPath: string, instance: GethInstanc
 }
 
 export async function startGeth(
+  gethConfig: GethRunConfig,
   gethBinaryPath: string,
   instance: GethInstanceConfig,
   verbose: boolean
 ) {
   if (verbose) {
-    const instanceConfig = { ...instance }
-    delete instanceConfig.gethRunConfig
-
-    console.log('starting geth with config', JSON.stringify(instanceConfig, null, 2))
+    console.log('starting geth with config', JSON.stringify(instance, null, 2))
   }
 
-  const datadir = getDatadir(instance)
+  const datadir = getDatadir(gethConfig.runPath, instance)
 
   const {
     syncmode,
@@ -866,15 +870,15 @@ export async function startGeth(
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
-  const verbosity = instance.gethRunConfig.verbosity ? instance.gethRunConfig.verbosity : '3'
+  const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
   let blocktime: number = 1
 
   if (
-    instance.gethRunConfig.genesisConfig &&
-    instance.gethRunConfig.genesisConfig.blockTime !== undefined &&
-    instance.gethRunConfig.genesisConfig.blockTime >= 0
+    gethConfig.genesisConfig &&
+    gethConfig.genesisConfig.blockTime !== undefined &&
+    gethConfig.genesisConfig.blockTime >= 0
   ) {
-    blocktime = instance.gethRunConfig.genesisConfig.blockTime
+    blocktime = gethConfig.genesisConfig.blockTime
   }
 
   const gethArgs = [
@@ -887,7 +891,7 @@ export async function startGeth(
     port.toString(),
     '--rpcvhosts=*',
     '--networkid',
-    instance.gethRunConfig.networkId.toString(),
+    gethConfig.networkId.toString(),
     `--verbosity=${verbosity}`,
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
@@ -976,7 +980,7 @@ export async function startGeth(
     const isOpen = await waitForPortOpen('localhost', rpcport, secondsToWait)
     if (!isOpen) {
       console.error(
-        `geth:${instance.name}: jsonRPC port didn't open after ${secondsToWait} seconds`
+        `geth:${instance.name}: jsonRPC port ${rpcport} didn't open after ${secondsToWait} seconds`
       )
       process.exit(1)
     } else {
@@ -987,7 +991,9 @@ export async function startGeth(
   if (wsport) {
     const isOpen = await waitForPortOpen('localhost', wsport, secondsToWait)
     if (!isOpen) {
-      console.error(`geth:${instance.name}: ws port didn't open after ${secondsToWait} seconds`)
+      console.error(
+        `geth:${instance.name}: ws port ${wsport} didn't open after ${secondsToWait} seconds`
+      )
       process.exit(1)
     } else {
       console.info(`geth:${instance.name}: ws port open ${wsport}`)
@@ -997,7 +1003,7 @@ export async function startGeth(
   return instance
 }
 
-export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig) {
+export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[]) {
   const genesis: string = generateGenesis({
     validators,
     epoch: 10,
@@ -1013,19 +1019,27 @@ export function writeGenesis(validators: Validator[], gethConfig: GethRunConfig)
   console.log(`wrote   genesis to ${genesisPath}`)
 }
 
-export async function snapshotDatadir(instance: GethInstanceConfig, verbose: boolean) {
+export async function snapshotDatadir(
+  runPath: string,
+  instance: GethInstanceConfig,
+  verbose: boolean
+) {
   if (verbose) {
     console.log('snapshotting data dir')
   }
 
   // Sometimes the socket is still present, preventing us from snapshotting.
-  await spawnCmd('rm', [`${getDatadir(instance)}/geth.ipc`], { silent: true })
-  await spawnCmdWithExitOnFailure('cp', ['-r', getDatadir(instance), getSnapshotdir(instance)])
+  await spawnCmd('rm', [`${getDatadir(runPath, instance)}/geth.ipc`], { silent: true })
+  await spawnCmdWithExitOnFailure('cp', [
+    '-r',
+    getDatadir(runPath, instance),
+    getSnapshotdir(runPath, instance),
+  ])
 }
 
-export async function restoreDatadir(instance: GethInstanceConfig) {
-  const datadir = getDatadir(instance)
-  const snapshotdir = getSnapshotdir(instance)
+export async function restoreDatadir(runPath: string, instance: GethInstanceConfig) {
+  const datadir = getDatadir(runPath, instance)
+  const snapshotdir = getSnapshotdir(runPath, instance)
 
   console.info(`geth:${instance.name}: restore datadir: ${datadir}`)
 

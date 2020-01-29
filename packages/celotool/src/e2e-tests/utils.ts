@@ -203,7 +203,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 
-    await writeGenesis(validators, gethConfig)
+    await writeGenesis(gethConfig, validators)
 
     let bootnodeEnode: string = ''
 
@@ -259,7 +259,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
-      await initAndStartGeth(gethBinaryPath, instance, verbose)
+      await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
     }
 
     await connectValidatorPeers(gethConfig, true)
@@ -283,7 +283,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.
     for (const instance of gethConfig.instances) {
-      await snapshotDatadir(instance, verbose)
+      await snapshotDatadir(gethConfig.runPath, instance, verbose)
     }
   }
 
@@ -310,11 +310,11 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     await Promise.all(
       gethConfig.instances.map(async (instance, i) => {
-        await restoreDatadir(instance)
+        await restoreDatadir(gethConfig.runPath, instance)
         if (!instance.privateKey && instance.validating) {
           instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
         }
-        return startGeth(gethBinaryPath, instance, verbose)
+        return startGeth(gethConfig, gethBinaryPath, instance, verbose)
       })
     )
     await connectValidatorPeers(gethConfig, true)

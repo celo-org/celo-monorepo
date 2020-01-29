@@ -1,7 +1,4 @@
-import { GethRunConfig } from './geth-run-config'
-
 export interface GethInstanceConfig {
-  gethRunConfig: GethRunConfig
   name: string
   validating?: boolean
   validatingGasPrice?: number
