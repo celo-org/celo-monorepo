@@ -59,7 +59,8 @@ describe('sync tests', function(this: any) {
     await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
-    const fullInstance: GethInstanceConfig = {
+
+    const fullNode: GethInstanceConfig = {
       name: 'full',
       validating: false,
       syncmode: 'full',

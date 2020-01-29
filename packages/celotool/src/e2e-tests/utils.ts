@@ -259,7 +259,10 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
-      await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
+      await initAndStartGeth(
+        gethConfig, gethBinaryPath,
+        instance, verbose
+      )
     }
 
     await connectValidatorPeers(gethConfig)
