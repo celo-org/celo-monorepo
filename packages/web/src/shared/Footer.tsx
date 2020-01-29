@@ -7,6 +7,7 @@ import Discourse from 'src/icons/Discourse'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import TwiterLogo from 'src/icons/TwitterLogo'
+import YouTube from 'src/icons/YouTube'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -39,13 +40,13 @@ export class Footer extends React.PureComponent<Props & I18nProps> {
     return (
       <GridRow
         mobileStyle={styles.mobileContainer}
-        tabletStyle={standardStyles.blockMarginTablet}
+        tabletStyle={[standardStyles.blockMarginTablet, styles.mobileContainer]}
         desktopStyle={standardStyles.blockMargin}
       >
-        <Cell span={Spans.half} tabletSpan={Spans.fourth}>
+        <Cell span={Spans.half} tabletSpan={Spans.full}>
           <Social />
         </Cell>
-        <Cell span={Spans.half} tabletSpan={Spans.three4th}>
+        <Cell span={Spans.half} tabletSpan={Spans.full}>
           <Navigation t={t} isVertical={false} />
           <Details t={t} />
         </Cell>
@@ -59,23 +60,40 @@ const Social = React.memo(function _Social() {
   return (
     <Responsive medium={styles.social}>
       <View style={[styles.social, styles.socialMobile]}>
-        <MediumLogo color={colors.dark} height={height} />
-        <Link href={CeloLinks.gitHub}>
-          <a>
-            <Octocat color={colors.dark} size={height} />
-          </a>
-        </Link>
-        <TwiterLogo color={colors.dark} height={height} />
-        <Link href={CeloLinks.discourse}>
-          <a>
-            <Discourse color={colors.dark} size={height} />
-          </a>
-        </Link>
-        <Link href={CeloLinks.discord}>
-          <a>
-            <Discord color={colors.dark} size={height} />
-          </a>
-        </Link>
+        <View style={styles.socialIcon}>
+          <MediumLogo color={colors.dark} height={height} />
+        </View>
+        <View style={styles.socialIcon}>
+          <Link href={CeloLinks.gitHub}>
+            <a>
+              <Octocat color={colors.dark} size={height} />
+            </a>
+          </Link>
+        </View>
+        <View style={styles.socialIcon}>
+          <TwiterLogo color={colors.dark} height={height} />
+        </View>
+        <View style={styles.socialIcon}>
+          <Link href={CeloLinks.discourse}>
+            <a>
+              <Discourse color={colors.dark} size={height} />
+            </a>
+          </Link>
+        </View>
+        <View style={styles.socialIcon}>
+          <Link href={CeloLinks.discord}>
+            <a>
+              <Discord color={colors.dark} size={height} />
+            </a>
+          </Link>
+        </View>
+        <View style={styles.socialIcon}>
+          <Link href={CeloLinks.youtube}>
+            <a>
+              <YouTube color={colors.dark} size={height} />
+            </a>
+          </Link>
+        </View>
       </View>
     </Responsive>
   )
@@ -93,7 +111,7 @@ const Navigation = React.memo(function _Navigation({
   currentPage = null,
 }: NavProps) {
   return (
-    <Responsive large={styles.menu}>
+    <Responsive large={styles.menu} medium={styles.menuTablet}>
       <View style={isVertical ? styles.verticalMenu : styles.menuMobile}>
         {menuItems.map((item, index) => {
           const linkIsToCurrentPage = isVertical && currentPage === item.link
@@ -159,12 +177,14 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
 const styles = StyleSheet.create({
   social: {
     flexDirection: 'row',
-    maxWidth: 210,
+    alignItems: 'center',
     width: '100%',
-    justifyContent: 'space-between',
     marginTop: 30,
   },
-  socialMobile: { alignSelf: 'center' },
+  socialMobile: { alignSelf: 'center', justifyContent: 'center' },
+  socialIcon: {
+    paddingRight: 25,
+  },
   details: {
     paddingTop: 40,
     paddingBottom: 20,
@@ -192,6 +212,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  menuTablet: {
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
   },
   menuMobile: {
     justifyContent: 'center',
