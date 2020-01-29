@@ -223,6 +223,8 @@ contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
    * @notice Allows only `revoker` to pause the gold withdrawal.
    * @param pausePeriod The period for which the withdrawal shall be paused.
    */
+  // TODO(lucas): pause should be callable on non-revocable contracts,
+  //              but pausing needs an overhaul anyway.
   function pause(uint256 pausePeriod) external onlyRevoker onlyRevocable {
     require(!isPaused(), "Vesting withdrawals cannot already be paused");
     require(!isRevoked(), "Vesting cannot be paused if already revoked");

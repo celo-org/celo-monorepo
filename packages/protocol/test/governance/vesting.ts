@@ -763,7 +763,6 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('beneficiary should set dataEncryptionKey', async () => {
-      // @ts-ignore
       await vestingInstance.setAccountDataEncryptionKey(dataEncryptionKey, { from: beneficiary })
       // @ts-ignore
       const fetchedKey: string = await accountsInstance.getDataEncryptionKey(
@@ -773,7 +772,6 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should revert if non-beneficiary attempts to set dataEncryptionKey', async () => {
-      // @ts-ignore
       await assertRevert(
         vestingInstance.setAccountDataEncryptionKey(dataEncryptionKey, { from: accounts[2] })
       )
@@ -781,7 +779,6 @@ contract('Vesting', (accounts: string[]) => {
 
     it('should allow setting a key with leading zeros', async () => {
       const keyWithZeros = '0x00000000000000000000000000000000000000000000000f2f48ee19680706191111'
-      // @ts-ignore
       await vestingInstance.setAccountDataEncryptionKey(keyWithZeros, { from: beneficiary })
       // @ts-ignore
       const fetchedKey: string = await accountsInstance.getDataEncryptionKey(
@@ -791,14 +788,12 @@ contract('Vesting', (accounts: string[]) => {
     })
 
     it('should revert when the key is invalid', async () => {
-      // @ts-ignore
       await assertRevert(
         vestingInstance.setAccountDataEncryptionKey('0x32132931293', { from: beneficiary })
       )
     })
 
     it('should allow a key that is longer than 33 bytes', async () => {
-      // @ts-ignore
       await vestingInstance.setAccountDataEncryptionKey(longDataEncryptionKey, {
         from: beneficiary,
       })
@@ -890,7 +885,7 @@ contract('Vesting', (accounts: string[]) => {
 
         describe('when a previous authorization has been made', () => {
           const newAuthorized = accounts[6]
-          let newSig
+          let newSig: any
           beforeEach(async () => {
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
             newSig = await getParsedSignatureOfAddress(web3, vestingInstance.address, newAuthorized)
@@ -959,6 +954,7 @@ contract('Vesting', (accounts: string[]) => {
       await assertRevert(vestingInstance.pause(301 * DAY, { from: revoker }))
     })
 
+    // TODO(lucas): this should not be true when pausing is changed.
     it('should revert when revoker attempts to pause a non-revocable vesting', async () => {
       const vestingSchedule = _.clone(vestingDefaultSchedule)
       vestingSchedule.vestingRevocable = false
