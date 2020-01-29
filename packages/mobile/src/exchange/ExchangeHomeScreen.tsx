@@ -63,7 +63,8 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, goldBalance } = this.props
+    const hasGold = new BigNumber(goldBalance || 0).isGreaterThan(0)
 
     return (
       <SafeAreaView style={styles.background}>
@@ -86,14 +87,18 @@ export class ExchangeHomeScreen extends React.Component<Props> {
                 standard={true}
                 type={BtnTypes.PRIMARY}
               />
-              <View style={styles.buttonDivider} />
-              <Button
-                text={t('sell')}
-                onPress={this.goToBuyDollars}
-                style={styles.button}
-                standard={true}
-                type={BtnTypes.PRIMARY}
-              />
+              {hasGold && (
+                <>
+                  <View style={styles.buttonDivider} />
+                  <Button
+                    text={t('sell')}
+                    onPress={this.goToBuyDollars}
+                    style={styles.button}
+                    standard={true}
+                    type={BtnTypes.PRIMARY}
+                  />
+                </>
+              )}
             </View>
           </View>
           <SectionHeadNew text={t('goldActivity')} />

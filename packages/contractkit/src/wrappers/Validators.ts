@@ -61,6 +61,11 @@ export interface GroupMembership {
   group: Address
 }
 
+export interface MembershipHistoryExtraData {
+  lastRemovedFromGroupTimestamp: number
+  tail: number
+}
+
 /**
  * Contract for voting for validators and managing validator groups.
  */
@@ -265,6 +270,19 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
   )
 
+  /**
+   * Returns extra data from the Validator's group membership history
+   * @param validator The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
+  getValidatorMembershipHistoryExtraData: (
+    validator: Address
+  ) => Promise<MembershipHistoryExtraData> = proxyCall(
+    this.contract.methods.getMembershipHistory,
+    undefined,
+    (res) => ({ lastRemovedFromGroupTimestamp: valueToInt(res[2]), tail: valueToInt(res[3]) })
+  )
+
   /** Get the size (amount of members) of a ValidatorGroup */
   getValidatorGroupSize: (group: Address) => Promise<number> = proxyCall(
     this.contract.methods.getGroupNumMembers,
@@ -432,7 +450,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
     const currentIdx = group.members.indexOf(validator)
     if (currentIdx < 0) {
-      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+      throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
       throw new Error(`Validator is already in position ${newIndex}`)
     }
@@ -466,15 +484,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidator(e.returnValues.validator, blockNumber)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, true, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
         epochNumber,
         validator: validator[index],
-        validatorPayment: e.returnValues.validatorPayment,
+        validatorPayment: valueToBigNumber(e.returnValues.validatorPayment),
         group: validatorGroup[index],
-        groupPayment: e.returnValues.groupPayment,
+        groupPayment: valueToBigNumber(e.returnValues.groupPayment),
       })
     )
   }
