@@ -158,7 +158,7 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
   ])
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const dollarsToLocal = useCallback(
-    (amount) => convertDollarsToLocalAmount(amount, localExchangeRate),
+    (amount) => convertDollarsToLocalAmount(amount, localCurrencyCode ? localExchangeRate : 1),
     [localExchangeRate]
   )
   const [range] = useState(30 * 24 * 60 * 60 * 1000) // 30 days
