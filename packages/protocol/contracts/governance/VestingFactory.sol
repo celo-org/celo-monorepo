@@ -12,7 +12,7 @@ import "../common/UsingRegistry.sol";
 contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
   using SafeMath for uint256;
 
-  // mapping between beneficiary addresses and associated vesting contracts (schedules)
+  // Mapping between beneficiary addresses and associated vesting contracts (schedules).
   mapping(address => address) public vestings;
 
   function initialize(address registryAddress) external initializer {
@@ -23,17 +23,17 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
   event NewVestingInstanceCreated(address indexed beneficiary, address atAddress);
 
   /**
-   * @notice Factory function for creating a new vesting contract instance
-   * @param vestingBeneficiary address of the beneficiary to whom vested tokens are transferred
-   * @param vestingNumPeriods number of vesting periods
-   * @param vestingCliff duration in seconds of the cliff in which tokens will begin to vest
-   * @param vestingStartTime the time (as Unix time) at which point vesting starts
-   * @param vestingPeriodSec duration in seconds of the period in which the tokens will vest
-   * @param vestAmountPerPeriod the vesting amound per period
-   * @param vestingRevokable whether the vesting is revocable or not
-   * @param vestingRevoker address of the person revoking the vesting
-   * @param vestingMaxPausePeriod maximum pause period in seconds
-   * @return The address of the newly created vesting instance
+   * @notice Factory function for creating a new vesting contract instance.
+   * @param vestingBeneficiary Address of the beneficiary to whom vested tokens are transferred.
+   * @param vestingNumPeriods Number of vesting periods.
+   * @param vestingCliff Duration in seconds of the cliff in which tokens will begin to vest.
+   * @param vestingStartTime The time (in Unix time) at which point vesting starts.
+   * @param vestingPeriodSec Duration in seconds of the period in which the tokens will vest.
+   * @param vestAmountPerPeriod The vesting amound per period.
+   * @param vestingRevocable Whether the vesting is revocable or not.
+   * @param vestingRevoker Address of the person revoking the vesting.
+   * @param vestingMaxPausePeriod Maximum pause period in seconds.
+   * @return The address of the newly created vesting instance.
    */
   function createVestingInstance(
     address payable vestingBeneficiary,
@@ -42,17 +42,20 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
     uint256 vestingStartTime,
     uint256 vestingPeriodSec,
     uint256 vestAmountPerPeriod,
-    bool vestingRevokable,
+    bool vestingRevocable,
     address payable vestingRevoker,
     uint256 vestingMaxPausePeriod
   ) external onlyOwner returns (address) {
     uint256 vestingAmount = vestingNumPeriods.mul(vestAmountPerPeriod);
     require(
       getGoldToken().balanceOf(address(this)) >= vestingAmount,
-      "factory balance is unsufficient to create a new vesting"
+      "Factory balance is insufficient to create requested vesting contract"
     );
 
-    require(vestings[vestingBeneficiary] == address(0), "only one vesting per beneficiary allowed");
+    require(
+      vestings[vestingBeneficiary] == address(0),
+      "Only one vesting contract per beneficiary allowed"
+    );
 
     address newVestingInstance = address(
       new VestingInstance(
@@ -62,7 +65,7 @@ contract VestingFactory is Initializable, UsingRegistry, IVestingFactory {
         vestingStartTime,
         vestingPeriodSec,
         vestAmountPerPeriod,
-        vestingRevokable,
+        vestingRevocable,
         vestingRevoker,
         vestingMaxPausePeriod,
         address(registry)
