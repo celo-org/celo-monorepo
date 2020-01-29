@@ -1,7 +1,6 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { assert } from 'chai'
-import yargs from 'yargs'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, sleep } from './utils'
 
@@ -9,11 +8,9 @@ const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 const phoneNumber = '+15555555555'
 
 const TMP_PATH = '/tmp/e2e'
-const gethRepoPath = yargs.argv.localgeth as string
 
 describe('attestations tests', () => {
   const gethConfig: GethRunConfig = {
-    gethRepoPath,
     runPath: TMP_PATH,
     networkId: 1101,
     network: 'local',

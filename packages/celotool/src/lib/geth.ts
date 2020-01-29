@@ -659,6 +659,11 @@ export const runGethNodes = async ({
 
   const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
 
+  if (!fs.existsSync(gethBinaryPath)) {
+    console.error(`Geth binary at ${gethBinaryPath} not found!`)
+    return
+  }
+
   if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
     await resetDataDir(gethConfig.runPath, verbose)
   }

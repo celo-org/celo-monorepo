@@ -29,7 +29,7 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
-const verboseOutput = false
+const verboseOutput = true
 
 export async function waitToFinishSyncing(web3: any) {
   while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
@@ -184,15 +184,19 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
-  const gethRepoPath = argv.localgeth || '/tmp/geth'
-  const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
-  const bootnodeBinaryPath = `${gethRepoPath}/build/bin/bootnode`
+
+  gethConfig.gethRepoPath = argv.localgeth || '/tmp/geth'
+  const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
+  const bootnodeBinaryPath = `${gethConfig.gethRepoPath}/build/bin/bootnode`
 
   const before = async () => {
-    if (!argv.localgeth) {
-      await checkoutGethRepo(branch, gethRepoPath)
+    if (!argv.localgeth && gethConfig.gethRepoPath) {
+      await checkoutGethRepo(branch, gethConfig.gethRepoPath)
     }
-    await buildGeth(gethRepoPath)
+
+    if (gethConfig.gethRepoPath) {
+      await buildGeth(gethConfig.gethRepoPath)
+    }
 
     if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
       await resetDataDir(gethConfig.runPath, verbose)
@@ -259,10 +263,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
-      await initAndStartGeth(
-        gethConfig, gethBinaryPath,
-        instance, verbose
-      )
+      await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
     }
 
     await connectValidatorPeers(gethConfig)

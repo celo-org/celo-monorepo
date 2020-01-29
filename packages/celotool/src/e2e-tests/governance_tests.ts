@@ -8,7 +8,6 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import yargs from 'yargs'
 import { importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
@@ -19,7 +18,6 @@ interface MemberSwapper {
 }
 
 const TMP_PATH = '/tmp/e2e'
-const gethRepoPath = yargs.argv.localgeth as string
 const verbose = false
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
@@ -114,7 +112,6 @@ async function newKeyRotator(
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
 describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
-    gethRepoPath,
     migrate: true,
     runPath: TMP_PATH,
     verbosity: 0,

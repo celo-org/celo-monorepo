@@ -17,7 +17,7 @@ export interface GethRunConfig {
   // where to run
   runPath: string
   verbosity?: number
-  gethRepoPath: string
+  gethRepoPath?: string
   // running instances
   instances: GethInstanceConfig[]
 }

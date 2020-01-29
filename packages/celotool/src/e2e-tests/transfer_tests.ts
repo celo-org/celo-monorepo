@@ -8,14 +8,12 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import yargs from 'yargs'
 import { initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
-const gethRepoPath = yargs.argv.localgeth as string
 const verbose = false
 
 /**
@@ -172,7 +170,6 @@ describe('Transfer tests', function(this: any) {
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
   const gethConfig: GethRunConfig = {
-    gethRepoPath,
     migrateTo: 18,
     networkId: 1101,
     network: 'local',

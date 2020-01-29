@@ -1,7 +1,6 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import Web3 from 'web3'
-import yargs from 'yargs'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, sleep } from './utils'
 
@@ -11,11 +10,9 @@ const EPOCHS_TO_WAIT = 3
 const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT
 
 const TMP_PATH = '/tmp/e2e'
-const gethRepoPath = yargs.argv.localgeth as string
 
 describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
-    gethRepoPath,
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
