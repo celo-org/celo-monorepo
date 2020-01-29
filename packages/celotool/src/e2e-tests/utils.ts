@@ -175,6 +175,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
   const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
   const numProxies = proxyInstances.length
+
   const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
   const proxyEnodes = proxyPrivateKeys.map((x: any, i: number) => [
     proxyInstances[i].name,

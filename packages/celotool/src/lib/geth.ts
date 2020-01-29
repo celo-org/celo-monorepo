@@ -874,6 +874,7 @@ export async function startGeth(
     validatingGasPrice,
     bootnodeEnode,
     isProxy,
+    proxyAllowPrivateIp,
     isProxied,
     proxyport,
     ethstats,
@@ -967,10 +968,13 @@ export async function startGeth(
   }
 
   if (isProxied && instance.proxies) {
+    if (proxyAllowPrivateIp) {
+      gethArgs.push('--proxy.allowprivateip=true')
+    }
     gethArgs.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
-  if (privateKey) {
+  if (privateKey || ethstats) {
     gethArgs.push('--password=/dev/null', `--unlock=0`)
   }
 

@@ -18,5 +18,6 @@ export interface GethInstanceConfig {
   bootnodeEnode?: string
   proxy?: string
   proxiedValidatorAddress?: string
+  proxyAllowPrivateIp?: boolean
   ethstats?: string
 }

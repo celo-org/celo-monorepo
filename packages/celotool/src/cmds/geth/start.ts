@@ -1,10 +1,16 @@
 import yargs from 'yargs'
 
 import { addCeloGethMiddleware } from 'src/lib/utils'
-import { AccountType, getPrivateKeysFor, getValidatorsInformation } from '../../lib/generate_utils'
-import { runGethNodes } from '../../lib/geth'
+import {
+  AccountType,
+  getPrivateKeysFor,
+  getValidatorsInformation,
+  privateKeyToPublicKey,
+} from '../../lib/generate_utils'
+import { getEnodeAddress, runGethNodes } from '../../lib/geth'
 import { GethRunConfig } from '../../lib/interfaces/geth-run-config'
 import { GethArgv } from '../geth'
+import { GethInstanceConfig } from '../../lib/interfaces/geth-instance-config'
 
 export const command = 'start'
 export const describe = 'command for running geth'
@@ -141,8 +147,14 @@ export const handler = async (argv: StartArgv) => {
     },
   }
 
+  const validators = getValidatorsInformation(mnemonic, instances)
+
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, instances)
+
+  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, instances)
+
   for (let x = 0; x < instances; x++) {
-    gethConfig.instances.push({
+    const node: GethInstanceConfig = {
       name: `${x}-node`,
       validating: mining,
       validatingGasPrice: minerGasPrice,
@@ -151,31 +163,39 @@ export const handler = async (argv: StartArgv) => {
       port: port + x,
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
-    })
+    }
+
+    let proxy: GethInstanceConfig | null = null
 
     if (withProxy) {
-      gethConfig.instances.push({
+      proxy = {
         name: `${x}-proxy`,
         validating: false,
         isProxy: true,
         syncmode: syncMode,
+        ethstats,
+        privateKey: proxyPrivateKeys[x],
         port: port + x + 1000,
         proxyport: port + x + 333,
         rpcport: rpcport + x * 2 + 1000,
         wsport: wsport + x * 2 + 1000,
-      })
-    }
-  }
-
-  const validators = getValidatorsInformation(mnemonic, instances)
-  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, instances)
-
-  if (withProxy) {
-    for (let i = 0; i < gethConfig.instances.length; i++) {
-      const instance = gethConfig.instances[i]
-      if (instance.isProxy) {
-        instance.proxiedValidatorAddress = validators[i - 1].address
       }
+
+      proxy.proxiedValidatorAddress = validators[x].address
+      proxy.proxy = validators[x].address
+      proxy.isProxy = true
+
+      node.isProxied = true
+      node.proxyAllowPrivateIp = true
+      node.proxies = [
+        getEnodeAddress(privateKeyToPublicKey(validatorPrivateKeys[x]), '127.0.0.1', node.port),
+        getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.proxyport!),
+      ]
+    }
+
+    gethConfig.instances.push(node)
+    if (proxy) {
+      gethConfig.instances.push(proxy)
     }
   }
 
