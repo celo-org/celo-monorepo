@@ -160,6 +160,7 @@ export const handler = async (argv: StartArgv) => {
       validatingGasPrice: minerGasPrice,
       syncmode: syncMode,
       ethstats,
+      privateKey: validatorPrivateKeys[x],
       port: port + x,
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
@@ -188,8 +189,8 @@ export const handler = async (argv: StartArgv) => {
       node.isProxied = true
       node.proxyAllowPrivateIp = true
       node.proxies = [
-        getEnodeAddress(privateKeyToPublicKey(validatorPrivateKeys[x]), '127.0.0.1', node.port),
         getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.proxyport!),
+        getEnodeAddress(privateKeyToPublicKey(validatorPrivateKeys[x]), '127.0.0.1', node.port),
       ]
     }
 
@@ -202,7 +203,6 @@ export const handler = async (argv: StartArgv) => {
   await runGethNodes({
     gethConfig,
     validators,
-    validatorPrivateKeys,
     verbose,
   })
 }

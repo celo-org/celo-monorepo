@@ -643,20 +643,12 @@ export const transferERC20Token = async (
 export const runGethNodes = async ({
   gethConfig,
   validators,
-  validatorPrivateKeys,
   verbose,
 }: {
   gethConfig: GethRunConfig
   validators: Validator[]
-  validatorPrivateKeys: string[]
   verbose: boolean
 }) => {
-  const validatorsFilePath = path.join(gethConfig.runPath, '/nodes.json')
-  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
-  const validatorEnodes = validatorPrivateKeys.map((x: string, i: number) => {
-    return getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  })
-
   const gethBinaryPath = path.join(gethConfig.gethRepoPath!, '/build/bin/geth')
 
   if (!fs.existsSync(gethBinaryPath)) {
@@ -676,27 +668,15 @@ export const runGethNodes = async ({
   await writeGenesis(gethConfig, validators, verbose)
 
   if (verbose) {
-    console.log('eNodes', JSON.stringify(validatorEnodes, null, 2))
-
     const validatorAddresses = validators.map((validator) => validator.address)
     console.log('Validators', JSON.stringify(validatorAddresses, null, 2))
   }
 
-  fs.writeFileSync(validatorsFilePath, JSON.stringify(validatorEnodes), 'utf8')
-
-  let validatorIndex = 0
-
   for (const instance of gethConfig.instances) {
-    if (instance.validating) {
-      // Automatically connect validator nodes to each other.
-      const otherValidators = validatorEnodes.filter((_: string, i: number) => i !== validatorIndex)
-      instance.peers = (instance.peers || []).concat(otherValidators)
-      instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
-      validatorIndex++
-    }
-
     await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
   }
+
+  await connectValidatorPeers(gethConfig)
 }
 
 function getInstanceDir(runPath: string, instance: GethInstanceConfig) {
@@ -738,10 +718,6 @@ export async function initAndStartGeth(
 
   if (instance.privateKey) {
     await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
-  }
-
-  if (instance.peers) {
-    await addStaticPeers(datadir, instance.peers, verbose)
   }
 
   return startGeth(gethConfig, gethBinaryPath, instance, verbose)
@@ -1144,7 +1120,10 @@ export async function connectValidatorPeers(gethConfig: GethRunConfig) {
           if (i === j) {
             return
           }
-          await admin.addPeer(enode)
+          const success = await admin.addPeer(enode)
+          if (!success) {
+            throw new Error('Connecting validators failed!')
+          }
         })
       )
     })
