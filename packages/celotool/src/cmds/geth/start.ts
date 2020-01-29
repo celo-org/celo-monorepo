@@ -147,8 +147,8 @@ export const handler = async (argv: StartArgv) => {
       validating: mining,
       validatingGasPrice: minerGasPrice,
       syncmode: syncMode,
-      port: port + x,
       ethstats,
+      port: port + x,
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
     })
@@ -160,6 +160,7 @@ export const handler = async (argv: StartArgv) => {
         isProxy: true,
         syncmode: syncMode,
         port: port + x + 1000,
+        proxyport: port + x + 333,
         rpcport: rpcport + x * 2 + 1000,
         wsport: wsport + x * 2 + 1000,
       })
@@ -168,6 +169,15 @@ export const handler = async (argv: StartArgv) => {
 
   const validators = getValidatorsInformation(mnemonic, instances)
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, instances)
+
+  if (withProxy) {
+    for (let i = 0; i < gethConfig.instances.length; i++) {
+      const instance = gethConfig.instances[i]
+      if (instance.isProxy) {
+        instance.proxiedValidatorAddress = validators[i - 1].address
+      }
+    }
+  }
 
   await runGethNodes({
     gethConfig,
