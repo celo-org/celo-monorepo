@@ -321,7 +321,7 @@ export const generateGenesis = ({
       // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
       // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
       policy: 2,
-      period: blockTime,
+      blockperiod: blockTime,
       requesttimeout: requestTimeout,
       epoch,
       lookbackwindow,
