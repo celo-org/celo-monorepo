@@ -181,7 +181,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe.only('#transferGold()', () => {
+  describe('#transferGold()', () => {
     const aValue = 10000
     beforeEach(async () => {
       await mockGoldToken.setBalanceOf(reserve.address, aValue)
