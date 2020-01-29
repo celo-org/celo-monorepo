@@ -122,11 +122,17 @@ USAGE
 
 OPTIONS
   --deposit=deposit                                  (required) Amount of Gold to attach to proposal
+
+  --descriptionURL=descriptionURL                    (required) A URL where further information about the proposal can
+                                                     be viewed
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
+
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
 EXAMPLE
   propose --jsonTransactions ./transactions.json --deposit 10000 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
 ```
 
 _See code: [packages/cli/src/commands/governance/propose.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/propose.ts)_
