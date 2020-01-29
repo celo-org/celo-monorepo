@@ -651,13 +651,13 @@ export const runGethNodes = async ({
   validatorPrivateKeys: string[]
   verbose: boolean
 }) => {
-  const validatorsFilePath = `${gethConfig.runPath}/nodes.json`
+  const validatorsFilePath = path.join(gethConfig.runPath, '/nodes.json')
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const validatorEnodes = validatorPrivateKeys.map((x: string, i: number) => {
     return getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
   })
 
-  const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
+  const gethBinaryPath = path.join(gethConfig.gethRepoPath!, '/build/bin/geth')
 
   if (!fs.existsSync(gethBinaryPath)) {
     console.error(`Geth binary at ${gethBinaryPath} not found!`)
