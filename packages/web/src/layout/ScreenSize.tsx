@@ -16,7 +16,7 @@ interface State {
 
 const defaultContext = { screen: null }
 
-export const ScreenSizeContext = React.createContext(defaultContext)
+export const ScreenSizeContext = React.createContext<State>(defaultContext)
 
 export class ScreenSizeProvider extends React.PureComponent<{}, State> {
   state = defaultContext
