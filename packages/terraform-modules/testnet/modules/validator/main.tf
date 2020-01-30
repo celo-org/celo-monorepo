@@ -77,18 +77,12 @@ resource "google_compute_instance" "validator" {
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
       max_peers : 125,
       network_id : var.network_id,
-      proxied : count.index < var.proxied_validator_count,
+      proxied : count.index < length(var.proxies_per_validator),
       rid : count.index,
-      # Unfortunately, there's no built-in function for summing.
-      # This is basically translates to:
-      # slice(module.proxy.internal_ip_addresses, sum(proxy counts for all validators with lesser indeces), sum(...) + the # of proxies for the current validator)
-      # so we can get the ip addresses of the proxies that are intended for this validator
-      # proxy_internal_ip_addresses : count.index < var.proxied_validator_count ? slice(module.proxy.internal_ip_addresses, length(flatten([for e in slice(var.proxies_per_validator, 0, count.index + 1) : range(e)])), length(flatten([for e in slice(var.proxies_per_validator, 0, count.index + 1) : range(e)])) + var.proxies_per_validator[count.index]) : [],
-      # proxy_external_ip_addresses : count.index < var.proxied_validator_count ? slice(module.proxy.ip_addresses, length(flatten([for e in slice(var.proxies_per_validator, 0, count.index + 1) : range(e)])), length(flatten([for e in slice(var.proxies_per_validator, 0, count.index + 1) : range(e)])) + var.proxies_per_validator[count.index]) : [],
-      # proxy_internal_ip_addresses : count.index < var.proxied_validator_count ? module.proxy.internal_ip_addresses[count.index] : "",
-      # proxy_external_ip_addresses : count.index < var.proxied_validator_count ? module.proxy.ip_addresses[count.index] : "",
-      proxy_internal_ip_addresses : compact([for key in keys(module.proxy.internal_ip_addresses_map) : substr(key, 0, length("validator-0")) == "validator-0" ? module.proxy.internal_ip_addresses_map[key] : ""]),
-      proxy_external_ip_addresses : compact([for key in keys(module.proxy.ip_addresses_map) : substr(key, 0, length("validator-0")) == "validator-0" ? module.proxy.ip_addresses_map[key] : ""]),
+      # Searches for all proxies whose map key corresponds to this specific validator
+      # by finding keys starting with "validator-${this validator index}"
+      proxy_internal_ip_addresses : compact([for key in keys(module.proxy.internal_ip_addresses_map) : substr(key, 0, length(format("validator-%d", count.index))) == format("validator-%d", count.index) ? module.proxy.internal_ip_addresses_map[key] : ""]),
+      proxy_external_ip_addresses : compact([for key in keys(module.proxy.ip_addresses_map) : substr(key, 0, length(format("validator-%d", count.index))) == format("validator-%d", count.index) ? module.proxy.ip_addresses_map[key] : ""]),
       validator_name : "${local.name_prefix}-${count.index}",
     }
   )
@@ -145,12 +139,10 @@ module "proxy" {
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = ["${var.celo_env}-proxy"]
   name                                  = "proxy"
-  names                                 = toset(["validator-0-proxy-0"])
+  names                                 = flatten([for val_index in range(length(var.proxies_per_validator)) : [for proxy_index in range(var.proxies_per_validator[val_index]) : format("validator-%d-proxy-%d", val_index, proxy_index)]])
   network_id                            = var.network_id
   network_name                          = var.network_name
-  # NOTE this assumes only one proxy will be used
-  node_count = var.proxied_validator_count
-  proxy      = true
+  proxy                                 = true
 }
 
 # if there are no proxied validators, we don't have to worry about

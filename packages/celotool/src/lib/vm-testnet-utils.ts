@@ -292,6 +292,7 @@ function getTestnetVars(celoEnv: string) {
     // forno is the name for our setup that has tx-nodes reachable via a domain name
     letsencrypt_email: 'n@celo.org',
     network_name: networkName(celoEnv),
+    proxies_per_validator: JSON.stringify(getProxiesPerValidator()),
   }
 }
 

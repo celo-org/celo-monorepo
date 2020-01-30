@@ -88,6 +88,11 @@ variable proxied_validator_count {
   description = "Number of validator_count validators that are hidden behind proxies"
 }
 
+variable proxies_per_validator {
+  type        = list(number)
+  description = "Number of proxies for each validator that is proxied. Does not include validators that aren't proxied. Indeces correspond to validator indeces."
+}
+
 variable tx_node_count {
   type        = number
   description = "Number of tx-nodes that are created"

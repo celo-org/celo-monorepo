@@ -1,15 +1,16 @@
 locals {
   attached_disk_name = "celo-data"
   name_prefix        = "${var.celo_env}-${var.name}"
+  names              = length(var.names) > 0 ? var.names : [for node_index in range(var.node_count) : "${var.name}-${node_index}"]
 }
 
 resource "google_compute_address" "full_node" {
-  name         = "${length(var.names) > 0 ? format("%s-%s", var.celo_env, each.key) : local.name_prefix}-address-${random_id.full_node[each.key].hex}"
+  name         = "${var.celo_env}-${each.key}-address-${random_id.full_node[each.key].hex}"
   address_type = "EXTERNAL"
 
   # count = var.node_count
 
-  for_each = var.names
+  for_each = local.names
 
   lifecycle {
     create_before_destroy = true
@@ -17,12 +18,10 @@ resource "google_compute_address" "full_node" {
 }
 
 resource "google_compute_instance" "full_node" {
-  name         = "${length(var.names) > 0 ? format("%s-%s", var.celo_env, each.key) : local.name_prefix}-${random_id.full_node[each.key].hex}"
+  name         = "${var.celo_env}-${each.key}-${random_id.full_node[each.key].hex}"
   machine_type = "n1-standard-2"
 
-  # count = var.node_count
-
-  for_each = var.names
+  for_each = local.names
 
   tags = concat(["${var.celo_env}-node"], var.instance_tags)
 
@@ -64,9 +63,9 @@ resource "google_compute_instance" "full_node" {
       in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.full_node[each.key].address,
       max_peers : 2000,
-      name : length(var.names) > 0 ? each.key : var.name,
+      name : each.key,
       network_id : var.network_id,
-      node_name : "${var.celo_env}-${var.name}-${each.key}",
+      node_name : "${var.celo_env}-${each.key}",
       proxy : var.proxy,
       rid : each.key,
     }
@@ -87,9 +86,9 @@ resource "google_compute_instance" "full_node" {
 }
 
 resource "google_compute_disk" "full_node" {
-  name  = "${length(var.names) > 0 ? format("%s-%s", var.celo_env, each.key) : local.name_prefix}-disk-${random_id.full_node_disk[each.key].hex}"
-  # count = var.node_count
-  for_each = var.names
+  name  = "${var.celo_env}-${each.key}-disk-${random_id.full_node_disk[each.key].hex}"
+
+  for_each = local.names
 
   type = "pd-ssd"
   # in GB
@@ -102,16 +101,14 @@ resource "google_compute_disk" "full_node" {
 }
 
 resource "random_id" "full_node" {
-  # count = var.node_count
-  for_each = var.names
+  for_each = local.names
 
   byte_length = 8
 }
 
 # Separate random id so that updating the ID of the instance doesn't force a new disk
 resource "random_id" "full_node_disk" {
-  # count = var.node_count
-  for_each = var.names
+  for_each = local.names
 
   byte_length = 8
 }

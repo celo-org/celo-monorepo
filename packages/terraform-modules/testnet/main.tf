@@ -193,6 +193,7 @@ module "validator" {
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   proxied_validator_count               = var.proxied_validator_count
+  proxies_per_validator                 = var.proxies_per_validator
   tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
 }

@@ -103,7 +103,8 @@ variable network_name {
 
 variable node_count {
   type        = number
-  description = "Number of nodes to create"
+  description = "Number of nodes to create if names is not specified"
+  default     = 0
 }
 
 variable proxy {
