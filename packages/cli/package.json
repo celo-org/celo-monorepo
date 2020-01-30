@@ -26,7 +26,7 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test:reset": "yarn --cwd ../protocol devchain generate .devchain --migration_override ../dev-utils/src/migration-override.json --upto 22",
+    "test:reset": "yarn --cwd ../protocol devchain generate .devchain --migration_override ../dev-utils/src/migration-override.json --upto 23",
     "test:livechain": "yarn --cwd ../protocol devchain run .devchain",
     "test": "TZ=UTC jest --runInBand"
   },
