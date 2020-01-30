@@ -23,10 +23,19 @@ Loss of an authorized key no longer has catastrophic implications, as the Accoun
 
 Key rotation for Consensus is a bit trickier. Let's assume that a validator is currently elected, actively signing consensus messages and wants to rotate their validator signer key. What they should do is the following:
 
-- Bring up a new validator node and create a new validator signer key on it.
-- Authorize the new validator signer with the Account key on the `Accounts` smart contract and update the ECDSA and BLS keys as well.
-- Your old node will continue to sign consensus messages for the current epoch, but with the starting epoch will find itself no longer authorized.
+- Bring up a new validator node and create a new Validator signer key (VSK) on it.
+- Authorize the new Validator signer key with the Account key to overwrite the old signer key.
+
+```bash
+celocli authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer <NEW_VSK_ADDRESS> --signature <PROOF_OF_NEW_VSK_POSSESSION>
+```
+
+- Your old node will continue to sign consensus messages for the current epoch, but upon the next epoch will find itself no longer authorized.
 - Your new node will find itself unauthorized, but will be authorized to sign as the next epoch begins.
+
+**Waiting for the epoch to flip before bringing down the retired validator node is essential to zero-downtime rotation when elected.**
+
+Please see the [Running a Validator](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator) section for details on key generation, authorization, and proof of possession.
 
 # Key Security
 
@@ -34,7 +43,7 @@ It is evident that the Account key is the most sensitive key. As it should be us
 
 # Key Usage in Protocol
 
-### Contracts
+### Celo Registry Contracts
 
 `Accounts` Entrypoint for users to create an account and authorize _unique_ addresses which correspond to signing keys
 
@@ -51,7 +60,7 @@ It is evident that the Account key is the most sensitive key. As it should be us
 
 `Attestations` Expects issuers to be registered accounts; expects completers to be signing with Attestation key (or account key)
 
-### Blockchain
+### Celo Blockchain Client
 
 `Consensus` Expects participants to be registered accounts and signing with Validator key
 
