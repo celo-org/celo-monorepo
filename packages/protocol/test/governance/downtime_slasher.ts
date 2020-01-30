@@ -20,6 +20,7 @@ const DowntimeSlasher: TestDowntimeSlasherContract = artifacts.require('TestDown
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
+const EPOCH = 100
 // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
 function getFirstBlockNumberForEpoch(epochNumber: number) {
   if (epochNumber === 0) {
