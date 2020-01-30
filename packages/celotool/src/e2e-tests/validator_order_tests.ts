@@ -10,7 +10,7 @@ const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT
 
 describe('governance tests', () => {
   const gethConfig: GethTestConfig = {
-    migrateTo: 15,
+    migrateTo: 16,
     instances: _.range(VALIDATORS).map((i) => ({
       name: `validator${i}`,
       validating: true,

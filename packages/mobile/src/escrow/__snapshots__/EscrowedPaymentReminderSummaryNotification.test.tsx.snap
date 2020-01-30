@@ -224,173 +224,185 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
       }
     }
   >
-    <View>
+    <View
+      style={
+        Array [
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "width": "100%",
+          },
+          Object {
+            "elevation": 2,
+            "shadowColor": "black",
+            "shadowOffset": Object {
+              "height": 1,
+              "width": 0,
+            },
+            "shadowOpacity": 0.3,
+            "shadowRadius": 1.6,
+          },
+        ]
+      }
+    >
       <View
         style={
-          Array [
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "padding": 16,
-              "width": "100%",
-            },
-            Object {
-              "elevation": 2,
-              "shadowColor": "black",
-              "shadowOffset": Object {
-                "height": 1,
-                "width": 0,
-              },
-              "shadowOpacity": 0.3,
-              "shadowRadius": 1.6,
-            },
-          ]
+          Object {
+            "padding": 16,
+          }
         }
       >
         <View
           style={
             Object {
-              "alignItems": "center",
-              "paddingRight": 16,
-            }
-          }
-        >
-          <Image
-            resizeMode="contain"
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-              }
-            }
-            style={
-              Object {
-                "height": 30,
-                "width": 30,
-              }
-            }
-          />
-        </View>
-        <View
-          style={
-            Object {
-              "flex": 1,
+              "flexDirection": "row",
               "justifyContent": "space-between",
             }
           }
         >
-          <Text
-            style={
-              Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            escrowPaymentNotificationTitle
-          </Text>
           <View
             style={
               Object {
+                "alignItems": "center",
+                "paddingRight": 16,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 30,
+                  "width": 30,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
                 "justifyContent": "space-between",
-                "minHeight": 60,
-                "paddingTop": 8,
               }
             }
           >
             <Text
               style={
                 Object {
-                  "color": "#2E3338",
+                  "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 14,
                   "lineHeight": 18,
                 }
               }
             >
-              test message
+              escrowPaymentNotificationTitle
             </Text>
             <View
               style={
                 Object {
-                  "flexDirection": "row",
-                  "marginTop": 5,
+                  "justifyContent": "space-between",
+                  "minHeight": 60,
+                  "paddingTop": 8,
                 }
               }
             >
-              <View
-                accessible={true}
-                focusable={true}
-                isTVSelectable={true}
-                nativeBackgroundAndroid={
+              <Text
+                style={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "paddingEnd": 15,
-                      },
-                    ]
-                  }
-                >
-                  global:remind
-                </Text>
-              </View>
+                test message
+              </Text>
               <View
-                accessible={true}
-                focusable={true}
-                isTVSelectable={true}
-                nativeBackgroundAndroid={
+                style={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "flexDirection": "row",
+                    "marginTop": 5,
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "paddingEnd": 15,
-                      },
-                    ]
+                <View
+                  accessible={true}
+                  focusable={true}
+                  isTVSelectable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
                   }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
                 >
-                  global:reclaim
-                </Text>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#42D689",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "paddingEnd": 15,
+                        },
+                      ]
+                    }
+                  >
+                    global:remind
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  isTVSelectable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#42D689",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "paddingEnd": 15,
+                        },
+                      ]
+                    }
+                  >
+                    global:reclaim
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
