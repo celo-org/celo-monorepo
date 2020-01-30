@@ -13,13 +13,21 @@ import {
   TestDowntimeSlasherContract,
   TestDowntimeSlasherInstance,
 } from 'types'
-import { getFirstBlockNumberForEpoch } from './validators'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const DowntimeSlasher: TestDowntimeSlasherContract = artifacts.require('TestDowntimeSlasher')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
+
+// Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+function getFirstBlockNumberForEpoch(epochNumber: number) {
+  if (epochNumber === 0) {
+    // No first block for epoch 0
+    return 0
+  }
+  return (epochNumber - 1) * EPOCH + 1
+}
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
