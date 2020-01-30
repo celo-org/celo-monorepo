@@ -5717,7 +5717,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                Brand
+                channels.brand.name
               </div>
             </a>
             <div
@@ -5733,7 +5733,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              Build On Celo
+              channels.brand.text
             </div>
           </div>
         </div>
@@ -6057,7 +6057,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                GitHub
+                channels.github.name
               </div>
             </a>
             <div
@@ -6073,7 +6073,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              Contribute to the codebase
+              channels.github.text
             </div>
           </div>
         </div>
@@ -6139,7 +6139,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                Discord
+                channels.discord.name
               </div>
             </a>
             <div
@@ -6155,8 +6155,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              Collaborate and get
-developer support
+              channels.discord.text
             </div>
           </div>
         </div>
@@ -6220,7 +6219,7 @@ developer support
                   }
                 }
               >
-                Forum
+                channels.forum.name
               </div>
             </a>
             <div
@@ -6236,7 +6235,7 @@ developer support
                 }
               }
             >
-              Ask technical questions
+              channels.forum.text
             </div>
           </div>
         </div>
@@ -6321,7 +6320,7 @@ developer support
                   }
                 }
               >
-                Events
+                channels.events.name
               </div>
             </a>
             <div
@@ -6337,7 +6336,7 @@ developer support
                 }
               }
             >
-              Connect in Person
+              channels.events.text
             </div>
           </div>
         </div>
