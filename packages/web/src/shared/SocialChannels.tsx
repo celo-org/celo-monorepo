@@ -131,7 +131,7 @@ export const BrandChannel = React.memo(function _BrandChannel({
       title={'Brand'}
       link={menuItems.BRAND.link}
       icon={<DrawCoin size={45} />}
-      text={'Build On Celo'}
+      text={'Design with Celo'}
     />
   )
 })

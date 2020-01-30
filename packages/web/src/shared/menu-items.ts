@@ -1,3 +1,5 @@
+import DevelopersPage from 'pages/developers'
+
 export const menuItems = {
   HOME: {
     name: 'Home',
@@ -22,6 +24,10 @@ export const menuItems = {
   COMMUNITY: {
     name: 'Connect',
     link: '/community',
+  },
+  SDK_DEVELOPERS: {
+    name: DevelopersPage,
+    link: '/developers',
   },
   JOBS: {
     name: 'Join',
