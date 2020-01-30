@@ -16,20 +16,18 @@ describe('governance tests', () => {
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
-    migrateTo: 15,
-    instances: [],
+    migrateTo: 16,
+    instances: _.range(VALIDATORS).map((i) => ({
+      name: `validator${i}`,
+      validating: true,
+      syncmode: 'full',
+      port: 30303 + 2 * i,
+      rpcport: 8545 + 2 * i,
+    })),
     genesisConfig: {
       epoch: EPOCH,
     },
   }
-
-  gethConfig.instances = _.range(VALIDATORS).map((i) => ({
-    name: `validator${i}`,
-    validating: true,
-    syncmode: 'full',
-    port: 30303 + 2 * i,
-    rpcport: 8545 + 2 * i,
-  }))
 
   const context: any = getContext(gethConfig)
   let web3: Web3
