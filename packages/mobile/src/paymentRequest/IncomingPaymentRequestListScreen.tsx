@@ -5,7 +5,6 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
@@ -28,7 +27,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
@@ -41,10 +39,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
 
-export const listItemRenderer = (params: {
-  recipientCache: NumberToRecipient
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
-}) => (request: PaymentRequest, key: number | undefined = undefined) => {
+export const listItemRenderer = (params: { recipientCache: NumberToRecipient }) => (
+  request: PaymentRequest,
+  key: number | undefined = undefined
+) => {
   const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
 
   return (
@@ -52,7 +50,6 @@ export const listItemRenderer = (params: {
       <IncomingPaymentRequestListItem
         id={request.uid || ''}
         amount={request.amount}
-        updatePaymentRequestStatus={params.updatePaymentRequestStatus}
         requester={requester}
         comment={request.comment}
       />
@@ -67,7 +64,6 @@ const IncomingPaymentRequestListScreen = (props: Props) => {
     <NotificationList
       items={props.paymentRequests}
       listItemRenderer={listItemRenderer({
-        updatePaymentRequestStatus: props.updatePaymentRequestStatus,
         recipientCache,
       })}
       dollarBalance={props.dollarBalance}
@@ -80,6 +76,5 @@ IncomingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
 )
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  updatePaymentRequestStatus,
   fetchPhoneAddresses,
 })(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

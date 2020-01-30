@@ -5,17 +5,16 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { PaymentRequestStatus } from 'src/account/types'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { connect } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
+import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
 import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
@@ -24,16 +23,19 @@ interface OwnProps {
   amount: string
   comment: string
   id: string
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
 }
 
-type Props = OwnProps & WithTranslation
+interface DispatchProps {
+  declinePaymentRequest: typeof declinePaymentRequest
+}
+
+type Props = OwnProps & DispatchProps & WithTranslation
 
 const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
-    const { amount, comment: reason, requester: recipient } = this.props
+    const { id, amount, comment: reason, requester: recipient } = this.props
     navigate(Screens.SendConfirmation, {
       confirmationInput: {
         reason,
@@ -41,25 +43,15 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
         amount: new BigNumber(amount),
         recipientAddress: recipient.address,
         type: TokenTransactionType.PayRequest,
+        firebasePendingRequestUid: id,
       },
-      onConfirm: this.onPaymentSuccess,
-      onCancel: this.onPaymentDecline,
     })
-  }
-
-  onPaymentSuccess = () => {
-    const { id } = this.props
-    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.COMPLETED)
-    Logger.showMessage(this.props.t('requestPaid'))
-    CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
-    navigate(Screens.WalletHome)
   }
 
   onPaymentDecline = () => {
     const { id } = this.props
-    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.DECLINED)
+    this.props.declinePaymentRequest(id)
     Logger.showMessage(this.props.t('requestDeclined'))
-    CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
   }
 
   getCTA = () => {
@@ -117,4 +109,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem)
+export default connect<{}, DispatchProps, {}, RootState>(null, {
+  declinePaymentRequest,
+})(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem))

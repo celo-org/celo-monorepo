@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
   addressToE164NumberSelector,
@@ -27,12 +26,7 @@ interface OwnProps {
   requests: PaymentRequest[]
 }
 
-interface DispatchProps {
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
-  updatePaymentRequestNotified: typeof updatePaymentRequestNotified
-}
-
-type Props = OwnProps & DispatchProps & WithTranslation & StateProps
+type Props = OwnProps & WithTranslation & StateProps
 
 interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
@@ -77,8 +71,6 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
     return requests.length === 1 ? (
       listItemRenderer({
         addressToE164Number: this.props.addressToE164Number,
-        updatePaymentRequestStatus: this.props.updatePaymentRequestStatus,
-        updatePaymentRequestNotified: this.props.updatePaymentRequestNotified,
         recipientCache,
       })(requests[0])
     ) : (
@@ -100,7 +92,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  updatePaymentRequestStatus,
-  updatePaymentRequestNotified,
-})(withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))
+export default connect<StateProps, {}, {}, RootState>(
+  mapStateToProps,
+  {}
+)(withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))

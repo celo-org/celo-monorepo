@@ -20,6 +20,8 @@ import {
 } from 'src/account/actions'
 import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
@@ -27,9 +29,11 @@ import { updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
 import { exchangeHistorySelector, ExchangeRate, MAX_HISTORY_RETENTION } from 'src/exchange/reducer'
 import {
   Actions,
+  CancelPaymentRequestAction,
+  CompletePaymentRequestAction,
+  DeclinePaymentRequestAction,
   firebaseAuthorized,
   UpdatePaymentRequestNotifiedAction,
-  UpdatePaymentRequestStatusAction,
 } from 'src/firebase/actions'
 import {
   initializeAuth,
@@ -162,7 +166,7 @@ function* subscribeToOutgoingPaymentRequests() {
   yield subscribeToPaymentRequests(REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
 }
 
-function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusAction) {
+function* updatePaymentRequestStatus(id: string, status: PaymentRequestStatus) {
   try {
     Logger.debug(TAG, 'Updating payment request', id, `status: ${status}`)
     yield call(() =>
@@ -178,8 +182,25 @@ function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusA
   }
 }
 
+function* declinePaymentRequest({ id }: DeclinePaymentRequestAction) {
+  CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
+  yield call(updatePaymentRequestStatus, id, PaymentRequestStatus.DECLINED)
+}
+
+function* completePaymentRequest({ id }: CompletePaymentRequestAction) {
+  CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
+  yield call(updatePaymentRequestStatus, id, PaymentRequestStatus.COMPLETED)
+}
+
+function* cancelPaymentRequest({ id }: CancelPaymentRequestAction) {
+  CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
+  yield call(updatePaymentRequestStatus, id, PaymentRequestStatus.CANCELLED)
+}
+
 export function* watchPaymentRequestStatusUpdates() {
-  yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
+  yield takeLeading(Actions.PAYMENT_REQUEST_COMPLETE, completePaymentRequest)
+  yield takeLeading(Actions.PAYMENT_REQUEST_DECLINE, declinePaymentRequest)
+  yield takeLeading(Actions.PAYMENT_REQUEST_CANCEL, cancelPaymentRequest)
 }
 
 function* updatePaymentRequestNotified({ id, notified }: UpdatePaymentRequestNotifiedAction) {
