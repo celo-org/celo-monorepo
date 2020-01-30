@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { initAndStartGeth } from '../lib/geth'
+import { connectValidatorPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
@@ -68,7 +68,7 @@ describe('sync tests', function(this: any) {
     }
 
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
-
+    await connectValidatorPeers(gethConfig)
     const web3 = new Web3('http://localhost:8553')
     await waitToFinishSyncing(web3)
   })
@@ -90,6 +90,7 @@ describe('sync tests', function(this: any) {
           peers: ['8553'],
         }
         await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncInstance, verbose)
+        await connectValidatorPeers(gethConfig)
       })
 
       afterEach(() => killInstance(syncInstance))
@@ -130,6 +131,7 @@ describe('sync tests', function(this: any) {
         { ...instance, peers: ['8547'] },
         verbose
       )
+      await connectValidatorPeers(gethConfig)
       await sleep(120, verbose) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')

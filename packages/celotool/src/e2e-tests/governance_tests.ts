@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import { importGenesis, initAndStartGeth } from '../lib/geth'
+import { connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
@@ -357,6 +357,8 @@ describe('governance tests', () => {
         )
       )
 
+      await connectValidatorPeers(gethConfig)
+
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
       // are properly gossiped.
       const additionalValidatingNodes = [
@@ -389,6 +391,8 @@ describe('governance tests', () => {
           initAndStartGeth(gethConfig, context.hooks.gethBinaryPath, nodeConfig, verbose)
         )
       )
+
+      await connectValidatorPeers(gethConfig)
 
       await sleep(10, true)
 

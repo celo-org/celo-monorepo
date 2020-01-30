@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { initAndStartGeth } from '../lib/geth'
+import { connectValidatorPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep } from './utils'
@@ -215,6 +215,8 @@ describe('Transfer tests', function(this: any) {
       peers: ['8545'],
     }
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
+
+    await connectValidatorPeers(gethConfig)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
