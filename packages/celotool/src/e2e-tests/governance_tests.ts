@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import { connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
+import { connectPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { assertAlmostEqual, getContext, sleep, waitToFinishSyncing } from './utils'
@@ -338,32 +338,24 @@ describe('governance tests', () => {
       const rotation1PrivateKey =
         '0x4519cae145fb9499358be484ca60c80d8f5b7f9c13ff82c88ec9e13283e9de1a'
 
-      const additionalNodes: GethInstanceConfig[] = [
-        {
-          name: 'validatorGroup',
-          validating: false,
-          syncmode: 'full',
-          port: 30313,
-          wsport: 8555,
-          rpcport: 8557,
-          privateKey: groupPrivateKey.slice(2),
-          peers: ['8545'],
-        },
-      ]
+      const validatorGroup: GethInstanceConfig = {
+        name: 'validatorGroup',
+        validating: false,
+        syncmode: 'full',
+        port: 30313,
+        wsport: 8555,
+        rpcport: 8557,
+        privateKey: groupPrivateKey.slice(2),
+      }
 
-      await Promise.all(
-        additionalNodes.map((nodeConfig: GethInstanceConfig) =>
-          initAndStartGeth(gethConfig, context.hooks.gethBinaryPath, nodeConfig, verbose)
-        )
-      )
+      await initAndStartGeth(gethConfig, context.hooks.gethBinaryPath, validatorGroup, verbose)
 
-      await connectValidatorPeers(gethConfig)
+      await connectPeers([gethConfig.instances[0], validatorGroup])
 
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
       // are properly gossiped.
-      const additionalValidatingNodes = [
+      const additionalValidatingNodes: GethInstanceConfig[] = [
         {
-          gethRunConfig: gethConfig,
           name: 'validator2KeyRotation0',
           validating: true,
           syncmode: 'full',
@@ -371,10 +363,8 @@ describe('governance tests', () => {
           port: 30315,
           wsport: 8559,
           privateKey: rotation0PrivateKey.slice(2),
-          peers: ['8557'],
         },
         {
-          gethRunConfig: gethConfig,
           name: 'validator2KeyRotation1',
           validating: true,
           syncmode: 'full',
@@ -382,7 +372,6 @@ describe('governance tests', () => {
           port: 30317,
           wsport: 8561,
           privateKey: rotation1PrivateKey.slice(2),
-          peers: ['8557'],
         },
       ]
 
@@ -392,7 +381,7 @@ describe('governance tests', () => {
         )
       )
 
-      await connectValidatorPeers(gethConfig)
+      await connectPeers([gethConfig.instances[0], ...additionalValidatingNodes])
 
       await sleep(10, true)
 

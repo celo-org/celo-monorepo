@@ -10,7 +10,6 @@ export interface GethInstanceConfig {
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
-  peers?: string[]
   proxies?: Array<string[2]>
   pid?: number
   isProxied?: boolean

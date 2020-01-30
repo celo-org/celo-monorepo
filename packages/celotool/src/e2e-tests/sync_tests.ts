@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { connectValidatorPeers, initAndStartGeth } from '../lib/geth'
+import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep, waitToFinishSyncing } from './utils'
@@ -64,11 +64,10 @@ describe('sync tests', function(this: any) {
       lightserv: true,
       port: 30311,
       rpcport: 8553,
-      peers: ['8545'],
     }
 
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
-    await connectValidatorPeers(gethConfig)
+    await connectPeers([gethConfig.instances[0], fullNode])
     const web3 = new Web3('http://localhost:8553')
     await waitToFinishSyncing(web3)
   })
@@ -87,10 +86,9 @@ describe('sync tests', function(this: any) {
           port: 30313,
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
-          peers: ['8553'],
         }
         await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncInstance, verbose)
-        await connectValidatorPeers(gethConfig)
+        await connectPeers([gethConfig.instances[0], syncInstance])
       })
 
       afterEach(() => killInstance(syncInstance))
@@ -125,13 +123,10 @@ describe('sync tests', function(this: any) {
       this.timeout(0)
       const instance: GethInstanceConfig = gethConfig.instances[0]
       await killInstance(instance)
-      await initAndStartGeth(
-        gethConfig,
-        hooks.gethBinaryPath,
-        { ...instance, peers: ['8547'] },
-        verbose
-      )
-      await connectValidatorPeers(gethConfig)
+      // copy instance
+      const additionalInstance = { ...instance }
+      await initAndStartGeth(gethConfig, hooks.gethBinaryPath, additionalInstance, verbose)
+      await connectPeers([gethConfig.instances[0], additionalInstance])
       await sleep(120, verbose) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')

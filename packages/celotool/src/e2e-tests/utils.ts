@@ -168,7 +168,9 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
+
   const numValidators = validatorInstances.length
+
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidatorsInformation(mnemonic, numValidators)
@@ -267,7 +269,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
     }
 
-    await connectValidatorPeers(gethConfig)
+    await connectValidatorPeers(gethConfig.instances)
 
     // Give validators time to connect to each other
     await sleep(60, true)
@@ -322,7 +324,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         return startGeth(gethConfig, gethBinaryPath, instance, verbose)
       })
     )
-    await connectValidatorPeers(gethConfig)
+    await connectValidatorPeers(gethConfig.instances)
   }
 
   const after = () => killGeth()

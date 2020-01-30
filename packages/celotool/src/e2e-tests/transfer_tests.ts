@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { connectValidatorPeers, initAndStartGeth } from '../lib/geth'
+import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep } from './utils'
@@ -201,8 +201,7 @@ describe('Transfer tests', function(this: any) {
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
     // Spin up a node that we can sync with.
-    const fullInstance = {
-      gethRunConfig: gethConfig,
+    const fullInstance: GethInstanceConfig = {
       name: 'txFull',
       validating: false,
       syncmode: 'full',
@@ -212,11 +211,9 @@ describe('Transfer tests', function(this: any) {
       // We need to set an etherbase here so that the full node will accept transactions from
       // light clients.
       etherbase: FeeRecipientAddress,
-      peers: ['8545'],
     }
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
-
-    await connectValidatorPeers(gethConfig)
+    await connectPeers([gethConfig.instances[0], fullInstance])
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -248,7 +245,6 @@ describe('Transfer tests', function(this: any) {
         port: 30307,
         rpcport: 8549,
         privateKey: DEF_FROM_PK,
-        peers: ['8547'],
       },
       true
     )

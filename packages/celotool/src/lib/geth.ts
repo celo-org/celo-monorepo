@@ -676,7 +676,7 @@ export const runGethNodes = async ({
     await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
   }
 
-  await connectValidatorPeers(gethConfig)
+  await connectValidatorPeers(gethConfig.instances)
 }
 
 function getInstanceDir(runPath: string, instance: GethInstanceConfig) {
@@ -1102,24 +1102,25 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
   return p
 }
 
-// Add validator 0 as a peer of each other validator.
-export async function connectValidatorPeers(gethConfig: GethRunConfig) {
-  const admins = gethConfig.instances
-    .filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
-    .map(({ wsport, rpcport }) => {
-      const url = `${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`
-      return new Admin(url)
-    })
-
-  const enodes = await Promise.all(admins.map(async (admin) => (await admin.getNodeInfo()).enode))
+export async function connectPeers(instances: GethInstanceConfig[]) {
+  const admins = instances.map(({ wsport, rpcport }) => {
+    const url = `${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`
+    return new Admin(url)
+  })
 
   await Promise.all(
     admins.map(async (admin, i) => {
+      const enodes = await Promise.all(admins.map(async (a) => (await a.getNodeInfo()).enode))
       await Promise.all(
         enodes.map(async (enode, j) => {
           if (i === j) {
             return
           }
+          /*
+          console.log(
+            `connecting ${instances[i].name} with ${instances[j].name} using enode ${enode}`
+          )
+          */
           const success = await admin.addPeer(enode)
           if (!success) {
             throw new Error('Connecting validators failed!')
@@ -1127,5 +1128,12 @@ export async function connectValidatorPeers(gethConfig: GethRunConfig) {
         })
       )
     })
+  )
+}
+
+// Add validator 0 as a peer of each other validator.
+export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
+  await connectPeers(
+    instances.filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
   )
 }
