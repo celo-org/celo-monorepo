@@ -17,7 +17,7 @@ Note that account and signer keys must be unique and may not be reused.
 
 # Key Rotation
 
-Loss of an authorized key no longer has catastrophic implications, as the Account key can just authorize another key in that case. In general, it is good hygene to rotate your keys, just like you should rotate your passwords.
+Loss of an authorized key no longer has catastrophic implications, as the Account key can just authorize another key in that case. In general, it is good hygiene to rotate your keys, just like you should rotate your passwords.
 
 ### Key Rotation for Consensus
 
@@ -31,3 +31,28 @@ Key rotation for Consensus is a bit trickier. Let's assume that a validator is c
 # Key Security
 
 It is evident that the Account key is the most sensitive key. As it should be used quite infrequently, it is highly recommended for important Account keys (i.e. Validators or accounts with high balances) to remain as secure as possible. At the minimum, we recommend them to be offline, ideally in cold storage or on a hardware wallet.
+
+# Key Usage in Protocol
+
+### Contracts
+
+`Accounts` Entrypoint for users to create an account and authorize _unique_ addresses which correspond to signing keys
+
+- requires user is _not_ a validator if authorizing Validator key and _not_ updating ECDSA public key
+- requires user is a validator if authorizing Validator key and updating ECDSA public key
+
+`LockedGold` Expects user to be registered account signing with Account key
+
+`Governance` Expects user to be registered account signing with Vote key (or account key)
+
+`Election` Expects user to be registered account signing with Vote key (or account key)
+
+`Validators` Expects user to be registered account signing with Validator key (or account key)
+
+`Attestations` Expects issuers to be registered accounts; expects completers to be signing with Attestation key (or account key)
+
+### Blockchain
+
+`Consensus` Expects participants to be registered accounts and signing with Validator key
+
+`Precompiles` Keeps track of current validator set and proof of possession using authorized Validator key addresses
