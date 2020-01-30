@@ -4,7 +4,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorDeregister extends BaseCommand {
-  static description = 'Deregister a Validator'
+  static description =
+    'Deregister a Validator. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator will become possible to unlock. Note that deregistering a Validator will also deaffiliate and remove the Validator from any Group it may be an affiliate or member of.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -23,6 +24,8 @@ export default class ValidatorDeregister extends BaseCommand {
       .isSignerOrAccount()
       .canSignValidatorTxs()
       .signerAccountIsValidator()
+      .isNotValidatorGroupMember()
+      .validatorDeregisterDurationPassed()
       .runChecks()
 
     const validator = await validators.signerToAccount(res.flags.from)

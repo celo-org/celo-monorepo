@@ -3,11 +3,13 @@ import { CeloContract } from './base'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
+import { newDoubleSigningSlasher } from './generated/DoubleSigningSlasher'
+import { newDowntimeSlasher } from './generated/DowntimeSlasher'
 import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
-import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
+import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
@@ -26,11 +28,13 @@ const ContractFactories = {
   [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
+  [CeloContract.DoubleSigningSlasher]: newDoubleSigningSlasher,
+  [CeloContract.DowntimeSlasher]: newDowntimeSlasher,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
-  [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
+  [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
@@ -67,6 +71,12 @@ export class Web3ContractCache {
   getBlockchainParameters() {
     return this.getContract(CeloContract.BlockchainParameters)
   }
+  getDoubleSigningSlasher() {
+    return this.getContract(CeloContract.DoubleSigningSlasher)
+  }
+  getDowntimeSlasher() {
+    return this.getContract(CeloContract.DowntimeSlasher)
+  }
   getElection() {
     return this.getContract(CeloContract.Election)
   }
@@ -79,8 +89,8 @@ export class Web3ContractCache {
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }
-  getGasCurrencyWhitelist() {
-    return this.getContract(CeloContract.GasCurrencyWhitelist)
+  getFeeCurrencyWhitelist() {
+    return this.getContract(CeloContract.FeeCurrencyWhitelist)
   }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)

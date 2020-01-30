@@ -3,7 +3,7 @@ import { E164Number } from '@celo/utils/lib/io'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import Nexmo from 'nexmo'
 import { fetchEnv } from '../env'
-import { SmsProvider, SmsProviderType } from './base'
+import { readBlacklistFromEnv, SmsProvider, SmsProviderType } from './base'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -12,7 +12,7 @@ export class NexmoSmsProvider extends SmsProvider {
     return new NexmoSmsProvider(
       fetchEnv('NEXMO_KEY'),
       fetchEnv('NEXMO_SECRET'),
-      fetchEnv('NEXMO_BLACKLIST').split(',')
+      readBlacklistFromEnv('NEXMO_BLACKLIST')
     )
   }
   type = SmsProviderType.NEXMO
@@ -34,6 +34,12 @@ export class NexmoSmsProvider extends SmsProvider {
 
   initialize = async () => {
     const availableNumbers = await this.getAvailableNumbers()
+
+    if (!availableNumbers) {
+      throw new Error(
+        'You have no phone numbers in your Nexmo account. Please buy at least one number at https://dashboard.nexmo.com/buy-numbers'
+      )
+    }
     this.nexmoNumbers = availableNumbers.map((number: any) => ({
       phoneNumber: number.msisdn,
       code: phoneUtil.getRegionCodeForNumber(phoneUtil.parse('+' + number.msisdn)),

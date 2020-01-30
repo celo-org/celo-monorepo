@@ -1,7 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'restore'
 
@@ -49,9 +49,7 @@ export const handler = async (argv: RestoreArgv) => {
   // That itself requires that the miner node be stopped.
   // For now, this step is intentionally manual.
   // When we encounter a real world use-case of restore, we can decide whether to automate this or not.
-  const restoreSnapshotCmd = `gcloud compute disks create ${pvcFullId} --source-snapshot=${
-    argv.snapshotname
-  } --type ${diskType}`
+  const restoreSnapshotCmd = `gcloud compute disks create ${pvcFullId} --source-snapshot=${argv.snapshotname} --type ${diskType}`
   await execCmdWithExitOnFailure(restoreSnapshotCmd)
   // const gcloudSnapshotsUrl = 'https://console.cloud.google.com/compute/snapshots'
   // console.info(`Snapshot \"${snapshotName}\" can be seen at ${gcloudSnapshotsUrl}`)

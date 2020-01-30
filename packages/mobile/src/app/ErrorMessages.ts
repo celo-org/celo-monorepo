@@ -12,8 +12,8 @@ export enum ErrorMessages {
   IMPORT_BACKUP_FAILED = 'backupKeyFlow6:importBackupFailed',
   BACKUP_QUIZ_FAILED = 'backupKeyFlow6:backupQuizFailed',
   FAILED_FETCH_MNEMONIC = 'backupKeyFlow6:failedFetchMnemonic',
-  INVALID_PHONE_NUMBER = 'nuxVerification2:invalidPhone',
-  MISSING_FULL_NAME = 'nuxVerification2:missingFullName',
+  INVALID_PHONE_NUMBER = 'invalidPhone',
+  MISSING_FULL_NAME = 'missingFullName',
   NOT_READY_FOR_CODE = 'nuxVerification2:notReadyForCode',
   EMPTY_ATTESTATION_CODE = 'nuxVerification2:emptyVerificationCode',
   INVALID_ATTESTATION_CODE = 'nuxVerification2:invalidVerificationCode',
@@ -46,4 +46,5 @@ export enum ErrorMessages {
   CALCULATE_FEE_FAILED = 'calculateFeeFailed',
   FAILED_TO_SWITCH_SYNC_MODES = 'failedToSwitchSyncModes',
   SMS_ERROR = 'walletFlow5:SMSError',
+  PAYMENT_REQUEST_UPDATE_FAILED = 'paymentRequestFlow:paymentRequestUpdateFailed',
 }

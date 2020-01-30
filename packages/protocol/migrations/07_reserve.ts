@@ -10,12 +10,16 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, ReserveInstance } from 'types'
 const truffle = require('@celo/protocol/truffle-config.js')
 
-const initializeArgs = async (): Promise<[string, number]> => {
+const initializeArgs = async (): Promise<[string, number, string]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
     artifacts
   )
-  return [registry.address, config.reserve.tobinTaxStalenessThreshold]
+  return [
+    registry.address,
+    config.reserve.tobinTaxStalenessThreshold,
+    config.reserve.dailySpendingRatio,
+  ]
 }
 
 module.exports = deploymentForCoreContract<ReserveInstance>(
@@ -31,5 +35,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       to: reserve.address,
       value: web3.utils.toWei(config.reserve.goldBalance.toString(), 'ether') as string,
     })
+    console.info(`Marking ${network.from} as a reserve spender`)
+    await reserve.addSpender(network.from)
   }
 )

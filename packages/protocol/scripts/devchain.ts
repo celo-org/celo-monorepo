@@ -7,7 +7,7 @@ import * as yargs from 'yargs'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 
-const gasLimit = 10000000
+const gasLimit = 20000000
 
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
 
@@ -70,7 +70,7 @@ async function startGanache(datadir: string, opts: { verbose?: boolean }) {
       }
 
   const server = ganache.server({
-    default_balance_ether: 1000000,
+    default_balance_ether: 200000000,
     logger: {
       log: logFn,
     },
@@ -174,7 +174,10 @@ async function runDevChain(
   createDirIfMissing(datadir)
   const stopGanache = await startGanache(datadir, { verbose: true })
   if (opts.reset) {
-    await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
+    const code = await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
+    if (code !== 0) {
+      throw Error('Migrations failed')
+    }
   }
   return stopGanache
 }

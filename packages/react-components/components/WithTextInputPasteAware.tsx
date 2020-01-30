@@ -21,18 +21,26 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
       isPasteIconVisible: false,
     }
 
+    _isMounted = false
+
     async componentDidMount() {
+      this._isMounted = true
       AppState.addEventListener('change', this.checkClipboardContents)
       await this.checkClipboardContents()
     }
 
     componentWillUnmount() {
+      this._isMounted = false
       AppState.removeEventListener('change', this.checkClipboardContents)
     }
 
     checkClipboardContents = async () => {
       try {
         const clipboardContent = await Clipboard.getString()
+        if (!this._isMounted) {
+          return
+        }
+
         if (
           clipboardContent &&
           clipboardContent !== this.props.value &&
@@ -49,8 +57,8 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
 
     onPressPate = async () => {
       const clipboardContents = await Clipboard.getString()
-      this.props.onChangeText(clipboardContents)
       this.setState({ isPasteIconVisible: false })
+      this.props.onChangeText(clipboardContents)
     }
 
     render() {
@@ -79,9 +87,11 @@ const style = StyleSheet.create({
     position: 'relative',
   },
   pasteIconContainer: {
+    backgroundColor: '#ffffff',
     position: 'absolute',
-    right: 16,
-    top: 18,
+    right: 11,
+    top: 13,
+    padding: 4,
     width: 20,
     height: 25,
     zIndex: 100,

@@ -4,7 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'blockscout'
@@ -32,7 +32,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     blockscoutDBConnectionName,
   ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName)
 
-  if (argv.reset) {
+  if (argv.reset === true) {
     console.info(
       'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
     )

@@ -5,7 +5,7 @@ import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
-import { NotificationReceiveState } from 'src/account'
+import { NotificationReceiveState } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -195,10 +195,12 @@ export async function isAppVersionDeprecated() {
   Logger.info(TAG, 'Checking version info')
   const version = DeviceInfo.getVersion()
 
-  const versionsInfo = (await firebase
-    .database()
-    .ref('versions')
-    .once('value')).val()
+  const versionsInfo = (
+    await firebase
+      .database()
+      .ref('versions')
+      .once('value')
+  ).val()
   if (!versionsInfo || !versionsInfo.minVersion) {
     return false
   }

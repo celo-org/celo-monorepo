@@ -1,5 +1,5 @@
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
-import { testWithGanache } from '../../test-utils/ganache-test'
 import Authorize from './authorize'
 import Register from './register'
 
@@ -16,7 +16,7 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
       'validator',
       '--signer',
       accounts[1],
-      '--pop',
+      '--signature',
       '0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
     ])
   })
@@ -31,7 +31,7 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
         'validator',
         '--signer',
         accounts[1],
-        '--pop',
+        '--signature',
         '0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
       ])
     ).rejects.toThrow()

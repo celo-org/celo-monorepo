@@ -5,14 +5,15 @@ import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { contractKit, web3 } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount, waitForWeb3Sync } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
@@ -41,12 +42,11 @@ export async function convertFromContractDecimals(value: BigNumber, token: CURRE
 
 export async function convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
   const weiPerUnit = await getWeiPerUnit(token)
-  return value.times(weiPerUnit)
+  return weiPerUnit.multipliedBy(value)
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
-  await waitForWeb3Sync()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()
@@ -119,7 +119,7 @@ export async function createTransaction(
   const decimals: string = await tokenContract.methods.decimals().call()
   const decimalBigNum = new BigNumber(decimals)
   const decimalFactor = new BigNumber(10).pow(decimalBigNum.toNumber())
-  const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor)
+  const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor).toFixed(0)
 
   const tx = tokenContract.methods.transferWithComment(
     recipientAddress,
@@ -156,7 +156,7 @@ export function tokenTransferFactory({
       yield put(
         addStandbyTransaction({
           id: txId,
-          type: TransactionTypes.SENT,
+          type: TokenTransactionType.Sent,
           comment,
           status: TransactionStatus.Pending,
           value: amount.toString(),

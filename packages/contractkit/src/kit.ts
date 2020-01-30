@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
@@ -51,8 +52,15 @@ export interface NetworkConfig {
 
 export interface KitOptions {
   gasInflationFactor: number
-  gasCurrency: Address | null
+  feeCurrency: Address | null
   from?: Address
+}
+
+interface AccountBalance {
+  gold: BigNumber
+  usd: BigNumber
+  total: BigNumber
+  lockedGold: BigNumber
 }
 
 export class ContractKit {
@@ -66,13 +74,29 @@ export class ContractKit {
   private config: KitOptions
   constructor(readonly web3: Web3) {
     this.config = {
-      gasCurrency: null,
+      feeCurrency: null,
       gasInflationFactor: 1.3,
     }
 
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+  }
+
+  async getTotalBalance(address: string): Promise<AccountBalance> {
+    const goldToken = await this.contracts.getGoldToken()
+    const stableToken = await this.contracts.getStableToken()
+    const lockedGold = await this.contracts.getLockedGold()
+    const exchange = await this.contracts.getExchange()
+    const goldBalance = await goldToken.balanceOf(address)
+    const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
+    const dollarBalance = await stableToken.balanceOf(address)
+    return {
+      gold: goldBalance,
+      lockedGold: lockedBalance,
+      usd: dollarBalance,
+      total: goldBalance.plus(lockedBalance).plus(await exchange.quoteUsdSell(dollarBalance)),
+    }
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
@@ -120,8 +144,8 @@ export class ContractKit {
    * Set CeloToken to use to pay for gas fees
    * @param token cUsd or cGold
    */
-  async setGasCurrency(token: CeloToken): Promise<void> {
-    this.config.gasCurrency =
+  async setFeeCurrency(token: CeloToken): Promise<void> {
+    this.config.feeCurrency =
       token === CeloContract.GoldToken ? null : await this.registry.addressFor(token)
   }
 
@@ -153,19 +177,19 @@ export class ContractKit {
   }
 
   /**
-   * Set the ERC20 address for the token to use to pay for gas fees.
+   * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
    *
    * Set to `null` to use cGold
    *
    * @param address ERC20 address
    */
-  set defaultGasCurrency(address: Address | null) {
-    this.config.gasCurrency = address
+  set defaultFeeCurrency(address: Address | null) {
+    this.config.feeCurrency = address
   }
 
-  get defaultGasCurrency() {
-    return this.config.gasCurrency
+  get defaultFeeCurrency() {
+    return this.config.feeCurrency
   }
 
   isListening(): Promise<boolean> {
@@ -230,13 +254,20 @@ export class ContractKit {
       gasPrice: '0',
     }
 
-    if (this.config.gasCurrency) {
-      defaultTx.gasCurrency = this.config.gasCurrency
+    if (this.config.feeCurrency) {
+      defaultTx.feeCurrency = this.config.feeCurrency
     }
 
     return {
       ...defaultTx,
       ...tx,
     }
+  }
+
+  async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
+    const validators = await this.contracts.getValidators()
+    const epochSize = await validators.getEpochSize()
+    // Reverses protocol/contracts getEpochNumber()
+    return (epochNumber + 1) * epochSize.toNumber()
   }
 }

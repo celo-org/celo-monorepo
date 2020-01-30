@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import * as React from 'react'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { createAppContainer, NavigationState } from 'react-navigation'
 import { connect } from 'react-redux'
 import AlertBanner from 'src/alert/AlertBanner'
+import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { recordStateChange, setTopLevelNavigator } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
 import BackupPrompt from 'src/shared/BackupPrompt'
@@ -13,7 +15,7 @@ import Logger from 'src/utils/Logger'
 // to improve the hot reloading experience when in DEV mode
 // https://reactnavigation.org/docs/en/state-persistence.html
 function getPersistenceFunctions() {
-  if (!__DEV__) {
+  if (!__DEV__ || !DEV_RESTORE_NAV_STATE_ON_RELOAD) {
     return undefined
   }
 
@@ -42,7 +44,7 @@ interface DispatchProps {
   setTopLevelNavigator: typeof setTopLevelNavigator
 }
 
-type Props = DispatchProps
+type Props = DispatchProps & WithTranslation
 
 const AppContainer = createAppContainer(Navigator)
 
@@ -97,9 +99,6 @@ export const headerArea = {
   },
 }
 
-export default connect<null, DispatchProps>(
-  null,
-  {
-    setTopLevelNavigator,
-  }
-)(NavigatorWrapper)
+export default connect<null, DispatchProps>(null, {
+  setTopLevelNavigator,
+})(NavigatorWrapper)

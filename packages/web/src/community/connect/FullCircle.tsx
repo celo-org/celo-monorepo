@@ -4,12 +4,12 @@ import { StyleSheet } from 'react-native-web'
 import shuffleSeed from 'shuffle-seed'
 import VECTORS from 'src/community/connect/RingOfCoinVectors'
 import { Path } from 'src/shared/svg'
-import { baseCoinStyle, colors } from 'src/styles'
+import { baseCoinStyle, baseCoinStyleLight, colors } from 'src/styles'
 import { randomIntegerInRange } from 'src/utils/utils'
 import Svg from 'svgs'
 
 const COLORS = [colors.greenScreen, colors.blueScreen, colors.redScreen, colors.purpleScreen]
-
+const STILL_COLORS = [colors.lightBlue, colors.redScreen, colors.purple, colors.greenScreen]
 const DURATION_MS = 1700
 const PAUSE = 200 // milliseconds between coins fading in and out
 
@@ -36,6 +36,8 @@ interface State {
 
 interface Props {
   init?: () => void
+  lightBackground: boolean
+  stillMode?: boolean
 }
 
 export default class FullCircle extends React.PureComponent<Props, State> {
@@ -48,47 +50,36 @@ export default class FullCircle extends React.PureComponent<Props, State> {
     color: colors.greenScreen,
   }
 
-  componentWillMount = () => {
-    if (this.props.init) {
-      this.props.init()
-    }
-  }
-
   componentDidMount = () => {
-    this.clock = setTimeout(() => this.setPlaying(), WAIT_TO_PLAY_MS)
+    if (!this.props.stillMode) {
+      if (this.props.init) {
+        this.props.init()
+      }
+      this.clock = setTimeout(() => this.setPlaying(), WAIT_TO_PLAY_MS)
+    } else {
+      this.setStill()
+    }
   }
 
   componentWillUnmount = () => {
     clearTimeout(this.clock)
   }
 
-  setPlaying = () => {
-    this.setState(
-      (state): State => {
-        const lastPlayingIndex = state.lastPlayingIndex
-        const beatCycleIndex = state.beatCycleIndex + 1
-        const isNowTogetherBeat = isTogetherBeat(beatCycleIndex) // are multiple fading in together
-        const nextRingIndex = nextSoloIndex(lastPlayingIndex, isNowTogetherBeat) // determine which will be the index of the next key animated coin
-        const nextRingIndexes = isNowTogetherBeat
-          ? getTogetherIndexes(nextRingIndex)
-          : [nextRingIndex]
-
-        // color isnt used when it's a together beat
-        let newColor = !isNowTogetherBeat ? pickRandom(COLORS) : state.color
-        // ensure that we dont accidentally draw the same color twice in a row
-        while (!isNowTogetherBeat && newColor === state.color) {
-          newColor = pickRandom(COLORS)
-        }
-
-        return {
-          playingIndexes: new Set(nextRingIndexes),
-          beatCycleIndex,
-          lastPlayingIndex: nextRingIndex,
-          duration: isNowTogetherBeat ? DURATION_MS * 2 : DURATION_MS,
-          color: newColor,
-        }
+  setStill = () => {
+    this.setState(() => {
+      const nextRingIndex = 50
+      return {
+        playingIndexes: new Set(getTogetherIndexes(nextRingIndex)),
+        beatCycleIndex: 0,
+        lastPlayingIndex: nextRingIndex,
+        duration: 1000000,
+        color: pickRandom(COLORS),
       }
-    )
+    })
+  }
+
+  setPlaying = () => {
+    this.setState(setFrame)
     this.clock = setTimeout(this.setPlaying, this.state.duration + PAUSE)
   }
 
@@ -98,7 +89,9 @@ export default class FullCircle extends React.PureComponent<Props, State> {
 
   render() {
     let colorIndex = -1
-    const colorArray = shuffleSeed.shuffle(COLORS, this.state.lastPlayingIndex)
+    const colorArray = this.props.stillMode
+      ? STILL_COLORS
+      : shuffleSeed.shuffle(COLORS, this.state.lastPlayingIndex)
     return (
       <Svg width="100%" height="100%" viewBox="0 0 717 750" fill="none">
         {VECTORS.map((path, index) => {
@@ -109,7 +102,9 @@ export default class FullCircle extends React.PureComponent<Props, State> {
           const style = ringStyle({
             color: playing ? this.getColor(colorArray, colorIndex) : 'transparent',
             duration: this.state.duration,
+            lightBackground: this.props.lightBackground,
             playing,
+            stillMode: this.props.stillMode,
           })
           return <Path key={path} d={path} style={style} />
         })}
@@ -118,11 +113,34 @@ export default class FullCircle extends React.PureComponent<Props, State> {
   }
 }
 
+function setFrame(state: State): State {
+  const lastPlayingIndex = state.lastPlayingIndex
+  const beatCycleIndex = state.beatCycleIndex + 1
+  const isNowTogetherBeat = isTogetherBeat(beatCycleIndex) // are multiple fading in together
+  const nextRingIndex = nextSoloIndex(lastPlayingIndex, isNowTogetherBeat) // determine which will be the index of the next key animated coin
+  const nextRingIndexes = isNowTogetherBeat ? getTogetherIndexes(nextRingIndex) : [nextRingIndex]
+
+  // color isnt used when it's a together beat
+  let newColor = !isNowTogetherBeat ? pickRandom(COLORS) : state.color
+  // ensure that we dont accidentally draw the same color twice in a row
+  while (!isNowTogetherBeat && newColor === state.color) {
+    newColor = pickRandom(COLORS)
+  }
+
+  return {
+    playingIndexes: new Set(nextRingIndexes),
+    beatCycleIndex,
+    lastPlayingIndex: nextRingIndex,
+    duration: isNowTogetherBeat ? DURATION_MS * 2 : DURATION_MS,
+    color: newColor,
+  }
+}
+
 function pickRandom(array: any[]) {
   return array[randomIntegerInRange(0, array.length - 1)] || pickRandom(array)
 }
 
-function getKeyframes({ color }: { color: colors }) {
+function getKeyframes({ color }: { color: colors | 'transparent' }) {
   const fullOn = {
     opacity: 0.95,
     fill: color,
@@ -200,10 +218,33 @@ function isTogetherBeat(beat: number) {
   return beat % BEAT_COUNT === 0
 }
 
-function ringStyle({ color, playing, duration }) {
-  const styleArray: ViewStyle[] = [styles.normal, baseCoinStyle]
+interface RingStyle {
+  color: colors | 'transparent'
+  playing: boolean
+  duration: number
+  lightBackground: boolean
+  stillMode: boolean
+}
 
-  if (playing) {
+function ringStyle({ color, playing, duration, lightBackground, stillMode }: RingStyle) {
+  const styleArray: ViewStyle[] = [
+    styles.normal,
+    stillMode
+      ? { stroke: '#CFCFCF', mixBlendMode: 'multiply' }
+      : lightBackground
+      ? baseCoinStyleLight
+      : baseCoinStyle,
+  ]
+
+  if (stillMode && playing) {
+    styleArray.push({
+      opacity: 0.9,
+      fill: color,
+      // @ts-ignore
+      stroke: color,
+      mixBlendMode: 'multiply',
+    })
+  } else if (playing) {
     styleArray.push(styles.animatedBase, {
       animationDuration: `${duration}ms`,
       animationKeyframes: getKeyframes({ color }),
@@ -214,7 +255,7 @@ function ringStyle({ color, playing, duration }) {
 
 const styles = StyleSheet.create({
   animatedBase: {
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'ease-in',
     willChange: 'fill',
   },

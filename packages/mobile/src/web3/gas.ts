@@ -11,7 +11,7 @@ let gasPrice: BigNumber | null = null
 let gasPriceLastUpdated: number | null = null
 
 export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR) {
-  Logger.debug(`${TAG}}/getGasPrice`, 'Getting gas price')
+  Logger.debug(`${TAG}/getGasPrice`, 'Getting gas price')
 
   try {
     if (
@@ -24,7 +24,7 @@ export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
     }
     return gasPrice
   } catch (error) {
-    Logger.error(`${TAG}}/getGasPrice`, 'Could not fetch and update gas price.', error)
+    Logger.error(`${TAG}/getGasPrice`, 'Could not fetch and update gas price.', error)
     throw new Error('Error fetching gas price')
   }
 }

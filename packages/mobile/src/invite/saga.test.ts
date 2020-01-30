@@ -17,10 +17,9 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { watchRedeemInvite, watchSendInvite, withdrawFundsFromTempAccount } from 'src/invite/saga'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
-import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
 
@@ -103,7 +102,10 @@ describe(watchSendInvite, () => {
 
   it('sends an SMS invite as expected', async () => {
     await expectSaga(watchSendInvite)
-      .provide([[call(waitWeb3LastBlock), true], [call(getConnectedUnlockedAccount), mockAccount]])
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getConnectedUnlockedAccount), mockAccount],
+      ])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
@@ -115,7 +117,10 @@ describe(watchSendInvite, () => {
 
   it('sends a WhatsApp invite as expected', async () => {
     await expectSaga(watchSendInvite)
-      .provide([[call(waitWeb3LastBlock), true], [call(getConnectedUnlockedAccount), mockAccount]])
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getConnectedUnlockedAccount), mockAccount],
+      ])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.WhatsApp))
       .put(storeInviteeData(mockKey, mockE164Number))
@@ -141,7 +146,10 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(new BigNumber(10)) // temp account
 
     await expectSaga(watchRedeemInvite)
-      .provide([[call(waitWeb3LastBlock), true], [call(getOrCreateAccount), mockAccount]])
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getOrCreateAccount), mockAccount],
+      ])
       .withState(state)
       .dispatch(redeemInvite(mockKey))
       .put(fetchDollarBalance())
@@ -173,7 +181,10 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(new BigNumber(0)) // current account
 
     await expectSaga(watchRedeemInvite)
-      .provide([[call(waitWeb3LastBlock), true], [call(getOrCreateAccount), mockAccount]])
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getOrCreateAccount), mockAccount],
+      ])
       .withState(state)
       .dispatch(redeemInvite(mockKey))
       .put(showError(ErrorMessages.EMPTY_INVITE_CODE))

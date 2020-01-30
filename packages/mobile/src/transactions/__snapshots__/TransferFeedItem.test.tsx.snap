@@ -81,22 +81,28 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
           feedItemNetworkFeeTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
-          
+          -
           $
           &lt;0.001
         </Text>
@@ -126,7 +132,20 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -213,18 +232,24 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
           feedItemFaucetTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -258,7 +283,20 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -375,18 +413,24 @@ exports[`transfer feed item renders correctly for known received 1`] = `
           John Doe
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -406,7 +450,20 @@ exports[`transfer feed item renders correctly for known received 1`] = `
             false,
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -523,18 +580,24 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
           John Doe
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "color": "#42D689",
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -554,7 +617,20 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
             false,
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -641,24 +717,30 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
           feedItemNetworkFeeTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
-          
+          -
           $
-          0.002
+          0.003
         </Text>
       </View>
       <Text
@@ -686,7 +768,20 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -803,18 +898,24 @@ exports[`transfer feed item renders correctly for received 1`] = `
           feedItemReceivedTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -834,7 +935,20 @@ exports[`transfer feed item renders correctly for received 1`] = `
             false,
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -921,18 +1035,24 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
           feedItemInviteReceivedTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -966,7 +1086,20 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -1083,18 +1216,24 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           feedItemReceivedTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -1128,7 +1267,20 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -1245,18 +1397,24 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           feedItemSentTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "color": "#42D689",
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -1276,7 +1434,20 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             false,
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -1363,18 +1534,24 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
           feedItemInviteSentTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "color": "#42D689",
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -1408,7 +1585,20 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -1525,18 +1715,24 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           feedItemSentTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "color": "#42D689",
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -1570,7 +1766,20 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -1687,18 +1896,24 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           feedItemSentTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "color": "#42D689",
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -1732,7 +1947,20 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -1819,18 +2047,24 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
           feedItemVerificationFeeTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "color": "#42D689",
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -1864,7 +2098,20 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -1970,18 +2217,24 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
           feedItemVerificationRewardTitle
         </Text>
         <Text
+          numberOfLines={1}
           style={
             Array [
               Object {
                 "color": "#42D689",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 15,
-                "lineHeight": 20,
               },
-              Object {
-                "marginLeft": "auto",
-                "paddingLeft": 10,
-              },
+              Array [
+                Object {
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ],
             ]
           }
         >
@@ -2015,7 +2268,20 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             },
           ]
         }
-      />
+      >
+        <Text
+          style={
+            Object {
+              "color": "#BDBDBD",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          Jan 1 global:at 12:00 AM
+        </Text>
+      </View>
     </View>
   </View>
 </View>

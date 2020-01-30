@@ -31,6 +31,7 @@ interface AllButtonProps {
   iconRight?: React.ReactNode
   iconLeft?: React.ReactNode
   align?: 'center' | 'flex-start' | 'flex-end'
+  style?: TextStyle | TextStyle[]
 }
 
 type NakedProps = {
@@ -46,7 +47,6 @@ type PrimaryProps = {
 
 type InlineProps = {
   kind: BTN.INLINE
-  style?: TextStyle
 } & AllButtonProps
 
 type NavProps = {
@@ -120,6 +120,7 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
     const { text, href, align, iconRight, iconLeft } = this.props
     const ButtonComponent = this.getButtonComponent()
     const renderedButton = (
+      // @ts-ignore
       <ButtonComponent status={this.getStatus()} {...this.props}>
         {iconLeft && <View style={baseStyles.iconLeft}>{iconLeft}</View>}
         {text}
@@ -331,7 +332,7 @@ function ButtonInline(props: Props) {
       href={href}
       target={target}
       accessibilityRole="link"
-      style={[fonts.p, inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
+      style={[inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
     >
       {children}
     </Text>
@@ -473,7 +474,7 @@ const baseStyles = StyleSheet.create({
   base: {
     justifyContent: 'center',
     flexGrow: 0,
-    width: 'max-content',
+    width: 'fit-content',
     opacity: 1,
   },
   verticallyAlign: {

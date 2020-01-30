@@ -1,4 +1,4 @@
-import { stripHexLeader } from '@celo/utils/src/address'
+import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -6,7 +6,7 @@ import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import VersionCheck from 'react-native-version-check'
-import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -15,6 +15,7 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
+import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
 import {
   Actions,
   InviteBy,
@@ -28,9 +29,8 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
@@ -40,12 +40,12 @@ import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
-export const REDEEM_INVITE_TIMEOUT = 1 * 60 * 1000 // 1 minute
+export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const INVITE_FEE = '0.2'
 
 export async function getInviteTxGas(
@@ -205,6 +205,7 @@ export function* sendInviteSaga(action: SendInviteAction) {
 }
 
 export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
+  yield call(waitWeb3LastBlock)
   Logger.debug(TAG, 'Starting Redeem Invite')
 
   const { result, timeout } = yield race({
@@ -229,10 +230,9 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 }
 
 export function* doRedeemInvite(inviteCode: string) {
-  yield call(waitWeb3LastBlock)
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
-    Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
+    Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceInWeiWithRetry,
       CURRENCY_ENUM.DOLLAR,
@@ -249,13 +249,31 @@ export function* doRedeemInvite(inviteCode: string) {
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
-    Logger.error(TAG, 'Failed to redeem invite', e)
+    Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
       yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     }
     return false
+  }
+}
+
+export function* skipInvite() {
+  yield take(Actions.SKIP_INVITE)
+  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken')
+  try {
+    Logger.debug(TAG + '@skipInvite', 'Creating new account')
+    yield call(getOrCreateAccount)
+    Logger.debug(TAG + '@skipInvite', 'Marking nux flows as complete')
+    // TODO(Rossy): Remove when import screen is removed
+    yield put(denyImportContacts())
+    yield put(setHasSeenVerificationNux(true))
+    Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
+    navigateHome()
+  } catch (e) {
+    Logger.error(TAG, 'Failed to skip invite', e)
+    yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
   }
 }
 
@@ -275,7 +293,7 @@ function* addTempAccountToWallet(inviteCode: string) {
     } else {
       // Import account into the local geth node
       // @ts-ignore
-      tempAccount = yield call(web3.eth.personal.importRawKey, stripHexLeader(inviteCode), TEMP_PW)
+      tempAccount = yield call(web3.eth.personal.importRawKey, trimLeading0x(inviteCode), TEMP_PW)
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
@@ -324,4 +342,5 @@ export function* watchRedeemInvite() {
 export function* inviteSaga() {
   yield spawn(watchSendInvite)
   yield spawn(watchRedeemInvite)
+  yield spawn(skipInvite)
 }

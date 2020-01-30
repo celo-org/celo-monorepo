@@ -1,5 +1,3 @@
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
-import { upperFirst } from 'lodash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -8,6 +6,8 @@ import {
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { upperFirst } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
@@ -59,18 +59,24 @@ contract('Accounts', (accounts: string[]) => {
       eventName: 'VoteSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getVoteSigner,
       authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
+      hasAuthorizedSigner: accountsInstance.hasAuthorizedVoteSigner,
+      removeSigner: accountsInstance.removeVoteSigner,
     }
     authorizationTests.validating = {
       fn: accountsInstance.authorizeValidatorSigner,
       eventName: 'ValidatorSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
       authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
+      hasAuthorizedSigner: accountsInstance.hasAuthorizedValidatorSigner,
+      removeSigner: accountsInstance.removeValidatorSigner,
     }
     authorizationTests.attesting = {
       fn: accountsInstance.authorizeAttestationSigner,
       eventName: 'AttestationSignerAuthorized',
       getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
       authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
+      hasAuthorizedSigner: accountsInstance.hasAuthorizedAttestationSigner,
+      removeSigner: accountsInstance.removeAttestationSigner,
     }
   })
 
@@ -135,7 +141,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setAccount', async () => {
+  describe('#setAccount', () => {
     describe('when the account has been created', () => {
       beforeEach(async () => {
         await accountsInstance.createAccount()
@@ -234,7 +240,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setWalletAddress', async () => {
+  describe('#setWalletAddress', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
         await assertRevert(accountsInstance.setWalletAddress(caller))
@@ -243,7 +249,7 @@ contract('Accounts', (accounts: string[]) => {
 
     describe('when the account has been created', () => {
       beforeEach(async () => {
-        accountsInstance.createAccount()
+        await accountsInstance.createAccount()
       })
 
       it('should set the walletAddress', async () => {
@@ -270,7 +276,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setMetadataURL', async () => {
+  describe('#setMetadataURL', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
         await assertRevert(accountsInstance.setMetadataURL(caller))
@@ -279,7 +285,7 @@ contract('Accounts', (accounts: string[]) => {
 
     describe('when the account has been created', () => {
       beforeEach(async () => {
-        accountsInstance.createAccount()
+        await accountsInstance.createAccount()
       })
 
       it('should set the metadataURL', async () => {
@@ -304,9 +310,9 @@ contract('Accounts', (accounts: string[]) => {
     it('returns multiple metadata URLs', async () => {
       const randomStrings = accounts.map((_) => web3.utils.randomHex(20).slice(2))
       await Promise.all(
-        accounts.map(async (account, i) => {
-          await accountsInstance.createAccount({ from: account })
-          await accountsInstance.setMetadataURL(randomStrings[i], { from: account })
+        accounts.map(async (mappedAccount, i) => {
+          await accountsInstance.createAccount({ from: mappedAccount })
+          await accountsInstance.setMetadataURL(randomStrings[i], { from: mappedAccount })
         })
       )
       const [stringLengths, data] = await accountsInstance.batchGetMetadataURL(accounts)
@@ -320,7 +326,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe('#setName', async () => {
+  describe('#setName', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
         await assertRevert(accountsInstance.setWalletAddress(caller))
@@ -329,7 +335,7 @@ contract('Accounts', (accounts: string[]) => {
 
     describe('when the account has been created', () => {
       beforeEach(async () => {
-        accountsInstance.createAccount()
+        await accountsInstance.createAccount()
       })
 
       it('should set the name', async () => {
@@ -367,10 +373,12 @@ contract('Accounts', (accounts: string[]) => {
         })
 
         it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
+          assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
           await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
           assert.equal(await accountsInstance.authorizedBy(authorized), account)
           assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
           assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
+          assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
         })
 
         it(`should emit the right event`, async () => {
@@ -381,16 +389,12 @@ contract('Accounts', (accounts: string[]) => {
           assertLogMatches(log, authorizationTest.eventName, expected)
         })
 
-        it(`should revert if the ${
-          authorizationTestDescriptions[key].me
-        } is an account`, async () => {
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
         })
 
-        it(`should revert if the ${
-          authorizationTestDescriptions[key].me
-        } is already authorized`, async () => {
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is already authorized`, async () => {
           const otherAccount = accounts[2]
           const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, authorized)
           await accountsInstance.createAccount({ from: otherAccount })
@@ -408,7 +412,7 @@ contract('Accounts', (accounts: string[]) => {
           )
         })
 
-        describe('when a previous authorization has been made', async () => {
+        describe('when a previous authorization has been made', () => {
           const newAuthorized = accounts[2]
           let newSig
           beforeEach(async () => {
@@ -430,9 +434,7 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       describe(`#getAccountFrom${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
-        describe(`when the account has not authorized a ${
-          authorizationTestDescriptions[key].me
-        }`, () => {
+        describe(`when the account has not authorized a ${authorizationTestDescriptions[key].me}`, () => {
           it('should return the account when passed the account', async () => {
             assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
           })
@@ -442,9 +444,7 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`when the account has authorized a ${
-          authorizationTestDescriptions[key].me
-        }`, () => {
+        describe(`when the account has authorized a ${authorizationTestDescriptions[key].me}`, () => {
           const authorized = accounts[1]
           beforeEach(async () => {
             const sig = await getParsedSignatureOfAddress(web3, account, authorized)
@@ -455,18 +455,14 @@ contract('Accounts', (accounts: string[]) => {
             assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
           })
 
-          it(`should return the account when passed the ${
-            authorizationTestDescriptions[key].me
-          }`, async () => {
+          it(`should return the account when passed the ${authorizationTestDescriptions[key].me}`, async () => {
             assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
           })
         })
       })
 
       describe(`#get${upperFirst(authorizationTestDescriptions[key].subject)}FromAccount()`, () => {
-        describe(`when the account has not authorized a ${
-          authorizationTestDescriptions[key].me
-        }`, () => {
+        describe(`when the account has not authorized a ${authorizationTestDescriptions[key].me}`, () => {
           it('should return the account when passed the account', async () => {
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
           })
@@ -476,9 +472,7 @@ contract('Accounts', (accounts: string[]) => {
           })
         })
 
-        describe(`when the account has authorized a ${
-          authorizationTestDescriptions[key].me
-        }`, () => {
+        describe(`when the account has authorized a ${authorizationTestDescriptions[key].me}`, () => {
           const authorized = accounts[1]
 
           beforeEach(async () => {
@@ -489,6 +483,21 @@ contract('Accounts', (accounts: string[]) => {
           it(`should return the ${key} when passed the account`, async () => {
             assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
           })
+        })
+      })
+
+      describe(`#remove${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+        it(`should be able to remove the ${key} signer after authorizing`, async () => {
+          const authorized = accounts[1]
+          const sig = await getParsedSignatureOfAddress(web3, account, authorized)
+          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+
+          assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
+          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+
+          await authorizationTest.removeSigner()
+          assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
+          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
         })
       })
     })

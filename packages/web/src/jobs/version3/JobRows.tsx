@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { LeverJob } from 'src/jobs/lever'
 import { ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { fonts, standardStyles } from 'src/styles'
 
 class JobRowBase extends React.PureComponent<LeverJob & ScreenProps & I18nProps> {
@@ -18,7 +18,7 @@ class JobRowBase extends React.PureComponent<LeverJob & ScreenProps & I18nProps>
               accessibilityRole="link"
               target="blank"
               href={this.props.hostedUrl}
-              style={fonts.h5}
+              style={fonts.h6}
             >
               {text}
             </Text>
@@ -31,7 +31,7 @@ class JobRowBase extends React.PureComponent<LeverJob & ScreenProps & I18nProps>
           <Text style={fonts.legal}>{t(categories.location)}</Text>
         </View>
         <View style={[styles.cell, styles.apply]}>
-          <Button text={'Apply'} kind={BTN.NAKED} href={this.props.hostedUrl} />
+          <Button text={'Apply'} kind={BTN.NAKED} href={this.props.hostedUrl} size={SIZE.normal} />
         </View>
       </View>
     )
@@ -81,7 +81,7 @@ class MobileJobRowBase extends React.PureComponent<LeverJob & I18nProps> {
 
     return (
       <View style={standardStyles.elementalMargin}>
-        <Button kind={BTN.DARKNAKED} text={text} href={hostedUrl} />
+        <Button kind={BTN.DARKNAKED} text={text} href={hostedUrl} size={SIZE.normal} />
         <View style={mobileStyles.row}>
           <View style={mobileStyles.commitment}>
             <Text style={fonts.legal}>{categories.commitment}</Text>

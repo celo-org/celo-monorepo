@@ -39,9 +39,9 @@ export class Escrow extends Contract {
 
     sentPaymentIds(arg0: string, arg1: number | string): TransactionObject<string>
 
-    getReceivedPaymentIds(identifier: string | number[]): TransactionObject<(string)[]>
+    getReceivedPaymentIds(identifier: string | number[]): TransactionObject<string[]>
 
-    getSentPaymentIds(sender: string): TransactionObject<(string)[]>
+    getSentPaymentIds(sender: string): TransactionObject<string[]>
 
     renounceOwnership(): TransactionObject<void>
 

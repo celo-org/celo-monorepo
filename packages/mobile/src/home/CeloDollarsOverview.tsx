@@ -2,27 +2,26 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
-import { Namespaces } from 'src/i18n'
-import {
-  useDollarsToLocalAmount,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
+import { Namespaces, withTranslation } from 'src/i18n'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import { useLocalCurrencyCode, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import useSelector from 'src/redux/useSelector'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
-type Props = WithNamespaces
+type Props = WithTranslation
 
 function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencySymbol = useLocalCurrencySymbol()
   const dollarBalance = useSelector((state) => state.stableToken.balance)
-  const localBalance = useDollarsToLocalAmount(dollarBalance)
+  const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
+  const localBalance = convertDollarsToLocalAmount(dollarBalance, localExchangeRate)
   const localValue =
     localBalance || dollarBalance === null
       ? getMoneyDisplayValue(localBalance || 0)
@@ -36,7 +35,7 @@ function CeloDollarsOverview({ t }: Props) {
         <Text style={styles.code}> {localBalance ? localCurrencyCode : ''}</Text>
       </Text>
       {!!localCurrencyCode && (
-        <Text style={[fontStyles.light, styles.localBalance]}>
+        <Text style={styles.localBalance}>
           <Text>{getMoneyDisplayValue(dollarBalance || 0)} </Text>
           <Text>{t('global:celoDollars')}</Text>
         </Text>
@@ -63,6 +62,7 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   localBalance: {
+    ...fontStyles.light,
     fontSize: 18,
     color: '#B0B5B9',
   },
@@ -71,4 +71,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.walletFlow5)(CeloDollarsOverview))
+export default componentWithAnalytics(withTranslation(Namespaces.walletFlow5)(CeloDollarsOverview))
