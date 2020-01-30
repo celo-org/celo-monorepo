@@ -23,6 +23,8 @@ chai.use(chaiSubset)
 
 const assert = chai.assert
 
+// hard coded in ganache
+export const EPOCH = 100
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export function stripHexEncoding(hexString: string) {
@@ -65,6 +67,18 @@ export async function mineBlocks(blocks: number, web3: Web3) {
   for (let i = 0; i < blocks; i++) {
     await jsonRpc(web3, 'evm_mine', [])
   }
+}
+
+export async function currentEpochNumber(web3) {
+  const blockNumber = await web3.eth.getBlockNumber()
+  return Math.floor((blockNumber - 1) / EPOCH)
+}
+
+export async function mineToNextEpoch(web3) {
+  const blockNumber = await web3.eth.getBlockNumber()
+  const epochNumber = await currentEpochNumber(web3)
+  const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+  await mineBlocks(blocksUntilNextEpoch, web3)
 }
 
 export async function assertBalance(address: string, balance: BigNumber) {
