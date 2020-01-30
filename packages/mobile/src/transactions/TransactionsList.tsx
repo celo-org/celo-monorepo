@@ -255,6 +255,7 @@ export class TransactionsList extends React.PureComponent<Props> {
 
     const queryAddress = address || ''
     const token = currency === CURRENCY_ENUM.GOLD ? Token.CGld : Token.CUsd
+    const kind = currency === CURRENCY_ENUM.GOLD ? FeedType.EXCHANGE : FeedType.HOME
 
     return (
       <UserTransactionsComponent
@@ -292,9 +293,7 @@ export class TransactionsList extends React.PureComponent<Props> {
 
           const feedData = [...standbyTxs, ...transactions].map(mapInvite)
 
-          return (
-            <TransactionFeed kind={FeedType.HOME} loading={loading} error={error} data={feedData} />
-          )
+          return <TransactionFeed kind={kind} loading={loading} error={error} data={feedData} />
         }}
       </UserTransactionsComponent>
     )

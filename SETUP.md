@@ -248,7 +248,7 @@ export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
 Run the emulator with:
 
 ```bash
-emulator -avd Nexus_5X_API_28
+emulator -avd Nexus_5X_API_28_x86
 ```
 
 #### Optional: Install Genymotion Emulator Manager

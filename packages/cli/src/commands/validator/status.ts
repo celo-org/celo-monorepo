@@ -133,9 +133,9 @@ export default class ValidatorStatus extends BaseCommand {
     let signatures = 0
     let eligible = 0
     for (const block of blocks) {
-      if (await electionCache.elected(signer, block.number)) {
+      if (await electionCache.elected(signer, block.number - 1)) {
         eligible++
-        if (await electionCache.signed(signer, block)) {
+        if (await electionCache.signedParent(signer, block)) {
           signatures++
         }
       }
