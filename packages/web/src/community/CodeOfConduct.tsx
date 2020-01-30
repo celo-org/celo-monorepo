@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import defaultContent from 'src/../static/locales/en/codeofconduct.json'
+import defaultContent from 'src/../public/static/locales/en/codeofconduct.json'
 import { IntegratingAnimation } from 'src/community/connect/CodeOfConduct'
 import { H1, Li, Ul } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
-import { I18nProps, Trans, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -39,7 +39,7 @@ export class CodeOfConduct extends React.Component<I18nProps> {
           <SideTitledSection
             title={t('OpenSource')}
             text={
-              <Trans i18nKey={'OpenSourceText'}>
+              <Trans ns={NameSpaces.codeofconduct} i18nKey={'OpenSourceText'}>
                 {
                   'A supplemental goal of this Code of Conduct is to increase open source citizenship by encouraging participants to recognize and strengthen the relationships between our actions and their effects on our community.\n\n Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.\n\n If you see someone who is making an extra effort to ensure our community is welcoming, friendly, and encourages all participants to contribute to the fullest extent, let us know by email '
                 }
@@ -66,7 +66,7 @@ export class CodeOfConduct extends React.Component<I18nProps> {
           <SideTitledSection
             title={t('Reporting')}
             text={
-              <Trans i18nKey="ReportingText">
+              <Trans ns={NameSpaces.codeofconduct} i18nKey="ReportingText">
                 If you are subject to or witness unacceptable behavior, or have any other concerns,
                 please notify <CommunityEmail /> as soon as possible.
               </Trans>
@@ -75,7 +75,7 @@ export class CodeOfConduct extends React.Component<I18nProps> {
           <SideTitledSection
             title={t('Grievances')}
             text={
-              <Trans i18nKey="GrievancesText">
+              <Trans ns={NameSpaces.codeofconduct} i18nKey="GrievancesText">
                 If you feel you have been falsely or unfairly accused of violating this Code of
                 Conduct, you should notify <CommunityEmail /> with a concise description of your
                 grievance.
@@ -85,7 +85,7 @@ export class CodeOfConduct extends React.Component<I18nProps> {
           <SideTitledSection
             title={t('License')}
             text={
-              <Trans i18nKey={'LicenseText'}>
+              <Trans ns={NameSpaces.codeofconduct} i18nKey={'LicenseText'}>
                 This Code of Conduct is distributed under a{' '}
                 <Button
                   href={'https://creativecommons.org/licenses/by-sa/3.0/'}
@@ -113,13 +113,15 @@ export class CodeOfConduct extends React.Component<I18nProps> {
                   text="Geek Feminism Anti-Harassment Policy"
                   kind={BTN.INLINE}
                   target={'_new'}
-                />, and the{' '}
+                />
+                , and the{' '}
                 <Button
                   href={'https://www.contributor-covenant.org/version/1/4/code-of-conduct.html'}
                   text="Contributor Covenant"
                   kind={BTN.INLINE}
                   target={'_new'}
-                />.
+                />
+                .
               </Trans>
             }
           />

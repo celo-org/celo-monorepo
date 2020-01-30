@@ -1,9 +1,7 @@
 {
   "getStarted": "Get Started",
-  "incomingPaymentRequest": "Request Waiting for You",
-  "incomingPaymentRequestWithCount_plural": "{{count}} Requests Waiting on You",
-  "outgoingPaymentRequest": "Payment You’ve Requested",
-  "outgoingPaymentRequestWithCount_plural": "{{count}} Payments You’ve Requested",
+  "incomingPaymentRequests": "Requests from Others",
+  "outgoingPaymentRequests": "Payments You’ve Requested",
   "SMSError": "Error sending SMS",
   "notifications": "Notifications",
   "getBackupKey": "Get Backup Key",
@@ -54,11 +52,7 @@
   "maybeLater": "Maybe Later",
   "balanceNeedUpdating": "Balance needs updating",
   "refreshBalances": "Refresh Balances",
-  "reclaimPayment": "Reclaim Payment",
-  "sendMessage": "Send Message",
-  "escrowedPaymentReminderListItemTitle": "Remind {{mobile}} to Accept Payment",
-  "escrowedPaymentReminder": "Remind the recipient to Accept Payment",
-  "escrowedPaymentReminderWithCount_plural": "Remind {{count}} recipients to Accept Payment",
+  "escrowedPaymentReminder": "Pending Invitations",
   "escrowedPaymentReminderSms":
     "A friendly reminder that you haven't yet redeemed your Celo Dollars!",
   "testnetAlert": {
@@ -84,5 +78,7 @@
   "feedItemInviteReceivedTitle": "Celo",
   "feedItemInviteReceivedInfo": "$t(inviteFlow11:inviteReceived)",
   "feedItemReceivedTitle_missingSenderDetails": "Payment Received",
-  "feedItemSentTitle_missingReceiverDetails": "Payment Sent"
+  "feedItemReceivedTitle_escrowRecieved": "Escrow Payment Received",
+  "feedItemSentTitle_missingReceiverDetails": "Payment Sent",
+  "feedItemSentTitle_escrowSent": "Escrow Payment Sent"
 }

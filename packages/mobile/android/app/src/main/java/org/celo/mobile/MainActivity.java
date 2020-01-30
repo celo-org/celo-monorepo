@@ -1,21 +1,19 @@
 package org.celo.mobile;
 
 import android.os.Bundle;
-
+import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactFragmentActivity;
 import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.ReactActivityDelegate;
-import com.facebook.react.ReactRootView;
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
-
+import java.util.Date;
 import org.devio.rn.splashscreen.SplashScreen;
 
-import java.util.Date;
-
-public class MainActivity extends ReactFragmentActivity implements ReactInstanceManager.ReactInstanceEventListener {
-
+public class MainActivity
+  extends ReactFragmentActivity
+  implements ReactInstanceManager.ReactInstanceEventListener {
   Date appStartTimestamp;
 
   /**
@@ -48,13 +46,15 @@ public class MainActivity extends ReactFragmentActivity implements ReactInstance
 
   @Override
   public void onReactContextInitialized(ReactContext context) {
-    context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("AppStartedLoading",
-        appStartTimestamp.toString());
+    context
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+      .emit("AppStartedLoading", appStartTimestamp.toString());
   }
 
   @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
     return new ReactActivityDelegate(this, getMainComponentName()) {
+
       @Override
       protected ReactRootView createRootView() {
         return new RNGestureHandlerEnabledRootView(MainActivity.this);

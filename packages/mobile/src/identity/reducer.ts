@@ -1,5 +1,7 @@
+import { RehydrateAction } from 'redux-persist'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { AttestationCode, VerificationStatus } from 'src/identity/verification'
+import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
@@ -11,6 +13,11 @@ export interface AddressToE164NumberType {
 
 export interface E164NumberToAddressType {
   [e164PhoneNumber: string]: string | null // null means unverified
+}
+
+export interface ContactMappingProgress {
+  current: number
+  total: number
 }
 
 export interface State {
@@ -25,6 +32,7 @@ export interface State {
   e164NumberToAddress: E164NumberToAddressType
   askedContactsPermission: boolean
   isLoadingImportContacts: boolean
+  contactMappingProgress: ContactMappingProgress
 }
 
 const initialState: State = {
@@ -37,10 +45,30 @@ const initialState: State = {
   e164NumberToAddress: {},
   askedContactsPermission: false,
   isLoadingImportContacts: false,
+  contactMappingProgress: {
+    current: 0,
+    total: 0,
+  },
 }
 
-export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
+export const reducer = (
+  state: State | undefined = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'identity'),
+        verificationStatus: VerificationStatus.Stopped,
+        isLoadingImportContacts: false,
+        contactMappingProgress: {
+          current: 0,
+          total: 0,
+        },
+      }
+    }
     case Actions.RESET_VERIFICATION:
       return {
         ...state,
@@ -83,11 +111,31 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         ...state,
         isLoadingImportContacts: true,
         askedContactsPermission: true,
+        contactMappingProgress: { current: 0, total: 0 },
+      }
+    case Actions.UPDATE_IMPORT_SYNC_PROGRESS:
+      return {
+        ...state,
+        contactMappingProgress: { current: action.current, total: action.total },
+      }
+    case Actions.INCREMENT_IMPORT_SYNC_PROGRESS:
+      return {
+        ...state,
+        contactMappingProgress: {
+          current: state.contactMappingProgress.current + action.increment,
+          total: state.contactMappingProgress.total,
+        },
       }
     case Actions.END_IMPORT_CONTACTS:
       return {
         ...state,
         isLoadingImportContacts: false,
+        contactMappingProgress: action.success
+          ? {
+              current: state.contactMappingProgress.total,
+              total: state.contactMappingProgress.total,
+            }
+          : state.contactMappingProgress,
       }
     case Actions.DENY_IMPORT_CONTACTS:
       return {
@@ -119,3 +167,7 @@ export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
+export const contactMappingProgressSelector = (state: RootState) =>
+  state.identity.contactMappingProgress
+export const isLoadingImportContactsSelector = (state: RootState) =>
+  state.identity.isLoadingImportContacts

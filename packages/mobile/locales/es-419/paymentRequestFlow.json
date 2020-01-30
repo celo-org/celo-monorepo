@@ -1,10 +1,12 @@
 {
   "requests": "Solicitudes",
   "empty": "No tienes solicitudes de pago",
-  "incomingPaymentRequests": "Pedidos esperandote",
-  "outgoingPaymentRequests": "Pagos que tu has pedido",
   "celoDollarBalance": "Saldo de {{CeloDollar}}",
   "requestDeclined": "Solicitud rechazada",
   "requestPaid": "Solicitud Pagada",
-  "paymentRequestUpdateFailed": "No se pudo actualizar el pedido de pago"
+  "paymentRequestUpdateFailed": "No se pudo actualizar el pedido de pago",
+  "incomingPaymentRequestNotificationTitle": "{{name}} solicitado  {{amount}}",
+  "outgoingPaymentRequestNotificationTitle": "Solicitado {{amount}} de {{name}}",
+  "defaultComment": "Pago solicitado",
+  "paymentRequestNotificationLine": "<0>{{displayName}} por</0> <1>{{amount}}</1>"
 }

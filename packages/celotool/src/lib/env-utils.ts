@@ -1,4 +1,3 @@
-// import { confirmAction } from './utils'
 import { config } from 'dotenv'
 import { existsSync } from 'fs'
 import path from 'path'
@@ -10,6 +9,9 @@ export interface CeloEnvArgv extends yargs.Argv {
 }
 
 export enum envVar {
+  ATTESTATION_BOT_INITIAL_WAIT_SECONDS = 'ATTESTATION_BOT_INITIAL_WAIT_SECONDS',
+  ATTESTATION_BOT_IN_BETWEEN_WAIT_SECONDS = 'ATTESTATION_BOT_IN_BETWEEN_WAIT_SECONDS',
+  ATTESTATION_BOT_MAX_ATTESTATIONS = 'ATTESTATION_BOT_MAX_ATTESTATIONS',
   ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY = 'ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY',
   ATTESTATION_SERVICE_DOCKER_IMAGE_TAG = 'ATTESTATION_SERVICE_DOCKER_IMAGE_TAG',
   BLOCK_TIME = 'BLOCK_TIME',
@@ -31,14 +33,17 @@ export enum envVar {
   CLUSTER_DOMAIN_NAME = 'CLUSTER_DOMAIN_NAME',
   ENV_TYPE = 'ENV_TYPE',
   EPOCH = 'EPOCH',
+  FAUCET_CUSD_WEI = 'FAUCET_CUSD_WEI',
   LOOKBACK = 'LOOKBACK',
   ETHSTATS_DOCKER_IMAGE_REPOSITORY = 'ETHSTATS_DOCKER_IMAGE_REPOSITORY',
   ETHSTATS_DOCKER_IMAGE_TAG = 'ETHSTATS_DOCKER_IMAGE_TAG',
   ETHSTATS_TRUSTED_ADDRESSES = 'ETHSTATS_TRUSTED_ADDRESSES',
   ETHSTATS_BANNED_ADDRESSES = 'ETHSTATS_BANNED_ADDRESSES',
+  ETHSTATS_RESERVED_ADDRESSES = 'ETHSTATS_RESERVED_ADDRESSES',
   FAUCET_GENESIS_ACCOUNTS = 'FAUCET_GENESIS_ACCOUNTS',
   FAUCET_GENESIS_BALANCE = 'FAUCET_GENESIS_BALANCE',
   ORACLE_GENESIS_BALANCE = 'ORACLE_GENESIS_BALANCE',
+  GENESIS_ACCOUNTS = 'GENESIS_ACCOUNTS',
   GETH_ACCOUNT_SECRET = 'GETH_ACCOUNT_SECRET',
   GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY = 'GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY',
   GETH_BOOTNODE_DOCKER_IMAGE_TAG = 'GETH_BOOTNODE_DOCKER_IMAGE_TAG',
@@ -58,17 +63,23 @@ export enum envVar {
   IN_MEMORY_DISCOVERY_TABLE = 'IN_MEMORY_DISCOVERY_TABLE',
   KUBERNETES_CLUSTER_NAME = 'KUBERNETES_CLUSTER_NAME',
   KUBERNETES_CLUSTER_ZONE = 'KUBERNETES_CLUSTER_ZONE',
+  LEADERBOARD_DOCKER_IMAGE_REPOSITORY = 'LEADERBOARD_DOCKER_IMAGE_REPOSITORY',
+  LEADERBOARD_DOCKER_IMAGE_TAG = 'LEADERBOARD_DOCKER_IMAGE_TAG',
+  LEADERBOARD_SHEET = 'LEADERBOARD_SHEET',
+  LOAD_TEST_CLIENTS = 'LOAD_TEST_CLIENTS',
+  LOAD_TEST_GENESIS_BALANCE = 'LOAD_TEST_GENESIS_BALANCE',
+  LOAD_TEST_TX_DELAY_MS = 'LOAD_TEST_TX_DELAY_MS',
   MNEMONIC = 'MNEMONIC',
   MOBILE_WALLET_PLAYSTORE_LINK = 'MOBILE_WALLET_PLAYSTORE_LINK',
   NETWORK_ID = 'NETWORK_ID',
   NEXMO_KEY = 'NEXMO_KEY',
   NEXMO_SECRET = 'NEXMO_SECRET',
-  NOTIFICATION_SERVICE_FIREBASE_DB = 'NOTIFICATION_SERVICE_FIREBASE_DB',
   ORACLE_CRON_SCHEDULE = 'ORACLE_CRON_SCHEDULE',
   ORACLE_DOCKER_IMAGE_REPOSITORY = 'ORACLE_DOCKER_IMAGE_REPOSITORY',
   ORACLE_DOCKER_IMAGE_TAG = 'ORACLE_DOCKER_IMAGE_TAG',
   PROMTOSD_EXPORT_INTERVAL = 'PROMTOSD_EXPORT_INTERVAL',
   PROMTOSD_SCRAPE_INTERVAL = 'PROMTOSD_SCRAPE_INTERVAL',
+  PROXIED_VALIDATORS = 'PROXIED_VALIDATORS',
   SMS_RETRIEVER_HASH_CODE = 'SMS_RETRIEVER_HASH_CODE',
   STACKDRIVER_MONITORING_DASHBOARD = 'STACKDRIVER_MONITORING_DASHBOARD',
   STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX = 'STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX',
@@ -81,10 +92,18 @@ export enum envVar {
   TX_NODES = 'TX_NODES',
   TWILIO_ACCOUNT_AUTH_TOKEN = 'TWILIO_ACCOUNT_AUTH_TOKEN',
   TWILIO_ACCOUNT_SID = 'TWILIO_ACCOUNT_SID',
+  TWILIO_ADDRESS_SID = 'TWILIO_ADDRESS_SID',
   VALIDATOR_GENESIS_BALANCE = 'VALIDATOR_GENESIS_BALANCE',
   VALIDATOR_ZERO_GENESIS_BALANCE = 'VALIDATOR_ZERO_GENESIS_BALANCE',
   VALIDATORS = 'VALIDATORS',
   VM_BASED = 'VM_BASED',
+  VOTING_BOTS = 'VOTING_BOTS',
+  VOTING_BOT_BALANCE = 'VOTING_BOT_BALANCE',
+  VOTING_BOT_CHANGE_BASELINE = 'VOTING_BOT_CHANGE_BASELINE',
+  VOTING_BOT_CRON_SCHEDULE = 'VOTING_BOT_CRON_SCHEDULE',
+  VOTING_BOT_EXPLORE_PROBABILITY = 'VOTING_BOT_EXPLORE_PROBABILITY',
+  VOTING_BOT_SCORE_SENSITIVITY = 'VOTING_BOT_SCORE_SENSITIVITY',
+  VOTING_BOT_WAKE_PROBABILITY = 'VOTING_BOT_WAKE_PROBABILITY',
 }
 
 export enum EnvTypes {
@@ -128,15 +147,6 @@ export function validateAndSwitchToEnv(celoEnv: string) {
     process.exit(1)
   }
 
-  const indicatesStagingOrProductionEnv = isStaging(celoEnv) || isProduction(celoEnv)
-
-  if (indicatesStagingOrProductionEnv && !isValidStagingOrProductionEnv(celoEnv)) {
-    console.error(
-      `${celoEnv} indicated to be a staging or production environment but did not conform to the expected regex ^[a-z][a-z0-9]*(staging|production)$.`
-    )
-    process.exit(1)
-  }
-
   const envResult = config({ path: getEnvFile(celoEnv) })
   const envMemonicResult = config({ path: getEnvFile(celoEnv, '.mnemonic') })
 
@@ -159,20 +169,12 @@ export function validateAndSwitchToEnv(celoEnv: string) {
   process.env.CELOTOOL_CELOENV = celoEnv
 }
 
-export function isStaging(env: string) {
-  return env.endsWith(EnvTypes.STAGING)
-}
-
-export function isProduction(env: string) {
-  return env.endsWith(EnvTypes.PRODUCTION)
+export function isProduction() {
+  return fetchEnv(envVar.ENV_TYPE).toLowerCase() === EnvTypes.PRODUCTION
 }
 
 export function isValidCeloEnv(celoEnv: string) {
   return new RegExp('^[a-z][a-z0-9]*$').test(celoEnv)
-}
-
-function isValidStagingOrProductionEnv(celoEnv: string) {
-  return new RegExp('^[a-z][a-z0-9]*(staging|production)$').test(celoEnv)
 }
 
 function celoEnvMiddleware(argv: CeloEnvArgv) {
@@ -180,12 +182,9 @@ function celoEnvMiddleware(argv: CeloEnvArgv) {
 }
 
 export async function doCheckOrPromptIfStagingOrProduction() {
-  if (
-    process.env.CELOTOOL_CONFIRMED !== 'true' &&
-    isValidStagingOrProductionEnv(process.env.CELOTOOL_CELOENV!)
-  ) {
+  if (process.env.CELOTOOL_CONFIRMED !== 'true' && isProduction()) {
     await confirmAction(
-      'You are about to apply a possibly irreversable action on a staging/production environment. Are you sure?'
+      `You are about to apply a possibly irreversible action on a production env: ${process.env.CELOTOOL_CELOENV}. Are you sure?`
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
   }
@@ -229,4 +228,18 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
 
 export function isVmBased() {
   return fetchEnv(envVar.VM_BASED) === 'true'
+}
+
+export function failIfNotVmBased() {
+  if (!isVmBased()) {
+    console.error('The celo env is not intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
+}
+
+export function failIfVmBased() {
+  if (isVmBased()) {
+    console.error('The celo env is intended for a VM-based testnet, aborting')
+    process.exit(1)
+  }
 }

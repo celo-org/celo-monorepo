@@ -22,6 +22,7 @@ export default class MobileApp extends React.PureComponent {
             title={'Celo | Download Mobile App'}
             path={CeloLinks.walletApp}
             description={''}
+            image={require('src/download/ogimage-wallet.png')}
           />
           <Cover />
           <CoverActions />

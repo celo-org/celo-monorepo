@@ -4,28 +4,32 @@ import {
   assertEqualBN,
   assertEqualDpBN,
   assertRevert,
+  jsonRpc,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
+  EpochRewardsTestContract,
+  EpochRewardsTestInstance,
   MockElectionContract,
   MockElectionInstance,
   MockGoldTokenContract,
   MockGoldTokenInstance,
   MockSortedOraclesContract,
   MockSortedOraclesInstance,
-  EpochRewardsTestContract,
-  EpochRewardsTestInstance,
   RegistryContract,
   RegistryInstance,
+  ReserveContract,
+  ReserveInstance,
 } from 'types'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const Registry: RegistryContract = artifacts.require('Registry')
+const Reserve: ReserveContract = artifacts.require('Reserve')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -34,7 +38,7 @@ EpochRewards.numberFormat = 'BigNumber'
 const YEAR = new BigNumber(365 * 24 * 60 * 60)
 const SUPPLY_CAP = new BigNumber(web3.utils.toWei('1000000000'))
 
-const getExpectedTargetTotalSupply = (timeDelta: BigNumber) => {
+const getExpectedTargetTotalSupply = (timeDelta: BigNumber): BigNumber => {
   const genesisSupply = new BigNumber(web3.utils.toWei('600000000'))
   const linearRewards = new BigNumber(web3.utils.toWei('200000000'))
   return genesisSupply
@@ -68,10 +72,13 @@ contract('EpochRewards', (accounts: string[]) => {
   const mockStableTokenAddress = web3.utils.randomHex(20)
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   const timeTravelToDelta = async (timeDelta: BigNumber) => {
-    const currentTime = new BigNumber((await web3.eth.getBlock('latest')).timestamp)
-    const startTime = await epochRewards.startTime()
-    const desiredTime = startTime.plus(timeDelta)
-    await timeTravel(desiredTime.minus(currentTime).toNumber(), web3)
+    // mine beforehand, just in case
+    await jsonRpc(web3, 'evm_mine', [])
+    const currentTime: BigNumber = new BigNumber((await web3.eth.getBlock('latest')).timestamp)
+    const startTime: BigNumber = await epochRewards.startTime()
+    const desiredTime: BigNumber = startTime.plus(timeDelta)
+    const delta: number = desiredTime.minus(currentTime).toNumber()
+    await timeTravel(delta, web3)
   }
 
   beforeEach(async () => {
@@ -91,6 +98,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
     await epochRewards.initialize(
       registry.address,
+      accounts[0],
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
@@ -130,6 +138,7 @@ contract('EpochRewards', (accounts: string[]) => {
       await assertRevert(
         epochRewards.initialize(
           registry.address,
+          accounts[0],
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
@@ -352,15 +361,16 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('#getTargetGoldTotalSupply()', () => {
     describe('when it has been fewer than 15 years since genesis', () => {
-      const timeDelta = YEAR.times(10)
+      const timeDelta: BigNumber = YEAR.times(10)
       beforeEach(async () => {
         await timeTravelToDelta(timeDelta)
       })
 
       it('should return 600MM + 200MM * t / 15', async () => {
-        assertEqualBN(
+        assertEqualDpBN(
           await epochRewards.getTargetGoldTotalSupply(),
-          getExpectedTargetTotalSupply(timeDelta)
+          getExpectedTargetTotalSupply(timeDelta),
+          8
         )
       })
     })
@@ -435,8 +445,8 @@ contract('EpochRewards', (accounts: string[]) => {
         const expected = new BigNumber(1).plus(
           fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
         )
-        // Assert equal to 9 decimal places due to fixidity imprecision.
-        assertEqualDpBN(actual, expected, 9)
+        // Assert equal to 8 decimal places due to fixidity imprecision.
+        assertEqualDpBN(actual, expected, 8)
       })
     })
 
@@ -466,15 +476,18 @@ contract('EpochRewards', (accounts: string[]) => {
     const totalSupply = new BigNumber(129762987346298761037469283746)
     const reserveBalance = new BigNumber(2397846127684712867321)
     const floatingSupply = totalSupply.minus(reserveBalance)
-    const mockReserveAddress = web3.utils.randomHex(20)
+    let reserve: ReserveInstance
+
     beforeEach(async () => {
+      reserve = await Reserve.new()
+      await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
+      await reserve.initialize(registry.address, 60, toFixed(1))
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
-        to: mockReserveAddress,
+        to: reserve.address,
         value: reserveBalance.toString(),
       })
-      await registry.setAddressFor(CeloContractName.Reserve, mockReserveAddress)
     })
 
     describe('when the percentage of voting gold is equal to the target', () => {
@@ -576,6 +589,21 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[1], expected)
       })
+    })
+  })
+
+  describe('when the contract is frozen', () => {
+    beforeEach(async () => {
+      await epochRewards.freeze()
+    })
+
+    it('should make calculateTargetEpochPaymentAndRewards return zeroes', async () => {
+      const [
+        validatorPayment,
+        voterRewards,
+      ] = await epochRewards.calculateTargetEpochPaymentAndRewards()
+      assertEqualBN(validatorPayment, 0)
+      assertEqualBN(voterRewards, 0)
     })
   })
 })

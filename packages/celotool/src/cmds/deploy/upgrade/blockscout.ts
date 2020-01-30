@@ -32,7 +32,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     blockscoutDBConnectionName,
   ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName)
 
-  if (argv.reset) {
+  if (argv.reset === true) {
     console.info(
       'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
     )

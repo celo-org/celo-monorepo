@@ -13,7 +13,6 @@ import {
 } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { Cell, Spans } from 'src/layout/GridRow'
-
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 export function ErrorMessage({ allErrors, field, t }) {
@@ -25,7 +24,7 @@ export function ErrorMessage({ allErrors, field, t }) {
 
   return allErrors.includes(field) ? (
     <Fade>
-      <Text style={[fonts.h5, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
+      <Text style={[fonts.h6, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
     </Fade>
   ) : (
     <View style={styles.errorPlaceholder} />
@@ -158,7 +157,7 @@ export class TextInput extends React.Component<TextInputProps & TextInputAuxProp
 
   render() {
     const { style, focusStyle, ...props } = this.props
-    const currentStyle = this.state.focused ? [style, focusStyle] : style
+    const currentStyle = this.state.focused ? StyleSheet.flatten([style, focusStyle]) : style
     return (
       <RNTextInput {...props} onFocus={this.onFocus} onBlur={this.onBlur} style={currentStyle} />
     )
@@ -171,7 +170,7 @@ interface LabelProps {
   hasError: boolean
   value: string
   label: string
-  onInput: () => void
+  onInput: (x?: unknown) => void
 }
 
 export function LabeledInput({ name, multiline, hasError, value, onInput, label }: LabelProps) {

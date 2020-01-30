@@ -2,14 +2,14 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
+import { TokenTransactionType } from 'src/apollo/types'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { TransactionTypes } from 'src/transactions/reducer'
 
-const avatarSize = 40
+const AVATAR_SIZE = 40
 
 interface Props {
-  type: TransactionTypes
+  type: TokenTransactionType
   recipient?: Recipient
   address?: string
 }
@@ -18,27 +18,29 @@ export default function TransferFeedIcon(props: Props) {
   const { recipient, address, type } = props
 
   switch (type) {
-    case TransactionTypes.VERIFICATION_FEE: // fallthrough
-    case TransactionTypes.FAUCET: // fallthrough
-    case TransactionTypes.INVITE_SENT: // fallthrough
-    case TransactionTypes.NETWORK_FEE: // fallthrough
-    case TransactionTypes.INVITE_RECEIVED: {
+    case TokenTransactionType.VerificationFee: // fallthrough
+    case TokenTransactionType.Faucet: // fallthrough
+    case TokenTransactionType.InviteSent: // fallthrough
+    case TokenTransactionType.NetworkFee: // fallthrough
+    case TokenTransactionType.InviteReceived: {
       return <Image source={coinsIcon} style={styles.image} />
     }
-    case TransactionTypes.VERIFICATION_REWARD: {
+    case TokenTransactionType.VerificationReward: {
       return (
         <View style={styles.image}>
           <RewardIcon height={38} />
         </View>
       )
     }
-    case TransactionTypes.RECEIVED: // fallthrough
-    case TransactionTypes.SENT: // fallthrough
+    case TokenTransactionType.Received: // fallthrough
+    case TokenTransactionType.Sent: // fallthrough
+    case TokenTransactionType.EscrowSent:
+    case TokenTransactionType.EscrowReceived:
     default: {
       return (
         <ContactCircle
           address={address}
-          size={avatarSize}
+          size={AVATAR_SIZE}
           thumbnailPath={getRecipientThumbnail(recipient)}
         >
           {<Image source={unknownUserIcon} style={styles.image} />}
@@ -50,8 +52,8 @@ export default function TransferFeedIcon(props: Props) {
 
 const styles = StyleSheet.create({
   image: {
-    height: avatarSize,
-    width: avatarSize,
+    height: AVATAR_SIZE,
+    width: AVATAR_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -1,10 +1,9 @@
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Transceive from 'src/dev/Transceive'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
-import { I18nProps, Trans, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
@@ -53,14 +52,15 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
         </Cell>
         <Cell span={Spans.half}>
           <H4 style={[textStyles.invert, standardStyles.elementalMarginBottom]}>
-            <Trans i18nKey={'purposeText'}>
+            <Trans ns={NameSpaces.dev} i18nKey={'purposeText'}>
               <Text href={CeloLinks.discourse} style={styles.colorEmphasis}>
                 2 million Celo Gold in rewards.
-              </Text>*
+              </Text>
+              *
             </Trans>
           </H4>
           <Text style={[fonts.p, textStyles.invert]}>
-            <Trans i18nKey={'purposeAsterisk'}>
+            <Trans ns={NameSpaces.dev} i18nKey={'purposeAsterisk'}>
               <Link href={CeloLinks.stakeOffTerms}>Terms and Conditions</Link>
             </Trans>
           </Text>
@@ -79,7 +79,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
             {t('challengeText')}
           </Text>
           <Button
-            size={SIZE}
+            size={SIZE.normal}
             kind={BTN.PRIMARY}
             text={t('challengeBtnText')}
             href="https://forum.celo.org/t/the-great-celo-stake-off-the-details/136"
@@ -98,17 +98,15 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <Text style={[fonts.p, textStyles.invert]}>{t('whoText')}</Text>
         </Cell>
       </GridRow>
-      <LazyLoad>
-        <GridRow
-          desktopStyle={standardStyles.blockMarginBottom}
-          tabletStyle={standardStyles.blockMarginBottomTablet}
-          mobileStyle={standardStyles.blockMarginBottomMobile}
-        >
-          <Cell span={Spans.full}>
-            <LeaderBoardApp />
-          </Cell>
-        </GridRow>
-      </LazyLoad>
+      <GridRow
+        desktopStyle={standardStyles.blockMarginBottom}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        mobileStyle={standardStyles.blockMarginBottomMobile}
+      >
+        <Cell span={Spans.full}>
+          <LeaderBoardApp />
+        </Cell>
+      </GridRow>
     </View>
   )
 })

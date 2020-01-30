@@ -29,7 +29,7 @@ export const builder = (argv: yargs.Argv) => {
   return argv
     .option('phone', {
       type: 'string',
-      description: 'Phone number to attest to,',
+      description: `Phone number to attest to. Should be an E.164 number matching formatted like +451234567890.`,
       demand: 'Please specify phone number to attest to',
     })
     .option('num', {
@@ -78,7 +78,7 @@ async function verifyCmd(argv: VerifyArgv) {
   const currentWalletAddress = await accounts.getWalletAddress(account)
 
   if (currentWalletAddress !== account) {
-    const setWalletAddressTx = await accounts.setWalletAddress(account)
+    const setWalletAddressTx = accounts.setWalletAddress(account)
     const result = await setWalletAddressTx.send()
     await result.waitReceipt()
   }
@@ -104,9 +104,7 @@ export async function printCurrentCompletedAttestations(
   const attestationStat = await attestations.getAttestationStat(phoneNumber, account)
 
   console.info(
-    `Phone Number: ${phoneNumber} has completed ${
-      attestationStat.completed
-    } attestations out of a total of ${attestationStat.total}`
+    `Phone Number: ${phoneNumber} has completed ${attestationStat.completed} attestations out of a total of ${attestationStat.total}`
   )
 }
 
@@ -166,9 +164,7 @@ async function promptForCodeAndVerify(
     const userResponse = await prompts({
       type: 'text',
       name: 'code',
-      message: `${
-        attestationsToComplete.length
-      } attestations completable. Enter the code here or type exit`,
+      message: `${attestationsToComplete.length} attestations completable. Enter the code here or type exit`,
     })
 
     if (userResponse.code === 'exit') {

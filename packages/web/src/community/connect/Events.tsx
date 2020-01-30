@@ -1,6 +1,6 @@
 import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
-import { SectionList, StyleSheet, Text, View } from 'react-native'
+import { SectionList, SectionListRenderItemInfo, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import EventRow from 'src/community/connect/EventRow'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -10,6 +10,7 @@ import OvalCoin from 'src/shared/OvalCoin'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
 import { NoneFound, Radio, SectionHeader } from 'src/table/table'
+
 interface OwnProps {
   upcomingEvents?: EventProps[]
   pastEvents?: EventProps[]
@@ -74,7 +75,7 @@ class Events extends React.PureComponent<Props, State> {
     )
   }
 
-  renderItem = ({ item, section }: { item: EventProps; section: { title?: string } }) => {
+  renderItem = ({ item, section }: SectionListRenderItemInfo<EventProps>) => {
     return (
       <Fade bottom={true} distance="20px">
         <EventRow {...item} key={item.name} section={section.title} />
@@ -92,7 +93,7 @@ class Events extends React.PureComponent<Props, State> {
       >
         <Cell span={Spans.fourth}>
           <View style={standardStyles.blockMarginMobile}>
-            <Text style={fonts.h5}>{t('events.refineBy')}</Text>
+            <Text style={fonts.h6}>{t('events.refineBy')}</Text>
             <Radio
               icon={<OvalCoin size={14} color={colors.primary} />}
               selected={this.state.filter === Filter.hosting}
@@ -108,7 +109,7 @@ class Events extends React.PureComponent<Props, State> {
               onValueSelected={this.filterBy}
             />
           </View>
-          <Text style={[fonts.h5, standardStyles.elementalMarginBottom]}>
+          <Text style={[fonts.h6, standardStyles.elementalMarginBottom]}>
             {t('events.reppingCelo')}
           </Text>
           <Text style={fonts.p}>
@@ -125,7 +126,6 @@ class Events extends React.PureComponent<Props, State> {
           <SectionList
             sections={this.getSections()}
             renderSectionHeader={SectionHeader}
-            // @ts-ignore
             renderItem={this.renderItem}
             keyExtractor={keyExtractor}
             ListEmptyComponent={this.renderNotFound}

@@ -2,7 +2,7 @@ import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-ut
 import BigNumber from 'bignumber.js'
 import * as chai from 'chai'
 import * as chaiSubset from 'chai-subset'
-import { spawn } from 'child_process'
+import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import {
   ProxyInstance,
@@ -23,6 +23,8 @@ chai.use(chaiSubset)
 
 const assert = chai.assert
 
+// hard coded in ganache
+export const EPOCH = 100
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export function stripHexEncoding(hexString: string) {
@@ -41,7 +43,9 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
         jsonrpc: '2.0',
         method,
         params,
-        id: new Date().getTime(),
+        // salt id generation, milliseconds might not be
+        // enough to generate unique ids
+        id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
       },
       // @ts-ignore
       (err: any, result: any) => {
@@ -65,6 +69,18 @@ export async function mineBlocks(blocks: number, web3: Web3) {
   }
 }
 
+export async function currentEpochNumber(web3) {
+  const blockNumber = await web3.eth.getBlockNumber()
+  return Math.floor((blockNumber - 1) / EPOCH)
+}
+
+export async function mineToNextEpoch(web3) {
+  const blockNumber = await web3.eth.getBlockNumber()
+  const epochNumber = await currentEpochNumber(web3)
+  const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+  await mineBlocks(blocksUntilNextEpoch, web3)
+}
+
 export async function assertBalance(address: string, balance: BigNumber) {
   const block = await web3.eth.getBlock('latest')
   const web3balance = new BigNumber(await web3.eth.getBalance(address))
@@ -80,14 +96,11 @@ export async function assertBalance(address: string, balance: BigNumber) {
 export async function assertRevert(promise: any, errorMessage: string = '') {
   try {
     await promise
-    assert.fail('Expected revert not received')
+    assert.fail('Expected transaction to revert')
   } catch (error) {
-    const revertFound = error.message.search('revert') >= 0
-    if (errorMessage === '') {
-      assert(revertFound, `Expected "revert", got ${error} instead`)
-    } else {
-      assert(revertFound, errorMessage)
-    }
+    const revertFound = error.message.search('VM Exception while processing transaction: revert') >= 0
+    const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
+    assert(revertFound, msg)
   }
 }
 
@@ -107,6 +120,41 @@ export async function exec(command: string, args: string[]) {
       }
     })
   })
+}
+
+function execCmd(
+  cmd: string,
+  args: string[],
+  options?: SpawnOptions & { silent?: boolean }
+) {
+  return new Promise<number>(async (resolve, reject) => {
+    const { silent, ...spawnOptions } = options || { silent: false }
+    if (!silent) {
+      console.debug('$ ' + [cmd].concat(args).join(' '))
+    }
+    const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
+    process.on('close', (code) => {
+      try {
+        resolve(code)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  })
+}
+
+async function isPortOpen(host: string, port: number) {
+  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
+}
+
+export async function waitForPortOpen(host: string, port: number, seconds: number) {
+  const deadline = Date.now() + seconds * 1000
+  do {
+    if (await isPortOpen(host, port)) {
+      return true
+    }
+  } while (Date.now() < deadline)
+  return false
 }
 
 export const assertProxiesSet = async (getContract: any) => {
@@ -205,13 +253,13 @@ export function assertLogMatches(
 }
 
 export function assertEqualBN(
-  value: number | BN | BigNumber,
+  actual: number | BN | BigNumber,
   expected: number | BN | BigNumber,
   msg?: string
 ) {
   assert(
-    web3.utils.toBN(value).eq(web3.utils.toBN(expected)),
-    `expected ${expected.toString()} and got ${value.toString()}. ${msg || ''}`
+    web3.utils.toBN(actual).eq(web3.utils.toBN(expected)),
+    `expected ${expected.toString(10)} and got ${actual.toString(10)}. ${msg || ''}`
   )
 }
 

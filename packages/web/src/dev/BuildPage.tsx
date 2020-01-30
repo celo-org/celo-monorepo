@@ -5,9 +5,10 @@ import Engage from 'src/dev/Engage'
 import Features from 'src/dev/Features'
 import FullStack from 'src/dev/FullStack'
 import OpenGraph from 'src/header/OpenGraph'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
+const previewImage = require('src/dev/opengraph.jpg')
 
 class BuildPage extends React.PureComponent<I18nProps> {
   static getInitialProps() {
@@ -18,6 +19,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
     return (
       <View style={styles.container}>
         <OpenGraph
+          image={previewImage}
           path={menuItems.BUILD.link}
           title={'Build with Celo | Celo Developers'}
           description={
@@ -34,7 +36,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces('dev')(BuildPage)
+export default withNamespaces(NameSpaces.dev)(BuildPage)
 
 const styles = StyleSheet.create({
   container: { scrollPadding: 20 },

@@ -1,4 +1,4 @@
-import { stripHexLeader } from '@celo/utils/src/address'
+import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -32,7 +32,6 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
@@ -42,7 +41,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { generateDynamicShortLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { zeroSyncSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
@@ -252,7 +251,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 export function* doRedeemInvite(inviteCode: string) {
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
-    Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
+    Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceInWeiWithRetry,
       CURRENCY_ENUM.DOLLAR,
@@ -269,7 +268,7 @@ export function* doRedeemInvite(inviteCode: string) {
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
-    Logger.error(TAG, 'Failed to redeem invite', e)
+    Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
@@ -313,7 +312,7 @@ function* addTempAccountToWallet(inviteCode: string) {
     } else {
       // Import account into the local geth node
       // @ts-ignore
-      tempAccount = yield call(web3.eth.personal.importRawKey, stripHexLeader(inviteCode), TEMP_PW)
+      tempAccount = yield call(web3.eth.personal.importRawKey, trimLeading0x(inviteCode), TEMP_PW)
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {

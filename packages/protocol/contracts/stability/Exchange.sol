@@ -56,10 +56,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     _;
   }
 
-  // TODO: Remove this one with https://github.com/celo-org/celo-monorepo/issues/2000
-  // solhint-disable-next-line
-  function() external payable {}
-
   /**
    * @dev Initializes the exchange, setting initial bucket sizes
    * @param registryAddress Address of the Registry contract

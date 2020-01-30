@@ -5,13 +5,13 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import Avatar from 'src/components/Avatar'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
@@ -46,7 +46,7 @@ function PaymentRequestReviewCard({
   currency,
   value,
   comment,
-}: OwnProps & StateProps & WithNamespaces) {
+}: OwnProps & StateProps & WithTranslation) {
   const localCurrencyCode = useLocalCurrencyCode()
   const localValue = useDollarsToLocalAmount(value)
 
@@ -71,22 +71,21 @@ function PaymentRequestReviewCard({
         {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
         <HorizontalLine />
         <View style={style.feeContainer}>
-          {!!localCurrencyCode &&
-            localValue && (
-              <>
-                <LineItemRow
-                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={getMoneyDisplayValue(value)}
-                  title={t('amountInCelloDollars')}
-                />
-                <Text style={style.localValueHint}>
-                  {t('localValueHint', {
-                    localValue: getMoneyDisplayValue(localValue),
-                    localCurrencyCode,
-                  })}
-                </Text>
-              </>
-            )}
+          {!!localCurrencyCode && localValue && (
+            <>
+              <LineItemRow
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={getMoneyDisplayValue(value)}
+                title={t('amountInCelloDollars')}
+              />
+              <Text style={style.localValueHint}>
+                {t('localValueHint', {
+                  localValue: getMoneyDisplayValue(localValue),
+                  localCurrencyCode,
+                })}
+              </Text>
+            </>
+          )}
           <LineItemRow
             currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
             amount={getMoneyDisplayValue(value.plus(dollarBalance))}
@@ -134,5 +133,5 @@ const style = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.sendFlow7)(PaymentRequestReviewCard)
+  withTranslation(Namespaces.sendFlow7)(PaymentRequestReviewCard)
 )

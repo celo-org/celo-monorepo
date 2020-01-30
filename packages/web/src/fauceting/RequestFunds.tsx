@@ -203,7 +203,7 @@ function MobileSelect({ selectedOS, onSelect, t }) {
   const androidColor = isandroid ? colors.white : colors.placeholderDarkMode
   return (
     <>
-      <Text style={[fonts.h5, textStyles.invert, standardStyles.elementalMarginTop]}>
+      <Text style={[fonts.h6, textStyles.invert, standardStyles.elementalMarginTop]}>
         {t('chooseMobileOS')}
       </Text>
       <View style={standardStyles.row}>

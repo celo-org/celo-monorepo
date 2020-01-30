@@ -31,14 +31,14 @@ spec:
         - -c
         args:
         - |
-           mix cmd --app indexer iex -S mix
+           mix cmd --app indexer iex -S mix | sed 's/^iex(1)> //'
         ports:
         - name: http
           containerPort: 4000
         resources:
           requests:
-            memory: 1G
-            cpu: 250m
+            memory: 500Mi
+            cpu: 500m
         env:
 {{ include "celo.blockscout-env-vars" .  | indent 10 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
