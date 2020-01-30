@@ -4,10 +4,12 @@ locals {
 }
 
 resource "google_compute_address" "full_node" {
-  name         = "${local.name_prefix}-address-${count.index}-${random_id.full_node[count.index].hex}"
+  name         = "${length(var.names) > 0 ? format("%s-%s", var.celo_env, each.key) : local.name_prefix}-address-${random_id.full_node[each.key].hex}"
   address_type = "EXTERNAL"
 
-  count = var.node_count
+  # count = var.node_count
+
+  for_each = var.names
 
   lifecycle {
     create_before_destroy = true
@@ -15,10 +17,12 @@ resource "google_compute_address" "full_node" {
 }
 
 resource "google_compute_instance" "full_node" {
-  name         = "${local.name_prefix}-${count.index}-${random_id.full_node[count.index].hex}"
+  name         = "${length(var.names) > 0 ? format("%s-%s", var.celo_env, each.key) : local.name_prefix}-${random_id.full_node[each.key].hex}"
   machine_type = "n1-standard-2"
 
-  count = var.node_count
+  # count = var.node_count
+
+  for_each = var.names
 
   tags = concat(["${var.celo_env}-node"], var.instance_tags)
 
@@ -31,14 +35,14 @@ resource "google_compute_instance" "full_node" {
   }
 
   attached_disk {
-    source      = google_compute_disk.full_node[count.index].self_link
+    source      = google_compute_disk.full_node[each.key].self_link
     device_name = local.attached_disk_name
   }
 
   network_interface {
     network = var.network_name
     access_config {
-      nat_ip = google_compute_address.full_node[count.index].address
+      nat_ip = google_compute_address.full_node[each.key].address
     }
   }
 
@@ -58,13 +62,13 @@ resource "google_compute_instance" "full_node" {
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
-      ip_address : google_compute_address.full_node[count.index].address,
+      ip_address : google_compute_address.full_node[each.key].address,
       max_peers : 2000,
-      name : var.name,
+      name : length(var.names) > 0 ? each.key : var.name,
       network_id : var.network_id,
-      node_name : "${var.celo_env}-${var.name}-${count.index}",
+      node_name : "${var.celo_env}-${var.name}-${each.key}",
       proxy : var.proxy,
-      rid : count.index,
+      rid : each.key,
     }
   )
 
@@ -83,8 +87,9 @@ resource "google_compute_instance" "full_node" {
 }
 
 resource "google_compute_disk" "full_node" {
-  name  = "${local.name_prefix}-disk-${count.index}-${random_id.full_node_disk[count.index].hex}"
-  count = var.node_count
+  name  = "${length(var.names) > 0 ? format("%s-%s", var.celo_env, each.key) : local.name_prefix}-disk-${random_id.full_node_disk[each.key].hex}"
+  # count = var.node_count
+  for_each = var.names
 
   type = "pd-ssd"
   # in GB
@@ -97,14 +102,16 @@ resource "google_compute_disk" "full_node" {
 }
 
 resource "random_id" "full_node" {
-  count = var.node_count
+  # count = var.node_count
+  for_each = var.names
 
   byte_length = 8
 }
 
 # Separate random id so that updating the ID of the instance doesn't force a new disk
 resource "random_id" "full_node_disk" {
-  count = var.node_count
+  # count = var.node_count
+  for_each = var.names
 
   byte_length = 8
 }

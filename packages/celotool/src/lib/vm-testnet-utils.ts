@@ -7,6 +7,7 @@ import {
   generatePublicKey,
   getAddressFromEnv,
   privateKeyToAddress,
+  privateKeyToPublicKey,
 } from './generate_utils'
 import {
   applyTerraformModule,
@@ -19,7 +20,11 @@ import {
   TerraformVars,
   untaintTerraformModuleResource,
 } from './terraform'
-import { uploadDataToGoogleStorage, uploadTestnetInfoToGoogleStorage } from './testnet-utils'
+import {
+  getProxiesPerValidator,
+  uploadDataToGoogleStorage,
+  uploadTestnetInfoToGoogleStorage,
+} from './testnet-utils'
 import { execCmd } from './utils'
 
 // Keys = gcloud project name
@@ -42,7 +47,7 @@ interface NodeSecrets {
   BOOTNODE_ENODE_ADDRESS: string
   PRIVATE_KEY: string
   PROXIED_VALIDATOR_ADDRESS?: string
-  PROXY_ENODE_ADDRESS?: string
+  PROXY_ENODE_ADDRESSES?: string
   [envVar.GETH_ACCOUNT_SECRET]: string
   [envVar.MNEMONIC]: string
 }
@@ -322,11 +327,14 @@ export async function generateAndUploadSecrets(celoEnv: string) {
     await uploadSecrets(celoEnv, secrets, `validator-${i}`)
   }
   // Proxies
-  // Assumes only 1 proxy per validator
-  const proxyCount = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
-  for (let i = 0; i < proxyCount; i++) {
-    const secrets = generateNodeSecretEnvVars(AccountType.PROXY, i)
-    await uploadSecrets(celoEnv, secrets, `proxy-${i}`)
+  const proxiesPerValidator = getProxiesPerValidator()
+  let validatorIndex = 0
+  for (const proxyCount of proxiesPerValidator) {
+    for (let i = 0; i < proxyCount; i++) {
+      const secrets = generateProxySecretEnvVars(validatorIndex, i)
+      await uploadSecrets(celoEnv, secrets, `validator-${validatorIndex}-proxy-${i}`)
+    }
+    validatorIndex++
   }
 }
 
@@ -351,24 +359,43 @@ function generateBootnodeSecretEnvVars() {
 function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const privateKey = generatePrivateKey(mnemonic, accountType, index)
-  const secrets: NodeSecrets = {
+  const secrets = getNodeSecrets(privateKey)
+  // If this is meant to be a proxied validator, also generate the enode of its proxy
+  if (accountType === AccountType.VALIDATOR) {
+    const proxiesPerValidator = getProxiesPerValidator()
+    if (index < proxiesPerValidator.length) {
+      const proxyEnodeAddresses = []
+      for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[index]; proxyIndex++) {
+        proxyEnodeAddresses.push(privateKeyToPublicKey(generateProxyPrivateKey(index, proxyIndex)))
+      }
+      secrets.PROXY_ENODE_ADDRESSES = proxyEnodeAddresses.join(',')
+    }
+  }
+  return formatEnvVars(secrets)
+}
+
+function generateProxySecretEnvVars(validatorIndex: number, proxyIndex: number) {
+  const privateKey = generateProxyPrivateKey(validatorIndex, proxyIndex)
+  const secrets = getNodeSecrets(privateKey)
+  secrets.PROXIED_VALIDATOR_ADDRESS = getAddressFromEnv(AccountType.VALIDATOR, validatorIndex)
+  return formatEnvVars(secrets)
+}
+
+function generateProxyPrivateKey(validatorIndex: number, proxyIndex: number) {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const index = validatorIndex * 10000 + proxyIndex
+  return generatePrivateKey(mnemonic, AccountType.PROXY, index)
+}
+
+function getNodeSecrets(privateKey: string): NodeSecrets {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  return {
     ACCOUNT_ADDRESS: privateKeyToAddress(privateKey),
     BOOTNODE_ENODE_ADDRESS: generatePublicKey(mnemonic, AccountType.BOOTNODE, 0),
     PRIVATE_KEY: privateKey,
     [envVar.GETH_ACCOUNT_SECRET]: fetchEnv(envVar.GETH_ACCOUNT_SECRET),
     [envVar.MNEMONIC]: mnemonic,
   }
-  // If this is meant to be a proxied validator, also generate the enode of its proxy
-  if (accountType === AccountType.VALIDATOR) {
-    const proxiedValidators = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
-    if (index < proxiedValidators) {
-      secrets.PROXY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.PROXY, index)
-    }
-  }
-  if (accountType === AccountType.PROXY) {
-    secrets.PROXIED_VALIDATOR_ADDRESS = getAddressFromEnv(AccountType.VALIDATOR, index)
-  }
-  return formatEnvVars(secrets)
 }
 
 // Formats an object into a multi-line string with each line as KEY=VALUE

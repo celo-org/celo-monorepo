@@ -104,7 +104,12 @@ async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: st
 // Allow failures
 function taintResource(moduleName: string, resourceName: string) {
   try {
-    return execTerraformCmd(`terraform taint ${resourceName}`, getModulePath(moduleName), false)
+    const escapedResourceName = resourceName.replace(/"/g, '\\"')
+    return execTerraformCmd(
+      `terraform taint ${escapedResourceName}`,
+      getModulePath(moduleName),
+      false
+    )
   } catch (e) {
     console.info(`Could not taint ${resourceName}`, e)
     return Promise.resolve()
@@ -114,7 +119,12 @@ function taintResource(moduleName: string, resourceName: string) {
 // Allow failures
 function untaintResource(moduleName: string, resourceName: string) {
   try {
-    return execTerraformCmd(`terraform untaint ${resourceName}`, getModulePath(moduleName), false)
+    const escapedResourceName = resourceName.replace(/"/g, '\\"')
+    return execTerraformCmd(
+      `terraform untaint ${escapedResourceName}`,
+      getModulePath(moduleName),
+      false
+    )
   } catch (e) {
     console.info(`Could not taint ${resourceName}`, e)
     return Promise.resolve()

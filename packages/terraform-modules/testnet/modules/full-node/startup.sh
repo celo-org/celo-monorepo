@@ -151,7 +151,7 @@ GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_i
 # download & apply secrets pulled from Cloud Storage as environment vars
 echo "Downloading secrets from Google Cloud Storage..."
 SECRETS_ENV_PATH=/var/.env.celo.secrets
-gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.${name}-${rid} $SECRETS_ENV_PATH
+gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.${name} $SECRETS_ENV_PATH
 # Apply the .env file
 . $SECRETS_ENV_PATH
 
@@ -171,6 +171,7 @@ RPC_APIS="eth,net,web3,debug"
 
 if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
+  echo -n "$PROXIED_VALIDATOR_ADDRESS" > $DATA_DIR/validator_address
 else
   RPC_APIS="$RPC_APIS,txpool"
 fi
@@ -186,9 +187,6 @@ echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
-if [ ${name} == "proxy" ]; then
-  echo -n "$VALIDATOR_ADDRESS" > $DATA_DIR/validator_address
-fi
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)

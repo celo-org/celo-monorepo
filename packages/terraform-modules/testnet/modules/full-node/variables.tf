@@ -85,6 +85,12 @@ variable name {
   description = "Name of the nodes"
 }
 
+variable names {
+  type        = set(string)
+  description = "Name of each node"
+  default     = []
+}
+
 variable network_id {
   type        = number
   description = "The network ID number"

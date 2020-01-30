@@ -150,6 +150,7 @@ module "tx_node" {
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = [local.target_tag_tx_node]
   name                                  = "tx-node"
+  names = [ "tx-node-0" ]
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   node_count                            = var.tx_node_count
