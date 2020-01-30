@@ -6,7 +6,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { CeloLinks } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
-const docImage = require('src/dev/Documentation.png')
+const docImage = require('src/dev/stable-coin-paper-dark-bg.png')
 const sdkImage = require('src/dev/code-coins-dark.png')
 const tutorialImg = require('src/dev/gold-code-dark-bg.png')
 
