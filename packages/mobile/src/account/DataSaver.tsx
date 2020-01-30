@@ -32,7 +32,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     fornoEnabled: state.web3.fornoMode,
-    gethStartedThisSession: state.web3.gethStartedThisSession,
+    gethStartedThisSession: state.geth.gethStartedThisSession,
   }
 }
 

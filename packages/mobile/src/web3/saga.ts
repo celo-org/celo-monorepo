@@ -6,7 +6,8 @@ import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
-import { setAccountCreationTime } from 'src/account/actions'
+import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
+import { promptFornoIfNeededSelector } from 'src/account/reducer'
 import { getPincode } from 'src/account/saga'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -14,11 +15,11 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
-import { Actions as GethActions, cancelGethSaga, setPromptForno } from 'src/geth/actions'
+import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
-import { promptFornoIfNeededSelector } from 'src/geth/selectors'
+import { gethStartedThisSessionSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
@@ -42,10 +43,8 @@ import {
   currentAccountInWeb3KeystoreSelector,
   currentAccountSelector,
   fornoSelector,
-  gethStartedThisSessionSelector,
 } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
-
 const ETH_PRIVATE_KEY_LENGTH = 64
 const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
@@ -455,7 +454,7 @@ export function* switchToGethFromForno() {
 
     yield spawn(gethSaga)
     switchWeb3ProviderForSyncMode(false)
-    yield take(GethActions.SET_GETH_CONNECTED)
+    yield call(waitForGethConnectivity)
     // Once geth connnected, ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
 
@@ -514,6 +513,7 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
     Logger.debug(TAG + '@toggleFornoMode', ` already in desired state: ${action.fornoMode}`)
   }
 }
+
 export function* watchFornoMode() {
   yield takeLatest(Actions.TOGGLE_IS_FORNO, toggleFornoMode)
 }

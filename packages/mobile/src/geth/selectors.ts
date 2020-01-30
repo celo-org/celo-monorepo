@@ -3,4 +3,5 @@ import { RootState } from 'src/redux/reducers'
 
 export const isGethConnectedSelector = (state: RootState) =>
   state.geth.initialized === InitializationState.INITIALIZED && state.geth.connected
-export const promptFornoIfNeededSelector = (state: RootState) => state.geth.promptFornoIfNeeded
+export const gethStartedThisSessionSelector = (state: RootState) =>
+  state.geth.gethStartedThisSession

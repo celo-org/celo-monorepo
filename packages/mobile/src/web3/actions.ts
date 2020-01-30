@@ -94,7 +94,6 @@ export const setFornoMode = (fornoMode: boolean): SetIsFornoAction => {
     fornoMode,
   }
 }
-
 export const setPrivateCommentKey = (commentKey: string): SetCommentKeyAction => {
   return {
     type: Actions.SET_COMMENT_KEY,

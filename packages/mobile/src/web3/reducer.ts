@@ -9,7 +9,6 @@ export interface State {
   accountInWeb3Keystore: string | null
   commentKey: string | null
   fornoMode: boolean
-  gethStartedThisSession: boolean
 }
 
 const initialState: State = {
@@ -23,7 +22,6 @@ const initialState: State = {
   accountInWeb3Keystore: null,
   commentKey: null,
   fornoMode: networkConfig.initiallyForno,
-  gethStartedThisSession: !networkConfig.initiallyForno,
 }
 
 export const reducer = (
@@ -42,7 +40,6 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
-        gethStartedThisSession: !state.fornoMode,
       }
     }
     case Actions.SET_ACCOUNT:
@@ -59,8 +56,6 @@ export const reducer = (
       return {
         ...state,
         fornoMode: action.fornoMode,
-        // If switching to geth, then geth has been started this session
-        gethStartedThisSession: !action.fornoMode ? true : state.gethStartedThisSession,
       }
     case Actions.SET_COMMENT_KEY:
       return {
@@ -82,7 +77,6 @@ export const reducer = (
         ...state,
         syncProgress: action.payload,
       }
-
     default:
       return state
   }

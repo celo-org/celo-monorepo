@@ -12,14 +12,16 @@ import {
   select,
   take,
 } from 'redux-saga/effects'
-import { Actions, setGethConnected, setInitState, setPromptForno } from 'src/geth/actions'
+import { setPromptForno } from 'src/account/actions'
+import { promptFornoIfNeededSelector } from 'src/account/reducer'
+import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
   getGeth,
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
-import { isGethConnectedSelector, promptFornoIfNeededSelector } from 'src/geth/selectors'
+import { isGethConnectedSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
