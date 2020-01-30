@@ -28,6 +28,10 @@ done
 
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 
+# Needed by metro packager to use .e2e.ts overrides
+# See metreo.config.js
+export CELO_TEST_CONFIG=e2e 
+
 # Ensure jest is accessible to detox
 cp ../../node_modules/.bin/jest node_modules/.bin/
 
@@ -82,7 +86,7 @@ if [ $PLATFORM = "android" ]; then
     sleep 3 
   done
 
-  CELO_TEST_CONFIG=e2e yarn detox test -c $CONFIG_NAME -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose
+  yarn detox test -c $CONFIG_NAME -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose
   STATUS=$?
 
   echo "Closing emulator (if active)"
@@ -90,8 +94,26 @@ if [ $PLATFORM = "android" ]; then
 
 elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
-  echo "IOS e2e tests not currently supported"
-  exit 1
+  
+  if [ "$RELEASE" = false ]; then
+    CONFIG_NAME="ios.sim.debug"
+  else
+    CONFIG_NAME="ios.sim.release"
+  fi
+
+  if [ "$FAST" = false ]; then
+    echo "Configuring the app"
+    ./scripts/run_app.sh -p $PLATFORM -b
+  fi
+
+  echo "Building detox"
+  yarn detox build -c $CONFIG_NAME
+
+  echo "Starting the metro server"
+  yarn react-native start &
+
+  yarn detox test -c $CONFIG_NAME -l verbose
+  STATUS=$?
 
 else
   echo "Invalid value for platform, must be 'android' or 'ios'"
