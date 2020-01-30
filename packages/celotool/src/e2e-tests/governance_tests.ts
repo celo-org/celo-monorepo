@@ -144,16 +144,6 @@ describe('governance tests', () => {
     }
   }
 
-  const activate = async (account: string, txOptions: any = {}) => {
-    const [group] = await validators.methods.getRegisteredValidatorGroups().call()
-    const tx = election.methods.activate(group)
-    let gas = txOptions.gas
-    if (!gas) {
-      gas = (await tx.estimateGas({ ...txOptions })) * 2
-    }
-    return tx.send({ from: account, ...txOptions, gas })
-  }
-
   const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
     return blockNumber % epochSize === 0
   }
