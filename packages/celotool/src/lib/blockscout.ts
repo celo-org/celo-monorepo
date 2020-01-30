@@ -120,3 +120,9 @@ spec:
     await execCmdWithExitOnFailure(`kubectl create --namespace=${celoEnv} -f ${ingressFilePath}`)
   }
 }
+
+export async function switchIngressService(celoEnv: string, ingressName: string) {
+  const command = `kubectl patch --namespace=${celoEnv} ing/berlintestnet001-blockscout-web-ingress --type=json\
+   -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"${ingressName}-web"}]'`
+  await execCmdWithExitOnFailure(command)
+}
