@@ -44,6 +44,23 @@ contract MockLockedGold is ILockedGold {
   function getTotalLockedGold() external view returns (uint256) {
     return totalLockedGold;
   }
+
+  function lock() external payable {
+    accountTotalLockedGold[msg.sender] = accountTotalLockedGold[msg.sender].add(msg.value);
+  }
+
+  function unlock(uint256 value) external {
+    accountTotalLockedGold[msg.sender] = accountTotalLockedGold[msg.sender].sub(value);
+  }
+
+  function relock(uint256 index, uint256 value) external {
+    // TODO: add implementation if necessary to mock behaviour
+  }
+
+  function withdraw(uint256 index) external {
+    // TODO: add implementation if necessary to mock behaviour
+  }
+
   function slash(
     address account,
     uint256 penalty,
