@@ -1,6 +1,5 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -86,9 +85,6 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  phoneNumber: {
-    color: colors.dark,
-  },
   container: {
     marginBottom: 16,
   },

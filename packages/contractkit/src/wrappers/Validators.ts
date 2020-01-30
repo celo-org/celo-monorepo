@@ -453,7 +453,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
     const currentIdx = group.members.indexOf(validator)
     if (currentIdx < 0) {
-      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+      throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
       throw new Error(`Validator is already in position ${newIndex}`)
     }
@@ -487,7 +487,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidator(e.returnValues.validator, blockNumber)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, true, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({

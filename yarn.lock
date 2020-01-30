@@ -2639,10 +2639,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@0.0.247":
-  version "0.0.247"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.247.tgz#7e9119bb7b3c5c4b1d12ba5f8aa6b1fd20fb38f2"
-  integrity sha512-dGaARMtqc8ZYMEz/x79rP8ewJTDD88NxbthqYNCPkoYNSlgCLMd6SEVHI6IipYK2+wAMskILLW4De0v3Ia0Lzw==
+"@celo/client@0.0.266":
+  version "0.0.266"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.266.tgz#0b37b3d1d1981cad6c9a235b33d9331810c718d1"
+  integrity sha512-fKjtPXeVnsf+1+5Tt+H2HeUPjNiv2L4Cgd3UH/e1oqlV1Oy/Pnp/9A0blHBqkUXRCF7RD/MRxyQyyI88FN1fEw==
 
 "@celo/contractkit@0.1.5":
   version "0.1.5"
@@ -2742,14 +2742,6 @@
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
     yargs "13.2.4"
-
-"@celo/react-native-fast-crypto@^1.8.2":
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/@celo/react-native-fast-crypto/-/react-native-fast-crypto-1.8.2.tgz#7563e73a47c9ce22407e0ceb4d6406078872795f"
-  integrity sha512-yb8TNnfVU6dWEWc2x8oNyF4mIzerXcS/Gv6ETRi5lM8bz1RyJUrX87mxTPhDJp0vdwtX0bnXRBjycgpPEPSPAA==
-  dependencies:
-    buffer "^5.0.8"
-    rfc4648 "^1.0.0"
 
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
@@ -13371,10 +13363,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
-detox@^14.5.0:
-  version "14.5.0"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-14.5.0.tgz#cc96b41a2b76a029ef26be861fb04f69fe70c965"
-  integrity sha512-6LH/Aw/0pnf5llCY5rZICxVK1uoAmV+OZzGPQogpE3ZqxPkViFkg/SHsQqOn1M1Iswia7SzfSgu2KfKMNFXvRA==
+detox@^15.0.0:
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-15.0.0.tgz#1b4a4133d2de1a9ac6918c061306cc348090b580"
+  integrity sha512-mnF+3FoTP0ruqmYSJOEWQ5mmDYp3igD/CytBnhOupYHzTrzgIKl7F5+qnIg6SXIA+ANqgfQvy6bAiXI/26CSrQ==
   dependencies:
     "@babel/core" "^7.4.5"
     bunyan "^1.8.12"
@@ -17424,7 +17416,7 @@ gitbook-plugin-lunr@^1.2.0:
     html-entities "1.2.0"
     lunr "0.5.12"
 
-gitbook-plugin-page-ref@^0.0.6:
+gitbook-plugin-page-ref@0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/gitbook-plugin-page-ref/-/gitbook-plugin-page-ref-0.0.6.tgz#58e8d7bd056efe22e17e063bc01c4bc07594cc26"
   integrity sha512-PSJl+IwSbjbtMxS/nrZY9uCxYsLPbzGtm4SdXhDTL4PI49VsFGPRWQPu39UwsLpQUCbc/Q/BbItlMRZTKFHuIw==
@@ -19153,17 +19145,17 @@ i18next-xhr-backend@^3.0.0:
   dependencies:
     "@babel/runtime" "^7.5.5"
 
-i18next@^18.0.1:
-  version "18.0.1"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-18.0.1.tgz#10841209f6983df4d8e367204da403d8cbc609cf"
-  integrity sha512-KWd9qMFXw0qjxF7cTAqQselPCYoHfaLvBs8c6JcNzaQKVxbAlE/wv9EZXPy+JlKUcXCT0qgjcmxrJjmbnEp60A==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
-
 i18next@^19.0.2:
   version "19.0.2"
   resolved "https://registry.yarnpkg.com/i18next/-/i18next-19.0.2.tgz#d72502ef031403572703f2e9f013cae005265444"
   integrity sha512-fBa43Ann2udP1CQAz3IQpOZ1dGAkmi3mMfzisOhH17igneSRbvZ7P2RNbL+L1iRYKMufBmVwnC7G3gqcyviZ9g==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+
+i18next@^19.0.3:
+  version "19.1.0"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-19.1.0.tgz#fe1a1da3d208872946307c7d2d115da45d46159f"
+  integrity sha512-ISbmukX4L6Dz0QoH9+EW1AnBw7j+NRLoMu9uLPMaNSSTP9Eie9/oUL0dOyWX15baB3gYOpkHJpGZRHOqcnl0ew==
   dependencies:
     "@babel/runtime" "^7.3.1"
 
@@ -24180,15 +24172,15 @@ nexmo@2.4.2:
     request "^2.88.0"
     uuid "^2.0.2"
 
-next-i18next@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/next-i18next/-/next-i18next-2.1.1.tgz#fb669b57b42efe95242af98a892be85096e2371a"
-  integrity sha512-Mbeb73SK9ozNBQIp8Fp/Fb51Xw7Tx/1m4rNHFnkTEupztrMCHBdKsG0t7L4k4VWwchW+a2sJ284nxSxtFSHOaw==
+next-i18next@^4.0.1:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/next-i18next/-/next-i18next-4.1.0.tgz#dcb5afba1254551b5ced34ef2e40b38203babdb6"
+  integrity sha512-i02CxQdLzUg1ny3FNFZ0QXoBu8Yn5SkNt1lctcUYUQNWw/xBGfN+WhuDAM8Vcifhb5bAcJeo3nX7ELMG2PyhBw==
   dependencies:
     core-js "^2"
     detect-node "^2.0.4"
     hoist-non-react-statics "^3.2.0"
-    i18next "^18.0.1"
+    i18next "^19.0.3"
     i18next-browser-languagedetector "^4.0.0"
     i18next-express-middleware "^1.5.0"
     i18next-node-fs-backend "^2.1.0"
@@ -28431,13 +28423,13 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@git://github.com/celo-org/react-native-bip39#8d00738":
+"react-native-bip39@git://github.com/celo-org/react-native-bip39#b31a8ff":
   version "2.2.0"
-  resolved "git://github.com/celo-org/react-native-bip39#8d007387fc8bcc18a2d0e2344ec986a0c6f15834"
+  resolved "git://github.com/celo-org/react-native-bip39#b31a8ffc6a6c4393178e5a173ecbc966fbfcf92c"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"
-    react-native-fast-crypto "^1.8.1"
+    react-native-fast-crypto "git+https://github.com/celo-org/react-native-fast-crypto#3946f9"
     react-native-secure-randombytes "^2.2.3"
     unorm "^1.3.3"
 
@@ -28507,10 +28499,9 @@ react-native-exit-app@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-native-exit-app/-/react-native-exit-app-1.1.0.tgz#5ec082152974240e2d6a93f1608efb49a4385f21"
   integrity sha512-Spne19zfMfJvnUTX909EHUqWMk69rATtLJq9XMBGpNSHhx0M7v5yetx2Z87egBhLOqQm+CWfD/oxWzDG8rbIQA==
 
-react-native-fast-crypto@^1.8.1:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/react-native-fast-crypto/-/react-native-fast-crypto-1.8.1.tgz#9b59d7eb4bcb19f99c62695df9ea4f683bb1e52c"
-  integrity sha512-5Cym09wcYSDXS7+QFg5oWGuW4rz2DyaU09YTeGxn3Qc+rqc01VQ5T6ruW4dWv7bIULtyBcJ2ovTkXTtbsDl3uA==
+"react-native-fast-crypto@git+https://github.com/celo-org/react-native-fast-crypto#3946f9":
+  version "1.8.3"
+  resolved "git+https://github.com/celo-org/react-native-fast-crypto#3946f918ff314455a6d55fdb49ecc0f1f5bc2ac2"
   dependencies:
     buffer "^5.0.8"
     rfc4648 "^1.0.0"
