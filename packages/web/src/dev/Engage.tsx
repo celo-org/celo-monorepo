@@ -117,7 +117,11 @@ export function Contribute() {
       <Cell span={Spans.half}>
         <H3>{t('engage.contributeTitle')}</H3>
         <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('engage.contributeText')}</Text>
-        <Button disabled={true} text={'Coming Soon'} kind={BTN.PRIMARY} />
+        <Button
+          text={t('engage.contributeBtn')}
+          kind={BTN.PRIMARY}
+          href={CeloLinks.fundingRequest}
+        />
       </Cell>
       <Cell span={Spans.half} style={standardStyles.centered}>
         <AspectRatio ratio={309 / 360} style={[standardStyles.image, styles.feastImage]}>
