@@ -114,7 +114,7 @@ export function Contribute() {
       tabletStyle={standardStyles.blockMarginTopTablet}
       mobileStyle={standardStyles.blockMarginTopMobile}
     >
-      <Cell span={Spans.half}>
+      <Cell span={Spans.half} style={styles.contributeContent}>
         <H3>{t('engage.contributeTitle')}</H3>
         <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('engage.contributeText')}</Text>
         <Button
@@ -271,4 +271,5 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'space-between',
   },
+  contributeContent: { justifyContent: 'center' },
 })
