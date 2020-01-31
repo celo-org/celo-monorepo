@@ -21,5 +21,31 @@
   "cookiesDisagree": "disagree",
   "trueGold": ["真金不怕火煉", "True gold fears no fire"],
   "copyRight": "Designed & Built by C Labs, © Celo {{year}}",
-  "footerReadMoreTerms": "Read more in <0>Celo Terms of Service</0>"
+  "footerReadMoreTerms": "Read more in <0>Celo Terms of Service</0>",
+  "channels": {
+    "brand": {
+      "name": "Brand",
+      "text": "Design with Celo"
+    },
+    "discord": {
+      "name": "Discord",
+      "text": "Collaborate and get\ndeveloper support"
+    },
+    "events": {
+      "name": "Events",
+      "text": "Connect in Person"
+    },
+    "forum": {
+      "name": "Forum",
+      "text": "Ask technical questions"
+    },
+    "github": {
+      "name": "GitHub",
+      "text": "Contribute to the codebase"
+    },
+    "linkedin": {
+      "name": "LinkedIn",
+      "text": "Find Professional Opportunities"
+    }
+  }
 }
