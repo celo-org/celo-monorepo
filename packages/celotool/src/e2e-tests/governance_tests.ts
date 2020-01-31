@@ -421,9 +421,6 @@ describe('governance tests', () => {
       const memberSwapper = await newMemberSwapper(groupKit, membersToSwap)
 
       const validatorRpc = 'http://localhost:8549'
-      if (verbose) {
-        console.log('validatorRpc', validatorRpc)
-      }
 
       // Prepare for key rotation.
       const validatorWeb3 = new Web3(validatorRpc)
