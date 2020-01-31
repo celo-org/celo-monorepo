@@ -1,4 +1,4 @@
-import { exec } from 'child_process'
+import { exec, spawn, SpawnOptions } from 'child_process'
 // import prompts from 'prompts'
 import yargs from 'yargs'
 import { switchToClusterFromEnv } from './cluster'
@@ -52,6 +52,27 @@ export function execCmd(
   })
 }
 
+export function spawnCmd(
+  cmd: string,
+  args: string[],
+  options?: SpawnOptions & { silent?: boolean }
+) {
+  return new Promise<number>(async (resolve, reject) => {
+    const { silent, ...spawnOptions } = options || { silent: false }
+    if (!silent) {
+      console.debug('$ ' + [cmd].concat(args).join(' '))
+    }
+    const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
+    process.on('close', (code) => {
+      try {
+        resolve(code)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  })
+}
+
 // Returns a Promise which resolves to [stdout, stderr] array
 export function execCmdWithExitOnFailure(
   cmd: string,
@@ -67,6 +88,18 @@ export function execCmdWithExitOnFailure(
       reject(error)
     }
   })
+}
+
+export async function spawnCmdWithExitOnFailure(
+  cmd: string,
+  args: string[],
+  options?: SpawnOptions & { silent?: boolean }
+) {
+  const code = await spawnCmd(cmd, args, options)
+  if (code !== 0) {
+    console.error('spawnCmd failed for: ' + [cmd].concat(args).join(' '))
+    process.exit(1)
+  }
 }
 
 export function execBackgroundCmd(cmd: string) {
