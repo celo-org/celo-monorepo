@@ -190,6 +190,19 @@ describe('Transfer tests', function(this: any) {
   after(hooks.after)
   before(hooks.before)
 
+  // Spin up a node that we can sync with.
+  const fullInstance: GethInstanceConfig = {
+    name: 'txFull',
+    validating: false,
+    syncmode: 'full',
+    lightserv: true,
+    port: 30305,
+    rpcport: 8547,
+    // We need to set an etherbase here so that the full node will accept transactions from
+    // light clients.
+    etherbase: FeeRecipientAddress,
+  }
+
   const restartWithCleanNodes = async () => {
     await hooks.restart()
 
@@ -200,19 +213,6 @@ describe('Transfer tests', function(this: any) {
     await sleep(2)
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
-
-    // Spin up a node that we can sync with.
-    const fullInstance: GethInstanceConfig = {
-      name: 'txFull',
-      validating: false,
-      syncmode: 'full',
-      lightserv: true,
-      port: 30305,
-      rpcport: 8547,
-      // We need to set an etherbase here so that the full node will accept transactions from
-      // light clients.
-      etherbase: FeeRecipientAddress,
-    }
 
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
     await connectPeers([...gethConfig.instances, fullInstance], verbose)
@@ -243,6 +243,7 @@ describe('Transfer tests', function(this: any) {
       syncmode,
       port: 30307,
       rpcport: 8549,
+      lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
       privateKey: DEF_FROM_PK,
     }
 
@@ -254,7 +255,8 @@ describe('Transfer tests', function(this: any) {
       verbose
     )
 
-    await connectPeers([gethConfig.instances[0], currentGethInstance])
+    await connectPeers([fullInstance, currentGethInstance])
+    await waitToFinishInstanceSyncing(currentGethInstance)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')

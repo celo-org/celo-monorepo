@@ -275,7 +275,9 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     await connectValidatorPeers(gethConfig.instances)
 
-    await waitToFinishInstanceSyncing(gethConfig.instances[0])
+    await Promise.all(
+      gethConfig.instances.filter((i) => i.validating).map((i) => waitToFinishInstanceSyncing(i))
+    )
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
