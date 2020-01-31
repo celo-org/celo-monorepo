@@ -19,7 +19,6 @@ describe('Blockchain parameters tests', function(this: any) {
 
   const gethConfig: GethRunConfig = {
     migrateTo: 19,
-    migrate: true,
     runPath: TMP_PATH,
     keepData: false,
     networkId: 1101,
