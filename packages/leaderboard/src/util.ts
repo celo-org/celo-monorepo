@@ -7,7 +7,7 @@ import fs from 'fs'
 
 const GoogleSpreadsheet = require('google-spreadsheet')
 
-function normalizeAddress(a: string) {
+export function normalizeAddress(a: string) {
   try {
     a = a.toLowerCase()
     if (a.substr(0, 2) == '0x') return a.substr(2)
@@ -172,7 +172,7 @@ function sinks(obj: any) {
   return entries.filter(([_, lst]) => dedup(lst).length > 6).map(([a, _]) => a)
 }
 
-function put(obj: any, key: string, elem: string) {
+export function put(obj: any, key: string, elem: string) {
   let lst = obj[key] || []
   lst.push(elem)
   obj[key] = lst
@@ -216,7 +216,7 @@ function removeNodes(obj: any, nodes: string[]) {
   return res
 }
 
-function readData() {
+export function readData() {
   let tokens = JSON.parse(fs.readFileSync('all_token.json', 'utf8'))
   let tr = JSON.parse(fs.readFileSync('all_tr.json', 'utf8'))
   let [claims, claims1] = readClaims()
@@ -258,4 +258,4 @@ function readData() {
   '14d449ef428e679da48b3e8cffa9036ff404b28a' ]
 */
 
-readData()
+// readData()
