@@ -137,7 +137,7 @@ export async function startBootnode(
   const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
   const bootnodeLog = joinPath(gethConfig.runPath, 'bootnode.log')
   const bootnodeArgs = [
-    '--verbosity=5',
+    '--verbosity=4',
     `--nodekeyhex=${bootnodePrivateKey}`,
     `--networkid=${gethConfig.networkId}`,
   ]
