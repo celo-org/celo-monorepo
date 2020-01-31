@@ -69,6 +69,7 @@ const testnetEnvVars: TerraformVars = {
   in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
   istanbul_request_timeout_ms: envVar.ISTANBUL_REQUEST_TIMEOUT_MS,
   network_id: envVar.NETWORK_ID,
+  node_disk_size_gb: envVar.NODE_DISK_SIZE_GB,
   proxied_validator_count: envVar.PROXIED_VALIDATORS,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
@@ -384,6 +385,8 @@ function generateProxySecretEnvVars(validatorIndex: number, proxyIndex: number) 
 
 function generateProxyPrivateKey(validatorIndex: number, proxyIndex: number) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
+  // To allow a validator to have many proxies and to be able to easily
+  // adjust the number of proxies it has, the following index is calculated
   const index = validatorIndex * 10000 + proxyIndex
   return generatePrivateKey(mnemonic, AccountType.PROXY, index)
 }

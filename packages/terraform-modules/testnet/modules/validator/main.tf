@@ -104,7 +104,7 @@ resource "google_compute_disk" "validator" {
 
   type = "pd-ssd"
   # in GB
-  size                      = 15
+  size                      = var.node_disk_size_gb
   physical_block_size_bytes = 4096
 }
 
@@ -142,6 +142,7 @@ module "proxy" {
   names                                 = flatten([for val_index in range(length(var.proxies_per_validator)) : [for proxy_index in range(var.proxies_per_validator[val_index]) : format("validator-%d-proxy-%d", val_index, proxy_index)]])
   network_id                            = var.network_id
   network_name                          = var.network_name
+  node_disk_size_gb                     = var.node_disk_size_gb
   proxy                                 = true
 }
 

@@ -389,18 +389,18 @@ export async function upgradeStaticIPs(celoEnv: string) {
   if (useStaticIPsForGethNodes()) {
     const prevValidatorNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators`)
     const newValidatorNodeCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-    console.log('doing validators')
     await upgradeValidatorStaticIPs(celoEnv, prevValidatorNodeCount, newValidatorNodeCount)
 
-    const higherProxyCount = Math.max(prevValidatorNodeCount, newValidatorNodeCount)
     const proxiesPerValidator = getProxiesPerValidator()
-    for (let i = 0; i < higherProxyCount; i++) {
+    // Iterate through all validators and check to see if there are changes in proxies
+    const higherValidatorCount = Math.max(prevValidatorNodeCount, newValidatorNodeCount)
+    for (let i = 0; i < higherValidatorCount; i++) {
       const proxyCount = i < proxiesPerValidator.length ? proxiesPerValidator[i] : 0
       let prevProxyCount = 0
       try {
         prevProxyCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators-${i}-proxy`)
       } catch (e) {
-        console.log('Unable to find any previous proxies')
+        console.log(`Unable to find any previous proxies for validator ${i}`)
       }
       await upgradeNodeTypeStaticIPs(celoEnv, `validators-${i}-proxy`, prevProxyCount, proxyCount)
     }
@@ -413,11 +413,11 @@ async function upgradeValidatorStaticIPs(
   newValidatorNodeCount: number
 ) {
   const proxiesPerValidator = getProxiesPerValidator()
-  const higherValidatorCount = Math.max(prevValidatorNodeCount, newValidatorNodeCount)
 
   // Iterate through each validator & create or destroy
   // IP addresses as necessary. If n validators are to be proxied,
-  // indeces 0 through n - 1 will not have public IP addresses.
+  // indices 0 through n - 1 will not have public IP addresses.
+  const higherValidatorCount = Math.max(prevValidatorNodeCount, newValidatorNodeCount)
   for (let i = 0; i < higherValidatorCount; i++) {
     const ipName = `${celoEnv}-validators-${i}`
     let ipExists
@@ -550,7 +550,7 @@ async function helmIPParameters(celoEnv: string) {
     // Validator IPs
     const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
     const proxiesPerValidator = getProxiesPerValidator()
-    // All validator IP addresses for each corresponding index. If the validator
+    // This tracks validator IP addresses for each corresponding validator. If the validator
     // is proxied, there is no public IP address, so it's set as an empty string
     const validatorIpAddresses = []
     for (let i = 0; i < numValidators; i++) {
@@ -633,6 +633,7 @@ async function helmParameters(celoEnv: string) {
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
+    `--set geth.diskSizeGB=${fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')}`,
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
@@ -752,17 +753,17 @@ async function scaleProxies(celoEnv: string, replicas?: number) {
     }
   } else {
     const proxiesPerValidator = getProxiesPerValidator()
-    let i = 0
+    let validatorIndex = 0
     for (const proxyCount of proxiesPerValidator) {
       // allow to fail for the cases where a testnet does not include the proxy statefulset yet
       await scaleResource(
         celoEnv,
         'StatefulSet',
-        `${celoEnv}-validators-${i}-proxy`,
+        `${celoEnv}-validators-${validatorIndex}-proxy`,
         proxyCount,
         true
       )
-      i++
+      validatorIndex++
     }
   }
 }

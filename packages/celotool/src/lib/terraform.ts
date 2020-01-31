@@ -104,6 +104,7 @@ async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: st
 // Allow failures
 function taintResource(moduleName: string, resourceName: string) {
   try {
+    // escape quotes
     const escapedResourceName = resourceName.replace(/"/g, '\\"')
     return execTerraformCmd(
       `terraform taint ${escapedResourceName}`,
@@ -119,6 +120,7 @@ function taintResource(moduleName: string, resourceName: string) {
 // Allow failures
 function untaintResource(moduleName: string, resourceName: string) {
   try {
+    // escape quotes
     const escapedResourceName = resourceName.replace(/"/g, '\\"')
     return execTerraformCmd(
       `terraform untaint ${escapedResourceName}`,

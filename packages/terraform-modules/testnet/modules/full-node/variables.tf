@@ -107,6 +107,11 @@ variable node_count {
   default     = 0
 }
 
+variable node_disk_size_gb {
+  type        = number
+  description = "The size in GB for each node's disk"
+}
+
 variable proxy {
   type        = bool
   description = "Whether the node is a proxy for a validator"

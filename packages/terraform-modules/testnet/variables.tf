@@ -118,6 +118,11 @@ variable network_name {
   description = "The name of the network to use"
 }
 
+variable node_disk_size_gb {
+  type        = number
+  description = "The size in GB of disks for all types of nodes"
+}
+
 variable proxied_validator_count {
   type        = number
   description = "Number of validator_count validators that are hidden behind proxies"
@@ -125,7 +130,7 @@ variable proxied_validator_count {
 
 variable proxies_per_validator {
   type        = list(number)
-  description = "Number of proxies for each validator that is proxied. Does not include validators that aren't proxied. Indeces correspond to validator indeces."
+  description = "Number of proxies for each validator that is proxied. Does not include validators that aren't proxied. indices correspond to validator indices."
 }
 
 variable tx_node_count {
