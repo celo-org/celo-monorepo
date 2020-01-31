@@ -132,7 +132,6 @@ export const handler = async (argv: StartArgv) => {
 
   const ethstats = argv.ethstats
 
-  console.info(`sync mode is ${syncMode}`)
 
   const gethConfig: GethRunConfig = {
     runPath: datadir,
