@@ -54,7 +54,7 @@ describe('sync tests', function(this: any) {
       .getRegisteredValidators()
       .call()
     const web3 = new Web3('ws://localhost:8557')
-    await sleep(3)
+    await sleep(10)
     await waitToFinishSyncing(web3)
     const kit = newKitFromWeb3(web3)
     // The validator set size at any one time will be 4, and we rotate two validators per epoch.
