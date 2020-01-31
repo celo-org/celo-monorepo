@@ -49,6 +49,15 @@ describe('sync tests', function(this: any) {
     ],
   }
 
+  const fullNode: GethInstanceConfig = {
+    name: 'full',
+    validating: false,
+    syncmode: 'full',
+    lightserv: true,
+    port: 30311,
+    rpcport: 8553,
+  }
+
   const hooks = getHooks(gethConfig)
 
   before(async () => {
@@ -56,15 +65,6 @@ describe('sync tests', function(this: any) {
     await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
-
-    const fullNode: GethInstanceConfig = {
-      name: 'full',
-      validating: false,
-      syncmode: 'full',
-      lightserv: true,
-      port: 30311,
-      rpcport: 8553,
-    }
 
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
     await connectPeers([gethConfig.instances[0], fullNode], verbose)
@@ -76,22 +76,24 @@ describe('sync tests', function(this: any) {
   const syncModes = ['full', 'fast', 'light', 'ultralight']
   for (const syncmode of syncModes) {
     describe(`when syncing with a ${syncmode} node`, () => {
-      let syncInstance: GethInstanceConfig
+      let syncNode: GethInstanceConfig
+
       beforeEach(async () => {
-        syncInstance = {
+        syncNode = {
           name: syncmode,
           validating: false,
           syncmode,
           port: 30313,
+          wsport: 9555,
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
         }
-        await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncInstance, verbose)
-        await connectPeers([...gethConfig.instances, syncInstance], verbose)
-        await waitToFinishInstanceSyncing(syncInstance)
+        await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncNode, verbose)
+        await connectPeers([fullNode, syncNode], verbose)
+        await waitToFinishInstanceSyncing(syncNode)
       })
 
-      afterEach(() => killInstance(syncInstance))
+      afterEach(() => killInstance(syncNode))
 
       it('should sync the latest block', async () => {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
