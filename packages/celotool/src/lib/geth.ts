@@ -904,7 +904,7 @@ export async function startGeth(
       '--ws',
       '--wsport',
       wsport.toString(),
-      '--wsapi=eth,net,web3,debug,admin,personal'
+      '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
