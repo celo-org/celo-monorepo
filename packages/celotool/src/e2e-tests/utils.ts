@@ -315,7 +315,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (lightserv) {
-    gethArgs.push('--lightserv=90')
+    gethArgs.push('--light.serve=90')
+    gethArgs.push('--light.maxpeers=10')
+  } else {
+    gethArgs.push('--light.serve=0')
   }
 
   if (validating) {
