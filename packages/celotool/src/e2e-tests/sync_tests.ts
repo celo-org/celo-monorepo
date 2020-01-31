@@ -59,7 +59,7 @@ describe('sync tests', function(this: any) {
     const kit = newKitFromWeb3(web3)
     // The validator set size at any one time will be 4, and we rotate two validators per epoch.
     // This means that if a node were to have a static view of the validator set, we guarantee that
-    // the node will reject blocks.
+    // the node were to return false when calling VerifyHeader().
     const memberSwapper0 = await newMemberSwapper(kit, [validators[0], validators[1]])
     const memberSwapper1 = await newMemberSwapper(kit, [validators[2], validators[3]])
 
