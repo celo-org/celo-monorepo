@@ -398,10 +398,6 @@ describe('governance tests', () => {
 
       const groupWeb3Url = 'ws://localhost:8555'
 
-      if (verbose) {
-        console.log('groupWeb3Url', groupWeb3Url)
-      }
-
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
 
