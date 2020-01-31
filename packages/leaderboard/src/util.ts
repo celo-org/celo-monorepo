@@ -167,36 +167,59 @@ function histogram(obj: any) {
   entries.forEach(([a, lst]) => console.log(a, dedup(lst).length))
 }
 
+function sinks(obj: any) {
+  let entries: [string, string[]][] = Object.entries(obj)
+  return entries.filter(([_, lst]) => dedup(lst).length > 6).map(([a, _]) => a)
+}
+
 function put(obj: any, key: string, elem: string) {
   let lst = obj[key] || []
   lst.push(elem)
   obj[key] = lst
 }
 
-function relClaims(obj: any, claims: any) {
+function relClaims(obj: any, claims: any, _claims1: any) {
   let entries: [string, string[]][] = Object.entries(obj)
   let res: any = {}
   entries.forEach(([a, lst]) =>
-    lst.forEach((b) => claims[a] && claims[b] && put(res, claims[a], claims[b]))
+    lst.forEach((b) => {
+      claims[a] && claims[b] && put(res, claims[a][0], claims[b][0])
+    })
   )
+  console.log(Object.keys(res).length)
+  return res
 }
 
 function readClaims() {
-  let claims = JSON.parse(fs.readFileSync('claims.json', 'utf8'))
+  let claims = JSON.parse(fs.readFileSync('claim.json', 'utf8'))
   let obj1: any = {}
   let obj2: any = {}
   function add(key: string, elem: string) {
     put(obj1, key, elem)
+    put(obj1, key, key)
+    put(obj2, key, key)
     put(obj2, elem, key)
   }
   claims.map((a: any) => add(a.address.substr(2), a.claimed_address.substr(2)))
-  return obj2
+  console.log(Object.keys(obj1).length, Object.keys(obj2).length)
+  return [obj2, obj1]
+}
+
+function removeNodes(obj: any, nodes: string[]) {
+  let entries: [string, string[]][] = Object.entries(obj)
+  let res: any = {}
+  entries.forEach(([a, lst]) =>
+    lst.forEach((b) => {
+      !nodes.includes(a) && !nodes.includes(b) && put(res, a, b)
+    })
+  )
+  return res
 }
 
 function readData() {
   let tokens = JSON.parse(fs.readFileSync('all_token.json', 'utf8'))
   let tr = JSON.parse(fs.readFileSync('all_tr.json', 'utf8'))
-  let claims = readClaims()
+  let [claims, claims1] = readClaims()
   let obj1: any = {}
   let obj2: any = {}
   function add(key: string, elem: string) {
@@ -208,8 +231,31 @@ function readData() {
     if (!a.from_address_hash || !a.to_address_hash) return
     add(a.from_address_hash.substr(2), a.to_address_hash.substr(2))
   })
+  console.log('Find sinks (contracts)')
+  histogram(obj2)
+  let lst = sinks(obj2)
+  console.log(lst)
+  // Remove sinks from obj1 and obj2
+  obj1 = removeNodes(obj1, lst)
+  obj2 = removeNodes(obj2, lst)
+  console.log('Sources for addresses:')
   histogram(transitive(obj2))
-  console.log(relClaims(transitive(obj1), claims))
+  console.log('Entanglements between competitors')
+  histogram(relClaims(transitive(obj1), claims, claims1))
+  console.log('Entanglements between competitors (other direction, why are these different?)')
+  histogram(relClaims(transitive(obj2), claims, claims1))
 }
+
+/* contract addresses
+
+[ 'c8fd77490a12f46709bffbcc0fce35740da8d860',
+  '1726428a6d575fdc9c7c3b7bac9f2247a5649bf2',
+  '5c7197e1147ebf98658a2a8bc3d32bebf1692829',
+  '62492a644a588fd904270bed06ad52b9abfea1ae',
+  '7c08fec4da47ebece57de73204bd632ddac91027',
+  '918919436bba96e2c80ca22405aaba075e2ac82e',
+  'e8e4969649330b25c13a36f977487084b92a7466',
+  '14d449ef428e679da48b3e8cffa9036ff404b28a' ]
+*/
 
 readData()
