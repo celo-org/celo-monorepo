@@ -796,7 +796,7 @@ export async function getEnode(peer: string, ws: boolean = false) {
 }
 
 export async function addStaticPeers(datadir: string, peers: string[], verbose: boolean) {
-  const staticPeersPath = `${datadir}/static-nodes.json`
+  const staticPeersPath = path.join(datadir, 'static-nodes.json')
   if (verbose) {
     console.log(`Writing static peers to ${staticPeersPath}`)
   }
