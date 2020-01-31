@@ -1,14 +1,13 @@
 import {
   hotfixToHash,
   ProposalBuilder,
-  proposalToJSON,
   ProposalTransactionJSON,
 } from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { readFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
+import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ExecuteHotfix extends BaseCommand {
@@ -29,22 +28,12 @@ export default class ExecuteHotfix extends BaseCommand {
     const res = this.parse(ExecuteHotfix)
     const account = res.flags.from
 
-    const builder = new ProposalBuilder(this.kit)
-
-    // BUILD FROM JSON
     const jsonString = readFileSync(res.flags.jsonTransactions).toString()
     const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
+
+    const builder = new ProposalBuilder(this.kit)
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
-
-    // BUILD FROM CONTRACTKIT FUNCTIONS
-    // const params = await this.kit.contracts.getBlockchainParameters()
-    // builder.addTx(params.setMinimumClientVersion(1, 8, 24), { to: params.address })
-    // builder.addWeb3Tx()
-    // builder.addProxyRepointingTx
-
     const hotfix = await builder.build()
-    printValueMapRecursive(proposalToJSON(this.kit, hotfix))
-
     const saltBuff = Buffer.from(res.flags.salt, 'hex')
     const hash = hotfixToHash(this.kit, hotfix, saltBuff)
 
