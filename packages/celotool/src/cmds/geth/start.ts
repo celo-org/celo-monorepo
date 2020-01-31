@@ -20,7 +20,6 @@ interface StartArgv extends GethArgv {
   syncMode: string
   mining: boolean
   blockTime: number
-  minerGasPrice: number
   port: number
   rpcport: number
   wsport: number
@@ -47,11 +46,6 @@ export const builder = (argv: yargs.Argv) => {
       type: 'boolean',
       description: 'Is mining enabled',
       default: false,
-    })
-    .option('miner-gas-price', {
-      type: 'number',
-      description: 'Mining gas price',
-      default: 0,
     })
     .option('port', {
       type: 'number',
@@ -119,7 +113,6 @@ export const handler = async (argv: StartArgv) => {
   const wsport = argv.wsport
 
   const mining = argv.mining
-  const minerGasPrice = argv.minerGasPrice
   const network = 'local'
   const instances = argv.instances
 
@@ -154,7 +147,6 @@ export const handler = async (argv: StartArgv) => {
     const node: GethInstanceConfig = {
       name: `${x}-node`,
       validating: mining,
-      validatingGasPrice: minerGasPrice,
       syncmode: syncMode,
       ethstats,
       privateKey: validatorPrivateKeys[x],
