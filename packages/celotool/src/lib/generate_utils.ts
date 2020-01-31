@@ -19,6 +19,8 @@ import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
+import { GenesisConfig } from './interfaces/genesis-config'
+
 const ec = new EC('secp256k1')
 
 export enum AccountType {
@@ -44,6 +46,7 @@ export interface Validator {
   blsPublicKey: string
   balance: string
 }
+
 export interface AccountAndBalance {
   address: string
   balance: string
@@ -89,7 +92,7 @@ export const generatePublicKey = (mnemonic: string, accountType: AccountType, in
 export const generateAddress = (mnemonic: string, accountType: AccountType, index: number) =>
   privateKeyToAddress(generatePrivateKey(mnemonic, accountType, index))
 
-export const privateKeyToPublicKey = (privateKey: string) => {
+export const privateKeyToPublicKey = (privateKey: string): string => {
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
   const ecPublicKey: string = ecPrivateKey.getPublic('hex')
   return ecPublicKey.slice(2)
@@ -123,7 +126,7 @@ export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: n
 export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
-export const getValidators = (mnemonic: string, n: number) => {
+export const getValidatorsInformation = (mnemonic: string, n: number): Validator[] => {
   return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
@@ -191,7 +194,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
-  const validators = getValidators(mnemonic, parseInt(validatorEnv, 10))
+  const validators = getValidatorsInformation(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -294,17 +297,7 @@ export const generateGenesis = ({
   chainId,
   requestTimeout,
   enablePetersburg = true,
-}: {
-  validators: Validator[]
-  consensusType?: ConsensusType
-  initialAccounts?: AccountAndBalance[]
-  blockTime: number
-  epoch: number
-  lookbackwindow: number
-  chainId: number
-  requestTimeout: number
-  enablePetersburg?: boolean
-}) => {
+}: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
@@ -321,21 +314,25 @@ export const generateGenesis = ({
   } else if (consensusType === ConsensusType.ISTANBUL) {
     genesis.mixHash = ISTANBUL_MIX_HASH
     genesis.difficulty = '0x1'
-    genesis.extraData = generateIstanbulExtraData(validators)
+    if (validators) {
+      genesis.extraData = generateIstanbulExtraData(validators)
+    }
     genesis.config.istanbul = {
       // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
       // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
       policy: 2,
-      period: blockTime,
+      blockperiod: blockTime,
       requesttimeout: requestTimeout,
       epoch,
       lookbackwindow,
     }
   }
 
-  for (const validator of validators) {
-    genesis.alloc[validator.address] = {
-      balance: validator.balance,
+  if (validators) {
+    for (const validator of validators) {
+      genesis.alloc[validator.address] = {
+        balance: validator.balance,
+      }
     }
   }
 
@@ -350,15 +347,18 @@ export const generateGenesis = ({
     monorepoRoot,
     'packages/protocol/build/contracts/Proxy.json'
   )
-  for (const contract of contracts) {
-    genesis.alloc[contract] = {
-      code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
-      storage: {
-        [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
-      },
-      balance: '0',
+
+  if (validators && validators.length > 0) {
+    for (const contract of contracts) {
+      genesis.alloc[contract] = {
+        code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
+        storage: {
+          [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
+        },
+        balance: '0',
+      }
     }
   }
 
-  return JSON.stringify(genesis)
+  return JSON.stringify(genesis, null, 2)
 }
