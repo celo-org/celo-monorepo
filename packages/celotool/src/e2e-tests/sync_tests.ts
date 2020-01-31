@@ -88,7 +88,7 @@ describe('sync tests', function(this: any) {
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
         }
         await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncInstance, verbose)
-        await connectPeers([gethConfig.instances[0], syncInstance], verbose)
+        await connectPeers([...gethConfig.instances, syncInstance], verbose)
       })
 
       afterEach(() => killInstance(syncInstance))
