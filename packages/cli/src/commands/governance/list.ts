@@ -27,7 +27,7 @@ export default class List extends BaseCommand {
       upvotes: { get: (p) => valueToString(p.upvotes) },
     })
 
-    const dequeue = await governance.getDequeue()
+    const dequeue = await governance.getDequeue(true)
     const stages = await concurrentMap(5, dequeue, governance.getProposalStage)
     const proposals = zip((proposalID, stage) => ({ proposalID, stage }), dequeue, stages)
 
