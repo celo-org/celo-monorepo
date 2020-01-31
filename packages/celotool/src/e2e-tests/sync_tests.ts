@@ -50,7 +50,7 @@ describe('sync tests', function(this: any) {
   }
 
   const fullNode: GethInstanceConfig = {
-    name: 'full',
+    name: 'txfull',
     validating: false,
     syncmode: 'full',
     lightserv: true,
@@ -67,7 +67,7 @@ describe('sync tests', function(this: any) {
     await hooks.restart()
 
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
-    await connectPeers([gethConfig.instances[0], fullNode], verbose)
+    await connectPeers([...gethConfig.instances, fullNode], verbose)
     await waitToFinishInstanceSyncing(fullNode)
   })
 
@@ -99,9 +99,9 @@ describe('sync tests', function(this: any) {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
         const validatingFirstBlock = await validatingWeb3.eth.getBlockNumber()
         // Give the validators time to create more blocks.
-        await sleep(20, verbose)
+        await sleep(20, true)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
-        await sleep(20, verbose)
+        await sleep(20, true)
         const syncWeb3 = new Web3(`http://localhost:8555`)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
         assert.isAbove(validatingLatestBlock, 1)
