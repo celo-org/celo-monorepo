@@ -164,29 +164,44 @@ function transitive(obj: any) {
 
 function histogram(obj: any) {
   let entries: [string, string[]][] = Object.entries(obj)
-  entries.forEach(([a, lst]) => console.log(a, lst.length))
+  entries.forEach(([a, lst]) => console.log(a, dedup(lst).length))
 }
 
-function relClaims(obj: any, claims1: any, claims2: any) {}
+function put(obj: any, key: string, elem: string) {
+  let lst = obj[key] || []
+  lst.push(elem)
+  obj[key] = lst
+}
+
+function relClaims(obj: any, claims: any) {
+  let entries: [string, string[]][] = Object.entries(obj)
+  let res: any = {}
+  entries.forEach(([a, lst]) =>
+    lst.forEach((b) => claims[a] && claims[b] && put(res, claims[a], claims[b]))
+  )
+}
+
+function readClaims() {
+  let claims = JSON.parse(fs.readFileSync('claims.json', 'utf8'))
+  let obj1: any = {}
+  let obj2: any = {}
+  function add(key: string, elem: string) {
+    put(obj1, key, elem)
+    put(obj2, elem, key)
+  }
+  claims.map((a: any) => add(a.address.substr(2), a.claimed_address.substr(2)))
+  return obj2
+}
 
 function readData() {
   let tokens = JSON.parse(fs.readFileSync('all_token.json', 'utf8'))
   let tr = JSON.parse(fs.readFileSync('all_tr.json', 'utf8'))
+  let claims = readClaims()
   let obj1: any = {}
   let obj2: any = {}
-  function add1(key: string, elem: string) {
-    let lst = obj1[key] || []
-    lst.push(elem)
-    obj1[key] = lst
-  }
-  function add2(key: string, elem: string) {
-    let lst = obj2[key] || []
-    lst.push(elem)
-    obj2[key] = lst
-  }
   function add(key: string, elem: string) {
-    add1(key, elem)
-    add2(elem, key)
+    put(obj1, key, elem)
+    put(obj2, elem, key)
   }
   tokens.map((a: any) => add(a.from.substr(2), a.to.substr(2)))
   tr.map((a: any) => {
@@ -194,6 +209,7 @@ function readData() {
     add(a.from_address_hash.substr(2), a.to_address_hash.substr(2))
   })
   histogram(transitive(obj2))
+  console.log(relClaims(transitive(obj1), claims))
 }
 
 readData()
