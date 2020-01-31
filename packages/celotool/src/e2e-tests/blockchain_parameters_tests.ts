@@ -47,7 +47,6 @@ describe('Blockchain parameters tests', function(this: any) {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
 
-
     kit = newKit(rpcURL)
 
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
