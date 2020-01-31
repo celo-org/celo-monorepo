@@ -20,7 +20,6 @@ interface StartArgv extends GethArgv {
   syncMode: string
   mining: boolean
   blockTime: number
-  nodekeyhex: string
   minerGasPrice: number
   port: number
   rpcport: number
