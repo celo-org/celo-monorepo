@@ -82,8 +82,8 @@ export function getInvitationVerificationFeeInWei() {
 }
 
 export async function generateLink(inviteCode: string, recipientName: string) {
-  const AndroidPackageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
-  const playStoreLink = await VersionCheck.getPlayStoreUrl({ AndroidPackageName })
+  const androidPackageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
+  const playStoreLink = await VersionCheck.getPlayStoreUrl({ androidPackageName })
   const referrerData = encodeURIComponent(`invite-code=${inviteCode}`)
   const referrerLink = `${playStoreLink}&referrer=${referrerData}`
 
@@ -103,9 +103,12 @@ export async function generateLink(inviteCode: string, recipientName: string) {
   const shortUrl = await generateDynamicShortLink(
     referrerLink,
     appStoreUrl,
-    AndroidPackageName,
+    androidPackageName,
     iOSBundleId
   )
+
+  Logger.debug(TAG, 'apple store url is :' + appStoreUrl)
+  Logger.debug(TAG, 'generating invite link :' + shortUrl)
   return {
     name: recipientName,
     code: inviteCode,

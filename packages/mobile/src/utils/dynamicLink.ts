@@ -12,7 +12,7 @@ export async function generateDynamicShortLink(
   try {
     // legacy users are using `celo.page.link`, but if we move that domain to the current firebase
     // those links are gonna break, so better do before a network reset
-    const link = new firebase.links.DynamicLink(appStoreUrl, 'https://celolink.page.link')
+    const link = new firebase.links.DynamicLink(appStoreUrl, 'https://celol.page.link')
 
     link.android.setFallbackUrl(url)
     link.android.setPackageName(androidPackageName)
