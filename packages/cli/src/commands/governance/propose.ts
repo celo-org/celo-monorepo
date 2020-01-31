@@ -1,11 +1,14 @@
-// import { ProposalBuilder } from '@celo/contractkit/lib/governance/proposals'
+import {
+  ProposalBuilder,
+  ProposalTransactionJSON,
+} from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
+import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { buildProposalFromJsonFile } from '../../utils/governance'
 
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
@@ -32,13 +35,20 @@ export default class Propose extends BaseCommand {
       .exceedsProposalMinDeposit(deposit)
       .runChecks()
 
-    const proposal = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
+    const builder = new ProposalBuilder(this.kit)
 
-    // const builder = new ProposalBuilder(this.kit)
-    // builder.addTx()
+    // BUILD FROM JSON
+    const jsonString = readFileSync(res.flags.jsonTransactions).toString()
+    const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
+    jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
+
+    // BUILD FROM CONTRACTKIT FUNCTIONS
+    // const params = await this.kit.contracts.getBlockchainParameters()
+    // builder.addTx(params.setMinimumClientVersion(1, 8, 24), { to: params.address })
     // builder.addWeb3Tx()
     // builder.addProxyRepointingTx
-    // const proposal = await builder.build()
+
+    const proposal = await builder.build()
 
     const governance = await this.kit.contracts.getGovernance()
     await displaySendTx(
