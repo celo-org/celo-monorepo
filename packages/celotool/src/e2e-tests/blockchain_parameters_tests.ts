@@ -47,7 +47,6 @@ describe('Blockchain parameters tests', function(this: any) {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
 
-    console.log('rpcURL', rpcURL)
 
     kit = newKit(rpcURL)
 
