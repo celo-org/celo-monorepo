@@ -225,7 +225,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         if (gethConfig.useBootnode) {
           instance.bootnodeEnode = bootnodeEnode
         }
-      } else if (instance.validating && instance.isProxied) {
+      } else {
         // Proxied validators should connect to only the proxy
         // Find this proxied validator's proxy
         const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
