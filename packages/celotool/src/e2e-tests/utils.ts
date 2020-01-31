@@ -179,7 +179,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const numProxies = proxyInstances.length
 
   const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
-  const proxyEnodes = proxyPrivateKeys.map((x: any, i: number) => [
+  const proxyEnodes = proxyPrivateKeys.map((x: string, i: number) => [
     proxyInstances[i].name,
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport!),
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].port),
