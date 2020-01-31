@@ -186,6 +186,7 @@ describe('Transfer tests', function(this: any) {
   }
 
   const hooks = getHooks(gethConfig)
+
   after(hooks.after)
   before(hooks.before)
 
@@ -212,6 +213,7 @@ describe('Transfer tests', function(this: any) {
       // light clients.
       etherbase: FeeRecipientAddress,
     }
+
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
     await connectPeers([...gethConfig.instances, fullInstance], verbose)
     await waitToFinishInstanceSyncing(fullInstance)
@@ -253,8 +255,6 @@ describe('Transfer tests', function(this: any) {
     )
 
     await connectPeers([...gethConfig.instances, instance])
-
-    await waitToFinishInstanceSyncing(instance)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
