@@ -5,6 +5,7 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
+import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
@@ -28,6 +29,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchPhoneAddresses: typeof fetchPhoneAddresses
+  declinePaymentRequest: typeof declinePaymentRequest
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -39,10 +41,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
 
-export const listItemRenderer = (params: { recipientCache: NumberToRecipient }) => (
-  request: PaymentRequest,
-  key: number | undefined = undefined
-) => {
+export const listItemRenderer = (params: {
+  recipientCache: NumberToRecipient
+  declinePaymentRequest: typeof declinePaymentRequest
+}) => (request: PaymentRequest, key: number | undefined = undefined) => {
   const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
 
   return (
@@ -52,20 +54,19 @@ export const listItemRenderer = (params: { recipientCache: NumberToRecipient }) 
         amount={request.amount}
         requester={requester}
         comment={request.comment}
+        declinePaymentRequest={params.declinePaymentRequest}
       />
     </View>
   )
 }
 
 const IncomingPaymentRequestListScreen = (props: Props) => {
-  const { recipientCache, dollarBalance, navigation } = props
+  const { dollarBalance, navigation } = props
   useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList
       items={props.paymentRequests}
-      listItemRenderer={listItemRenderer({
-        recipientCache,
-      })}
+      listItemRenderer={listItemRenderer(props)}
       dollarBalance={props.dollarBalance}
     />
   )
@@ -77,4 +78,5 @@ IncomingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   fetchPhoneAddresses,
+  declinePaymentRequest,
 })(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

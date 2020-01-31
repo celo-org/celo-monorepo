@@ -4,7 +4,6 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
@@ -12,7 +11,6 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
 import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
@@ -21,28 +19,25 @@ interface OwnProps {
   amount: string
   comment: string
   id: string
-}
-
-interface DispatchProps {
   cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
 
 const AVATAR_SIZE = 40
 
-type Props = OwnProps & DispatchProps & WithTranslation
+type Props = OwnProps & WithTranslation
 
 export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
     const { id, t } = this.props
-    this.props.updatePaymentRequestNotified(id.toString(), false)
+    this.props.updatePaymentRequestNotified(id, false)
     CeloAnalytics.track(CustomEventNames.outgoing_request_payment_remind)
     Logger.showMessage(t('sendFlow7:reminderSent'))
   }
 
   onCancel = () => {
     const { id } = this.props
-    this.props.cancelPaymentRequest(id.toString())
+    this.props.cancelPaymentRequest(id)
   }
 
   getCTA = () => {
@@ -99,7 +94,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps, {}, RootState>(null, {
-  cancelPaymentRequest,
-  updatePaymentRequestNotified,
-})(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem))
+export default withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)

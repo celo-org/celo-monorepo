@@ -166,7 +166,21 @@ function* subscribeToOutgoingPaymentRequests() {
   yield subscribeToPaymentRequests(REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
 }
 
-function* updatePaymentRequestStatus(id: string, status: PaymentRequestStatus) {
+function* updatePaymentRequestStatus({
+  id,
+  status,
+}: (DeclinePaymentRequestAction | CompletePaymentRequestAction) | CancelPaymentRequestAction) {
+  switch (status) {
+    case PaymentRequestStatus.DECLINED:
+      CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
+      break
+    case PaymentRequestStatus.COMPLETED:
+      CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
+      break
+    case PaymentRequestStatus.CANCELLED:
+      CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
+      break
+  }
   try {
     Logger.debug(TAG, 'Updating payment request', id, `status: ${status}`)
     yield call(() =>
@@ -182,25 +196,8 @@ function* updatePaymentRequestStatus(id: string, status: PaymentRequestStatus) {
   }
 }
 
-function* declinePaymentRequest({ id }: DeclinePaymentRequestAction) {
-  CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
-  yield call(updatePaymentRequestStatus, id, PaymentRequestStatus.DECLINED)
-}
-
-function* completePaymentRequest({ id }: CompletePaymentRequestAction) {
-  CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
-  yield call(updatePaymentRequestStatus, id, PaymentRequestStatus.COMPLETED)
-}
-
-function* cancelPaymentRequest({ id }: CancelPaymentRequestAction) {
-  CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
-  yield call(updatePaymentRequestStatus, id, PaymentRequestStatus.CANCELLED)
-}
-
 export function* watchPaymentRequestStatusUpdates() {
-  yield takeLeading(Actions.PAYMENT_REQUEST_COMPLETE, completePaymentRequest)
-  yield takeLeading(Actions.PAYMENT_REQUEST_DECLINE, declinePaymentRequest)
-  yield takeLeading(Actions.PAYMENT_REQUEST_CANCEL, cancelPaymentRequest)
+  yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
 }
 
 function* updatePaymentRequestNotified({ id, notified }: UpdatePaymentRequestNotifiedAction) {

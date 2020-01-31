@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { connect } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -14,7 +13,6 @@ import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
 import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
@@ -23,13 +21,10 @@ interface OwnProps {
   amount: string
   comment: string
   id: string
-}
-
-interface DispatchProps {
   declinePaymentRequest: typeof declinePaymentRequest
 }
 
-type Props = OwnProps & DispatchProps & WithTranslation
+type Props = OwnProps & WithTranslation
 
 const AVATAR_SIZE = 40
 
@@ -109,6 +104,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps, {}, RootState>(null, {
-  declinePaymentRequest,
-})(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem))
+export default withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem)

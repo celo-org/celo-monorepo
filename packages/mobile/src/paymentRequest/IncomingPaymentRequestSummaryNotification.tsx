@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { declinePaymentRequest } from 'src/firebase/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
   addressToE164NumberSelector,
@@ -26,7 +27,11 @@ interface OwnProps {
   requests: PaymentRequest[]
 }
 
-type Props = OwnProps & WithTranslation & StateProps
+interface DispatchProps {
+  declinePaymentRequest: typeof declinePaymentRequest
+}
+
+type Props = OwnProps & DispatchProps & WithTranslation & StateProps
 
 interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
@@ -71,6 +76,8 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
 
     return requests.length === 1 ? (
       listItemRenderer({
+        // accessing via this.props.<...> to avoid shadowing
+        declinePaymentRequest: this.props.declinePaymentRequest,
         recipientCache,
       })(requests[0])
     ) : (
@@ -92,7 +99,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, {}, {}, RootState>(
-  mapStateToProps,
-  {}
-)(withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  declinePaymentRequest,
+})(withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))

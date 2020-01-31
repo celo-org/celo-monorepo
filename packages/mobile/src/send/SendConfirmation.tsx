@@ -24,7 +24,7 @@ import { getFeeDollars } from 'src/fees/selectors'
 import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
-import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
@@ -118,7 +118,13 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   sendOrInvite = (inviteMethod?: InviteBy) => {
-    const { amount, reason, recipient, recipientAddress } = this.getConfirmationInput()
+    const {
+      amount,
+      reason,
+      recipient,
+      recipientAddress,
+      firebasePendingRequestUid,
+    } = this.getConfirmationInput()
 
     this.props.sendPaymentOrInvite(
       amount,
@@ -126,14 +132,7 @@ class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       inviteMethod,
-      () => {
-        const { firebasePendingRequestUid } = this.getConfirmationInput()
-        if (firebasePendingRequestUid) {
-          this.props.completePaymentRequest(firebasePendingRequestUid.toString())
-        }
-        Logger.showMessage(this.props.t('paymentRequestFlow:requestPaid'))
-        navigateHome()
-      }
+      firebasePendingRequestUid
     )
   }
 
@@ -145,7 +144,7 @@ class SendConfirmation extends React.Component<Props, State> {
   onCancelClick = () => {
     const { firebasePendingRequestUid } = this.getConfirmationInput()
     if (firebasePendingRequestUid) {
-      this.props.declinePaymentRequest(firebasePendingRequestUid.toString())
+      this.props.declinePaymentRequest(firebasePendingRequestUid)
     }
     Logger.showMessage(this.props.t('paymentRequestFlow:requestDeclined'))
     navigateBack()

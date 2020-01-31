@@ -1,10 +1,8 @@
-import { PaymentRequest } from 'src/account/types'
+import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 
 export enum Actions {
   AUTHORIZED = 'FIREBASE/AUTHORIZED',
-  PAYMENT_REQUEST_DECLINE = 'FIREBASE/PAYMENT_REQUEST_DECLINE',
-  PAYMENT_REQUEST_COMPLETE = 'FIREBASE/PAYMENT_REQUEST_COMPLETE',
-  PAYMENT_REQUEST_CANCEL = 'FIREBASE/PAYMENT_REQUEST_CANCEL',
+  PAYMENT_REQUEST_UPDATE_STATUS = 'FIREBASE/PAYMENT_REQUEST_UPDATE_STATUS',
   PAYMENT_REQUEST_UPDATE_NOTIFIED = 'FIREBASE/PAYMENT_REQUEST_UPDATE_NOTIFIED',
   PAYMENT_REQUEST_WRITE = 'FIREBASE/PAYMENT_REQUEST_WRITE',
 }
@@ -14,17 +12,20 @@ export const firebaseAuthorized = () => ({
 })
 
 export interface DeclinePaymentRequestAction {
-  type: Actions.PAYMENT_REQUEST_DECLINE
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS
+  status: PaymentRequestStatus.DECLINED
   id: string
 }
 
 export interface CompletePaymentRequestAction {
-  type: Actions.PAYMENT_REQUEST_COMPLETE
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS
+  status: PaymentRequestStatus.COMPLETED
   id: string
 }
 
 export interface CancelPaymentRequestAction {
-  type: Actions.PAYMENT_REQUEST_CANCEL
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS
+  status: PaymentRequestStatus.CANCELLED
   id: string
 }
 
@@ -40,17 +41,20 @@ export interface WritePaymentRequest {
 }
 
 export const declinePaymentRequest = (id: string): DeclinePaymentRequestAction => ({
-  type: Actions.PAYMENT_REQUEST_DECLINE,
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS,
+  status: PaymentRequestStatus.DECLINED,
   id,
 })
 
 export const completePaymentRequest = (id: string): CompletePaymentRequestAction => ({
-  type: Actions.PAYMENT_REQUEST_COMPLETE,
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS,
+  status: PaymentRequestStatus.COMPLETED,
   id,
 })
 
 export const cancelPaymentRequest = (id: string): CancelPaymentRequestAction => ({
-  type: Actions.PAYMENT_REQUEST_CANCEL,
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS,
+  status: PaymentRequestStatus.CANCELLED,
   id,
 })
 
