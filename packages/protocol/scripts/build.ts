@@ -28,7 +28,7 @@ export const ProxyContracts = [
   'SortedOraclesProxy',
   'RegistryProxy',
   'BlockchainParametersProxy',
-  'VestingFactoryProxy',
+  'ReleaseGoldFactoryProxy',
 ]
 export const CoreContracts = [
   // common
@@ -48,8 +48,8 @@ export const CoreContracts = [
   'DowntimeSlasher',
   'LockedGold',
   'Validators',
-  'VestingFactory',
-  'VestingInstance',
+  'ReleaseGoldFactory',
+  'ReleaseGoldInstance',
 
   // identity
   'Attestations',

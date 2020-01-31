@@ -3,7 +3,7 @@ import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
-import { RegistryInstance, VestingFactoryInstance } from 'types'
+import { RegistryInstance, ReleaseGoldFactoryInstance } from 'types'
 
 const initializeArgs = async (): Promise<[string]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
@@ -13,9 +13,9 @@ const initializeArgs = async (): Promise<[string]> => {
   return [registry.address]
 }
 
-module.exports = deploymentForCoreContract<VestingFactoryInstance>(
+module.exports = deploymentForCoreContract<ReleaseGoldFactoryInstance>(
   web3,
   artifacts,
-  CeloContractName.VestingFactory,
+  CeloContractName.ReleaseGoldFactory,
   initializeArgs
 )
