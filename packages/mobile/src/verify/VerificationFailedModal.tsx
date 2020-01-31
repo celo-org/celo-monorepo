@@ -20,14 +20,14 @@ export function VerificationFailedModal(props: Props) {
   const { t } = useTranslation(Namespaces.nuxVerification2)
   const [isDismissed, setIsDismissed] = React.useState(false)
 
-  const onDismiss = () => {
+  const onDismiss = React.useCallback(() => {
     setIsDismissed(true)
-  }
+  }, [setIsDismissed])
 
-  const onSkip = () => {
+  const onSkip = React.useCallback(() => {
     props.cancelVerification()
     navigateHome()
-  }
+  }, [props.cancelVerification])
 
   const isVisible =
     props.verificationStatus === VerificationStatus.Failed ||
