@@ -254,7 +254,7 @@ describe('Transfer tests', function(this: any) {
       verbose
     )
 
-    await connectPeers([...gethConfig.instances, instance])
+    await connectPeers([gethConfig.instances[0], currentGethInstance])
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
