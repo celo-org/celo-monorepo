@@ -78,7 +78,6 @@ describe('slashing tests', function(this: any) {
   }
 
   const gethConfig: GethRunConfig = {
-    gethRepoPath: '../../../celo-blockchain',
     network: 'local',
     networkId: 1101,
     runPath: TMP_PATH,
