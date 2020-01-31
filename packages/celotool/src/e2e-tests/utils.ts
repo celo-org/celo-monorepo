@@ -4,6 +4,7 @@ import { assert } from 'chai'
 import fs from 'fs'
 import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
+import Web3 from 'web3'
 import {
   AccountType,
   getPrivateKeysFor,
@@ -30,6 +31,11 @@ import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
+
+export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
+  const { wsport, rpcport } = instance
+  await waitToFinishSyncing(new Web3(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`))
+}
 
 export async function waitToFinishSyncing(web3: any) {
   while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
@@ -269,8 +275,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     await connectValidatorPeers(gethConfig.instances)
 
-    // Give validators time to connect to each other
-    await sleep(60, true)
+    await waitToFinishInstanceSyncing(gethConfig.instances[0])
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(

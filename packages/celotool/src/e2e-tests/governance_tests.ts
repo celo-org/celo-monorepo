@@ -11,7 +11,7 @@ import Web3 from 'web3'
 import { connectPeers, connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { assertAlmostEqual, getHooks, sleep, waitToFinishSyncing } from './utils'
+import { assertAlmostEqual, getHooks, sleep, waitToFinishInstanceSyncing } from './utils'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -352,6 +352,8 @@ describe('governance tests', () => {
 
       await connectPeers([...gethConfig.instances, validatorGroup], verbose)
 
+      await waitToFinishInstanceSyncing(validatorGroup)
+
       // Connect the validating nodes to the non-validating nodes, to test that announce messages
       // are properly gossiped.
       const additionalValidatingNodes: GethInstanceConfig[] = [
@@ -362,6 +364,7 @@ describe('governance tests', () => {
           lightserv: false,
           port: 30315,
           wsport: 8559,
+          rpcport: 9559,
           privateKey: rotation0PrivateKey.slice(2),
         },
         {
@@ -371,6 +374,7 @@ describe('governance tests', () => {
           lightserv: false,
           port: 30317,
           wsport: 8561,
+          rpcport: 9561,
           privateKey: rotation1PrivateKey.slice(2),
         },
       ]
@@ -383,7 +387,7 @@ describe('governance tests', () => {
 
       await connectValidatorPeers([...gethConfig.instances, ...additionalValidatingNodes])
 
-      await sleep(10, true)
+      await Promise.all(additionalValidatingNodes.map((i) => waitToFinishInstanceSyncing(i)))
 
       validatorAccounts = await getValidatorGroupMembers()
       assert.equal(validatorAccounts.length, 5)
@@ -392,7 +396,7 @@ describe('governance tests', () => {
 
       // Wait for an epoch transition so we can activate our vote.
       await waitForEpochTransition(epoch)
-      await sleep(5)
+      await sleep(5.5)
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(epoch)
 
@@ -400,9 +404,6 @@ describe('governance tests', () => {
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
-
-      console.info('Waiting to finish syncing')
-      await waitToFinishSyncing(groupWeb3)
 
       const groupKit = newKitFromWeb3(groupWeb3)
       const group: string = (await groupWeb3.eth.getAccounts())[0]
@@ -425,8 +426,6 @@ describe('governance tests', () => {
       const authWeb32 = 'ws://localhost:8561'
 
       const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
-
-      await Promise.all(authorizedWeb3s.map((w) => waitToFinishSyncing(w)))
 
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(

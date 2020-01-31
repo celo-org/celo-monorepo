@@ -1104,8 +1104,7 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
 
 export async function connectPeers(instances: GethInstanceConfig[], verbose: boolean = false) {
   const admins = instances.map(({ wsport, rpcport }) => {
-    const url = `${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`
-    return new Admin(url)
+    return new Admin(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`)
   })
 
   await Promise.all(
