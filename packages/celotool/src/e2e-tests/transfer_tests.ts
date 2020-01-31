@@ -246,7 +246,7 @@ describe('Transfer tests', function(this: any) {
         rpcport: 8549,
         privateKey: DEF_FROM_PK,
       },
-      true
+      verbose
     )
 
     // Reset contracts to send RPCs through transferring node.
