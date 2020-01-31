@@ -127,7 +127,7 @@ describe('sync tests', function(this: any) {
       await initAndStartGeth(gethConfig, hooks.gethBinaryPath, additionalInstance, verbose)
       await connectPeers([gethConfig.instances[0], additionalInstance], verbose)
       await waitToFinishInstanceSyncing(additionalInstance)
-      await sleep(120, verbose) // wait for round change / resync
+      await sleep(120, true) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
       for (let i = 0; i < gethConfig.instances.length; i++) {
