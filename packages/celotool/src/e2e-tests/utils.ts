@@ -194,12 +194,10 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
   const before = async () => {
     if (!argv.localgeth) {
-      await checkoutGethRepo(branch, gethConfig.gethRepoPath)
+      await checkoutGethRepo(branch, gethConfig.gethRepoPath!)
     }
 
-    if (gethConfig.gethRepoPath) {
-      await buildGeth(gethConfig.gethRepoPath)
-    }
+    await buildGeth(gethConfig.gethRepoPath!)
 
     if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
       await resetDataDir(gethConfig.runPath, verbose)
