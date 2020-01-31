@@ -193,7 +193,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const bootnodeBinaryPath = `${gethConfig.gethRepoPath}/build/bin/bootnode`
 
   const before = async () => {
-    if (!argv.localgeth && gethConfig.gethRepoPath) {
+    if (!argv.localgeth) {
       await checkoutGethRepo(branch, gethConfig.gethRepoPath)
     }
 
