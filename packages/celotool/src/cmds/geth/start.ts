@@ -29,6 +29,7 @@ interface StartArgv extends GethArgv {
   purge: boolean
   withProxy: boolean
   ethstats: string
+  mnemonic: string
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -91,6 +92,12 @@ export const builder = (argv: yargs.Argv) => {
       type: 'string',
       description: 'address of the ethstats server',
     })
+    .option('mnemonic', {
+      type: 'string',
+      description: 'seed phrase to use for private key generation',
+      default:
+        'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast',
+    })
     .option('blockTime', {
       type: 'number',
       description: 'Block Time',
@@ -115,9 +122,7 @@ export const handler = async (argv: StartArgv) => {
   const mining = argv.mining
   const network = 'local'
   const instances = argv.instances
-
-  const mnemonic =
-    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
+  const mnemonic = argv.mnemonic
 
   const purge = argv.purge
   const withProxy = argv.withProxy
