@@ -52,10 +52,11 @@ export function migrationOverrides() {
       ),
     },
     epochRewards: {
-      frozen: fetchEnvOrFallback(envVar.EPOCH_REWARDS_FROZEN, DEFAULT_EPOCH_REWARDS_FROZEN),
+      frozen:
+        fetchEnvOrFallback(envVar.EPOCH_REWARDS_FROZEN, DEFAULT_EPOCH_REWARDS_FROZEN) == 'true',
     },
     exchange: {
-      frozen: fetchEnvOrFallback(envVar.EXCHANGE_FROZEN, DEFAULT_EXCHANGE_FROZEN),
+      frozen: fetchEnvOrFallback(envVar.EXCHANGE_FROZEN, DEFAULT_EXCHANGE_FROZEN) == 'true',
     },
     stableToken: {
       initialBalances: {
