@@ -11,7 +11,7 @@ import { TransactionReceipt } from 'web3/types'
 import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, killInstance, sleep } from './utils'
+import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -213,7 +213,8 @@ describe('Transfer tests', function(this: any) {
       etherbase: FeeRecipientAddress,
     }
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
-    await connectPeers([gethConfig.instances[0], fullInstance], verbose)
+    await connectPeers([...gethConfig.instances, fullInstance], verbose)
+    await waitToFinishInstanceSyncing(fullInstance)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -234,20 +235,26 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
+    const instance: GethInstanceConfig = {
+      name: syncmode,
+      validating: false,
+      syncmode,
+      port: 30307,
+      rpcport: 8549,
+      privateKey: DEF_FROM_PK,
+    }
+
     // Spin up the node to run transfers as.
     currentGethInstance = await initAndStartGeth(
       gethConfig,
       hooks.gethBinaryPath,
-      {
-        name: syncmode,
-        validating: false,
-        syncmode,
-        port: 30307,
-        rpcport: 8549,
-        privateKey: DEF_FROM_PK,
-      },
+      instance,
       verbose
     )
+
+    await connectPeers([...gethConfig.instances, instance])
+
+    await waitToFinishInstanceSyncing(instance)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
