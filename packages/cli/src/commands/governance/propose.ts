@@ -1,3 +1,4 @@
+// import { ProposalBuilder } from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { BaseCommand } from '../../base'
@@ -22,7 +23,6 @@ export default class Propose extends BaseCommand {
 
   async run() {
     const res = this.parse(Propose)
-    const proposal = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
     const account = res.flags.from
     const deposit = new BigNumber(res.flags.deposit)
     this.kit.defaultAccount = account
@@ -31,6 +31,14 @@ export default class Propose extends BaseCommand {
       .hasEnoughGold(account, deposit)
       .exceedsProposalMinDeposit(deposit)
       .runChecks()
+
+    const proposal = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
+
+    // const builder = new ProposalBuilder(this.kit)
+    // builder.addTx()
+    // builder.addWeb3Tx()
+    // builder.addProxyRepointingTx
+    // const proposal = await builder.build()
 
     const governance = await this.kit.contracts.getGovernance()
     await displaySendTx(
