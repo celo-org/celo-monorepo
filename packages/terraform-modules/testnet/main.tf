@@ -149,8 +149,8 @@ module "tx_node" {
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = [local.target_tag_tx_node]
+  max_peers                             = 500
   name                                  = "tx-node"
-  names = [ "tx-node-0" ]
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   node_count                            = var.tx_node_count
@@ -194,7 +194,6 @@ module "validator" {
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   node_disk_size_gb                     = var.node_disk_size_gb
-  proxied_validator_count               = var.proxied_validator_count
   proxies_per_validator                 = var.proxies_per_validator
   tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count

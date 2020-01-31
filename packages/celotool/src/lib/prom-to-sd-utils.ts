@@ -2,6 +2,7 @@ import sleep from 'sleep-promise'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { scaleResource } from 'src/lib/kubernetes'
+import { getProxiesPerValidator } from 'src/lib/testnet-utils'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import {
   getInternalProxyIPs,
@@ -64,10 +65,12 @@ async function helmParameters(celoEnv: string) {
   }
 
   const proxyIpAddresses = await getInternalProxyIPs(celoEnv)
-  const proxyCount = parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
+  const proxiesPerValidator = getProxiesPerValidator()
   const proxyPodIds = []
-  for (let i = 0; i < proxyCount; i++) {
-    proxyPodIds.push(`${celoEnv}-proxy-${i}`)
+  for (let valIndex = 0; valIndex < proxiesPerValidator.length; valIndex++) {
+    for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[valIndex]; proxyIndex++) {
+      proxyPodIds.push(`${celoEnv}-validators-${valIndex}-proxy-${proxyIndex}`)
+    }
   }
 
   const txNodeIpAddresses = await getInternalTxNodeIPs(celoEnv)
@@ -95,7 +98,9 @@ async function helmParameters(celoEnv: string) {
 function getReplicaCount() {
   const txNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  const proxyCount = parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
+  const proxyCount = getProxiesPerValidator().reduce((sum, value) => {
+    return sum + value
+  }, 0)
 
   return txNodeCount + validatorCount + proxyCount
 }

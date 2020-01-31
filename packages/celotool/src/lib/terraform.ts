@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import sleep from 'sleep-promise'
 import { execCmd } from './utils'
 
 const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
@@ -86,6 +87,8 @@ async function taintEveryResourceWithPrefix(moduleName: string, resourceName: st
   const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
   for (const match of matches) {
     await taintResource(moduleName, match)
+    // To avoid hitting rate limits
+    await sleep(500)
   }
 }
 
@@ -93,6 +96,8 @@ async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: 
   const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
   for (const match of matches) {
     await untaintResource(moduleName, match)
+    // To avoid hitting rate limits
+    await sleep(1000)
   }
 }
 

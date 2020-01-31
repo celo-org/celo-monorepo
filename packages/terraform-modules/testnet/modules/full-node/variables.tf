@@ -80,14 +80,21 @@ variable instance_tags {
   default     = []
 }
 
+variable max_peers {
+  type        = number
+  description = "The maximum number of peers for the node"
+  default     = 100
+}
+
 variable name {
   type        = string
-  description = "Name of the nodes"
+  description = "Name of the nodes. Should be specified if names is not."
+  default     = ""
 }
 
 variable names {
   type        = set(string)
-  description = "Name of each node"
+  description = "Name of each node to create. If not specified, the names will be generated using the name variable and an index."
   default     = []
 }
 

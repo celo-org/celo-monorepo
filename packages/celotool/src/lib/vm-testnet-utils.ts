@@ -27,6 +27,11 @@ import {
 } from './testnet-utils'
 import { execCmd } from './utils'
 
+interface ProxyIndex {
+  validatorIndex: number
+  proxyIndex: number
+}
+
 // Keys = gcloud project name
 const projectConfig = {
   'celo-testnet': {
@@ -70,7 +75,6 @@ const testnetEnvVars: TerraformVars = {
   istanbul_request_timeout_ms: envVar.ISTANBUL_REQUEST_TIMEOUT_MS,
   network_id: envVar.NETWORK_ID,
   node_disk_size_gb: envVar.NODE_DISK_SIZE_GB,
-  proxied_validator_count: envVar.PROXIED_VALIDATORS,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
 }
@@ -454,7 +458,11 @@ export function getVmSshCommand(instanceName: string) {
   return `gcloud beta compute --project '${project}' ssh --zone '${zone}' ${instanceName} --tunnel-through-iap`
 }
 
-export async function getNodeVmName(celoEnv: string, nodeType: string, index?: number) {
+export async function getNodeVmName(
+  celoEnv: string,
+  nodeType: string,
+  index?: number | ProxyIndex
+) {
   const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
   const nodeTypesWithNoIndex = ['bootnode']
 
@@ -472,11 +480,20 @@ export async function getNodeVmName(celoEnv: string, nodeType: string, index?: n
 
 // Some VM names have a randomly generated suffix. This returns the full name
 // of the instance given only the celoEnv and index.
-async function getNodeVmNameWithRandomSuffix(celoEnv: string, nodeType: string, index: number) {
+async function getNodeVmNameWithRandomSuffix(
+  celoEnv: string,
+  nodeType: string,
+  index: number | ProxyIndex
+) {
   const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
 
+  const baseName =
+    typeof index === 'number'
+      ? `${celoEnv}-${nodeType}-${index}`
+      : `${celoEnv}-validator-${index.validatorIndex}-proxy-${index.proxyIndex}`
+
   const [nodeName] = await execCmd(
-    `gcloud compute instances list --project '${project}' --filter="NAME ~ ${celoEnv}-${nodeType}-${index}-.*" --format get\\(NAME\\)`
+    `gcloud compute instances list --project '${project}' --filter="NAME ~ ${baseName}-.*" --format get\\(NAME\\)`
   )
   return nodeName.trim()
 }

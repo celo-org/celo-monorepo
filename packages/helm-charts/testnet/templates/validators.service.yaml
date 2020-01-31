@@ -4,7 +4,7 @@
 
 {{ if (ge $index (len $.Values.geth.proxiesPerValidator)) }}
 
-{{ $loadBalancerIP := index $.Values.geth.validators_ip_address_array $index }}
+{{ $loadBalancerIP := index $.Values.geth.validatorsIPAddressArray $index }}
 
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "validators" "component_label" "validators" "load_balancer_ip" $loadBalancerIP ) }}
   ports:

@@ -97,7 +97,7 @@ spec:
               # and individual IP addresses are separated by /'s. For example,
               # if one validator has 2 proxies, and the other has 1 proxy:
               # ALL_VALIDATOR_PROXY_IPS would have the form X.X.X.X/X.X.X.X,X.X.X.X
-              ALL_VALIDATOR_PROXY_IPS={{ join "," .Values.geth.proxy_ip_addresses_per_validator_array }}
+              ALL_VALIDATOR_PROXY_IPS={{ join "," .Values.geth.proxyIPAddressesPerValidatorArray }}
 
               PROXY_IPS=`echo -n $ALL_VALIDATOR_PROXY_IPS | cut -d ',' -f $((RID + 1))`
 
@@ -133,7 +133,7 @@ spec:
               name: {{ template "ethereum.fullname" . }}-geth-account
               key: mnemonic
         - name: IP_ADDRESSES
-          value: {{ join "/" .Values.geth.validators_ip_address_array }}
+          value: {{ join "/" .Values.geth.validatorsIPAddressArray }}
         - name: BOOTNODE_IP_ADDRESS
           value: "{{ default "none" .Values.geth.bootnodeIpAddress  }}"
         volumeMounts:

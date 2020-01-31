@@ -123,11 +123,6 @@ variable node_disk_size_gb {
   description = "The size in GB of disks for all types of nodes"
 }
 
-variable proxied_validator_count {
-  type        = number
-  description = "Number of validator_count validators that are hidden behind proxies"
-}
-
 variable proxies_per_validator {
   type        = list(number)
   description = "Number of proxies for each validator that is proxied. Does not include validators that aren't proxied. indices correspond to validator indices."

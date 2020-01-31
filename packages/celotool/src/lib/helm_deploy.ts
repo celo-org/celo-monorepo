@@ -539,7 +539,7 @@ async function helmIPParameters(celoEnv: string) {
   )
 
   // Tx-node IPs
-  const txNodeIpParams = setHelmArray('geth.tx_nodes_ip_address_array', txAddresses)
+  const txNodeIpParams = setHelmArray('geth.txNodesIPAddressArray', txAddresses)
   ipAddressParameters.push(...txNodeIpParams)
 
   if (useStaticIPsForGethNodes()) {
@@ -561,7 +561,7 @@ async function helmIPParameters(celoEnv: string) {
         validatorIpAddresses.push(await retrieveIPAddress(`${celoEnv}-validators-${i}`))
       }
     }
-    const validatorIpParams = setHelmArray('geth.validators_ip_address_array', validatorIpAddresses)
+    const validatorIpParams = setHelmArray('geth.validatorsIPAddressArray', validatorIpAddresses)
     ipAddressParameters.push(...validatorIpParams)
 
     // Proxy IPs
@@ -584,7 +584,7 @@ async function helmIPParameters(celoEnv: string) {
     }
 
     const proxyIpAddressesParams = setHelmArray(
-      'geth.proxy_ip_addresses_per_validator_array',
+      'geth.proxyIPAddressesPerValidatorArray',
       proxyIpAddressesPerValidator
     )
     ipAddressParameters.push(...proxyIpAddressesParams)

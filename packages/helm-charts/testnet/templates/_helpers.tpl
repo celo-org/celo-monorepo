@@ -362,14 +362,12 @@ PROXY_INTERNAL_IP_ENV_VAR={{ $.Release.Namespace | upper }}_VALIDATORS_${RID}_PR
 echo "PROXY_INTERNAL_IP_ENV_VAR=$PROXY_INTERNAL_IP_ENV_VAR"
 PROXY_INTERNAL_IP=`eval "echo \\${${PROXY_INTERNAL_IP_ENV_VAR}}"`
 
-# we can't get the external IP of a service from an environment variable,
-# so we use the IP address that was allocated for this validator that is
-# being used by the proxy found in /root/.celo/externalIpAddress
-if [ -s /root/.celo/externalIpAddress ]; then
+# If $PROXY_IPS is not empty, then we use the IPs from there. Otherwise,
+# we use the IP address of the proxy internal service
+if [ ! -z PROXY_IPS ]; then
   echo "Proxy external IP from PROXY_IPS=$PROXY_IPS: "
   PROXY_EXTERNAL_IP=`echo -n $PROXY_IPS | cut -d '/' -f $((PROXY_INDEX + 1))`
 else
-  # otherwise use the internal proxy service IP address
   PROXY_EXTERNAL_IP=$PROXY_INTERNAL_IP
 fi
 

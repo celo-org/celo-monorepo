@@ -1,6 +1,6 @@
 {{ range $validatorIndex, $proxyCount := .Values.geth.proxiesPerValidator }}
 
-{{ $proxyIpAddresses := (splitList "/" (index $.Values.geth.proxy_ip_addresses_per_validator_array $validatorIndex)) }}
+{{ $proxyIpAddresses := (splitList "/" (index $.Values.geth.proxyIPAddressesPerValidatorArray $validatorIndex)) }}
 
 {{ range $index, $e := until ($proxyCount | int) }}
 

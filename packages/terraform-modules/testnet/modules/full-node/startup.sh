@@ -171,7 +171,6 @@ RPC_APIS="eth,net,web3,debug"
 
 if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
-  echo -n "$PROXIED_VALIDATOR_ADDRESS" > $DATA_DIR/validator_address
 else
   RPC_APIS="$RPC_APIS,txpool"
 fi
