@@ -332,7 +332,7 @@ function ButtonInline(props: Props) {
       href={href}
       target={target}
       accessibilityRole="link"
-      style={[fonts.p, inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
+      style={[inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
     >
       {children}
     </Text>

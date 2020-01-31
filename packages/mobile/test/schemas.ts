@@ -226,9 +226,22 @@ export const v4Schema = {
       celoGoldExchangeRates: [],
       lastTimeUpdated: 0,
     },
+    tobinTax: '0',
+  },
+}
+
+export const v5Schema = {
+  ...v4Schema,
+  localCurrency: {
+    ...v4Schema.localCurrency,
+    exchangeRate: '1.33',
+  },
+  geth: {
+    ...v4Schema.geth,
+    promptZeroSyncIfNeeded: false,
   },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v4Schema as Partial<RootState>
+  return v5Schema as Partial<RootState>
 }

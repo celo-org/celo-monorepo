@@ -31,6 +31,8 @@ export default class ValidatorGroupRegister extends BaseCommand {
       .addCheck('Commission is in range [0,1]', () => commission.gte(0) && commission.lte(1))
       .isSignerOrAccount()
       .canSignValidatorTxs()
+      .isNotValidator()
+      .isNotValidatorGroup()
       .signerMeetsValidatorGroupBalanceRequirements()
       .runChecks()
 

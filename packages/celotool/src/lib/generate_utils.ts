@@ -222,6 +222,17 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     }
   }
 
+  // Allocate voting bot account(s)
+  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
+  initialAccounts.concat(
+    getStrippedAddressesFor(AccountType.VOTING_BOT, mnemonic, numVotingBotAccounts).map((addr) => {
+      return {
+        address: addr,
+        balance: fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '100000000000000000000'),
+      }
+    })
+  )
+
   return generateGenesis({
     validators,
     consensusType,
@@ -268,8 +279,6 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
           // ParentAggregatedSeal.Round
           new Buffer(0),
         ],
-        // EpochData
-        new Buffer(0),
       ])
       .toString('hex')
   )

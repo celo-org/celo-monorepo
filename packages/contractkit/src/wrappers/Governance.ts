@@ -218,6 +218,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     (res) => Object.keys(ProposalStage)[valueToInt(res)] as ProposalStage
   )
 
+  async timeUntilStages(proposalID: BigNumber.Value) {
+    const meta = await this.getProposalMetadata(proposalID)
+    const durations = await this.stageDurations()
+    const referendum = meta.timestamp.plus(durations.Approval)
+    const execution = referendum.plus(durations.Referendum)
+    const expiration = referendum.plus(durations.Execution)
+    return { referendum, execution, expiration }
+  }
+
   /**
    * Returns the proposal associated with a given id.
    * @param proposalID Governance proposal UUID
@@ -241,7 +250,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
     if (stage === ProposalStage.Queued) {
       upvotes = await this.getUpvotes(proposalID)
-    } else if (stage >= ProposalStage.Referendum && stage < ProposalStage.Expiration) {
+    } else if (stage !== ProposalStage.Expiration) {
       votes = await this.getVotes(proposalID)
     }
 
@@ -333,11 +342,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
-   * Returns the proposal dequeue as list of proposal IDs.
+   * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
-    arrayObject.map(valueToBigNumber)
-  )
+  async getDequeue() {
+    const dequeue = await this.contract.methods.getDequeue().call()
+    // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
+    return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
+  }
 
   /**
    * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
@@ -389,7 +400,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
   }
 
-  private sortedQueue(queue: UpvoteRecord[]) {
+  sortedQueue(queue: UpvoteRecord[]) {
     return queue.sort((a, b) => a.upvotes.comparedTo(b.upvotes))
   }
 
@@ -421,9 +432,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    const queue = upvoteRecord.proposalID.isZero()
-      ? await this.getQueue()
-      : (await this.withUpvoteRevoked(upvoter)).queue
+    const recordQueued = await this.isQueued(upvoteRecord.proposalID)
+    // if existing upvote exists in queue, revoke it before applying new upvote
+    const queue = recordQueued
+      ? (await this.withUpvoteRevoked(upvoter)).queue
+      : await this.getQueue()
     const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
     return this.lesserAndGreater(proposalID, upvoteQueue)
   }
@@ -535,6 +548,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
   isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToString))
+
+  /**
+   * Returns the number of validators required to reach a Byzantine quorum
+   */
+  byzantineQuorumValidators = proxyCall(
+    this.contract.methods.byzantineQuorumValidatorsInCurrentSet,
+    undefined,
+    valueToBigNumber
+  )
 
   /**
    * Returns the number of validators that whitelisted the hotfix

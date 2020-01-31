@@ -6,7 +6,7 @@ import {
   assertLogMatches2,
   assertRevert,
   matchAny,
-  mineBlocks,
+  mineToNextEpoch,
   NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
@@ -71,9 +71,6 @@ interface Transaction {
   destination: string
   data: Buffer
 }
-
-// hard coded in ganache
-const EPOCH = 100
 
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
@@ -1373,6 +1370,10 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
+    it('should revert when the index is out of bounds', async () => {
+      await assertRevert(governance.approve(proposalId, index + 1))
+    })
+
     it('should revert if the proposal id does not match the index', async () => {
       await governance.propose(
         [transactionSuccess1.value],
@@ -1521,6 +1522,10 @@ contract('Governance', (accounts: string[]) => {
     it('should revert when the account weight is 0', async () => {
       await mockLockedGold.setAccountTotalLockedGold(account, 0)
       await assertRevert(governance.vote(proposalId, index, value))
+    })
+
+    it('should revert when the index is out of bounds', async () => {
+      await assertRevert(governance.vote(proposalId, index + 1, value))
     })
 
     it('should revert if the proposal id does not match the index', async () => {
@@ -1715,6 +1720,10 @@ contract('Governance', (accounts: string[]) => {
               participationBaseline: expectedParticipationBaseline,
             },
           })
+        })
+
+        it('should revert when the index is out of bounds', async () => {
+          await assertRevert(governance.execute(proposalId, index + 1))
         })
       })
 
@@ -2083,7 +2092,7 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when hotfix is passing', () => {
       beforeEach(async () => {
-        await mineBlocks(EPOCH, web3)
+        await mineToNextEpoch(web3)
         await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       })
 
@@ -2116,7 +2125,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should succeed for epoch != preparedEpoch', async () => {
         await governance.prepareHotfix(hotfixHashStr)
-        await mineBlocks(EPOCH, web3)
+        await mineToNextEpoch(web3)
         await governance.prepareHotfix(hotfixHashStr)
       })
     })
@@ -2138,7 +2147,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when hotfix not prepared for current epoch', async () => {
-      await mineBlocks(EPOCH, web3)
+      await mineToNextEpoch(web3)
       await governance.approveHotfix(hotfixHashStr, { from: approver })
       await assertRevert(executeHotfixTx())
     })
@@ -2149,14 +2158,14 @@ contract('Governance', (accounts: string[]) => {
       await accountsInstance.createAccount({ from: accounts[2] })
       await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       await governance.prepareHotfix(hotfixHashStr, { from: accounts[2] })
-      await mineBlocks(EPOCH, web3)
+      await mineToNextEpoch(web3)
       await assertRevert(executeHotfixTx())
     })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
         await governance.approveHotfix(hotfixHashStr, { from: approver })
-        await mineBlocks(EPOCH, web3)
+        await mineToNextEpoch(web3)
         await governance.addValidator(accounts[2])
         await accountsInstance.createAccount({ from: accounts[2] })
         await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })

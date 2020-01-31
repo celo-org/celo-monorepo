@@ -10,7 +10,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { fetchExchangeRate } from 'src/exchange/actions'
-import Activity from 'src/exchange/Activity'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -19,6 +18,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import TransactionsList from 'src/transactions/TransactionsList'
 import { getRateForMakerToken } from 'src/utils/currencyExchange'
 
 interface StateProps {
@@ -63,7 +63,8 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, goldBalance } = this.props
+    const hasGold = new BigNumber(goldBalance || 0).isGreaterThan(0)
 
     return (
       <SafeAreaView style={styles.background}>
@@ -86,19 +87,23 @@ export class ExchangeHomeScreen extends React.Component<Props> {
                 standard={true}
                 type={BtnTypes.PRIMARY}
               />
-              <View style={styles.buttonDivider} />
-              <Button
-                text={t('sell')}
-                onPress={this.goToBuyDollars}
-                style={styles.button}
-                standard={true}
-                type={BtnTypes.PRIMARY}
-              />
+              {hasGold && (
+                <>
+                  <View style={styles.buttonDivider} />
+                  <Button
+                    text={t('sell')}
+                    onPress={this.goToBuyDollars}
+                    style={styles.button}
+                    standard={true}
+                    type={BtnTypes.PRIMARY}
+                  />
+                </>
+              )}
             </View>
           </View>
           <SectionHeadNew text={t('goldActivity')} />
           <View style={styles.activity}>
-            <Activity />
+            <TransactionsList currency={CURRENCY_ENUM.GOLD} />
           </View>
         </ScrollContainer>
       </SafeAreaView>
