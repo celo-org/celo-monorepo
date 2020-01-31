@@ -213,7 +213,7 @@ describe('Transfer tests', function(this: any) {
       etherbase: FeeRecipientAddress,
     }
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
-    await connectPeers([gethConfig.instances[0], fullInstance])
+    await connectPeers([gethConfig.instances[0], fullInstance], verbose)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance

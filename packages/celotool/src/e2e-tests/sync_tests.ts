@@ -67,7 +67,7 @@ describe('sync tests', function(this: any) {
     }
 
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
-    await connectPeers([gethConfig.instances[0], fullNode])
+    await connectPeers([gethConfig.instances[0], fullNode], verbose)
     const web3 = new Web3('http://localhost:8553')
     await waitToFinishSyncing(web3)
   })
@@ -88,7 +88,7 @@ describe('sync tests', function(this: any) {
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
         }
         await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncInstance, verbose)
-        await connectPeers([gethConfig.instances[0], syncInstance])
+        await connectPeers([gethConfig.instances[0], syncInstance], verbose)
       })
 
       afterEach(() => killInstance(syncInstance))
@@ -126,7 +126,7 @@ describe('sync tests', function(this: any) {
       // copy instance
       const additionalInstance = { ...instance }
       await initAndStartGeth(gethConfig, hooks.gethBinaryPath, additionalInstance, verbose)
-      await connectPeers([gethConfig.instances[0], additionalInstance])
+      await connectPeers([gethConfig.instances[0], additionalInstance], verbose)
       await sleep(120, verbose) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')

@@ -1102,7 +1102,7 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
   return p
 }
 
-export async function connectPeers(instances: GethInstanceConfig[]) {
+export async function connectPeers(instances: GethInstanceConfig[], verbose: boolean = false) {
   const admins = instances.map(({ wsport, rpcport }) => {
     const url = `${wsport ? 'ws' : 'http'}://localhost:${wsport || rpcport}`
     return new Admin(url)
@@ -1116,11 +1116,11 @@ export async function connectPeers(instances: GethInstanceConfig[]) {
           if (i === j) {
             return
           }
-          /*
-          console.log(
-            `connecting ${instances[i].name} with ${instances[j].name} using enode ${enode}`
-          )
-          */
+          if (verbose) {
+            console.log(
+              `connecting ${instances[i].name} with ${instances[j].name} using enode ${enode}`
+            )
+          }
           const success = await admin.addPeer(enode)
           if (!success) {
             throw new Error('Connecting validators failed!')

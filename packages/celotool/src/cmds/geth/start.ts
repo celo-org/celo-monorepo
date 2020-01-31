@@ -131,7 +131,6 @@ export const handler = async (argv: StartArgv) => {
 
   const ethstats = argv.ethstats
 
-
   const gethConfig: GethRunConfig = {
     runPath: datadir,
     keepData: !purge,
