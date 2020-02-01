@@ -56,7 +56,7 @@ describe('sync tests', function(this: any) {
     await hooks.restart()
     const validatorKit = newKitFromWeb3(new Web3('http://localhost:8545'))
     const groupPrivateKey = await getValidatorGroupPrivateKey(validatorKit, gethConfig.instances[0])
-    fullNode['privateKey'] = groupPrivateKey.slice(2)
+    fullNode.privateKey = groupPrivateKey.slice(2)
     await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
     await connectPeers([...gethConfig.instances, fullNode], verbose)
     const validators = await (await validatorKit._web3Contracts.getValidators()).methods
