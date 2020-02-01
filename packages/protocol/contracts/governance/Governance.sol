@@ -458,17 +458,17 @@ contract Governance is
   }
 
   /**
-   * @notice Expires a proposal if it is queued and expired.
+   * @notice Removes a proposal if it is queued and expired.
    * @param proposalId The ID of the proposal to remove.
    * @return Whether the proposal was expired.
    */
   function removeIfQueuedAndExpired(uint256 proposalId) private returns (bool) {
-    bool result = queue.contains(proposalId) && isQueuedProposalExpired(proposalId);
-    if (result) {
+    bool expired = queue.contains(proposalId) && isQueuedProposalExpired(proposalId);
+    if (expired) {
       queue.remove(proposalId);
       emit ProposalExpired(proposalId);
     }
-    return result;
+    return expired;
   }
 
   /**
@@ -476,7 +476,7 @@ contract Governance is
    * @param proposalId The ID of the proposal.
    * @return The proposal storage struct and stage corresponding to `proposalId`. 
    */
-  function requireDequeuedAndRemoveExpired(uint256 proposalId, uint256 index)
+  function requireDequeuedAndDeleteIfExpired(uint256 proposalId, uint256 index)
     private
     returns (Proposals.Proposal storage, Proposals.Stage)
   {
@@ -518,6 +518,7 @@ contract Governance is
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(weight > 0, "cannot upvote without locking gold");
+    require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
     require(
       voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
       "cannot upvote more than one queued proposal"
@@ -584,7 +585,7 @@ contract Governance is
    */
   function approve(uint256 proposalId, uint256 index) external onlyApprover returns (bool) {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndRemoveExpired(
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteIfExpired(
       proposalId,
       index
     );
@@ -615,7 +616,7 @@ contract Governance is
     returns (bool)
   {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndRemoveExpired(
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteIfExpired(
       proposalId,
       index
     );
@@ -627,10 +628,7 @@ contract Governance is
     Voter storage voter = voters[account];
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(proposal.isApproved(), "Proposal not approved");
-    require(
-      stage == Proposals.Stage.Referendum && value != Proposals.VoteValue.None && weight > 0,
-      "Incorrect proposal state"
-    );
+    require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
     require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
     VoteRecord storage voteRecord = voter.referendumVotes[index];
@@ -659,7 +657,7 @@ contract Governance is
    */
   function execute(uint256 proposalId, uint256 index) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndRemoveExpired(
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteIfExpired(
       proposalId,
       index
     );
@@ -904,6 +902,7 @@ contract Governance is
   /**
    * @notice Returns the dequeued proposal IDs.
    * @return The dequeued proposal IDs.
+   * @dev Note that this includes unused indices with proposalId == 0 from deleted proposals.
    */
   function getDequeue() external view returns (uint256[] memory) {
     return dequeued;
@@ -1088,14 +1087,9 @@ contract Governance is
   /**
    * @notice Returns whether or not a dequeued proposal has expired.
    * @param proposalId The ID of the proposal.
-   * @param index The index of the proposal ID in `dequeued`.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function isDequeuedProposalExpired(uint256 proposalId, uint256 index)
-    external
-    view
-    returns (bool)
-  {
+  function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
     return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
 

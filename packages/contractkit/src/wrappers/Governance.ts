@@ -211,10 +211,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns whether a dequeued proposal is expired.
    * @param proposalID Governance proposal UUID
    */
-  async isDequeuedProposalExpired(proposalID: BigNumber.Value) {
-    const index = await this.getDequeueIndex(proposalID)
-    return this.contract.methods.isDequeuedProposalExpired(valueToString(proposalID), index)
-  }
+  isDequeuedProposalExpired: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
+    this.contract.methods.isDequeuedProposalExpired,
+    tupleParser(valueToString)
+  )
 
   /**
    * Returns whether a dequeued proposal is expired.
