@@ -21,6 +21,7 @@ import CalculateFee, {
   PropsWithoutChildren as CalculateFeeProps,
 } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
+import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -31,6 +32,7 @@ import { sendPaymentOrInvite } from 'src/send/actions'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 export interface ConfirmationInput {
@@ -39,6 +41,7 @@ export interface ConfirmationInput {
   reason: string
   recipientAddress?: string | null
   type: TokenTransactionType
+  firebasePendingRequestUid?: string | null
 }
 
 interface StateProps {
@@ -52,11 +55,15 @@ interface StateProps {
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
   fetchDollarBalance: typeof fetchDollarBalance
+  declinePaymentRequest: typeof declinePaymentRequest
+  completePaymentRequest: typeof completePaymentRequest
 }
 
 const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
+  declinePaymentRequest,
+  completePaymentRequest,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -111,8 +118,13 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   sendOrInvite = (inviteMethod?: InviteBy) => {
-    const { amount, reason, recipient, recipientAddress } = this.getConfirmationInput()
-    const { onConfirm } = this.getNavParams()
+    const {
+      amount,
+      reason,
+      recipient,
+      recipientAddress,
+      firebasePendingRequestUid,
+    } = this.getConfirmationInput()
 
     this.props.sendPaymentOrInvite(
       amount,
@@ -120,16 +132,21 @@ class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       inviteMethod,
-      onConfirm
+      firebasePendingRequestUid
     )
   }
 
   onEditClick = () => {
     CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
-    const { onCancel } = this.getNavParams()
-    if (onCancel) {
-      onCancel()
+    navigateBack()
+  }
+
+  onCancelClick = () => {
+    const { firebasePendingRequestUid } = this.getConfirmationInput()
+    if (firebasePendingRequestUid) {
+      this.props.declinePaymentRequest(firebasePendingRequestUid)
     }
+    Logger.showMessage(this.props.t('paymentRequestFlow:requestDeclined'))
     navigateBack()
   }
 
@@ -195,7 +212,7 @@ class SendConfirmation extends React.Component<Props, State> {
         disabled: isPrimaryButtonDisabled,
       }
       secondaryBtnInfo = {
-        action: this.onEditClick,
+        action: this.onCancelClick,
         text: i18n.t('global:decline'),
         disabled: isSending,
       }
