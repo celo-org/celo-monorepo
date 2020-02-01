@@ -443,7 +443,8 @@ contract Governance is
     uint256[] calldata values,
     address[] calldata destinations,
     bytes calldata data,
-    uint256[] calldata dataLengths
+    uint256[] calldata dataLengths,
+    string calldata descriptionUrl
   ) external payable returns (uint256) {
     dequeueProposalsIfReady();
     require(msg.value >= minDeposit, "Too small deposit");
@@ -451,6 +452,7 @@ contract Governance is
     proposalCount = proposalCount.add(1);
     Proposals.Proposal storage proposal = proposals[proposalCount];
     proposal.make(values, destinations, data, dataLengths, msg.sender, msg.value);
+    proposal.setDescriptionUrl(descriptionUrl);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
     emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
@@ -810,7 +812,7 @@ contract Governance is
   function getProposal(uint256 proposalId)
     external
     view
-    returns (address, uint256, uint256, uint256)
+    returns (address, uint256, uint256, uint256, string memory)
   {
     return proposals[proposalId].unpack();
   }

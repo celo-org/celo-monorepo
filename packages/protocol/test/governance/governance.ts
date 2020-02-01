@@ -48,6 +48,7 @@ const parseProposalParams = (proposalParams: any) => {
     deposit: proposalParams[1],
     timestamp: proposalParams[2].toNumber(),
     transactionCount: proposalParams[3].toNumber(),
+    descriptionUrl: proposalParams[4],
   }
 }
 
@@ -103,6 +104,7 @@ contract('Governance', (accounts: string[]) => {
   const expectedParticipationBaseline = multiply(baselineUpdateFactor, participation).plus(
     multiply(fixed1.minus(baselineUpdateFactor), participationBaseline)
   )
+  const descriptionUrl = 'https://descriptionUrl.sample.com'
   let transactionSuccess1: Transaction
   let transactionSuccess2: Transaction
   let transactionFail: Transaction
@@ -727,6 +729,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -740,6 +743,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -753,6 +757,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -765,18 +770,19 @@ contract('Governance', (accounts: string[]) => {
     describe('when making a proposal with zero transactions', () => {
       it('should register the proposal', async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        await governance.propose([], [], [], [], { value: minDeposit })
+        await governance.propose([], [], [], [], descriptionUrl, { value: minDeposit })
         const timestamp = (await web3.eth.getBlock('latest')).timestamp
         const proposal = parseProposalParams(await governance.getProposal(proposalId))
         assert.equal(proposal.proposer, accounts[0])
         assert.equal(proposal.deposit, minDeposit)
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 0)
+        assert.equal(proposal.descriptionUrl, descriptionUrl)
       })
 
       it('should emit the ProposalQueued event', async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        const resp = await governance.propose([], [], [], [], { value: minDeposit })
+        const resp = await governance.propose([], [], [], [], descriptionUrl, { value: minDeposit })
         const timestamp = (await web3.eth.getBlock('latest')).timestamp
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
@@ -801,6 +807,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -810,6 +817,7 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(proposal.deposit, minDeposit)
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 1)
+        assert.equal(proposal.descriptionUrl, descriptionUrl)
       })
 
       it('should register the proposal transactions', async () => {
@@ -819,6 +827,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -839,6 +848,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -856,6 +866,21 @@ contract('Governance', (accounts: string[]) => {
           },
         })
       })
+
+      it('should revert if one tries to make a proposal without description', async () => {
+        await assertRevert(
+          governance.propose.call(
+            [transactionSuccess1.value],
+            [transactionSuccess1.destination],
+            // @ts-ignore bytes type
+            transactionSuccess1.data,
+            [transactionSuccess1.data.length],
+            '',
+            // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+            { value: minDeposit }
+          )
+        )
+      })
     })
 
     describe('when making a proposal with two transactions', () => {
@@ -866,6 +891,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore
           Buffer.concat([transactionSuccess1.data, transactionSuccess2.data]),
           [transactionSuccess1.data.length, transactionSuccess2.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -875,6 +901,7 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(proposal.deposit, minDeposit)
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 2)
+        assert.equal(proposal.descriptionUrl, descriptionUrl)
       })
 
       it('should register the proposal transactions', async () => {
@@ -884,6 +911,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore
           Buffer.concat([transactionSuccess1.data, transactionSuccess2.data]),
           [transactionSuccess1.data.length, transactionSuccess2.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -912,6 +940,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore
           Buffer.concat([transactionSuccess1.data, transactionSuccess2.data]),
           [transactionSuccess1.data.length, transactionSuccess2.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -939,6 +968,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -952,6 +982,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -972,6 +1003,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1021,6 +1053,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -1045,6 +1078,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -1092,6 +1126,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -1128,6 +1163,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -1187,6 +1223,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1293,6 +1330,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1329,6 +1367,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1381,6 +1420,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1400,6 +1440,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1420,6 +1461,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -1469,6 +1511,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1535,6 +1578,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
@@ -1666,6 +1710,7 @@ contract('Governance', (accounts: string[]) => {
             // @ts-ignore bytes type
             transactionSuccess1.data,
             [transactionSuccess1.data.length],
+            descriptionUrl,
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )
@@ -1735,6 +1780,7 @@ contract('Governance', (accounts: string[]) => {
             // @ts-ignore bytes type
             transactionFail.data,
             [transactionFail.data.length],
+            descriptionUrl,
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )
@@ -1759,6 +1805,7 @@ contract('Governance', (accounts: string[]) => {
             // @ts-ignore
             transactionSuccess1.data,
             [transactionSuccess1.data.length],
+            descriptionUrl,
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )
@@ -1785,6 +1832,7 @@ contract('Governance', (accounts: string[]) => {
             // @ts-ignore
             Buffer.concat([transactionSuccess1.data, transactionSuccess2.data]),
             [transactionSuccess1.data.length, transactionSuccess2.data.length],
+            descriptionUrl,
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )
@@ -1852,6 +1900,7 @@ contract('Governance', (accounts: string[]) => {
               // @ts-ignore
               Buffer.concat([transactionSuccess1.data, transactionFail.data]),
               [transactionSuccess1.data.length, transactionFail.data.length],
+              descriptionUrl,
               // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
               { value: minDeposit }
             )
@@ -1876,6 +1925,7 @@ contract('Governance', (accounts: string[]) => {
               // @ts-ignore
               Buffer.concat([transactionFail.data, transactionSuccess1.data]),
               [transactionFail.data.length, transactionSuccess1.data.length],
+              descriptionUrl,
               // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
               { value: minDeposit }
             )
@@ -1902,6 +1952,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -2220,6 +2271,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -2262,6 +2314,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
+          descriptionUrl,
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
@@ -2299,6 +2352,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
+        descriptionUrl,
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
