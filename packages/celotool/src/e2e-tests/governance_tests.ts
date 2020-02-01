@@ -1,6 +1,4 @@
 // tslint:disable: no-console
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
