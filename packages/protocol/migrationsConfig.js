@@ -108,6 +108,7 @@ const DefaultConfig = {
       values: [],
     },
     oracles: [],
+    unfreezeImmediately: true,
   },
   validators: {
     groupLockedGoldRequirements: {
