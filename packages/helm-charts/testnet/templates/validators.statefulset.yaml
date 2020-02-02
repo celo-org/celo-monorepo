@@ -185,6 +185,7 @@ spec:
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
+            --allow-insecure-unlock \
             --metrics \
             ${PING_IP_FROM_PACKET_FLAG} \
             ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
