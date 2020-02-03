@@ -5,8 +5,8 @@ import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 import { getProxiesPerValidator } from './testnet-utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -400,7 +400,7 @@ export async function upgradeStaticIPs(celoEnv: string) {
       try {
         prevProxyCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators-${i}-proxy`)
       } catch (e) {
-        console.log(`Unable to find any previous proxies for validator ${i}`)
+        console.info(`Unable to find any previous proxies for validator ${i}`)
       }
       await upgradeNodeTypeStaticIPs(celoEnv, `validators-${i}-proxy`, prevProxyCount, proxyCount)
     }
@@ -506,7 +506,13 @@ export async function deleteStaticIPs(celoEnv: string) {
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   await Promise.all(range(numValdiators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
-  return
+
+  const proxiesPerValidator = getProxiesPerValidator()
+  for (let valIndex = 0; valIndex < proxiesPerValidator.length; valIndex++) {
+    for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[valIndex]; proxyIndex++) {
+      await deleteIPAddress(`${celoEnv}-validators-${valIndex}-proxy-${proxyIndex}`)
+    }
+  }
 }
 
 export async function deletePersistentVolumeClaims(celoEnv: string) {

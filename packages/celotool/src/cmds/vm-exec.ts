@@ -7,17 +7,12 @@ import {
 } from 'src/lib/env-utils'
 import { getProxiesPerValidator } from 'src/lib/testnet-utils'
 import { execCmd } from 'src/lib/utils'
-import { getNodeVmName, getVmSshCommand } from 'src/lib/vm-testnet-utils'
+import { getNodeVmName, getVmSshCommand, indexCoercer, ProxyIndex } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 
 export const command = 'vm-exec'
 
 export const describe = 'SSH and exec commands on all or individual nodes in a VM-based env'
-
-interface ProxyIndex {
-  validatorIndex: number
-  proxyIndex: number
-}
 
 interface ValidatorsExecArgv extends CeloEnvArgv {
   nodeType: string
@@ -26,27 +21,6 @@ interface ValidatorsExecArgv extends CeloEnvArgv {
   only: number | ProxyIndex
   from: number | ProxyIndex
   to: number | ProxyIndex
-}
-
-function indexCoercer(value: string) {
-  if (!value) {
-    return value
-  }
-  const splitValues = value.split(':').filter((value) => value)
-  // Then it's just a single index number
-  if (splitValues.length == 1) {
-    return parseInt(value, 10)
-  } else if (splitValues.length == 2) {
-    console.log('sup')
-    const parsedValues = splitValues.map((value) => parseInt(value, 10))
-    const proxyIndex: ProxyIndex = {
-      validatorIndex: parsedValues[0],
-      proxyIndex: parsedValues[1],
-    }
-    return proxyIndex
-  } else {
-    throw new Error('Incorrect index')
-  }
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -154,7 +128,7 @@ async function runSshCommand(instanceName: string, cmd: string) {
   return execCmd(fullCmd, {}, false, true)
 }
 
-function getMaxNodeIndex(nodeType: string) {
+function getMaxNodeIndex(nodeType: string): number | ProxyIndex {
   switch (nodeType) {
     case 'validator':
       return parseInt(fetchEnv(envVar.VALIDATORS), 10)
@@ -168,12 +142,12 @@ function getMaxNodeIndex(nodeType: string) {
         return {
           validatorIndex: 0,
           proxyIndex: 0,
-        } as ProxyIndex
+        }
       }
       return {
         validatorIndex: proxiesPerValidator.length - 1,
         proxyIndex: proxiesPerValidator[proxiesPerValidator.length - 1],
-      } as ProxyIndex
+      }
     default:
       throw new Error('Invalid node type')
   }

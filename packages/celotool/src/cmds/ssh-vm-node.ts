@@ -1,5 +1,5 @@
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
-import { getNodeVmName, getVmSshCommand } from 'src/lib/vm-testnet-utils'
+import { getNodeVmName, getVmSshCommand, indexCoercer } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 
 export const command = 'ssh-vm-node <nodeType> [nodeIndex]'
@@ -21,11 +21,11 @@ export const builder = (argv: yargs.Argv) => {
     })
     .positional('nodeIndex', {
       describe: 'Index of the node. Only needed for validator or tx-node',
-      type: 'number',
+      type: 'string',
+      coerce: indexCoercer,
     })
     .check((checkArgv: SshVmNodeArgv) => {
-      const requiresIndex = checkArgv.nodeType === 'validator' || checkArgv.nodeType === 'tx-node'
-      if (requiresIndex && checkArgv.nodeIndex === undefined) {
+      if (checkArgv.nodeType !== 'bootnode' && checkArgv.nodeIndex === undefined) {
         return new Error(`nodeIndex is required for nodeType ${checkArgv.nodeType}`)
       }
       return true

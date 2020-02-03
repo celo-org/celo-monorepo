@@ -1,7 +1,8 @@
 locals {
   attached_disk_name = "celo-data"
   name_prefix        = "${var.celo_env}-${var.name}"
-  names              = length(var.names) > 0 ? var.names : [for node_index in range(var.node_count) : "${var.name}-${node_index}"]
+  # generate names using `var.name` if `var.names` isn't set
+  names = length(var.names) > 0 ? var.names : [for node_index in range(var.node_count) : "${var.name}-${node_index}"]
 }
 
 resource "google_compute_address" "full_node" {
@@ -84,7 +85,7 @@ resource "google_compute_instance" "full_node" {
 }
 
 resource "google_compute_disk" "full_node" {
-  name  = "${var.celo_env}-${each.key}-disk-${random_id.full_node_disk[each.key].hex}"
+  name = "${var.celo_env}-${each.key}-disk-${random_id.full_node_disk[each.key].hex}"
 
   for_each = local.names
 

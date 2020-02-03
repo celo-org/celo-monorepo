@@ -69,7 +69,7 @@ async function helmParameters(celoEnv: string) {
   const proxyPodIds = []
   for (let valIndex = 0; valIndex < proxiesPerValidator.length; valIndex++) {
     for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[valIndex]; proxyIndex++) {
-      proxyPodIds.push(`${celoEnv}-validators-${valIndex}-proxy-${proxyIndex}`)
+      proxyPodIds.push(`${celoEnv}-validator-${valIndex}-proxy-${proxyIndex}`)
     }
   }
 

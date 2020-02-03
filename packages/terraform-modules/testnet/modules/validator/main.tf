@@ -3,8 +3,8 @@
 # proxies, and the rest are exposed to the external internet.
 
 locals {
-  attached_disk_name = "celo-data"
-  name_prefix        = "${var.celo_env}-validator"
+  attached_disk_name      = "celo-data"
+  name_prefix             = "${var.celo_env}-validator"
   proxied_validator_count = length(var.proxies_per_validator)
 }
 

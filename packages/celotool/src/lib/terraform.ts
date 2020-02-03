@@ -97,7 +97,7 @@ async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: 
   for (const match of matches) {
     await untaintResource(moduleName, match)
     // To avoid hitting rate limits
-    await sleep(1000)
+    await sleep(500)
   }
 }
 

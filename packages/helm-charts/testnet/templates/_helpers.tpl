@@ -178,6 +178,8 @@ spec:
             [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
             RID=${BASH_REMATCH[1]}
             {{ if .proxy }}
+            # To allow proxies to scale up easily without conflicting with keys of
+            # proxies associated with other validators
             KEY_INDEX=$(( ({{ .validator_index }} * 10000) + $RID ))
             {{ else }}
             KEY_INDEX=$RID
@@ -232,7 +234,7 @@ spec:
               apiVersion: v1
               fieldPath: status.podIP
         - name: BOOTNODE_IP_ADDRESS
-          value: {{ default "none" .Values.geth.bootnodeIpAddress  }}
+          value: {{ default "none" .Values.geth.bootnodeIpAddress }}
         - name: REPLICA_NAME
           valueFrom:
             fieldRef:
@@ -364,15 +366,15 @@ PROXY_INTERNAL_IP=`eval "echo \\${${PROXY_INTERNAL_IP_ENV_VAR}}"`
 
 # If $PROXY_IPS is not empty, then we use the IPs from there. Otherwise,
 # we use the IP address of the proxy internal service
-if [ ! -z PROXY_IPS ]; then
+if [ ! -z $PROXY_IPS ]; then
   echo "Proxy external IP from PROXY_IPS=$PROXY_IPS: "
   PROXY_EXTERNAL_IP=`echo -n $PROXY_IPS | cut -d '/' -f $((PROXY_INDEX + 1))`
 else
   PROXY_EXTERNAL_IP=$PROXY_INTERNAL_IP
 fi
 
-echo "Proxy internal IP: $PROXY_INTERNAL_IP_ENV_VAR=$PROXY_INTERNAL_IP"
-echo "Proxy external IP: $PROXY_EXTERNAL_IP_ENV_VAR=$PROXY_EXTERNAL_IP"
+echo "Proxy internal IP: $PROXY_INTERNAL_IP"
+echo "Proxy external IP: $PROXY_EXTERNAL_IP"
 
 # Proxy key index to allow for a high number of proxies per validator without overlap
 PROXY_KEY_INDEX=$(( ($RID * 10000) + $PROXY_INDEX ))
@@ -384,4 +386,11 @@ echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"
 echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
 
 PROXY_ENODE_URL_PAIR=$PROXY_INTERNAL_ENODE\;$PROXY_EXTERNAL_ENODE
+{{- end -}}
+
+
+{{- define "celo.proxyipaddresses" -}}
+{{- if .Values.geth.static_ips -}}
+{{- index .Values.geth.proxyIPAddressesPerValidatorArray .validatorIndex -}}
+{{- end -}}
 {{- end -}}

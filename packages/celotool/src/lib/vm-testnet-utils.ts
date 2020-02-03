@@ -27,7 +27,7 @@ import {
 } from './testnet-utils'
 import { execCmd } from './utils'
 
-interface ProxyIndex {
+export interface ProxyIndex {
   validatorIndex: number
   proxyIndex: number
 }
@@ -465,7 +465,6 @@ export async function getNodeVmName(
 ) {
   const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
   const nodeTypesWithNoIndex = ['bootnode']
-
   let instanceName
   if (nodeTypesWithRandomSuffixes.includes(nodeType)) {
     instanceName = await getNodeVmNameWithRandomSuffix(celoEnv, nodeType, index || 0)
@@ -496,4 +495,26 @@ async function getNodeVmNameWithRandomSuffix(
     `gcloud compute instances list --project '${project}' --filter="NAME ~ ${baseName}-.*" --format get\\(NAME\\)`
   )
   return nodeName.trim()
+}
+
+// indexCoercer is a yargs coercer that parses numeric indices and colon-separated
+// indices (<validator index>:<proxy index>) into a ProxyIndex type.
+export function indexCoercer(value: string) {
+  if (!value) {
+    return value
+  }
+  const splitValues = value.split(':').filter((v) => v)
+  // Then it's just a single index number
+  if (splitValues.length === 1) {
+    return parseInt(value, 10)
+  } else if (splitValues.length === 2) {
+    const parsedValues = splitValues.map((v) => parseInt(v, 10))
+    const proxyIndex: ProxyIndex = {
+      validatorIndex: parsedValues[0],
+      proxyIndex: parsedValues[1],
+    }
+    return proxyIndex
+  } else {
+    throw new Error('Incorrect index')
+  }
 }
