@@ -608,6 +608,21 @@ contract('EpochRewards', (accounts: string[]) => {
       await reserve.initialize(registry.address, 60, toFixed(1))
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)
+      const assetAllocationSymbols = [
+        web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
+        web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64),
+      ]
+      const assetAllocationWeights = [
+        new BigNumber(10)
+          .pow(24)
+          .dividedBy(new BigNumber(2))
+          .integerValue(),
+        new BigNumber(10)
+          .pow(24)
+          .dividedBy(new BigNumber(2))
+          .integerValue(),
+      ]
+      await reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights)
     })
 
     describe('reserve ratio of 0.5', () => {
@@ -615,6 +630,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const stableBalance = new BigNumber(2397846127684712867321)
         const goldBalance = stableBalance
           .div(exchangeRate)
+          .div(2)
           .times(0.5)
           .integerValue()
         await mockStableToken.setTotalSupply(stableBalance)
@@ -652,6 +668,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const stableBalance = new BigNumber(2397846127684712867321)
         const goldBalance = stableBalance
           .div(exchangeRate)
+          .div(2)
           .times(1.5)
           .integerValue()
         await mockStableToken.setTotalSupply(stableBalance)
@@ -696,6 +713,7 @@ contract('EpochRewards', (accounts: string[]) => {
         const stableBalance = new BigNumber(2397846127684712867321)
         const goldBalance = stableBalance
           .div(exchangeRate)
+          .div(2)
           .times(2.5)
           .integerValue()
         await mockStableToken.setTotalSupply(stableBalance)
