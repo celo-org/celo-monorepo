@@ -76,6 +76,7 @@ resource "google_compute_instance" "validator" {
       in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : count.index < local.proxied_validator_count ? "" : google_compute_address.validator[count.index - local.proxied_validator_count].address,
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
+      max_light_peers : 20,
       max_peers : 125,
       network_id : var.network_id,
       proxied : count.index < length(var.proxies_per_validator),

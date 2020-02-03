@@ -61,6 +61,7 @@ resource "google_compute_instance" "full_node" {
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
       ip_address : google_compute_address.full_node[each.key].address,
+      max_light_peers : var.max_light_peers,
       max_peers : var.max_peers,
       name : each.key,
       network_id : var.network_id,

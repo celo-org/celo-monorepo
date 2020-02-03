@@ -80,6 +80,12 @@ variable instance_tags {
   default     = []
 }
 
+variable max_light_peers {
+  type        = number
+  description = "The maximum number of light client peers"
+  default     = 50
+}
+
 variable max_peers {
   type        = number
   description = "The maximum number of peers for the node"

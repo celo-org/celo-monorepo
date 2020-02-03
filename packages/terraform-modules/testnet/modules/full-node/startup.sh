@@ -207,7 +207,7 @@ docker run \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
       --lightserv 90 \
-      --lightpeers 1000 \
+      --lightpeers=${max_light_peers} \
       --maxpeers=${max_peers} \
       --rpc \
       --rpcaddr 0.0.0.0 \
