@@ -1,5 +1,9 @@
-import fs from 'fs'
 import { dedup, put } from './util'
+import { Client } from 'pg'
+
+const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
+
+const client = new Client({ database: LEADERBOARD_DATABASE })
 
 /*
 select json_agg(t) from (select distinct on (address, to_address_hash) address, to_address_hash from transactions, claims where from_address_hash = claimed_address) as t \g tr.json
@@ -57,8 +61,11 @@ function relClaims(obj: any, claims: any, _claims1: any) {
   return res
 }
 
-function readClaims() {
-  let claims = JSON.parse(fs.readFileSync('claim.json', 'utf8'))
+async function readClaims() {
+  let claims_json = await client.query(
+    `select json_agg(t) from (select address, claimed_address from claims) t`
+  )
+  let claims = claims_json.rows[0].json_agg
   let obj1: any = {}
   let obj2: any = {}
   function add(key: string, elem: string) {
@@ -83,10 +90,19 @@ function removeNodes(obj: any, nodes: string[]) {
   return res
 }
 
-export function readData() {
-  let tokens = JSON.parse(fs.readFileSync('all_token.json', 'utf8'))
-  let tr = JSON.parse(fs.readFileSync('all_tr.json', 'utf8'))
-  let [claims, claims1] = readClaims()
+export async function readData() {
+  await client.connect()
+  let tokens = (
+    await client.query(
+      `select json_agg(t) from (select distinct on (second_topic, third_topic) decode(substring(second_topic from 27), 'hex') as from, decode(substring(third_topic from 27), 'hex') as to from logs where first_topic = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' order by second_topic, third_topic) as t`
+    )
+  ).rows[0].json_agg
+  let tr = (
+    await client.query(
+      `select json_agg(t) from (select distinct on (from_address_hash, to_address_hash) from_address_hash, to_address_hash from transactions) as t`
+    )
+  ).rows[0].json_agg
+  let [claims, claims1] = await readClaims()
   let obj1: any = {}
   let obj2: any = {}
   function add(key: string, elem: string) {
@@ -111,6 +127,7 @@ export function readData() {
   histogram(relClaims(transitive(obj1), claims, claims1))
   console.log('Entanglements between competitors (other direction, why are these different?)')
   histogram(relClaims(transitive(obj2), claims, claims1))
+  client.end()
 }
 
 /* contract addresses
