@@ -5,7 +5,7 @@ import { TransactionObject, Tx } from 'web3/eth/types'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
-import { CeloProvider } from './providers/celo-provider'
+import { NewCeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { addLocalAccount } from './utils/web3-utils'
 import { Web3ContractCache } from './web3-contract-cache'
@@ -81,10 +81,9 @@ export class ContractKit {
       feeCurrency: null,
       gasInflationFactor: 1.3,
     }
-    if (!(web3.currentProvider instanceof CeloProvider)) {
-      const celoProviderInstance = new CeloProvider(web3.currentProvider)
+    if (!(web3.currentProvider instanceof NewCeloProvider)) {
+      const celoProviderInstance = new NewCeloProvider(web3.currentProvider)
       web3.setProvider(celoProviderInstance)
-      celoProviderInstance.start()
     }
 
     this.registry = new AddressRegistry(this)
@@ -159,6 +158,8 @@ export class ContractKit {
   }
 
   addAccount(privateKey: string) {
+    const provider = this.web3.currentProvider as NewCeloProvider
+    provider.addAccount(privateKey)
     addLocalAccount(this.web3, privateKey)
   }
 
