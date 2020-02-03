@@ -58,6 +58,25 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validator/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deregister.ts)_
 
+### Force-deaffiliate
+
+Force deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member. Used by stake-off admins in order to remove validators from the next epoch's validator set if they are down and consistently unresponsive, in order to preserve the health of the network. This feature will be removed once slashing for downtime is implemented.
+
+```
+USAGE
+  $ celocli validator:force-deaffiliate
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
+  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
+
+EXAMPLE
+  force-deaffiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --validator
+  0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD
+```
+
+_See code: [packages/cli/src/commands/validator/force-deaffiliate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/force-deaffiliate.ts)_
+
 ### List
 
 List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.
@@ -82,13 +101,16 @@ USAGE
 
 OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
-  --blsPop=0x                                        (required) BLS Proof-of-Possession
+  --blsSignature=0x                                  (required) BLS Proof-of-Possession
+  --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
 
 EXAMPLE
-  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --blsKey
+  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey
+  0x049b7291ab8813a095d6b7913a7930ede5ea17466abd5e1a26c6c44f6df9a400a6f474080098b2c752c6c4871978ca977b90dcd3aed92bc9d564
+  137c8dfa14ee72 --blsKey
   0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4
-  db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsPop
+  db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsSignature
   0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900
 ```
 
@@ -124,6 +146,56 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_
+
+### Signed-blocks
+
+Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block.
+
+```
+USAGE
+  $ celocli validator:signed-blocks
+
+OPTIONS
+  --at-block=at-block                                  latest block to examine for sginer activity
+  --lookback=lookback                                  [default: 120] how many blocks to look back for signer activity
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check for signatures
+  --width=width                                        [default: 40] line width for printing marks
+
+EXAMPLES
+  heartbeat --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  heartbeat --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  heartbeat --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  heartbeat --lookback 50 --width 10 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+```
+
+_See code: [packages/cli/src/commands/validator/signed-blocks.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/signed-blocks.ts)_
+
+### Status
+
+Shows the consensus status of a validator. This command will show whether a validator is currently elected, would be elected if an election were to be run right now, and the percentage of blocks signed and number of blocks successfully proposed within a given window.
+
+```
+USAGE
+  $ celocli validator:status
+
+OPTIONS
+  --all                                                   get the status of all registered validators
+
+  --lookback=lookback                                     [default: 100] how many blocks to look back for signer
+                                                          activity
+
+  --no-truncate                                           Don't truncate fields to fit line
+
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
+
+  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the validator to check if elected and validating
+
+EXAMPLES
+  status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  status --all --lookback 100
+```
+
+_See code: [packages/cli/src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
 
 ### Update-bls-public-key
 

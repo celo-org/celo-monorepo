@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   base: {
     opacity: 0.5,
-    animationIterationCount: '3',
+    animationIterationCount: 3,
     animationDuration: `${DURATION}ms`,
     animationFillMode: 'both',
     animationDirection: 'normal',
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   lighting: {
     height: 1000,
     width: '100%',
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationDuration: `${DURATION * 2}ms`,
     animationDelay: `${DURATION}ms`,
     animationFillMode: 'both',

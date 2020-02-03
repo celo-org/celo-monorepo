@@ -3,7 +3,6 @@ import { StyleSheet, Text, TextProps, View, ViewProps } from 'react-native'
 import Responsive from 'src/shared/Responsive'
 import { TextStyles } from 'src/shared/Styles'
 import { fonts, standardStyles } from 'src/styles'
-
 interface Props {
   style?: any
   children?: any
@@ -98,26 +97,44 @@ export const H4 = ({ style, children, tabIndex, accessibilityRole, id }: Props) 
   )
 }
 
+export enum ListType {
+  numeric,
+  alpha,
+  bullet,
+}
+
 interface ViewChildren {
   children: React.ReactNode
 }
 interface TextChildren {
   children: React.ReactNode | string
+  listStyle?: ListType
 }
 
 export function Ul(props: ViewProps & ViewChildren) {
   return (
-    <View style={[styles.ul, props.style]} accessibilityRole={'list'}>
+    <View style={[styles.ul, StyleSheet.flatten(props.style)]} accessibilityRole={'list'}>
       {props.children}
     </View>
   )
 }
 
+function listType(listStyle: ListType) {
+  switch (listStyle) {
+    case ListType.numeric:
+      return styles.numeric
+    case ListType.alpha:
+      return styles.alpha
+    default:
+      return styles.bullet
+  }
+}
+
 export function Li(props: TextProps & TextChildren) {
   const style = StyleSheet.flatten([
-    styles.bullet,
     fonts.p,
     standardStyles.elementalMarginBottom,
+    listType(props.listStyle),
     props.style,
   ])
   return (
@@ -130,6 +147,14 @@ export function Li(props: TextProps & TextChildren) {
 const styles = StyleSheet.create({
   reset: {
     textTransform: 'none',
+  },
+  alpha: {
+    listStyle: 'lower-alpha',
+    display: 'list-item',
+  },
+  numeric: {
+    listStyle: 'decimal',
+    display: 'list-item',
   },
   bullet: {
     listStyle: 'disc',

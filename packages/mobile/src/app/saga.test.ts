@@ -3,15 +3,19 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
 import { getPincode } from 'src/account/saga'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { finishPinVerification, startPinVerification } from 'src/app/actions'
+import { finishPinVerification, openDeepLink, startPinVerification } from 'src/app/actions'
 import {
   checkAppDeprecation,
+  handleDeepLink,
   navigatePinProtected,
   navigateToProperScreen,
   waitForRehydrate,
 } from 'src/app/saga'
+import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { UNLOCK_DURATION } from 'src/geth/consts'
+import { receiveAttestationMessage } from 'src/identity/actions'
+import { CodeInputType } from 'src/identity/verification'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { web3 } from 'src/web3/contracts'
@@ -21,6 +25,8 @@ import { zeroSyncSelector } from 'src/web3/selectors'
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
 }))
+
+jest.mock('src/dappkit/dappkit')
 
 const MockedAnalytics = CeloAnalytics as any
 
@@ -56,14 +62,20 @@ describe('App saga', () => {
 
   it('Version Deprecated', async () => {
     await expectSaga(checkAppDeprecation)
-      .provide([[call(waitForRehydrate), null], [call(isAppVersionDeprecated), true]])
+      .provide([
+        [call(waitForRehydrate), null],
+        [call(isAppVersionDeprecated), true],
+      ])
       .run()
     expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
   })
 
   it('Version Not Deprecated', async () => {
     await expectSaga(checkAppDeprecation)
-      .provide([[call(waitForRehydrate), null], [call(isAppVersionDeprecated), false]])
+      .provide([
+        [call(waitForRehydrate), null],
+        [call(isAppVersionDeprecated), false],
+      ])
       .run()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -89,6 +101,18 @@ describe('App saga', () => {
       .put(finishPinVerification())
       .run()
     expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
+  })
+
+  it('Handles Dappkit deep link', async () => {
+    const deepLink = 'celo://wallet/dappkit?abcdsa'
+    await expectSaga(handleDeepLink, openDeepLink(deepLink)).run()
+    expect(handleDappkitDeepLink).toHaveBeenCalledWith(deepLink)
+  })
+
+  it('Handles verification deep link', async () => {
+    await expectSaga(handleDeepLink, openDeepLink('celo://wallet/v/12345'))
+      .put(receiveAttestationMessage('12345', CodeInputType.DEEP_LINK))
+      .run()
   })
 })
 

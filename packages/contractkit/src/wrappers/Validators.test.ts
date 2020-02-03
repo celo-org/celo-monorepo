@@ -1,4 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
@@ -25,11 +26,14 @@ testWithGanache('Validators Wrapper', (web3) => {
   let validators: ValidatorsWrapper
   let lockedGold: LockedGoldWrapper
 
-  const registerAccountWithLockedGold = async (account: string) => {
+  const registerAccountWithLockedGold = async (
+    account: string,
+    value: string = minLockedGoldValue
+  ) => {
     if (!(await accountsInstance.isAccount(account))) {
       await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     }
-    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: minLockedGoldValue })
+    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value })
   }
 
   beforeAll(async () => {
@@ -39,8 +43,11 @@ testWithGanache('Validators Wrapper', (web3) => {
     accountsInstance = await kit.contracts.getAccounts()
   })
 
-  const setupGroup = async (groupAccount: string) => {
-    await registerAccountWithLockedGold(groupAccount)
+  const setupGroup = async (groupAccount: string, members: number = 1) => {
+    await registerAccountWithLockedGold(
+      groupAccount,
+      new BigNumber(minLockedGoldValue).times(members).toFixed()
+    )
     await (await validators.registerValidatorGroup(new BigNumber(0.1))).sendAndWaitForReceipt({
       from: groupAccount,
     })
@@ -48,12 +55,13 @@ testWithGanache('Validators Wrapper', (web3) => {
 
   const setupValidator = async (validatorAccount: string) => {
     await registerAccountWithLockedGold(validatorAccount)
-    // set account1 as the validator
-    await (await validators
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.web3.eth.sign)
+    await validators
       // @ts-ignore
-      .registerValidator(validatorAccount, blsPublicKey, blsPoP)).sendAndWaitForReceipt({
-      from: validatorAccount,
-    })
+      .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)
+      .sendAndWaitForReceipt({
+        from: validatorAccount,
+      })
   }
 
   test('SBAT registerValidatorGroup', async () => {
@@ -109,7 +117,7 @@ testWithGanache('Validators Wrapper', (web3) => {
 
     beforeEach(async () => {
       groupAccount = accounts[0]
-      await setupGroup(groupAccount)
+      await setupGroup(groupAccount, 2)
 
       validator1 = accounts[1]
       validator2 = accounts[2]
@@ -129,6 +137,8 @@ testWithGanache('Validators Wrapper', (web3) => {
     })
 
     test('move last to first', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator2, 0)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -136,10 +146,13 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
 
     test('move first to last', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator1, 1)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -147,6 +160,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
   })

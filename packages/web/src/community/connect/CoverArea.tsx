@@ -13,6 +13,7 @@ import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 type Props = ScreenProps & I18nProps
+type VoidFunc = () => void
 class CoverArea extends React.PureComponent<Props> {
   render() {
     const { screen, t } = this.props
@@ -25,7 +26,7 @@ class CoverArea extends React.PureComponent<Props> {
           <View style={[standardStyles.centered, styles.aboveFold]}>
             <View style={circleContainerStyle(screen)}>
               <FadeIn duration={0} unmountIfInvisible={true}>
-                {(load) => <FullCircle init={load} />}
+                {(load: VoidFunc) => <FullCircle init={load} lightBackground={false} />}
               </FadeIn>
               {isDesktop && <FourWords screen={screen} />}
             </View>
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     animationDuration: `4s`,
     animationDelay: '3s',
     animationFillMode: 'both',
-    animationIterationCount: '8',
+    animationIterationCount: 8,
     animationKeyframes: [
       {
         '0%': {

@@ -5,6 +5,8 @@ import * as t from 'io-ts'
 import { rootLogger } from './logger'
 
 export enum ErrorMessages {
+  INVALID_SIGNATURE = 'Invalid signature provided',
+  NO_PROVIDER_SETUP = 'No provider was setup for this phone number',
   UNKNOWN_ERROR = 'Something went wrong',
 }
 
@@ -51,9 +53,7 @@ function serializeErrors(errors: t.Errors) {
     const path = error.context.map(({ key }) => key).join('.')
     const value =
       error.message ||
-      `Expected value at path ${path} to be of type ${expectedType.name}, but received ${
-        error.value
-      }`
+      `Expected value at path ${path} to be of type ${expectedType.name}, but received ${error.value}`
 
     // Create recursive payload in case of nested properties
     let payload: any = value

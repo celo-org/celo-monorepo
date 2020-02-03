@@ -2,7 +2,7 @@ const ganache = require('@celo/ganache-cli')
 const glob = require('glob-fs')({
   gitignore: false,
 })
-const { exec } = require('./lib/test-utils')
+const { exec, waitForPortOpen } = require('./lib/test-utils')
 const minimist = require('minimist')
 const network = require('./truffle-config.js').networks.development
 
@@ -11,13 +11,20 @@ const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * s
 // As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
 const isCI = process.env.CI === 'true'
 
+// Migration overrides specifically for unit tests
+const migrationOverrides = {
+  downtimeSlasher: {
+    slashableDowntime: 60, // epoch length is 100 for unit tests
+  },
+}
+
 async function startGanache() {
   const server = ganache.server({
     default_balance_ether: network.defaultBalance,
     network_id: network.network_id,
     mnemonic: network.mnemonic,
     gasPrice: network.gasPrice,
-    gasLimit: 10000000,
+    gasLimit: 20000000,
     allowUnlimitedContractSize: true,
   })
 
@@ -51,9 +58,8 @@ async function test() {
   try {
     const closeGanache = await startGanache()
     if (isCI) {
-      // if we are running on circle ci we need to wait for ganache to be up
-      // TODO(mcortesi): improvement: check for open port instead of a fixed wait time.
-      await sleep(60)
+      // If we are running on circle ci we need to wait for ganache to be up.
+      await waitForPortOpen('localhost', 8545, 60)
     }
 
     let testArgs = ['run', 'truffle', 'test']
@@ -66,12 +72,15 @@ async function test() {
     if (argv.gas) {
       testArgs = testArgs.concat(['--color', '--gas'])
     }
+    // Add test specific migration overrides
+    testArgs = testArgs.concat(['--migration_override', JSON.stringify(migrationOverrides)])
+
     if (argv._.length > 0) {
       const testGlob = argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
       const testFiles = glob.readdirSync(testGlob)
       if (testFiles.length === 0) {
         // tslint:disable-next-line: no-console
-        console.error(`No tests matched with ${argv._}`)
+        console.error(`No test files matched with ${testGlob}`)
         process.exit(1)
       }
       testArgs = testArgs.concat(testFiles)

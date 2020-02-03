@@ -1,35 +1,48 @@
 import { eqAddress } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
-import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
+import { EventLog } from 'web3/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  parseBytes,
   proxyCall,
   proxySend,
-  toBigNumber,
-  toNumber,
+  stringToBytes,
   toTransactionObject,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
 } from './BaseWrapper'
 
 export interface Validator {
+  name: string
   address: Address
   ecdsaPublicKey: string
   blsPublicKey: string
   affiliation: string | null
   score: BigNumber
+  signer: Address
 }
 
 export interface ValidatorGroup {
+  name: string
   address: Address
   members: Address[]
+  membersUpdated: number
   affiliates: Address[]
   commission: BigNumber
+}
+
+export interface ValidatorReward {
+  validator: Validator
+  validatorPayment: BigNumber
+  group: ValidatorGroup
+  groupPayment: BigNumber
+  epochNumber: number
 }
 
 export interface LockedGoldRequirements {
@@ -46,6 +59,11 @@ export interface ValidatorsConfig {
 export interface GroupMembership {
   epoch: number
   group: Address
+}
+
+export interface MembershipHistoryExtraData {
+  lastRemovedFromGroupTimestamp: number
+  tail: number
 }
 
 /**
@@ -66,8 +84,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getValidatorLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getValidatorLockedGoldRequirements().call()
     return {
-      value: toBigNumber(res[0]),
-      duration: toBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
 
@@ -78,10 +96,20 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getGroupLockedGoldRequirements(): Promise<LockedGoldRequirements> {
     const res = await this.contract.methods.getGroupLockedGoldRequirements().call()
     return {
-      value: toBigNumber(res[0]),
-      duration: toBigNumber(res[1]),
+      value: valueToBigNumber(res[0]),
+      duration: valueToBigNumber(res[1]),
     }
   }
+
+  /**
+   * Returns the Locked Gold requirements for specific account.
+   * @returns The Locked Gold requirements for a specific account.
+   */
+  getAccountLockedGoldRequirement = proxyCall(
+    this.contract.methods.getAccountLockedGoldRequirement,
+    undefined,
+    valueToBigNumber
+  )
 
   /**
    * Returns current configuration parameters.
@@ -95,7 +123,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
-      maxGroupSize: toBigNumber(res[2]),
+      maxGroupSize: valueToBigNumber(res[2]),
     }
   }
 
@@ -116,9 +144,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  async signerToAccount(signerAddress: Address) {
+  async signerToAccount(signerAddress: Address, blockNumber?: number) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.signerToAccount(signerAddress)
+    return accounts.signerToAccount(signerAddress, blockNumber)
   }
 
   /**
@@ -135,7 +163,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsPublicKey,
-    tupleParser(parseBytes, parseBytes)
+    tupleParser(stringToBytes, stringToBytes)
   )
 
   /**
@@ -178,34 +206,53 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get Validator information */
-  async getValidator(address: Address): Promise<Validator> {
-    const res = await this.contract.methods.getValidator(address).call()
+  async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    const res = await this.contract.methods.getValidator(address).call({}, blockNumber)
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address, blockNumber)) || ''
+
     return {
+      name,
       address,
-      // @ts-ignore Incorrect type for bytes
-      ecdsaPublicKey: res.ecdsaPublicKey,
-      // @ts-ignore Incorrect type for bytes
-      blsPublicKey: res.blsPublicKey,
+      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
+      blsPublicKey: (res.blsPublicKey as unknown) as string,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
+      signer: res.signer,
     }
   }
 
-  async getValidatorFromSigner(address: Address): Promise<Validator> {
-    const account = await this.signerToAccount(address)
-    return this.getValidator(account)
+  async getValidatorFromSigner(address: Address, blockNumber?: number): Promise<Validator> {
+    const account = await this.signerToAccount(address, blockNumber)
+    return this.getValidator(account, blockNumber)
   }
 
   /** Get ValidatorGroup information */
-  async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
-    const res = await this.contract.methods.getValidatorGroup(address).call()
-    const validators = await this.getRegisteredValidators()
-    const affiliates = validators
-      .filter((v) => v.affiliation === address)
-      .filter((v) => !res[0].includes(v.address))
+  async getValidatorGroup(
+    address: Address,
+    getAffiliates: boolean = true,
+    blockNumber?: number
+  ): Promise<ValidatorGroup> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    const res = await this.contract.methods.getValidatorGroup(address).call({}, blockNumber)
+    const accounts = await this.kit.contracts.getAccounts()
+    const name = (await accounts.getName(address, blockNumber)) || ''
+    let affiliates: Validator[] = []
+    if (getAffiliates) {
+      const validators = await this.getRegisteredValidators(blockNumber)
+      affiliates = validators
+        .filter((v) => v.affiliation === address)
+        .filter((v) => !res[0].includes(v.address))
+    }
     return {
+      name,
       address,
       members: res[0],
+      membersUpdated: res[2].reduce(
+        (a: number, b: BigNumber.Value) => Math.max(a, new BigNumber(b).toNumber()),
+        0
+      ),
       commission: fromFixed(new BigNumber(res[1])),
       affiliates: affiliates.map((v) => v.address),
     }
@@ -220,21 +267,34 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     this.contract.methods.getMembershipHistory,
     undefined,
     (res) =>
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      zip((epoch, group) => ({ epoch: toNumber(epoch), group } as GroupMembership), res[0], res[1])
+      zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
+  )
+
+  /**
+   * Returns extra data from the Validator's group membership history
+   * @param validator The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
+  getValidatorMembershipHistoryExtraData: (
+    validator: Address
+  ) => Promise<MembershipHistoryExtraData> = proxyCall(
+    this.contract.methods.getMembershipHistory,
+    undefined,
+    (res) => ({ lastRemovedFromGroupTimestamp: valueToInt(res[2]), tail: valueToInt(res[3]) })
   )
 
   /** Get the size (amount of members) of a ValidatorGroup */
   getValidatorGroupSize: (group: Address) => Promise<number> = proxyCall(
     this.contract.methods.getGroupNumMembers,
     undefined,
-    toNumber
+    valueToInt
   )
 
   /** Get list of registered validator addresses */
-  getRegisteredValidatorsAddresses: () => Promise<Address[]> = proxyCall(
-    this.contract.methods.getRegisteredValidators
-  )
+  async getRegisteredValidatorsAddresses(blockNumber?: number): Promise<Address[]> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.getRegisteredValidators().call({}, blockNumber)
+  }
 
   /** Get list of registered validator group addresses */
   getRegisteredValidatorGroupsAddresses: () => Promise<Address[]> = proxyCall(
@@ -242,15 +302,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   /** Get list of registered validators */
-  async getRegisteredValidators(): Promise<Validator[]> {
-    const vgAddresses = await this.getRegisteredValidatorsAddresses()
-    return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
+  async getRegisteredValidators(blockNumber?: number): Promise<Validator[]> {
+    const vgAddresses = await this.getRegisteredValidatorsAddresses(blockNumber)
+    return concurrentMap(10, vgAddresses, (addr) => this.getValidator(addr, blockNumber))
   }
 
   /** Get list of registered validator groups */
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
     const vgAddresses = await this.getRegisteredValidatorGroupsAddresses()
-    return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr)))
+    return concurrentMap(10, vgAddresses, (addr) => this.getValidatorGroup(addr, false))
   }
 
   /**
@@ -260,19 +320,26 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    *
    * @param validatorAddress The address that the validator is using for consensus, should match
    *   the validator signer.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. 64 bytes.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
    *   of possession. 48 bytes.
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    */
-  async registerValidator(validatorAddress: Address, blsPublicKey: string, blsPop: string) {
-    const ecdsaPublicKey = await addressToPublicKey(validatorAddress, this.kit.web3.eth.sign)
-    return toTransactionObject(
-      this.kit,
-      // @ts-ignore incorrect typing for bytes type
-      this.contract.methods.registerValidator(ecdsaPublicKey, blsPublicKey, blsPop)
-    )
-  }
+
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
+
+  registerValidator: (
+    ecdsaPublicKey: string,
+    blsPublicKey: string,
+    blsPop: string
+  ) => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.registerValidator,
+    tupleParser(stringToBytes, stringToBytes, stringToBytes)
+  )
 
   /**
    * De-registers a validator, removing it from the group for which it is a member.
@@ -333,6 +400,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
 
+  forceDeaffiliateIfValidator = proxySend(
+    this.kit,
+    this.contract.methods.forceDeaffiliateIfValidator
+  )
+
   /**
    * Adds a member to the end of a validator group's list of members.
    * Fails if `validator` has not set their affiliation to this account.
@@ -378,7 +450,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
     const currentIdx = group.members.indexOf(validator)
     if (currentIdx < 0) {
-      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+      throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
       throw new Error(`Validator is already in position ${newIndex}`)
     }
@@ -396,5 +468,51 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.kit,
       this.contract.methods.reorderMember(validator, nextMember, prevMember)
     )
+  }
+
+  /**
+   * Retrieves ValidatorRewards for epochNumber.
+   * @param epochNumber The epoch to retrieve ValidatorRewards at.
+   */
+  async getValidatorRewards(epochNumber: number): Promise<ValidatorReward[]> {
+    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
+    const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
+      this.getValidator(e.returnValues.validator, blockNumber)
+    )
+    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
+      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
+    )
+    return events.map(
+      (e: EventLog, index: number): ValidatorReward => ({
+        epochNumber,
+        validator: validator[index],
+        validatorPayment: valueToBigNumber(e.returnValues.validatorPayment),
+        group: validatorGroup[index],
+        groupPayment: valueToBigNumber(e.returnValues.groupPayment),
+      })
+    )
+  }
+
+  /**
+   * Returns the current set of validator signer addresses
+   */
+  async currentSignerSet(): Promise<Address[]> {
+    const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
+    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+      this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
+    )
+  }
+
+  /**
+   * Returns the current set of validator signer and account addresses
+   */
+  async currentValidatorAccountsSet() {
+    const signerAddresses = await this.currentSignerSet()
+    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
+    return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
   }
 }

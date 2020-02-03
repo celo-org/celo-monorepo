@@ -1,4 +1,4 @@
-import { CURRENCY_ENUM } from '@celo/utils'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
 import { Currencies } from './blockscout/transfers'
@@ -8,7 +8,6 @@ let database: admin.database.Database
 let registrationsRef: admin.database.Reference
 let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
-let exchangeRatesRef: admin.database.Reference
 
 export interface Registrations {
   [address: string]:
@@ -44,9 +43,8 @@ interface PendingRequests {
 }
 
 interface ExchangeRateObject {
-  makerToken: CURRENCY_ENUM
   exchangeRate: string
-  timestamp: string
+  timestamp: number // timestamp in milliseconds
 }
 
 let registrations: Registrations = {}
@@ -76,7 +74,6 @@ export function initializeDb() {
   registrationsRef = database.ref('/registrations')
   lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
-  exchangeRatesRef = database.ref('/exchangeRates')
 
   // Attach to the registration ref to keep local registrations mapping up to date
   registrationsRef.on(
@@ -149,13 +146,18 @@ export function setPaymentRequestNotified(uid: string): Promise<void> {
 }
 
 export function writeExchangeRatePair(
+  takerToken: CURRENCY_ENUM,
   makerToken: CURRENCY_ENUM,
   exchangeRate: string,
-  timestamp: string
+  timestamp: number
 ) {
-  const exchangeRateRecord: ExchangeRateObject = { makerToken, exchangeRate, timestamp }
-  exchangeRatesRef.push(exchangeRateRecord)
-  console.debug('Recorded exchange rate ', exchangeRateRecord)
+  const pair = `${CURRENCIES[takerToken].code}/${CURRENCIES[makerToken].code}`
+  const exchangeRateRecord: ExchangeRateObject = {
+    exchangeRate,
+    timestamp,
+  }
+  database.ref(`/exchangeRates/${pair}`).push(exchangeRateRecord)
+  console.debug(`Recorded exchange rate for ${pair}`, exchangeRateRecord)
 }
 
 export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {
@@ -191,13 +193,10 @@ export async function sendPaymentNotification(
   )
 }
 
-export async function requestedPaymentNotification(
-  address: string,
-  amount: string,
-  currency: Currencies,
-  data: PaymentRequest
-) {
-  const t = getTranslatorForAddress(address)
+export async function requestedPaymentNotification(uid: string, data: PaymentRequest) {
+  const { requesteeAddress, amount, currency } = data
+  const t = getTranslatorForAddress(requesteeAddress)
+
   data.type = NotificationTypes.PAYMENT_REQUESTED
   return sendNotification(
     t('paymentRequestedTitle'),
@@ -205,8 +204,8 @@ export async function requestedPaymentNotification(
       amount,
       currency: t(currency, { count: parseInt(amount, 10) }),
     }),
-    address,
-    paymentObjectToNotification(data)
+    requesteeAddress,
+    { uid, ...paymentObjectToNotification(data) }
   )
 }
 

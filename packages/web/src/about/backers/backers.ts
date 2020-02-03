@@ -6,35 +6,35 @@ interface Backer {
 const people: Backer[] = [
   {
     name: 'a16z',
-    photo: require('./a16z.png'),
+    photo: require('./a16z.jpg'),
   },
   {
     name: 'Polychain Capital',
-    photo: require('./polychain.png'),
+    photo: require('./polychain.jpg'),
   },
   {
     name: 'General Catalyst',
-    photo: require('./gc.png'),
+    photo: require('./general-catalyst.jpg'),
   },
   {
     name: 'Reid Hoffman',
   },
   {
     name: 'Coinbase',
-    photo: require('./coinbase.png'),
+    photo: require('./coinbase.jpg'),
   },
   {
     name: 'SV Angel',
-    photo: require('./sv-angel.png'),
+    photo: require('./sv-angel.jpg'),
   },
   {
     name: 'Social Capital',
-    photo: require('./social-capital.png'),
+    photo: require('./social-capital.jpg'),
   },
 
   {
     name: 'A.Capital',
-    photo: require('./a-capital-logo.png'),
+    photo: require('./a-capital.jpg'),
   },
   {
     name: 'Dragonfly Capital Partners',
@@ -60,23 +60,27 @@ const people: Backer[] = [
   },
   {
     name: 'Lakestar',
-    photo: require('./lake-star.png'),
+    photo: require('./lake-star.jpg'),
   },
   {
     name: 'Version One',
-    photo: require('./version-one.png'),
+    photo: require('./version-one.jpg'),
   },
   {
     name: 'Greenfield',
-    photo: require('./greenfield-one-dark.png'),
+    photo: require('./greenfield-one.jpg'),
   },
   {
     name: '9yards Capital',
-    photo: require('./9yardscapital.png'),
+    photo: require('./9yardscapital.jpg'),
   },
   {
     name: 'Andromeda Group',
-    photo: require('./andromeda-logo.png'),
+    photo: require('./andromeda.jpg'),
+  },
+  {
+    name: 'Valor',
+    photo: require('./valor.jpg'),
   },
   {
     name: 'Keisuke Honda',
@@ -86,7 +90,7 @@ const people: Backer[] = [
   },
   {
     name: 'Nima Capital',
-    photo: require('./nima.png'),
+    photo: require('./nima.jpg'),
   },
   {
     name: 'Julia Popowitz',
