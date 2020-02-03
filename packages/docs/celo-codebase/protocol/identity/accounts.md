@@ -24,10 +24,18 @@ Loss of an authorized key no longer has catastrophic implications, as the Accoun
 Key rotation for Consensus is a bit trickier. Let's assume that a validator is currently elected, actively signing consensus messages and wants to rotate their validator signer key. What they should do is the following:
 
 - Bring up a new validator node and create a new Validator signer key (VSK) on it.
-- Authorize the new Validator signer key with the Account key to overwrite the old signer key.
+- Authorize the new Validator signer key with the Account key to overwrite the old Validator signer key.
 
 ```bash
-celocli authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer <NEW_VSK_ADDRESS> --signature <PROOF_OF_NEW_VSK_POSSESSION>
+celocli account:authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer <NEW_VSK_ADDRESS> --signature <PROOF_OF_NEW_VSK_POSSESSION>
+```
+
+**This should also update your ECDSA public key automatically.**
+
+- Update your BLS key used for consensus. Rotating both the ECDSA and BLS keys is recommended.
+
+```bash
+celocli validator:update-bls-public-key --from <NEW_VSK_ADDRESS> --blsKey <NEW_BLS_KEY> --blsPop <PROOF_OF_NEW_BLS_KEY_POSSESSION>
 ```
 
 - Your old node will continue to sign consensus messages for the current epoch, but upon the next epoch will find itself no longer authorized.
@@ -35,7 +43,7 @@ celocli authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer <NEW_VS
 
 **Waiting for the epoch to flip before bringing down the retired validator node is essential to zero-downtime rotation when elected.**
 
-Please see the [Running a Validator](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator) section for details on key generation, authorization, and proof of possession.
+Please see the [Running a Validator](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator) section for details on ECDSA and BLS key generation, authorization, and proof of possession.
 
 # Key Security
 
