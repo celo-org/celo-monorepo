@@ -23,29 +23,37 @@ export interface CTA {
 }
 
 function Wrapper({ onPress, children }: { children: React.ReactNode; onPress?: () => unknown }) {
-  return onPress ? <Touchable onPress={onPress}>{children}</Touchable> : <View>{children}</View>
+  return onPress ? (
+    <Touchable style={styles.wrapper} onPress={onPress}>
+      {children}
+    </Touchable>
+  ) : (
+    <View style={styles.wrapper}>{children}</View>
+  )
 }
 
 export default function BaseNotification({ icon, title, children, ctas, onPress }: Props) {
   return (
-    <Wrapper onPress={onPress}>
-      <View style={[styles.container, elevationShadowStyle(2)]}>
-        {icon && <View style={styles.iconArea}>{icon}</View>}
-        <View style={styles.contentArea}>
-          <Text style={fontStyles.bodySmallSecondary}>{title}</Text>
-          <View style={styles.body}>
-            {children}
-            <View style={styles.ctas}>
-              {ctas.map((cta, j) => (
-                <TextButton key={j} style={styles.action} onPress={cta.onPress}>
-                  {cta.text}
-                </TextButton>
-              ))}
+    <View style={[styles.container, elevationShadowStyle(2)]}>
+      <Wrapper onPress={onPress}>
+        <View style={styles.innerContainer}>
+          {icon && <View style={styles.iconArea}>{icon}</View>}
+          <View style={styles.contentArea}>
+            <Text style={fontStyles.bodySmallSecondary}>{title}</Text>
+            <View style={styles.body}>
+              {children}
+              <View style={styles.ctas}>
+                {ctas.map((cta, j) => (
+                  <TextButton key={j} style={styles.action} onPress={cta.onPress}>
+                    {cta.text}
+                  </TextButton>
+                ))}
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </Wrapper>
+      </Wrapper>
+    </View>
   )
 }
 
@@ -63,11 +71,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   container: {
-    padding: contentPadding,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     width: '100%',
     backgroundColor: colors.background,
+  },
+  innerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  wrapper: {
+    padding: contentPadding,
   },
   iconArea: {
     paddingRight: contentPadding,

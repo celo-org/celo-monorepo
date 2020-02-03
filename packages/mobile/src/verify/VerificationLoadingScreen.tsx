@@ -20,7 +20,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import VerificationFailedModal from 'src/verify/VerificationFailedModal'
+import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 
 const TAG = 'VerificationLoadingScreen'
 
@@ -113,7 +113,10 @@ class VerificationLoadingScreen extends React.Component<Props> {
           </View>
           <Carousel containerStyle={styles.carouselContainer} items={items} />
         </ScrollView>
-        <VerificationFailedModal isVisible={verificationStatus === VerificationStatus.Failed} />
+        <VerificationFailedModal
+          verificationStatus={verificationStatus}
+          cancelVerification={this.props.cancelVerification}
+        />
       </SafeAreaView>
     )
   }
