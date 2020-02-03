@@ -2,8 +2,8 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
   assertRevert,
-  jsonRpc,
   getFirstBlockNumberForEpoch,
+  jsonRpc,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
