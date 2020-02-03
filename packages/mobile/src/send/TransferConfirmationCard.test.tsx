@@ -1,10 +1,9 @@
-import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { TokenTransactionType } from 'src/apollo/types'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { createMockStore } from 'test/utils'
 import {
   mockAccount,
@@ -23,11 +22,10 @@ const store = createMockStore({
 describe('TransferConfirmationCard', () => {
   it('renders correctly for verification fee drilldown', () => {
     const props = {
-      type: TransactionTypes.VERIFICATION_FEE,
+      type: TokenTransactionType.VerificationFee,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(0.3),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { value: '-0.3', currencyCode: 'cUSD', localAmount: null },
     }
 
     const tree = renderer.create(
@@ -40,11 +38,10 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for faucet drilldown', () => {
     const props = {
-      type: TransactionTypes.FAUCET,
+      type: TokenTransactionType.Faucet,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
     }
 
     const tree = renderer.create(
@@ -57,11 +54,10 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for received transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.RECEIVED,
+      type: TokenTransactionType.Received,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
     }
@@ -76,11 +72,10 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for received escrow transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.ESCROW_RECEIVED,
+      type: TokenTransactionType.EscrowReceived,
       address: mockAccount,
       comment: '',
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
     }
@@ -95,11 +90,10 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for sent transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.SENT,
+      type: TokenTransactionType.Sent,
       address: mockAccount,
       comment: mockComment,
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
       fee: new BigNumber(0.01),
@@ -115,11 +109,10 @@ describe('TransferConfirmationCard', () => {
 
   it('renders correctly for sent escrow transaction drilldown', () => {
     const props = {
-      type: TransactionTypes.ESCROW_SENT,
+      type: TokenTransactionType.EscrowSent,
       address: mockAccount,
       comment: mockComment,
-      value: new BigNumber(100),
-      currency: CURRENCY_ENUM.DOLLAR,
+      amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
       fee: new BigNumber(0.01),

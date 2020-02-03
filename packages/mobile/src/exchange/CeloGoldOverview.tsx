@@ -51,11 +51,13 @@ export function CeloGoldOverview({ t, testID }: Props) {
           <Text style={fontStyles.semiBold}>{getMoneyDisplayValue(goldBalance)}</Text>
         )}
       </Text>
-      <Text style={styles.localBalance}>
-        {localValue
-          ? t('equalToAmount', { amount: displayLocalCurrency(localValue) })
-          : t('loadingExchangeRate')}
-      </Text>
+      {!!localCurrencyCode && (
+        <Text style={styles.localBalance}>
+          {localValue
+            ? t('equalToAmount', { amount: displayLocalCurrency(localValue) })
+            : t('loadingExchangeRate')}
+        </Text>
+      )}
     </View>
   )
 }

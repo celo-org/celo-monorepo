@@ -36,6 +36,6 @@ export default class Vote extends BaseCommand {
       .proposalInStage(id, 'Referendum')
       .runChecks()
 
-    await displaySendTx('voteTx', await governance.vote(id, voteValue))
+    await displaySendTx('voteTx', await governance.vote(id, voteValue), {}, 'ProposalVoted')
   }
 }
