@@ -3,7 +3,6 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
-import DeviceInfo from 'react-native-device-info'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import VersionCheck from 'react-native-version-check'
@@ -85,30 +84,18 @@ export async function generateLink(inviteCode: string, recipientName: string) {
   const androidPackageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
   const playStoreLink = await VersionCheck.getPlayStoreUrl({ androidPackageName })
   const referrerData = encodeURIComponent(`invite-code=${inviteCode}`)
-  const referrerLink = `${playStoreLink}&referrer=${referrerData}`
+  const playStoreLinkReferrerLink = `${playStoreLink}&referrer=${referrerData}`
 
-  let appStoreUrl
-  try {
-    appStoreUrl = await VersionCheck.getAppStoreUrl()
-  } catch (error) {
-    // can't get App Store url on Android
-    appStoreUrl = 'http://play.google.com/store/apps/details?id=org.celo.mobile.debug'.replace(
-      /\.debug$/g,
-      '.integration'
-    )
-  }
-
-  const iOSBundleId = await DeviceInfo.getBundleId()
+  const iOSBundleId = '1482389446' // This is the id in the url, couldn't figure out a way to get it programatically
+  const appStoreUrl = await VersionCheck.getAppStoreUrl({ appID: iOSBundleId })
 
   const shortUrl = await generateDynamicShortLink(
-    referrerLink,
+    playStoreLinkReferrerLink,
     appStoreUrl,
     androidPackageName,
     iOSBundleId
   )
 
-  Logger.debug(TAG, 'apple store url is :' + appStoreUrl)
-  Logger.debug(TAG, 'generating invite link :' + shortUrl)
   return {
     name: recipientName,
     code: inviteCode,
