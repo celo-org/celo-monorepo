@@ -1,15 +1,21 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import Web3 from 'web3'
-import { getContext, GethTestConfig, sleep } from './utils'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { getContext, sleep } from './utils'
 
 const VALIDATORS = 10
 const EPOCH = 20
 const EPOCHS_TO_WAIT = 3
 const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT
 
+const TMP_PATH = '/tmp/e2e'
+
 describe('governance tests', () => {
-  const gethConfig: GethTestConfig = {
+  const gethConfig: GethRunConfig = {
+    networkId: 1101,
+    network: 'local',
+    runPath: TMP_PATH,
     migrateTo: 16,
     instances: _.range(VALIDATORS).map((i) => ({
       name: `validator${i}`,
