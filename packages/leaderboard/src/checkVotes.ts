@@ -1,4 +1,5 @@
 import { ContractKit } from '@celo/contractkit'
+import BigNumber from 'bignumber.js'
 import { readFromSheet, dedup, put, normalizeAddress } from './util'
 
 readFromSheet(async function(kit: ContractKit, data: any) {
@@ -35,6 +36,7 @@ readFromSheet(async function(kit: ContractKit, data: any) {
     }
   }
   for (let i = epochSize; i < lastBlock; i += epochSize) {
+    // for (let i = 90000; i < 100000; i += epochSize) {
     // Get groups
     // @ts-ignore
     let lst = await election.methods.getEligibleValidatorGroups().call({}, i)
@@ -66,21 +68,36 @@ readFromSheet(async function(kit: ContractKit, data: any) {
       let votes = groupVoters[normalizeAddress(group)]
       if (votes) {
         let unknown = votes.filter((a: string) => {
-          if (badvoters[normalizeAddress(group) + '-' + a]) return false
-          badvoters[normalizeAddress(group) + '-' + a] = true
           return !competitors.includes(a)
         })
         if (unknown.length > 0) {
-          let names = await Promise.all(unknown.map((a: string) => fetchName(a)))
-          let comp_names = await Promise.all(competitors.map((a) => fetchName(a)))
-          console.log(
-            'Unknown voter for group',
-            await fetchName(group),
-            'Voters',
-            names,
-            'should have been',
-            comp_names
+          let print: string[] = await Promise.all(
+            unknown.map(async (a: string) => {
+              // @ts-ignore
+              let amount = await election.methods
+                .getTotalVotesForGroupByAccount(group, a)
+                .call({}, i)
+              // console.log("Amount", amount)
+              let orig = badvoters[normalizeAddress(group) + '-' + a] || new BigNumber(0)
+              let res = orig.plus(amount)
+              badvoters[normalizeAddress(group) + '-' + a] = res
+              if (!orig.gt(new BigNumber(0)) && res.gt(new BigNumber(0))) return a
+              else return ''
+            })
           )
+          print = print.filter((a) => !!a)
+          if (print.length > 0) {
+            let names = await Promise.all(print.map((a: string) => fetchName(a)))
+            let comp_names = await Promise.all(competitors.map((a) => fetchName(a)))
+            console.log(
+              'Unknown voter for group',
+              await fetchName(group),
+              'Voters',
+              names,
+              'should have been',
+              comp_names
+            )
+          }
         }
       }
       if (
@@ -109,4 +126,17 @@ readFromSheet(async function(kit: ContractKit, data: any) {
       }
     }
   }
+  console.log('Voting Summary')
+  let entries: [string, BigNumber][] = Object.entries(badvoters)
+  let lst = await Promise.all(
+    entries
+      .sort(([_1, a], [_2, b]) => a.comparedTo(b))
+      .map(async ([str, am]) => {
+        let [group, address] = str.split('-')
+        return `${await fetchName(address)} voting for ${await fetchName(group)}: ${am.shiftedBy(
+          -18
+        )}`
+      })
+  )
+  lst.forEach((a) => console.log(a))
 })
