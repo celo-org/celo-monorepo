@@ -114,7 +114,6 @@ contract StableToken is
 
     // At network launch, stable token transfers should be frozen.
     frozen = true;
-    setFreezer(msg.sender);
 
     totalSupply_ = 0;
     name_ = _name;
@@ -134,8 +133,9 @@ contract StableToken is
     setRegistry(registryAddress);
   }
 
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
+  function _transferOwnership(address owner) internal {
+    Ownable._transferOwnership(owner);
+    _setFreezer(owner);
   }
 
   /**

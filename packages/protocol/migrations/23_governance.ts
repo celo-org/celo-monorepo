@@ -9,7 +9,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { GovernanceInstance, ReserveInstance, StableTokenInstance } from 'types'
+import { GovernanceInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const approver = require('@celo/protocol/truffle-config.js').networks[networkName].from
@@ -73,12 +73,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'StableToken',
       'Validators',
     ]
-
-    const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
-      'StableToken',
-      artifacts
-    )
-    await stableToken.setFreezer(governance.address)
 
     await Promise.all(
       proxyAndImplementationOwnedByGovernance.map((contractName) =>
