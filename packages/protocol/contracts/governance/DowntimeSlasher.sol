@@ -49,7 +49,13 @@ contract DowntimeSlasher is SlasherUtil {
     pure
     returns (uint256)
   {
-    return blockNumber.add(epochSize).sub(1) / epochSize;
+    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    uint256 epochNumber = blockNumber / epochSize;
+    if (blockNumber % epochSize == 0) {
+      return epochNumber;
+    } else {
+      return epochNumber + 1;
+    }
   }
 
   /**
