@@ -38,6 +38,7 @@ async function failIfSecretMissing(secretName: string, namespace: string) {
 async function copySecret(secretName: string, srcNamespace: string, destNamespace: string) {
   console.info(`Copying secret ${secretName} from namespace ${srcNamespace} to ${destNamespace}`)
   await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} -o yaml |\
+  grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid |\
   kubectl apply --namespace=${destNamespace} -f -`)
 }
 
