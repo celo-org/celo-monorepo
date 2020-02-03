@@ -4,25 +4,26 @@ import { findNodeHandle, StyleSheet, View } from 'react-native'
 import MobileMenu from 'src/brandkit/common/MobileMenu'
 import Sidebar from 'src/brandkit/common/Sidebar'
 import Topbar from 'src/brandkit/common/TopBar'
+import OpenGraph from 'src/header/OpenGraph'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Footer from 'src/shared/Footer.3'
+import Footer from 'src/shared/Footer'
 import menu, { hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles } from 'src/styles'
-
 const FOOTER_ID = 'experience-footer'
 
-const ROOT = menu.BRAND.link
+export const ROOT = menu.BRAND.link
 
-const LOGO_PATH = `${ROOT}/logo`
+export const LOGO_PATH = `${ROOT}/logo`
 
-const COLOR_PATH = `${ROOT}/color`
+export const COLOR_PATH = `${ROOT}/color`
 
-const TYPE_PATH = `${ROOT}/typography`
+export const TYPE_PATH = `${ROOT}/typography`
 
-// const IMAGERY_PATH = `${ROOT}/key-imagery`
-const ICONS_PATH = `${ROOT}/icons`
+export const IMAGERY_PATH = `${ROOT}/key-imagery`
+export const ICONS_PATH = `${ROOT}/icons`
+export const COMPOSITION_PATH = `${ROOT}/composition`
 
 const PAGES = [
   {
@@ -59,20 +60,29 @@ const PAGES = [
     ],
   },
   {
+    title: 'Composition',
+    href: COMPOSITION_PATH,
+
+    sections: [
+      { title: 'Overview', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.overview}` },
+      { title: 'The Grid', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.grid}` },
+    ],
+  },
+  {
     title: 'Icons',
     href: ICONS_PATH,
     sections: [],
   },
-  // {
-  //   title: 'Key Imagery',
-  //   href: IMAGERY_PATH,
+  {
+    title: 'Key Imagery',
+    href: IMAGERY_PATH,
 
-  //   sections: [
-  //     { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
-  //     { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
-  //     { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
-  //   ],
-  // },
+    sections: [
+      { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
+      { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
+      { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
+    ],
+  },
 ]
 
 const THAW_DISTANCE = 600
@@ -90,6 +100,9 @@ interface Section {
 interface Props {
   router: SingletonRouter
   sections: Section[]
+  title: string
+  path: string
+  metaDescription: string
 }
 
 interface State {
@@ -108,8 +121,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
   ratios: Record<string, { id: string; ratio: number; top: number }> = {}
 
   observer: IntersectionObserver
-
-  pageRef = React.createRef<View>()
 
   footer = React.createRef<View>()
 
@@ -204,51 +215,58 @@ class Page extends React.Component<Props & ScreenProps, State> {
   }
 
   render() {
-    const { screen, sections, router } = this.props
+    const { screen, sections, router, path, metaDescription, title } = this.props
     const isMobile = screen === ScreenSizes.MOBILE
     return (
-      <View style={styles.conatiner} ref={this.pageRef}>
-        <View style={styles.topbar}>
-          <Topbar isMobile={isMobile} />
+      <>
+        <OpenGraph
+          title={`Celo Experience / Brand Kit / ${title}`}
+          path={path}
+          description={metaDescription}
+          image={require('src/brandkit/images/ogimage-brandkit.png')}
+        />
+        <View style={styles.conatiner}>
+          <View style={styles.topbar}>
+            <Topbar isMobile={isMobile} />
+          </View>
+          <View style={styles.justNeedSpace} />
+          {isMobile && (
+            <MobileMenu pages={PAGES} pathname={router.pathname} routeHash={this.state.routeHash} />
+          )}
+          <GridRow mobileStyle={styles.mobileMain} desktopStyle={standardStyles.sectionMarginTop}>
+            <Cell span={Spans.fourth} style={styles.sidebar}>
+              {!isMobile && (
+                <Sidebar
+                  pages={PAGES}
+                  currentPathName={router.pathname}
+                  routeHash={this.state.routeHash}
+                  isFlowing={!this.state.isSidebarFrozen}
+                  distance={this.state.distanceToTop}
+                />
+              )}
+            </Cell>
+            <Cell span={Spans.three4th} style={!isMobile && styles.desktopMain}>
+              <View
+                style={[
+                  styles.childrenArea,
+                  screen === ScreenSizes.DESKTOP && styles.childrenAreaDesktop,
+                ]}
+              >
+                {sections.map(({ id, children }) => {
+                  return (
+                    <View key={id} nativeID={id} ref={this.sectionRefs[id]}>
+                      {children}
+                    </View>
+                  )
+                })}
+              </View>
+            </Cell>
+          </GridRow>
+          <View style={styles.footer} nativeID={FOOTER_ID} ref={this.footer}>
+            <Footer />
+          </View>
         </View>
-        <View style={styles.justNeedSpace} />
-        {isMobile && (
-          <MobileMenu pages={PAGES} pathname={router.pathname} routeHash={this.state.routeHash} />
-        )}
-        <GridRow mobileStyle={styles.mobileMain} desktopStyle={standardStyles.sectionMarginTop}>
-          <Cell span={Spans.fourth} style={styles.sidebar}>
-            {!isMobile && (
-              <Sidebar
-                pages={PAGES}
-                currentPathName={router.pathname}
-                routeHash={this.state.routeHash}
-                isFlowing={!this.state.isSidebarFrozen}
-                distance={this.state.distanceToTop}
-              />
-            )}
-          </Cell>
-          <Cell span={Spans.three4th} style={!isMobile && styles.desktopMain}>
-            <View
-              style={[
-                styles.childrenArea,
-                screen === ScreenSizes.DESKTOP && styles.childrenAreaDesktop,
-              ]}
-              ref={this.pageRef}
-            >
-              {sections.map(({ id, children }) => {
-                return (
-                  <View key={id} nativeID={id} ref={this.sectionRefs[id]}>
-                    {children}
-                  </View>
-                )
-              })}
-            </View>
-          </Cell>
-        </GridRow>
-        <View style={styles.footer} nativeID={FOOTER_ID} ref={this.footer}>
-          <Footer />
-        </View>
-      </View>
+      </>
     )
   }
 }

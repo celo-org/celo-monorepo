@@ -1,5 +1,5 @@
 // need to mock this as it expects to be called inside a provider
-jest.mock('src/components/AccountOverview', () => ({ default: () => 'AccountOverviewComponent' }))
+jest.mock('src/exchange/CeloGoldOverview', () => ({ default: () => 'AccountOverviewComponent' }))
 // import * as React from 'react'
 // import { MockedProvider } from 'react-apollo/test-utils'
 import 'react-native'

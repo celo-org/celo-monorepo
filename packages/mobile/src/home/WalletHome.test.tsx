@@ -17,8 +17,8 @@ const storeData = {
   },
 }
 
-jest.mock('src/components/AccountOverview')
-jest.mock('src/home/TransactionsList')
+jest.mock('src/exchange/CeloGoldOverview')
+jest.mock('src/transactions/TransactionsList')
 
 describe('Testnet banner', () => {
   it('Shows testnet banner for 5 seconds', async () => {
@@ -39,7 +39,6 @@ describe('Testnet banner', () => {
           setLoading={jest.fn()}
           showMessage={showMessageMock}
           hideAlert={jest.fn()}
-          importContacts={jest.fn()}
           loading={false}
           appConnected={true}
           address={null}
@@ -66,7 +65,6 @@ describe('Testnet banner', () => {
           setLoading={jest.fn()}
           showMessage={jest.fn()}
           hideAlert={jest.fn()}
-          importContacts={jest.fn()}
           loading={false}
           appConnected={false}
           address={null}
@@ -91,7 +89,6 @@ describe('Testnet banner', () => {
           setLoading={jest.fn()}
           showMessage={jest.fn()}
           hideAlert={jest.fn()}
-          importContacts={jest.fn()}
           loading={false}
           appConnected={true}
           address={null}

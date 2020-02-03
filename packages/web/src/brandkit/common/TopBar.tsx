@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'

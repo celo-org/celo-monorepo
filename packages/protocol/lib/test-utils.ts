@@ -23,6 +23,8 @@ chai.use(chaiSubset)
 
 const assert = chai.assert
 
+// hard coded in ganache
+export const EPOCH = 100
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export function stripHexEncoding(hexString: string) {
@@ -67,6 +69,18 @@ export async function mineBlocks(blocks: number, web3: Web3) {
   }
 }
 
+export async function currentEpochNumber(web3) {
+  const blockNumber = await web3.eth.getBlockNumber()
+  return Math.floor((blockNumber - 1) / EPOCH)
+}
+
+export async function mineToNextEpoch(web3) {
+  const blockNumber = await web3.eth.getBlockNumber()
+  const epochNumber = await currentEpochNumber(web3)
+  const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+  await mineBlocks(blocksUntilNextEpoch, web3)
+}
+
 export async function assertBalance(address: string, balance: BigNumber) {
   const block = await web3.eth.getBlock('latest')
   const web3balance = new BigNumber(await web3.eth.getBalance(address))
@@ -82,14 +96,11 @@ export async function assertBalance(address: string, balance: BigNumber) {
 export async function assertRevert(promise: any, errorMessage: string = '') {
   try {
     await promise
-    assert.fail('Expected revert not received')
+    assert.fail('Expected transaction to revert')
   } catch (error) {
-    const revertFound = error.message.search('revert') >= 0
-    if (errorMessage === '') {
-      assert(revertFound, `Expected "revert", got ${error} instead`)
-    } else {
-      assert(revertFound, errorMessage)
-    }
+    const revertFound = error.message.search('VM Exception while processing transaction: revert') >= 0
+    const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
+    assert(revertFound, msg)
   }
 }
 

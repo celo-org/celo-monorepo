@@ -7,8 +7,8 @@ import Hoverable from 'src/shared/Hoverable'
 import { PlayCircle2 } from 'src/shared/PlayCircle'
 import VideoModal from 'src/shared/VideoModal'
 import { standardStyles, textStyles } from 'src/styles'
-
 import { hasGoodConnection } from 'src/utils/utils'
+
 interface State {
   isHovering: boolean
   supportsVideo: boolean
@@ -56,17 +56,18 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
             muted={true}
             autoPlay={true}
             loop={true}
-            poster="/static/AboutPreview.jpg"
+            poster="/images/AboutPreview.jpg"
           >
             {this.state.supportsVideo && (
               <source
                 src="https://storage.googleapis.com/celo_whitepapers/about-video.mp4"
                 type="video/mp4"
               />
-            )}}
+            )}
+            }
             <Image
               resizeMode="cover"
-              source={{ uri: '/static/AboutPreview.jpg' }}
+              source={{ uri: '/images/AboutPreview.jpg' }}
               style={standardStyles.image}
             />
           </Video>

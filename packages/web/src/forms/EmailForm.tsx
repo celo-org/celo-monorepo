@@ -89,7 +89,6 @@ function EmailForm({
                   text={submitText}
                   kind={BTN.PRIMARY}
                   size={SIZE.fullWidth}
-                  style={styles.submitBtn}
                 />
               </Responsive>
               <Responsive large={styles.feedback}>

@@ -1,7 +1,7 @@
 import { CURRENCY_ENUM as Tokens } from '@celo/utils'
 import { BigNumber } from 'bignumber.js'
 import sleep from 'sleep-promise'
-import { TransactionReceipt } from 'web3/types'
+import { TransactionReceipt } from 'web3-eth'
 import { NETWORK_NAME } from '../contracts/network-name'
 import ContractUtils from '../src/contract-utils-v2'
 import { Logger, LogLevel } from '../src/logger'
@@ -89,10 +89,9 @@ describe('Contract Utils V2', () => {
       const from = getMiner0AccountAddress(NETWORK_NAME)
       const to = getMiner1AccountAddress(NETWORK_NAME)
       const amountInEther = 1
-      const gasPriceInCeloGold: BigNumber = (await ContractUtils.getGasPrice(
-        web3Miner0,
-        Tokens.GOLD
-      )).multipliedBy(5)
+      const gasPriceInCeloGold: BigNumber = (
+        await ContractUtils.getGasPrice(web3Miner0, Tokens.GOLD)
+      ).multipliedBy(5)
       Logger.debug('Send celo gold test', `Gas price in Celo Gold is ${gasPriceInCeloGold}`)
       const gasFees = new BigNumber(250 * 1000)
       await transferGold(

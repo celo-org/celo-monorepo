@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
-import { Namespaces } from 'src/i18n'
+import { declinePaymentRequest } from 'src/firebase/actions'
+import { Namespaces, withTranslation } from 'src/i18n'
 import {
   addressToE164NumberSelector,
   AddressToE164NumberType,
@@ -28,10 +28,10 @@ interface OwnProps {
 }
 
 interface DispatchProps {
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
+  declinePaymentRequest: typeof declinePaymentRequest
 }
 
-type Props = OwnProps & DispatchProps & WithNamespaces & StateProps
+type Props = OwnProps & DispatchProps & WithTranslation & StateProps
 
 interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
@@ -76,7 +76,8 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
 
     return requests.length === 1 ? (
       listItemRenderer({
-        updatePaymentRequestStatus: this.props.updatePaymentRequestStatus,
+        // accessing via this.props.<...> to avoid shadowing
+        declinePaymentRequest: this.props.declinePaymentRequest,
         recipientCache,
       })(requests[0])
     ) : (
@@ -98,7 +99,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  { updatePaymentRequestStatus }
-)(withNamespaces(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  declinePaymentRequest,
+})(withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))

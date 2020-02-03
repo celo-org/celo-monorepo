@@ -11,10 +11,22 @@ export const firebaseAuthorized = () => ({
   type: Actions.AUTHORIZED,
 })
 
-export interface UpdatePaymentRequestStatusAction {
+export interface DeclinePaymentRequestAction {
   type: Actions.PAYMENT_REQUEST_UPDATE_STATUS
+  status: PaymentRequestStatus.DECLINED
   id: string
-  status: PaymentRequestStatus
+}
+
+export interface CompletePaymentRequestAction {
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS
+  status: PaymentRequestStatus.COMPLETED
+  id: string
+}
+
+export interface CancelPaymentRequestAction {
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS
+  status: PaymentRequestStatus.CANCELLED
+  id: string
 }
 
 export interface UpdatePaymentRequestNotifiedAction {
@@ -28,13 +40,22 @@ export interface WritePaymentRequest {
   paymentInfo: PaymentRequest
 }
 
-export const updatePaymentRequestStatus = (
-  id: string,
-  status: PaymentRequestStatus
-): UpdatePaymentRequestStatusAction => ({
+export const declinePaymentRequest = (id: string): DeclinePaymentRequestAction => ({
   type: Actions.PAYMENT_REQUEST_UPDATE_STATUS,
+  status: PaymentRequestStatus.DECLINED,
   id,
-  status,
+})
+
+export const completePaymentRequest = (id: string): CompletePaymentRequestAction => ({
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS,
+  status: PaymentRequestStatus.COMPLETED,
+  id,
+})
+
+export const cancelPaymentRequest = (id: string): CancelPaymentRequestAction => ({
+  type: Actions.PAYMENT_REQUEST_UPDATE_STATUS,
+  status: PaymentRequestStatus.CANCELLED,
+  id,
 })
 
 export const updatePaymentRequestNotified = (

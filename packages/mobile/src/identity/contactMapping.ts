@@ -1,4 +1,5 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { retryAsync } from '@celo/utils/src/async'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { chunk } from 'lodash'
@@ -11,7 +12,9 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   endImportContacts,
   FetchPhoneAddressesAction,
+  incrementImportSyncProgress,
   updateE164PhoneNumberAddresses,
+  updateImportSyncProgress,
 } from 'src/identity/actions'
 import {
   AddressToE164NumberType,
@@ -27,40 +30,15 @@ import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
-const MAPPING_CHUNK_SIZE = 25
-const NUM_PARALLEL_REQUESTS = 3
+const MAPPING_CHUNK_SIZE = 50
+const NUM_PARALLEL_REQUESTS = 1
 
-export function* doImportContacts() {
-  Logger.debug(TAG, 'Importing user contacts')
+export function* doImportContactsWrapper() {
+  yield call(getConnectedAccount)
   try {
-    yield call(getConnectedAccount)
+    Logger.debug(TAG, 'Importing user contacts')
 
-    const result: boolean = yield call(checkContactsPermission)
-
-    if (!result) {
-      return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
-    }
-
-    const contacts: MinimalContact[] = yield call(getAllContacts)
-    if (!contacts || !contacts.length) {
-      return Logger.warn(TAG, 'Empty contacts list. Skipping import.')
-    }
-
-    const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
-    const e164NumberToAddress: E164NumberToAddressType = yield select(e164NumberToAddressSelector)
-    const recipients = contactsToRecipients(contacts, defaultCountryCode, e164NumberToAddress)
-    if (!recipients) {
-      return Logger.warn(TAG, 'No recipients found')
-    }
-    const { e164NumberToRecipients, otherRecipients } = recipients
-
-    yield call(updateUserContact, e164NumberToRecipients)
-
-    // We call this here before we've refreshed the contact mapping
-    //   so that users can see a recipients list asap
-    yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
-
-    yield call(lookupNewRecipients, e164NumberToAddress, e164NumberToRecipients, otherRecipients)
+    yield call(doImportContacts)
 
     Logger.debug(TAG, 'Done importing user contacts')
     yield put(endImportContacts(true))
@@ -69,6 +47,37 @@ export function* doImportContacts() {
     yield put(showError(ErrorMessages.IMPORT_CONTACTS_FAILED))
     yield put(endImportContacts(false))
   }
+}
+
+function* doImportContacts() {
+  const result: boolean = yield call(checkContactsPermission)
+
+  if (!result) {
+    return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+  }
+
+  const contacts: MinimalContact[] = yield call(getAllContacts)
+  if (!contacts || !contacts.length) {
+    return Logger.warn(TAG, 'Empty contacts list. Skipping import.')
+  }
+
+  const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
+  const e164NumberToAddress: E164NumberToAddressType = yield select(e164NumberToAddressSelector)
+  const recipients = contactsToRecipients(contacts, defaultCountryCode, e164NumberToAddress)
+  if (!recipients) {
+    return Logger.warn(TAG, 'No recipients found')
+  }
+  const { e164NumberToRecipients, otherRecipients } = recipients
+
+  yield call(updateUserContact, e164NumberToRecipients)
+
+  // We call this here before we've refreshed the contact mapping
+  //   so that users can see a recipients list asap
+  yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
+
+  yield put(updateImportSyncProgress(0, Object.keys(e164NumberToRecipients).length))
+
+  yield call(lookupNewRecipients, e164NumberToAddress, e164NumberToRecipients, otherRecipients)
 }
 
 // Find the user's contact among those important and save useful bits
@@ -107,7 +116,8 @@ function* lookupNewRecipients(
   // Iterate through all numbers found in recipients and lookup any
   // numbers we haven't checked before
   const newE164Numbers: string[] = []
-  for (const e164Number of Object.keys(e164NumberToRecipients)) {
+  const allE164Numbers = Object.keys(e164NumberToRecipients)
+  for (const e164Number of allE164Numbers) {
     if (e164Number && e164NumberToAddress[e164Number] === undefined) {
       newE164Numbers.push(e164Number)
     }
@@ -117,6 +127,8 @@ function* lookupNewRecipients(
     return Logger.debug(`${TAG}@refreshContactMapping`, 'No new numbers to check')
   }
   Logger.debug(TAG, `Total new recipients found: ${newE164Numbers.length}`)
+
+  yield put(incrementImportSyncProgress(allE164Numbers.length - newE164Numbers.length))
 
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
@@ -170,6 +182,11 @@ async function getAddresses(e164Numbers: string[], attestationsWrapper: Attestat
       addresses.push(null)
     }
   }
+
+  if (!addresses || addresses.length !== e164Numbers.length) {
+    throw new Error('Address lookup length did not match numbers list length')
+  }
+
   return addresses
 }
 
@@ -178,16 +195,16 @@ const isValidAddress = (address: string) =>
 
 export function* fetchAndStoreAddressMappings(
   attestationsWrapper: AttestationsWrapper,
-  e164Numbers: string[]
+  e164Numbers: string[],
+  incrementSyncProgress = true
 ) {
   try {
     Logger.debug(TAG, `Fetch and store address mapping for ${e164Numbers.length} phone numbers`)
 
-    const addresses: Array<string | null> = yield getAddresses(e164Numbers, attestationsWrapper)
-
-    if (!addresses || addresses.length !== e164Numbers.length) {
-      throw new Error('Address lookup length did not match numbers list length')
-    }
+    const addresses: Array<string | null> = yield call(retryAsync, getAddresses, 3, [
+      e164Numbers,
+      attestationsWrapper,
+    ])
 
     Logger.debug(TAG, `Retrieved ${addresses.length} addresses`)
 
@@ -211,8 +228,12 @@ export function* fetchAndStoreAddressMappings(
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
+    if (incrementSyncProgress) {
+      yield put(incrementImportSyncProgress(e164Numbers.length))
+    }
   } catch (error) {
     Logger.error(TAG, `Error fetching addresses for chunk: ${e164Numbers}`, error)
+    throw new Error('Phone number lookup error')
   }
 }
 
@@ -228,7 +249,7 @@ export function* fetchPhoneAddresses(action: FetchPhoneAddressesAction) {
     contractKit.contracts,
     contractKit.contracts.getAttestations,
   ])
-  yield call(fetchAndStoreAddressMappings, attestationsWrapper, e164Numbers)
+  yield call(fetchAndStoreAddressMappings, attestationsWrapper, e164Numbers, false)
 }
 
 export enum RecipientVerificationStatus {

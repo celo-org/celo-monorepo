@@ -8,8 +8,8 @@ export const menuItems = {
     link: '/applications',
   },
   ABOUT_US: {
-    name: 'About Us',
-    link: '/about-us',
+    name: 'About',
+    link: '/about',
   },
   BUILD: {
     name: 'Build',
@@ -78,6 +78,7 @@ export enum CeloLinks {
   tutorial = 'https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client',
   buildWalletDocs = 'https://docs.celo.org/celo-codebase/wallet/intro',
   stakeOffTerms = '/stake-off/terms',
+  youtube = 'https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw',
 }
 
 export const languageOptions = {
@@ -115,7 +116,10 @@ export const hashNav = {
   home: { partnerships: 'partnerships' },
   brandLogo: { overview: 'overview', space: 'space-and-sizing', backgrounds: 'backgrounds' },
   brandColor: { overview: 'overview', backgrounds: 'background-colors' },
-  brandTypography: { overview: 'overview', scale: 'type-scale' },
+  brandComposition: {
+    overview: 'overview',
+    grid: 'grid',
+  },
   brandImagery: {
     overview: 'overview',
     illustrations: 'illustrations',
@@ -124,6 +128,7 @@ export const hashNav = {
   brandIcons: {
     overview: 'overview',
   },
+  brandTypography: { overview: 'overview', scale: 'type-scale' },
 }
 
 export default menuItems

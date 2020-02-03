@@ -1,5 +1,6 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
+import cache from '../server/cache'
 import airtableInit from './airtable'
 
 const ASSSET_FIELD_LIGHT = 'Assets (on light bg)'
@@ -8,11 +9,13 @@ const ASSSET_FIELD_DARK = 'Assets (on dark bg)'
 interface Fields extends FieldSet {
   Name: string
   Description: string
-  [ASSSET_FIELD_LIGHT]: Attachment[]
-  [ASSSET_FIELD_DARK]: Attachment[]
+  [ASSSET_FIELD_LIGHT]?: Attachment[]
+  [ASSSET_FIELD_DARK]?: Attachment[]
+  Preview?: Attachment[]
   Zip: Attachment[]
   Terms: boolean
   Tags: string[]
+  Order: number
 }
 
 enum AssetSheet {
@@ -21,11 +24,15 @@ enum AssetSheet {
   AbstractGraphics = 'Abstract Graphics',
 }
 
-export default function getAssets(sheet: AssetSheet) {
+export default async function getAssets(sheet: AssetSheet) {
+  return cache(`brand-assets-${sheet}`, fetchAssets, { args: sheet, minutes: 10 })
+}
+
+function fetchAssets(sheet: AssetSheet) {
   return getAirtable(sheet)
     .select({
       filterByFormula: `AND(${IS_APROVED}, ${TERMS_SIGNED})`,
-      sort: [{ field: 'Name', direction: 'desc' }],
+      sort: [{ field: 'Order', direction: 'asc' }],
     })
     .all()
     .then((records) => {
@@ -34,7 +41,7 @@ export default function getAssets(sheet: AssetSheet) {
 }
 
 function getAirtable(sheet: AssetSheet): Table<Fields> {
-  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_BRANDKIT_ID)(sheet)
+  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_BRANDKIT_ID)(sheet) as Table<Fields>
 }
 
 const IS_APROVED = 'Approved=1'
@@ -50,7 +57,7 @@ function normalize(asset: Fields) {
 }
 
 function getPreview(asset: Fields) {
-  const previewField = asset[ASSSET_FIELD_LIGHT]
+  const previewField = asset.Preview || asset[ASSSET_FIELD_LIGHT]
 
   return (
     (previewField &&

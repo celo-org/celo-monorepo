@@ -1,5 +1,5 @@
 import throttle from 'lodash.throttle'
-import * as MobileDetect from 'mobile-detect'
+import MobileDetect from 'mobile-detect'
 import * as React from 'react'
 import { Dimensions } from 'react-native'
 import { DESKTOP_BREAKPOINT, TABLET_BREAKPOINT } from 'src/shared/Styles'
@@ -16,7 +16,7 @@ interface State {
 
 const defaultContext = { screen: null }
 
-export const ScreenSizeContext = React.createContext(defaultContext)
+export const ScreenSizeContext = React.createContext<State>(defaultContext)
 
 export class ScreenSizeProvider extends React.PureComponent<{}, State> {
   state = defaultContext
@@ -78,6 +78,11 @@ export function withScreenSize<T>(
       </ScreenSizeContext.Consumer>
     )
   }
+}
+
+export function useScreenSize() {
+  const { screen } = React.useContext(ScreenSizeContext)
+  return screen
 }
 
 // by guessing device type we can have our server rendered content likely be the right size

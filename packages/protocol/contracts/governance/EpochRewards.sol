@@ -142,7 +142,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return True upon success.
    */
   function setTargetVotingGoldFraction(uint256 value) public onlyOwner returns (bool) {
-    require(value != targetVotingGoldFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    require(value != targetVotingGoldFraction.unwrap(), "Target voting gold fraction unchanged");
+    require(
+      value < FixidityLib.fixed1().unwrap(),
+      "Target voting gold fraction cannot be larger than 1"
+    );
     targetVotingGoldFraction = FixidityLib.wrap(value);
     emit TargetVotingGoldFractionSet(value);
     return true;
@@ -162,7 +166,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return True upon success.
    */
   function setTargetValidatorEpochPayment(uint256 value) public onlyOwner returns (bool) {
-    require(value != targetValidatorEpochPayment);
+    require(value != targetValidatorEpochPayment, "Target validator epoch payment unchanged");
     targetValidatorEpochPayment = value;
     emit TargetValidatorEpochPaymentSet(value);
     return true;
@@ -185,7 +189,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     require(
       max != rewardsMultiplierParams.max.unwrap() ||
         overspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.overspend.unwrap() ||
-        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap()
+        underspendAdjustmentFactor != rewardsMultiplierParams.adjustmentFactors.underspend.unwrap(),
+      "Bad rewards multiplier parameters"
     );
     rewardsMultiplierParams = RewardsMultiplierParameters(
       RewardsMultiplierAdjustmentFactors(
@@ -211,7 +216,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
-        adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap()
+        adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap(),
+      "Bad target voting yield parameters"
     );
     targetVotingYieldParams.max = FixidityLib.wrap(max);
     targetVotingYieldParams.adjustmentFactor = FixidityLib.wrap(adjustmentFactor);
@@ -236,7 +242,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       return targetRewards.add(GENESIS_GOLD_SUPPLY);
     } else {
       // TODO(asa): Implement block reward calculation for years 15-30.
-      require(false);
+      require(false, "Implement block reward calculation for years 15-30");
       return 0;
     }
   }
@@ -324,10 +330,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
-    // TODO(asa): Ignore custodial accounts.
-    address reserveAddress = registry.getAddressForOrDie(RESERVE_REGISTRY_ID);
-    uint256 liquidGold = getGoldToken().totalSupply().sub(reserveAddress.balance);
-    // TODO(asa): Should this be active votes?
+    uint256 liquidGold = getGoldToken().totalSupply().sub(getReserve().getReserveGoldBalance());
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }
@@ -373,8 +376,29 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @dev Only called directly by the protocol.
    */
   function updateTargetVotingYield() external onlyWhenNotFrozen {
-    require(msg.sender == address(0));
+    require(msg.sender == address(0), "Only VM can call");
     _updateTargetVotingYield();
+  }
+
+  /**
+   * @notice Determines if the reserve is low enough to demand a diversion from
+   *    the community reward. Targets initial critical ratio of 2 with a linear
+   *    decline until 25 years have passed where the critical ratio will be 1.
+   */
+  function isReserveLow() external view returns (bool) {
+    // critical reserve ratio = 2 - time in second / 25 years
+    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
+    FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
+    FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
+    FixidityLib.Fraction memory criticalRatio;
+    // Don't let the critical reserve ratio go under 1 after 25 years.
+    if (timeSinceInitialization.gte(m)) {
+      criticalRatio = FixidityLib.fixed1();
+    } else {
+      criticalRatio = b.subtract(timeSinceInitialization.divide(m));
+    }
+    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().getReserveRatio());
+    return ratio.lte(criticalRatio);
   }
 
   /**

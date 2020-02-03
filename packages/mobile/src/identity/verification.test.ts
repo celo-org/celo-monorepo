@@ -135,8 +135,8 @@ const mockAttestationsWrapperPartlyVerified = {
 }
 
 const mockAccountsWrapper = {
-  getWalletAddress: jest.fn(() => mockAccount),
-  getDataEncryptionKey: jest.fn(() => [mockPublicDEK]),
+  getWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
+  getDataEncryptionKey: jest.fn(() => Promise.resolve(mockPublicDEK)),
 }
 
 describe('Start Verification Saga', () => {
@@ -147,7 +147,10 @@ describe('Start Verification Saga', () => {
   })
   it('tracks failure', async () => {
     await expectSaga(startVerification)
-      .provide([[call(getConnectedAccount), null], [call(doVerificationFlow), false]])
+      .provide([
+        [call(getConnectedAccount), null],
+        [call(doVerificationFlow), false],
+      ])
       .run()
     expect(MockedAnalytics.track.mock.calls.length).toBe(1)
     expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_failed)
@@ -168,7 +171,10 @@ describe('Start Verification Saga', () => {
 
   it('stops when the user cancels', async () => {
     await expectSaga(startVerification)
-      .provide([[call(getConnectedAccount), null], [call(doVerificationFlow), sleep(1500)]])
+      .provide([
+        [call(getConnectedAccount), null],
+        [call(doVerificationFlow), sleep(1500)],
+      ])
       .dispatch(cancelVerification())
       .run(2000)
     expect(MockedAnalytics.track.mock.calls.length).toBe(1)
@@ -238,7 +244,7 @@ describe('Do Verification Saga', () => {
       .run()
   })
 
-  it('shows errors on failure', async () => {
+  it('shows error on unexpected failure', async () => {
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -253,6 +259,31 @@ describe('Do Verification Saga', () => {
       .put(showError(ErrorMessages.VERIFICATION_FAILURE))
       .put(setVerificationStatus(VerificationStatus.Failed))
       .returns(false)
+      .run()
+  })
+
+  it('shows error on reveal failure', async () => {
+    const mockAttestationsWrapperRevealFailure = {
+      ...mockAttestationsWrapperPartlyVerified,
+      revealPhoneNumberToIssuer: jest.fn(() => {
+        throw new Error('Reveal error')
+      }),
+    }
+
+    await expectSaga(doVerificationFlow)
+      .provide([
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperRevealFailure,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [select(e164NumberSelector), mockE164Number],
+        [select(attestationCodesSelector), attestationCodes],
+      ])
+      .put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
+      .put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
       .run()
   })
 })

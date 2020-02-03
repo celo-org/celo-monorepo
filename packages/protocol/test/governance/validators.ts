@@ -7,7 +7,8 @@ import {
   assertEqualDpBN,
   assertRevert,
   assertSameAddress,
-  mineBlocks,
+  currentEpochNumber,
+  mineToNextEpoch,
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -55,6 +56,8 @@ const parseValidatorGroupParams = (groupParams: any) => {
     members: groupParams[0],
     commission: groupParams[1],
     sizeHistory: groupParams[2],
+    slashingMultiplier: groupParams[3],
+    lastSlashed: groupParams[4],
   }
 }
 
@@ -63,13 +66,12 @@ const parseMembershipHistory = (membershipHistory: any) => {
     epochs: membershipHistory[0],
     groups: membershipHistory[1],
     lastRemovedFromGroupTimestamp: membershipHistory[2],
+    tail: membershipHistory[3],
   }
 }
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
-// Hard coded in ganache.
-const EPOCH = 100
 
 contract('Validators', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
@@ -91,6 +93,7 @@ contract('Validators', (accounts: string[]) => {
     exponent: new BigNumber(5),
     adjustmentSpeed: toFixed(0.25),
   }
+  const slashingMultiplierResetPeriod = 30 * DAY
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
 
@@ -124,6 +127,7 @@ contract('Validators', (accounts: string[]) => {
       validatorScoreParameters.exponent,
       validatorScoreParameters.adjustmentSpeed,
       membershipHistoryLength,
+      slashingMultiplierResetPeriod,
       maxGroupSize
     )
   })
@@ -142,13 +146,16 @@ contract('Validators', (accounts: string[]) => {
     )
   }
 
-  const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+  const registerValidatorGroup = async (group: string, numMembers: number = 1) => {
+    await mockLockedGold.setAccountTotalLockedGold(
+      group,
+      groupLockedGoldRequirements.value.times(numMembers)
+    )
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
   const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
-    await registerValidatorGroup(group)
+    await registerValidatorGroup(group, members.length)
     for (const validator of members) {
       await registerValidator(validator)
       await validators.affiliate(group, { from: validator })
@@ -205,6 +212,7 @@ contract('Validators', (accounts: string[]) => {
           validatorScoreParameters.exponent,
           validatorScoreParameters.adjustmentSpeed,
           membershipHistoryLength,
+          slashingMultiplierResetPeriod,
           maxGroupSize
         )
       )
@@ -555,8 +563,7 @@ contract('Validators', (accounts: string[]) => {
             // @ts-ignore bytes type
             blsPoP
           )
-          const blockNumber = await web3.eth.getBlockNumber()
-          validatorRegistrationEpochNumber = Math.floor(blockNumber / EPOCH)
+          validatorRegistrationEpochNumber = await currentEpochNumber(web3)
         })
 
         it('should mark the account as a validator', async () => {
@@ -774,9 +781,9 @@ contract('Validators', (accounts: string[]) => {
             })
           })
 
-          describe('when it has been `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
+          describe('when it has been less than `validatorLockedGoldRequirements.duration` since the validator was removed from the group', () => {
             beforeEach(async () => {
-              await timeTravel(validatorLockedGoldRequirements.duration.toNumber(), web3)
+              await timeTravel(validatorLockedGoldRequirements.duration.minus(1).toNumber(), web3)
             })
 
             it('should revert', async () => {
@@ -810,7 +817,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the account has a registered validator', () => {
       beforeEach(async () => {
         await registerValidator(validator)
-        registrationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+        registrationEpoch = await currentEpochNumber(web3)
       })
       describe('when affiliating with a registered validator group', () => {
         beforeEach(async () => {
@@ -891,9 +898,9 @@ contract('Validators', (accounts: string[]) => {
                   await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
                     from: group,
                   })
-                  additionEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+                  additionEpoch = await currentEpochNumber(web3)
                   resp = await validators.affiliate(otherGroup)
-                  affiliationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+                  affiliationEpoch = await currentEpochNumber(web3)
                 })
 
                 it('should remove the validator from the group membership list', async () => {
@@ -991,7 +998,7 @@ contract('Validators', (accounts: string[]) => {
     let registrationEpoch: number
     beforeEach(async () => {
       await registerValidator(validator)
-      registrationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+      registrationEpoch = await currentEpochNumber(web3)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
     })
@@ -1021,9 +1028,9 @@ contract('Validators', (accounts: string[]) => {
       let resp: any
       beforeEach(async () => {
         await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
-        additionEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+        additionEpoch = await currentEpochNumber(web3)
         resp = await validators.deaffiliate()
-        deaffiliationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+        deaffiliationEpoch = await currentEpochNumber(web3)
       })
 
       it('should remove the validator from the group membership list', async () => {
@@ -1403,7 +1410,7 @@ contract('Validators', (accounts: string[]) => {
         let registrationEpoch: number
         beforeEach(async () => {
           await registerValidator(validator)
-          registrationEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+          registrationEpoch = await currentEpochNumber(web3)
           await validators.affiliate(group, { from: validator })
         })
 
@@ -1412,7 +1419,7 @@ contract('Validators', (accounts: string[]) => {
             let additionEpoch: number
             beforeEach(async () => {
               resp = await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
-              additionEpoch = Math.floor((await web3.eth.getBlockNumber()) / EPOCH)
+              additionEpoch = await currentEpochNumber(web3)
             })
 
             it('should add the member to the list of members', async () => {
@@ -1518,15 +1525,34 @@ contract('Validators', (accounts: string[]) => {
         })
 
         describe('when the group does not meet the locked gold requirements', () => {
-          beforeEach(async () => {
-            await mockLockedGold.setAccountTotalLockedGold(
-              group,
-              groupLockedGoldRequirements.value.minus(1)
-            )
+          describe('when the group does not have a member', () => {
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.minus(1)
+              )
+            })
+
+            it('should revert', async () => {
+              await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+            })
           })
 
-          it('should revert', async () => {
-            await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+          describe('when the group already has a member', () => {
+            const validator2 = accounts[2]
+            beforeEach(async () => {
+              await mockLockedGold.setAccountTotalLockedGold(
+                group,
+                groupLockedGoldRequirements.value.times(2).minus(1)
+              )
+              await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
+              await registerValidator(validator2)
+              await validators.affiliate(group, { from: validator2 })
+            })
+
+            it('should revert', async () => {
+              await assertRevert(validators.addMember(validator2))
+            })
           })
         })
       })
@@ -1573,8 +1599,7 @@ contract('Validators', (accounts: string[]) => {
       const membershipHistory = parseMembershipHistory(
         await validators.getMembershipHistory(validator)
       )
-      const latestBlock = await web3.eth.getBlock('latest')
-      const expectedEpoch = new BigNumber(Math.floor(latestBlock.number / EPOCH))
+      const expectedEpoch = await currentEpochNumber(web3)
 
       // Depending on test timing, we may or may not span an epoch boundary between registration
       // and removal.
@@ -1588,6 +1613,7 @@ contract('Validators', (accounts: string[]) => {
         assertEqualBN(membershipHistory.epochs[1], expectedEpoch)
         assertSameAddress(membershipHistory.groups[1], NULL_ADDRESS)
       }
+      const latestBlock = await web3.eth.getBlock('latest')
       assert.equal(membershipHistory.lastRemovedFromGroupTimestamp, latestBlock.timestamp)
     })
 
@@ -1863,8 +1889,7 @@ contract('Validators', (accounts: string[]) => {
     let validatorRegistrationEpochNumber: number
     beforeEach(async () => {
       await registerValidator(validator)
-      const blockNumber = await web3.eth.getBlockNumber()
-      validatorRegistrationEpochNumber = Math.floor(blockNumber / EPOCH)
+      validatorRegistrationEpochNumber = await currentEpochNumber(web3)
       for (const group of groups) {
         await registerValidatorGroup(group)
       }
@@ -1877,11 +1902,8 @@ contract('Validators', (accounts: string[]) => {
         const expectedMembershipHistoryGroups = [NULL_ADDRESS]
         const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
         for (let i = 0; i < numTests; i++) {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          await mineBlocks(blocksUntilNextEpoch, web3)
-
+          await mineToNextEpoch(web3)
+          const epochNumber = await currentEpochNumber(web3)
           let group = groups[0]
           await validators.affiliate(group)
           await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
@@ -1916,11 +1938,8 @@ contract('Validators', (accounts: string[]) => {
         const expectedMembershipHistoryGroups = [NULL_ADDRESS]
         const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          await mineBlocks(blocksUntilNextEpoch, web3)
-
+          await mineToNextEpoch(web3)
+          const epochNumber = await currentEpochNumber(web3)
           await validators.affiliate(groups[i])
           await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
             from: groups[i],
@@ -1952,10 +1971,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when changing groups more times than membership history length', () => {
       it('should always return the correct membership for the last epoch', async () => {
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = Math.floor(blockNumber / EPOCH)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          await mineBlocks(blocksUntilNextEpoch, web3)
+          await mineToNextEpoch(web3)
 
           await validators.affiliate(groups[i])
           await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
@@ -2054,9 +2070,7 @@ contract('Validators', (accounts: string[]) => {
       mockStableToken = await MockStableToken.new()
       await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
       // Fast-forward to the next epoch, so that the getMembershipInLastEpoch(validator) == group
-      const blockNumber = await web3.eth.getBlockNumber()
-      const epochNumber = Math.floor(blockNumber / EPOCH)
-      await mineBlocks((epochNumber + 1) * EPOCH - blockNumber, web3)
+      await mineToNextEpoch(web3)
     })
 
     describe('when the validator score is non-zero', () => {
@@ -2142,7 +2156,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#forceDeaffiliateIfValidator', async () => {
+  describe('#forceDeaffiliateIfValidator', () => {
     const validator = accounts[0]
     const group = accounts[1]
 
@@ -2150,37 +2164,203 @@ contract('Validators', (accounts: string[]) => {
       await registerValidator(validator)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
+      await mockLockedGold.addSlasher(accounts[2])
     })
 
-    describe('when the sender is one of three approved contract addresses', async () => {
-      beforeEach(async () => {
-        await registry.setAddressFor(CeloContractName.DowntimeSlasher, validator)
-        await registry.setAddressFor(CeloContractName.DoubleSigningSlasher, accounts[3])
-        await registry.setAddressFor(CeloContractName.Governance, accounts[4])
-      })
-
-      it('should succeed when the sender is the downtime slasher contract', async () => {
-        await validators.forceDeaffiliateIfValidator(validator)
-        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
-      })
-
-      it('should succeed when the sender is the double signing slasher contract', async () => {
-        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[3] })
-        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
-      })
-
-      it('should succeed when the sender is the governance contract', async () => {
-        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[4] })
+    describe('when the sender is one of the whitelisted slashing addresses', () => {
+      it('should succeed when the account is manually added', async () => {
+        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[2] })
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
         assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
       })
     })
 
-    describe('when the sender is not an approved address', async () => {
+    describe('when the sender is not an approved address', () => {
       it('should revert', async () => {
         await assertRevert(validators.forceDeaffiliateIfValidator(validator))
+      })
+    })
+  })
+
+  describe('#groupMembershipInEpoch', () => {
+    const validator = accounts[0]
+    const groups = accounts.slice(1, -1)
+    const gapSize = 3
+    // Multiple of gapSize
+    const totalEpochs = 24
+    // Stored index on chain
+    let contractIndex = 0
+
+    describe('when the validator is added to different groups with gaps in between epochs', () => {
+      let epochs = []
+
+      beforeEach(async () => {
+        // epochs stores [epochNumber, group] of the corresponding i + 1 indexed entry on chain
+        // i + 1 because registering validators adds a dummy null address as the first entry
+        epochs = []
+        await registerValidator(validator)
+        contractIndex = 1
+        for (const group of groups) {
+          await registerValidatorGroup(group)
+        }
+        // Start at 1 since we can't start with deaffiliate
+        for (let i = 1; i < totalEpochs; i++) {
+          await mineToNextEpoch(web3)
+
+          const epochNumber = await currentEpochNumber(web3)
+          if (i % gapSize === 0) {
+            const group =
+              i % (gapSize * gapSize) !== 0
+                ? groups[Math.floor(i / gapSize) % groups.length]
+                : NULL_ADDRESS
+            contractIndex += 1
+            // Current epochNumber is 1 greater since we just called `mineBlocks`
+            epochs.push([epochNumber + 1, group])
+            // deaffiliate every gapSize^2 entry
+            if (i % (gapSize * gapSize) !== 0) {
+              await validators.affiliate(group)
+              await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+                from: group,
+              })
+            } else {
+              await validators.deaffiliate()
+            }
+          }
+        }
+      })
+
+      it('should correctly get the group address for exact epoch numbers', async () => {
+        for (let i = 0; i < epochs.length; i++) {
+          const group = epochs[i][1]
+          if (epochs.length - i <= membershipHistoryLength.toNumber()) {
+            assert.equal(
+              await validators.groupMembershipInEpoch(validator, epochs[i][0], 1 + i),
+              group
+            )
+          } else {
+            await assertRevert(validators.groupMembershipInEpoch(validator, epochs[i][0], 1 + i))
+          }
+        }
+      })
+
+      describe('when called with various malformed inputs', () => {
+        it('should revert when epochNumber at given index is greater than provided epochNumber', async () => {
+          await assertRevert(
+            validators.groupMembershipInEpoch(
+              validator,
+              epochs[epochs.length - 2][0],
+              contractIndex
+            )
+          )
+        })
+
+        it("should revert when epochNumber fits into a different index's bucket", async () => {
+          await assertRevert(
+            validators.groupMembershipInEpoch(
+              validator,
+              epochs[epochs.length - 1][0],
+              contractIndex - 2
+            )
+          )
+        })
+
+        it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
+          const epochNumber = await currentEpochNumber(web3)
+          await assertRevert(
+            validators.groupMembershipInEpoch(validator, epochNumber + 1, contractIndex)
+          )
+        })
+
+        it('should revert when provided index is greater than greatest index on chain', async () => {
+          const epochNumber = await currentEpochNumber(web3)
+          await assertRevert(
+            validators.groupMembershipInEpoch(validator, epochNumber, contractIndex + 1)
+          )
+        })
+
+        it('should revert when provided index is less than `tail` index on chain', async () => {
+          await assertRevert(
+            validators.groupMembershipInEpoch(
+              validator,
+              epochs[epochs.length - membershipHistoryLength.toNumber() - 1][0],
+              contractIndex - membershipHistoryLength.toNumber()
+            )
+          )
+        })
+      })
+    })
+  })
+
+  describe('#halveSlashingMultiplier', async () => {
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidatorGroup(group)
+    })
+
+    describe('when run from an approved address', async () => {
+      beforeEach(async () => {
+        await mockLockedGold.addSlasher(accounts[2])
+      })
+
+      it('should halve the slashing multiplier of a group', async () => {
+        let multiplier = 1.0
+        for (let i = 0; i < 10; i++) {
+          await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+          multiplier /= 2
+          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+          assertEqualBN(parsedGroup.slashingMultiplier, toFixed(multiplier))
+        }
+      })
+
+      it('should update `lastSlashed timestamp', async () => {
+        let parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        const initialTimestamp = parsedGroup.lastSlashed
+        await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+        parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assert(parsedGroup.lastSlashed > initialTimestamp)
+      })
+    })
+  })
+
+  describe('#resetSlashingMultiplier', async () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+
+    beforeEach(async () => {
+      await registerValidator(validator)
+      await registerValidatorGroup(group)
+      await validators.affiliate(group)
+      await mockLockedGold.addSlasher(accounts[2])
+      await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+      const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+      assertEqualBN(parsedGroup.slashingMultiplier, toFixed(0.5))
+    })
+
+    describe('when the slashing multiplier is reset after reset period', async () => {
+      it('should return to default 1.0', async () => {
+        await timeTravel(slashingMultiplierResetPeriod, web3)
+        await validators.resetSlashingMultiplier({ from: group })
+        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(1))
+      })
+    })
+
+    describe('when the slashing multiplier is reset before reset period', async () => {
+      it('should revert', async () => {
+        await timeTravel(slashingMultiplierResetPeriod - 10, web3)
+        await assertRevert(validators.resetSlashingMultiplier({ from: group }))
+      })
+    })
+
+    describe('when the slashing reset period is changed', async () => {
+      it('should be read properly', async () => {
+        const newPeriod = 60 * 60 * 24 * 10 // 10 days
+        await validators.setSlashingMultiplierResetPeriod(newPeriod)
+        await timeTravel(newPeriod, web3)
+        await validators.resetSlashingMultiplier({ from: group })
+        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.slashingMultiplier, toFixed(1))
       })
     })
   })

@@ -169,7 +169,10 @@ contract('IntegerSortedLinkedListTest', () => {
       const expectedPopped = Array.from(Array(numElements + 1).keys())
         .filter((x) => x > numElements - n)
         .reverse()
-      assert.deepEqual(popped.map((x) => x.toNumber()), expectedPopped)
+      assert.deepEqual(
+        popped.map((x) => x.toNumber()),
+        expectedPopped
+      )
     })
 
     it('should decrement numElements', async () => {
