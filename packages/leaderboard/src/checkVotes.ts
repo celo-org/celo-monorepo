@@ -1,12 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import { readFromSheet, dedup, put, normalizeAddress } from './util'
 
-/*
-function findCommon(a: string[], b: string[]) {
-  return dedup(a.filter((el) => b.includes(el)).concat(b.filter((el) => a.includes(el))))
-}
-*/
-
 readFromSheet(async function(kit: ContractKit, data: any) {
   console.log('========= CUT HERE')
   // First, get all voters
