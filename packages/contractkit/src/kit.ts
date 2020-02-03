@@ -5,6 +5,7 @@ import { TransactionObject, Tx } from 'web3/eth/types'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
+import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { addLocalAccount } from './utils/web3-utils'
 import { Web3ContractCache } from './web3-contract-cache'
@@ -34,6 +35,9 @@ export function newKit(url: string) {
  * @param web3 Web3 instance
  */
 export function newKitFromWeb3(web3: Web3) {
+  if (!web3.currentProvider) {
+    throw new Error('Must have a valid Provider')
+  }
   return new ContractKit(web3)
 }
 
@@ -76,6 +80,11 @@ export class ContractKit {
     this.config = {
       feeCurrency: null,
       gasInflationFactor: 1.3,
+    }
+    if (!(web3.currentProvider instanceof CeloProvider)) {
+      const celoProviderInstance = new CeloProvider(web3.currentProvider)
+      web3.setProvider(celoProviderInstance)
+      celoProviderInstance.start()
     }
 
     this.registry = new AddressRegistry(this)
@@ -269,5 +278,14 @@ export class ContractKit {
     const epochSize = await validators.getEpochSize()
     // Reverses protocol/contracts getEpochNumber()
     return (epochNumber + 1) * epochSize.toNumber()
+  }
+
+  stop() {
+    // This should be true except that the user actively decide to change the web3 provider
+    // after creating the kit
+    if (this.web3.currentProvider && this.web3.currentProvider.hasOwnProperty('stop')) {
+      // @ts-ignore
+      this.web3.currentProvider.stop()
+    }
   }
 }

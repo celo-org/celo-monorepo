@@ -16,6 +16,10 @@ const DefaultGasLimit = 90000
 // TODO(nategraf): Provide a method of fecthing the gateway fee value from the full-node peer.
 const DefaultGatewayFee = new BigNumber(10000)
 
+// This is a fake initial privateKey needed by PrivateKeyWalletSubprovider, but never used the way it should,
+// we are over-riding the way to retrieve the accounts
+const DummyPrivateKey: string = 'F2F48EE19680706196E2E339E5DA3491186E0C4C5030670656B0E0164837257D'
+
 function getPrivateKeyWithout0xPrefix(privateKey: string) {
   return privateKey.toLowerCase().startsWith('0x') ? privateKey.substring(2) : privateKey
 }
@@ -48,10 +52,8 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   private chainId: number | null = null
   private gatewayFeeRecipient: string | null = null
 
-  constructor(readonly privateKey: string) {
-    // This won't accept a privateKey with 0x prefix and will call that an invalid key.
-    super(getPrivateKeyWithout0xPrefix(privateKey))
-    this.addAccount(privateKey)
+  constructor() {
+    super(DummyPrivateKey)
   }
 
   public addAccount(privateKey: string) {
@@ -148,7 +150,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   }
 
   private canSign(from: string): boolean {
-    return this.accountAddressToPrivateKey.has(from.toLocaleLowerCase())
+    return from ? this.accountAddressToPrivateKey.has(from.toLocaleLowerCase()) : false
   }
 
   private getPrivateKeyFor(account: string): string {
