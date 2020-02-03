@@ -70,7 +70,6 @@ async function helmParameters(
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
     `--set blockscout.replicas=${fetchEnv('BLOCKSCOUT_WEB_REPLICAS')}`,
     `--set blockscout.subnetwork="${fetchEnvOrFallback('BLOCKSCOUT_SUBNETWORK_NAME', celoEnv)}"`,
-    `--set blockscout.chain_spec_path="${fetchEnvOrFallback('BLOCKSCOUT_CHAIN_SPEC_PATH', '')}"`,
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
   ]
@@ -122,7 +121,7 @@ spec:
 }
 
 export async function switchIngressService(celoEnv: string, ingressName: string) {
-  const command = `kubectl patch --namespace=${celoEnv} ing/berlintestnet001-blockscout-web-ingress --type=json\
+  const command = `kubectl patch --namespace=${celoEnv} ing/${celoEnv}-blockscout-web-ingress --type=json\
    -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"${ingressName}-web"}]'`
   await execCmdWithExitOnFailure(command)
 }
