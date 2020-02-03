@@ -45,7 +45,7 @@
   "mobileNumber": "Mobile #",
   "walletAddress": "Wallet Address",
   "inviteSMS":
-    "Hi{{name}}! I would like to invite you to join the Celo payments network. Your invite code is: {{code}} You can install the Celo application from the following link: {{link}}",
+    "Hi{{name}}! I'd like to invite you the Celo payments network. Your invite code is: {{code}} You can install the Celo app from this link: {{link}}",
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",

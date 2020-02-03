@@ -86,7 +86,7 @@ export async function generateLink(inviteCode: string, recipientName: string) {
   const referrerData = encodeURIComponent(`invite-code=${inviteCode}`)
   const playStoreLinkReferrerLink = `${playStoreLink}&referrer=${referrerData}`
 
-  const iOSBundleId = '1482389446' // This is the id in the url, couldn't figure out a way to get it programatically
+  const iOSBundleId = '1482389446' // This is the id in the Apple Store URL
   const appStoreUrl = await VersionCheck.getAppStoreUrl({ appID: iOSBundleId })
 
   const shortUrl = await generateDynamicShortLink(
@@ -208,6 +208,7 @@ export function* sendInviteSaga(action: SendInviteAction) {
     yield call(navigate, Screens.WalletHome)
     yield put(sendInviteSuccess())
   } catch (e) {
+    Logger.error(TAG, 'Send invite error: ', e)
     yield put(showError(ErrorMessages.INVITE_FAILED))
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
   }

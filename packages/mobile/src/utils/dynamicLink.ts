@@ -4,24 +4,22 @@ import Logger from 'src/utils/Logger'
 const TAG = 'utils/dynamicLink'
 
 export async function generateDynamicShortLink(
-  url: string,
+  playStoreUrl: string,
   appStoreUrl: string,
   androidPackageName: string,
   iOSBundleId: string
 ): Promise<string> {
   try {
-    // legacy users are using `celo.page.link`, but if we move that domain to the current firebase
-    // those links are gonna break, so better do before a network reset
-    const link = new firebase.links.DynamicLink(appStoreUrl, 'https://celol.page.link')
+    const firebaseLink = new firebase.links.DynamicLink(appStoreUrl, 'https://celol.page.link')
 
-    link.android.setFallbackUrl(url)
-    link.android.setPackageName(androidPackageName)
+    firebaseLink.android.setFallbackUrl(playStoreUrl)
+    firebaseLink.android.setPackageName(androidPackageName)
 
-    link.ios.setFallbackUrl(appStoreUrl)
-    link.ios.setBundleId(iOSBundleId)
+    firebaseLink.ios.setFallbackUrl(appStoreUrl)
+    firebaseLink.ios.setBundleId(iOSBundleId)
 
-    // Please not other parameter than UNGUESSABLE is unsafe
-    const shortUrl = await firebase.links().createShortDynamicLink(link, 'UNGUESSABLE')
+    // Please note other parameter than UNGUESSABLE is unsafe
+    const shortUrl = await firebase.links().createShortDynamicLink(firebaseLink, 'UNGUESSABLE')
     Logger.error(TAG, `dynamic link ${shortUrl}`)
 
     // It is NOT recommended to shorten this link because it
@@ -29,6 +27,6 @@ export async function generateDynamicShortLink(
     return shortUrl
   } catch (error) {
     Logger.error(TAG, 'Failed to shorten invite URL: ' + error.toString())
-    return url
+    return playStoreUrl
   }
 }

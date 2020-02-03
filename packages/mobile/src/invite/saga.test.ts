@@ -226,9 +226,9 @@ describe(generateLink, () => {
     expect(generateDynamicShortLink).toBeCalledTimes(1)
     expect(generateDynamicShortLink).toHaveBeenCalledWith(
       'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores&referrer=invite-code%3D0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-      'http://play.google.com/store/apps/details?id=org.celo.mobile.integration',
+      'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446',
       'org.celo.mobile.alfajores',
-      'org.celo.mobile.debug'
+      '1482389446'
     )
   })
 })
