@@ -26,14 +26,8 @@ contract MockUsingPrecompiles {
   }
 
   function calcEpoch(uint256 blockNumber) internal pure returns (uint256) {
-    uint256 epochSize = 100;
-    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    uint256 epochNumber = blockNumber / epochSize;
-    if (blockNumber % epochSize == 0) {
-      return epochNumber;
-    } else {
-      return epochNumber + 1;
-    }
+    uint256 sz = 100;
+    return (blockNumber - 1) / sz;
   }
 
   function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)

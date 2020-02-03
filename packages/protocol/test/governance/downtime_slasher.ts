@@ -20,16 +20,6 @@ const DowntimeSlasher: TestDowntimeSlasherContract = artifacts.require('TestDown
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
-const EPOCH = 100
-// Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-function getFirstBlockNumberForEpoch(epochNumber: number) {
-  if (epochNumber === 0) {
-    // No first block for epoch 0
-    return 0
-  }
-  return (epochNumber - 1) * EPOCH + 1
-}
-
 // @ts-ignore
 // TODO(mcortesi): Use BN
 DowntimeSlasher.numberFormat = 'BigNumber'
@@ -171,7 +161,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       await slasher.setNumberValidators(2)
       // when epoch-2 changes to epoch-1, the validator to be slashed is down, but our signer number changes
       // another validator is up around the epoch change
-      changeBlock = getFirstBlockNumberForEpoch(epoch - 1) - 3
+      changeBlock = (epoch - 1) * 100 - 3
       async function prepareBlock(bn) {
         const parentEpoch = (await slasher.getEpochNumberOfBlock(bn - 1)).toNumber()
         await slasher.setParentSealBitmap(bn, parentEpoch === epoch - 2 ? bitmap3 : bitmap2)
