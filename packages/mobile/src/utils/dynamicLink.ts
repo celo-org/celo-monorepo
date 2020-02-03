@@ -20,7 +20,6 @@ export async function generateDynamicShortLink(
 
     // Please note other parameter than UNGUESSABLE is unsafe
     const shortUrl = await firebase.links().createShortDynamicLink(firebaseLink, 'UNGUESSABLE')
-    Logger.error(TAG, `dynamic link ${shortUrl}`)
 
     // It is NOT recommended to shorten this link because it
     // can break deep links
