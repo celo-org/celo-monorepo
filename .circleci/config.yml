@@ -56,31 +56,37 @@ commands:
             - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
-      # - run:
-      #     name: Delete @celo dir from node_modules (if its there)
-      #     command: rm -rf ~/app/node_modules/@celo
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       # Deals with yarn install flakiness which can come due to yarnpkg.com being
-      #       # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
-      #       yarn install || yarn install
-      # - run:
-      #     name: Fail if someone forgot to commit "yarn.lock"
-      #     command: |
-      #       if [[ $(git status --porcelain) ]]; then
-      #         echo "There are git differences after running yarn install"
-      #         exit 1
-      #       fi
-      # - when:
-      #     condition: << parameters.rebuild_scrypt >>
-      #     steps:
-      #       - run: npm rebuild scrypt
-      # - save_cache:
-      #     key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      #     paths:
-      #       - node_modules
-      #       - packages/*/node_modules
+      - run: ([[ -e ~/node_modules.tgz ]] && tar -xf ~/node_modules.tgz) || true
+
+      - run:
+          name: Delete @celo dir from node_modules (if its there)
+          command: rm -rf ~/app/node_modules/@celo
+
+      - run:
+          name: Install dependencies
+          command: |
+            # Deals with yarn install flakiness which can come due to yarnpkg.com being
+            # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
+            yarn install || yarn install
+      - run:
+          name: Fail if someone forgot to commit "yarn.lock"
+          command: |
+            if [[ $(git status --porcelain) ]]; then
+              echo "There are git differences after running yarn install"
+              exit 1
+            fi
+      - when:
+          condition: << parameters.rebuild_scrypt >>
+          steps:
+            - run: npm rebuild scrypt
+
+      # Workaround save_cache not supporting globbing for the paths key
+      # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
+      - run: rm -rf ~/node_modules.tgz && tar -czf ~/node_modules.tgz node_modules packages/*/node_modules
+      - save_cache:
+          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/node_modules.tgz
 
 jobs:
   install_dependencies:
@@ -300,42 +306,42 @@ jobs:
       # differ between our macOS executor image and the Docker containers
       - yarn_install:
           rebuild_scrypt: false
-      # - run:
-      #     name: Build mobile dependencies
-      #     command: |
-      #       set -euo pipefail
-      #       yarn build \
-      #         --scope @celo/mobile \
-      #         --include-filtered-dependencies
-      # - run:
-      #     name: Install bundle
-      #     command: |
-      #       set -euo pipefail
-      #       cd packages/mobile
-      #       bundle install
-      # - restore_cache:
-      #     keys:
-      #       - pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
-      #       - pods-wallet-v1-{{ arch }}-{{ .Branch }}-
-      #       - pods-wallet-v1-{{ arch }}-
-      # - run:
-      #     name: Install pods
-      #     command: |
-      #       set -euo pipefail
-      #       cd packages/mobile/ios
-      #       bundle exec pod install
-      # - save_cache:
-      #     key: pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
-      #     paths:
-      #       - packages/mobile/ios/Pods
-      # - run:
-      #     name: Run e2e tests
-      #     command: |
-      #       set -euo pipefail
-      #       cd packages/mobile
-      #       # Create dummy Google services plist
-      #       /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
-      #       yarn run test:e2e:ios
+      - run:
+          name: Build mobile dependencies
+          command: |
+            set -euo pipefail
+            yarn build \
+              --scope @celo/mobile \
+              --include-filtered-dependencies
+      - run:
+          name: Install bundle
+          command: |
+            set -euo pipefail
+            cd packages/mobile
+            bundle install
+      - restore_cache:
+          keys:
+            - pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
+            - pods-wallet-v1-{{ arch }}-{{ .Branch }}-
+            - pods-wallet-v1-{{ arch }}-
+      - run:
+          name: Install pods
+          command: |
+            set -euo pipefail
+            cd packages/mobile/ios
+            bundle exec pod install
+      - save_cache:
+          key: pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
+          paths:
+            - packages/mobile/ios/Pods
+      - run:
+          name: Run e2e tests
+          command: |
+            set -euo pipefail
+            cd packages/mobile
+            # Create dummy Google services plist
+            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
+            yarn run test:e2e:ios
 
   lint-checks:
     <<: *defaults
