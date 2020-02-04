@@ -24,8 +24,8 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
 
   /**
    * @notice Factory function for creating a new release gold contract instance.
-   * @param numReleasePeriods Number of releasing periods.
    * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
+   * @param numReleasePeriods Number of releasing periods.
    * @param releaseStartTime The time (in Unix time) at which point releasing starts.
    * @param releasePeriod Duration (in seconds) of each release period.
    * @param amountReleasedPerPeriod The released gold amound per period.
@@ -33,24 +33,23 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
    * @param beneficiary Address of the beneficiary to whom released tokens are transferred.
    * @param owner Address capable of revoking, setting the liquidity provision
    *              and setting the withdrawal amount.
-   * @param initialDistributionPercentage Percentage of total balance available for distribution.
-   *                                      Number that represents a 24-decimal fraction.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param _canValidate If this schedule's gold can be used for validating.
+   * @param _canVote If this schedule's gold can be used for voting.
    * @return The address of the newly created release gold instance.
    */
   function createReleaseGoldInstance(
-    uint256 numReleasePeriods,
     uint256 releaseCliffTime,
+    uint256 numReleasePeriods,
     uint256 releaseStartTime,
     uint256 releasePeriod,
     uint256 amountReleasedPerPeriod,
     bool revocable,
     address payable beneficiary,
     address payable owner,
-    uint256 initialDistributionPercentage,
     bool subjectToLiquidityProvision,
-    bool _canValidate
+    bool _canValidate,
+    bool _canVote
   ) external onlyOwner returns (address) {
     uint256 releaseGoldAmount = numReleasePeriods.mul(amountReleasedPerPeriod);
     require(
@@ -65,17 +64,17 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
 
     address newReleaseGoldInstance = address(
       new ReleaseGoldInstance(
-        numReleasePeriods,
         releaseCliffTime,
+        numReleasePeriods,
         releaseStartTime,
         releasePeriod,
         amountReleasedPerPeriod,
         revocable,
         beneficiary,
         owner,
-        initialDistributionPercentage,
         subjectToLiquidityProvision,
         _canValidate,
+        _canVote,
         address(registry)
       )
     );

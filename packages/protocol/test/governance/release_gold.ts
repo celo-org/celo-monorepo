@@ -7,7 +7,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/utils/src/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import {
@@ -39,20 +39,28 @@ const authorizationTestDescriptions = {
     me: 'vote signing key',
     subject: 'voteSigner',
   },
+  validating: {
+    me: 'validating signing key',
+    subject: 'validatorSigner',
+  },
+  attestation: {
+    me: 'attestation signing key',
+    subject: 'attestationSigner',
+  },
 }
 
 interface IReleaseGoldInstance {
-  releaseGoldNumPeriods: number
   releaseGoldCliff: number
+  releaseGoldNumPeriods: number
   releaseGoldStartTime: number
   releaseGoldPeriodSec: number
   releasedAmountPerPeriod: BigNumber
   releaseGoldRevocable: boolean
   releaseGoldBeneficiary: string
   releaseGoldOwner: string
-  initialDistributionPercentage: BigNumber
   liquidityProvision: boolean
   canValidate: boolean
+  canVote: boolean
 }
 
 const ReleaseGoldFactory: ReleaseGoldFactoryContract = artifacts.require('ReleaseGoldFactory')
@@ -89,17 +97,17 @@ contract('ReleaseGold', (accounts: string[]) => {
   let registry: RegistryInstance
 
   const releaseGoldDefaultSchedule: IReleaseGoldInstance = {
-    releaseGoldNumPeriods: 4,
     releaseGoldCliff: HOUR,
+    releaseGoldNumPeriods: 4,
     releaseGoldStartTime: null, // to be adjusted on every next run
     releaseGoldPeriodSec: 3 * MONTH,
     releasedAmountPerPeriod: ONE_GOLDTOKEN.div(4),
     releaseGoldRevocable: true,
     releaseGoldBeneficiary: beneficiary,
     releaseGoldOwner: releaseOwner,
-    initialDistributionPercentage: toFixed(100),
     liquidityProvision: false,
-    canValidate: false,
+    canValidate: true,
+    canVote: true,
   }
 
   const createNewReleaseGoldInstanceTx = async (
@@ -109,17 +117,17 @@ contract('ReleaseGold', (accounts: string[]) => {
     releaseGoldSchedule.releaseGoldStartTime =
       (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
     const ReleaseGoldInstanceTx = await releaseGoldFactoryInstance.createReleaseGoldInstance(
-      releaseGoldSchedule.releaseGoldNumPeriods,
       releaseGoldSchedule.releaseGoldCliff,
+      releaseGoldSchedule.releaseGoldNumPeriods,
       releaseGoldSchedule.releaseGoldStartTime,
       releaseGoldSchedule.releaseGoldPeriodSec,
       releaseGoldSchedule.releasedAmountPerPeriod,
       releaseGoldSchedule.releaseGoldRevocable,
       releaseGoldSchedule.releaseGoldBeneficiary,
       releaseGoldSchedule.releaseGoldOwner,
-      releaseGoldSchedule.initialDistributionPercentage,
       releaseGoldSchedule.liquidityProvision,
       releaseGoldSchedule.canValidate,
+      releaseGoldSchedule.canVote,
       { from: owner }
     )
     return ReleaseGoldInstanceTx
@@ -219,17 +227,17 @@ contract('ReleaseGold', (accounts: string[]) => {
         (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
       await assertRevert(
         releaseGoldFactoryInstance.createReleaseGoldInstance(
-          releaseGoldSchedule.releaseGoldNumPeriods,
           releaseGoldSchedule.releaseGoldCliff,
+          releaseGoldSchedule.releaseGoldNumPeriods,
           releaseGoldSchedule.releaseGoldStartTime,
           releaseGoldSchedule.releaseGoldPeriodSec,
           releaseGoldSchedule.releasedAmountPerPeriod,
           releaseGoldSchedule.releaseGoldRevocable,
           releaseGoldSchedule.releaseGoldBeneficiary,
           releaseGoldSchedule.releaseGoldOwner,
-          releaseGoldSchedule.initialDistributionPercentage,
           releaseGoldSchedule.liquidityProvision,
           releaseGoldSchedule.canValidate,
+          releaseGoldSchedule.canVote,
           { from: accounts[5] }
         )
       )
@@ -316,6 +324,11 @@ contract('ReleaseGold', (accounts: string[]) => {
     it('should set releaseOwner to releaseGold instance', async () => {
       const releaseGoldOwner = await releaseGoldInstance.releaseOwner()
       assert.equal(releaseGoldOwner, releaseGoldDefaultSchedule.releaseGoldOwner)
+    })
+
+    it('should set liquidity provision met to true', async () => {
+      const liquidityProvisionMet = await releaseGoldInstance.liquidityProvisionMet()
+      assert.equal(liquidityProvisionMet, true)
     })
 
     it('should have zero total withdrawn on init', async () => {
@@ -809,32 +822,62 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
   })
 
-  Object.keys(authorizationTestDescriptions).forEach((key) => {
-    describe('authorization tests:', () => {
+  describe('#setMaxDistribution', () => {
+    let releaseGoldInstanceAddress: any
+    let releaseGoldInstance: any
+
+    beforeEach(async () => {
+      await createNewReleaseGoldInstanceTx(releaseGoldDefaultSchedule, web3)
+      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary)
+      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
+    })
+
+    describe('when the max distribution is set to 50%', () => {
+      beforeEach(async () => {
+        await releaseGoldInstance.setMaxDistribution(toFixed(0.5), { from: releaseOwner })
+      })
+
+      it('should set max distribution to 0.5 gold', async () => {
+        const maxDistribution = await releaseGoldInstance.maxDistribution()
+        assertEqualBN(maxDistribution, ONE_GOLDTOKEN.div(2))
+      })
+    })
+  })
+
+  describe.only('authorization tests:', () => {
+    Object.keys(authorizationTestDescriptions).forEach((key) => {
       let authorizationTest: any
       let releaseGoldInstanceAddress: any
       let releaseGoldInstance: any
-
-      beforeEach(async () => {
-        await createNewReleaseGoldInstanceTx(releaseGoldDefaultSchedule, web3)
-        releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary)
-        releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
-        await releaseGoldInstance.createAccount({ from: beneficiary })
-
-        authorizationTests.voting = {
-          fn: releaseGoldInstance.authorizeVoteSigner,
-          eventName: 'VoteSignerAuthorized',
-          getAuthorizedFromAccount: accountsInstance.getVoteSigner,
-          authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
-        }
-        authorizationTest = authorizationTests[key]
-      })
+      const authorized = accounts[4] // the account that is to be authorized for whatever role
+      let sig: any
 
       describe(`#authorize${_.upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
-        const authorized = accounts[4] // the account that is to be authorized for whatever role
-        let sig: any
-
         beforeEach(async () => {
+          await createNewReleaseGoldInstanceTx(releaseGoldDefaultSchedule, web3)
+          releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary)
+          releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
+          await releaseGoldInstance.createAccount({ from: beneficiary })
+
+          authorizationTests.voting = {
+            fn: releaseGoldInstance.authorizeVoteSigner,
+            eventName: 'VoteSignerAuthorized',
+            getAuthorizedFromAccount: accountsInstance.getVoteSigner,
+            authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
+          }
+          authorizationTests.validating = {
+            fn: releaseGoldInstance.authorizeValidatorSigner,
+            eventName: 'ValidatorSignerAuthorized',
+            getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
+            authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
+          }
+          authorizationTests.attestation = {
+            fn: releaseGoldInstance.authorizeAttestationSigner,
+            eventName: 'AttestationSignerAuthorized',
+            getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
+            authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
+          }
+          authorizationTest = authorizationTests[key]
           sig = await getParsedSignatureOfAddress(web3, releaseGoldInstance.address, authorized)
         })
 
@@ -1367,6 +1410,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       initialreleaseGoldAmount = releaseGoldSchedule.releasedAmountPerPeriod.multipliedBy(
         releaseGoldSchedule.releaseGoldNumPeriods
       )
+      await releaseGoldInstance.setMaxDistribution(toFixed(1), { from: releaseOwner })
     })
 
     it('should revert before the release cliff has passed', async () => {
@@ -1523,6 +1567,74 @@ contract('ReleaseGold', (accounts: string[]) => {
         } catch (ex) {
           return assert.isTrue(true)
         }
+      })
+    })
+
+    describe('when max distribution is set', () => {
+      let beneficiaryBalanceBefore: any
+      beforeEach(async () => {
+        beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        const timeToTravel = 12 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+      })
+
+      describe('when max distribution is 50%', () => {
+        beforeEach(async () => {
+          await releaseGoldInstance.setMaxDistribution(toFixed(0.5), { from: releaseOwner })
+        })
+
+        it('should allow withdrawal of 50%', async () => {
+          const expectedWithdrawalAmount = initialreleaseGoldAmount.multipliedBy(0.5)
+          await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+
+          assertEqualBN(
+            new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+            expectedWithdrawalAmount
+          )
+        })
+
+        it('should revert on withdrawal of more than 50%', async () => {
+          await assertRevert(
+            releaseGoldInstance.withdraw(initialreleaseGoldAmount, { from: beneficiary })
+          )
+        })
+      })
+
+      describe('when max distribution is 100%', () => {
+        beforeEach(async () => {
+          await releaseGoldInstance.setMaxDistribution(toFixed(1), { from: releaseOwner })
+        })
+
+        it('should allow withdrawal of all gold', async () => {
+          const expectedWithdrawalAmount = initialreleaseGoldAmount
+          await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+
+          assertEqualBN(
+            new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
+            expectedWithdrawalAmount
+          )
+        })
+      })
+    })
+
+    describe('when the liquidity provision is observed and set false', () => {
+      beforeEach(async () => {
+        const timeToTravel = 12 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+        await releaseGoldInstance.setLiquidityProvision(false, { from: releaseOwner })
+      })
+
+      it('should revert on withdraw of any amount', async () => {
+        await assertRevert(
+          releaseGoldInstance.withdraw(initialreleaseGoldAmount.multipliedBy(0.5), {
+            from: beneficiary,
+          })
+        )
+        await assertRevert(
+          releaseGoldInstance.withdraw(initialreleaseGoldAmount, { from: beneficiary })
+        )
       })
     })
   })

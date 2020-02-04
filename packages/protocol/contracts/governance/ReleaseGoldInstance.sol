@@ -50,12 +50,13 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
 
   // Indicates if the schedule contains a liquidity provision that has not yet been met.
   // Only settable by the `releaseOwner` address, subject to grant conditions.
-  // Defaults to true.
   bool public liquidityProvisionMet;
 
   // Indicates if this schedule's unreleased gold can be used for validating.
-  // Defaults to false.
   bool public canValidate;
+
+  // Indicates if this schedule's unreleased gold can be used for voting.
+  bool public canVote;
 
   // Public struct housing params pertaining to releasing gold.
   ReleaseSchedule public releaseSchedule;
@@ -64,6 +65,8 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   RevocationInfo public revocationInfo;
 
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
+  // TODO(lucas): do i need address?
+  event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
 
   modifier onlyReleaseOwner() {
     require(msg.sender == releaseOwner, "Sender must be the registered releaseOwner address");
@@ -85,6 +88,16 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     _;
   }
 
+  modifier onlyCanVote() {
+    require(canVote, "Release Gold contract does not have permission to vote");
+    _;
+  }
+
+  modifier onlyCanValidate() {
+    require(canValidate, "Release Gold contract does not have permission to validate");
+    _;
+  }
+
   modifier onlyReleaseOwnerAndRevoked() {
     require(
       msg.sender == releaseOwner && isRevoked(),
@@ -97,7 +110,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     bool isRevoked = isRevoked();
     require(
       (msg.sender == releaseOwner && isRevoked) || (msg.sender == beneficiary && !isRevoked),
-      "Must be called by releaseOwner in revoked state or beneficiary before revocation"
+      "Must be called by releaseOwner when revoked or beneficiary before revocation"
     );
     _;
   }
@@ -106,8 +119,8 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
 
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
-   * @param numReleasePeriods Number of releasing periods.
    * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
+   * @param numReleasePeriods Number of releasing periods.
    * @param releaseStartTime The time (in Unix time) at which point releasing starts.
    * @param releasePeriod Duration (in seconds) of each release period.
    * @param amountReleasedPerPeriod The released gold amount per period.
@@ -115,24 +128,23 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param _beneficiary Address of the beneficiary to whom released tokens are transferred.
    * @param _releaseOwner Address capable of revoking, setting the liquidity provision
    *              and setting the withdrawal amount.
-   * @param initialDistributionPercentage Percentage of total balance available for distribution.
-   *                                      Number that represents a 24-decimal fraction.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param _canValidate If this schedule's gold can be used for validating.
+   * @param _canVote If this schedule's gold can be used for voting.
    * @param registryAddress Address of the deployed contracts registry.
    */
   constructor(
-    uint256 numReleasePeriods,
     uint256 releaseCliffTime,
+    uint256 numReleasePeriods,
     uint256 releaseStartTime,
     uint256 releasePeriod,
     uint256 amountReleasedPerPeriod,
     bool revocable,
     address payable _beneficiary,
     address payable _releaseOwner,
-    uint256 initialDistributionPercentage,
     bool subjectToLiquidityProvision,
     bool _canValidate,
+    bool _canVote,
     address registryAddress
   ) public {
     require(numReleasePeriods >= 1, "There must be at least one releasing period");
@@ -166,13 +178,11 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
 
-    // uint256 totalBalance = getTotalBalance()
-    // maxDistribution = FixidityLib.fromFixed(
-    //   FixidityLib.newFixed(totalBalance)
-    //     .multiply(
-    //        FixidityLib.wrap(initialDistributionPercentage)));
+    // Set maxDistribution default to maxUInt, i.e. no set max.
+    maxDistribution = ~uint256(0);
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
     canValidate = _canValidate;
+    canVote = _canVote;
   }
 
   /**
@@ -183,12 +193,30 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     return revocationInfo.revokeTime > 0;
   }
 
+  function setLiquidityProvision(bool met) external onlyReleaseOwner {
+    liquidityProvisionMet = met;
+  }
+
+  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
+  function setMaxDistribution(uint256 distributionPercentage) external onlyReleaseOwner {
+    if (distributionPercentage == FIXED1_UINT) {
+      maxDistribution = ~uint256(0);
+    } else {
+      uint256 totalBalance = getTotalBalance();
+      maxDistribution = FixidityLib.fromFixed(
+        FixidityLib.newFixed(totalBalance).multiply(FixidityLib.wrap(distributionPercentage))
+      );
+    }
+    emit DistributionLimitSet(beneficiary, maxDistribution);
+  }
+
   /**
    * @notice Transfers gold from this release schedule instance to the beneficiary.
    * @param amount The requested gold amount.
    */
   function withdraw(uint256 amount) external nonReentrant onlyBeneficiary {
     require(amount > 0, "Requested withdrawal amount must be greater than zero");
+    require(liquidityProvisionMet, "Requested withdrawal before liquidity provision is met");
 
     uint256 releasedAmount;
     if (isRevoked()) {
@@ -200,6 +228,10 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     require(
       releasedAmount.sub(totalWithdrawn) >= amount,
       "Requested amount is greater than available released funds"
+    );
+    require(
+      maxDistribution >= totalWithdrawn + amount,
+      "Requested amount exceeds current alloted maximum distribution"
     );
     require(
       getRemainingUnlockedBalance() >= amount,
@@ -350,9 +382,46 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
+    onlyCanVote
     onlyWhenInProperState
   {
     getAccounts().authorizeVoteSigner(signer, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev The v,r and s signature should be a signed message by the beneficiary
+   *      encrypting the authorized address.
+   */
+  function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+    external
+    nonReentrant
+    onlyCanValidate
+    onlyWhenInProperState
+  {
+    getAccounts().authorizeValidatorSigner(signer, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize attestation signer account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev The v,r and s signature should be a signed message by the beneficiary
+   *      encrypting the authorized address.
+   */
+  function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+    external
+    nonReentrant
+    onlyCanValidate
+    onlyWhenInProperState
+  {
+    getAccounts().authorizeAttestationSigner(signer, v, r, s);
   }
 
   /**
@@ -373,6 +442,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice A wrapper setter function for creating an account.
    */
   function createAccount() external onlyWhenInProperState {
+    require(canVote, "Account cannot be created if voting is disabled");
     require(getAccounts().createAccount(), "Account creation failed");
   }
 

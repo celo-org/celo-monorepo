@@ -10,7 +10,7 @@ interface IReleaseGoldFactory {
     bool,
     address payable,
     address payable,
-    uint256,
+    bool,
     bool,
     bool
   ) external returns (address);
