@@ -13,11 +13,13 @@ Celo has various mechanisms to reduce the impact of the loss or compromise of ke
 | Vote signer key        | This key can be used to vote in Validator elections and for on-chain governance proposals.                                                                                                                                                                                          |
 | Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |
 
-Note that account and signer keys must be unique and may not be reused.
+{% hint style="info" %}
+Each signer key must be unique and may not be reused. Once a signer key is authorized, the only way to deauthorize that key is to authorize a new key that has never been used before.
+{% endhint %}
 
 # Key Rotation
 
-Loss of an authorized key no longer has catastrophic implications, as the Account key can just authorize another key in that case. In general, it is good hygiene to rotate your keys, just like you should rotate your passwords.
+Loss of an authorized key doesn't have to be catastrophic, as the Account key can just authorize another key in that case. It is strongly recommended to regularly rotate keys to limit the impact of an undiscovered compromise.
 
 ### Key Rotation for Consensus
 
