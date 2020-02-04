@@ -65,6 +65,9 @@
 - [ContractKit](developer-resources/contractkit/README.md)
   - [Getting Started](developer-resources/contractkit/setup.md)
   - [Examples](developer-resources/contractkit/examples.md)
+  - [Reference]()
+<!--contractkit-reference-start-->
+<!--contractkit-reference-end-->
 - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
 
 ## Command Line Interface

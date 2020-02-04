@@ -4,5 +4,9 @@
   "excludeNotExported": true,
   "excludePrivate": true,
   "excludeProtected": true,
-  "ignoreCompilerErrors": true
+  "includeDeclarations": false,
+  "ignoreCompilerErrors": true,
+  "hideGenerator": "true",
+  "theme": "gitbook",
+  "out": "../docs/developer-resources/contractkit/reference"
 }
