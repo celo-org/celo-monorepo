@@ -601,6 +601,7 @@ jobs:
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Run test
+          no_output_timeout: 20m
           command: |
             set -e
             cd packages/celotool
