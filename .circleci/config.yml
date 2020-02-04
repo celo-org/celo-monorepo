@@ -308,7 +308,7 @@ jobs:
           command: |
             set -euo pipefail
             yarn build \
-              --scope @celo/mobile
+              --scope @celo/mobile \
               --include-filtered-dependencies
 
       - run:
