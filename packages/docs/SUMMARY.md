@@ -14,6 +14,10 @@
   - [Reconnecting to a Network](getting-started/reconnecting-to-network.md)
 - [Glossary](getting-started/glossary.md)
 
+## Node Operations
+
+- [Key Management](node-operations/key-management.md)
+
 ## Celo Codebase
 
 - [Celo Protocol](celo-codebase/protocol/README.md)
@@ -65,7 +69,6 @@
 - [ContractKit](developer-resources/contractkit/README.md)
   - [Getting Started](developer-resources/contractkit/setup.md)
   - [Examples](developer-resources/contractkit/examples.md)
-  - [Account Keys](developer-resources/contractkit/key-usage.md)
 - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
 
 ## Command Line Interface
