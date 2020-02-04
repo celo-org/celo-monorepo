@@ -21,13 +21,13 @@ Loss of an authorized key no longer has catastrophic implications, as the Accoun
 
 ### Key Rotation for Consensus
 
-Key rotation for Consensus is a bit trickier. Let's assume that a validator is currently elected, actively signing consensus messages and wants to rotate their validator signer key. What they should do is the following:
+Key rotation for Consensus is a bit trickier. As a validator that is currently elected and actively signing consensus messages, you can rotate the Validator key as follows:
 
-- Bring up a new validator node and create a new Validator signer key (VSK) on it.
+- Bring up a new validator node and create a new Validator signer key on it.
 - Authorize the new Validator signer key with the Account key to overwrite the old Validator signer key.
 
 ```bash
-celocli account:authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer <NEW_VSK_ADDRESS> --signature <PROOF_OF_NEW_VSK_POSSESSION>
+celocli account:authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer <NEW_VALIDATOR_ADDRESS> --signature <PROOF_OF_NEW_VALIDATOR_KEY_POSSESSION>
 ```
 
 **This will also update your ECDSA public key automatically.**
@@ -35,11 +35,11 @@ celocli account:authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer
 - Update your BLS key used for consensus. Rotating both the ECDSA and BLS keys is recommended.
 
 ```bash
-celocli validator:update-bls-public-key --from <NEW_VSK_ADDRESS> --blsKey <NEW_BLS_KEY> --blsPop <PROOF_OF_NEW_BLS_KEY_POSSESSION>
+celocli validator:update-bls-public-key --from <NEW_VALIDTOR_KEY_ADDRESS> --blsKey <NEW_BLS_KEY> --blsPop <PROOF_OF_NEW_BLS_KEY_POSSESSION>
 ```
 
 - Your old node will continue to sign consensus messages for the current epoch, but upon the next epoch will find itself no longer authorized.
-- Your new node will find itself unauthorized, but will be authorized to sign as the next epoch begins.
+- Your new node will initially find itself unauthorized, but will be authorized to sign as the next epoch begins.
 
 {% hint style="warning" %}
 The newly authorized keys will only take effect in the next epoch, so the node operating with the old key must remain running until the end of the current epoch to avoid downtime.
