@@ -271,9 +271,46 @@ jobs:
   end-to-end-mobile-test-ios:
     macos:
       xcode: '11.3.1'
+    working_directory: ~/app_osx
     steps:
-      - attach_workspace:
-          at: ~/app
+      - checkout
+      - run:
+          name: Configure environment variables
+          command: |
+            echo 'export PATH=/usr/local/opt/node@10/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Install needed tools
+          command: |
+            set -euo pipefail
+            export HOMEBREW_NO_AUTO_UPDATE=1
+            brew install node@10
+            brew tap wix/brew
+            brew install applesimutils
+            touch .watchmanconfig
+            node -v
+      # Not using a workspace here as Node and Yarn versions
+      # differ between our macOS executor image and the Docker containers
+      - run:
+          name: Install dependencies
+          command: yarn install || yarn install
+      - run:
+          name: Build packages
+          command: |
+            set -euo pipefail
+            yarn build --scope @celo/walletkit
+      - run:
+          name: Install bundle
+          command: |
+            set -euo pipefail
+            cd packages/mobile
+            bundle install
+      - run:
+          name: Install pods
+          command: |
+            set -euo pipefail
+            cd packages/mobile
+            bundle exec pod install
       - run:
           name: Run e2e tests
           command: |
@@ -708,7 +745,7 @@ workflows:
   version: 2
   celo-monorepo-build:
     jobs:
-      - install_dependencies
+      # - install_dependencies
       # - lint-checks:
       #     requires:
       #       - install_dependencies
@@ -730,9 +767,7 @@ workflows:
       # - mobile-test-build-app:
       #     requires:
       #       - mobile-test
-      - end-to-end-mobile-test-ios:
-          requires:
-            - install_dependencies
+      - end-to-end-mobile-test-ios
       # - verification-pool-api:
       #     requires:
       #       - lint-checks
