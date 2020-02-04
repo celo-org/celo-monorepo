@@ -29,3 +29,5 @@ const modifiedGlobalSummary =
   globalSummary.slice(globalSummary.search(endTag))
 
 writeFileSync(globalSummaryPath, modifiedGlobalSummary)
+
+console.log(`${globalSummaryPath} updated with links to generated docs`)
