@@ -335,6 +335,8 @@ jobs:
           command: |
             set -euo pipefail
             cd packages/mobile
+            # Make sure the detox framework is present
+            yarn run detox build-framework-cache
             # Create dummy Google services plist
             /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
             yarn run test:e2e:ios
