@@ -35,7 +35,10 @@ const parseBlsProofOfPossession: ParseFn<string> = (input) => {
   return parseBytes(input, BLS_POP_SIZE, `${input} is not a BLS proof-of-possession`)
 }
 const parseAddress: ParseFn<string> = (input) => {
-  if (Web3.utils.isAddress(input)) {
+  if (
+    Web3.utils.isAddress(input) &&
+    (process.env.NO_ADDRESSCHECK || Web3.utils.checkAddressChecksum(input))
+  ) {
     return input
   } else {
     throw new CLIError(`${input} is not a valid address`)
