@@ -8,7 +8,7 @@ import { escrowSaga } from 'src/escrow/saga'
 import { exchangeSaga } from 'src/exchange/saga'
 import { feesSaga } from 'src/fees/saga'
 import { firebaseSaga } from 'src/firebase/saga'
-import { gethSaga } from 'src/geth/saga'
+import { gethSagaIfNecessary } from 'src/geth/saga'
 import { goldTokenSaga } from 'src/goldToken/saga'
 import { homeSaga } from 'src/home/saga'
 import { identitySaga } from 'src/identity/saga'
@@ -63,7 +63,7 @@ export function* rootSaga() {
   yield spawn(loggerSaga)
   yield spawn(appSaga)
   yield spawn(networkInfoSaga)
-  yield spawn(gethSaga)
+  yield spawn(gethSagaIfNecessary)
   yield spawn(accountSaga)
   yield spawn(identitySaga)
   yield spawn(goldTokenSaga)

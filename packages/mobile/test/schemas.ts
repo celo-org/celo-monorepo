@@ -236,9 +236,17 @@ export const v5Schema = {
     ...v4Schema.localCurrency,
     exchangeRate: '1.33',
   },
+  web3: {
+    ...v4Schema.web3,
+    fornoMode: false,
+  },
   geth: {
     ...v4Schema.geth,
-    promptZeroSyncIfNeeded: false,
+    gethStartedThisSession: false,
+  },
+  account: {
+    ...v4Schema.account,
+    promptFornoIfNeeded: false,
   },
 }
 
