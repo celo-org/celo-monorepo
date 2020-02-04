@@ -83,6 +83,7 @@ ExecStart=/usr/bin/docker run \\
       --wsapi=eth,net,web3,debug \\
       --networkid=${network_id} \\
       --syncmode=full \\
+      --gcmode=archive \\
       --consoleformat=json \\
       --consoleoutput=stdout \\
       --verbosity=${geth_verbosity} \\

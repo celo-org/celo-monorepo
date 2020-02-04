@@ -64,6 +64,7 @@ resource "google_compute_instance" "full_node" {
       network_id : var.network_id,
       node_name : "${var.celo_env}-${var.name}-${count.index}",
       proxy : var.proxy,
+      txnode : var.txnode,
       rid : count.index,
     }
   )

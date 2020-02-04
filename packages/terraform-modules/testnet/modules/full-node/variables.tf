@@ -105,3 +105,9 @@ variable proxy {
   description = "Whether the node is a proxy for a validator"
   default     = false
 }
+
+variable txnode {
+  type        = bool
+  description = "Whether the node is a txnode"
+  default     = false
+}

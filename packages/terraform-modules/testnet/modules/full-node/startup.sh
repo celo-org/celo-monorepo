@@ -171,6 +171,9 @@ RPC_APIS="eth,net,web3,debug"
 
 if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
+elif [[ ${txnode} == "true" ]]; then
+  ADDITIONAL_GETH_FLAGS="--gcmode=archive"
+  RPC_APIS="$RPC_APIS,txpool"
 else
   RPC_APIS="$RPC_APIS,txpool"
 fi

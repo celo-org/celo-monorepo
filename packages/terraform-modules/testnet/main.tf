@@ -153,6 +153,7 @@ module "tx_node" {
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   node_count                            = var.tx_node_count
+  txnode                                = true
 }
 
 # used for access by blockscout
