@@ -59,10 +59,6 @@ commands:
       - run: ([[ -e ~/node_modules.tgz ]] && tar -xf ~/node_modules.tgz) || true
 
       - run:
-          name: Delete @celo dir from node_modules (if its there)
-          command: rm -rf ~/app/node_modules/@celo
-
-      - run:
           name: Install dependencies
           command: |
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
