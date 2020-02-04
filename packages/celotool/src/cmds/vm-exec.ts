@@ -90,7 +90,7 @@ export const handler = async (argv: ValidatorsExecArgv) => {
   if (argv.only === null) {
     let to: number | ProxyIndex = argv.to
 
-    if (typeof argv.to === 'number') {
+    if (typeof to === 'number' && to < 0) {
       to = getMaxNodeIndex(argv.nodeType)
     }
 

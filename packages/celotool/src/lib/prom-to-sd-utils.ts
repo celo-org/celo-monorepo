@@ -2,7 +2,7 @@ import sleep from 'sleep-promise'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { scaleResource } from 'src/lib/kubernetes'
-import { getProxiesPerValidator } from 'src/lib/testnet-utils'
+import { getProxiesPerValidator, getProxyName } from 'src/lib/testnet-utils'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import {
   getInternalProxyIPs,
@@ -69,7 +69,7 @@ async function helmParameters(celoEnv: string) {
   const proxyPodIds = []
   for (let valIndex = 0; valIndex < proxiesPerValidator.length; valIndex++) {
     for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[valIndex]; proxyIndex++) {
-      proxyPodIds.push(`${celoEnv}-validator-${valIndex}-proxy-${proxyIndex}`)
+      proxyPodIds.push(getProxyName(celoEnv, valIndex, proxyIndex))
     }
   }
 

@@ -88,7 +88,7 @@ async function taintEveryResourceWithPrefix(moduleName: string, resourceName: st
   for (const match of matches) {
     await taintResource(moduleName, match)
     // To avoid hitting rate limits
-    await sleep(500)
+    await sleep(100)
   }
 }
 
@@ -97,7 +97,7 @@ async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: 
   for (const match of matches) {
     await untaintResource(moduleName, match)
     // To avoid hitting rate limits
-    await sleep(500)
+    await sleep(100)
   }
 }
 

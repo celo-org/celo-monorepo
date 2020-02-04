@@ -231,3 +231,7 @@ export function getProxiesPerValidator() {
   }
   return arr
 }
+
+export function getProxyName(celoEnv: string, validatorIndex: number, proxyIndex: number) {
+  return `${celoEnv}-validators-${validatorIndex}-proxy-${proxyIndex}`
+}

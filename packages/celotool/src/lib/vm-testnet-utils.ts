@@ -22,6 +22,7 @@ import {
 } from './terraform'
 import {
   getProxiesPerValidator,
+  getProxyName,
   uploadDataToGoogleStorage,
   uploadTestnetInfoToGoogleStorage,
 } from './testnet-utils'
@@ -489,7 +490,7 @@ async function getNodeVmNameWithRandomSuffix(
   const baseName =
     typeof index === 'number'
       ? `${celoEnv}-${nodeType}-${index}`
-      : `${celoEnv}-validator-${index.validatorIndex}-proxy-${index.proxyIndex}`
+      : getProxyName(celoEnv, index.validatorIndex, index.proxyIndex)
 
   const [nodeName] = await execCmd(
     `gcloud compute instances list --project '${project}' --filter="NAME ~ ${baseName}-.*" --format get\\(NAME\\)`

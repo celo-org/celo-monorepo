@@ -5,7 +5,7 @@ import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
-import { getProxiesPerValidator } from './testnet-utils'
+import { getProxiesPerValidator, getProxyName } from './testnet-utils'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
@@ -374,7 +374,7 @@ export async function createStaticIPs(celoEnv: string) {
     let validatorIndex = 0
     for (const proxyCount of proxiesPerValidator) {
       for (let i = 0; i < proxyCount; i++) {
-        await registerIPAddress(`${celoEnv}-validators-${validatorIndex}-proxy-${i}`)
+        await registerIPAddress(getProxyName(celoEnv, validatorIndex, i))
       }
       validatorIndex++
     }
@@ -510,7 +510,7 @@ export async function deleteStaticIPs(celoEnv: string) {
   const proxiesPerValidator = getProxiesPerValidator()
   for (let valIndex = 0; valIndex < proxiesPerValidator.length; valIndex++) {
     for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[valIndex]; proxyIndex++) {
-      await deleteIPAddress(`${celoEnv}-validators-${valIndex}-proxy-${proxyIndex}`)
+      await deleteIPAddress(getProxyName(celoEnv, valIndex, proxyIndex))
     }
   }
 }
@@ -579,9 +579,7 @@ async function helmIPParameters(celoEnv: string) {
     for (const proxyCount of proxiesPerValidator) {
       const proxyIpAddresses = []
       for (let i = 0; i < proxyCount; i++) {
-        proxyIpAddresses.push(
-          await retrieveIPAddress(`${celoEnv}-validators-${validatorIndex}-proxy-${i}`)
-        )
+        proxyIpAddresses.push(await retrieveIPAddress(getProxyName(celoEnv, validatorIndex, i)))
       }
       const listOfProxyIpAddresses = proxyIpAddresses.join('/')
       proxyIpAddressesPerValidator.push(listOfProxyIpAddresses)
