@@ -1,7 +1,7 @@
 # adapted from https://github.com/CircleCI-Public/circleci-demo-react-native
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
-version: 2
+version: 2.1
 reference:
   workspace: &workspace ~/src
   ## Configurations
