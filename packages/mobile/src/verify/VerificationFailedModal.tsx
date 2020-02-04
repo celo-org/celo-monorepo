@@ -3,34 +3,54 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
+import { cancelVerification } from 'src/identity/actions'
+import { VerificationStatus } from 'src/identity/verification'
 import { navigateHome } from 'src/navigator/NavigationService'
 
-interface OwnProps {
-  isVisible: boolean
+interface Props {
+  verificationStatus: VerificationStatus
+  cancelVerification: typeof cancelVerification
 }
 
-type Props = OwnProps & WithTranslation
+export function VerificationFailedModal(props: Props) {
+  const { t } = useTranslation(Namespaces.nuxVerification2)
+  const [isDismissed, setIsDismissed] = React.useState(false)
 
-function VerificationFailedModal(props: Props) {
-  const onSkip = () => {
+  const onDismiss = React.useCallback(() => {
+    setIsDismissed(true)
+  }, [setIsDismissed])
+
+  const onSkip = React.useCallback(() => {
+    props.cancelVerification()
     navigateHome()
-  }
+  }, [props.cancelVerification])
+
+  const isVisible =
+    props.verificationStatus === VerificationStatus.Failed ||
+    (props.verificationStatus === VerificationStatus.RevealAttemptFailed && !isDismissed)
+
+  const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
 
   return (
-    <Modal isVisible={props.isVisible}>
+    <Modal isVisible={isVisible}>
       <View style={styles.modalContainer}>
-        <Text style={styles.modalHeader}>{props.t('failModal.header')}</Text>
-        <Text style={fontStyles.body}>{props.t('failModal.body1')}</Text>
+        <Text style={styles.modalHeader}>{t('failModal.header')}</Text>
+        <Text style={fontStyles.body}>{t('failModal.body1')}</Text>
         <Text style={[fontStyles.body, componentStyles.marginTop10]}>
-          {props.t('failModal.body2')}
+          {t('failModal.body2') + (allowEnterCodes ? t('failModal.enterCodesBody') : '')}
         </Text>
         <View style={styles.modalButtonsContainer}>
+          {allowEnterCodes && (
+            <TextButton onPress={onDismiss} style={styles.modalSkipText}>
+              {t('failModal.enterCodesButton')}
+            </TextButton>
+          )}
           <TextButton onPress={onSkip} style={styles.modalSkipText}>
-            {props.t('missingCodesModal.skip')}
+            {t('missingCodesModal.skip')}
           </TextButton>
         </View>
       </View>
@@ -62,5 +82,3 @@ const styles = StyleSheet.create({
     ...fontStyles.semiBold,
   },
 })
-
-export default withTranslation(Namespaces.nuxVerification2)(VerificationFailedModal)

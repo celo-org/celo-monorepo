@@ -6,7 +6,6 @@ import { connect } from 'react-redux'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
 import { getReclaimableEscrowPayments } from 'src/escrow/saga'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
@@ -25,7 +24,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
@@ -62,6 +60,5 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
 )
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  updatePaymentRequestStatus,
   fetchPhoneAddresses,
 })(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))

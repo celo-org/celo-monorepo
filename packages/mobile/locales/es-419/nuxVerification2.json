@@ -4,6 +4,7 @@
   "emptyVerificationCode": "Sin Código en el Portapapeles",
   "invalidVerificationCode": "Código de Verification Inválido",
   "repeatVerificationCode": "Código de Verificación Repetido",
+  "revealAttestationFailure": "Error al solicitar mensaje SMS",
   "verificationFailure": "Fallo en la Verificación",
   "verificationTimeout": "Verificación no pudo ser verificada a tiempo",
   "errorRequestCode": "Error al solicitar los códigos.",
@@ -33,11 +34,9 @@
   "loading": {
     "verifyingNumber": "Verificando {{number}}",
     "keepOpen": "Deje abierta la aplicación",
-    "card1":
-      "Verificar su número telefónico permite que sus amigos lo encuentren en la red de Celo.",
+    "card1": "Verificar su número telefónico permite que sus amigos lo encuentren en la red de Celo.",
     "card2": "Con Celo, puede enviar dinero a cualquier persona con tan solo el número telefónico.",
-    "card3":
-      "Celo ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
+    "card3": "Celo ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
   },
   "skipModal": {
     "header": "¿Omitir la verificación?",
@@ -70,9 +69,11 @@
     "skip": "Omitir por ahora"
   },
   "failModal": {
-    "header": "No se pudo verificar",
+    "header": "Error de verificación",
     "body1": "Se produjo un problema al verificar su número de teléfono.",
-    "body2": "Puede saltar la verificación y volver a intentarlo más tarde."
+    "body2": "Puede saltar la verificación y volver a intentarlo más tarde.",
+    "enterCodesBody": " Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
+    "enterCodesButton": "Ingresar códigos"
   },
   "congratsVerified": "¡Felicitaciones se ha verificado tu suario!",
   "notification": {
