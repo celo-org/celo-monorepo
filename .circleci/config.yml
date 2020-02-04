@@ -53,9 +53,9 @@ commands:
     steps:
       - restore_cache:
           keys:
-            - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v2-{{ arch }}-{{ .Branch }}-
-            - yarn-v2-{{ arch }}-
+            - yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-v3-{{ arch }}-{{ .Branch }}-
+            - yarn-v3-{{ arch }}-
       - run: ([[ -e ~/node_modules.tgz ]] && tar -xf ~/node_modules.tgz) || true
 
       - run:
@@ -84,7 +84,7 @@ commands:
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
       - run: rm -rf ~/node_modules.tgz && tar -czf ~/node_modules.tgz node_modules packages/*/node_modules
       - save_cache:
-          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/node_modules.tgz
 
