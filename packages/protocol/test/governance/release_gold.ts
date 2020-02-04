@@ -844,7 +844,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
   })
 
-  describe.only('authorization tests:', () => {
+  describe('authorization tests:', () => {
     Object.keys(authorizationTestDescriptions).forEach((key) => {
       let authorizationTest: any
       let releaseGoldInstanceAddress: any
