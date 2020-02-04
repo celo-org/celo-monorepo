@@ -315,12 +315,21 @@ jobs:
             set -euo pipefail
             cd packages/mobile
             bundle install
+      - restore_cache:
+          keys:
+            - pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
+            - pods-wallet-v1-{{ arch }}-{{ .Branch }}-
+            - pods-wallet-v1-{{ arch }}-
       - run:
           name: Install pods
           command: |
             set -euo pipefail
-            cd packages/mobile
+            cd packages/mobile/ios
             bundle exec pod install
+      - save_cache:
+          key: pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
+          paths:
+            - packages/mobile/ios/Pods
       - run:
           name: Run e2e tests
           command: |
