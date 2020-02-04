@@ -70,7 +70,7 @@ export PROJECT_NAME=celo-testnet
 gcloud config set project $PROJECT_NAME
 ```
 
-We use `celo-testnet` for all non-production environments, and `celo-production` for production environments.
+We use `celo-testnet` for all non-production environments, and `celo-testnet-production` for production environments.
 
 Then create a new Kubernetes cluster:
 
