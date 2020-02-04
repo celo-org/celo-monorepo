@@ -298,6 +298,7 @@ jobs:
           name: Build packages
           command: |
             set -euo pipefail
+            yarn build --scope @celo/utils
             yarn build --scope @celo/walletkit
       - run:
           name: Install bundle
