@@ -304,11 +304,13 @@ jobs:
       - yarn_install:
           rebuild_scrypt: false
       - run:
-          name: Build packages
+          name: Build mobile dependencies
           command: |
             set -euo pipefail
-            yarn build --scope @celo/utils
-            yarn build --scope @celo/walletkit
+            yarn build \
+              --scope @celo/mobile
+              --include-filtered-dependencies
+
       - run:
           name: Install bundle
           command: |
