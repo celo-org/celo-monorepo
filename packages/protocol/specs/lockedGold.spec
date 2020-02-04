@@ -40,7 +40,7 @@ rule totalNonVotingGEAccountNonVoting(address a,method f)  {
 	require sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a);
 	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector;
 	env eF; 
-	require f.selector!=unlock(uint256).selector	|| eF.msg.sender==a;
+	require (f.selector!=unlock(uint256).selector	|| eF.msg.sender==a) &&  f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector;
 	calldataarg arg;
 	sinvoke f(eF,arg);
 	assert sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a);
@@ -68,7 +68,8 @@ rule totalPreserved( address a,  method f)
 	env eF;
 	require eF.msg.sender==a;
 	//this two function breaks the rule 
-	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector;
+	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector
+	&& f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector;
 	calldataarg arg;
 	sinvoke f(eF,arg);
 	// we limit the amount of pending records due to loop handling 
@@ -100,7 +101,7 @@ rule noChangeByOther( address a, address b, method f )
 	env eF;
 	require eF.msg.sender==b;
 	calldataarg arg;
-	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector;
+	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector && f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector;
 	sinvoke f(eF,arg);
 	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a); 
 	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
