@@ -64,9 +64,13 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   // Public struct housing params pertaining to revocation.
   RevocationInfo public revocationInfo;
 
-  event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
-  // TODO(lucas): do i need address?
+  event ReleaseScheduleRevoked(
+    address indexed beneficiary,
+    uint256 revokeTimestamp,
+    uint256 releasedBalanceAtRevoke
+  );
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
+  event LiquidityProvisionSet(address indexed beneficiary, bool beneficiaryProvision);
 
   modifier onlyReleaseOwner() {
     require(msg.sender == releaseOwner, "Sender must be the registered releaseOwner address");
@@ -193,11 +197,22 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     return revocationInfo.revokeTime > 0;
   }
 
+  /**
+   * @notice Controls if the liquidity provision has been met.
+   *         If true, allows gold to be withdrawn.
+   */
   function setLiquidityProvision(bool met) external onlyReleaseOwner {
     liquidityProvisionMet = met;
+    emit LiquidityProvisionSet(beneficiary, met);
   }
 
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
+
+  /**
+   * @notice Controls the maximum distribution percentage.
+   *         Calculates `distributionPercentage` of current `totalBalance()`
+   *         and sets this value as the maximum allowed gold to be currently withdrawn.
+   */
   function setMaxDistribution(uint256 distributionPercentage) external onlyReleaseOwner {
     if (distributionPercentage == FIXED1_UINT) {
       maxDistribution = ~uint256(0);
@@ -269,7 +284,11 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     require(!isRevoked(), "Release schedule instance must not already be revoked");
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = getCurrentReleasedTotalAmount();
-    emit ReleaseScheduleRevoked(revocationInfo.revokeTime, revocationInfo.releasedBalanceAtRevoke);
+    emit ReleaseScheduleRevoked(
+      beneficiary,
+      revocationInfo.revokeTime,
+      revocationInfo.releasedBalanceAtRevoke
+    );
   }
 
   /**

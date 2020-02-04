@@ -978,11 +978,11 @@ contract('ReleaseGold', (accounts: string[]) => {
       const releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       const releaseOwnereleaseGoldTx = await releaseGoldInstance.revoke({ from: releaseOwner })
       const revokeBlockTimestamp = await getCurrentBlockchainTimestamp(web3)
-      // TODO(lucas): figure out compiler here
-      // const releaseGoldRevokeTime = await releaseGoldInstance.revocationInfo.revokeTime()
-      // assertEqualBN(revokeBlockTimestamp, releaseGoldRevokeTime)
+      const [, , releaseGoldRevokeTime] = await releaseGoldInstance.revocationInfo()
+      assertEqualBN(revokeBlockTimestamp, releaseGoldRevokeTime)
       assert.isTrue(await releaseGoldInstance.isRevoked())
       assertLogMatches(releaseOwnereleaseGoldTx.logs[0], 'ReleaseScheduleRevoked', {
+        beneficiary,
         revokeTimestamp: revokeBlockTimestamp,
         releasedBalanceAtRevoke: await releaseGoldInstance.getCurrentReleasedTotalAmount(),
       })
