@@ -41,7 +41,9 @@ celocli validator:update-bls-public-key --from <NEW_VSK_ADDRESS> --blsKey <NEW_B
 - Your old node will continue to sign consensus messages for the current epoch, but upon the next epoch will find itself no longer authorized.
 - Your new node will find itself unauthorized, but will be authorized to sign as the next epoch begins.
 
-**Waiting for the epoch to flip before bringing down the retired validator node is essential to zero-downtime rotation when elected.**
+{% hint style="warning" %}
+The newly authorized keys will only take effect in the next epoch, so the node operating with the old key must remain running until the end of the current epoch to avoid downtime.
+{% endhint %}
 
 Please see the [Running a Validator](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator) section for details on ECDSA and BLS key generation, authorization, and proof of possession.
 
