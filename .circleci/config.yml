@@ -56,7 +56,6 @@ commands:
             - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
-            - yarn-v2-
 
       - run:
           name: Delete @celo dir from node_modules (if its there)
