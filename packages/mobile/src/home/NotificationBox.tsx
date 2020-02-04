@@ -13,7 +13,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
-import { getReclaimableEscrowPayments } from 'src/escrow/saga'
+import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { setEducationCompleted as setGoldEducationCompleted } from 'src/goldToken/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
@@ -42,7 +42,7 @@ interface StateProps {
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
-  sentEscrowPayments: EscrowedPayment[]
+  reclaimableEscrowPayments: EscrowedPayment[]
 }
 
 interface DispatchProps {
@@ -64,7 +64,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
   backupTooLate: isBackupTooLate(state),
-  sentEscrowPayments: state.escrow.sentEscrowedPayments,
+  reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
 })
 
 const mapDispatchToProps = {
@@ -84,9 +84,11 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   escrowedPaymentReminderNotification = () => {
-    const escrowPayments = getReclaimableEscrowPayments(this.props.sentEscrowPayments)
-    if (escrowPayments && escrowPayments.length) {
-      return [<EscrowedPaymentReminderSummaryNotification key={1} payments={escrowPayments} />]
+    const { reclaimableEscrowPayments } = this.props
+    if (reclaimableEscrowPayments && reclaimableEscrowPayments.length) {
+      return [
+        <EscrowedPaymentReminderSummaryNotification key={1} payments={reclaimableEscrowPayments} />,
+      ]
     }
     return []
   }

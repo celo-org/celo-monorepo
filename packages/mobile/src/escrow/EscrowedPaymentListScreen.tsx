@@ -5,7 +5,7 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
-import { getReclaimableEscrowPayments } from 'src/escrow/saga'
+import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
@@ -29,7 +29,7 @@ interface DispatchProps {
 
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
-  sentEscrowedPayments: getReclaimableEscrowPayments(state.escrow.sentEscrowedPayments),
+  sentEscrowedPayments: getReclaimableEscrowPayments(state),
   recipientCache: recipientCacheSelector(state),
 })
 
