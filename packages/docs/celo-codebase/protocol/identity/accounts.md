@@ -30,7 +30,7 @@ Key rotation for Consensus is a bit trickier. Let's assume that a validator is c
 celocli account:authorize --from <ACCOUNT_KEY_ADDRESS> --role validator --signer <NEW_VSK_ADDRESS> --signature <PROOF_OF_NEW_VSK_POSSESSION>
 ```
 
-**This should also update your ECDSA public key automatically.**
+**This will also update your ECDSA public key automatically.**
 
 - Update your BLS key used for consensus. Rotating both the ECDSA and BLS keys is recommended.
 
