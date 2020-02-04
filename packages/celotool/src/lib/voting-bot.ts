@@ -9,8 +9,9 @@ import { ensure0x } from 'src/lib/utils'
 
 const helmChartPath = '../helm-charts/voting-bot'
 
-export async function installHelmChart(celoEnv: string) {
-  const params = await helmParameters(celoEnv)
+export async function installHelmChart(celoEnv: string, excludedGroups?: string[]) {
+  const params = await helmParameters(celoEnv, excludedGroups)
+  console.info(params)
   return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, params)
 }
 export async function removeHelmRelease(celoEnv: string) {
@@ -68,8 +69,8 @@ export async function setupVotingBotAccounts(celoEnv: string) {
   }
 }
 
-function helmParameters(celoEnv: string) {
-  return [
+function helmParameters(celoEnv: string, excludedGroups?: string[]) {
+  const params = [
     `--set celoProvider=${getFornoUrl(celoEnv)}`,
     `--set cronSchedule="${fetchEnv(envVar.VOTING_BOT_CRON_SCHEDULE)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
@@ -83,6 +84,11 @@ function helmParameters(celoEnv: string) {
     `--set votingBot.scoreSensitivity="${fetchEnv(envVar.VOTING_BOT_SCORE_SENSITIVITY)}"`,
     `--set votingBot.wakeProbability="${fetchEnv(envVar.VOTING_BOT_WAKE_PROBABILITY)}"`,
   ]
+
+  if (excludedGroups && excludedGroups.length > 0) {
+    params.push(`--set votingBot.excludedGroups="${excludedGroups.join('\\,')}"`)
+  }
+  return params
 }
 
 function releaseName(celoEnv: string) {

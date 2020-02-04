@@ -18,6 +18,8 @@ import {
   MockGoldTokenInstance,
   MockSortedOraclesContract,
   MockSortedOraclesInstance,
+  MockStableTokenContract,
+  MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
   ReserveContract,
@@ -27,6 +29,7 @@ import {
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
+const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const Registry: RegistryContract = artifacts.require('Registry')
 const Reserve: ReserveContract = artifacts.require('Reserve')
@@ -50,6 +53,7 @@ contract('EpochRewards', (accounts: string[]) => {
   let epochRewards: EpochRewardsTestInstance
   let mockElection: MockElectionInstance
   let mockGoldToken: MockGoldTokenInstance
+  let mockStableToken: MockStableTokenInstance
   let mockSortedOracles: MockSortedOraclesInstance
   let registry: RegistryInstance
   const nonOwner = accounts[1]
@@ -70,7 +74,6 @@ contract('EpochRewards', (accounts: string[]) => {
   const communityRewardFraction = toFixed(new BigNumber(1 / 4))
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
-  const mockStableTokenAddress = web3.utils.randomHex(20)
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   const timeTravelToDelta = async (timeDelta: BigNumber) => {
     // mine beforehand, just in case
@@ -86,14 +89,15 @@ contract('EpochRewards', (accounts: string[]) => {
     epochRewards = await EpochRewards.new()
     mockElection = await MockElection.new()
     mockGoldToken = await MockGoldToken.new()
+    mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
-    await registry.setAddressFor(CeloContractName.StableToken, mockStableTokenAddress)
+    await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
     await mockSortedOracles.setMedianRate(
-      mockStableTokenAddress,
+      mockStableToken.address,
       sortedOraclesDenominator.times(exchangeRate)
     )
 
@@ -647,6 +651,157 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(expectedMultiplier)
           .integerValue(BigNumber.ROUND_FLOOR)
         assertEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected)
+      })
+    })
+  })
+
+  describe('#isReserveLow', () => {
+    // TODO: Add changing parameters in this test / don't hardcode the linear
+    // ratio change.
+    let reserve: ReserveInstance
+
+    beforeEach(async () => {
+      const totalSupply = new BigNumber(129762987346298761037469283746)
+      reserve = await Reserve.new()
+      await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
+      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.addToken(mockStableToken.address)
+      await mockGoldToken.setTotalSupply(totalSupply)
+      const assetAllocationSymbols = [
+        web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
+        web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64),
+      ]
+      const assetAllocationWeights = [
+        new BigNumber(10)
+          .pow(24)
+          .dividedBy(new BigNumber(2))
+          .integerValue(),
+        new BigNumber(10)
+          .pow(24)
+          .dividedBy(new BigNumber(2))
+          .integerValue(),
+      ]
+      await reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights)
+    })
+
+    describe('reserve ratio of 0.5', () => {
+      beforeEach(async () => {
+        const stableBalance = new BigNumber(2397846127684712867321)
+        const goldBalance = stableBalance
+          .div(exchangeRate)
+          .div(2)
+          .times(0.5)
+          .integerValue()
+        await mockStableToken.setTotalSupply(stableBalance)
+        await web3.eth.sendTransaction({
+          from: accounts[9],
+          to: reserve.address,
+          value: goldBalance.toString(),
+        })
+      })
+
+      it('should be low at start', async () => {
+        const timeDelta: BigNumber = YEAR.times(0)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, true)
+      })
+
+      it('should be low at 15 years', async () => {
+        const timeDelta: BigNumber = YEAR.times(15)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, true)
+      })
+
+      it('should be low at 25 years', async () => {
+        const timeDelta: BigNumber = YEAR.times(25)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, true)
+      })
+    })
+
+    describe('reserve ratio of 1.5', () => {
+      beforeEach(async () => {
+        const stableBalance = new BigNumber(2397846127684712867321)
+        const goldBalance = stableBalance
+          .div(exchangeRate)
+          .div(2)
+          .times(1.5)
+          .integerValue()
+        await mockStableToken.setTotalSupply(stableBalance)
+        await web3.eth.sendTransaction({
+          from: accounts[9],
+          to: reserve.address,
+          value: goldBalance.toString(),
+        })
+      })
+
+      it('should be low at start', async () => {
+        const timeDelta: BigNumber = YEAR.times(0)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, true)
+      })
+
+      it('should be low at 12 years', async () => {
+        const timeDelta: BigNumber = YEAR.times(12)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, true)
+      })
+
+      it('should not be low at 15 years', async () => {
+        const timeDelta: BigNumber = YEAR.times(15)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, false)
+      })
+
+      it('should not be low at 25 years', async () => {
+        const timeDelta: BigNumber = YEAR.times(25)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, false)
+      })
+    })
+
+    describe('reserve ratio of 2.5', () => {
+      beforeEach(async () => {
+        const stableBalance = new BigNumber(2397846127684712867321)
+        const goldBalance = stableBalance
+          .div(exchangeRate)
+          .div(2)
+          .times(2.5)
+          .integerValue()
+        await mockStableToken.setTotalSupply(stableBalance)
+        await web3.eth.sendTransaction({
+          from: accounts[9],
+          to: reserve.address,
+          value: goldBalance.toString(),
+        })
+      })
+
+      it('should not be low at start', async () => {
+        const timeDelta: BigNumber = YEAR.times(0)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, false)
+      })
+
+      it('should not be low at 15 years', async () => {
+        const timeDelta: BigNumber = YEAR.times(15)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, false)
+      })
+
+      it('should not be low at 25 years', async () => {
+        const timeDelta: BigNumber = YEAR.times(25)
+        await timeTravelToDelta(timeDelta)
+        const isLow = await epochRewards.isReserveLow()
+        assert.equal(isLow, false)
       })
     })
   })

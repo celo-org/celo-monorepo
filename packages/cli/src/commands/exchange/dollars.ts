@@ -41,6 +41,7 @@ export default class ExchangeDollars extends BaseCommand {
     await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toFixed()))
 
     const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount!.toFixed(), false)
-    await displaySendTx('exchange', exchangeTx)
+    // Set explicit gas based on github.com/celo-org/celo-monorepo/issues/2541
+    await displaySendTx('exchange', exchangeTx, { gas: 300000 })
   }
 }
