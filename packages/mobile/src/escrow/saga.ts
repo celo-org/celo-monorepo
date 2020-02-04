@@ -273,14 +273,6 @@ function* doFetchSentPayments() {
   }
 }
 
-export function getReclaimableEscrowPayments(allPayments: EscrowedPayment[]) {
-  const currUnixTime = Date.now() / 1000
-  return allPayments.filter((payment) => {
-    const paymentExpiryTime = +payment.timestamp + +payment.expirySeconds
-    return currUnixTime >= paymentExpiryTime
-  })
-}
-
 export function* watchTransferPayment() {
   yield takeLeading(Actions.TRANSFER_PAYMENT, transferStableTokenToEscrow)
 }

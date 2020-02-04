@@ -10,7 +10,6 @@ import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
-import i18n from 'src/i18n'
 import { encryptComment } from 'src/identity/commentKey'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
@@ -162,7 +161,6 @@ export function* sendPaymentOrInviteSaga({
     if (firebasePendingRequestUid) {
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
-    Logger.showMessage(i18n.t('paymentRequestFlow:requestPaid'))
     yield call(navigate, Screens.WalletHome)
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
