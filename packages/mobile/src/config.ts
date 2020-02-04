@@ -39,7 +39,7 @@ export const INPUT_DEBOUNCE_TIME = 1000 // milliseconds
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 // The number of seconds before the sender can reclaim the payment.
-export const ESCROW_PAYMENT_EXPIRY_SECONDS = 172800 // 2 days
+export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
 // We need to fallback to `integration` for testing under jest where react-native-config is undefined.
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
 

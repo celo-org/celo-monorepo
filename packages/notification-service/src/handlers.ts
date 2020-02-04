@@ -19,11 +19,6 @@ export async function handlePaymentRequests() {
       continue
     }
     await setPaymentRequestNotified(uid)
-    await requestedPaymentNotification(
-      request.requesteeAddress,
-      request.amount,
-      request.currency,
-      request
-    )
+    await requestedPaymentNotification(uid, request)
   }
 }
