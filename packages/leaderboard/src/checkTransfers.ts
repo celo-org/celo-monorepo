@@ -99,7 +99,9 @@ export async function readData() {
   ).rows[0].json_agg
   let tr = (
     await client.query(
-      `select json_agg(t) from (select distinct on (from_address_hash, to_address_hash) from_address_hash, to_address_hash from transactions) as t`
+      `select json_agg(t) from (select distinct on (from_address_hash, to_address_hash) from_address_hash, to_address_hash from 
+        ((select from_address_hash, to_address_hash from transactions where value > 0) union
+         (select from_address_hash, to_address_hash from internal_transactions where value > 0)) as t1) as t`
     )
   ).rows[0].json_agg
   let [claims, claims1] = await readClaims()
