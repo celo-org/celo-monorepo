@@ -381,6 +381,27 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
+   * @notice Determines if the reserve is low enough to demand a diversion from
+   *    the community reward. Targets initial critical ratio of 2 with a linear
+   *    decline until 25 years have passed where the critical ratio will be 1.
+   */
+  function isReserveLow() external view returns (bool) {
+    // critical reserve ratio = 2 - time in second / 25 years
+    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
+    FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
+    FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
+    FixidityLib.Fraction memory criticalRatio;
+    // Don't let the critical reserve ratio go under 1 after 25 years.
+    if (timeSinceInitialization.gte(m)) {
+      criticalRatio = FixidityLib.fixed1();
+    } else {
+      criticalRatio = b.subtract(timeSinceInitialization.divide(m));
+    }
+    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().getReserveRatio());
+    return ratio.lte(criticalRatio);
+  }
+
+  /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
    * @return The per validator epoch payment and the total rewards to voters.
    */
