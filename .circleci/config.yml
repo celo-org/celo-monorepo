@@ -44,6 +44,48 @@ general:
     - 'web/coverage'
     - 'protocol/coverage'
 
+commands:
+  yarn_install:
+    parameters:
+      rebuild_scrypt:
+        type: boolean
+        default: true
+    steps:
+      - restore_cache:
+          keys:
+            - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-v2-{{ arch }}-{{ .Branch }}-
+            - yarn-v2-{{ arch }}-
+            - yarn-v2-
+
+      - run:
+          name: Delete @celo dir from node_modules (if its there)
+          command: rm -rf ~/app/node_modules/@celo
+
+      - run:
+          name: Install dependencies
+          command: |
+            # Deals with yarn install flakiness which can come due to yarnpkg.com being
+            # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
+            yarn install || yarn install
+      - run:
+          name: Fail if someone forgot to commit "yarn.lock"
+          command: |
+            if [[ $(git status --porcelain) ]]; then
+              echo "There are git differences after running yarn install"
+              exit 1
+            fi
+      - when:
+          condition: << parameters.rebuild_scrypt >>
+          steps:
+            - run: npm rebuild scrypt
+
+      - save_cache:
+          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - packages/*/node_modules
+
 jobs:
   install_dependencies:
     <<: *defaults
@@ -79,37 +121,7 @@ jobs:
       - attach_workspace:
           at: ~/app
 
-      - restore_cache:
-          keys:
-            - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v2-{{ arch }}-{{ .Branch }}-
-            - yarn-v2-{{ arch }}-
-            - yarn-v2-
-
-      - run:
-          name: Delete @celo dir from node_modules (if its there)
-          command: rm -rf ~/app/node_modules/@celo
-
-      - run:
-          name: Install dependencies
-          command: |
-            # Deals with yarn install flakiness which can come due to yarnpkg.com being
-            # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
-            yarn install || yarn install
-      - run:
-          name: Fail if someone forgot to commit "yarn.lock"
-          command: |
-            if [[ $(git status --porcelain) ]]; then
-              echo "There are git differences after running yarn install"
-              exit 1
-            fi
-      - run: npm rebuild scrypt
-
-      - save_cache:
-          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
-            - packages/*/node_modules
+      - yarn_install
 
       - run:
           name: Build packages
@@ -291,9 +303,8 @@ jobs:
             node -v
       # Not using a workspace here as Node and Yarn versions
       # differ between our macOS executor image and the Docker containers
-      - run:
-          name: Install dependencies
-          command: yarn install || yarn install
+      - yarn_install:
+          rebuild_scrypt: false
       - run:
           name: Build packages
           command: |
