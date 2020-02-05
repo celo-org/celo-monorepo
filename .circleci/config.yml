@@ -766,7 +766,7 @@ workflows:
   version: 2
   celo-monorepo-build:
     jobs:
-      # - install_dependencies
+      - install_dependencies
       # - lint-checks:
       #     requires:
       #       - install_dependencies
