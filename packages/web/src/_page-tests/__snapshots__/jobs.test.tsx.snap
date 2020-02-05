@@ -4132,8 +4132,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               position: absolute;
               bottom: 60px;
               left: 0;
-              width: 100%;
-              height: calc(90% - 100px)
+              width: calc(100% - 5px);
+              height: calc(90% - 60px);
             }
 
             .ReactModal__Overlay {
@@ -11448,8 +11448,8 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               position: absolute;
               bottom: 60px;
               left: 0;
-              width: 100%;
-              height: calc(90% - 100px)
+              width: calc(100% - 5px);
+              height: calc(90% - 60px);
             }
 
             .ReactModal__Overlay {

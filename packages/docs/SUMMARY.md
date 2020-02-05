@@ -14,6 +14,10 @@
   - [Reconnecting to a Network](getting-started/reconnecting-to-network.md)
 - [Glossary](getting-started/glossary.md)
 
+## Node Operations
+
+- [Key Management](node-operations/key-management.md)
+
 ## Celo Codebase
 
 - [Celo Protocol](celo-codebase/protocol/README.md)

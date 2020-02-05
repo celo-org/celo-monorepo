@@ -84,7 +84,7 @@
     "1": "algunas funciones no disponible"
   },
   "networkConnectionFailed": "No se pudo conectar a la red, por favor verifica tu conexión",
-  "firebaseFailed": "No se pudo conectar al servicio de notificaciones",
+  "firebaseFailed": "No se pudo conectar al Firebase",
   "gasPriceUpdateFailed": "No se pudo actualizar la comisión",
   "appHasToBeUpdated": "La aplicación tiene que ser actualizada",
   "thisVersionIsInsecure": "Esta versión es insegura.",

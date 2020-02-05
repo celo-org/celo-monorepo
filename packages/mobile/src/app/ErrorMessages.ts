@@ -18,6 +18,7 @@ export enum ErrorMessages {
   EMPTY_ATTESTATION_CODE = 'nuxVerification2:emptyVerificationCode',
   INVALID_ATTESTATION_CODE = 'nuxVerification2:invalidVerificationCode',
   REPEAT_ATTESTATION_CODE = 'nuxVerification2:repeatVerificationCode',
+  REVEAL_ATTESTATION_FAILURE = 'nuxVerification2:revealAttestationFailure',
   VERIFICATION_FAILURE = 'nuxVerification2:verificationFailure',
   VERIFICATION_TIMEOUT = 'nuxVerification2:verificationTimeout',
   INVALID_ACCOUNT = 'invalidAccount',

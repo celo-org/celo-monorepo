@@ -83,6 +83,20 @@
     "license": "All icons are licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
     "headline": "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
   },
+  "keyImagery": {
+    "title": "Key Imagery",
+    "headline":
+      "Used to tell a story, key images are visual tools that bring the text to life. These images help the user comprehend the material multidimensionally.\n\nImages have descriptions that act as guidelines for both accessibility and communication clarity. Most images can have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.",
+    "license":
+      "All imagery is licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
+    "illoTitle": "Illustrations",
+    "illoText":
+      "Illustrations show concrete ways that humans interact with an idea. They utilize current mental models to simplify a concept.",
+    "abstractTitle": "Abstract Graphics",
+    "abstractText":
+      "Abstract Graphics are visual tools that use coins to animate an idea. They can be dynamic or static.",
+    "errorMessage": "Images could not be found"
+  },
   "downloadAssetBtn": "Download",
   "licenseTitle": "Usage & License Note"
 }

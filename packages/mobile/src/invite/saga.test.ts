@@ -62,7 +62,7 @@ jest.mock('src/web3/contracts', () => {
         sha3: (x: any) => `a sha3 hash`,
       },
     },
-    isZeroSyncMode: () => false,
+    isFornoMode: () => false,
   }
 })
 
