@@ -14,10 +14,14 @@ export default class Propose extends BaseCommand {
     jsonTransactions: flags.string({ required: true, description: 'Path to json transactions' }),
     deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
+    descriptionURL: flags.string({
+      required: true,
+      description: 'A URL where further information about the proposal can be viewed',
+    }),
   }
 
   static examples = [
-    'propose --jsonTransactions ./transactions.json --deposit 10000 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+    'propose --jsonTransactions ./transactions.json --deposit 10000 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33',
   ]
 
   async run() {
@@ -35,7 +39,7 @@ export default class Propose extends BaseCommand {
     const governance = await this.kit.contracts.getGovernance()
     await displaySendTx(
       'proposeTx',
-      governance.propose(proposal),
+      governance.propose(proposal, res.flags.descriptionURL),
       { value: res.flags.deposit },
       'ProposalQueued'
     )

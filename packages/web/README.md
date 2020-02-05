@@ -14,6 +14,16 @@ and then running
 
 which will start a server accessible at [http://localhost:3000](http://localhost:3000)
 
+## Testing
+
+run tests with `yarn test`
+
+tools: `jest`, `@testing-library/react`
+
+#### Testing Strategy
+
+Each page should have a snapshot test found in `src/_page-tests` more interactive components should have an additional tests for various states/ interactions.
+
 ## Architecture
 
 The website uses [React.js](https://reactjs.org/), [Next.js](https://nextjs.org/), and [React Native Web](https://github.com/necolas/react-native-web). React is a great library for building user interfaces. Next.js takes care of server-rendering React apps in a simple way and preloading/transitioning pages quickly. React Native web allows us to use the same code in the application on the website, specifically the way we do CSS.
@@ -35,7 +45,3 @@ Now you can run
 `yarn run deploy:dev`
 
 to deploy to the `dev` environment, with similar commands for `staging` and `prod`
-
-## Add your picture
-
-Take a look at the files in [this folder](https://github.com/celo-org/celo-monorepo/tree/master/packages/web/src/about/team) and see if you can figure out how to add your picture to the `/about` page :)

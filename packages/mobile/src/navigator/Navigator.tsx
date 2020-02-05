@@ -103,6 +103,7 @@ export const commonScreens = {
   [Screens.DappKitSignTxScreen]: { screen: DappKitSignTxScreen },
   [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
   [Screens.Debug]: { screen: Debug },
+  [Screens.DataSaver]: { screen: DataSaver },
 }
 
 const verificationScreens = {

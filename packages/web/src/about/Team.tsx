@@ -23,7 +23,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
     const isTablet = screen === ScreenSizes.TABLET
     const isMobile = screen === ScreenSizes.MOBILE
     return (
-      <>
+      <View nativeID="contributors">
         <BookLayout label={t('teamTitle')} startBlock={true}>
           <Text style={[fonts.p, standardStyles.sectionMarginBottomMobile]}>{t('teamCopy')} </Text>
         </BookLayout>
@@ -66,7 +66,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
             </View>
           </Cell>
         </GridRow>
-      </>
+      </View>
     )
   }
 }
@@ -95,7 +95,12 @@ const Portrait = React.memo(function _Portrait({
       <Responsive medium={styles.mediumPerson} large={styles.largePerson}>
         <View style={styles.person}>
           <AspectRatio ratio={1}>
-            <Image source={source} onLoad={onLoad} style={styles.photo} />
+            <Image
+              accessibilityLabel={`Photo of ${name}`}
+              source={source}
+              onLoad={onLoad}
+              style={styles.photo}
+            />
           </AspectRatio>
 
           <View style={standardStyles.row}>

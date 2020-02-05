@@ -193,13 +193,10 @@ export async function sendPaymentNotification(
   )
 }
 
-export async function requestedPaymentNotification(
-  address: string,
-  amount: string,
-  currency: Currencies,
-  data: PaymentRequest
-) {
-  const t = getTranslatorForAddress(address)
+export async function requestedPaymentNotification(uid: string, data: PaymentRequest) {
+  const { requesteeAddress, amount, currency } = data
+  const t = getTranslatorForAddress(requesteeAddress)
+
   data.type = NotificationTypes.PAYMENT_REQUESTED
   return sendNotification(
     t('paymentRequestedTitle'),
@@ -207,8 +204,8 @@ export async function requestedPaymentNotification(
       amount,
       currency: t(currency, { count: parseInt(amount, 10) }),
     }),
-    address,
-    paymentObjectToNotification(data)
+    requesteeAddress,
+    { uid, ...paymentObjectToNotification(data) }
   )
 }
 

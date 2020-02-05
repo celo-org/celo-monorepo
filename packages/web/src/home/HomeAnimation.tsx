@@ -12,6 +12,7 @@ export interface Props {
   mode: Mode
   onLoaded: () => void
   onFinished: () => void
+  onError: () => void
 }
 export enum Mode {
   'wait',
@@ -25,12 +26,16 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   started = false
 
   videoLoaded = () => {
-    if (this.video) {
-      if (!this.started) {
-        this.props.onLoaded()
-        this.video.play()
+    try {
+      if (this.video) {
+        if (!this.started) {
+          this.props.onLoaded()
+          this.video.play()
+        }
+        this.started = true
       }
-      this.started = true
+    } catch {
+      this.props.onError()
     }
   }
 
