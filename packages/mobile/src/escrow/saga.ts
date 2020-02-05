@@ -110,7 +110,7 @@ function* withdrawFromEscrow() {
 
     const escrow: EscrowWrapper = yield call([
       contractKit.contracts,
-      contractKit.contracts.getExchange,
+      contractKit.contracts.getEscrow,
     ])
     const account: string = yield call(getConnectedUnlockedAccount)
     const tmpWalletPrivateKey: string = yield select(

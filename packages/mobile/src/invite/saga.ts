@@ -1,3 +1,4 @@
+import { CeloTransactionObject } from '@celo/contractkit'
 import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
@@ -318,7 +319,7 @@ export function* withdrawFundsFromTempAccount(
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx = yield call(createTransaction, CURRENCY_ENUM.DOLLAR, {
+  const tx: CeloTransactionObject<boolean> = yield call(createTransaction, CURRENCY_ENUM.DOLLAR, {
     recipientAddress: newAccount,
     comment: SENTINEL_INVITE_COMMENT,
     // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
@@ -326,7 +327,7 @@ export function* withdrawFundsFromTempAccount(
   })
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
+  yield call(sendTransaction, tx.txo, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 
