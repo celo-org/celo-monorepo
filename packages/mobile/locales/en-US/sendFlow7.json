@@ -44,8 +44,7 @@
   "sentEscrowPayment": "Sent Escrow Payment",
   "mobileNumber": "Mobile #",
   "walletAddress": "Wallet Address",
-  "inviteSMS":
-    "Hi{{name}}! I would like to invite you to join the Celo payments network. Your invite code is: {{code}} You can install the Celo application from the following link: {{link}}",
+  "inviteSMS": "Hi{{name}}! I would like to invite you to join the Celo payments network. Your invite code is: {{code}} You can install the Celo application from the following link: {{link}}",
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
@@ -60,6 +59,7 @@
   "showYourQRCode": "Show your QR code",
   "toSentOrRequestPayment": "to send or request payment",
   "requestSent": "Request Sent",
+  "reminderSent": "Reminder Sent",
   "reclaimPayment": "Reclaim Payment",
   "totalSent": "Total Sent",
   "totalRefunded": "Total Refunded",

@@ -20,14 +20,14 @@ const mobileFirst = require('src/home/version3/mobileFirst.png')
 type Props = I18nProps & ScreenProps
 
 const trackPaper = (name) => {
-  analytics.track(`${name} opened`)
+  return analytics.track(`${name} opened`)
 }
 
-const onWhitePaperPress = () => {
-  trackPaper('white_paper')
+const onWhitePaperPress = async () => {
+  await trackPaper('white_paper')
 }
-const onStabilityPress = () => {
-  trackPaper('stability')
+const onStabilityPress = async () => {
+  await trackPaper('stability')
 }
 
 class HomeSystems extends React.PureComponent<Props> {
