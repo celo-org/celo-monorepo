@@ -12,6 +12,6 @@
 
 ▸ **setup**(): *Promise‹void›*
 
-*Defined in [packages/contractkit/src/test-utils/ganache.setup.ts:7](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/test-utils/ganache.setup.ts#L7)*
+*Defined in [packages/contractkit/src/test-utils/ganache.setup.ts:7](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/test-utils/ganache.setup.ts#L7)*
 
 **Returns:** *Promise‹void›*

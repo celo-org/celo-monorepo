@@ -17,7 +17,7 @@
 
 • **duration**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:50](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Validators.ts#L50)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:50](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Validators.ts#L50)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **value**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:49](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Validators.ts#L49)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:49](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Validators.ts#L49)*

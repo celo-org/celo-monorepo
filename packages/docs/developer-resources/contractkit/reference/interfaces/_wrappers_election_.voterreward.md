@@ -19,7 +19,7 @@
 
 • **address**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:36](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Election.ts#L36)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:36](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Election.ts#L36)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **addressPayment**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:37](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Election.ts#L37)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:37](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Election.ts#L37)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **epochNumber**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:39](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Election.ts#L39)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:39](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Election.ts#L39)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **group**: *[ValidatorGroup](_wrappers_validators_.validatorgroup.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:38](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Election.ts#L38)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:38](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Election.ts#L38)*

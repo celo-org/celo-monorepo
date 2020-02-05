@@ -11,6 +11,7 @@
 * [args](_governance_proposals_.proposaltransactionjson.md#args)
 * [contract](_governance_proposals_.proposaltransactionjson.md#contract)
 * [function](_governance_proposals_.proposaltransactionjson.md#function)
+* [params](_governance_proposals_.proposaltransactionjson.md#optional-params)
 * [value](_governance_proposals_.proposaltransactionjson.md#value)
 
 ## Properties
@@ -19,7 +20,7 @@
 
 • **args**: *any[]*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:26](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/governance/proposals.ts#L26)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:26](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/governance/proposals.ts#L26)*
 
 ___
 
@@ -27,7 +28,7 @@ ___
 
 • **contract**: *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:24](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/governance/proposals.ts#L24)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:24](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/governance/proposals.ts#L24)*
 
 ___
 
@@ -35,7 +36,15 @@ ___
 
 • **function**: *string*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:25](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/governance/proposals.ts#L25)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:25](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/governance/proposals.ts#L25)*
+
+___
+
+### `Optional` params
+
+• **params**? : *Record‹string, any›*
+
+*Defined in [packages/contractkit/src/governance/proposals.ts:27](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/governance/proposals.ts#L27)*
 
 ___
 
@@ -43,4 +52,4 @@ ___
 
 • **value**: *string*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:27](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/governance/proposals.ts#L27)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:28](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/governance/proposals.ts#L28)*

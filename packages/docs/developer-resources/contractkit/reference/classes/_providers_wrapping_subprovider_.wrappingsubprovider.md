@@ -28,7 +28,7 @@
 
 \+ **new WrappingSubprovider**(`provider`: Provider): *[WrappingSubprovider](_providers_wrapping_subprovider_.wrappingsubprovider.md)*
 
-*Defined in [packages/contractkit/src/providers/wrapping-subprovider.ts:7](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/providers/wrapping-subprovider.ts#L7)*
+*Defined in [packages/contractkit/src/providers/wrapping-subprovider.ts:7](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/wrapping-subprovider.ts#L7)*
 
 **Parameters:**
 
@@ -44,7 +44,7 @@ Name | Type |
 
 • **provider**: *Provider*
 
-*Defined in [packages/contractkit/src/providers/wrapping-subprovider.ts:8](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/providers/wrapping-subprovider.ts#L8)*
+*Defined in [packages/contractkit/src/providers/wrapping-subprovider.ts:8](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/wrapping-subprovider.ts#L8)*
 
 ## Methods
 
@@ -78,7 +78,7 @@ ___
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/providers/wrapping-subprovider.ts:16](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/providers/wrapping-subprovider.ts#L16)*
+*Defined in [packages/contractkit/src/providers/wrapping-subprovider.ts:16](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/wrapping-subprovider.ts#L16)*
 
 **Parameters:**
 

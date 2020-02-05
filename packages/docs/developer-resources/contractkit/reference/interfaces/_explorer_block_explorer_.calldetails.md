@@ -19,7 +19,7 @@
 
 • **argList**: *any[]*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:11](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/explorer/block-explorer.ts#L11)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:12](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/explorer/block-explorer.ts#L12)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **contract**: *string*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:8](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/explorer/block-explorer.ts#L8)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:9](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/explorer/block-explorer.ts#L9)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **function**: *string*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:9](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/explorer/block-explorer.ts#L9)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:10](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/explorer/block-explorer.ts#L10)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **paramMap**: *Record‹string, any›*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:10](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/explorer/block-explorer.ts#L10)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:11](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/explorer/block-explorer.ts#L11)*

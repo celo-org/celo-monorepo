@@ -20,7 +20,7 @@
 
 • **concurrentProposals**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:39](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Governance.ts#L39)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:39](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Governance.ts#L39)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **dequeueFrequency**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:40](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Governance.ts#L40)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:40](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Governance.ts#L40)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **minDeposit**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:41](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Governance.ts#L41)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:41](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Governance.ts#L41)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **queueExpiry**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:42](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Governance.ts#L42)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:42](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Governance.ts#L42)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **stageDurations**: *[ProposalStageDurations](_wrappers_governance_.proposalstagedurations.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:43](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Governance.ts#L43)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:43](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Governance.ts#L43)*

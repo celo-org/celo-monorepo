@@ -13,7 +13,7 @@
 
 ▸ **recoverTransaction**(`rawTx`: string): *[[CeloTx](../interfaces/_utils_tx_signing_.celotx.md), string]*
 
-*Defined in [packages/contractkit/src/utils/signing-utils.ts:131](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/utils/signing-utils.ts#L131)*
+*Defined in [packages/contractkit/src/utils/signing-utils.ts:131](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/signing-utils.ts#L131)*
 
 **Parameters:**
 
@@ -29,7 +29,7 @@ ___
 
 ▸ **signTransaction**(`txn`: any, `privateKey`: string): *Promise‹any›*
 
-*Defined in [packages/contractkit/src/utils/signing-utils.ts:31](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/utils/signing-utils.ts#L31)*
+*Defined in [packages/contractkit/src/utils/signing-utils.ts:31](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/signing-utils.ts#L31)*
 
 **Parameters:**
 

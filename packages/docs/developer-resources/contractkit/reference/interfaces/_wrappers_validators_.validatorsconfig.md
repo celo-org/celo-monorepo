@@ -18,7 +18,7 @@
 
 • **groupLockedGoldRequirements**: *[LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:54](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Validators.ts#L54)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:54](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Validators.ts#L54)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **maxGroupSize**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:56](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Validators.ts#L56)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:56](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Validators.ts#L56)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **validatorLockedGoldRequirements**: *[LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:55](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/Validators.ts#L55)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:55](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/Validators.ts#L55)*

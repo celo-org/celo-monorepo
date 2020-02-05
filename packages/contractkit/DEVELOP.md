@@ -16,4 +16,4 @@ To generate docs from [TSdoc](https://github.com/microsoft/tsdoc) annotations us
 
 `yarn docs`
 
-To customize this generation, see the [linkdocs](./linkdocs.ts) script.
+To customize this generation, see the [linkdocs](./scripts/linkdocs.ts) script.

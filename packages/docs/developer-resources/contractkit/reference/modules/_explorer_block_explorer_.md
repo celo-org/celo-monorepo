@@ -22,7 +22,7 @@
 
 ▸ **newBlockExplorer**(`kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹[BlockExplorer](../classes/_explorer_block_explorer_.blockexplorer.md)‹››*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:29](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/explorer/block-explorer.ts#L29)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:30](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/explorer/block-explorer.ts#L30)*
 
 **Parameters:**
 

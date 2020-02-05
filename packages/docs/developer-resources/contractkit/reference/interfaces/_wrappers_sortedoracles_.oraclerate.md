@@ -18,7 +18,7 @@
 
 • **address**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:27](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/SortedOracles.ts#L27)*
+*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:27](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/SortedOracles.ts#L27)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **medianRelation**: *[MedianRelation](../enums/_wrappers_sortedoracles_.medianrelation.md)*
 
-*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:29](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/SortedOracles.ts#L29)*
+*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:29](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/SortedOracles.ts#L29)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **rate**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:28](https://github.com/celo-org/celo-monorepo/blob/6049da1fa/packages/contractkit/src/wrappers/SortedOracles.ts#L28)*
+*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:28](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/wrappers/SortedOracles.ts#L28)*
