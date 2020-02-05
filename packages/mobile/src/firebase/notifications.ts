@@ -53,8 +53,6 @@ function* handlePaymentReceived(
   transferNotification: TransferNotificationData,
   notificationState: NotificationReceiveState
 ) {
-  yield put(refreshAllBalances())
-
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
     const recipientCache = yield select(recipientCacheSelector)
     const addressToE164Number = yield select(addressToE164NumberSelector)
