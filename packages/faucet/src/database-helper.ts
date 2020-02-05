@@ -87,12 +87,7 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
 function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: NetworkConfig) {
   return async (account: AccountRecord) => {
     const celo = new CeloAdapter({ nodeUrl: config.nodeUrl, pk: account.pk })
-    const goldTx = await celo.transferGold(request.beneficiary, config.faucetGoldAmount)
-    const goldTxReceipt = await goldTx.sendAndWaitForReceipt()
-    const goldTxHash = goldTxReceipt.transactionHash
-    console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
-    await snap.ref.update({ goldTxHash })
-
+    await sendGold(celo, request.beneficiary, config.faucetGoldAmount, snap)
     await sendDollars(celo, request.beneficiary, config.faucetDollarAmount, snap)
   }
 }
@@ -108,13 +103,8 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     const celo = new CeloAdapter({ nodeUrl: config.nodeUrl, pk: account.pk })
     const { address: tempAddress, inviteCode } = generateInviteCode()
 
-    const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
-    const goldReceipt = await goldTx.sendAndWaitForReceipt()
-    const goldTxHash = goldReceipt.transactionHash
-    console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
-    await snap.ref.update({ goldTxHash })
-
-    const dollarTxHash = await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
+    await sendGold(celo, tempAddress, config.inviteGoldAmount, snap)
+    await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
 
     const phoneHash = getPhoneHash(request.beneficiary)
     const escrowTx = await celo.escrowDollars(
@@ -126,7 +116,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     )
     const escrowReceipt = await escrowTx.sendAndWaitForReceipt()
     const escrowTxHash = escrowReceipt.transactionHash
-    console.info(`req(${snap.key}): Escrow Dollar Transaction Sent. txhash:${dollarTxHash}`)
+    console.info(`req(${snap.key}): Escrow Dollar Transaction Sent. txhash:${escrowTxHash}`)
     await snap.ref.update({ escrowTxHash })
 
     await config.twilioClient.messages.create({
@@ -149,6 +139,15 @@ async function sendDollars(
   console.info(`req(${snap.key}): Dollar Transaction Sent. txhash:${dollarTxHash}`)
   await snap.ref.update({ dollarTxHash })
   return dollarTxHash
+}
+
+async function sendGold(celo: CeloAdapter, address: Address, amount: string, snap: DataSnapshot) {
+  const goldTx = await celo.transferGold(address, amount)
+  const goldTxReceipt = await goldTx.sendAndWaitForReceipt()
+  const goldTxHash = goldTxReceipt.transactionHash
+  console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
+  await snap.ref.update({ goldTxHash })
+  return goldTxHash
 }
 
 function messageText(inviteCode: string, request: RequestRecord) {
