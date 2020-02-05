@@ -41,6 +41,7 @@ function* handlePaymentRequested(
   const targetRecipient = getRecipientFromPaymentRequest(paymentRequest, recipientCache)
 
   navigateToRequestedPaymentReview({
+    firebasePendingRequestUid: paymentRequest.uid,
     recipient: targetRecipient,
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
