@@ -14,7 +14,7 @@
   - [Reconnecting to a Network](getting-started/reconnecting-to-network.md)
 - [Glossary](getting-started/glossary.md)
 
-## Node Operations
+## Operations Manual
 
 - [Key Management](node-operations/key-management.md)
 
