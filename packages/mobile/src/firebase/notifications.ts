@@ -10,7 +10,6 @@ import {
 import { showMessage } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
-import { refreshAllBalances } from 'src/home/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { getRecipientFromAddress } from 'src/recipients/recipient'
