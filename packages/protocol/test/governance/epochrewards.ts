@@ -71,6 +71,7 @@ contract('EpochRewards', (accounts: string[]) => {
     },
   }
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
+  const communityRewardFraction = toFixed(new BigNumber(1 / 4))
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
@@ -110,7 +111,8 @@ contract('EpochRewards', (accounts: string[]) => {
       rewardsMultiplier.adjustments.underspend,
       rewardsMultiplier.adjustments.overspend,
       targetVotingGoldFraction,
-      targetValidatorEpochPayment
+      targetValidatorEpochPayment,
+      communityRewardFraction
     )
   })
 
@@ -150,7 +152,8 @@ contract('EpochRewards', (accounts: string[]) => {
           rewardsMultiplier.adjustments.underspend,
           rewardsMultiplier.adjustments.overspend,
           targetVotingGoldFraction,
-          targetValidatorEpochPayment
+          targetValidatorEpochPayment,
+          communityRewardFraction
         )
       )
     })
@@ -192,6 +195,47 @@ contract('EpochRewards', (accounts: string[]) => {
       describe('when the fraction is the same', () => {
         it('should revert', async () => {
           await assertRevert(epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction))
+        })
+      })
+    })
+  })
+
+  describe('#setCommunityRewardFraction()', () => {
+    describe('when the fraction is different', () => {
+      const newFraction = communityRewardFraction.plus(1)
+
+      describe('when called by the owner', () => {
+        it('should set the community reward fraction', async () => {
+          await epochRewards.setCommunityRewardFraction(newFraction)
+          assertEqualBN(await epochRewards.getCommunityRewardFraction(), newFraction)
+        })
+
+        it('should emit the CommunityRewardFractionSet event', async () => {
+          const resp = await epochRewards.setCommunityRewardFraction(newFraction)
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'CommunityRewardFractionSet',
+            args: {
+              fraction: newFraction,
+            },
+          })
+        })
+
+        describe('when called by a non-owner', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              epochRewards.setCommunityRewardFraction(newFraction, {
+                from: nonOwner,
+              })
+            )
+          })
+        })
+      })
+
+      describe('when the fraction is the same', () => {
+        it('should revert', async () => {
+          await assertRevert(epochRewards.setCommunityRewardFraction(communityRewardFraction))
         })
       })
     })
@@ -380,7 +424,7 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe('#getTargetEpochRewards()', () => {
+  describe('#getTargetVoterRewards()', () => {
     describe('when there are active votes', () => {
       const activeVotes = 1000000
       beforeEach(async () => {
@@ -389,7 +433,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
       it('should return a percentage of the active votes', async () => {
         const expected = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
-        assertEqualBN(await epochRewards.getTargetEpochRewards(), expected)
+        assertEqualBN(await epochRewards.getTargetVoterRewards(), expected)
       })
     })
   })
@@ -417,7 +461,7 @@ contract('EpochRewards', (accounts: string[]) => {
     const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
     let targetEpochReward: BigNumber
     beforeEach(async () => {
-      targetEpochReward = await epochRewards.getTargetEpochRewards()
+      targetEpochReward = await epochRewards.getTargetVoterRewards()
       targetEpochReward = targetEpochReward.plus(
         await epochRewards.getTargetTotalEpochPaymentsInGold()
       )
@@ -550,12 +594,13 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe('#calculateTargetEpochPaymentAndRewards()', () => {
+  describe('#calculateTargetEpochRewards()', () => {
     describe('when there are active votes, a stable token exchange rate is set and the actual remaining supply is 10% more than the target remaining supply after rewards', () => {
       const activeVotes = 1000000
       const timeDelta = YEAR.times(10)
       const numberValidators = 100
       let expectedMultiplier: BigNumber
+      let expectedTargetGoldSupplyIncrease: BigNumber
       beforeEach(async () => {
         await epochRewards.setNumberValidatorsInCurrentSet(numberValidators)
         await mockElection.setActiveVotes(activeVotes)
@@ -566,9 +611,10 @@ contract('EpochRewards', (accounts: string[]) => {
         const expectedTargetEpochRewards = fromFixed(targetVotingYieldParams.initial).times(
           activeVotes
         )
-        const expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards.plus(
-          expectedTargetTotalEpochPaymentsInGold
-        )
+        expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards
+          .plus(expectedTargetTotalEpochPaymentsInGold)
+          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .integerValue(BigNumber.ROUND_FLOOR)
         const expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta)
         const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
         const actualRemainingSupply = expectedTargetRemainingSupply.times(1.1)
@@ -584,14 +630,27 @@ contract('EpochRewards', (accounts: string[]) => {
 
       it('should return the target validator epoch payment times the rewards multiplier', async () => {
         const expected = targetValidatorEpochPayment.times(expectedMultiplier)
-        assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[0], expected)
+        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[0], expected)
       })
 
       it('should return the target yield times the number of active votes times the rewards multiplier', async () => {
         const expected = fromFixed(targetVotingYieldParams.initial)
           .times(activeVotes)
           .times(expectedMultiplier)
-        assertEqualBN((await epochRewards.calculateTargetEpochPaymentAndRewards())[1], expected)
+        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[1], expected)
+      })
+      it('should return the correct amount for the community reward', async () => {
+        const validatorReward = targetValidatorEpochPayment
+          .times(numberValidators)
+          .div(exchangeRate)
+        const votingReward = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
+        const expected = validatorReward
+          .plus(votingReward)
+          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .times(fromFixed(communityRewardFraction))
+          .times(expectedMultiplier)
+          .integerValue(BigNumber.ROUND_FLOOR)
+        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected)
       })
     })
   })
@@ -752,13 +811,15 @@ contract('EpochRewards', (accounts: string[]) => {
       await epochRewards.freeze()
     })
 
-    it('should make calculateTargetEpochPaymentAndRewards return zeroes', async () => {
+    it('should make calculateTargetEpochRewards return zeroes', async () => {
       const [
         validatorPayment,
         voterRewards,
-      ] = await epochRewards.calculateTargetEpochPaymentAndRewards()
+        communityReward,
+      ] = await epochRewards.calculateTargetEpochRewards()
       assertEqualBN(validatorPayment, 0)
       assertEqualBN(voterRewards, 0)
+      assertEqualBN(communityReward, 0)
     })
   })
 })
