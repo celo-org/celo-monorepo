@@ -1,13 +1,28 @@
-import { ExchangeTransaction, TransferTransaction } from 'src/apollo/types'
+import { TokenTransactionType } from 'src/apollo/types'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, ActionTypes } from 'src/transactions/actions'
 
-export interface ExchangeStandby extends ExchangeTransaction {
+export interface ExchangeStandby {
   id: string
+  type: TokenTransactionType.Exchange
   status: TransactionStatus
+  inSymbol: CURRENCY_ENUM
+  inValue: string
+  outSymbol: CURRENCY_ENUM
+  outValue: string
+  timestamp: number
+  hash?: string
 }
-export interface TransferStandby extends TransferTransaction {
+export interface TransferStandby {
   id: string
+  type: TransferTransactionType
   status: TransactionStatus
+  value: string
+  comment: string
+  symbol: CURRENCY_ENUM
+  timestamp: number
+  address: string
+  hash?: string
 }
 
 export type StandbyTransaction = ExchangeStandby | TransferStandby
@@ -18,51 +33,17 @@ export enum TransactionStatus {
   Failed = 'Failed',
 }
 
-// Should correspond to EventTypes enum in blockchain api
-export enum TransactionTypes {
-  EXCHANGE = 'EXCHANGE',
-  RECEIVED = 'RECEIVED',
-  SENT = 'SENT',
-  ESCROW_SENT = 'ESCROW_SENT',
-  ESCROW_RECEIVED = 'ESCROW_RECEIVED',
-  FAUCET = 'FAUCET',
-  VERIFICATION_REWARD = 'VERIFICATION_REWARD',
-  VERIFICATION_FEE = 'VERIFICATION_FEE',
-  INVITE_SENT = 'INVITE_SENT',
-  INVITE_RECEIVED = 'INVITE_RECEIVED',
-  PAY_REQUEST = 'PAY_REQUEST',
-  NETWORK_FEE = 'NETWORK_FEE',
-}
-
-export type TransferTransactionTypes =
-  | TransactionTypes.SENT
-  | TransactionTypes.RECEIVED
-  | TransactionTypes.ESCROW_RECEIVED
-  | TransactionTypes.ESCROW_SENT
-  | TransactionTypes.FAUCET
-  | TransactionTypes.VERIFICATION_REWARD
-  | TransactionTypes.VERIFICATION_FEE
-  | TransactionTypes.INVITE_SENT
-  | TransactionTypes.INVITE_RECEIVED
-  | TransactionTypes.NETWORK_FEE
-
-export const isTransferType = (txType: TransactionTypes) => {
-  if (
-    txType === TransactionTypes.SENT ||
-    txType === TransactionTypes.RECEIVED ||
-    txType === TransactionTypes.ESCROW_RECEIVED ||
-    txType === TransactionTypes.ESCROW_SENT ||
-    txType === TransactionTypes.FAUCET ||
-    txType === TransactionTypes.VERIFICATION_REWARD ||
-    txType === TransactionTypes.VERIFICATION_FEE ||
-    txType === TransactionTypes.INVITE_SENT ||
-    txType === TransactionTypes.INVITE_RECEIVED ||
-    txType === TransactionTypes.NETWORK_FEE
-  ) {
-    return true
-  }
-  return false
-}
+type TransferTransactionType =
+  | TokenTransactionType.Sent
+  | TokenTransactionType.Received
+  | TokenTransactionType.EscrowReceived
+  | TokenTransactionType.EscrowSent
+  | TokenTransactionType.Faucet
+  | TokenTransactionType.VerificationReward
+  | TokenTransactionType.VerificationFee
+  | TokenTransactionType.InviteSent
+  | TokenTransactionType.InviteReceived
+  | TokenTransactionType.NetworkFee
 
 export interface State {
   standbyTransactions: StandbyTransaction[]
@@ -95,10 +76,13 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         standbyTransactions: state.standbyTransactions.map((tx) => {
-          if (tx.id === action.idx) {
-            tx.hash = action.hash
+          if (tx.id !== action.idx) {
+            return tx
           }
-          return tx
+          return {
+            ...tx,
+            hash: action.hash,
+          }
         }),
       }
     default:

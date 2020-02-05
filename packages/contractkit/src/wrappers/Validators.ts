@@ -32,6 +32,7 @@ export interface ValidatorGroup {
   name: string
   address: Address
   members: Address[]
+  membersUpdated: number
   affiliates: Address[]
   commission: BigNumber
 }
@@ -243,6 +244,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       name,
       address,
       members: res[0],
+      membersUpdated: res[2].reduce(
+        (a: number, b: BigNumber.Value) => Math.max(a, new BigNumber(b).toNumber()),
+        0
+      ),
       commission: fromFixed(new BigNumber(res[1])),
       affiliates: affiliates.map((v) => v.address),
     }
@@ -472,5 +477,24 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
         groupPayment: e.returnValues.groupPayment,
       })
     )
+  }
+
+  /**
+   * Returns the current set of validator signer addresses
+   */
+  async currentSignerSet(): Promise<Address[]> {
+    const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
+    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+      this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
+    )
+  }
+
+  /**
+   * Returns the current set of validator signer and account addresses
+   */
+  async currentValidatorAccountsSet() {
+    const signerAddresses = await this.currentSignerSet()
+    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
+    return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
   }
 }

@@ -1,4 +1,4 @@
-import { Validator } from '@celo/contractkit/src/wrappers/Validators'
+import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
