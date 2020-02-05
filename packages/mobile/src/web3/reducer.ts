@@ -8,8 +8,7 @@ export interface State {
   account: string | null
   accountInWeb3Keystore: string | null
   commentKey: string | null
-  zeroSyncMode: boolean
-  gethStartedThisSession: boolean
+  fornoMode: boolean
 }
 
 const initialState: State = {
@@ -22,8 +21,7 @@ const initialState: State = {
   account: null,
   accountInWeb3Keystore: null,
   commentKey: null,
-  zeroSyncMode: networkConfig.initiallyZeroSync,
-  gethStartedThisSession: !networkConfig.initiallyZeroSync,
+  fornoMode: networkConfig.initiallyForno,
 }
 
 export const reducer = (
@@ -42,7 +40,6 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
-        gethStartedThisSession: !state.zeroSyncMode,
       }
     }
     case Actions.SET_ACCOUNT:
@@ -55,12 +52,10 @@ export const reducer = (
         ...state,
         accountInWeb3Keystore: action.address,
       }
-    case Actions.SET_IS_ZERO_SYNC:
+    case Actions.SET_IS_FORNO:
       return {
         ...state,
-        zeroSyncMode: action.zeroSyncMode,
-        // If switching to geth, then geth has been started this session
-        gethStartedThisSession: !action.zeroSyncMode ? true : state.gethStartedThisSession,
+        fornoMode: action.fornoMode,
       }
     case Actions.SET_COMMENT_KEY:
       return {
@@ -82,7 +77,6 @@ export const reducer = (
         ...state,
         syncProgress: action.payload,
       }
-
     default:
       return state
   }

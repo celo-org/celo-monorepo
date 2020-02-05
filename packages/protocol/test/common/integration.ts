@@ -127,6 +127,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         // @ts-ignore
         Buffer.concat(proposalTransactions.map((x: any) => x.data)),
         proposalTransactions.map((x: any) => x.data.length),
+        'URL',
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
       )
@@ -257,6 +258,7 @@ contract('Integration: Governance', (accounts: string[]) => {
         // @ts-ignore
         Buffer.concat(proposalTransactions.map((x: any) => x.data)),
         proposalTransactions.map((x: any) => x.data.length),
+        'URL',
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
       )
