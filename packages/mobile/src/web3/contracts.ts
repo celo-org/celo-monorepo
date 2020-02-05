@@ -16,8 +16,8 @@ export const web3: Web3 = getWeb3()
 // @ts-ignore - need to align web3 versions in contractkit
 export const contractKit = newKitFromWeb3(web3)
 
-export function isInitiallyZeroSyncMode() {
-  return networkConfig.initiallyZeroSync
+export function isInitiallyFornoMode() {
+  return networkConfig.initiallyForno
 }
 
 function getIpcProvider() {
@@ -71,11 +71,10 @@ function getHttpProvider(url: string): Provider {
 function getWeb3(): Web3 {
   Logger.info(
     `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
+    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
   )
 
-  if (isInitiallyZeroSyncMode()) {
-    // Geth free mode
+  if (isInitiallyFornoMode()) {
     const url = DEFAULT_FORNO_URL
     Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
     return new Web3(getHttpProvider(url))
@@ -85,8 +84,8 @@ function getWeb3(): Web3 {
 }
 
 // Mutates web3 with new provider
-export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
-  if (zeroSync) {
+export function switchWeb3ProviderForSyncMode(forno: boolean) {
+  if (forno) {
     web3.setProvider(getHttpProvider(DEFAULT_FORNO_URL))
     Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
   } else {

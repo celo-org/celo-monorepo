@@ -88,20 +88,13 @@ renders when no state has changed. Reducing renders can be done via pure
 components in react or overloading the should component update method
 [example here][rn optimize example].
 
-### Connecting to networks
-
-By default, we have the `alfajores` network set up. If you have other testnets
-that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with
-the new network name and settings, then rebuild the app. Note that this will assume the testnets
-have a corresponding `/blockchain-api` and `/notification-service` set up.
-
-### Running Wallet app in zero sync (Data Saver) mode
+### Running Wallet app in forno (Data Saver) mode
 
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
-To run the wallet in zero sync (Data Saver) mode, using a trusted node rather than the local geth node as a provider, turn it on from the Data Saver page in settings or update the `ZERO_SYNC_ENABLED_INITIALLY` parameter in the .env file linked above. When zero sync mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In zero sync mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
+To run the wallet in forno (Data Saver) mode, using a trusted node rather than the local geth node as a provider, turn it on from the Data Saver page in settings or update the `FORNO_ENABLED_INITIALLY` parameter in the .env file linked above. When forno mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In forno mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
 
-To debug network requests in zero sync mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
+To debug network requests in forno mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
 
 ## Testing
 
@@ -130,21 +123,9 @@ See [`src/identity/verification.test.ts`] for an example.
 ### E2E testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
-must have the proper emulator set up. Emulator installation instructions are in
-the [setup instructions][setup#emulator].
+must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
 
-Please set `123456` as the pin code in the emulator, since the e2e tests rely on
-that.
-
-Next, the VM snapshot settings should be modified:
-
-1.  Close all apps and lock the emulator (go to lock screen).
-2.  Power off the emulator
-3.  Power it back on and go to emulator settings (... button) -> Snapshots -> Settings
-4.  Set Auto-Save to No
-
-For information on how to run and extend the e2e tests, refer to the
-[e2e readme][e2e readme].
+Once setup is done, you can run the tests with `yarn test:e2e:android`
 
 ## Building APKs / Bundles
 
@@ -218,9 +199,9 @@ Relevant code references:
 2.  [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
 3.  [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
 
-There are two major differencs in ZeroSync mode:
+There are two major differences in Forno mode:
 
-1.  Geth won't run at all. The web3 would instead connect to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
+1.  Geth won't run at all. Instead, web3 connects to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
 2.  Changes to [sendTransactionAsyncWithWeb3Signing](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/walletkit/src/contract-utils.ts#L362) in walletkit to poll after sending a transaction for the transaction to succeed. This is needed because http provider, unliked web sockets and IPC provider, does not support subscriptions.
 
 #### Why http(s) provider?
@@ -264,7 +245,6 @@ $ adb kill-server && adb start-server
 [rn profiler]: https://reactjs.org/blog/2018/09/10/introducing-the-react-profiler.html
 [rn running on device]: https://facebook.github.io/react-native/docs/running-on-device
 [setup]: ../../SETUP.md
-[setup#emulator]: ../../SETUP.md#optional-install-an-android-emulator
 [react-native-testing-library]: https://github.com/callstack/react-native-testing-library
 [rntl-docs]: https://callstack.github.io/react-native-testing-library/
 [jest]: https://jestjs.io/docs/en/snapshot-testing
