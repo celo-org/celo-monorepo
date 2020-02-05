@@ -13,7 +13,12 @@ import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src/app/actions'
+import {
+  navigatePinProtected,
+  resetAppOpenedState,
+  setAnalyticsEnabled,
+  setNumberVerified,
+} from 'src/app/actions'
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
@@ -33,6 +38,7 @@ interface DispatchProps {
   setAnalyticsEnabled: typeof setAnalyticsEnabled
   resetBackupState: typeof resetBackupState
   devModeTriggerClicked: typeof devModeTriggerClicked
+  navigatePinProtected: typeof navigatePinProtected
 }
 
 interface StateProps {
@@ -66,6 +72,7 @@ const mapDispatchToProps = {
   setAnalyticsEnabled,
   resetBackupState,
   devModeTriggerClicked,
+  navigatePinProtected,
 }
 
 export class Account extends React.Component<Props, State> {
@@ -106,6 +113,10 @@ export class Account extends React.Component<Props, State> {
 
   goToLicenses() {
     navigate(Screens.Licenses)
+  }
+
+  goToSecurity = () => {
+    this.props.navigatePinProtected(Screens.Security, { nextScreen: Screens.Account })
   }
 
   goToAnalytics() {
@@ -254,6 +265,7 @@ export class Account extends React.Component<Props, State> {
             {features.SHOW_SHOW_REWARDS_APP_LINK && (
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
+            <SettingsItem title={t('security')} onPress={this.goToSecurity} />
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
             <SettingsItem title={t('dataSaver')} onPress={this.goToDataSaver} />
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />

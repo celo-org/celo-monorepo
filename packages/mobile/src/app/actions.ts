@@ -18,6 +18,7 @@ export enum Actions {
   EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
+  SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
   NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
   START_PIN_VERIFICATION = 'APP/START_PIN_VERIFICATION',
   FINISH_PIN_VERIFICATION = 'APP/FINISH_PIN_VERIFICATION',
@@ -60,6 +61,11 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
+interface SetLockWithPinEnabled {
+  type: Actions.SET_LOCK_WITH_PIN_ENABLED
+  enabled: boolean
+}
+
 export interface NavigatePinProtected {
   type: Actions.NAVIGATE_PIN_PROTECTED
   routeName: string
@@ -83,6 +89,7 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
+  | SetLockWithPinEnabled
   | NavigatePinProtected
   | StartPinVerification
   | FinishPinVerification
@@ -133,6 +140,11 @@ export const exitBackupFlow = () => ({
 
 export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   type: Actions.SET_ANALYTICS_ENABLED,
+  enabled,
+})
+
+export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+  type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
 })
 

@@ -23,6 +23,7 @@ import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
+import Security from 'src/account/Security'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
@@ -254,6 +255,7 @@ const SettingsStack = createStackNavigator(
     [Screens.Account]: { screen: Account },
     [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Language]: { screen: Language },
+    [Screens.Security]: { screen: Security },
     [Screens.Analytics]: { screen: Analytics },
     [Screens.DataSaver]: { screen: DataSaver },
     [Screens.EditProfile]: { screen: EditProfile },

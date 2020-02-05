@@ -7,8 +7,8 @@ import { finishPinVerification, openDeepLink, startPinVerification } from 'src/a
 import {
   checkAppDeprecation,
   handleDeepLink,
-  navigatePinProtected,
   navigateToProperScreen,
+  navigateWithPinProtection,
   waitForRehydrate,
 } from 'src/app/saga'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
@@ -82,7 +82,7 @@ describe('App saga', () => {
 
   it('Navigates after verifying PIN - Forno', async () => {
     const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(navigatePinProtected, testRoute)
+    await expectSaga(navigateWithPinProtection, testRoute)
       .provide([[select(fornoSelector), true]])
       .run()
     expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
@@ -90,7 +90,7 @@ describe('App saga', () => {
 
   it('Navigates after verifying PIN - Light node', async () => {
     const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(navigatePinProtected, testRoute)
+    await expectSaga(navigateWithPinProtection, testRoute)
       .provide([
         [select(fornoSelector), false],
         [call(getPincode, false), '123456'],

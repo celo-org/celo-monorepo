@@ -9,6 +9,7 @@ export interface State {
   doingBackupFlow: boolean
   doingPinVerification: boolean
   analyticsEnabled: boolean
+  lockWithPinEnabled: boolean
 }
 
 const initialState = {
@@ -19,6 +20,7 @@ const initialState = {
   doingBackupFlow: false,
   doingPinVerification: false,
   analyticsEnabled: true,
+  lockWithPinEnabled: false,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -72,6 +74,11 @@ export const appReducer = (
       return {
         ...state,
         analyticsEnabled: action.enabled,
+      }
+    case Actions.SET_LOCK_WITH_PIN_ENABLED:
+      return {
+        ...state,
+        lockWithPinEnabled: action.enabled,
       }
     case Actions.START_PIN_VERIFICATION:
       return {

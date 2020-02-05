@@ -8,6 +8,7 @@ import {
   Actions,
   finishPinVerification,
   NavigatePinProtected,
+  navigatePinProtected,
   OpenDeepLink,
   setLanguage,
   startPinVerification,
@@ -123,9 +124,9 @@ export function* navigateToProperScreen() {
   } else if (!redeemComplete && !account) {
     navigate(Screens.EnterInviteCode)
   } else if (!hasSeenVerificationNux) {
-    navigate(Screens.VerificationEducationScreen)
+    yield put(navigatePinProtected(Screens.VerificationEducationScreen))
   } else {
-    navigate(Stacks.AppStack)
+    yield put(navigatePinProtected(Stacks.AppStack))
   }
 }
 
@@ -144,7 +145,7 @@ export function* handleDeepLink(action: OpenDeepLink) {
   }
 }
 
-export function* navigatePinProtected(action: NavigatePinProtected) {
+export function* navigateWithPinProtection(action: NavigatePinProtected) {
   const fornoMode = yield select(fornoSelector)
   try {
     if (!fornoMode) {
@@ -166,7 +167,7 @@ export function* navigatePinProtected(action: NavigatePinProtected) {
 }
 
 export function* watchNavigatePinProtected() {
-  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigatePinProtected)
+  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigateWithPinProtection)
 }
 
 export function* watchDeepLinks() {
