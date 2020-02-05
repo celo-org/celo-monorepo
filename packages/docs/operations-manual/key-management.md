@@ -31,7 +31,7 @@ If a signing key is lost or compromised, the Account key can authorize a new sig
 
 Because the Validator signing key is constantly in use to sign consensus messages, Validator key rotation is a bit trickier. Here is a recommended procedure for rotating the signing key of an active and elected validator:
 
-1. Create a new Validator instance as detailed in the [Deploy a Validator](../getting-started/running-a-validator.md#deploy-a-validator) section of the getting started documentation. Wait for the new instance to sync before proceeding.
+1. Create a new Validator instance as detailed in the [Deploy a Validator](../getting-started/running-a-validator.md#deploy-a-validator) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding.
 
   {% hint style="warning" %}
   Before proceeding to steps 2 and 3, ensure there is sufficient time until the next epoch to complete both when rotating ECDSA and BLS keys together.
