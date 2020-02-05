@@ -1,7 +1,6 @@
 /* tslint:disable max-classes-per-file */
 import { database } from 'firebase-admin'
 import { DataSnapshot } from 'firebase-functions/lib/providers/database'
-import Web3 from 'web3'
 import { CeloAdapter } from './celo-adapter'
 import { NetworkConfig } from './config'
 import { ExecutionResult, logExecutionResult } from './metrics'
@@ -87,18 +86,12 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
 
 function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: NetworkConfig) {
   return async (account: AccountRecord) => {
-    const celo = new CeloAdapter(
-      new Web3(config.nodeUrl),
-      account.pk,
-      config.stableTokenAddress,
-      config.escrowAddress,
-      config.goldTokenAddress
-    )
+    const celo = new CeloAdapter({ nodeUrl: config.nodeUrl, pk: account.pk })
     const goldTx = await celo.transferGold(request.beneficiary, config.faucetGoldAmount)
-    const goldTxHash = await goldTx.getHash()
+    const goldTxReceipt = await goldTx.sendAndWaitForReceipt()
+    const goldTxHash = goldTxReceipt.transactionHash
     console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
     await snap.ref.update({ goldTxHash })
-    await goldTx.waitReceipt()
 
     await sendDollars(celo, request.beneficiary, config.faucetDollarAmount, snap)
   }
@@ -112,20 +105,14 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     if (!isE164Number(request.beneficiary)) {
       throw new Error('Must send to valid E164 Number.')
     }
-    const celo = new CeloAdapter(
-      new Web3(config.nodeUrl),
-      account.pk,
-      config.stableTokenAddress,
-      config.escrowAddress,
-      config.goldTokenAddress
-    )
+    const celo = new CeloAdapter({ nodeUrl: config.nodeUrl, pk: account.pk })
     const { address: tempAddress, inviteCode } = generateInviteCode()
 
     const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
-    const goldTxHash = await goldTx.getHash()
+    const goldReceipt = await goldTx.sendAndWaitForReceipt()
+    const goldTxHash = goldReceipt.transactionHash
     console.info(`req(${snap.key}): Gold Transaction Sent. txhash:${goldTxHash}`)
     await snap.ref.update({ goldTxHash })
-    await goldTx.waitReceipt()
 
     const dollarTxHash = await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
 
@@ -137,10 +124,10 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       config.expirarySeconds,
       config.minAttestations
     )
-    const escrowTxHash = await escrowTx.getHash()
+    const escrowReceipt = await escrowTx.sendAndWaitForReceipt()
+    const escrowTxHash = escrowReceipt.transactionHash
     console.info(`req(${snap.key}): Escrow Dollar Transaction Sent. txhash:${dollarTxHash}`)
     await snap.ref.update({ escrowTxHash })
-    await escrowTx.waitReceipt()
 
     await config.twilioClient.messages.create({
       body: messageText(inviteCode, request),
@@ -157,10 +144,10 @@ async function sendDollars(
   snap: DataSnapshot
 ) {
   const dollarTx = await celo.transferDollars(address, amount)
-  const dollarTxHash = await dollarTx.getHash()
+  const dollarTxReceipt = await dollarTx.sendAndWaitForReceipt()
+  const dollarTxHash = dollarTxReceipt.transactionHash
   console.info(`req(${snap.key}): Dollar Transaction Sent. txhash:${dollarTxHash}`)
   await snap.ref.update({ dollarTxHash })
-  await dollarTx.waitReceipt()
   return dollarTxHash
 }
 

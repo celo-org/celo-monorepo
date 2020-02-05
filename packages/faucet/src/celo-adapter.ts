@@ -1,47 +1,34 @@
+import { ContractKit, newKit } from '@celo/contractkit'
 import Web3 from 'web3'
-import getEscrowInstance from './contracts/Escrow'
-import getGoldTokenInstance from './contracts/GoldToken'
-import getStableTokenInstance from './contracts/StableToken'
-import { Escrow } from './contracts/types/Escrow'
-import { GoldToken } from './contracts/types/GoldToken'
-import { StableToken } from './contracts/types/StableToken'
-import { getAddress, sendTx } from './tx'
+import { getAddress } from './tx'
+
+const web3 = new Web3()
 
 export class CeloAdapter {
   public readonly defaultAddress: string
-  private readonly goldToken: GoldToken
-  private readonly stableToken: StableToken
-  private readonly escrow: Escrow
+  public readonly kit: ContractKit
   private readonly privateKey: string
 
-  constructor(
-    private readonly web3: Web3,
-    pk: string,
-    private readonly stableTokenAddress: string,
-    private readonly escrowAddress: string,
-    private readonly goldTokenAddress: string
-  ) {
+  constructor({ pk, nodeUrl }: { pk: string; nodeUrl: string }) {
     // To add more logging:
     // Uncomment when in need for debug
     // injectDebugProvider(web3)
 
-    this.privateKey = this.web3.utils.isHexStrict(pk) ? pk : '0x' + pk
-    this.defaultAddress = getAddress(this.web3, this.privateKey)
-    this.goldToken = getGoldTokenInstance(this.web3, goldTokenAddress)
-    this.stableToken = getStableTokenInstance(this.web3, stableTokenAddress)
-    this.escrow = getEscrowInstance(this.web3, escrowAddress)
+    this.privateKey = web3.utils.isHexStrict(pk) ? pk : '0x' + pk
+    this.defaultAddress = getAddress(web3, this.privateKey)
+    this.kit = newKit(nodeUrl)
+    this.kit.addAccount(this.privateKey)
+    this.kit.defaultAccount = this.defaultAddress
   }
 
   async transferGold(to: string, amount: string) {
-    return sendTx(this.web3, this.goldToken.methods.transfer(to, amount), this.privateKey, {
-      to: this.goldTokenAddress,
-    })
+    const goldToken = await this.kit.contracts.getGoldToken()
+    return goldToken.transfer(to, amount)
   }
 
   async transferDollars(to: string, amount: string) {
-    return sendTx(this.web3, this.stableToken.methods.transfer(to, amount), this.privateKey, {
-      to: this.stableTokenAddress,
-    })
+    const stableToken = await this.kit.contracts.getStableToken()
+    return stableToken.transfer(to, amount)
   }
 
   async escrowDollars(
@@ -51,35 +38,25 @@ export class CeloAdapter {
     expirarySeconds: number,
     minAttestations: number
   ) {
-    // Wait to approve escrow transfer
-    const approveTx = await sendTx(
-      this.web3,
-      this.stableToken.methods.approve(this.escrowAddress, amount),
-      this.privateKey,
-      { to: this.stableTokenAddress }
-    )
-    await approveTx.waitReceipt()
-    return sendTx(
-      this.web3,
-      this.escrow.methods.transfer(
-        phoneHash,
-        this.stableTokenAddress,
-        amount,
-        expirarySeconds,
-        tempWallet,
-        minAttestations
-      ),
-      this.privateKey,
-      {
-        to: this.escrowAddress,
-      }
+    const escrow = await this.kit.contracts.getEscrow()
+    const stableToken = await this.kit.contracts.getStableToken()
+    return escrow.transfer(
+      phoneHash,
+      stableToken.address,
+      amount,
+      expirarySeconds,
+      tempWallet,
+      minAttestations
     )
   }
 
-  getDollarsBalance(accountAddress: string = this.defaultAddress) {
-    return this.stableToken.methods.balanceOf(accountAddress).call()
+  async getDollarsBalance(accountAddress: string = this.defaultAddress) {
+    const stableToken = await this.kit.contracts.getStableToken()
+    return stableToken.balanceOf(accountAddress)
   }
-  getGoldBalance(accountAddress: string = this.defaultAddress) {
-    return this.web3.eth.getBalance(accountAddress)
+
+  async getGoldBalance(accountAddress: string = this.defaultAddress) {
+    const goldToken = await this.kit.contracts.getStableToken()
+    return goldToken.balanceOf(accountAddress)
   }
 }
