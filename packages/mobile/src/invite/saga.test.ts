@@ -82,7 +82,7 @@ jest.mock('src/web3/contracts', () => ({
       getStableToken: () => mockContractKitContract,
     },
   },
-  isZeroSyncMode: () => false,
+  isFornoMode: () => false,
 }))
 
 SendIntentAndroid.sendSms = jest.fn()

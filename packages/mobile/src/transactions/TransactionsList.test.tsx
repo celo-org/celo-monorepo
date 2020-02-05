@@ -172,6 +172,7 @@ it('ignores pending standby transactions that are completed in the response and 
   expect(toJSON()).toMatchSnapshot()
 
   expect(store.getActions()).toEqual([
+    { type: 'HOME/REFRESH_BALANCES' },
     { type: 'TRANSACTIONS/REMOVE_STANDBY_TRANSACTION', idx: 'a-standby-tx-id' },
   ])
 })

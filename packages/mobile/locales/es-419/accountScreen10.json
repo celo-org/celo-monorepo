@@ -23,7 +23,7 @@
     "body": "En caso de ingresar un PIN incorrecto, la aplicación se reiniciará.",
     "understand": "Entendido"
   },
-  "promptZeroSyncModal": {
+  "promptFornoModal": {
     "header": "Cambiar modo de conexión?",
     "body": "Hemos notado que tienes problemas para conectarte. Recomendamos habilitar el modo de ahorro de datos para que pueda seguir usando Celo Wallet con una conexión intermitente.",
     "switchToDataSaver": "Habilitar Ahorro de Datos"

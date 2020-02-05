@@ -12,18 +12,21 @@ import {
   select,
   take,
 } from 'redux-saga/effects'
-import { Actions, setGethConnected, setInitState, setPromptZeroSync } from 'src/geth/actions'
+import { setPromptForno } from 'src/account/actions'
+import { promptFornoIfNeededSelector } from 'src/account/reducer'
+import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
   getGeth,
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
-import { isGethConnectedSelector, promptZeroSyncIfNeededSelector } from 'src/geth/selectors'
+import { isGethConnectedSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
+import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -129,8 +132,8 @@ export function* initGethSaga() {
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
-    if (yield select(promptZeroSyncIfNeededSelector)) {
-      yield put(setPromptZeroSync(false))
+    if (yield select(promptFornoIfNeededSelector)) {
+      yield put(setPromptForno(false))
       navigate(Screens.DataSaver, { promptModalVisible: true })
     } else {
       navigateToError('networkConnectionFailed')
@@ -217,4 +220,10 @@ export function* gethSaga() {
   yield take(Actions.CANCEL_GETH_SAGA)
   yield cancel(gethRelatedSagas)
   yield put(setGethConnected(true))
+}
+
+export function* gethSagaIfNecessary() {
+  if (!(yield select(fornoSelector))) {
+    yield call(gethSaga)
+  }
 }
