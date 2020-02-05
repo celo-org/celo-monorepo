@@ -1,8 +1,5 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import Web3 from 'web3'
 import { getAddress } from './tx'
-
-const web3 = new Web3()
 
 export class CeloAdapter {
   public readonly defaultAddress: string
@@ -13,10 +10,9 @@ export class CeloAdapter {
     // To add more logging:
     // Uncomment when in need for debug
     // injectDebugProvider(web3)
-
-    this.privateKey = web3.utils.isHexStrict(pk) ? pk : '0x' + pk
-    this.defaultAddress = getAddress(web3, this.privateKey)
     this.kit = newKit(nodeUrl)
+    this.privateKey = this.kit.web3.utils.isHexStrict(pk) ? pk : '0x' + pk
+    this.defaultAddress = getAddress(this.kit.web3, this.privateKey)
     this.kit.addAccount(this.privateKey)
     this.kit.defaultAccount = this.defaultAddress
   }
