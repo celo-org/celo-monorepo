@@ -17,7 +17,7 @@ function getEnvFile(celoEnv) {
   if (fs.existsSync(filePath)) {
     return filePath
   } else {
-    throw new Error(`Unable to find env file for ''${celoEnv}`)
+    throw new Error(`Unable to find env file for '${celoEnv}'`)
   }
 }
 
