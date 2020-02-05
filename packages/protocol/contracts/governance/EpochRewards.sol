@@ -55,9 +55,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   RewardsMultiplierParameters private rewardsMultiplierParams;
   TargetVotingYieldParameters private targetVotingYieldParams;
   FixidityLib.Fraction private targetVotingGoldFraction;
+  FixidityLib.Fraction private communityRewardFraction;
   uint256 public targetValidatorEpochPayment;
 
   event TargetVotingGoldFractionSet(uint256 fraction);
+  event CommunityRewardFractionSet(uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event RewardsMultiplierParametersSet(
@@ -81,6 +83,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   rewards when the protocol is running ahead of the target Gold supply.
    * @param _targetVotingGoldFraction The percentage of floating Gold voting to target.
    * @param _targetValidatorEpochPayment The target validator epoch payment.
+   * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @dev Should be called only once.
    */
   function initialize(
@@ -93,7 +96,8 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 rewardsMultiplierUnderspendAdjustmentFactor,
     uint256 rewardsMultiplierOverspendAdjustmentFactor,
     uint256 _targetVotingGoldFraction,
-    uint256 _targetValidatorEpochPayment
+    uint256 _targetValidatorEpochPayment,
+    uint256 _communityRewardFraction
   ) external initializer {
     _transferOwnership(msg.sender);
     setFreezer(_freezer);
@@ -106,6 +110,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     );
     setTargetVotingGoldFraction(_targetVotingGoldFraction);
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
+    setCommunityRewardFraction(_communityRewardFraction);
     targetVotingYieldParams.target = FixidityLib.wrap(targetVotingYieldInitial);
     startTime = now;
   }
@@ -134,6 +139,26 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   function setFreezer(address freezer) public onlyOwner {
     _setFreezer(freezer);
+  }
+
+  /**
+   * @notice Sets the community reward percentage
+   * @param value The percentage of the total reward to be sent to the community funds.
+   * @return True upon success.
+   */
+  function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
+    require(value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    communityRewardFraction = FixidityLib.wrap(value);
+    emit CommunityRewardFractionSet(value);
+    return true;
+  }
+
+  /**
+   * @notice Returns the community reward fraction.
+   * @return The percentage of total reward which goes to the community funds.
+   */
+  function getCommunityRewardFraction() external view returns (uint256) {
+    return communityRewardFraction.unwrap();
   }
 
   /**
@@ -290,21 +315,10 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   }
 
   /**
-   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
-   * @return The rewards multiplier based on the current and target Gold supplies.
-   */
-  function getRewardsMultiplier() external view returns (uint256) {
-    uint256 targetEpochRewards = getTargetEpochRewards();
-    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
-    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
-    return _getRewardsMultiplier(targetGoldSupplyIncrease).unwrap();
-  }
-
-  /**
    * @notice Returns the total target epoch rewards for voters.
    * @return the total target epoch rewards for voters.
    */
-  function getTargetEpochRewards() public view returns (uint256) {
+  function getTargetVoterRewards() public view returns (uint256) {
     return
       FixidityLib
         .newFixed(getElection().getActiveVotes())
@@ -323,6 +337,30 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
         numerator
       );
+  }
+
+  /**
+   * @notice Returns the target gold supply increase used in calculating the rewards multiplier.
+   * @return The target increase in gold w/out the rewards multiplier.
+   */
+  function _getTargetGoldSupplyIncrease() internal view returns (uint256) {
+    uint256 targetEpochRewards = getTargetVoterRewards();
+    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
+    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
+    // increase /= (1 - fraction) st the final community reward is fraction * increase
+    targetGoldSupplyIncrease = FixidityLib
+      .newFixed(targetGoldSupplyIncrease)
+      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
+      .fromFixed();
+    return targetGoldSupplyIncrease;
+  }
+
+  /**
+   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
+   * @return The rewards multiplier based on the current and target Gold supplies.
+   */
+  function getRewardsMultiplier() external view returns (uint256) {
+    return _getRewardsMultiplier(_getTargetGoldSupplyIncrease()).unwrap();
   }
 
   /**
@@ -403,20 +441,25 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch payment and the total rewards to voters.
+   * @return The per validator epoch reward, the total rewards to voters, and the total community
+   * reward
    */
-  function calculateTargetEpochPaymentAndRewards() external view returns (uint256, uint256) {
+  function calculateTargetEpochRewards() external view returns (uint256, uint256, uint256) {
     if (frozen) {
-      return (0, 0);
+      return (0, 0, 0);
     }
 
-    uint256 targetEpochRewards = getTargetEpochRewards();
-    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
-    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
+    uint256 targetVoterReward = getTargetVoterRewards();
+    uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
     return (
       FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
-      FixidityLib.newFixed(targetEpochRewards).multiply(rewardsMultiplier).fromFixed()
+      FixidityLib.newFixed(targetVoterReward).multiply(rewardsMultiplier).fromFixed(),
+      FixidityLib
+        .newFixed(targetGoldSupplyIncrease)
+        .multiply(communityRewardFraction)
+        .multiply(rewardsMultiplier)
+        .fromFixed()
     );
   }
 }
