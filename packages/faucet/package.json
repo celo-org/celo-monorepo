@@ -7,7 +7,7 @@
   "main": "dist/index.js",
   "scripts": {
     "preserve": "yarn run build",
-    "serve": "cross-env NODE_ENV=production fi rebase serve",
+    "serve": "cross-env NODE_ENV=production firebase serve",
     "deploy:staging": "firebase deploy --project celo-faucet-staging",
     "deploy:prod": "firebase deploy --project celo-faucet",
     "clean": "tsc -b . --clean",
