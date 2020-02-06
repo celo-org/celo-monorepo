@@ -143,7 +143,7 @@ export default class Voters extends BaseCommand {
         for (const member of group.members) {
           const idx = eResults.findIndex((a) => normalizeAddress(member) === a.address)
           const vName = await accounts.methods.getName(member).call()
-          console.log(`   ${idx}. Votes ${eResults[idx].votes} ${vName}@${member}`)
+          console.log(`    ${idx}. Votes ${eResults[idx].votes} ${vName}@${member}`)
         }
       }
       console.log(await nth(100))
