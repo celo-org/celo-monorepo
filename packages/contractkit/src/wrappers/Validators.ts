@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -448,7 +448,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
     }
 
-    const currentIdx = group.members.indexOf(validator)
+    const currentIdx = group.members.map(normalizeAddress).indexOf(normalizeAddress(validator))
     if (currentIdx < 0) {
       throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
