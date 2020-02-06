@@ -28460,9 +28460,9 @@ react-native-clock-sync@^1.0.0:
   version "2.0.0"
   resolved "git://github.com/celo-org/react-native-confirm-device-credentials#436afa981889b51178f959f0c8cd137cc46386f1"
 
-"react-native-contacts@git://github.com/celo-org/react-native-contacts#fcf8f0d":
+"react-native-contacts@https://github.com/celo-org/react-native-contacts#e473717":
   version "5.0.0"
-  resolved "git://github.com/celo-org/react-native-contacts#fcf8f0d434786c4b03443c7d1a6c764b2a9391df"
+  resolved "https://github.com/celo-org/react-native-contacts#e4737173236ef14971fb55faf68e99655c0c5f47"
 
 react-native-crypto@^2.0.1:
   version "2.1.2"
