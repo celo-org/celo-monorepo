@@ -5,12 +5,14 @@ export function rpcCallHandler(
   handler: (p: JsonRPCRequest) => Promise<any>,
   callback: Callback<JsonRPCResponse>
 ) {
-  // TODO q pasa si la function handler falla?
-  // TODO q pasa si en el then callback falla?
-
-  handler(payload)
-    .then((result) => callback(null, toRPCResponse(payload, result)))
-    .catch((error) => callback(error, toRPCResponse(payload, null, error)))
+  handler(payload).then(
+    (result) => {
+      callback(null, toRPCResponse(payload, result))
+    },
+    (error) => {
+      callback(error, toRPCResponse(payload, null, error))
+    }
+  )
 }
 
 function toRPCResponse(payload: JsonRPCRequest, result: any, error?: Error): JsonRPCResponse {

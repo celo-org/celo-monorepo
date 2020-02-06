@@ -10,7 +10,7 @@ const debugPayload = debugFactory('kit:provider:celo-provider:rpc:payload')
 const debugResponse = debugFactory('kit:provider:celo-provider:rpc:response')
 
 export class CeloProvider implements Provider {
-  private readonly wallet: IWallet = new Wallet()
+  private readonly wallet: IWallet
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: MissingTxParamsPopulator
   private alreadyStopped: boolean = false
@@ -18,6 +18,7 @@ export class CeloProvider implements Provider {
   constructor(readonly existingProvider: Provider) {
     this.rpcCaller = new RpcCaller(existingProvider)
     this.paramsPopulator = new MissingTxParamsPopulator(this.rpcCaller)
+    this.wallet = new Wallet()
   }
 
   addAccount(privateKey: string) {
@@ -143,28 +144,28 @@ export class CeloProvider implements Provider {
 
   private async handleSignTypedData(payload: JsonRPCRequest): Promise<any> {
     const [address, typedData] = payload.params
-    const signature = this.wallet.signTypedDataAsync(address, typedData)
+    const signature = this.wallet.signTypedData(address, typedData)
     return signature
   }
 
   private async handleSign(payload: JsonRPCRequest): Promise<any> {
     const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
     const data = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
-    const ecSignatureHex = this.wallet.signPersonalMessageAsync(data, address)
+    const ecSignatureHex = this.wallet.signPersonalMessage(address, data)
     return ecSignatureHex
   }
 
   private async handleSignTransaction(payload: JsonRPCRequest): Promise<any> {
     const txParams = payload.params[0]
     const filledParams = await this.paramsPopulator.populate(txParams)
-    const signedTx = await this.wallet.signTransactionAsync(filledParams)
+    const signedTx = await this.wallet.signTransaction(filledParams)
     return { raw: signedTx, tx: txParams }
   }
 
   private async handleSendTransaction(payload: JsonRPCRequest): Promise<any> {
     const txParams = payload.params[0]
     const filledParams = await this.paramsPopulator.populate(txParams)
-    const signedTx = await this.wallet.signTransactionAsync(filledParams)
+    const signedTx = await this.wallet.signTransaction(filledParams)
     const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx])
     return response.result
   }

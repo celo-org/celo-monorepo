@@ -3,7 +3,7 @@ import debugFactory from 'debug'
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 // @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
-import { CeloTx } from './tx-signing'
+import { CeloTx } from './celo-tx'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -131,6 +131,9 @@ export async function signTransaction(txn: any, privateKey: string) {
 export function recoverTransaction(rawTx: string): [CeloTx, string] {
   const rawValues = RLP.decode(rawTx)
   debug('signing-utils@recoverTransaction: values are %s', rawValues)
+  const recovery = Bytes.toNumber(rawValues[9])
+  // tslint:disable-next-line:no-bitwise
+  const chainId = Bytes.fromNumber((recovery - 35) >> 1)
   const celoTx: CeloTx = {
     nonce: rawValues[0].toLowerCase() === '0x' ? 0 : parseInt(rawValues[0], 16),
     gasPrice: rawValues[1].toLowerCase() === '0x' ? 0 : parseInt(rawValues[1], 16),
@@ -141,12 +144,10 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
     to: rawValues[6],
     value: rawValues[7],
     data: rawValues[8],
-    chainId: rawValues[9],
+    chainId,
   }
   const signature = Account.encodeSignature(rawValues.slice(9, 12))
-  const recovery = Bytes.toNumber(rawValues[9])
-  // tslint:disable-next-line:no-bitwise
-  const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']
+  const extraData = recovery < 35 ? [] : [chainId, '0x', '0x']
   const signingData = rawValues.slice(0, 9).concat(extraData)
   const signingDataHex = RLP.encode(signingData)
   const signer = Account.recover(Hash.keccak256(signingDataHex), signature)

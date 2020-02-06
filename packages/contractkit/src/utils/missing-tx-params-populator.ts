@@ -1,23 +1,10 @@
 import BigNumber from 'bignumber.js'
+import { CeloTx } from './celo-tx'
 import { RpcCaller } from './rpc-caller'
 
 // Default gateway fee to send the serving full-node on each transaction.
 // TODO(nategraf): Provide a method of fecthing the gateway fee value from the full-node peer.
 const DefaultGatewayFee = new BigNumber(10000)
-
-export interface PartialTxParams {
-  nonce: string
-  gasPrice?: string
-  gas: string
-  to: string
-  from: string
-  value?: string
-  data?: string
-  chainId: number
-  gatewayFeeRecipient?: string
-  gatewayFee?: string
-  feeCurrency?: string
-}
 
 export class MissingTxParamsPopulator {
   private chainId: number | null = null
@@ -25,18 +12,18 @@ export class MissingTxParamsPopulator {
 
   constructor(readonly rpc: RpcCaller) {}
 
-  public async populate(partialTxParams: PartialTxParams): Promise<PartialTxParams> {
-    const txParams = { ...partialTxParams }
+  public async populate(celoTxParams: CeloTx): Promise<CeloTx> {
+    const txParams = { ...celoTxParams }
 
     if (txParams.chainId == null) {
       this.chainId = await this.getChainId()
     }
 
     if (txParams.nonce == null) {
-      txParams.nonce = await this.getNonce(txParams.from)
+      txParams.nonce = await this.getNonce(txParams.from!)
     }
 
-    if (this.isEmpty(txParams.gas)) {
+    if (!txParams.gas || this.isEmpty(txParams.gas.toString())) {
       const gasResult = await this.rpc.call('eth_estimateGas', [txParams])
       const gas = gasResult.result.toString()
       txParams.gas = gas
@@ -50,7 +37,7 @@ export class MissingTxParamsPopulator {
       txParams.gatewayFee = DefaultGatewayFee.toString(16)
     }
 
-    if (this.isEmpty(txParams.gasPrice)) {
+    if (!txParams.gasPrice || this.isEmpty(txParams.gasPrice.toString())) {
       txParams.gasPrice = await this.getGasPrice(txParams.feeCurrency)
     }
 
