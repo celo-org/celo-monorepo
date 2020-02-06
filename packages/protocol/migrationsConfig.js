@@ -32,7 +32,7 @@ const DefaultConfig = {
     slashableDowntime: 480,
   },
   election: {
-    minElectableValidators: '22',
+    minElectableValidators: '10',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
     electabilityThreshold: 1 / 1000,
@@ -81,7 +81,7 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   lockedGold: {
-    unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days divided by 24 to accelerate for Stake off
+    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
   },
   oracles: {
     reportExpiry: 10 * 60, // 10 minutes
@@ -113,11 +113,11 @@ const DefaultConfig = {
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold per validator
-      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
+      duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold
-      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
+      duration: 60 * 24 * 60 * 60, // 60 days
     },
     validatorScoreParameters: {
       exponent: 10,
@@ -125,8 +125,8 @@ const DefaultConfig = {
     },
     membershipHistoryLength: 60,
     maxGroupSize: '5',
-    // 30 Days divided by 24 to accelerate for Stake off
-    slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24,
+    // 30 Days
+    slashingPenaltyResetPeriod: 60 * 60 * 24 * 30,
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],
