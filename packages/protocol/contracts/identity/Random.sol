@@ -20,6 +20,7 @@ contract Random is IRandom, Ownable, Initializable {
   mapping(uint256 => bytes32) private history;
   uint256 private historyFirst;
   uint256 private historySize;
+  uint256 private lastEpochBlock;
 
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
@@ -48,14 +49,20 @@ contract Random is IRandom, Ownable, Initializable {
    * @param randomness Bytes that will be added to the entropy pool.
    * @param newCommitment The hash of randomness that will be revealed in the future.
    * @param proposer Address of the block proposer.
+   * @param isLastEpochBlock If current block is the last of its epoch.
    * @dev If the Random contract is pointed to by the Registry, the first transaction in a block
    * should be a special transaction to address 0x0 with 64 bytes of data - the concatenated
    * `randomness` and `newCommitment`. Before running regular transactions, this function should be
    * called.
    */
-  function revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) external {
+  function revealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer,
+    bool isLastEpochBlock
+  ) external {
     require(msg.sender == address(0), "only VM can call");
-    _revealAndCommit(randomness, newCommitment, proposer);
+    _revealAndCommit(randomness, newCommitment, proposer, isLastEpochBlock);
   }
 
   /**
@@ -63,8 +70,14 @@ contract Random is IRandom, Ownable, Initializable {
    * @param randomness Bytes that will be added to the entropy pool.
    * @param newCommitment The hash of randomness that will be revealed in the future.
    * @param proposer Address of the block proposer.
+   * @param isLastEpochBlock If current block is the last of its epoch.
    */
-  function _revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) internal {
+  function _revealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer,
+    bool isLastEpochBlock
+  ) internal {
     // ensure revealed randomness matches previous commitment
     if (commitments[proposer] != 0) {
       require(randomness != 0, "randomness cannot be zero if there is a previous commitment");
@@ -79,7 +92,11 @@ contract Random is IRandom, Ownable, Initializable {
 
     // add entropy
     uint256 blockNumber = block.number == 0 ? 0 : block.number.sub(1);
-    addRandomness(block.number, keccak256(abi.encodePacked(history[blockNumber], randomness)));
+    addRandomness(
+      block.number,
+      keccak256(abi.encodePacked(history[blockNumber], randomness)),
+      isLastEpochBlock
+    );
 
     commitments[proposer] = newCommitment;
   }
@@ -88,25 +105,31 @@ contract Random is IRandom, Ownable, Initializable {
    * @notice Add a value to the randomness history.
    * @param blockNumber Current block number.
    * @param randomness The new randomness added to history.
+   * @param isLastEpochBlock If current block is the last of its epoch.
    * @dev The calls to this function should be made so that on the next call, blockNumber will
    * be the previous one, incremented by one.
    */
-  function addRandomness(uint256 blockNumber, bytes32 randomness) internal {
+  function addRandomness(uint256 blockNumber, bytes32 randomness, bool isLastEpochBlock) internal {
     history[blockNumber] = randomness;
-    if (historySize == 0) {
-      historyFirst = block.number;
-      historySize = 1;
-    } else if (historySize > randomnessBlockRetentionWindow) {
-      delete history[historyFirst];
-      delete history[historyFirst + 1];
-      historyFirst += 2;
-      historySize--;
-    } else if (historySize == randomnessBlockRetentionWindow) {
-      delete history[historyFirst];
-      historyFirst++;
+    if (isLastEpochBlock) {
+      delete history[lastEpochBlock];
+      lastEpochBlock = block.number;
     } else {
-      // historySize < randomnessBlockRetentionWindow
-      historySize++;
+      if (historySize == 0) {
+        historyFirst = block.number;
+        historySize = 1;
+      } else if (historySize > randomnessBlockRetentionWindow) {
+        delete history[historyFirst];
+        delete history[historyFirst + 1];
+        historyFirst += 2;
+        historySize--;
+      } else if (historySize == randomnessBlockRetentionWindow) {
+        delete history[historyFirst];
+        historyFirst++;
+      } else {
+        // historySize < randomnessBlockRetentionWindow
+        historySize++;
+      }
     }
   }
 
@@ -145,9 +168,10 @@ contract Random is IRandom, Ownable, Initializable {
   function _getBlockRandomness(uint256 blockNumber, uint256 cur) internal view returns (bytes32) {
     require(blockNumber <= cur, "Cannot query randomness of future blocks");
     require(
-      blockNumber > cur.sub(historySize) &&
-        (randomnessBlockRetentionWindow >= cur ||
-          blockNumber > cur.sub(randomnessBlockRetentionWindow)),
+      blockNumber == lastEpochBlock ||
+        (blockNumber > cur.sub(historySize) &&
+          (randomnessBlockRetentionWindow >= cur ||
+            blockNumber > cur.sub(randomnessBlockRetentionWindow))),
       "Cannot query randomness older than the stored history"
     );
     return history[blockNumber];
