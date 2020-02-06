@@ -34,7 +34,7 @@ Because the Validator signing key is constantly in use to sign consensus message
 1. Create a new Validator instance as detailed in the [Deploy a Validator](../getting-started/running-a-validator.md#deploy-a-validator) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding.
 
   {% hint style="warning" %}
-  Before proceeding to steps 2 and 3, ensure there is sufficient time until the next epoch to complete both when rotating ECDSA and BLS keys together.
+  Before proceeding to steps 2 and 3, ensure there is sufficient time until the next epoch to complete both steps when rotating ECDSA and BLS keys together.
   {% endhint %}
 
 2. Authorize the new Validator signer key with the Account key to overwrite the old Validator signer key.
@@ -55,10 +55,10 @@ Because the Validator signing key is constantly in use to sign consensus message
   celocli validator:update-bls-public-key --from $CELO_VALIDATOR_ADDRESS --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsPop $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE
   ```
 
-4. Wait until the next epoch change, **leaving both validator instances running**. At the start the next epoch, the new Validator signer take over participation in consensus. 
+4. Wait until the next epoch change, **leaving both validator instances running**. At the start the next epoch, the new Validator signer will take over participation in consensus. 
 5. Verify that the transition occurred correctly. Here are two ways to check:
   <!-- TODO: The following URL assumes that the user is running against the baklava network. This will need to be updated -->
-  * Open `baklava-blockscout.celo-testnet.org/address/<NEW_VALIDATOR_SIGNER_ADDRESS>/validations` to confirm that validation are being produced.
+  * Open `baklava-blockscout.celo-testnet.org/address/<NEW_VALIDATOR_SIGNER_ADDRESS>/validations` to confirm that validation are being signed.
   * Run `celocli validator:signed-blocks --signer $CELO_VALIDATOR_SIGNER_ADDRESS` with the new signer address. (Run `celocli validator:signed-block --help` if you are unfamiliar with this command)
 
   {% hint style="warning" %}

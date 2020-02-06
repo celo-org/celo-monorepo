@@ -10,10 +10,13 @@ Occasionally, they may be required when the upgrade is necessary to continue ope
 
 ## Upgrading a non-validating node
 
+Use these instructions to update non-validating nodes, such as your account node or your attestaion node on the Baklava testnet. Also use these instructions to upgrade your proxy node, but remember not to stop the proxy of a running validator.
+
 ### Pull the latest Docker image
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+export export NETWORK_ID=200110 # Baklava testnet phases 2 and 3
 docker pull $CELO_IMAGE
 ```
 
@@ -28,7 +31,12 @@ docker rm celo-fullnode
 
 ### Start the new node
 
-Start the new node using `docker run` as detailed in the getting started guide.
+Start the new node using `docker run` as detailed in the appropriate section of the getting started guide. Remember to recover any environment variables, if using a new terminal, before running the documented commands.
+
+* [Full node](../getting-started/running-a-full-node.html#start-the-node)
+* [Accounts node](../getting-started/running-a-validator.md#start-your-accounts-node)
+* [Attestion node](../getting-started/running-a-validator.md#running-the-attestation-service)
+* [Proxy node](../getting-started/running-a-validator.md#deploy-a-proxy)
 
 ## Upgrading a Validating Node
 
