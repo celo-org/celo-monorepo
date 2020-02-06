@@ -17,7 +17,8 @@ readFromSheet(async function(kit: ContractKit, data: any) {
   let election = await kit._web3Contracts.getElection()
   let accounts = await kit._web3Contracts.getAccounts()
   let validators = await kit._web3Contracts.getValidators()
-  async function fetchName(addr: string) {
+  async function fetchName(a: string) {
+    let addr = normalizeAddress(a)
     let name = await accounts.methods.getName(addr).call()
     return name + (orig[addr] ? '' : '???') + ' @ ' + addr
   }
@@ -25,6 +26,7 @@ readFromSheet(async function(kit: ContractKit, data: any) {
   console.log('Events', evs.length, evs[0])
   let voters = dedup(evs.map((a: any) => a.returnValues.account)).map(normalizeAddress)
   console.log('Voters', voters.length)
+  // @ts-ignore
   const lastBlock = await kit.web3.eth.getBlockNumber()
   const epochSize = parseInt(await election.methods.getEpochSize().call())
   let badgroups: any = {}
@@ -36,7 +38,7 @@ readFromSheet(async function(kit: ContractKit, data: any) {
     }
   }
   for (let i = epochSize; i < lastBlock; i += epochSize) {
-    // for (let i = 90000; i < 100000; i += epochSize) {
+    // for (let i = 100000; i < 110000; i += epochSize) {
     // Get groups
     // @ts-ignore
     let lst = await election.methods.getEligibleValidatorGroups().call({}, i)
@@ -47,7 +49,7 @@ readFromSheet(async function(kit: ContractKit, data: any) {
       let groups = (await election.methods.getGroupsVotedForByAccount(voter).call({}, i)).map(
         normalizeAddress
       )
-      groups.forEach((g: string) => put(groupVoters, g, rev[voter][0]))
+      groups.forEach((g: string) => put(groupVoters, g, voter))
     }
     // Check group members, if it's mixed, check commission
     for (let group of lst) {
@@ -68,20 +70,21 @@ readFromSheet(async function(kit: ContractKit, data: any) {
       let votes = groupVoters[normalizeAddress(group)]
       if (votes) {
         let unknown = votes.filter((a: string) => {
-          return !competitors.includes(a)
+          return !competitors.includes(rev[a][0])
         })
         if (unknown.length > 0) {
           let print: string[] = await Promise.all(
             unknown.map(async (a: string) => {
-              // @ts-ignore
+              let account = rev[a][0]
               let amount = await election.methods
                 .getTotalVotesForGroupByAccount(group, a)
+                // @ts-ignore
                 .call({}, i)
-              // console.log("Amount", amount)
-              let orig = badvoters[normalizeAddress(group) + '-' + a] || new BigNumber(0)
+              let orig = badvoters[normalizeAddress(group) + '-' + account] || new BigNumber(0)
+              // console.log("Amount", amount, "orig", orig, group, a)
               let res = orig.plus(amount)
-              badvoters[normalizeAddress(group) + '-' + a] = res
-              if (!orig.gt(new BigNumber(0)) && res.gt(new BigNumber(0))) return a
+              badvoters[normalizeAddress(group) + '-' + account] = res
+              if (!orig.gt(new BigNumber(0)) && res.gt(new BigNumber(0))) return account
               else return ''
             })
           )
