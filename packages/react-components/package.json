@@ -19,7 +19,7 @@
     "hoist-non-react-statics": "^3.3.0",
     "lodash": "^4.17.14",
     "react-native-autocomplete-input": "^4.1.0",
-    "react-native-contacts": "git://github.com/celo-org/react-native-contacts#fcf8f0d",
+    "react-native-contacts": "https://github.com/celo-org/react-native-contacts#e473717",
     "react-native-platform-touchable": "^1.1.1",
     "svgs": "^4.1.0"
   },
