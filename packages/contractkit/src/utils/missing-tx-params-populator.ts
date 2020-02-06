@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { CeloTx } from './celo-tx'
-import { RpcCaller } from './rpc-caller'
+import { IRpcCaller } from './rpc-caller'
 
 // Default gateway fee to send the serving full-node on each transaction.
 // TODO(nategraf): Provide a method of fecthing the gateway fee value from the full-node peer.
@@ -10,13 +10,13 @@ export class MissingTxParamsPopulator {
   private chainId: number | null = null
   private gatewayFeeRecipient: string | null = null
 
-  constructor(readonly rpc: RpcCaller) {}
+  constructor(readonly rpc: IRpcCaller) {}
 
   public async populate(celoTxParams: CeloTx): Promise<CeloTx> {
     const txParams = { ...celoTxParams }
 
     if (txParams.chainId == null) {
-      this.chainId = await this.getChainId()
+      txParams.chainId = await this.getChainId()
     }
 
     if (txParams.nonce == null) {
@@ -24,13 +24,11 @@ export class MissingTxParamsPopulator {
     }
 
     if (!txParams.gas || this.isEmpty(txParams.gas.toString())) {
-      const gasResult = await this.rpc.call('eth_estimateGas', [txParams])
-      const gas = gasResult.result.toString()
-      txParams.gas = gas
+      txParams.gas = await this.getEstimateGas(txParams)
     }
 
     if (this.isEmpty(txParams.gatewayFeeRecipient)) {
-      this.gatewayFeeRecipient = await this.getCoinbase()
+      txParams.gatewayFeeRecipient = await this.getCoinbase()
     }
 
     if (!this.isEmpty(txParams.gatewayFeeRecipient) && this.isEmpty(txParams.gatewayFee)) {
@@ -58,6 +56,13 @@ export class MissingTxParamsPopulator {
     const result = await this.rpc.call('eth_getTransactionCount', [address, 'pending'])
     const nonce = result.result.toString()
     return nonce
+  }
+
+  private async getEstimateGas(txParams: CeloTx): Promise<string> {
+    // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas
+    const gasResult = await this.rpc.call('eth_estimateGas', [txParams])
+    const gas = gasResult.result.toString()
+    return gas
   }
 
   private async getCoinbase(): Promise<string> {

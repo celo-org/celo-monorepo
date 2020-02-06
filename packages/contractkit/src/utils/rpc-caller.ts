@@ -15,6 +15,18 @@ export function rpcCallHandler(
   )
 }
 
+// Ported from: https://github.com/MetaMask/provider-engine/blob/master/util/random-id.js
+export function getRandomId(): number {
+  const extraDigits = 3
+  const baseTen = 10
+  // 13 time digits
+  const datePart = new Date().getTime() * Math.pow(baseTen, extraDigits)
+  // 3 random digits
+  const extraPart = Math.floor(Math.random() * Math.pow(baseTen, extraDigits))
+  // 16 digits
+  return datePart + extraPart
+}
+
 function toRPCResponse(payload: JsonRPCRequest, result: any, error?: Error): JsonRPCResponse {
   const response: JsonRPCResponse = {
     id: payload.id,
@@ -31,13 +43,16 @@ function toRPCResponse(payload: JsonRPCRequest, result: any, error?: Error): Jso
   return response
 }
 
-export class RpcCaller {
+export interface IRpcCaller {
+  call: (method: string, params: any[]) => Promise<JsonRPCResponse>
+}
+export class RpcCaller implements IRpcCaller {
   constructor(readonly provider: Provider, readonly jsonrpcVersion: string = '2.0') {}
 
   public async call(method: string, params: any[]): Promise<JsonRPCResponse> {
     return new Promise((resolve, reject) => {
       const payload: JsonRPCRequest = {
-        id: this.getRandomId(),
+        id: getRandomId(),
         jsonrpc: this.jsonrpcVersion,
         method,
         params,
@@ -50,17 +65,5 @@ export class RpcCaller {
         }
       }) as Callback<JsonRPCResponse>)
     })
-  }
-
-  // Ported from: https://github.com/MetaMask/provider-engine/blob/master/util/random-id.js
-  public getRandomId(): number {
-    const extraDigits = 3
-    const baseTen = 10
-    // 13 time digits
-    const datePart = new Date().getTime() * Math.pow(baseTen, extraDigits)
-    // 3 random digits
-    const extraPart = Math.floor(Math.random() * Math.pow(baseTen, extraDigits))
-    // 16 digits
-    return datePart + extraPart
   }
 }
