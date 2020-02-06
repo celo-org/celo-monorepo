@@ -5,11 +5,12 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "../common/Initializable.sol";
+import "../common/UsingPrecompiles.sol";
 
 /**
  * @title Provides randomness for verifier selection
  */
-contract Random is IRandom, Ownable, Initializable {
+contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
   using SafeMath for uint256;
 
   /* Stores most recent commitment per address */
@@ -49,20 +50,14 @@ contract Random is IRandom, Ownable, Initializable {
    * @param randomness Bytes that will be added to the entropy pool.
    * @param newCommitment The hash of randomness that will be revealed in the future.
    * @param proposer Address of the block proposer.
-   * @param isLastEpochBlock If current block is the last of its epoch.
    * @dev If the Random contract is pointed to by the Registry, the first transaction in a block
    * should be a special transaction to address 0x0 with 64 bytes of data - the concatenated
    * `randomness` and `newCommitment`. Before running regular transactions, this function should be
    * called.
    */
-  function revealAndCommit(
-    bytes32 randomness,
-    bytes32 newCommitment,
-    address proposer,
-    bool isLastEpochBlock
-  ) external {
+  function revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) external {
     require(msg.sender == address(0), "only VM can call");
-    _revealAndCommit(randomness, newCommitment, proposer, isLastEpochBlock);
+    _revealAndCommit(randomness, newCommitment, proposer);
   }
 
   /**
@@ -70,14 +65,8 @@ contract Random is IRandom, Ownable, Initializable {
    * @param randomness Bytes that will be added to the entropy pool.
    * @param newCommitment The hash of randomness that will be revealed in the future.
    * @param proposer Address of the block proposer.
-   * @param isLastEpochBlock If current block is the last of its epoch.
    */
-  function _revealAndCommit(
-    bytes32 randomness,
-    bytes32 newCommitment,
-    address proposer,
-    bool isLastEpochBlock
-  ) internal {
+  function _revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) internal {
     // ensure revealed randomness matches previous commitment
     if (commitments[proposer] != 0) {
       require(randomness != 0, "randomness cannot be zero if there is a previous commitment");
@@ -92,11 +81,7 @@ contract Random is IRandom, Ownable, Initializable {
 
     // add entropy
     uint256 blockNumber = block.number == 0 ? 0 : block.number.sub(1);
-    addRandomness(
-      block.number,
-      keccak256(abi.encodePacked(history[blockNumber], randomness)),
-      isLastEpochBlock
-    );
+    addRandomness(block.number, keccak256(abi.encodePacked(history[blockNumber], randomness)));
 
     commitments[proposer] = newCommitment;
   }
@@ -105,22 +90,27 @@ contract Random is IRandom, Ownable, Initializable {
    * @notice Add a value to the randomness history.
    * @param blockNumber Current block number.
    * @param randomness The new randomness added to history.
-   * @param isLastEpochBlock If current block is the last of its epoch.
    * @dev The calls to this function should be made so that on the next call, blockNumber will
    * be the previous one, incremented by one.
    */
-  function addRandomness(uint256 blockNumber, bytes32 randomness, bool isLastEpochBlock) internal {
+  function addRandomness(uint256 blockNumber, bytes32 randomness) internal {
     history[blockNumber] = randomness;
-    if (isLastEpochBlock) {
-      delete history[lastEpochBlock];
-      lastEpochBlock = block.number;
+    if ((blockNumber + 1) % getEpochSize() == 0) {
+      if (lastEpochBlock != historyFirst) {
+        delete history[lastEpochBlock];
+      }
+      lastEpochBlock = blockNumber;
     } else {
       if (historySize == 0) {
-        historyFirst = block.number;
+        historyFirst = blockNumber;
         historySize = 1;
       } else if (historySize > randomnessBlockRetentionWindow) {
-        delete history[historyFirst];
-        delete history[historyFirst + 1];
+        if (historyFirst != lastEpochBlock) {
+          delete history[historyFirst];
+        }
+        if (historyFirst + 1 != lastEpochBlock) {
+          delete history[historyFirst + 1];
+        }
         historyFirst += 2;
         historySize--;
       } else if (historySize == randomnessBlockRetentionWindow) {
