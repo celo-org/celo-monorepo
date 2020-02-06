@@ -34,9 +34,9 @@ export default class ElectionCompare extends BaseCommand {
     const validators = await this.kit._web3Contracts.getValidators()
     const blockNumber = res.flags['at-block'] ?? (await this.web3.eth.getBlock('latest')).number
 
-    // @ts-ignore
     const groups: string[] = await election.methods
       .getEligibleValidatorGroups()
+      // @ts-ignore
       .call({}, blockNumber)
 
     const elected = []
