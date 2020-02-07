@@ -478,7 +478,7 @@ contract Governance is
    * @param proposalId The ID of the proposal.
    * @return The proposal storage struct and stage corresponding to `proposalId`. 
    */
-  function requireDequeuedAndDeleteIfExpired(uint256 proposalId, uint256 index)
+  function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
     returns (Proposals.Proposal storage, Proposals.Stage)
   {
@@ -587,7 +587,7 @@ contract Governance is
    */
   function approve(uint256 proposalId, uint256 index) external onlyApprover returns (bool) {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteIfExpired(
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
       proposalId,
       index
     );
@@ -618,7 +618,7 @@ contract Governance is
     returns (bool)
   {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteIfExpired(
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
       proposalId,
       index
     );
@@ -659,7 +659,7 @@ contract Governance is
    */
   function execute(uint256 proposalId, uint256 index) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteIfExpired(
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
       proposalId,
       index
     );
