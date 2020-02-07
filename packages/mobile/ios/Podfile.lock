@@ -1,7 +1,7 @@
 PODS:
   - Analytics (3.7.0)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.247)
+  - CeloBlockchain (0.0.266)
   - Crashlytics (3.13.4):
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
@@ -304,7 +304,7 @@ PODS:
     - React
   - react-native-contacts (5.0.0):
     - React
-  - react-native-fast-crypto (1.8.2):
+  - react-native-fast-crypto (1.8.3):
     - React
   - react-native-geth (0.1.0-development):
     - CeloBlockchain
@@ -450,8 +450,8 @@ DEPENDENCIES:
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
-  - react-native-contacts (from `../../../node_modules/react-native-contacts`)
-  - "react-native-fast-crypto (from `../../../node_modules/@celo/react-native-fast-crypto`)"
+  - react-native-contacts (from `../node_modules/react-native-contacts`)
+  - react-native-fast-crypto (from `../../../node_modules/react-native-fast-crypto`)
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
@@ -558,9 +558,9 @@ EXTERNAL SOURCES:
   react-native-config:
     :path: "../../../node_modules/react-native-config"
   react-native-contacts:
-    :path: "../../../node_modules/react-native-contacts"
+    :path: "../node_modules/react-native-contacts"
   react-native-fast-crypto:
-    :path: "../../../node_modules/@celo/react-native-fast-crypto"
+    :path: "../../../node_modules/react-native-fast-crypto"
   react-native-geth:
     :path: "../../../node_modules/react-native-geth"
   react-native-keep-awake:
@@ -651,7 +651,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: bb746f8a319e53229e68009adaf14c804bdf79d0
+  CeloBlockchain: 2a87851e2102e1b8e095c40c40df50231271b02f
   Crashlytics: 2dfd686bcb918dc10ee0e76f7f853fe42c7bd552
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
@@ -689,7 +689,7 @@ SPEC CHECKSUMS:
   react-native-camera: ccbcbe683c621b9a4270e86e3a46bb9609121186
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
-  react-native-fast-crypto: 1e9d58d1723de0a225b56a5f86b161afea3dbbf6
+  react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
   react-native-geth: b643560e11512a3c0b1d78df929cb9f2409cf4a2
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: 7e37dfbe93ff0d4c7df346b738854dbed533e86f
