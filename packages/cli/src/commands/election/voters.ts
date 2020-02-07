@@ -1,7 +1,6 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
-import Web3 from 'web3'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 
