@@ -128,8 +128,10 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await goldTx.waitReceipt()
 
     const dollarTxHash = await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
+    console.info(`req(${snap.key}): Dollar Transaction to temp wallet sent. txhash:${dollarTxHash}`)
 
     const phoneHash = getPhoneHash(request.beneficiary)
+    console.info(`req(${snap.key}): Sending escrow payment for phone hash ${phoneHash}`)
     const escrowTx = await celo.escrowDollars(
       phoneHash,
       tempAddress,
@@ -138,7 +140,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       config.minAttestations
     )
     const escrowTxHash = await escrowTx.getHash()
-    console.info(`req(${snap.key}): Escrow Dollar Transaction Sent. txhash:${dollarTxHash}`)
+    console.info(`req(${snap.key}): Escrow Dollar Transaction Sent. txhash:${escrowTxHash}`)
     await snap.ref.update({ escrowTxHash })
     await escrowTx.waitReceipt()
 
