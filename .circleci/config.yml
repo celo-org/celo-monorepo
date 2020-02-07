@@ -46,10 +46,6 @@ general:
 
 commands:
   yarn_install:
-    parameters:
-      rebuild_scrypt:
-        type: boolean
-        default: true
     steps:
       - run:
           name: Create cache checksum files
@@ -80,10 +76,6 @@ commands:
               echo "There are git differences after running yarn install"
               exit 1
             fi
-      - when:
-          condition: << parameters.rebuild_scrypt >>
-          steps:
-            - run: npm rebuild scrypt
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -312,8 +304,7 @@ jobs:
             node -v
       # Not using a workspace here as Node and Yarn versions
       # differ between our macOS executor image and the Docker containers
-      - yarn_install:
-          rebuild_scrypt: false
+      - yarn_install
       - run:
           name: Build mobile dependencies
           command: |
