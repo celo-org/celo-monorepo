@@ -163,5 +163,19 @@ testWithGanache('Validators Wrapper', (web3) => {
 
       expect(membersAfter).toEqual([validator2, validator1])
     })
+
+    test('test address normalization', async () => {
+      jest.setTimeout(30 * 1000)
+
+      await validators
+        .reorderMember(groupAccount, validator2.toLowerCase(), 0)
+        .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
+
+      const membersAfter = await validators
+        .getValidatorGroup(groupAccount)
+        .then((group) => group.members)
+
+      expect(membersAfter).toEqual([validator2, validator1])
+    })
   })
 })
