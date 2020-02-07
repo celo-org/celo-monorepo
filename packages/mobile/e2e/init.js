@@ -18,7 +18,7 @@ jest.setTimeout(120000)
 
 beforeAll(async () => {
   await detox.init(config)
-}, 300000)
+}, 400000)
 
 beforeEach(async () => {
   await adapter.beforeEach()
