@@ -51,12 +51,21 @@ commands:
         type: boolean
         default: true
     steps:
+      - run:
+          name: Create cache checksum files
+          command: |
+            mkdir -p ~/.tmp/checksumfiles
+            # Concatenate patches so we can use them as a part of the cache key
+            find ./patches -type f -name '*.patch' -exec cat {} + >> ~/.tmp/checksumfiles/patches
       - restore_cache:
+          name: Restore cached node_modules
           keys:
-            - yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v3-{{ arch }}-{{ .Branch }}-
-            - yarn-v3-{{ arch }}-
-      - run: ([[ -e ~/node_modules.tgz ]] && tar -xf ~/node_modules.tgz) || true
+            # Using a single cache key here as we don't want to fallback on restoring node_modules produced
+            # by a different yarn.lock and patches
+            - node_modules-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+      - run:
+          name: Extract cached node_modules (if present)
+          command: if [ -e ~/.tmp/node_modules.tgz ]; then tar -xf ~/.tmp/node_modules.tgz; fi
 
       - run:
           name: Install dependencies
@@ -78,11 +87,14 @@ commands:
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
-      - run: rm -rf ~/node_modules.tgz && tar -czf ~/node_modules.tgz node_modules packages/*/node_modules
+      - run:
+          name: Create cached node_modules (if necessary)
+          command: if [ ! -e ~/.tmp/node_modules.tgz ]; then tar -czf ~/.tmp/node_modules.tgz node_modules packages/*/node_modules; fi
       - save_cache:
-          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          name: Save cached node_modules
+          key: node_modules-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
-            - ~/node_modules.tgz
+            - ~/.tmp/node_modules.tgz
 
 jobs:
   install_dependencies:
