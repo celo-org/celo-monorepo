@@ -23,8 +23,7 @@ export enum Actions {
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
-  SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
-  SET_MOONPAY_URL = 'ACCOUNT/SET_MOONPAY_URL',
+  SET_PROMPT_FORNO = 'GETH/SET_PROMPT_FORNO',
 }
 
 export interface SetNameAction {
@@ -114,11 +113,6 @@ interface SetPromptFornoAction {
   promptIfNeeded: boolean
 }
 
-interface SetMoonpayUrlAction {
-  type: Actions.SET_MOONPAY_URL
-  url: string
-}
-
 export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
@@ -139,7 +133,6 @@ export type ActionTypes =
   | UpdateOutgoingPaymentRequestsAction
   | SetContactDetailsAction
   | SetPromptFornoAction
-  | SetMoonpayUrlAction
 
 export function setName(name: string): SetNameAction {
   return {
@@ -229,11 +222,6 @@ export const dismissGetVerified = (): DismissGetVerifiedAction => ({
 export const setPromptForno = (promptIfNeeded: boolean): SetPromptFornoAction => ({
   type: Actions.SET_PROMPT_FORNO,
   promptIfNeeded,
-})
-
-export const setMoonpayUrl = (url: string): SetMoonpayUrlAction => ({
-  type: Actions.SET_MOONPAY_URL,
-  url,
 })
 
 export const setUserContactDetails = (
