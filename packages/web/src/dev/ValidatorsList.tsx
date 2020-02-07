@@ -39,6 +39,9 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
     return celoValidatorGroups
       .map(({ account, affiliates, votes }) => {
         const group = account
+        const rewards = 50 + Math.random() * 50
+        const rewardsStyle =
+          rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
         return {
           name: group.name,
           address: group.address,
@@ -48,6 +51,8 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             .dividedBy(totalVotes)
             .multipliedBy(100)
             .toString(),
+          rewards, // <-- Mock
+          rewardsStyle, // <-- Mock
           validators: affiliates.edges.map((validator) => {
             const {
               address,
@@ -96,16 +101,13 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             Validator Explorer
           </H1>
           <View style={[styles.table]}>
-            <View style={[styles.tableRow]}>
+            <View style={[styles.tableRow, styles.tableHeaderRow]}>
               <Text style={[styles.tableHeaderCell, styles.tableHeaderCellPadding]}>Name</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeS]}>Elected</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeS]}>Online</Text>
-              <Text style={[styles.tableHeaderCell, styles.tableHeaderCellLeft, styles.sizeXL]}>
-                Address
-              </Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeM]}>Votes received</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeM]}>CUSD</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeM]}>CGLD</Text>
+              <Text style={[styles.tableHeaderCell, styles.sizeS]}>Elected/ Total</Text>
+              <Text style={[styles.tableHeaderCell, styles.sizeXL]}>Votes Available</Text>
+              <Text style={[styles.tableHeaderCell, styles.sizeM]}>Locked CGLD</Text>
+              <Text style={[styles.tableHeaderCell, styles.sizeM]}>Group Share</Text>
+              <Text style={[styles.tableHeaderCell, styles.sizeM]}>Voter Rewards</Text>
               <Text style={[styles.tableHeaderCell, styles.sizeS]}>Uptime</Text>
             </View>
             {validatorGroups.map((group, i) => (
@@ -125,61 +127,55 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                         size={10}
                       />
                     </Text>
-                    {group.name}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.tableCell,
-                      styles.tableCellCenter,
-                      group.elected ? styles.tableCellHighlight : styles.tableCellHighlightError,
-                      styles.sizeS,
-                    ]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {group.elected}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.tableCell,
-                      styles.tableCellCenter,
-                      group.online ? styles.tableCellHighlight : styles.tableCellHighlightError,
-                      styles.sizeS,
-                    ]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {group.online}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.sizeXL]}>
-                    <Text>{cutAddress(group.address)}</Text>
-                    <Text
-                      style={[styles.tableCopy]}
-                      onClick={copyToClipboad.bind(this, group.address)}
-                    >
-                      copy
+                    <Text style={[styles.tableCellTitleRows]}>
+                      <Text style={[styles.tableCellTitleFirstRow]}>{group.name}</Text>
+                      <Text style={[styles.tableCellTitleSecRow]}>
+                        <Text>{cutAddress(group.address)}</Text>
+                        <Text
+                          style={[styles.tableCopy]}
+                          onClick={copyToClipboad.bind(this, group.address)}
+                        >
+                          copy
+                        </Text>
+                      </Text>
                     </Text>
                   </Text>
                   <Text
+                    style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    <Text style={[styles.numberBlock, styles.numberBlockFirst]}>
+                      {group.elected}
+                    </Text>
+                    <Text style={[styles.numberBlock]}>{group.online}</Text>
+                  </Text>
+                  <Text style={[styles.tableCell, styles.sizeXL]}>3 percentages</Text>
+                  <Text
                     style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {formatNumber(group.votes, 2)}%
+                    {formatNumber(group.gold, 0)}
                   </Text>
                   <Text
                     style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {formatNumber(group.usd, 2)}
+                    {formatNumber(12, 0)}%
                   </Text>
                   <Text
                     style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {formatNumber(group.gold, 2)}
+                    <Text>{formatNumber(group.rewards, 1)}%</Text>
+                    <Text style={[styles.barContainer]}>
+                      <Text
+                        style={[styles.bar, group.rewardsStyle, { width: `${group.rewards}%` }]}
+                      ></Text>
+                    </Text>
                   </Text>
                   <Text
                     style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
@@ -189,107 +185,80 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     {formatNumber(group.uptime, 1)}%
                   </Text>
                 </View>
-                {i === expanded && (
-                  <View style={[styles.tableRow]}>
-                    <Text style={[styles.tableCellDescription]}>{group.description}</Text>
-                    <View style={[styles.tableCellTableContainer]}>
-                      <View style={[styles.tableRow]}>
+                {i === 0 /*expanded*/ && (
+                  <View>
+                    {group.validators.map((validator, j) => (
+                      <View key={`${i}.${j}`} style={[styles.tableRow]}>
                         <Text
                           style={[
-                            styles.tableSecondaryHeaderCell,
-                            textStyles.left,
-                            styles.tableSecondaryHeaderCellTitle,
+                            styles.tableCell,
+                            styles.tableCellTitle,
+                            styles.tableSecondaryCell,
                           ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
                         >
-                          Name
-                        </Text>
-                        <Text style={[styles.tableSecondaryHeaderCell, styles.sizeXS]}>
-                          Elected
-                        </Text>
-                        <Text style={[styles.tableSecondaryHeaderCell, styles.sizeXS]}>Online</Text>
-                        <Text
-                          style={[styles.tableSecondaryHeaderCell, styles.sizeL, textStyles.left]}
-                        >
-                          Address
-                        </Text>
-                        <Text style={[styles.tableSecondaryHeaderCell, styles.sizeS]}>USD</Text>
-                        <Text style={[styles.tableSecondaryHeaderCell, styles.sizeS]}>CGLD</Text>
-                        <Text style={[styles.tableSecondaryHeaderCell, styles.sizeS]}>Uptime</Text>
-                      </View>
-                      {group.validators.map((validator, j) => (
-                        <View key={`${i}.${j}`} style={[styles.tableRow]}>
-                          <Text
-                            style={[
-                              styles.tableSecondaryCell,
-                              textStyles.left,
-                              styles.tableSecondaryTitleCell,
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {validator.name}
+                          <Text style={[styles.tableCell, styles.tableCellTitleNumber]}>
+                            {j + 1}
                           </Text>
-                          <Text
-                            style={[styles.tableSecondaryCell, styles.sizeXS]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            <View
-                              style={[
-                                styles.circle,
-                                styles[validator.elected ? 'circleOk' : 'circleError'],
-                              ]}
-                            />
-                          </Text>
-                          <Text
-                            style={[styles.tableSecondaryCell, styles.sizeXS]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            <View
-                              style={[
-                                styles.circle,
-                                styles[validator.online ? 'circleOk' : 'circleError'],
-                              ]}
-                            />
-                          </Text>
-                          <Text
-                            style={[styles.tableSecondaryCell, textStyles.left, styles.sizeL]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {cutAddress(validator.address)}
+                          <Text style={[styles.tableCellTitleRows]}>
                             <Text
-                              style={[styles.tableCopy]}
-                              onClick={copyToClipboad.bind(this, validator.address)}
+                              style={[styles.tableCellTitleFirstRow, styles.tableSecondaryCell]}
                             >
-                              copy
+                              {validator.name}
+                            </Text>
+                            <Text style={[styles.tableCellTitleSecRow]}>
+                              <Text>{cutAddress(validator.address)}</Text>
+                              <Text
+                                style={[styles.tableCopy]}
+                                onClick={copyToClipboad.bind(this, group.address)}
+                              >
+                                copy
+                              </Text>
                             </Text>
                           </Text>
-                          <Text
-                            style={[styles.tableSecondaryCell, styles.sizeS]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {formatNumber(validator.usd, 2)}
-                          </Text>
-                          <Text
-                            style={[styles.tableSecondaryCell, styles.sizeS]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {formatNumber(validator.gold, 2)}
-                          </Text>
-                          <Text
-                            style={[styles.tableSecondaryCell, styles.sizeS]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {formatNumber(validator.uptime, 1)}%
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
+                        </Text>
+                        <Text
+                          style={[styles.tableSecondaryCell, styles.sizeXS]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          <View
+                            style={[
+                              styles.circle,
+                              styles[validator.elected ? 'circleOk' : 'circleError'],
+                            ]}
+                          />
+                        </Text>
+                        <Text style={[styles.tableCell, styles.sizeXL]}></Text>
+                        <Text
+                          style={[
+                            styles.tableCell,
+                            styles.tableCellCenter,
+                            styles.tableSecondaryCell,
+                            styles.sizeM,
+                          ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {formatNumber(validator.gold, 0)}
+                        </Text>
+                        <Text style={[styles.tableCell, styles.sizeM]}></Text>
+                        <Text style={[styles.tableCell, styles.sizeM]}></Text>
+                        <Text
+                          style={[
+                            styles.tableCell,
+                            styles.tableCellCenter,
+                            styles.tableSecondaryCell,
+                            styles.sizeS,
+                          ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {formatNumber(validator.uptime, 1)}%
+                        </Text>
+                      </View>
+                    ))}
                   </View>
                 )}
               </View>
@@ -325,9 +294,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
+    width: '100%',
+  },
+  tableHeaderRow: {
+    borderBottomWidth: 1,
+    borderStyle: 'solid',
+    borderColor: colors.white,
   },
   tableHeaderCell: {
-    fontFamily: typeFaces.garamond,
     color: colors.white,
     fontSize: 16,
     lineHeight: 20,
@@ -335,9 +309,6 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     textAlign: 'center',
     flexGrow: 0,
-    borderBottomWidth: 1,
-    borderStyle: 'solid',
-    borderColor: colors.white,
   },
   tableHeaderCellPadding: {
     textAlign: 'left',
@@ -355,15 +326,36 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   tableCellTitle: {
-    textDecorationLine: 'underline',
-    fontWeight: '500',
     cursor: 'pointer',
     flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  tableCellTitleRows: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  tableCellTitleFirstRow: {
+    textDecorationLine: 'underline',
+    fontWeight: '500',
+  },
+  tableCellTitleSecRow: {
+    color: colors.grayHeavy,
+    fontSize: 14,
+    paddingTop: 10,
+    fontWeight: 'normal',
   },
   tableCellTitleArrow: {
-    marginLeft: 16,
-    marginRight: 24,
+    marginLeft: 15,
+    marginRight: 20,
     width: 20,
+    textAlign: 'center',
+  },
+  tableCellTitleNumber: {
+    marginLeft: 15 + 20 + 20,
+    marginRight: 24,
+    width: 10,
+    fontSize: 14,
     textAlign: 'center',
   },
   tableCellHighlight: {
@@ -403,28 +395,8 @@ const styles = StyleSheet.create({
     paddingRight: 5,
     maxWidth: 596,
   },
-  tableSecondaryHeaderCell: {
-    fontFamily: typeFaces.futura,
-    opacity: 0.4,
-    fontSize: 12,
-    padding: 5,
-    textTransform: 'uppercase',
-    color: colors.white,
-    textAlign: 'center',
-  },
-  tableSecondaryHeaderCellTitle: {
-    flexGrow: 1,
-  },
-  tableSecondaryTitleCell: {
-    textAlign: 'left',
-    flexGrow: 1,
-  },
   tableSecondaryCell: {
-    textAlign: 'center',
-    fontFamily: typeFaces.garamond,
-    paddingHorizontal: 5,
-    paddingVertical: 10,
-    color: colors.white,
+    fontSize: 14,
   },
 
   // Column sizes
@@ -443,9 +415,48 @@ const styles = StyleSheet.create({
     margin: 'auto',
   },
   circleOk: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.gold,
   },
   circleError: {
-    backgroundColor: colors.error,
+    backgroundColor: 'transprent',
+  },
+
+  // Number block
+  numberBlockContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  numberBlock: {
+    paddingHorizontal: 10,
+    borderLeftWidth: 1,
+    borderLeftColor: colors.grayHeavy,
+    border: 'solid',
+  },
+  numberBlockFirst: {
+    borderLeftWidth: 0,
+  },
+
+  // Bar
+  barContainer: {
+    width: 40,
+    height: 20,
+    display: 'inline-flex',
+    marginLeft: 8,
+    position: 'relative',
+    top: 4,
+  },
+  bar: {
+    height: 20,
+    display: 'inline-flex',
+    borderRadius: 2,
+  },
+  barOk: {
+    backgroundColor: colors.primary,
+  },
+  barWarn: {
+    backgroundColor: colors.gold,
+  },
+  barKo: {
+    backgroundColor: colors.red,
   },
 })
