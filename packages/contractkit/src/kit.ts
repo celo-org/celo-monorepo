@@ -283,6 +283,6 @@ export class ContractKit {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
     // Follows protocol/contracts getEpochNumber()
-    return (blockNumber - 1) / epochSize.toNumber()
+    return Math.floor((blockNumber - 1) / epochSize.toNumber())
   }
 }
