@@ -54,9 +54,8 @@ commands:
       - restore_cache:
           name: Restore yarn global cache
           keys:
-            - yarn-global-v1-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-global-v1-{{ arch }}-{{ .Branch }}-
-            - yarn-global-v1-{{ arch }}-
+            - yarn-global-v2-{{ arch }}-{{ checksum "yarn.lock" }}
+            - yarn-global-v2-{{ arch }}-
       - run:
           name: Create cache checksum files
           command: |
@@ -68,7 +67,7 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v2-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
           command: if [ -e ~/.tmp/node_modules.tgz ]; then tar -xf ~/.tmp/node_modules.tgz; fi
@@ -99,12 +98,12 @@ commands:
           command: if [ ! -e ~/.tmp/node_modules.tgz ]; then tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz; fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v2-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
       - save_cache:
           name: Save yarn global cache
-          key: yarn-global-v1-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-global-v2-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
 
