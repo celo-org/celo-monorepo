@@ -62,7 +62,7 @@ commands:
           command: |
             mkdir -p ~/.tmp/checksumfiles
             # Concatenate patches so we can use them as a part of the cache key
-            find ./patches -type f -name '*.patch' -exec cat {} + >> ~/.tmp/checksumfiles/patches
+            find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/patches
       - restore_cache:
           name: Restore cached node_modules
           keys:
