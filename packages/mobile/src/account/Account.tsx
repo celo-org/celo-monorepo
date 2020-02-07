@@ -208,11 +208,6 @@ export class Account extends React.Component<Props, State> {
             </TouchableOpacity>
           </View>
           <View style={style.devSettingsItem}>
-            <TouchableOpacity onPress={this.goToFiatExchange}>
-              <Text>Buy/Sell Celo Dollars</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={Sentry.nativeCrash}>
               <Text>Trigger a crash</Text>
             </TouchableOpacity>
@@ -241,6 +236,9 @@ export class Account extends React.Component<Props, State> {
             </View>
           </View>
           <View style={style.containerList}>
+            {features.SHOW_ADD_FUNDS && (
+              <SettingsItem title={t('addFunds')} onPress={this.goToFiatExchange} />
+            )}
             <SettingsItem
               title={t('backupKeyFlow6:backupAndRecovery')}
               onPress={this.goToBackupScreen}
