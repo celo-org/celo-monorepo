@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { connect } from 'react-redux'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -47,9 +47,10 @@ async function signMoonpayUrl(account: string, localCurrencyCode: LocalCurrencyC
       }),
     }
   )
-  Logger.debug('response', JSON.stringify(response))
-  Logger.debug('response url: ', response.url)
-  return response.url
+  const json = await response.json()
+  Logger.debug('response', JSON.stringify(json))
+  Logger.debug('response url: ', json.url)
+  return json.url
 }
 
 class FiatExchange extends React.Component<Props, State> {
@@ -76,9 +77,7 @@ class FiatExchange extends React.Component<Props, State> {
 
   render() {
     return this.state.signedUrl === '' ? (
-      <View>
-        <Text>loading </Text>
-      </View>
+      <ActivityIndicator size="large" color={colors.celoGreen} />
     ) : (
       <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />
     )
