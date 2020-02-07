@@ -185,7 +185,7 @@ exports[`DataSaver renders correctly 1`] = `
               }
             }
           >
-            promptZeroSyncModal.header
+            promptFornoModal.header
           </Text>
           <Text
             style={
@@ -197,7 +197,7 @@ exports[`DataSaver renders correctly 1`] = `
               }
             }
           >
-            promptZeroSyncModal.body
+            promptFornoModal.body
           </Text>
           <View
             style={
@@ -286,7 +286,7 @@ exports[`DataSaver renders correctly 1`] = `
                   ]
                 }
               >
-                promptZeroSyncModal.switchToDataSaver
+                promptFornoModal.switchToDataSaver
               </Text>
             </View>
           </View>
