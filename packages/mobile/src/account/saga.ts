@@ -39,7 +39,12 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
   }
 }
 
-export function* getPincode(useCache = true) {
+export function* getPincode(
+  useCache = true,
+  pinVerifier: null | ((password: string) => Promise<boolean>) = null,
+  hideBackButton: null | boolean = false,
+  shouldNavigateBack: null | boolean = true
+) {
   const pincodeType = yield select(pincodeTypeSelector)
 
   if (pincodeType === PincodeType.Unset) {
@@ -66,7 +71,13 @@ export function* getPincode(useCache = true) {
     }
 
     const pincodeEntered = new Promise((resolve, reject) => {
-      navigate(Screens.PincodeConfirmation, { resolve, reject })
+      navigate(Screens.PincodeConfirmation, {
+        resolve,
+        reject,
+        pinVerifier,
+        hideBackButton,
+        shouldNavigateBack,
+      })
     })
     const pin = yield pincodeEntered
     if (!pin) {

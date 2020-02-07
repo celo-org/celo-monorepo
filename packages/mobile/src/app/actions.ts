@@ -70,6 +70,7 @@ export interface NavigatePinProtected {
   type: Actions.NAVIGATE_PIN_PROTECTED
   routeName: string
   params?: NavigationParams
+  hideBackButton?: boolean
 }
 
 interface StartPinVerification {
@@ -150,11 +151,13 @@ export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled =
 
 export const navigatePinProtected = (
   routeName: string,
-  params?: NavigationParams
+  params?: NavigationParams,
+  hideBackButton?: boolean
 ): NavigatePinProtected => ({
   type: Actions.NAVIGATE_PIN_PROTECTED,
   routeName,
   params,
+  hideBackButton,
 })
 
 export const startPinVerification = (): StartPinVerification => ({

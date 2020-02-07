@@ -15,6 +15,7 @@ export const vNeg1Schema = {
     dismissMessageAfter: null,
     analyticsEnabled: true,
     doingPinVerification: false,
+    lockWithPinEnabled: false,
   },
   networkInfo: {
     connected: true,

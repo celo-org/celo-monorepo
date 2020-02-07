@@ -1,19 +1,19 @@
-import { Linking } from 'react-native'
+import { AppState, Linking } from 'react-native'
 import { REHYDRATE } from 'redux-persist/es/constants'
-import { all, call, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import { eventChannel } from 'redux-saga'
+import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { getPincode } from 'src/account/saga'
 import { showError } from 'src/alert/actions'
 import {
   Actions,
-  finishPinVerification,
   NavigatePinProtected,
   navigatePinProtected,
   OpenDeepLink,
   setLanguage,
-  startPinVerification,
 } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { UNLOCK_DURATION } from 'src/geth/consts'
@@ -27,9 +27,8 @@ import { clockInSync } from 'src/utils/time'
 import { toggleFornoMode } from 'src/web3/actions'
 import { isInitiallyFornoMode, web3 } from 'src/web3/contracts'
 import { getAccount } from 'src/web3/saga'
-import { fornoSelector } from 'src/web3/selectors'
+import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
-
 const TAG = 'app/saga'
 
 export function* waitForRehydrate() {
@@ -89,6 +88,7 @@ export function* navigateToProperScreen() {
   const deepLink = yield call(Linking.getInitialURL)
   const inSync = yield call(clockInSync)
   const mappedState: PersistedStateProps = yield select(mapStateToProps)
+  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
 
   if (!mappedState) {
     navigate(Stacks.NuxStack)
@@ -124,9 +124,17 @@ export function* navigateToProperScreen() {
   } else if (!redeemComplete && !account) {
     navigate(Screens.EnterInviteCode)
   } else if (!hasSeenVerificationNux) {
-    yield put(navigatePinProtected(Screens.VerificationEducationScreen))
+    if (lockWithPinEnabled) {
+      yield put(navigatePinProtected(Screens.VerificationEducationScreen, {}, true))
+    } else {
+      navigate(Screens.VerificationEducationScreen)
+    }
   } else {
-    yield put(navigatePinProtected(Stacks.AppStack))
+    if (lockWithPinEnabled) {
+      yield put(navigatePinProtected(Stacks.AppStack, {}, true))
+    } else {
+      navigate(Stacks.AppStack)
+    }
   }
 }
 
@@ -149,12 +157,17 @@ export function* navigateWithPinProtection(action: NavigatePinProtected) {
   const fornoMode = yield select(fornoSelector)
   try {
     if (!fornoMode) {
-      const pincode = yield call(getPincode, false)
-      yield put(startPinVerification())
       const account = yield call(getAccount)
-      yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+      yield call(
+        getPincode,
+        false,
+        (password: string) => {
+          return web3.eth.personal.unlockAccount(account, password, UNLOCK_DURATION)
+        },
+        action.hideBackButton,
+        false
+      )
       navigate(action.routeName, action.params)
-      yield put(finishPinVerification())
     } else {
       // TODO: Implement PIN protection for forno mode
       navigate(action.routeName, action.params)
@@ -162,7 +175,6 @@ export function* navigateWithPinProtection(action: NavigatePinProtected) {
   } catch (error) {
     Logger.error(TAG + '@showBackupAndRecovery', 'Incorrect pincode', error)
     yield put(showError(ErrorMessages.INCORRECT_PIN))
-    yield put(finishPinVerification())
   }
 }
 
@@ -174,10 +186,54 @@ export function* watchDeepLinks() {
   yield takeLatest(Actions.OPEN_DEEP_LINK, handleDeepLink)
 }
 
+function createAppStateChannel() {
+  return eventChannel((emit: any) => {
+    AppState.addEventListener('change', emit)
+
+    const removeEventListener = () => {
+      AppState.removeEventListener('change', emit)
+    }
+    return removeEventListener
+  })
+}
+
+function* watchAppState() {
+  Logger.debug(`${TAG}@monitorAppState`, 'Starting monitor app state saga')
+  const appStateChannel = yield createAppStateChannel()
+  while (true) {
+    try {
+      const newState = yield take(appStateChannel)
+      Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
+      if (newState === 'active') {
+        const account = yield select(currentAccountSelector)
+        const lockWithPinEnabled = yield select(getLockWithPinEnabled)
+        if (account && lockWithPinEnabled) {
+          console.debug(account)
+          yield getPincode(
+            false,
+            (password: string) => {
+              return web3.eth.personal.unlockAccount(account, password, UNLOCK_DURATION)
+            },
+            true,
+            true
+          )
+        }
+      }
+    } catch (error) {
+      Logger.error(`${TAG}@monitorAppState`, error)
+    } finally {
+      if (yield cancelled()) {
+        appStateChannel.close()
+      }
+    }
+  }
+}
+
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
   yield spawn(checkAppDeprecation)
   yield spawn(watchNavigatePinProtected)
   yield spawn(watchDeepLinks)
+  yield spawn(watchAppState)
 }
