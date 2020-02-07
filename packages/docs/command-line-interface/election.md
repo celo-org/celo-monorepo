@@ -23,6 +23,20 @@ EXAMPLES
 
 _See code: [packages/cli/src/commands/election/activate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)_
 
+### Compare
+
+Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.
+
+```
+USAGE
+  $ celocli election:compare
+
+OPTIONS
+  --at-block=at-block  block for which to run elections
+```
+
+_See code: [packages/cli/src/commands/election/compare.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/compare.ts)_
+
 ### Current
 
 Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.
@@ -120,3 +134,21 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/election/vote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/vote.ts)_
+
+### Voters
+
+Returns information about who has voted for groups.
+
+```
+USAGE
+  $ celocli election:voters
+
+OPTIONS
+  --at-block=at-block                                 block for which to get info
+  --debug                                             Toggle verbose output
+  --from-block=from-block                             first block for which to get info
+  --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Group to inspect
+  --to-block=to-block                                 last block for which to get info
+```
+
+_See code: [packages/cli/src/commands/election/voters.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/voters.ts)_

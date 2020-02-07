@@ -78,6 +78,24 @@ EXAMPLES
 
 _See code: [packages/cli/src/commands/validatorgroup/member.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/member.ts)_
 
+### Membership-history
+
+Returns information about historical members of groups.
+
+```
+USAGE
+  $ celocli validatorgroup:membership-history
+
+OPTIONS
+  --at-block=at-block                                 block for which to get info
+  --debug                                             Toggle verbose output
+  --from-block=from-block                             first block for which to get info
+  --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Group to inspect
+  --to-block=to-block                                 last block for which to get info
+```
+
+_See code: [packages/cli/src/commands/validatorgroup/membership-history.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/membership-history.ts)_
+
 ### Register
 
 Register a new Validator Group
