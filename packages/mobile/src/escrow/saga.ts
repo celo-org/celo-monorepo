@@ -38,7 +38,7 @@ import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { zeroSyncSelector } from 'src/web3/selectors'
+import { fornoSelector } from 'src/web3/selectors'
 
 const TAG = 'escrow/saga'
 
@@ -113,8 +113,8 @@ function* withdrawFromEscrow() {
     }
 
     const tempWalletAddress = web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey).address
-    const zeroSyncMode = yield select(zeroSyncSelector)
-    if (zeroSyncMode) {
+    const fornoMode = yield select(fornoSelector)
+    if (fornoMode) {
       addLocalAccount(web3, tmpWalletPrivateKey)
     }
     Logger.debug(TAG + '@withdrawFromEscrow', 'Added temp account to wallet: ' + tempWalletAddress)
@@ -127,10 +127,10 @@ function* withdrawFromEscrow() {
       return
     }
 
-    if (zeroSyncMode) {
+    if (fornoMode) {
       Logger.info(
         TAG + '@withdrawFromEscrow',
-        'Geth free mode is on, no need to unlock the temporary account'
+        'Forno mode is on, no need to unlock the temporary account'
       )
     } else {
       // Unlock temporary account
@@ -271,14 +271,6 @@ function* doFetchSentPayments() {
   } catch (e) {
     Logger.error(TAG + '@doFetchSentPayments', 'Error fetching sent escrowed payments', e)
   }
-}
-
-export function getReclaimableEscrowPayments(allPayments: EscrowedPayment[]) {
-  const currUnixTime = Date.now() / 1000
-  return allPayments.filter((payment) => {
-    const paymentExpiryTime = +payment.timestamp + +payment.expirySeconds
-    return currUnixTime >= paymentExpiryTime
-  })
 }
 
 export function* watchTransferPayment() {
