@@ -26,6 +26,7 @@ export interface State {
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
+  moonpayUrl: string
 }
 
 export enum PincodeType {
@@ -62,6 +63,7 @@ export const initialState = {
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
+  moonpayUrl: '',
 }
 
 export const reducer = (
@@ -77,6 +79,11 @@ export const reducer = (
         dismissedGetVerified: false,
       }
     }
+    case Actions.SET_MOONPAY_URL:
+      return {
+        ...state,
+        moonpayUrl: action.url,
+      }
     case Actions.SET_NAME:
       return {
         ...state,

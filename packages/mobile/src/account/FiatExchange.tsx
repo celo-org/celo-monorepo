@@ -1,51 +1,87 @@
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { connect } from 'react-redux'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
+import Logger from 'src/utils/Logger'
 
-const moonpayUri = 'https://buy-staging.moonpay.io/'
-const apiKey = 'pk_test_EDT0SRJUlsJezJUFGaVZIr8LuaTsF5NO' // (publishable) TODO production api key when actually buying cUSD
-const currencyCode = 'ETH' // TODO switch to cUSD when added to Moonpay
-const moonpaySupportedCurrencies = ['USD', 'EUR', 'GBP']
-
-const moonpayBuyEth = moonpayUri + '?apiKey=' + apiKey + '&currencyCode=' + currencyCode
+interface State {
+  signedUrl: string
+}
 
 interface StateProps {
+  url: string
+  localCurrency: LocalCurrencyCode
   account: string | null
-  currencyCode: LocalCurrencyCode
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    url: state.account.moonpayUrl,
+    localCurrency: state.localCurrency.preferredCurrencyCode || LocalCurrencyCode.USD,
     account: state.web3.account,
-    currencyCode: state.localCurrency.preferredCurrencyCode || LocalCurrencyCode.USD,
   }
 }
 
 type Props = StateProps & WithTranslation
 
-class FiatExchange extends React.Component<Props> {
+const celoCurrencyCode = 'ETH' // TODO switch to cUSD when added to Moonpay
+
+async function signMoonpayUrl(account: string, localCurrencyCode: LocalCurrencyCode) {
+  const response = await fetch(
+    'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpay',
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        currency: celoCurrencyCode,
+        address: account,
+        fiatCurrency: localCurrencyCode,
+      }),
+    }
+  )
+  Logger.debug('response', JSON.stringify(response))
+  Logger.debug('response url: ', response.url)
+  return response.url
+}
+
+class FiatExchange extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('accountScreen10:addFunds'),
   })
 
+  state: State = {
+    signedUrl: '',
+  }
+
+  componentDidMount() {
+    if (this.props.account) {
+      signMoonpayUrl(this.props.account, this.props.localCurrency)
+        .then((signedUrl) => this.setState({ signedUrl }))
+        .catch((err) => this.handleError(err))
+    } // TODO(anna) handle account that hasn't been made yet
+  }
+
+  handleError = (error: Error) => {
+    // TODO(anna) handleError
+  }
+
   render() {
-    const moonpayCurrencyCode = moonpaySupportedCurrencies.includes(this.props.currencyCode)
-      ? this.props.currencyCode
-      : LocalCurrencyCode.USD // Default to USD if fiat currency not supported by moonpay
-    const moonpayLink =
-      moonpayBuyEth +
-      '&walletAddress=' +
-      this.props.account +
-      '&baseCurrencyCode=' +
-      moonpayCurrencyCode
-    return <WebView style={styles.exchangeWebView} source={{ uri: moonpayLink }} />
+    return this.state.signedUrl === '' ? (
+      <View>
+        <Text>loading </Text>
+      </View>
+    ) : (
+      <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />
+    )
   }
 }
 
