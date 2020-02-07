@@ -14,18 +14,18 @@ const DEFAULT_COMPONENT = 'validators'
 
 async function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
   if (isVmBased()) {
-    return Promise.resolve(getVmPortForwardCmd(celoEnv, ports))
+    return Promise.resolve(getVmPortForwardCmd(celoEnv, component, ports))
   } else {
     return getKubernetesPortForwardCmd(celoEnv, component, ports)
   }
 }
 
-function getVmPortForwardCmd(celoEnv: string, ports = defaultPortsString) {
+function getVmPortForwardCmd(celoEnv: string, machine = 'validator-0', ports = defaultPortsString) {
   const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   // this command expects port mappings to be of the form `[localPort]:localhost:[remotePort]`
   const portMappings = ports.replace(/:/g, ':localhost:').split(' ')
   const portsWithFlags = portMappings.map((mapping) => `-L ${mapping}`).join(' ')
-  return `gcloud compute ssh --zone ${zone} ${celoEnv}-validator-0 -- -N ${portsWithFlags}`
+  return `gcloud compute ssh --zone ${zone} ${celoEnv}-${machine} -- -N ${portsWithFlags}`
 }
 
 async function getKubernetesPortForwardCmd(

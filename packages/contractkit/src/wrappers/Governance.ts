@@ -48,19 +48,21 @@ export interface ProposalMetadata {
   deposit: BigNumber
   timestamp: BigNumber
   transactionCount: number
+  descriptionURL: string
 }
 
 export type ProposalParams = Parameters<Governance['methods']['propose']>
 export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
-export const proposalToParams = (proposal: Proposal): ProposalParams => {
+export const proposalToParams = (proposal: Proposal, descriptionURL: string): ProposalParams => {
   const data = proposal.map((tx) => stringToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
     proposal.map((tx) => tx.to),
     bufferToBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
+    descriptionURL,
   ]
 }
 
@@ -92,7 +94,7 @@ export interface Votes {
 
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
 export const hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams => {
-  const p = proposalToParams(proposal)
+  const p = proposalToParams(proposal, '') // no description URL for hotfixes
   return [p[0], p[1], p[2], p[3], bufferToString(salt)]
 }
 
@@ -177,6 +179,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       deposit: valueToBigNumber(res[1]),
       timestamp: valueToBigNumber(res[2]),
       transactionCount: valueToInt(res[3]),
+      descriptionURL: res[4],
     })
   )
 
@@ -272,6 +275,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Submits a new governance proposal.
    * @param proposal Governance proposal
+   * @param descriptionURL A URL where further information about the proposal can be viewed
    */
   propose = proxySend(this.kit, this.contract.methods.propose, proposalToParams)
 
@@ -342,11 +346,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
-   * Returns the proposal dequeue as list of proposal IDs.
+   * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
-    arrayObject.map(valueToBigNumber)
-  )
+  async getDequeue() {
+    const dequeue = await this.contract.methods.getDequeue().call()
+    // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
+    return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
+  }
 
   /**
    * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
@@ -430,9 +436,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    const queue = upvoteRecord.proposalID.isZero()
-      ? await this.getQueue()
-      : (await this.withUpvoteRevoked(upvoter)).queue
+    const recordQueued = await this.isQueued(upvoteRecord.proposalID)
+    // if existing upvote exists in queue, revoke it before applying new upvote
+    const queue = recordQueued
+      ? (await this.withUpvoteRevoked(upvoter)).queue
+      : await this.getQueue()
     const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
     return this.lesserAndGreater(proposalID, upvoteQueue)
   }

@@ -7,6 +7,7 @@ import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
 import CeloValues from 'src/about/Values'
 import VideoCover from 'src/about/VideoCover'
+import analytics from 'src/analytics/analytics'
 import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
@@ -26,6 +27,7 @@ interface Props {
 async function pronunceCelo() {
   const audio = document.getElementById('pronunce') as HTMLAudioElement
   await audio.play()
+  await analytics.track('pronounced celo')
 }
 
 export class About extends React.Component<Props & I18nProps> {

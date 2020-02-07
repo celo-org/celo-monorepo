@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
+import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
   addressToE164NumberSelector,
@@ -28,17 +28,17 @@ interface OwnProps {
 }
 
 interface DispatchProps {
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
+  cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
-
-type Props = OwnProps & DispatchProps & WithTranslation & StateProps
 
 interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
+
+type Props = OwnProps & DispatchProps & WithTranslation & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
@@ -77,9 +77,10 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
     return requests.length === 1 ? (
       listItemRenderer({
         addressToE164Number: this.props.addressToE164Number,
-        updatePaymentRequestStatus: this.props.updatePaymentRequestStatus,
-        updatePaymentRequestNotified: this.props.updatePaymentRequestNotified,
         recipientCache,
+        // accessing via this.props.<...> to avoid shadowing
+        cancelPaymentRequest: this.props.cancelPaymentRequest,
+        updatePaymentRequestNotified: this.props.updatePaymentRequestNotified,
       })(requests[0])
     ) : (
       <SummaryNotification<PaymentRequest>
@@ -101,6 +102,6 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  updatePaymentRequestStatus,
+  cancelPaymentRequest,
   updatePaymentRequestNotified,
 })(withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))

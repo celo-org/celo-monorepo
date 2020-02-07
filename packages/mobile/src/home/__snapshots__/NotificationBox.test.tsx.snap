@@ -255,145 +255,157 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "width": "100%",
+              },
+              Object {
+                "elevation": 2,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 1,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 1.6,
+              },
+            ]
+          }
+        >
           <View
             style={
-              Array [
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "padding": 16,
-                  "width": "100%",
-                },
-                Object {
-                  "elevation": 2,
-                  "shadowColor": "black",
-                  "shadowOffset": Object {
-                    "height": 1,
-                    "width": 0,
-                  },
-                  "shadowOpacity": 0.3,
-                  "shadowRadius": 1.6,
-                },
-              ]
+              Object {
+                "padding": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <Image
-                resizeMode="contain"
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/backup-icon.png",
-                  }
-                }
-                style={
-                  Object {
-                    "height": 30,
-                    "width": 30,
-                  }
-                }
-              />
-            </View>
-            <View
-              style={
-                Object {
-                  "flex": 1,
+                  "flexDirection": "row",
                   "justifyContent": "space-between",
                 }
               }
             >
-              <Text
-                style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                backupKeyFlow6:yourBackupKey
-              </Text>
               <View
                 style={
                   Object {
-                    "justifyContent": "space-between",
-                    "minHeight": 60,
-                    "paddingTop": 8,
+                    "alignItems": "center",
+                    "paddingRight": 16,
                   }
                 }
               >
-                <View
+                <Image
+                  resizeMode="contain"
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/backup-icon.png",
+                    }
+                  }
                   style={
                     Object {
-                      "marginTop": 5,
+                      "height": 30,
+                      "width": 30,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     }
                   }
                 >
-                  <Text
-                    style={
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
-                    }
-                  >
-                    backupKeyFlow6:backupKeyNotification
-                  </Text>
-                </View>
+                  backupKeyFlow6:yourBackupKey
+                </Text>
                 <View
                   style={
                     Object {
-                      "flexDirection": "row",
-                      "marginTop": 5,
+                      "justifyContent": "space-between",
+                      "minHeight": 60,
+                      "paddingTop": 8,
                     }
                   }
                 >
                   <View
-                    accessible={true}
-                    focusable={true}
-                    isTVSelectable={true}
-                    nativeBackgroundAndroid={
+                    style={
                       Object {
-                        "attribute": "selectableItemBackgroundBorderless",
-                        "type": "ThemeAttrAndroid",
+                        "marginTop": 5,
                       }
                     }
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                   >
                     <Text
                       style={
-                        Array [
-                          Object {
-                            "color": "#42D689",
-                            "fontFamily": "Hind-SemiBold",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
-                            "paddingEnd": 15,
-                          },
-                        ]
+                        Object {
+                          "color": "#81868B",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 20,
+                        }
                       }
                     >
-                      backupKeyFlow6:getBackupKey
+                      backupKeyFlow6:backupKeyNotification
                     </Text>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "flexDirection": "row",
+                        "marginTop": 5,
+                      }
+                    }
+                  >
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      isTVSelectable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#42D689",
+                              "fontFamily": "Hind-SemiBold",
+                              "fontSize": 14,
+                              "lineHeight": 18,
+                            },
+                            Object {
+                              "paddingEnd": 15,
+                            },
+                          ]
+                        }
+                      >
+                        backupKeyFlow6:getBackupKey
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -409,181 +421,193 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "width": "100%",
+              },
+              Object {
+                "elevation": 2,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 1,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 1.6,
+              },
+            ]
+          }
+        >
           <View
             style={
-              Array [
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "padding": 16,
-                  "width": "100%",
-                },
-                Object {
-                  "elevation": 2,
-                  "shadowColor": "black",
-                  "shadowOffset": Object {
-                    "height": 1,
-                    "width": 0,
-                  },
-                  "shadowOpacity": 0.3,
-                  "shadowRadius": 1.6,
-                },
-              ]
+              Object {
+                "padding": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <Image
-                resizeMode="contain"
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/get-verified-icon.png",
-                  }
-                }
-                style={
-                  Object {
-                    "height": 30,
-                    "width": 30,
-                  }
-                }
-              />
-            </View>
-            <View
-              style={
-                Object {
-                  "flex": 1,
+                  "flexDirection": "row",
                   "justifyContent": "space-between",
                 }
               }
             >
-              <Text
-                style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                nuxVerification2:notification.title
-              </Text>
               <View
                 style={
                   Object {
-                    "justifyContent": "space-between",
-                    "minHeight": 60,
-                    "paddingTop": 8,
+                    "alignItems": "center",
+                    "paddingRight": 16,
                   }
                 }
               >
-                <View
+                <Image
+                  resizeMode="contain"
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/get-verified-icon.png",
+                    }
+                  }
                   style={
                     Object {
-                      "marginTop": 5,
+                      "height": 30,
+                      "width": 30,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     }
                   }
                 >
-                  <Text
-                    style={
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
-                    }
-                  >
-                    nuxVerification2:notification.body
-                  </Text>
-                </View>
+                  nuxVerification2:notification.title
+                </Text>
                 <View
                   style={
                     Object {
-                      "flexDirection": "row",
-                      "marginTop": 5,
+                      "justifyContent": "space-between",
+                      "minHeight": 60,
+                      "paddingTop": 8,
                     }
                   }
                 >
                   <View
-                    accessible={true}
-                    focusable={true}
-                    isTVSelectable={true}
-                    nativeBackgroundAndroid={
+                    style={
                       Object {
-                        "attribute": "selectableItemBackgroundBorderless",
-                        "type": "ThemeAttrAndroid",
+                        "marginTop": 5,
                       }
                     }
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                   >
                     <Text
                       style={
-                        Array [
-                          Object {
-                            "color": "#42D689",
-                            "fontFamily": "Hind-SemiBold",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
-                            "paddingEnd": 15,
-                          },
-                        ]
+                        Object {
+                          "color": "#81868B",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 20,
+                        }
                       }
                     >
-                      nuxVerification2:notification.cta
+                      nuxVerification2:notification.body
                     </Text>
                   </View>
                   <View
-                    accessible={true}
-                    focusable={true}
-                    isTVSelectable={true}
-                    nativeBackgroundAndroid={
+                    style={
                       Object {
-                        "attribute": "selectableItemBackgroundBorderless",
-                        "type": "ThemeAttrAndroid",
+                        "flexDirection": "row",
+                        "marginTop": 5,
                       }
                     }
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                   >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#42D689",
-                            "fontFamily": "Hind-SemiBold",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
-                            "paddingEnd": 15,
-                          },
-                        ]
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      isTVSelectable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
                       }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                     >
-                      maybeLater
-                    </Text>
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#42D689",
+                              "fontFamily": "Hind-SemiBold",
+                              "fontSize": 14,
+                              "lineHeight": 18,
+                            },
+                            Object {
+                              "paddingEnd": 15,
+                            },
+                          ]
+                        }
+                      >
+                        nuxVerification2:notification.cta
+                      </Text>
+                    </View>
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      isTVSelectable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#42D689",
+                              "fontFamily": "Hind-SemiBold",
+                              "fontSize": 14,
+                              "lineHeight": 18,
+                            },
+                            Object {
+                              "paddingEnd": 15,
+                            },
+                          ]
+                        }
+                      >
+                        maybeLater
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -599,181 +623,193 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "width": "100%",
+              },
+              Object {
+                "elevation": 2,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 1,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 1.6,
+              },
+            ]
+          }
+        >
           <View
             style={
-              Array [
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "padding": 16,
-                  "width": "100%",
-                },
-                Object {
-                  "elevation": 2,
-                  "shadowColor": "black",
-                  "shadowOffset": Object {
-                    "height": 1,
-                    "width": 0,
-                  },
-                  "shadowOpacity": 0.3,
-                  "shadowRadius": 1.6,
-                },
-              ]
+              Object {
+                "padding": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <Image
-                resizeMode="contain"
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/home-icon.png",
-                  }
-                }
-                style={
-                  Object {
-                    "height": 30,
-                    "width": 30,
-                  }
-                }
-              />
-            </View>
-            <View
-              style={
-                Object {
-                  "flex": 1,
+                  "flexDirection": "row",
                   "justifyContent": "space-between",
                 }
               }
             >
-              <Text
-                style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                global:celoGold
-              </Text>
               <View
                 style={
                   Object {
-                    "justifyContent": "space-between",
-                    "minHeight": 60,
-                    "paddingTop": 8,
+                    "alignItems": "center",
+                    "paddingRight": 16,
                   }
                 }
               >
-                <View
+                <Image
+                  resizeMode="contain"
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/home-icon.png",
+                    }
+                  }
                   style={
                     Object {
-                      "marginTop": 5,
+                      "height": 30,
+                      "width": 30,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     }
                   }
                 >
-                  <Text
-                    style={
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
-                    }
-                  >
-                    exchangeFlow9:whatIsGold
-                  </Text>
-                </View>
+                  global:celoGold
+                </Text>
                 <View
                   style={
                     Object {
-                      "flexDirection": "row",
-                      "marginTop": 5,
+                      "justifyContent": "space-between",
+                      "minHeight": 60,
+                      "paddingTop": 8,
                     }
                   }
                 >
                   <View
-                    accessible={true}
-                    focusable={true}
-                    isTVSelectable={true}
-                    nativeBackgroundAndroid={
+                    style={
                       Object {
-                        "attribute": "selectableItemBackgroundBorderless",
-                        "type": "ThemeAttrAndroid",
+                        "marginTop": 5,
                       }
                     }
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                   >
                     <Text
                       style={
-                        Array [
-                          Object {
-                            "color": "#42D689",
-                            "fontFamily": "Hind-SemiBold",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
-                            "paddingEnd": 15,
-                          },
-                        ]
+                        Object {
+                          "color": "#81868B",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 20,
+                        }
                       }
                     >
-                      exchange
+                      exchangeFlow9:whatIsGold
                     </Text>
                   </View>
                   <View
-                    accessible={true}
-                    focusable={true}
-                    isTVSelectable={true}
-                    nativeBackgroundAndroid={
+                    style={
                       Object {
-                        "attribute": "selectableItemBackgroundBorderless",
-                        "type": "ThemeAttrAndroid",
+                        "flexDirection": "row",
+                        "marginTop": 5,
                       }
                     }
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                   >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#42D689",
-                            "fontFamily": "Hind-SemiBold",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
-                            "paddingEnd": 15,
-                          },
-                        ]
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      isTVSelectable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
                       }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                     >
-                      maybeLater
-                    </Text>
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#42D689",
+                              "fontFamily": "Hind-SemiBold",
+                              "fontSize": 14,
+                              "lineHeight": 18,
+                            },
+                            Object {
+                              "paddingEnd": 15,
+                            },
+                          ]
+                        }
+                      >
+                        exchange
+                      </Text>
+                    </View>
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      isTVSelectable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#42D689",
+                              "fontFamily": "Hind-SemiBold",
+                              "fontSize": 14,
+                              "lineHeight": 18,
+                            },
+                            Object {
+                              "paddingEnd": 15,
+                            },
+                          ]
+                        }
+                      >
+                        maybeLater
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -789,181 +825,193 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           }
         }
       >
-        <View>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "width": "100%",
+              },
+              Object {
+                "elevation": 2,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 1,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 1.6,
+              },
+            ]
+          }
+        >
           <View
             style={
-              Array [
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "padding": 16,
-                  "width": "100%",
-                },
-                Object {
-                  "elevation": 2,
-                  "shadowColor": "black",
-                  "shadowOffset": Object {
-                    "height": 1,
-                    "width": 0,
-                  },
-                  "shadowOpacity": 0.3,
-                  "shadowRadius": 1.6,
-                },
-              ]
+              Object {
+                "padding": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <Image
-                resizeMode="contain"
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-                  }
-                }
-                style={
-                  Object {
-                    "height": 30,
-                    "width": 30,
-                  }
-                }
-              />
-            </View>
-            <View
-              style={
-                Object {
-                  "flex": 1,
+                  "flexDirection": "row",
                   "justifyContent": "space-between",
                 }
               }
             >
-              <Text
-                style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                inviteFlow11:inviteFriendsToCelo
-              </Text>
               <View
                 style={
                   Object {
-                    "justifyContent": "space-between",
-                    "minHeight": 60,
-                    "paddingTop": 8,
+                    "alignItems": "center",
+                    "paddingRight": 16,
                   }
                 }
               >
-                <View
+                <Image
+                  resizeMode="contain"
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
+                    }
+                  }
                   style={
                     Object {
-                      "marginTop": 5,
+                      "height": 30,
+                      "width": 30,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     }
                   }
                 >
-                  <Text
-                    style={
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
-                    }
-                  >
-                    inviteFlow11:inviteAnyone
-                  </Text>
-                </View>
+                  inviteFlow11:inviteFriendsToCelo
+                </Text>
                 <View
                   style={
                     Object {
-                      "flexDirection": "row",
-                      "marginTop": 5,
+                      "justifyContent": "space-between",
+                      "minHeight": 60,
+                      "paddingTop": 8,
                     }
                   }
                 >
                   <View
-                    accessible={true}
-                    focusable={true}
-                    isTVSelectable={true}
-                    nativeBackgroundAndroid={
+                    style={
                       Object {
-                        "attribute": "selectableItemBackgroundBorderless",
-                        "type": "ThemeAttrAndroid",
+                        "marginTop": 5,
                       }
                     }
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                   >
                     <Text
                       style={
-                        Array [
-                          Object {
-                            "color": "#42D689",
-                            "fontFamily": "Hind-SemiBold",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
-                            "paddingEnd": 15,
-                          },
-                        ]
+                        Object {
+                          "color": "#81868B",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 20,
+                        }
                       }
                     >
-                      global:inviteFriends
+                      inviteFlow11:inviteAnyone
                     </Text>
                   </View>
                   <View
-                    accessible={true}
-                    focusable={true}
-                    isTVSelectable={true}
-                    nativeBackgroundAndroid={
+                    style={
                       Object {
-                        "attribute": "selectableItemBackgroundBorderless",
-                        "type": "ThemeAttrAndroid",
+                        "flexDirection": "row",
+                        "marginTop": 5,
                       }
                     }
-                    onClick={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                   >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#42D689",
-                            "fontFamily": "Hind-SemiBold",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          },
-                          Object {
-                            "paddingEnd": 15,
-                          },
-                        ]
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      isTVSelectable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
                       }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                     >
-                      maybeLater
-                    </Text>
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#42D689",
+                              "fontFamily": "Hind-SemiBold",
+                              "fontSize": 14,
+                              "lineHeight": 18,
+                            },
+                            Object {
+                              "paddingEnd": 15,
+                            },
+                          ]
+                        }
+                      >
+                        global:inviteFriends
+                      </Text>
+                    </View>
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      isTVSelectable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#42D689",
+                              "fontFamily": "Hind-SemiBold",
+                              "fontSize": 14,
+                              "lineHeight": 18,
+                            },
+                            Object {
+                              "paddingEnd": 15,
+                            },
+                          ]
+                        }
+                      >
+                        maybeLater
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>

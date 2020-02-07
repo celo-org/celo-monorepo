@@ -4,31 +4,44 @@ const execSync = require('child_process').execSync
 const fs = require('fs')
 const chalk = require('chalk')
 const path = require('path')
+const { config } = require('dotenv')
 
 function execCmd(cmd) {
   console.log('Running ==> ' + chalk.bold.cyan(cmd))
   execSync(cmd, { stdio: 'inherit' })
 }
 
+function getEnvFile(celoEnv) {
+  const monorepoRoot = path.resolve(path.dirname(__dirname), '../..')
+  const filePath = path.resolve(monorepoRoot, `.env.${celoEnv}`)
+  if (fs.existsSync(filePath)) {
+    return filePath
+  } else {
+    throw new Error(`Unable to find env file for '${celoEnv}'`)
+  }
+}
+
 function isProduction(env) {
-  return env.endsWith('production')
+  const envConfig = config({ path: getEnvFile(env) })
+  return envConfig.parsed['TESTNET_PROJECT_NAME'] === 'celo-testnet-production'
 }
 
 // TODO(asa): Use @google-cloud/storage, tar-stream to do all of this directly in node
-function downloadContractArtifacts(gcsBucket, environment, outputDir) {
-  console.debug(
-    `Downloading contract artifacts from ${gcsBucket} to ${outputDir} for environment ${environment}`
-  )
+function downloadContractArtifacts(environment, outputDir) {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir)
   }
 
-  const projectPath = isProduction(environment)
+  const gcsBucket = isProduction(environment)
     ? 'contract_artifacts_production'
     : 'contract_artifacts'
 
+  console.debug(
+    `Downloading contract artifacts from ${gcsBucket} to ${outputDir} for environment ${environment}`
+  )
+
   execCmd(
-    `curl https://www.googleapis.com/storage/v1/b/${projectPath}/o/${environment}?alt=media > ${environment}.tar.gz`
+    `curl https://www.googleapis.com/storage/v1/b/${gcsBucket}/o/${environment}?alt=media > ${environment}.tar.gz`
   )
   execCmd(`tar -zxf ${environment}.tar.gz --directory ${outputDir}`)
   execCmd(`rm ${environment}.tar.gz`)
@@ -75,7 +88,7 @@ export default async function getInstance(web3: Web3, account: string | null = n
 }
 
 function writeProxiedContractGetters(artifactDir, outputDir, environment) {
-  downloadContractArtifacts('contract_artifacts', environment, artifactDir)
+  downloadContractArtifacts(environment, artifactDir)
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir)
   }

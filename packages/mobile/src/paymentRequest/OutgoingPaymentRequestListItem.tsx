@@ -1,14 +1,12 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { PaymentRequestStatus } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { updatePaymentRequestNotified, updatePaymentRequestStatus } from 'src/firebase/actions'
+import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
@@ -21,7 +19,7 @@ interface OwnProps {
   amount: string
   comment: string
   id: string
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
+  cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
 
@@ -32,15 +30,14 @@ type Props = OwnProps & WithTranslation
 export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
     const { id, t } = this.props
-    this.props.updatePaymentRequestNotified(id.toString(), false)
+    this.props.updatePaymentRequestNotified(id, false)
     CeloAnalytics.track(CustomEventNames.outgoing_request_payment_remind)
-    Logger.showMessage(t('sendFlow7:requestSent'))
+    Logger.showMessage(t('sendFlow7:reminderSent'))
   }
 
   onCancel = () => {
     const { id } = this.props
-    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.CANCELLED)
-    CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
+    this.props.cancelPaymentRequest(id)
   }
 
   getCTA = () => {
@@ -86,9 +83,6 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  phoneNumber: {
-    color: colors.dark,
-  },
   container: {
     marginBottom: 16,
   },
