@@ -52,10 +52,11 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
           return
         }
 
+        const { shouldShowClipboard, value } = this.props
         if (
           clipboardContent &&
-          clipboardContent !== this.props.value &&
-          this.props.shouldShowClipboard(clipboardContent)
+          !(value && clipboardContent.toLowerCase().includes(value.toLowerCase())) &&
+          shouldShowClipboard(clipboardContent)
         ) {
           this.setState({ isPasteIconVisible: true, clipboardContent })
         } else {
