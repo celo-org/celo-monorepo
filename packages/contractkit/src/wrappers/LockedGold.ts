@@ -1,5 +1,6 @@
-import { zip } from '@celo/utils/lib/collections'
+import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
+import { EventLog } from 'web3/types'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
@@ -26,6 +27,14 @@ interface AccountSummary {
     requirement: BigNumber
   }
   pendingWithdrawals: PendingWithdrawal[]
+}
+
+export interface AccountSlashed {
+  slashed: Address
+  penalty: BigNumber
+  reporter: Address
+  reward: BigNumber
+  epochNumber: number
 }
 
 interface PendingWithdrawal {
@@ -186,5 +195,68 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       withdrawals[1],
       withdrawals[0]
     )
+  }
+
+  /**
+   * Retrieves AccountSlashed for epochNumber.
+   * @param epochNumber The epoch to retrieve AccountSlashed at.
+   */
+  async getAccountsSlashed(epochNumber: number): Promise<AccountSlashed[]> {
+    const events = await this.getPastEvents('AccountSlashed', {
+      fromBlock: await this.kit.getFirstBlockNumberForEpoch(epochNumber),
+      toBlock: await this.kit.getLastBlockNumberForEpoch(epochNumber),
+    })
+    return events.map(
+      (e: EventLog): AccountSlashed => ({
+        epochNumber,
+        slashed: e.returnValues.slashed,
+        penalty: valueToBigNumber(e.returnValues.penalty),
+        reporter: e.returnValues.reporter,
+        reward: valueToBigNumber(e.returnValues.reward),
+      })
+    )
+  }
+
+  /**
+   * Computes parameters for slashing `penalty` from `account`.
+   * @param account The account to slash.
+   * @param penalty The amount to slash as penalty.
+   * @return List of (group, voting gold) to decrement from `account`.
+   */
+  async computeParametersForSlashing(account: string, penalty: BigNumber) {
+    const election = await this.kit.contracts.getElection()
+    const eligible = await election.getEligibleValidatorGroupsVotes()
+    const groups: AddressListItem[] = eligible.map((x) => ({ address: x.address, value: x.votes }))
+    const changed = await this.computeDecrementsForSlashing(account, penalty)
+    const changes = linkedListChanges(groups, changed)
+    return { ...changes, indices: changed.map((a) => a.index) }
+  }
+
+  // Returns how much voting gold will be decremented from the groups voted by an account
+  // Implementation follows protocol/test/common/integration slashingOfGroups()
+  private async computeDecrementsForSlashing(account: Address, penalty: BigNumber) {
+    // first check how much voting gold has to be slashed
+    const nonVoting = await this.getAccountNonvotingLockedGold(account)
+    if (penalty.isLessThan(nonVoting)) {
+      return []
+    }
+    let difference = penalty.minus(nonVoting)
+    // find voted groups
+    const election = await this.kit.contracts.getElection()
+    const groups = await election.getGroupsVotedForByAccount(account)
+    const res = []
+    //
+    for (let i = groups.length - 1; i >= 0; i++) {
+      const group = groups[i]
+      const totalVotes = await election.getTotalVotesForGroup(group)
+      const votes = await election.getTotalVotesForGroupByAccount(group, account)
+      const slashedVotes = votes.lt(difference) ? votes : difference
+      res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })
+      difference = difference.minus(slashedVotes)
+      if (difference.eq(new BigNumber(0))) {
+        break
+      }
+    }
+    return res
   }
 }
