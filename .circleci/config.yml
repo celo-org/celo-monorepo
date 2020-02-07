@@ -62,7 +62,7 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-v2-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
           command: if [ -e ~/.tmp/node_modules.tgz ]; then tar -xf ~/.tmp/node_modules.tgz; fi
@@ -89,10 +89,10 @@ commands:
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
       - run:
           name: Create cached node_modules (if necessary)
-          command: if [ ! -e ~/.tmp/node_modules.tgz ]; then tar -czf ~/.tmp/node_modules.tgz node_modules packages/*/node_modules; fi
+          command: if [ ! -e ~/.tmp/node_modules.tgz ]; then tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz; fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-v2-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
 
