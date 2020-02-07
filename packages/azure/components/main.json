@@ -48,7 +48,7 @@
     "validatorAccountAddress": {
       "type": "string",
       "metadata": {
-        "description": "Validator etherbase account address"
+        "description": "Authorized validator signer etherbase account address"
       }
     },
     "proxyPublicKey": {
@@ -66,13 +66,13 @@
     "validatorPrivateKey": {
       "type": "secureString",
       "metadata": {
-        "description": "Validator etherbase account private key"
+        "description": "Authorized validator signer etherbase account private key"
       }
     },
     "validatorGethAccountSecret": {
       "type": "secureString",
       "metadata": {
-        "description": "Validator etherbase account password"
+        "description": "Password to secure validatorPrivateKey"
       }
     },
     "attesterAccountAddress": {
@@ -90,7 +90,7 @@
     "attesterGethAccountSecret": {
       "type": "secureString",
       "metadata": {
-        "description": "Attester account password"
+        "description": "Password to secure attesterPrivateKey"
       }
     },
     "attesterTwilioAccountSID": {

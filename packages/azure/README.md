@@ -29,21 +29,37 @@ az group create \
    --name $GROUP --location $LOCATION
 ```
 
-Deploy `template.json`, specifying an admin username, a path to an
-SSH public key, and your Azure User ID:
+Deploy `template.json`, specifying all the required parameters:
 
 ```
-ADMIN_USER=...
-PUBLIC_KEY=...
-AZURE_USER_ID=... # You can get this via the Portal or with `az ad user list`
 az group deployment create \
    --resource-group $GROUP \
    --name ${GROUP}-deployment \
    --template-file=template.json \
-   --parameters adminPublicKey=@${PUBLIC_KEY} adminUsername=${ADMIN_USER} userObjectId=${AZURE_USER_ID}
+   --parameters \
+   userObjectId=... \
+   proxyName=... \
+   validatorName=... \
+   adminUsername=... \
+   adminPublicKey=... \
+   attesterPostgreSQLUsername=... \
+   attesterPostgreSQLPassword=... \
+   validatorAccountAddress=... \
+   proxyPublicKey=... \
+   proxyPrivateKey=... \
+   validatorPrivateKey=... \
+   validatorGethAccountSecret=... \
+   attesterAccountAddress=... \
+   attesterPrivateKey=... \
+   attesterGethAccountSecret=... \
+   attesterTwilioAccountSID=... \
+   attesterTwilioAuthToken=... \
+   attesterTwilioMessageServiceSID=... \
 ```
 
-Clean up your resources when you're done:
+You can get the value of your `userObjectId` via the Portal or `az ad user list`.
+
+You can delete all the services you created with:
 
 ```
 az group delete --name $GROUP
@@ -60,14 +76,14 @@ az group delete --name $GROUP
 | `adminPublicKey` | secureString | Admin public key for SSH access |
 | `attesterPostgreSQLUsername` | string | Admin username for Attester PostgreSQL server |
 | `attesterPostgreSQLPassword` | secureString | Admin password for Attester PostgreSQL server |
-| `validatorAccountAddress` | string | Validator etherbase account address |
+| `validatorAccountAddress` | string | Authorized validator signer etherbase account address |
 | `proxyPublicKey` | string | Proxy enode public key |
 | `proxyPrivateKey` | secureString | Proxy etherbase account private key |
-| `validatorPrivateKey` | secureString | Validator etherbase account private key |
-| `validatorGethAccountSecret` | secureString | Validator etherbase account password |
+| `validatorPrivateKey` | secureString | Authorized validator signer etherbase account private key |
+| `validatorGethAccountSecret` | secureString | Password to secure validatorPrivateKey |
 | `attesterAccountAddress` | string | Attester account address |
 | `attesterPrivateKey` | secureString | Attester account private key |
-| `attesterGethAccountSecret` | secureString | Attester account password |
+| `attesterGethAccountSecret` | secureString | Password to secure attesterPrivateKey |
 | `attesterTwilioAccountSID` | string | Attester Twilio account SID |
 | `attesterTwilioAuthToken` | secureString | Attester Twilio authentication token |
 | `attesterTwilioMessageServiceSID` | string | Attester Twilio message service SID |
@@ -93,6 +109,6 @@ az network nic ip-config update \
 
 ## Future work
 
-1.  Use suggested defaults for VM sizes and OS disk types.
+1.  Tune the default values for resources sizes (*e.g.*, VM, disk, etc).
 1.  Convert to an [Azure Managed
     Application](https://docs.microsoft.com/en-us/azure/azure-resource-manager/managed-applications/overview).

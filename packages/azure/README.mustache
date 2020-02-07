@@ -29,21 +29,22 @@ az group create \
    --name $GROUP --location $LOCATION
 ```
 
-Deploy `template.json`, specifying an admin username, a path to an
-SSH public key, and your Azure User ID:
+Deploy `template.json`, specifying all the required parameters:
 
 ```
-ADMIN_USER=...
-PUBLIC_KEY=...
-AZURE_USER_ID=... # You can get this via the Portal or with `az ad user list`
 az group deployment create \
    --resource-group $GROUP \
    --name ${GROUP}-deployment \
    --template-file=template.json \
-   --parameters adminPublicKey=@${PUBLIC_KEY} adminUsername=${ADMIN_USER} userObjectId=${AZURE_USER_ID}
+   --parameters \
+{{#parameters}}
+   {{name}}=... \
+{{/parameters}}
 ```
 
-Clean up your resources when you're done:
+You can get the value of your `userObjectId` via the Portal or `az ad user list`.
+
+You can delete all the services you created with:
 
 ```
 az group delete --name $GROUP
@@ -78,6 +79,6 @@ az network nic ip-config update \
 
 ## Future work
 
-1.  Use suggested defaults for VM sizes and OS disk types.
+1.  Tune the default values for resources sizes (*e.g.*, VM, disk, etc).
 1.  Convert to an [Azure Managed
     Application](https://docs.microsoft.com/en-us/azure/azure-resource-manager/managed-applications/overview).
