@@ -2,16 +2,18 @@ import debugFactory from 'debug'
 import { Socket } from 'net'
 import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
 import { MissingTxParamsPopulator } from '../utils/missing-tx-params-populator'
-import { RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
+import { IRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { IWallet, Wallet } from '../utils/wallet'
 
 const debug = debugFactory('kit:provider:celo-provider:connection')
-const debugPayload = debugFactory('kit:provider:celo-provider:rpc:payload')
-const debugResponse = debugFactory('kit:provider:celo-provider:rpc:response')
+const debugPayloadExistingProvider = debugFactory('kit:existing-provider:rpc:payload')
+const debugResponseExistingProvider = debugFactory('kit:existing-provider:rpc:response')
+const debugPayloadCeloProvider = debugFactory('kit:celo-provider:rpc:payload')
+const debugResponseCeloProvider = debugFactory('kit:celo-provider:rpc:response')
 
 export class CeloProvider implements Provider {
   private readonly wallet: IWallet
-  private readonly rpcCaller: RpcCaller
+  private readonly rpcCaller: IRpcCaller
   private readonly paramsPopulator: MissingTxParamsPopulator
   private alreadyStopped: boolean = false
 
@@ -39,16 +41,6 @@ export class CeloProvider implements Provider {
    * Send method as expected by web3.js
    */
   send(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): void {
-    debugPayload('%O', payload)
-
-    const callbackDecorator = (error: Error, result: JsonRPCResponse) => {
-      debugResponse('%O', result)
-      callback(error as any, result)
-    }
-    this.sendAsync(payload, callbackDecorator as Callback<JsonRPCResponse>)
-  }
-
-  sendAsync(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): void {
     let txParams: any
     let address: string
 
@@ -58,24 +50,38 @@ export class CeloProvider implements Provider {
 
     switch (payload.method) {
       case 'eth_accounts': {
-        rpcCallHandler(payload, this.handleAccounts.bind(this), callback)
+        rpcCallHandler(
+          payload,
+          this.handleAccounts.bind(this),
+          this.celoCallback(payload, callback)
+        )
         return
       }
       case 'eth_sendTransaction': {
-        // TODO params no existe, params no es un array
+        this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
 
         if (this.isLocalAccount(txParams.from)) {
-          rpcCallHandler(payload, this.handleSendTransaction.bind(this), callback)
+          rpcCallHandler(
+            payload,
+            this.handleSendTransaction.bind(this),
+            this.celoCallback(payload, callback)
+          )
         } else {
           this._forwardSend(payload, callback)
         }
         return
       }
       case 'eth_signTransaction': {
+        this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
+
         if (this.isLocalAccount(txParams.from)) {
-          rpcCallHandler(payload, this.handleSignTransaction.bind(this), callback)
+          rpcCallHandler(
+            payload,
+            this.handleSignTransaction.bind(this),
+            this.celoCallback(payload, callback)
+          )
         } else {
           this._forwardSend(payload, callback)
         }
@@ -83,10 +89,15 @@ export class CeloProvider implements Provider {
       }
       case 'eth_sign':
       case 'personal_sign': {
+        if (payload.method === 'eth_sign') {
+          this.checkPayloadWithAtLeastNParams(payload, 1)
+        } else {
+          this.checkPayloadWithAtLeastNParams(payload, 2)
+        }
         address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
 
         if (this.isLocalAccount(address)) {
-          rpcCallHandler(payload, this.handleSign.bind(this), callback)
+          rpcCallHandler(payload, this.handleSign.bind(this), this.celoCallback(payload, callback))
         } else {
           this._forwardSend(payload, callback)
         }
@@ -94,9 +105,15 @@ export class CeloProvider implements Provider {
         return
       }
       case 'eth_signTypedData': {
+        this.checkPayloadWithAtLeastNParams(payload, 1)
         address = payload.params[0]
+
         if (this.isLocalAccount(address)) {
-          rpcCallHandler(payload, this.handleSignTypedData.bind(this), callback)
+          rpcCallHandler(
+            payload,
+            this.handleSignTypedData.bind(this),
+            this.celoCallback(payload, callback)
+          )
         } else {
           this._forwardSend(payload, callback)
         }
@@ -159,18 +176,58 @@ export class CeloProvider implements Provider {
     const txParams = payload.params[0]
     const filledParams = await this.paramsPopulator.populate(txParams)
     const signedTx = await this.wallet.signTransaction(filledParams)
-    return { raw: signedTx, tx: txParams }
+    return { raw: signedTx.raw, tx: txParams }
   }
 
   private async handleSendTransaction(payload: JsonRPCRequest): Promise<any> {
     const txParams = payload.params[0]
     const filledParams = await this.paramsPopulator.populate(txParams)
     const signedTx = await this.wallet.signTransaction(filledParams)
-    const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx])
+    const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
     return response.result
   }
 
   private _forwardSend(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): void {
-    this.existingProvider.send(payload, callback)
+    const decoratedCallback = this.debugDecoratorFn(
+      payload,
+      callback,
+      debugPayloadExistingProvider,
+      debugResponseExistingProvider
+    )
+    this.existingProvider.send(payload, decoratedCallback)
+  }
+
+  private celoCallback(
+    payload: JsonRPCRequest,
+    callback: Callback<JsonRPCResponse>
+  ): Callback<JsonRPCResponse> {
+    return this.debugDecoratorFn(
+      payload,
+      callback,
+      debugPayloadCeloProvider,
+      debugResponseCeloProvider
+    )
+  }
+
+  private debugDecoratorFn(
+    payload: JsonRPCRequest,
+    callback: Callback<JsonRPCResponse>,
+    payloadDebbug: debugFactory.Debugger,
+    responseDebbug: debugFactory.Debugger
+  ): Callback<JsonRPCResponse> {
+    payloadDebbug('%O', payload)
+
+    const decoratedCallback = (error: Error, result: JsonRPCResponse) => {
+      responseDebbug('%O', result)
+      callback(error as any, result)
+    }
+
+    return decoratedCallback as Callback<JsonRPCResponse>
+  }
+
+  private checkPayloadWithAtLeastNParams(payload: JsonRPCRequest, n: number) {
+    if (!payload.params || payload.params.length < n) {
+      throw Error('Invalid params')
+    }
   }
 }

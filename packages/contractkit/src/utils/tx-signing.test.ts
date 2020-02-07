@@ -107,21 +107,23 @@ async function verifyLocalSigningInAllPermutations(
   const gatewayFeeRecipient = '0x1234'
   const gatewayFee = '0x5678'
   const data = '0xabcdef'
+  const chainId = 1
 
   // tslint:disable:no-bitwise
   // Test all possible combinations for rigor.
-  for (let i = 0; i < 128; i++) {
+  for (let i = 0; i < 16; i++) {
     const celoTransaction: CeloTx = {
       from,
       to,
       value: amountInWei,
-      nonce: i & 1 ? nonce : undefined,
-      gas: i & 2 ? gas : undefined,
-      gasPrice: i & 4 ? gasPrice : undefined,
-      feeCurrency: i & 8 ? feeCurrency : undefined,
-      gatewayFeeRecipient: i & 16 ? gatewayFeeRecipient : undefined,
-      gatewayFee: i & 32 ? gatewayFee : undefined,
-      data: i & 64 ? data : undefined,
+      nonce,
+      gasPrice,
+      chainId,
+      gas,
+      feeCurrency: i & 1 ? feeCurrency : undefined,
+      gatewayFeeRecipient: i & 2 ? gatewayFeeRecipient : undefined,
+      gatewayFee: i & 4 ? gatewayFee : undefined,
+      data: i & 8 ? data : undefined,
     }
     await verifyLocalSigning(web3, celoTransaction)
   }
@@ -129,9 +131,10 @@ async function verifyLocalSigningInAllPermutations(
 
   // A special case.
   // An incorrect nonce  will only work, if no implict calls to estimate gas are required.
-  await verifyLocalSigning(web3, { from, to, nonce: badNonce, gas, gasPrice })
+  await verifyLocalSigning(web3, { from, to, nonce: badNonce, gas, gasPrice, chainId })
 }
 
+// These tests verify the signTransaction WITHOUT the ParamsPopulator
 testWithGanache('Transaction Utils', (web3: Web3) => {
   let originalProvider: Provider
   beforeEach(() => {

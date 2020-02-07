@@ -3,6 +3,7 @@ import debugFactory from 'debug'
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 // @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
+import { EncodedTransaction } from 'web3/types'
 import { CeloTx } from './celo-tx'
 
 const debug = debugFactory('kit:tx:sign')
@@ -28,8 +29,8 @@ function makeEven(hex: string) {
   return hex
 }
 
-export async function signTransaction(txn: any, privateKey: string) {
-  let result: any
+export async function signTransaction(txn: any, privateKey: string): Promise<EncodedTransaction> {
+  let result: EncodedTransaction
 
   if (!txn) {
     throw new Error('No transaction object given!')
@@ -91,12 +92,21 @@ export async function signTransaction(txn: any, privateKey: string) {
       const rawTransaction = RLP.encode(rawTx)
 
       const values = RLP.decode(rawTransaction)
+
       result = {
-        messageHash: hash,
-        v: trimLeadingZero(values[9]),
-        r: trimLeadingZero(values[10]),
-        s: trimLeadingZero(values[11]),
-        rawTransaction,
+        tx: {
+          nonce: transaction.nonce,
+          gasPrice: transaction.gasPrice,
+          gas: transaction.gas,
+          to: transaction.to,
+          value: transaction.value,
+          input: transaction.input,
+          v: trimLeadingZero(values[9]),
+          r: trimLeadingZero(values[10]),
+          s: trimLeadingZero(values[11]),
+          hash,
+        },
+        raw: rawTransaction,
       }
     } catch (e) {
       throw e

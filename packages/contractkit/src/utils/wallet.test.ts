@@ -1,5 +1,6 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
+import { EncodedTransaction } from 'web3/types'
 import { CeloTx } from './celo-tx'
 import { EIP712TypedData } from './sign_typed_data_utils'
 import { recoverTransaction } from './signing-utils'
@@ -106,8 +107,8 @@ describe('Wallet class', () => {
           })
 
           test('with same signer', async () => {
-            const rawTransaction = await wallet.signTransaction(celoTransaction)
-            const [, recoveredSigner] = recoverTransaction(rawTransaction)
+            const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+            const [, recoveredSigner] = recoverTransaction(signedTx.raw)
             expect(normalizeKey(recoveredSigner)).toBe(normalizeKey(knownAddress))
           })
         })
