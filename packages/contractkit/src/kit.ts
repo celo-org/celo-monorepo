@@ -264,7 +264,7 @@ export class ContractKit {
     }
   }
 
-  /// TODO(jfoutts) correct epoch definitions below and elsewhere to match celo-blockchain istanbul
+  /// TODO(jfoutts): correct epoch definitions below and elsewhere to match celo-blockchain istanbul
   async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
@@ -283,6 +283,6 @@ export class ContractKit {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
     // Follows protocol/contracts getEpochNumber()
-    return (blockNumber - 1) * epochSize.toNumber()
+    return (blockNumber - 1) / epochSize.toNumber()
   }
 }
