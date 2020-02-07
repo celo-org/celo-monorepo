@@ -51,11 +51,6 @@ commands:
         type: boolean
         default: true
     steps:
-      - restore_cache:
-          name: Restore yarn global cache
-          keys:
-            - yarn-global-v2-{{ arch }}-{{ checksum "yarn.lock" }}
-            - yarn-global-v2-{{ arch }}-
       - run:
           name: Create cache checksum files
           command: |
@@ -75,7 +70,6 @@ commands:
       - run:
           name: Install dependencies
           command: |
-            export YARN_CACHE_FOLDER=~/.cache/yarn
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
             yarn install || yarn install
@@ -101,11 +95,6 @@ commands:
           key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
-      - save_cache:
-          name: Save yarn global cache
-          key: yarn-global-v2-{{ arch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
 
 jobs:
   install_dependencies:
