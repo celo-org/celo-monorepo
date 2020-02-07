@@ -96,7 +96,7 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
   function addRandomness(uint256 blockNumber, bytes32 randomness) internal {
     history[blockNumber] = randomness;
     if ((blockNumber + 1) % getEpochSize() == 0) {
-      if (lastEpochBlock != historyFirst) {
+      if (lastEpochBlock < historyFirst) {
         delete history[lastEpochBlock];
       }
       lastEpochBlock = blockNumber;
