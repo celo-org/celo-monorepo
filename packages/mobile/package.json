@@ -82,7 +82,7 @@
     "react-native-clock-sync": "^1.0.0",
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
     "react-native-confirm-device-credentials": "git://github.com/celo-org/react-native-confirm-device-credentials#436afa9",
-    "react-native-contacts": "git://github.com/celo-org/react-native-contacts#fcf8f0d",
+    "react-native-contacts": "https://github.com/celo-org/react-native-contacts#e473717",
     "react-native-device-info": "^4.0.1",
     "react-native-exit-app": "^1.1.0",
     "react-native-fast-crypto": "git+https://github.com/celo-org/react-native-fast-crypto#3946f9",
