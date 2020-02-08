@@ -48,7 +48,7 @@ ___
 
 • **feeCurrency**? : *undefined | string*
 
-*Defined in [packages/contractkit/src/utils/tx-signing.ts:11](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/tx-signing.ts#L11)*
+*Defined in [packages/contractkit/src/utils/tx-signing.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-signing.ts#L11)*
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 • **gatewayFee**? : *undefined | string*
 
-*Defined in [packages/contractkit/src/utils/tx-signing.ts:13](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/tx-signing.ts#L13)*
+*Defined in [packages/contractkit/src/utils/tx-signing.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-signing.ts#L13)*
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 • **gatewayFeeRecipient**? : *undefined | string*
 
-*Defined in [packages/contractkit/src/utils/tx-signing.ts:12](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/tx-signing.ts#L12)*
+*Defined in [packages/contractkit/src/utils/tx-signing.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-signing.ts#L12)*
 
 ___
 

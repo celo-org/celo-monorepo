@@ -16,7 +16,7 @@
 
 ▸ **generateAccountAddressFromPrivateKey**(`privateKey`: string): *string*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:23](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L23)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L23)*
 
 **Parameters:**
 

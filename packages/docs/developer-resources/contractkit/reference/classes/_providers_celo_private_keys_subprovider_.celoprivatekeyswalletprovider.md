@@ -39,7 +39,7 @@ The base class PrivateKeyWalletSubprovider only supports one key.
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:49](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L49)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L49)*
 
 **Parameters:**
 
@@ -55,7 +55,7 @@ Name | Type |
 
 • **privateKey**: *string*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:51](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L51)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L51)*
 
 ## Methods
 
@@ -63,7 +63,7 @@ Name | Type |
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:57](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L57)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L57)*
 
 **Parameters:**
 
@@ -103,7 +103,7 @@ ___
 
 ▸ **getAccounts**(): *string[]*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:68](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L68)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L68)*
 
 **Returns:** *string[]*
 
@@ -115,7 +115,7 @@ ___
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:73](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L73)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L73)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -127,7 +127,7 @@ ___
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:77](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L77)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L77)*
 
 **Parameters:**
 
@@ -198,7 +198,7 @@ ___
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:101](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L101)*
+*Defined in [packages/contractkit/src/providers/celo-private-keys-subprovider.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-private-keys-subprovider.ts#L101)*
 
 **Parameters:**
 

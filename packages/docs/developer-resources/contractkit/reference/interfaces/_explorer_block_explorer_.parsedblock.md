@@ -17,7 +17,7 @@
 
 • **block**: *Block*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:21](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/explorer/block-explorer.ts#L21)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L21)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **parsedTx**: *[ParsedTx](_explorer_block_explorer_.parsedtx.md)[]*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:22](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/explorer/block-explorer.ts#L22)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L22)*

@@ -30,7 +30,7 @@
 
 Ƭ **IdentityMetadata**: *t.TypeOf‹typeof IdentityMetadataType›*
 
-*Defined in [packages/contractkit/src/identity/metadata.ts:21](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/identity/metadata.ts#L21)*
+*Defined in [packages/contractkit/src/identity/metadata.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L21)*
 
 ## Variables
 
@@ -41,4 +41,4 @@
   meta: MetaType,
 })
 
-*Defined in [packages/contractkit/src/identity/metadata.ts:17](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/identity/metadata.ts#L17)*
+*Defined in [packages/contractkit/src/identity/metadata.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L17)*

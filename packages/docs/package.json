@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "gitbook install && gitbook build",
-    "preview": "gitbook serve"
+    "preview": "gitbook install && gitbook serve"
   },
   "author": "",
   "license": "ISC"

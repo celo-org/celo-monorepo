@@ -13,7 +13,7 @@
 
 ▸ **injectDebugProvider**(`web3`: Web3): *void*
 
-*Defined in [packages/contractkit/src/providers/debug-provider.ts:26](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/debug-provider.ts#L26)*
+*Defined in [packages/contractkit/src/providers/debug-provider.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/debug-provider.ts#L26)*
 
 **Parameters:**
 
@@ -29,7 +29,7 @@ ___
 
 ▸ **wrap**(`provider`: Provider): *DebugProvider‹›*
 
-*Defined in [packages/contractkit/src/providers/debug-provider.ts:22](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/providers/debug-provider.ts#L22)*
+*Defined in [packages/contractkit/src/providers/debug-provider.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/debug-provider.ts#L22)*
 
 **Parameters:**
 

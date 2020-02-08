@@ -50,7 +50,7 @@ ___
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/utils/tx-signing.ts:5](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/tx-signing.ts#L5)*
+*Defined in [packages/contractkit/src/utils/tx-signing.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-signing.ts#L5)*
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/utils/tx-signing.ts:7](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/tx-signing.ts#L7)*
+*Defined in [packages/contractkit/src/utils/tx-signing.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-signing.ts#L7)*
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 *Overrides void*
 
-*Defined in [packages/contractkit/src/utils/tx-signing.ts:6](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/tx-signing.ts#L6)*
+*Defined in [packages/contractkit/src/utils/tx-signing.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-signing.ts#L6)*
 
 ___
 

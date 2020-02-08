@@ -14,7 +14,7 @@
 
 ▸ **addLocalAccount**(`web3`: Web3, `privateKey`: string): *Web3*
 
-*Defined in [packages/contractkit/src/utils/web3-utils.ts:10](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/web3-utils.ts#L10)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L10)*
 
 **Parameters:**
 
@@ -31,7 +31,7 @@ ___
 
 ▸ **getAbiTypes**(`abi`: ABIDefinition[], `methodName`: string): *string[]*
 
-*Defined in [packages/contractkit/src/utils/web3-utils.ts:24](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/web3-utils.ts#L24)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L24)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **parseDecodedParams**(`params`: DecodedParamsObject): *object*
 
-*Defined in [packages/contractkit/src/utils/web3-utils.ts:27](https://github.com/celo-org/celo-monorepo/blob/06adf8b7a/packages/contractkit/src/utils/web3-utils.ts#L27)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L27)*
 
 **Parameters:**
 
