@@ -32,10 +32,12 @@ Contract managing voting for governance proposals.
 * [getVotes](_wrappers_governance_.governancewrapper.md#getvotes)
 * [hotfixWhitelistValidatorTally](_wrappers_governance_.governancewrapper.md#hotfixwhitelistvalidatortally)
 * [isApproved](_wrappers_governance_.governancewrapper.md#isapproved)
+* [isDequeuedProposalExpired](_wrappers_governance_.governancewrapper.md#isdequeuedproposalexpired)
 * [isHotfixPassing](_wrappers_governance_.governancewrapper.md#ishotfixpassing)
 * [isHotfixWhitelistedBy](_wrappers_governance_.governancewrapper.md#ishotfixwhitelistedby)
 * [isProposalPassing](_wrappers_governance_.governancewrapper.md#isproposalpassing)
 * [isQueued](_wrappers_governance_.governancewrapper.md#isqueued)
+* [isQueuedProposalExpired](_wrappers_governance_.governancewrapper.md#isqueuedproposalexpired)
 * [minDeposit](_wrappers_governance_.governancewrapper.md#mindeposit)
 * [prepareHotfix](_wrappers_governance_.governancewrapper.md#preparehotfix)
 * [proposalExists](_wrappers_governance_.governancewrapper.md#proposalexists)
@@ -94,7 +96,7 @@ Name | Type |
     tupleParser(bufferToString)
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:589](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L589)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:608](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L608)*
 
 Marks the given hotfix approved by `sender`.
 
@@ -122,7 +124,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:559](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L559)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:578](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L578)*
 
 Returns the number of validators required to reach a Byzantine quorum
 
@@ -190,7 +192,7 @@ ___
 
 • **dequeueProposalsIfReady**: *function* = proxySend(this.kit, this.contract.methods.dequeueProposalsIfReady)
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:360](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L360)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:379](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L379)*
 
 Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
 
@@ -210,7 +212,7 @@ ___
 
 • **executeHotfix**: *function* = proxySend(this.kit, this.contract.methods.executeHotfix, hotfixToParams)
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:611](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L611)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:630](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L630)*
 
 Executes a given sequence of transactions if the corresponding hash is prepared and approved.
 
@@ -236,7 +238,7 @@ ___
 
 • **getApprover**: *function* = proxyCall(this.contract.methods.approver)
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:216](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L216)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:234](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L234)*
 
 Returns the approver address for proposals and hotfixes.
 
@@ -292,7 +294,7 @@ ___
     (res) => Object.keys(ProposalStage)[valueToInt(res)] as ProposalStage
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:218](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L218)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:236](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L236)*
 
 #### Type declaration:
 
@@ -352,7 +354,7 @@ ___
     )
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:337](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L337)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:355](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L355)*
 
 Returns the proposal queue as list of upvote records.
 
@@ -379,7 +381,7 @@ ___
     })
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:295](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L295)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:313](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L313)*
 
 Returns the current upvoted governance proposal ID and applied vote weight (zeroes if none).
 
@@ -405,7 +407,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:314](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L314)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:332](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L332)*
 
 Returns the upvotes applied to a given proposal.
 
@@ -435,7 +437,7 @@ ___
     })
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:324](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L324)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:342](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L342)*
 
 Returns the yes, no, and abstain votes applied to a given proposal.
 
@@ -460,7 +462,7 @@ ___
     tupleParser(bufferToString)
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:569](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L569)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:588](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L588)*
 
 Returns the number of validators that whitelisted the hotfix
 
@@ -503,11 +505,36 @@ Name | Type |
 
 ___
 
+###  isDequeuedProposalExpired
+
+• **isDequeuedProposalExpired**: *function* = proxyCall(
+    this.contract.methods.isDequeuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:217](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L217)*
+
+Returns whether a dequeued proposal is expired.
+
+**`param`** Governance proposal UUID
+
+#### Type declaration:
+
+▸ (`proposalID`: BigNumber.Value): *Promise‹boolean›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`proposalID` | BigNumber.Value |
+
+___
+
 ###  isHotfixPassing
 
 • **isHotfixPassing**: *function* = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToString))
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:554](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L554)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:573](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L573)*
 
 Returns whether a given hotfix can be passed.
 
@@ -532,7 +559,7 @@ ___
     tupleParser(bufferToString, (s: Address) => identity<Address>(s))
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:545](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L545)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:564](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L564)*
 
 Returns whether a given hotfix has been whitelisted by a given address.
 
@@ -556,7 +583,7 @@ ___
 
 • **isProposalPassing**: *function* = proxyCall(this.contract.methods.isProposalPassing, tupleParser(valueToString))
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:273](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L273)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:291](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L291)*
 
 Returns whether a given proposal is passing relative to the constitution's threshold.
 
@@ -578,9 +605,34 @@ ___
 
 • **isQueued**: *function* = proxyCall(this.contract.methods.isQueued, tupleParser(valueToString))
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:308](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L308)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:326](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L326)*
 
 Returns whether a given proposal is queued.
+
+**`param`** Governance proposal UUID
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  isQueuedProposalExpired
+
+• **isQueuedProposalExpired**: *function* = proxyCall(
+    this.contract.methods.isQueuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L226)*
+
+Returns whether a dequeued proposal is expired.
 
 **`param`** Governance proposal UUID
 
@@ -626,7 +678,7 @@ ___
     tupleParser(bufferToString)
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:599](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L599)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:618](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L618)*
 
 Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
 
@@ -651,7 +703,7 @@ ___
     tupleParser(valueToString)
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:286](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L286)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:304](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L304)*
 
 Returns whether a governance proposal exists with the given ID.
 
@@ -673,7 +725,7 @@ ___
 
 • **propose**: *function* = proxySend(this.kit, this.contract.methods.propose, proposalToParams)
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:280](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L280)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:298](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L298)*
 
 Submits a new governance proposal.
 
@@ -723,7 +775,7 @@ ___
     tupleParser(bufferToString)
   )
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:578](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L578)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:597](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L597)*
 
 Marks the given hotfix whitelisted by `sender`.
 
@@ -759,7 +811,7 @@ Contract address
 
 ▸ **approve**(`proposalID`: BigNumber.Value): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:482](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L482)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:501](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L501)*
 
 Approves given proposal, allowing it to later move to `referendum`.
 
@@ -779,7 +831,7 @@ ___
 
 ▸ **execute**(`proposalID`: BigNumber.Value): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:519](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L519)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:538](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L538)*
 
 Executes a given proposal's associated transactions.
 
@@ -807,11 +859,17 @@ ___
 
 ###  getDequeue
 
-▸ **getDequeue**(): *Promise‹BigNumber‹›[]›*
+▸ **getDequeue**(`filterZeroes`: boolean): *Promise‹BigNumber‹›[]›*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:351](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L351)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:369](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L369)*
 
 Returns the (existing) proposal dequeue as list of proposal IDs.
+
+**Parameters:**
+
+Name | Type | Default |
+------ | ------ | ------ |
+`filterZeroes` | boolean | false |
 
 **Returns:** *Promise‹BigNumber‹›[]›*
 
@@ -821,7 +879,7 @@ ___
 
 ▸ **getHotfixRecord**(`hash`: Buffer): *Promise‹[HotfixRecord](../interfaces/_wrappers_governance_.hotfixrecord.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:531](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L531)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:550](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L550)*
 
 Returns approved, executed, and prepared status associated with a given hotfix.
 
@@ -839,7 +897,7 @@ ___
 
 ▸ **getProposal**(`proposalID`: BigNumber.Value): *Promise‹[Proposal](../modules/_wrappers_governance_.md#proposal)›*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:237](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L237)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:255](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L255)*
 
 Returns the proposal associated with a given id.
 
@@ -857,7 +915,7 @@ ___
 
 ▸ **getProposalRecord**(`proposalID`: BigNumber.Value): *Promise‹[ProposalRecord](../interfaces/_wrappers_governance_.proposalrecord.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:247](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L247)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:265](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L265)*
 
 Returns the stage, metadata, upvotes, votes, and transactions associated with a given proposal.
 
@@ -875,7 +933,7 @@ ___
 
 ▸ **getVoteValue**(`proposalID`: BigNumber.Value, `voter`: [Address](../modules/_base_.md#address)): *Promise‹[VoteValue](../enums/_wrappers_governance_.votevalue.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:509](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L509)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:528](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L528)*
 
 Returns `voter`'s vote choice on a given proposal.
 
@@ -894,7 +952,7 @@ ___
 
 ▸ **getVoteWeight**(`voter`: [Address](../modules/_base_.md#address)): *Promise‹BigNumber‹››*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:366](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L366)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:385](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L385)*
 
 Returns the number of votes that will be applied to a proposal for a given voter.
 
@@ -912,7 +970,7 @@ ___
 
 ▸ **revokeUpvote**(`upvoter`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:469](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L469)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:488](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L488)*
 
 Revokes provided upvoter's upvote.
 
@@ -930,7 +988,7 @@ ___
 
 ▸ **sortedQueue**(`queue`: [UpvoteRecord](../interfaces/_wrappers_governance_.upvoterecord.md)[]): *[UpvoteRecord](../interfaces/_wrappers_governance_.upvoterecord.md)[]*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:407](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L407)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:426](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L426)*
 
 **Parameters:**
 
@@ -960,7 +1018,7 @@ ___
 
 ▸ **timeUntilStages**(`proposalID`: BigNumber.Value): *Promise‹object›*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L224)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:242](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L242)*
 
 **Parameters:**
 
@@ -976,7 +1034,7 @@ ___
 
 ▸ **upvote**(`proposalID`: BigNumber.Value, `upvoter`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:453](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L453)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:472](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L472)*
 
 Applies provided upvoter's upvote to given proposal.
 
@@ -995,7 +1053,7 @@ ___
 
 ▸ **vote**(`proposalID`: BigNumber.Value, `vote`: keyof typeof VoteValue): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:495](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L495)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:514](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L514)*
 
 Applies `sender`'s vote choice to a given proposal.
 

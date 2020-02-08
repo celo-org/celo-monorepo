@@ -20,8 +20,11 @@ Contract for voting for validators and managing validator groups.
 * [electValidatorSigners](_wrappers_election_.electionwrapper.md#electvalidatorsigners)
 * [electabilityThreshold](_wrappers_election_.electionwrapper.md#electabilitythreshold)
 * [getGroupsVotedForByAccount](_wrappers_election_.electionwrapper.md#getgroupsvotedforbyaccount)
+* [getTotalVotesForGroupByAccount](_wrappers_election_.electionwrapper.md#gettotalvotesforgroupbyaccount)
 * [numberValidatorsInCurrentSet](_wrappers_election_.electionwrapper.md#numbervalidatorsincurrentset)
+* [numberValidatorsInSet](_wrappers_election_.electionwrapper.md#numbervalidatorsinset)
 * [validatorSignerAddressFromCurrentSet](_wrappers_election_.electionwrapper.md#validatorsigneraddressfromcurrentset)
+* [validatorSignerAddressFromSet](_wrappers_election_.electionwrapper.md#validatorsigneraddressfromset)
 
 ### Accessors
 
@@ -36,10 +39,12 @@ Contract for voting for validators and managing validator groups.
 * [getConfig](_wrappers_election_.electionwrapper.md#getconfig)
 * [getCurrentValidatorSigners](_wrappers_election_.electionwrapper.md#getcurrentvalidatorsigners)
 * [getElectedValidators](_wrappers_election_.electionwrapper.md#getelectedvalidators)
+* [getEligibleValidatorGroupsVotes](_wrappers_election_.electionwrapper.md#geteligiblevalidatorgroupsvotes)
 * [getGroupVoterRewards](_wrappers_election_.electionwrapper.md#getgroupvoterrewards)
 * [getTotalVotesForGroup](_wrappers_election_.electionwrapper.md#gettotalvotesforgroup)
 * [getValidatorGroupVotes](_wrappers_election_.electionwrapper.md#getvalidatorgroupvotes)
 * [getValidatorGroupsVotes](_wrappers_election_.electionwrapper.md#getvalidatorgroupsvotes)
+* [getValidatorSigners](_wrappers_election_.electionwrapper.md#getvalidatorsigners)
 * [getVoter](_wrappers_election_.electionwrapper.md#getvoter)
 * [getVoterRewards](_wrappers_election_.electionwrapper.md#getvoterrewards)
 * [getVotesForGroupByAccount](_wrappers_election_.electionwrapper.md#getvotesforgroupbyaccount)
@@ -75,7 +80,7 @@ Name | Type |
 
 • **_activate**: *function* = proxySend(this.kit, this.contract.methods.activate)
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:242](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L242)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:300](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L300)*
 
 #### Type declaration:
 
@@ -93,7 +98,7 @@ ___
 
 • **electValidatorSigners**: *function* = proxyCall(this.contract.methods.electValidatorSigners)
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L111)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L157)*
 
 Returns a list of elected validators with seats allocated to groups via the D'Hondt method.
 
@@ -121,7 +126,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L81)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L83)*
 
 Returns the current election threshold.
 
@@ -145,7 +150,7 @@ ___
     this.contract.methods.getGroupsVotedForByAccount
   )
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L140)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:198](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L198)*
 
 Returns the groups that `account` has voted for.
 
@@ -165,15 +170,23 @@ Name | Type |
 
 ___
 
-###  numberValidatorsInCurrentSet
+###  getTotalVotesForGroupByAccount
 
-• **numberValidatorsInCurrentSet**: *function* = proxyCall(
-    this.contract.methods.numberValidatorsInCurrentSet,
+• **getTotalVotesForGroupByAccount**: *function* = proxyCall(
+    this.contract.methods.getTotalVotesForGroupByAccount,
     undefined,
-    valueToInt
+    valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L91)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:176](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L176)*
+
+Returns the total votes for `group` made by `account`.
+
+**`param`** The address of the validator group.
+
+**`param`** The address of the voting account.
+
+**`returns`** The total votes for `group` made by `account`.
 
 #### Type declaration:
 
@@ -187,6 +200,60 @@ Name | Type |
 
 ___
 
+###  numberValidatorsInCurrentSet
+
+• **numberValidatorsInCurrentSet**: *function* = proxyCall(
+    this.contract.methods.numberValidatorsInCurrentSet,
+    undefined,
+    valueToInt
+  )
+
+*Defined in [packages/contractkit/src/wrappers/Election.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L125)*
+
+Gets the size of the current elected validator set.
+
+**`returns`** Size of the current elected validator set.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  numberValidatorsInSet
+
+• **numberValidatorsInSet**: *function* = proxyCall(
+    this.contract.methods.numberValidatorsInSet,
+    undefined,
+    valueToInt
+  )
+
+*Defined in [packages/contractkit/src/wrappers/Election.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L115)*
+
+Gets the size of the validator set that must sign the given block number.
+
+**`param`** Block number to retrieve the validator set from.
+
+**`returns`** Size of the validator set.
+
+#### Type declaration:
+
+▸ (`blockNumber`: number): *Promise‹number›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`blockNumber` | number |
+
+___
+
 ###  validatorSignerAddressFromCurrentSet
 
 • **validatorSignerAddressFromCurrentSet**: *function* = proxyCall(
@@ -194,7 +261,13 @@ ___
     tupleParser<number, number>(identity)
   )
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L86)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L105)*
+
+Gets a validator address from the current validator set.
+
+**`param`** Index of requested validator in the validator set.
+
+**`returns`** Address of validator at the requested index.
 
 #### Type declaration:
 
@@ -205,6 +278,33 @@ ___
 Name | Type |
 ------ | ------ |
 `index` | number |
+
+___
+
+###  validatorSignerAddressFromSet
+
+• **validatorSignerAddressFromSet**: *function* = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
+
+*Defined in [packages/contractkit/src/wrappers/Election.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L95)*
+
+Gets a validator address from the validator set at the given block number.
+
+**`param`** Index of requested validator in the validator set.
+
+**`param`** Block number to retrieve the validator set from.
+
+**`returns`** Address of validator at the requested index.
+
+#### Type declaration:
+
+▸ (`signerIndex`: number, `blockNumber`: number): *Promise‹[Address](../modules/_base_.md#address)›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`signerIndex` | number |
+`blockNumber` | number |
 
 ## Accessors
 
@@ -226,7 +326,7 @@ Contract address
 
 ▸ **activate**(`account`: [Address](../modules/_base_.md#address)): *Promise‹Array‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean›››*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:248](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L248)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:306](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L306)*
 
 Activates any activatable pending votes.
 
@@ -244,7 +344,7 @@ ___
 
 ▸ **electableValidators**(): *Promise‹[ElectableValidators](../interfaces/_wrappers_election_.electablevalidators.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L73)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L74)*
 
 Returns the minimum and maximum number of validators that can be elected.
 
@@ -258,7 +358,7 @@ ___
 
 ▸ **findLesserAndGreaterAfterVote**(`votedGroup`: [Address](../modules/_base_.md#address), `voteWeight`: BigNumber): *Promise‹object›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:344](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L344)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:402](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L402)*
 
 **Parameters:**
 
@@ -275,7 +375,7 @@ ___
 
 ▸ **getActiveVotesForGroup**(`group`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹BigNumber›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L129)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:187](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L187)*
 
 Returns the active votes for `group`.
 
@@ -296,7 +396,7 @@ ___
 
 ▸ **getConfig**(): *Promise‹[ElectionConfig](../interfaces/_wrappers_election_.electionconfig.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:206](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L206)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:264](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L264)*
 
 Returns current configuration parameters.
 
@@ -308,9 +408,9 @@ ___
 
 ▸ **getCurrentValidatorSigners**(`blockNumber?`: undefined | number): *Promise‹[Address](../modules/_base_.md#address)[]›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L101)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:135](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L135)*
 
-Returns get current validator signers using the precompiles.
+Returns the current validator signers using the precompiles.
 
 **Parameters:**
 
@@ -328,7 +428,7 @@ ___
 
 ▸ **getElectedValidators**(`epochNumber`: number): *Promise‹[Validator](../interfaces/_wrappers_validators_.validator.md)[]›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:382](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L382)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:440](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L440)*
 
 Retrieves the set of validatorsparticipating in BFT at epochNumber.
 
@@ -342,11 +442,23 @@ Name | Type | Description |
 
 ___
 
+###  getEligibleValidatorGroupsVotes
+
+▸ **getEligibleValidatorGroupsVotes**(): *Promise‹[ValidatorGroupVote](../interfaces/_wrappers_election_.validatorgroupvote.md)[]›*
+
+*Defined in [packages/contractkit/src/wrappers/Election.ts:387](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L387)*
+
+Returns the current eligible validator groups and their total votes.
+
+**Returns:** *Promise‹[ValidatorGroupVote](../interfaces/_wrappers_election_.validatorgroupvote.md)[]›*
+
+___
+
 ###  getGroupVoterRewards
 
 ▸ **getGroupVoterRewards**(`epochNumber`: number): *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:395](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L395)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:453](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L453)*
 
 Retrieves GroupVoterRewards at epochNumber.
 
@@ -364,7 +476,7 @@ ___
 
 ▸ **getTotalVotesForGroup**(`group`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹BigNumber›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L118)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:164](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L164)*
 
 Returns the total votes for `group`.
 
@@ -385,7 +497,7 @@ ___
 
 ▸ **getValidatorGroupVotes**(`address`: [Address](../modules/_base_.md#address)): *Promise‹[ValidatorGroupVote](../interfaces/_wrappers_election_.validatorgroupvote.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:219](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L219)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:277](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L277)*
 
 **Parameters:**
 
@@ -401,7 +513,7 @@ ___
 
 ▸ **getValidatorGroupsVotes**(): *Promise‹[ValidatorGroupVote](../interfaces/_wrappers_election_.validatorgroupvote.md)[]›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:236](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L236)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:294](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L294)*
 
 Returns the current registered validator groups and their total votes and eligibility.
 
@@ -409,11 +521,31 @@ Returns the current registered validator groups and their total votes and eligib
 
 ___
 
+###  getValidatorSigners
+
+▸ **getValidatorSigners**(`blockNumber`: number): *Promise‹[Address](../modules/_base_.md#address)[]›*
+
+*Defined in [packages/contractkit/src/wrappers/Election.ts:145](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L145)*
+
+Returns the validator signers for block `blockNumber`.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`blockNumber` | number | Block number to retrieve signers for. |
+
+**Returns:** *Promise‹[Address](../modules/_base_.md#address)[]›*
+
+Address of each signer in the validator set.
+
+___
+
 ###  getVoter
 
 ▸ **getVoter**(`account`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹[Voter](../interfaces/_wrappers_election_.voter.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L166)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L224)*
 
 **Parameters:**
 
@@ -430,7 +562,7 @@ ___
 
 ▸ **getVoterRewards**(`address`: [Address](../modules/_base_.md#address), `epochNumber`: number): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:419](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L419)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:477](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L477)*
 
 Retrieves VoterRewards for address at epochNumber.
 
@@ -449,7 +581,7 @@ ___
 
 ▸ **getVotesForGroupByAccount**(`account`: [Address](../modules/_base_.md#address), `group`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹[GroupVote](../interfaces/_wrappers_election_.groupvote.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:144](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L144)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L202)*
 
 **Parameters:**
 
@@ -467,7 +599,7 @@ ___
 
 ▸ **hasActivatablePendingVotes**(`account`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:195](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L195)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:253](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L253)*
 
 **Parameters:**
 
@@ -483,7 +615,7 @@ ___
 
 ▸ **hasPendingVotes**(`account`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:183](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L183)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L241)*
 
 Returns whether or not the account has any pending votes.
 
@@ -503,7 +635,7 @@ ___
 
 ▸ **revoke**(`account`: [Address](../modules/_base_.md#address), `group`: [Address](../modules/_base_.md#address), `value`: BigNumber): *Promise‹Array‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean›››*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:287](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L287)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:345](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L345)*
 
 **Parameters:**
 
@@ -521,7 +653,7 @@ ___
 
 ▸ **revokeActive**(`account`: [Address](../modules/_base_.md#address), `group`: [Address](../modules/_base_.md#address), `value`: BigNumber): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:272](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L272)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:330](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L330)*
 
 **Parameters:**
 
@@ -539,7 +671,7 @@ ___
 
 ▸ **revokePending**(`account`: [Address](../modules/_base_.md#address), `group`: [Address](../modules/_base_.md#address), `value`: BigNumber): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:257](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L257)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:315](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L315)*
 
 **Parameters:**
 
@@ -557,7 +689,7 @@ ___
 
 ▸ **vote**(`validatorGroup`: [Address](../modules/_base_.md#address), `value`: BigNumber): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [packages/contractkit/src/wrappers/Election.ts:313](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L313)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:371](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L371)*
 
 Increments the number of total and pending votes for `group`.
 

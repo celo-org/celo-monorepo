@@ -10,6 +10,7 @@
 
 * [groupLockedGoldRequirements](_wrappers_validators_.validatorsconfig.md#grouplockedgoldrequirements)
 * [maxGroupSize](_wrappers_validators_.validatorsconfig.md#maxgroupsize)
+* [membershipHistoryLength](_wrappers_validators_.validatorsconfig.md#membershiphistorylength)
 * [validatorLockedGoldRequirements](_wrappers_validators_.validatorsconfig.md#validatorlockedgoldrequirements)
 
 ## Properties
@@ -27,6 +28,14 @@ ___
 • **maxGroupSize**: *BigNumber*
 
 *Defined in [packages/contractkit/src/wrappers/Validators.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L56)*
+
+___
+
+###  membershipHistoryLength
+
+• **membershipHistoryLength**: *BigNumber*
+
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L57)*
 
 ___
 

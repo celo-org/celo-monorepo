@@ -26,6 +26,8 @@
 ### Methods
 
 * [addAccount](_kit_.contractkit.md#addaccount)
+* [getEpochNumberOfBlock](_kit_.contractkit.md#getepochnumberofblock)
+* [getFirstBlockNumberForEpoch](_kit_.contractkit.md#getfirstblocknumberforepoch)
 * [getLastBlockNumberForEpoch](_kit_.contractkit.md#getlastblocknumberforepoch)
 * [getNetworkConfig](_kit_.contractkit.md#getnetworkconfig)
 * [getTotalBalance](_kit_.contractkit.md#gettotalbalance)
@@ -187,11 +189,43 @@ Name | Type |
 
 ___
 
+###  getEpochNumberOfBlock
+
+▸ **getEpochNumberOfBlock**(`blockNumber`: number): *Promise‹number›*
+
+*Defined in [packages/contractkit/src/kit.ts:282](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L282)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`blockNumber` | number |
+
+**Returns:** *Promise‹number›*
+
+___
+
+###  getFirstBlockNumberForEpoch
+
+▸ **getFirstBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
+
+*Defined in [packages/contractkit/src/kit.ts:268](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L268)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`epochNumber` | number |
+
+**Returns:** *Promise‹number›*
+
+___
+
 ###  getLastBlockNumberForEpoch
 
 ▸ **getLastBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [packages/contractkit/src/kit.ts:267](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L267)*
+*Defined in [packages/contractkit/src/kit.ts:275](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L275)*
 
 **Parameters:**
 

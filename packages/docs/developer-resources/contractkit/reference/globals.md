@@ -36,6 +36,8 @@
 * ["wrappers/Attestations"](modules/_wrappers_attestations_.md)
 * ["wrappers/BaseWrapper"](modules/_wrappers_basewrapper_.md)
 * ["wrappers/BlockchainParameters"](modules/_wrappers_blockchainparameters_.md)
+* ["wrappers/DoubleSigningSlasher"](modules/_wrappers_doublesigningslasher_.md)
+* ["wrappers/DowntimeSlasher"](modules/_wrappers_downtimeslasher_.md)
 * ["wrappers/Election"](modules/_wrappers_election_.md)
 * ["wrappers/Escrow"](modules/_wrappers_escrow_.md)
 * ["wrappers/Exchange"](modules/_wrappers_exchange_.md)

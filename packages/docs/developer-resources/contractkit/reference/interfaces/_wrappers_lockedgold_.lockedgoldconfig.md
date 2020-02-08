@@ -16,4 +16,4 @@
 
 • **unlockingPeriod**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/LockedGold.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L37)*
+*Defined in [packages/contractkit/src/wrappers/LockedGold.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L46)*

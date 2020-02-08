@@ -8,5 +8,6 @@
 
 ### Interfaces
 
+* [AccountSlashed](../interfaces/_wrappers_lockedgold_.accountslashed.md)
 * [LockedGoldConfig](../interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
 * [VotingDetails](../interfaces/_wrappers_lockedgold_.votingdetails.md)
