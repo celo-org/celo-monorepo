@@ -1,5 +1,4 @@
 import { Actions, ActionTypes } from 'src/geth/actions'
-import { RootState } from 'src/redux/reducers'
 
 export enum InitializationState {
   NOT_YET_INITIALIZED = 'NOT_YET_INITIALIZED',
@@ -12,17 +11,24 @@ export enum InitializationState {
 export interface State {
   initialized: InitializationState
   connected: boolean
+  gethStartedThisSession: boolean
 }
 
 const initialState: State = {
   initialized: InitializationState.NOT_YET_INITIALIZED,
   connected: false,
+  gethStartedThisSession: false,
 }
 
 export function gethReducer(state: State = initialState, action: ActionTypes) {
   switch (action.type) {
     case Actions.SET_INIT_STATE:
-      return { ...state, initialized: action.state }
+      return {
+        ...state,
+        initialized: action.state,
+        gethStartedThisSession:
+          action.state === InitializationState.INITIALIZED ? true : state.gethStartedThisSession, // Once geth initialized, it has been started this session
+      }
     case Actions.SET_GETH_CONNECTED:
       return {
         ...state,
@@ -32,6 +38,3 @@ export function gethReducer(state: State = initialState, action: ActionTypes) {
       return state
   }
 }
-
-export const isGethConnectedSelector = (state: RootState) =>
-  state.geth.initialized === InitializationState.INITIALIZED && state.geth.connected

@@ -151,7 +151,7 @@ android {
         minSdkVersion isDetoxTestBuild ? rootProject.ext.minSdkVersion : 18
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.5.2"
+        versionName "1.6.0"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
@@ -252,10 +252,8 @@ android {
     packagingOptions {
         exclude 'META-INF/-no-jdk.kotlin_module'
         exclude 'META-INF/androidx.exifinterface_exifinterface.version'
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst '**/libjsc.so'
+        pickFirst '**/libc++_shared.so'
     }
 
     

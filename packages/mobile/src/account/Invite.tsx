@@ -17,7 +17,6 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
 import Search from 'src/icons/Search'
 import { importContacts } from 'src/identity/actions'
-import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -43,7 +42,6 @@ interface Section {
 
 interface StateProps {
   defaultCountryCode: string
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
   recipientCache: NumberToRecipient
 }
 
@@ -63,7 +61,6 @@ type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedPr
 
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: defaultCountryCodeSelector(state),
-  e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
   recipientCache: recipientCacheSelector(state),
 })
 

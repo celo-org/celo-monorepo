@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.1.5",
-    "@celo/utils": "0.1.5-dev",
+    "@celo/utils": "0.1.6-dev",
     "expo": "^34.0.1",
     "expo-contacts": "6.0.0",
     "libphonenumber-js": "^1.7.22"

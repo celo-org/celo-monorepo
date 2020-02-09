@@ -26,4 +26,7 @@ interface IAccounts {
     view
     returns (uint256[] memory, bytes memory);
   function getName(address) external view returns (string memory);
+
+  function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
+  function createAccount() external returns (bool);
 }

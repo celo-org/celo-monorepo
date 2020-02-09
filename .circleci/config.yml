@@ -41,6 +41,7 @@ e2e-defaults: &e2e-defaults
 general:
   artifacts:
     - "mobile/coverage"
+    - "web/coverage"
     - "protocol/coverage"
 
 jobs:
@@ -289,6 +290,22 @@ jobs:
             mkdir -p test-results/jest
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: packages/web/coverage
+          destination: web/coverage
+
+      - run:
+          name: copy
+          command: |
+            mkdir -p packages/web/web/coverage
+            cp -r packages/web/coverage packages/web/web/
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F web
+
   mobile-test-build-app:
     <<: *android-defaults
     resource_class: large
@@ -405,6 +422,15 @@ jobs:
       - run:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
+      - run:
+          name: Fail if someone forgot to commit contractkit docs
+          command: |
+            yarn --cwd=packages/contractkit docs
+            if [[ $(git status packages/docs/developer-resources/contractkit --porcelain) ]]; then
+              git --no-pager diff packages/docs/developer-resources/contractkit
+              echo "There are git differences after generating contractkit docs"
+              exit 1
+            fi
 
   walletkit-test:
     <<: *defaults

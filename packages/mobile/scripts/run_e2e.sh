@@ -1,78 +1,105 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-#####
-# This file launches the emulator and fires the tests
-#####
+# ========================================
+# Build and run the end-to-end tests
+# ========================================
 
-export CELO_TEST_CONFIG=e2e
+# Flags:
+# -p: Platform (android or ios)
+# -v (Optional): Name of virual machine to run
+# -f (Optional): Fast (skip build step)
+# -r (Optional): Use release build (by default uses debug) 
+# TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 
-adb kill-server && adb start-server
+PLATFORM=""
+VD_NAME="Nexus_5X_API_28_x86"
+FAST=false
+RELEASE=false
+while getopts 'p:fr' flag; do
+  case "${flag}" in
+    p) PLATFORM="$OPTARG" ;;
+    v) VD_NAME="$OPTARG" ;;
+    f) FAST=true ;;
+    r) RELEASE=true ;;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
 
-DEFAULT_AVD="Nexus_5X_API_28_x86"
+[ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 
-if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$DEFAULT_AVD$) ]]; then
-  echo "AVD $DEFAULT_AVD not installed. Pleas install it or change detox' configuration in package.json"
-  echo "You can see the list of available installed devices with $ANDROID_SDK_ROOT/emulator/emulator -list-avds"
-  exit 1
-fi
-
-
-bash ./scripts/unlock.sh
-adb reconnect
-if [ $? -ne 0 ]
-then
-  exit 1
-fi
-
-echo "Waiting for emulator to unlock..."
-# TODO: improve this to actually poll if the screen is unlocked
-# https://stackoverflow.com/questions/35275828/is-there-a-way-to-check-if-android-device-screen-is-locked-via-adb
-sleep 3
-echo "Emulator unlocked!"
-
-# sometimes the emulator locks itself after boot
-# this prevents that
-bash ./scripts/unlock.sh
+# Ensure jest is accessible to detox
+cp ../../node_modules/.bin/jest node_modules/.bin/
 
 # Just to be safe kill any process that listens on the port 'yarn start' is going to use
 echo "Killing previous metro server (if any)"
-react-native-kill-packager || echo 'Failed to kill for some reason'
-echo "Start metro server"
-yarn react-native start &
+yarn react-native-kill-packager || echo "Failed to kill package manager, proceeding anyway"
 
+# Build the app and run it
+if [ $PLATFORM = "android" ]; then
+  echo "Using platform android"
 
-echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
-until adb shell dumpsys wifi | grep "mNetworkInfo" |grep "state: CONNECTED"
-do
-  sleep 10
-done
+  if [ -z $ANDROID_HOME ]; then
+    echo "No Android SDK root set"
+    exit 1
+  fi
 
-cp ../../node_modules/.bin/jest node_modules/.bin/
+  if [[ ! $($ANDROID_HOME/emulator/emulator -list-avds | grep ^$VD_NAME$) ]]; then
+    echo "AVD $VD_NAME not installed. Please install it or change the detox configuration in package.json"
+    echo "You can see the list of available installed devices with $ANDROID_HOME/emulator/emulator -list-avds"
+    exit 1
+  fi
 
-yarn test:detox
-STATUS=$?
+  if [ "$RELEASE" = false ]; then
+    CONFIG_NAME="android.emu.debug"
+  else
+    CONFIG_NAME="android.emu.release"
+  fi
 
- # Retry on fail logic
-if [ $STATUS -ne 0 ]; then
-   echo "It failed once, let's try again"
-   yarn test:detox
-   STATUS=$?
-fi
+  if [ "$FAST" = false ]; then
+    echo "Configuring the app"
+    ./scripts/run_app.sh -p $PLATFORM -b
+  fi
 
-if [ $STATUS -ne 0 ]; then
-   # TODO: upload e2e_run.log and attach the link
-   echo "Test failed"
+  echo "Building detox"
+  yarn detox build -c $CONFIG_NAME
+
+  echo "Starting the metro server"
+  yarn react-native start &
+
+  NUM_DEVICES=`adb devices -l | wc -l`
+  if [ $NUM_DEVICES -gt 2 ]; then 
+    echo "Emulator already running or device attached. Please shutdown / remove first"
+    exit 1
+  fi
+
+  echo "Starting the emulator"
+  $ANDROID_HOME/emulator/emulator -avd $VD_NAME -no-boot-anim &
+
+  echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
+  until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
+  do
+    sleep 3 
+  done
+
+  CELO_TEST_CONFIG=e2e yarn detox test -c $CONFIG_NAME -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose
+  STATUS=$?
+
+  echo "Closing emulator (if active)"
+  adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+
+elif [ $PLATFORM = "ios" ]; then
+  echo "Using platform ios"
+  echo "IOS e2e tests not currently supported"
+  exit 1
+
 else
-   echo "Test passed"
+  echo "Invalid value for platform, must be 'android' or 'ios'"
+  exit 1
 fi
 
-react-native-kill-packager
+echo "Done test, cleaning up"
+yarn react-native-kill-packager
 
-echo "Closing emulator"
-kill -s 9 `ps -a | grep "Nexus_5X_API_28_x86" | grep -v "grep"  | awk '{print $1}'`
-
-echo "Closing pidcat"
-kill -s 9 `ps -a | grep "pidcat" | grep -v "grep"  | awk '{print $1}'`
-
+echo "Exiting with test result status $STATUS"
 exit $STATUS

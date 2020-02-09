@@ -12,7 +12,7 @@ import Octocat from 'src/icons/Octocat'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
-import Footer from 'src/shared/Footer.3'
+import Footer from 'src/shared/Footer'
 import Link from 'src/shared/Link'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
@@ -282,7 +282,7 @@ export class Header extends React.PureComponent<Props, State> {
         </View>
 
         {!this.state.showDesktopMenu && !this.state.menuFaded && (
-          <View style={styles.hamburger}>
+          <View style={[styles.hamburger]}>
             <div
               className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
                 this.state.mobileMenuActive ? cssStyles['is-active'] : ''
