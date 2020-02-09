@@ -107,7 +107,6 @@ contract('Attestations', (accounts: string[]) => {
   enum KeyOffsets {
     VALIDATING_KEY_OFFSET,
     ATTESTING_KEY_OFFSET,
-    NEW_VALIDATING_KEY_OFFSET,
   }
 
   const getDerivedKey = (offset: number, address: string) => {
@@ -176,12 +175,7 @@ contract('Attestations', (accounts: string[]) => {
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
-
-    await attestations.__setValidators(
-      accounts.map((account) =>
-        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
-      )
-    )
+    await attestations.__setValidators(accounts)
   })
 
   describe('#initialize()', () => {
@@ -537,29 +531,6 @@ contract('Attestations', (accounts: string[]) => {
             )
 
             assert.lengthOf(attestationBlockNumbers, 0)
-          })
-        })
-
-        describe('when the validation key has been rotated for all validators', () => {
-          // Rotate all validation keys
-          beforeEach(async () => {
-            await Promise.all(
-              accounts.map((account) =>
-                unlockAndAuthorizeKey(
-                  KeyOffsets.NEW_VALIDATING_KEY_OFFSET,
-                  accountsInstance.authorizeValidatorSigner,
-                  account
-                )
-              )
-            )
-          })
-
-          it('can still select issuers', async () => {
-            assert.isEmpty(await attestations.getAttestationIssuers(phoneHash, caller))
-            await attestations.selectIssuers(phoneHash)
-
-            const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
-            assert.lengthOf(attestationIssuers, attestationsRequested)
           })
         })
       })

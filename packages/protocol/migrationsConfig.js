@@ -52,15 +52,14 @@ const DefaultConfig = {
     },
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
-    communityRewardFraction: 1 / 4,
-    frozen: false,
+    frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * 60, // 5 minutes
     minimumReports: 1,
-    frozen: false,
+    frozen: true,
   },
   gasPriceMinimum: {
     minimumFloor: 1000000000,
@@ -109,7 +108,6 @@ const DefaultConfig = {
       values: [],
     },
     oracles: [],
-    unfreezeImmediately: true,
   },
   validators: {
     groupLockedGoldRequirements: {

@@ -180,12 +180,12 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
-  function authorizeValidatorSignerWithPublicKey(
+  function authorizeValidatorSigner(
     address signer,
+    bytes calldata ecdsaPublicKey,
     uint8 v,
     bytes32 r,
-    bytes32 s,
-    bytes calldata ecdsaPublicKey
+    bytes32 s
   ) external nonReentrant {
     Account storage account = accounts[msg.sender];
     authorize(signer, v, r, s);

@@ -7,7 +7,6 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
-import "../common/interfaces/IAccounts.sol";
 import "../common/ExtractFunctionSignature.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
@@ -164,16 +163,6 @@ contract Governance is
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
   event HotfixExecuted(bytes32 indexed hash);
-
-  modifier hotfixNotExecuted(bytes32 hash) {
-    require(!hotfixes[hash].executed, "hotfix already executed");
-    _;
-  }
-
-  modifier onlyApprover() {
-    require(msg.sender == approver, "msg.sender not approver");
-    _;
-  }
 
   function() external payable {} // solhint-disable no-empty-blocks
 
@@ -443,8 +432,7 @@ contract Governance is
     uint256[] calldata values,
     address[] calldata destinations,
     bytes calldata data,
-    uint256[] calldata dataLengths,
-    string calldata descriptionUrl
+    uint256[] calldata dataLengths
   ) external payable returns (uint256) {
     dequeueProposalsIfReady();
     require(msg.value >= minDeposit, "Too small deposit");
@@ -452,43 +440,10 @@ contract Governance is
     proposalCount = proposalCount.add(1);
     Proposals.Proposal storage proposal = proposals[proposalCount];
     proposal.make(values, destinations, data, dataLengths, msg.sender, msg.value);
-    proposal.setDescriptionUrl(descriptionUrl);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
     emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
     return proposalCount;
-  }
-
-  /**
-   * @notice Removes a proposal if it is queued and expired.
-   * @param proposalId The ID of the proposal to remove.
-   * @return Whether the proposal was expired.
-   */
-  function removeIfQueuedAndExpired(uint256 proposalId) private returns (bool) {
-    bool expired = queue.contains(proposalId) && isQueuedProposalExpired(proposalId);
-    if (expired) {
-      queue.remove(proposalId);
-      emit ProposalExpired(proposalId);
-    }
-    return expired;
-  }
-
-  /**
-   * @notice Requires a proposal is dequeued and removes it if expired.
-   * @param proposalId The ID of the proposal.
-   * @return The proposal storage struct and stage corresponding to `proposalId`. 
-   */
-  function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
-    private
-    returns (Proposals.Proposal storage, Proposals.Stage)
-  {
-    Proposals.Proposal storage proposal = proposals[proposalId];
-    require(_isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
-    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
-    if (_isDequeuedProposalExpired(proposal, stage)) {
-      deleteDequeuedProposal(proposal, proposalId, index);
-    }
-    return (proposal, stage);
   }
 
   /**
@@ -505,22 +460,31 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
     // If acting on an expired proposal, expire the proposal and take no action.
-    if (removeIfQueuedAndExpired(proposalId)) {
+    // solhint-disable-next-line not-rely-on-time
+    if (queue.contains(proposalId) && now >= proposals[proposalId].timestamp.add(queueExpiry)) {
+      queue.remove(proposalId);
+      emit ProposalExpired(proposalId);
       return false;
     }
-
-    address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
-    removeIfQueuedAndExpired(voter.upvote.proposalId);
-
+    // If the previously upvoted proposal is still in the queue but has expired, expire the
+    // proposal from the queue.
+    if (
+      queue.contains(voter.upvote.proposalId) &&
+      now >= proposals[voter.upvote.proposalId].timestamp.add(queueExpiry)
+    ) {
+      queue.remove(voter.upvote.proposalId);
+      emit ProposalExpired(voter.upvote.proposalId);
+    }
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(weight > 0, "cannot upvote without locking gold");
-    require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
+    require(isQueued(proposalId), "cannot upvote a proposal not in the queue");
     require(
       voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
       "cannot upvote more than one queued proposal"
@@ -561,17 +525,24 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
-    // TODO(yorke): clean up redundant computation
-    require(proposalId != 0, "Account has no historical upvote");
-    removeIfQueuedAndExpired(proposalId);
+    Proposals.Proposal storage proposal = proposals[proposalId];
+    require(proposal.exists(), "Proposal doesn't exist");
+    // If acting on an expired proposal, expire the proposal.
+    // TODO(asa): Break this out into a separate function.
     if (queue.contains(proposalId)) {
-      queue.update(
-        proposalId,
-        queue.getValue(proposalId).sub(voter.upvote.weight),
-        lesser,
-        greater
-      );
-      emit ProposalUpvoteRevoked(proposalId, account, voter.upvote.weight);
+      // solhint-disable-next-line not-rely-on-time
+      if (now >= proposal.timestamp.add(queueExpiry)) {
+        queue.remove(proposalId);
+        emit ProposalExpired(proposalId);
+      } else {
+        queue.update(
+          proposalId,
+          queue.getValue(proposalId).sub(voter.upvote.weight),
+          lesser,
+          greater
+        );
+        emit ProposalUpvoteRevoked(proposalId, account, voter.upvote.weight);
+      }
     }
     voter.upvote = UpvoteRecord(0, 0);
     return true;
@@ -585,16 +556,16 @@ contract Governance is
    * @param index The index of the proposal ID in `dequeued`.
    * @return Whether or not the approval was made successfully.
    */
-  function approve(uint256 proposalId, uint256 index) external onlyApprover returns (bool) {
+  function approve(uint256 proposalId, uint256 index) external returns (bool) {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
-      proposalId,
-      index
-    );
-    if (!proposal.exists()) {
+    Proposals.Proposal storage proposal = proposals[proposalId];
+    require(isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
+    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+    if (isDequeuedProposalExpired(proposal, stage)) {
+      deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
-
+    require(msg.sender == approver, "Only approver can approve");
     require(!proposal.isApproved(), "Proposal already approved");
     require(stage == Proposals.Stage.Approval, "Proposal not in approval stage");
     proposal.approved = true;
@@ -617,20 +588,22 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
-      proposalId,
-      index
-    );
-    if (!proposal.exists()) {
+    Proposals.Proposal storage proposal = proposals[proposalId];
+    require(isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
+    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+    if (isDequeuedProposalExpired(proposal, stage)) {
+      deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
-
-    address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(proposal.isApproved(), "Proposal not approved");
-    require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
+    require(
+      stage == Proposals.Stage.Referendum && value != Proposals.VoteValue.None && weight > 0,
+      "Incorrect proposal state"
+    );
     require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
     VoteRecord storage voteRecord = voter.referendumVotes[index];
@@ -659,28 +632,31 @@ contract Governance is
    */
   function execute(uint256 proposalId, uint256 index) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
-    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
-      proposalId,
-      index
-    );
-    bool notExpired = proposal.exists();
-    if (notExpired) {
+    Proposals.Proposal storage proposal = proposals[proposalId];
+    require(isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
+    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+    bool expired = isDequeuedProposalExpired(proposal, stage);
+    if (!expired) {
+      // TODO(asa): Think through the effects of changing the passing function
       require(
         stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
         "Proposal not in execution stage or not passing"
       );
       proposal.execute();
       emit ProposalExecuted(proposalId);
-      deleteDequeuedProposal(proposal, proposalId, index);
     }
-    return notExpired;
+    // Proposal must have executed fully or expired if this point is reached.
+    deleteDequeuedProposal(proposal, proposalId, index);
+    return !expired;
   }
 
   /**
    * @notice Whitelists the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
-  function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyApprover {
+  function approveHotfix(bytes32 hash) external {
+    require(!hotfixes[hash].executed, "hotfix already executed");
+    require(msg.sender == approver, "Not approver");
     hotfixes[hash].approved = true;
     emit HotfixApproved(hash);
   }
@@ -698,7 +674,8 @@ contract Governance is
    * @notice Whitelists the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
-  function whitelistHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
+  function whitelistHotfix(bytes32 hash) external {
+    require(!hotfixes[hash].executed, "hotfix already executed");
     hotfixes[hash].whitelisted[msg.sender] = true;
     emit HotfixWhitelisted(hash, msg.sender);
   }
@@ -707,7 +684,8 @@ contract Governance is
    * @notice Gives hotfix a prepared epoch for execution.
    * @param hash The hash of the hotfix to be prepared.
    */
-  function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
+  function prepareHotfix(bytes32 hash) external {
+    require(!hotfixes[hash].executed, "hotfix already executed");
     require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
     uint256 epoch = getEpochNumber();
     require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
@@ -721,7 +699,7 @@ contract Governance is
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
-   * @param salt Arbitrary salt associated with hotfix which guarantees uniqueness of hash.
+   * @param salt Secret associated with hotfix which guarantees uniqueness of hash.
    * @dev Reverts if hotfix is already executed, not approved, or not prepared for current epoch.
    */
   function executeHotfix(
@@ -826,7 +804,7 @@ contract Governance is
   function getProposal(uint256 proposalId)
     external
     view
-    returns (address, uint256, uint256, uint256, string memory)
+    returns (address, uint256, uint256, uint256)
   {
     return proposals[proposalId].unpack();
   }
@@ -904,7 +882,6 @@ contract Governance is
   /**
    * @notice Returns the dequeued proposal IDs.
    * @return The dequeued proposal IDs.
-   * @dev Note that this includes unused indices with proposalId == 0 from deleted proposals.
    */
   function getDequeue() external view returns (uint256[] memory) {
     return dequeued;
@@ -937,10 +914,9 @@ contract Governance is
   function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
-    IAccounts accounts = getAccounts();
     for (uint256 idx = 0; idx < n; idx++) {
       address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
-      address validatorAccount = accounts.validatorSignerToAccount(validatorSigner);
+      address validatorAccount = getAccounts().validatorSignerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
         isHotfixWhitelistedBy(hash, validatorAccount)
@@ -990,7 +966,8 @@ contract Governance is
       for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
         uint256 proposalId = dequeuedIds[i];
         Proposals.Proposal storage proposal = proposals[proposalId];
-        if (_isQueuedProposalExpired(proposal)) {
+        // solhint-disable-next-line not-rely-on-time
+        if (now >= proposal.timestamp.add(queueExpiry)) {
           emit ProposalExpired(proposalId);
           continue;
         }
@@ -1022,7 +999,8 @@ contract Governance is
    * @return Whether or not the proposal is in the queue.
    */
   function isQueued(uint256 proposalId) public view returns (bool) {
-    return queue.contains(proposalId) && !isQueuedProposalExpired(proposalId);
+    // solhint-disable-next-line not-rely-on-time
+    return queue.contains(proposalId) && now < proposals[proposalId].timestamp.add(queueExpiry);
   }
 
   /**
@@ -1062,47 +1040,24 @@ contract Governance is
 
   /**
    * @notice Returns whether a proposal is dequeued at the given index.
-   * @param proposalId The ID of the proposal.
-   * @param index The index of the proposal ID in `dequeued`.
-   * @return Whether the proposal is in `dequeued`.
-   */
-  function isDequeuedProposal(uint256 proposalId, uint256 index) external view returns (bool) {
-    return _isDequeuedProposal(proposals[proposalId], proposalId, index);
-  }
-
-  /**
-   * @notice Returns whether a proposal is dequeued at the given index.
    * @param proposal The proposal struct.
    * @param proposalId The ID of the proposal.
    * @param index The index of the proposal ID in `dequeued`.
-   * @return Whether the proposal is in `dequeued` at index.
    */
-  function _isDequeuedProposal(
+  function isDequeuedProposal(
     Proposals.Proposal storage proposal,
     uint256 proposalId,
     uint256 index
   ) private view returns (bool) {
-    require(index < dequeued.length, "Provided index greater than dequeue length.");
     return proposal.exists() && dequeued[index] == proposalId;
   }
 
   /**
    * @notice Returns whether or not a dequeued proposal has expired.
-   * @param proposalId The ID of the proposal.
-   * @return Whether or not the dequeued proposal has expired.
-   */
-  function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
-    Proposals.Proposal storage proposal = proposals[proposalId];
-    return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
-
-  }
-
-  /**
-   * @notice Returns whether or not a dequeued proposal has expired.
    * @param proposal The proposal struct.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function _isDequeuedProposalExpired(Proposals.Proposal storage proposal, Proposals.Stage stage)
+  function isDequeuedProposalExpired(Proposals.Proposal storage proposal, Proposals.Stage stage)
     private
     view
     returns (bool)
@@ -1117,34 +1072,10 @@ contract Governance is
   }
 
   /**
-   * @notice Returns whether or not a queued proposal has expired.
-   * @param proposalId The ID of the proposal.
-   * @return Whether or not the dequeued proposal has expired.
-   */
-  function isQueuedProposalExpired(uint256 proposalId) public view returns (bool) {
-    return _isQueuedProposalExpired(proposals[proposalId]);
-  }
-
-  /**
-   * @notice Returns whether or not a queued proposal has expired.
-   * @param proposal The proposal struct.
-   * @return Whether or not the dequeued proposal has expired.
-   */
-  function _isQueuedProposalExpired(Proposals.Proposal storage proposal)
-    private
-    view
-    returns (bool)
-  {
-    // solhint-disable-next-line not-rely-on-time
-    return now >= proposal.timestamp.add(queueExpiry);
-  }
-
-  /**
    * @notice Deletes a dequeued proposal.
    * @param proposal The proposal struct.
    * @param proposalId The ID of the proposal to delete.
    * @param index The index of the proposal ID in `dequeued`.
-   * @dev Must always be preceded by `isDequeuedProposal`, which checks `index`.
    */
   function deleteDequeuedProposal(
     Proposals.Proposal storage proposal,

@@ -107,8 +107,6 @@ contract('Exchange', (accounts: string[]) => {
       []
     )
 
-    await stableToken.unfreeze()
-
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await mockSortedOracles.setMedianRate(stableToken.address, stableAmountForRate)

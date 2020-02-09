@@ -199,12 +199,13 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
       return toTransactionObject(
         this.kit,
-        this.contract.methods.authorizeValidatorSignerWithPublicKey(
+        this.contract.methods.authorizeValidatorSigner(
           signer,
+          stringToBytes(pubKey),
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
-          proofOfSigningKeyPossession.s,
-          stringToBytes(pubKey)
+          // @ts-ignore Typescript does not support overloading.
+          proofOfSigningKeyPossession.s
         )
       )
     } else {

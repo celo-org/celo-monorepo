@@ -45,7 +45,6 @@ library Proposals {
     Transaction[] transactions;
     bool approved;
     uint256 networkWeight;
-    string descriptionUrl;
   }
 
   /**
@@ -86,11 +85,6 @@ library Proposals {
       );
       dataPosition = dataPosition.add(dataLengths[i]);
     }
-  }
-
-  function setDescriptionUrl(Proposal storage proposal, string memory descriptionUrl) internal {
-    require(bytes(descriptionUrl).length != 0, "Description url must have non-zero length");
-    proposal.descriptionUrl = descriptionUrl;
   }
 
   /**
@@ -302,15 +296,9 @@ library Proposals {
   function unpack(Proposal storage proposal)
     internal
     view
-    returns (address, uint256, uint256, uint256, string storage)
+    returns (address, uint256, uint256, uint256)
   {
-    return (
-      proposal.proposer,
-      proposal.deposit,
-      proposal.timestamp,
-      proposal.transactions.length,
-      proposal.descriptionUrl
-    );
+    return (proposal.proposer, proposal.deposit, proposal.timestamp, proposal.transactions.length);
   }
 
   /**

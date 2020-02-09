@@ -572,7 +572,7 @@ contract Attestations is
     while (currentIndex < unselectedRequest.attestationsRequested) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validatorSignerAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = accounts.signerToAccount(validator);
+      issuer = accounts.validatorSignerToAccount(validator);
 
       if (!accounts.hasAuthorizedAttestationSigner(issuer)) {
         continue;

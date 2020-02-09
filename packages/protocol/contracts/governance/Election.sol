@@ -679,19 +679,11 @@ contract Election is
     ActiveVotes storage active = votes.active;
     active.total = active.total.sub(value);
 
-    // Rounding may cause getActiveVotesUnitsDelta to return 0 for value != 0, preventing users
-    // from revoking the last of their votes. The case where value == activeVotes is special cased
-    // to prevent this.
-    uint256 unitsDelta = 0;
-    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
-    GroupActiveVotes storage groupActive = active.forGroup[group];
-    if (activeVotes == value) {
-      unitsDelta = groupActive.unitsByAccount[account];
-    } else {
-      unitsDelta = getActiveVotesUnitsDelta(group, value);
-    }
+    uint256 unitsDelta = getActiveVotesUnitsDelta(group, value);
 
+    GroupActiveVotes storage groupActive = active.forGroup[group];
     groupActive.total = groupActive.total.sub(value);
+
     groupActive.totalUnits = groupActive.totalUnits.sub(unitsDelta);
     groupActive.unitsByAccount[account] = groupActive.unitsByAccount[account].sub(unitsDelta);
   }
@@ -840,12 +832,7 @@ contract Election is
     while (totalNumMembersElected < electableValidators.max) {
       uint256 groupIndex = 0;
       bool memberElected = false;
-      (groupIndex, memberElected) = dHondt(
-        electionGroups,
-        numMembers,
-        totalNumMembersElected,
-        numMembersElected
-      );
+      (groupIndex, memberElected) = dHondt(electionGroups, numMembers, numMembersElected);
 
       if (memberElected) {
         numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
@@ -854,7 +841,7 @@ contract Election is
         break;
       }
     }
-    require(totalNumMembersElected >= electableValidators.min, "Not enough elected validators");
+    require(totalNumMembersElected >= electableValidators.min, "Not enough elected groups");
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
@@ -883,16 +870,12 @@ contract Election is
   function dHondt(
     address[] memory electionGroups,
     uint256[] memory numMembers,
-    uint256 totalNumMembersElected,
     uint256[] memory numMembersElected
   ) private view returns (uint256, bool) {
     bool memberElected = false;
     uint256 groupIndex = 0;
     FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
     for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-      if (i > totalNumMembersElected) {
-        break;
-      }
       address group = electionGroups[i];
       // Only consider groups with members left to be elected.
       if (numMembers[i] > numMembersElected[i]) {

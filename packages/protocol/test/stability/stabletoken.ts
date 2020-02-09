@@ -39,7 +39,6 @@ contract('StableToken', (accounts: string[]) => {
       [],
       []
     )
-    await stableToken.unfreeze()
     initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
 
