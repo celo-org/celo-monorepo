@@ -18,7 +18,7 @@ CELO_PROVIDER=http://localhost:8545
 TWILIO_AUTH_TOKEN=$(get_secret $ATTESTER_KEY_VAULT 'attesterTwilioAuthToken')
 
 /usr/bin/docker run \
-  --name attestation-service \
+  --name $1 \
   --net=host \
   --entrypoint /bin/bash \
   -v $DATA_DIR:$DATA_DIR \
