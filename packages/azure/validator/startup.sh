@@ -66,11 +66,11 @@ docker run \
   -i $GETH_NODE_DOCKER_IMAGE \
   -c "geth init $DATA_DIR/genesis.json"
 
-cp validator-run /usr/local/bin
-cp validator-geth.service /etc/systemd/system/geth.service
+cp celo-validator-run /usr/local/bin
+cp celo-validator.service /etc/systemd/system/celo-validator.service
 systemctl daemon-reload
-systemctl enable geth.service
-systemctl restart geth.service
+systemctl enable celo-validator.service
+systemctl restart celo-validator.service
 
 echo "Pulling geth exporter..."
 docker pull $GETH_EXPORTER_DOCKER_IMAGE

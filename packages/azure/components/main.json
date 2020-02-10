@@ -176,7 +176,7 @@
     },
     "attestationServiceDockerImageTag": {
       "type": "string",
-      "defaultValue": "attestation-service-8e69cf86010b62e283d5f9285f181fca5483733e",
+      "defaultValue": "[concat('attestation-service-', parameters('celoEnv'))]",
       "metadata": {
         "description": "Celo attestation service Docker image tag"
       }
@@ -241,7 +241,7 @@
       "type": "string",
       "defaultValue": "1024",
       "metadata": {
-        "description": "Validator data disk size"
+        "description": "Validator data disk size in gigabytes"
       }
     },
     "validatorVirtualMachineSize": {
@@ -269,7 +269,7 @@
       "type": "string",
       "defaultValue": "1024",
       "metadata": {
-        "description": "Validator data disk size"
+        "description": "Validator data disk size in gigabytes"
       }
     },
     "proxyVirtualMachineSize": {
@@ -304,7 +304,7 @@
       "type": "string",
       "defaultValue": "1024",
       "metadata": {
-        "description": "Attester data disk size"
+        "description": "Attester data disk size in gigabytes"
       }
     },
     "osDiskType": {

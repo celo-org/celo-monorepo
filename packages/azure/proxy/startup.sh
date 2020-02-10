@@ -63,11 +63,11 @@ docker run \
   -i $GETH_NODE_DOCKER_IMAGE \
   -c "geth init $DATA_DIR/genesis.json"
 
-cp proxy-run /usr/local/bin
-cp proxy-geth.service /etc/systemd/system/geth.service
+cp celo-proxy-run /usr/local/bin
+cp celo-proxy.service /etc/systemd/system/celo-proxy.service
 systemctl daemon-reload
-systemctl enable geth.service
-systemctl restart geth.service
+systemctl enable celo-proxy.service
+systemctl restart celo-proxy.service
 
 echo "Pulling geth exporter..."
 docker pull $GETH_EXPORTER_DOCKER_IMAGE

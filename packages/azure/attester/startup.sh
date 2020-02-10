@@ -72,8 +72,8 @@ systemctl restart celo-node.service
 echo "Pulling attestation service..."
 docker pull $ATTESTATION_SERVICE_DOCKER_IMAGE
 
-cp attestation-service-run /usr/local/bin
-cp attestation-service.service /etc/systemd/system/attestation-service.service
+cp celo-attestations-run /usr/local/bin
+cp celo-attestations.service /etc/systemd/system/celo-attestations.service
 systemctl daemon-reload
-systemctl enable attestation-service.service
-systemctl restart attestation-service.service
+systemctl enable celo-attestations.service
+systemctl restart celo-attestations.service
