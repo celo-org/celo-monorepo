@@ -299,7 +299,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function getReserveGoldBalance() public view returns (uint256) {
-    uint256 reserveGoldBalance = address(this).balance;
+    return address(this).balance + getOtherReserveAddressesGoldBalance();
+  }
+
+  function getOtherReserveAddressesGoldBalance() public view returns (uint256) {
+    uint256 reserveGoldBalance = 0;
     for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
       reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
@@ -307,11 +311,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function getUnfrozenReserveGoldBalance() public view returns (uint256) {
-    uint256 reserveGoldBalance = getUnfrozenBalance();
-    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
-      reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
-    }
-    return reserveGoldBalance;
+    return getUnfrozenBalance() + getOtherReserveAddressesGoldBalance();
   }
 
   function getFrozenReserveGoldBalance() public view returns (uint256) {
