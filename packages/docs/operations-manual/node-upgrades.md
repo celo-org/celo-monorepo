@@ -16,7 +16,7 @@ Use these instructions to update non-validating nodes, such as your account node
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export export NETWORK_ID=200110 # Baklava testnet phases 2 and 3
+export NETWORK_ID=200110 # Baklava testnet phases 2 and 3
 docker pull $CELO_IMAGE
 ```
 
