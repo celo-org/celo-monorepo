@@ -114,7 +114,9 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
         historyFirst += 2;
         historySize--;
       } else if (historySize == randomnessBlockRetentionWindow) {
-        delete history[historyFirst];
+        if (historyFirst != lastEpochBlock) {
+          delete history[historyFirst];
+        }
         historyFirst++;
       } else {
         // historySize < randomnessBlockRetentionWindow

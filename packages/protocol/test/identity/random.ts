@@ -109,59 +109,58 @@ contract('Random', (accounts: string[]) => {
     })
 
     describe("when relying on the last block of each epoch's randomness", async () => {
-      let lastBlockOfEpoch: any
-      let totalBlocks: any
+      let lastEpochBlock: any
+      let currentBlock: any
       const retentionWindow = 5
       beforeEach(async () => {
         const epochNumber = await currentEpochNumber(web3)
-        lastBlockOfEpoch = (epochNumber + 1) * EPOCH - 2
-        await timeTravel(lastBlockOfEpoch, web3)
-        totalBlocks = lastBlockOfEpoch
+        currentBlock = (epochNumber + 1) * EPOCH - 1
+        await timeTravel(currentBlock, web3)
 
         await random.setRandomnessBlockRetentionWindow(retentionWindow)
         // Starting on epoch i, it should add randomness for epoch i's last block
         // Then it should add randomness for all of epoch i+1's blocks (including its last)
         // This should overlap the original lastEpochBlock.
         for (let i = 0; i <= EPOCH; i++) {
-          totalBlocks += 1
-          if ((totalBlocks + 1) % EPOCH === 0) {
-            await random.addTestRandomness(totalBlocks, randomValues[0])
+          if ((currentBlock + 1) % EPOCH === 0) {
+            lastEpochBlock = currentBlock
+            await random.addTestRandomness(currentBlock, randomValues[1])
           } else {
-            await random.addTestRandomness(totalBlocks, randomValues[1])
+            await random.addTestRandomness(currentBlock, randomValues[2])
           }
+          currentBlock += 1
         }
         // Now we add `retentionWindow` worth of blocks' randomness to flush out the new lastEpochBlock
         // This means we can test `lastEpochBlock` stores epoch i+1's last block,
         // and we test that epoch i's last block is not retained.
         for (let i = 0; i < retentionWindow + 1; i++) {
-          totalBlocks += 1
-          await random.addTestRandomness(totalBlocks, randomValues[1])
+          await random.addTestRandomness(currentBlock, randomValues[2])
+          if (i !== retentionWindow) {
+            currentBlock += 1
+          }
         }
       })
 
       it("should retain the last epoch block's randomness", async () => {
         // Get start of epoch and then subtract one for last block of previous epoch
-        const lastEpochBlock = totalBlocks - (totalBlocks % EPOCH) - 1
-        assert.equal(randomValues[0], await random.getTestRandomness(lastEpochBlock, totalBlocks))
+        assert.equal(randomValues[1], await random.getTestRandomness(lastEpochBlock, currentBlock))
       })
 
       it('should retain the usual `retentionWindow` worth of blocks', async () => {
         for (let i = 0; i < retentionWindow; i++) {
           assert.equal(
-            randomValues[1],
-            await random.getTestRandomness(totalBlocks - i, totalBlocks)
+            randomValues[2],
+            await random.getTestRandomness(currentBlock - i, currentBlock)
           )
         }
       })
 
       it('should still not retain other blocks not covered by the retention window', async () => {
-        await assertRevert(random.getTestRandomness(totalBlocks - retentionWindow, totalBlocks))
+        await assertRevert(random.getTestRandomness(currentBlock - retentionWindow, currentBlock))
       })
 
       it('should not retain the last epoch block of previous epochs', async () => {
-        const lastEpochBlock = totalBlocks - (totalBlocks % EPOCH) - 1
-        const previousLastEpochBlock = lastEpochBlock - EPOCH
-        await assertRevert(random.getTestRandomness(previousLastEpochBlock, totalBlocks))
+        await assertRevert(random.getTestRandomness(lastEpochBlock - EPOCH, currentBlock))
       })
     })
   })
