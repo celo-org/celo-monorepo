@@ -1,13 +1,24 @@
 import { BigNumber } from 'bignumber.js'
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text as RNText, View } from 'react-native'
 // import css from 'src/dev/ValidatorsList.scss'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
+import CopyToClipboard from 'src/dev/CopyToClipboard'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles, typeFaces } from 'src/styles'
-import { copyToClipboad, cutAddress, formatNumber, weiToDecimal } from 'src/utils/utils'
+import { cutAddress, formatNumber, weiToDecimal } from 'src/utils/utils'
+
+class Text extends RNText {
+  render() {
+    return (
+      <RNText style={[{ fontFamily: typeFaces.futura }, this.props.style]}>
+        {this.props.children}
+      </RNText>
+    )
+  }
+}
 
 interface ValidatorsListProps {
   data: any
@@ -128,15 +139,16 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                       />
                     </Text>
                     <Text style={[styles.tableCellTitleRows]}>
-                      <Text style={[styles.tableCellTitleFirstRow]}>{group.name}</Text>
+                      <Text
+                        style={[styles.tableCellTitleFirstRow]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {group.name}
+                      </Text>
                       <Text style={[styles.tableCellTitleSecRow]}>
                         <Text>{cutAddress(group.address)}</Text>
-                        <Text
-                          style={[styles.tableCopy]}
-                          onClick={copyToClipboad.bind(this, group.address)}
-                        >
-                          copy
-                        </Text>
+                        <CopyToClipboard content={group.address} />
                       </Text>
                     </Text>
                   </Text>
@@ -185,7 +197,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     {formatNumber(group.uptime, 1)}%
                   </Text>
                 </View>
-                {i === 0 /*expanded*/ && (
+                {i === 3 /*expanded*/ && (
                   <View>
                     {group.validators.map((validator, j) => (
                       <View key={`${i}.${j}`} style={[styles.tableRow]}>
@@ -207,19 +219,19 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                             >
                               {validator.name}
                             </Text>
-                            <Text style={[styles.tableCellTitleSecRow]}>
+                            <Text
+                              style={[
+                                styles.tableCellTitleSecRow,
+                                styles.tableCellTitleSecondarySecRow,
+                              ]}
+                            >
                               <Text>{cutAddress(validator.address)}</Text>
-                              <Text
-                                style={[styles.tableCopy]}
-                                onClick={copyToClipboad.bind(this, group.address)}
-                              >
-                                copy
-                              </Text>
+                              <CopyToClipboard content={validator.address} />
                             </Text>
                           </Text>
                         </Text>
                         <Text
-                          style={[styles.tableSecondaryCell, styles.sizeXS]}
+                          style={[styles.tableSecondaryCell, styles.sizeS]}
                           numberOfLines={1}
                           ellipsizeMode="tail"
                         >
@@ -327,23 +339,33 @@ const styles = StyleSheet.create({
   },
   tableCellTitle: {
     cursor: 'pointer',
-    flexGrow: 1,
     display: 'flex',
     flexDirection: 'row',
+    overflow: 'hidden',
+    flexGrow: 1,
   },
   tableCellTitleRows: {
     display: 'flex',
     flexDirection: 'column',
+    overflow: 'hidden',
   },
   tableCellTitleFirstRow: {
     textDecorationLine: 'underline',
     fontWeight: '500',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
   },
   tableCellTitleSecRow: {
+    display: 'flex',
+    flexDirection: 'row',
     color: colors.grayHeavy,
     fontSize: 14,
     paddingTop: 10,
     fontWeight: 'normal',
+  },
+  tableCellTitleSecondarySecRow: {
+    paddingTop: 2,
   },
   tableCellTitleArrow: {
     marginLeft: 15,
@@ -363,17 +385,6 @@ const styles = StyleSheet.create({
   },
   tableCellHighlightError: {
     color: colors.error,
-  },
-  tableCopy: {
-    fontFamily: typeFaces.futura,
-    textTransform: 'uppercase',
-    opacity: 0.4,
-    fontWeight: '500',
-    fontSize: 12,
-    position: 'relative',
-    top: -0.5,
-    marginLeft: 7,
-    cursor: 'pointer',
   },
   tableCellCenter: {
     textAlign: 'center',
