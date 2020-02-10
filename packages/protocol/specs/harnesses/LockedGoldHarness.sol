@@ -3,17 +3,20 @@ pragma solidity ^0.5.8;
 import "contracts/governance/LockedGold.sol";
 
 contract LockedGoldHarness is LockedGold {
+  /* solhint-disable-next-line no-empty-blocks */
   function init_state() public {}
 
   function ercBalanceOf(address a) public returns (uint256) {
     return a.balance;
   }
 
-  function getPendingWithdrawalsIndex(address account, uint256 index) public returns (uint256) {
-    require(getAccounts().isAccount(account));
-    require(index < balances[account].pendingWithdrawals.length);
+  function getPendingWithdrawalAtIndex(address account, uint256 index) public returns (uint256) {
+    require(getAccounts().isAccount(account), "Unknown account");
+    require(
+      index < balances[account].pendingWithdrawals.length,
+      "Index cannot exceed pending withdrawals length"
+    );
     return balances[account].pendingWithdrawals[index].value;
-
   }
 
   function getunlockingPeriod() public returns (uint256) {
@@ -21,7 +24,7 @@ contract LockedGoldHarness is LockedGold {
   }
 
   function getTotalPendingWithdrawals(address account) public view returns (uint256) {
-    require(getAccounts().isAccount(account));
+    require(getAccounts().isAccount(account), "Unknown account");
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256 total = 0;
     for (uint256 i = 0; i < length; i++) {
@@ -35,5 +38,4 @@ contract LockedGoldHarness is LockedGold {
     uint256 length = balances[account].pendingWithdrawals.length;
     return length;
   }
-
 }
