@@ -347,13 +347,27 @@ jobs:
           key: pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
           paths:
             - packages/mobile/ios/Pods
+      - restore_cache:
+          name: Restore built detox framework
+          keys:
+            - detox-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
-          name: Run e2e tests
+          name: Build detox framework
           command: |
             set -euo pipefail
             cd packages/mobile
             # Make sure the detox framework is present
             yarn run detox build-framework-cache
+      - save_cache:
+          name: Save built detox framework
+          key: detox-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          paths:
+            - ~/Library/Detox/ios
+      - run:
+          name: Run e2e tests
+          command: |
+            set -euo pipefail
+            cd packages/mobile
             # Create dummy Google services plist
             /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
             yarn run test:e2e:ios
