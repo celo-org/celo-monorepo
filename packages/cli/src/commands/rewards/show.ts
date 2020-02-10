@@ -1,5 +1,6 @@
 import { Address } from '@celo/contractkit/lib/base'
 import { GroupVoterReward, VoterReward } from '@celo/contractkit/lib/wrappers/Election'
+import { AccountSlashed } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { Validator, ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
@@ -26,6 +27,7 @@ export default class Show extends BaseCommand {
     voter: Flags.address({ description: 'Voter to show rewards for' }),
     validator: Flags.address({ description: 'Validator to show rewards for' }),
     group: Flags.address({ description: 'Validator Group to show rewards for' }),
+    slashing: flags.boolean({ description: 'Show rewards for slashing', default: true }),
     epochs: flags.integer({
       default: 1,
       description: 'Show results for the last N epochs',
@@ -42,6 +44,7 @@ export default class Show extends BaseCommand {
       Boolean(res.flags.voter) || Boolean(res.flags.validator) || Boolean(res.flags.group)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
+    const lockedGold = await this.kit.contracts.getLockedGold()
     const currentEpoch = (await validators.getEpochNumber()).toNumber()
     const checkBuilder = newCheckBuilder(this)
     const epochs = Math.max(1, res.flags.epochs || 1)
@@ -64,7 +67,9 @@ export default class Show extends BaseCommand {
     let groupVoterRewards: ExplainedGroupVoterReward[] = []
     let validatorRewards: ValidatorReward[] = []
     let validatorGroupRewards: ValidatorReward[] = []
+    let accountsSlashed: AccountSlashed[] = []
 
+    cli.action.start(`Calculating rewards`)
     // Accumulate the rewards from each epoch
     for (
       let epochNumber = Math.max(0, currentEpoch - epochs);
@@ -124,7 +129,26 @@ export default class Show extends BaseCommand {
           )
         }
       }
+
+      if (res.flags.slashing) {
+        const epochAccountsSlashed = await lockedGold.getAccountsSlashed(epochNumber)
+        const address = res.flags.voter || res.flags.validator || res.flags.group
+        accountsSlashed = accountsSlashed.concat(
+          address ? filterAccountsSlashed(epochAccountsSlashed, address) : epochAccountsSlashed
+        )
+      }
     }
+
+    // Slashing rewards are available before the current epoch ends
+    if (res.flags.slashing) {
+      const epochAccountsSlashed = await lockedGold.getAccountsSlashed(currentEpoch)
+      const address = res.flags.voter || res.flags.validator || res.flags.group
+      accountsSlashed = accountsSlashed.concat(
+        address ? filterAccountsSlashed(epochAccountsSlashed, address) : epochAccountsSlashed
+      )
+    }
+
+    cli.action.stop()
 
     // At the end of each epoch: R, the total amount of rewards in gold to be allocated to stakers
     // for this epoch is programmatically derived from considering the tradeoff between paying rewards
@@ -221,11 +245,28 @@ export default class Show extends BaseCommand {
       )
     }
 
+    if (accountsSlashed.length > 0) {
+      console.info('')
+      console.info('Slashing penalties and rewards:')
+      cli.table(
+        accountsSlashed,
+        {
+          slashed: {},
+          penalty: {},
+          reporter: {},
+          reward: {},
+          epochNumber: {},
+        },
+        { 'no-truncate': !res.flags.truncate }
+      )
+    }
+
     if (
       voterRewards.length === 0 &&
       groupVoterRewards.length === 0 &&
       validatorRewards.length === 0 &&
-      validatorGroupRewards.length === 0
+      validatorGroupRewards.length === 0 &&
+      accountsSlashed.length === 0
     ) {
       console.info('No rewards.')
     }
@@ -240,4 +281,10 @@ function averageValidatorScore(validators: Validator[]): BigNumber {
   return validators
     .reduce((sumScore: BigNumber, v: Validator) => sumScore.plus(v.score), new BigNumber(0))
     .dividedBy(validators.length || 1)
+}
+
+function filterAccountsSlashed(accountsSlashed: AccountSlashed[], address: Address) {
+  return accountsSlashed.filter(
+    (e: AccountSlashed) => eqAddress(e.slashed, address) || eqAddress(e.reporter, address)
+  )
 }

@@ -1,5 +1,5 @@
-import { newKit } from './src'
-import { newBlockExplorer } from './src/explorer/block-explorer'
+import { newKit } from '../src'
+import { newBlockExplorer } from '../src/explorer/block-explorer'
 
 const kit = newKit('ws://localhost:8545')
 
