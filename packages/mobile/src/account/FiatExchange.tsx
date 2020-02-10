@@ -59,12 +59,15 @@ class FiatExchange extends React.Component<Props, State> {
     signedUrl: '',
   }
 
-  componentDidMount() {
+  updateMoonpayUrl = async () => {
     if (this.props.account) {
-      signMoonpayUrl(this.props.account, this.props.localCurrency)
-        .then((signedUrl) => this.setState({ signedUrl }))
-        .catch(() => this.handleError())
+      const signedUrl = await signMoonpayUrl(this.props.account, this.props.localCurrency)
+      this.setState({ signedUrl })
     }
+  }
+
+  componentDidMount() {
+    this.updateMoonpayUrl().catch(() => this.handleError())
   }
 
   handleError = () => {
