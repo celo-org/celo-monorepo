@@ -49,7 +49,7 @@ docker run \
       --wsorigins=* \
       --wsapi=eth,net,web3 \
       --nodekey=$SECRET_DIR/validatorPrivateKey \
-      --etherbase=$ACCOUNT_ADDRESS \
+      --etherbase=$VALIDATOR_ACCOUNT_ADDRESS \
       --networkid=${NETWORK_ID} \
       --syncmode=full \
       --consoleformat=json \
