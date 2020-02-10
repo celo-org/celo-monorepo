@@ -122,12 +122,7 @@ USAGE
 
 OPTIONS
   --deposit=deposit                                  (required) Amount of Gold to attach to proposal
-
-  --descriptionURL=descriptionURL                    (required) A URL where further information about the proposal can
-                                                     be viewed
-
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
-
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
 EXAMPLE

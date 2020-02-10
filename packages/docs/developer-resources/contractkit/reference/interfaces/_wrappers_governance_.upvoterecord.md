@@ -17,7 +17,7 @@
 
 • **proposalID**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L78)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L76)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **upvotes**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L79)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L77)*

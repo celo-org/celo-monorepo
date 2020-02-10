@@ -120,7 +120,7 @@ ___
 
 • **getDataEncryptionKey**: *function* = proxyCall(this.contract.methods.getDataEncryptionKey)
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:253](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L253)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:254](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L254)*
 
 Returns the set data encryption key for the account
 
@@ -142,7 +142,7 @@ ___
 
 • **getMetadataURL**: *function* = proxyCall(this.contract.methods.getMetadataURL)
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:265](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L265)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:266](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L266)*
 
 Returns the metadataURL for the account
 
@@ -216,7 +216,7 @@ ___
 
 • **getWalletAddress**: *function* = proxyCall(this.contract.methods.getWalletAddress)
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:259](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L259)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:260](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L260)*
 
 Returns the set wallet address for the account
 
@@ -288,7 +288,7 @@ ___
 
 • **setAccount**: *function* = proxySend(this.kit, this.contract.methods.setAccount)
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:282](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L282)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:283](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L283)*
 
 Convenience Setter for the dataEncryptionKey and wallet address for an account
 
@@ -317,7 +317,7 @@ ___
     this.contract.methods.setAccountDataEncryptionKey
   )
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:271](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L271)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:272](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L272)*
 
 Sets the data encryption of the account
 
@@ -339,7 +339,7 @@ ___
 
 • **setMetadataURL**: *function* = proxySend(this.kit, this.contract.methods.setMetadataURL)
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:294](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L294)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:295](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L295)*
 
 Sets the metadataURL for the account
 
@@ -361,7 +361,7 @@ ___
 
 • **setName**: *function* = proxySend(this.kit, this.contract.methods.setName)
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:288](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L288)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:289](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L289)*
 
 Sets the name for the account
 
@@ -383,7 +383,7 @@ ___
 
 • **setWalletAddress**: *function* = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:300](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L300)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:301](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L301)*
 
 Sets the wallet address for the account
 
@@ -534,7 +534,7 @@ ___
 
 ▸ **generateProofOfSigningKeyPossession**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹object›*
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:223](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L223)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L224)*
 
 **Parameters:**
 
@@ -551,7 +551,7 @@ ___
 
 ▸ **generateProofOfSigningKeyPossessionLocally**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address), `privateKey`: string): *Promise‹object›*
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:231](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L231)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:232](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L232)*
 
 **Parameters:**
 
@@ -585,7 +585,7 @@ ___
 
 ▸ **getName**(`account`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹string›*
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:244](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L244)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L245)*
 
 Returns the set name for the account
 
@@ -604,7 +604,7 @@ ___
 
 ▸ **parseSignatureOfAddress**(`address`: [Address](../modules/_base_.md#address), `signer`: string, `signature`: string): *object*
 
-*Defined in [packages/contractkit/src/wrappers/Accounts.ts:302](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L302)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:303](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L303)*
 
 **Parameters:**
 
