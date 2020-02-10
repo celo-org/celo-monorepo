@@ -13,7 +13,7 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
   using SafeMath for uint256;
 
   // Mapping between beneficiary addresses and associated release schedule contracts.
-  mapping(address => address) public releases;
+  mapping(address => address[]) public releases;
 
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
@@ -24,9 +24,9 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
 
   /**
    * @notice Factory function for creating a new release gold contract instance.
+   * @param releaseStartTime The time (in Unix time) at which point releasing starts.
    * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
    * @param numReleasePeriods Number of releasing periods.
-   * @param releaseStartTime The time (in Unix time) at which point releasing starts.
    * @param releasePeriod Duration (in seconds) of each release period.
    * @param amountReleasedPerPeriod The released gold amound per period.
    * @param revocable Whether the release schedule is revocable or not.
@@ -39,9 +39,9 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
    * @return The address of the newly created release gold instance.
    */
   function createReleaseGoldInstance(
+    uint256 releaseStartTime,
     uint256 releaseCliffTime,
     uint256 numReleasePeriods,
-    uint256 releaseStartTime,
     uint256 releasePeriod,
     uint256 amountReleasedPerPeriod,
     bool revocable,
@@ -57,16 +57,11 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
       "Factory balance is insufficient to create requested release gold contract"
     );
 
-    require(
-      releases[beneficiary] == address(0),
-      "Only one release gold contract per beneficiary allowed"
-    );
-
     address newReleaseGoldInstance = address(
       new ReleaseGoldInstance(
+        releaseStartTime,
         releaseCliffTime,
         numReleasePeriods,
-        releaseStartTime,
         releasePeriod,
         amountReleasedPerPeriod,
         revocable,
@@ -78,7 +73,7 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
         address(registry)
       )
     );
-    releases[beneficiary] = newReleaseGoldInstance;
+    releases[beneficiary].push(newReleaseGoldInstance);
     getGoldToken().transfer(newReleaseGoldInstance, releaseGoldAmount);
     emit NewReleaseGoldInstanceCreated(beneficiary, newReleaseGoldInstance);
     return newReleaseGoldInstance;

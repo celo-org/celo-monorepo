@@ -13,16 +13,16 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   using FixidityLib for FixidityLib.Fraction;
 
   struct ReleaseSchedule {
-    // Number of release periods.
-    uint256 numReleasePeriods;
-    // Amount that is to be released per period.
-    uint256 amountReleasedPerPeriod;
-    // Duration (in seconds) of one period.
-    uint256 releasePeriod;
     // Timestamp (in UNIX time) that releasing begins.
     uint256 releaseStartTime;
     // Timestamp (in UNIX time) of the releasing cliff.
     uint256 releaseCliff;
+    // Number of release periods.
+    uint256 numReleasePeriods;
+    // Duration (in seconds) of one period.
+    uint256 releasePeriod;
+    // Amount that is to be released per period.
+    uint256 amountReleasedPerPeriod;
   }
 
   struct RevocationInfo {
@@ -70,7 +70,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     uint256 releasedBalanceAtRevoke
   );
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
-  event LiquidityProvisionSet(address indexed beneficiary, bool beneficiaryProvision);
+  event LiquidityProvisionSet(address indexed beneficiary);
 
   modifier onlyReleaseOwner() {
     require(msg.sender == releaseOwner, "Sender must be the registered releaseOwner address");
@@ -123,9 +123,9 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
 
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
+   * @param releaseStartTime The time (in Unix time) at which point releasing starts.
    * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
    * @param numReleasePeriods Number of releasing periods.
-   * @param releaseStartTime The time (in Unix time) at which point releasing starts.
    * @param releasePeriod Duration (in seconds) of each release period.
    * @param amountReleasedPerPeriod The released gold amount per period.
    * @param revocable Whether the release schedule is revocable or not.
@@ -138,9 +138,9 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param registryAddress Address of the deployed contracts registry.
    */
   constructor(
+    uint256 releaseStartTime,
     uint256 releaseCliffTime,
     uint256 numReleasePeriods,
-    uint256 releaseStartTime,
     uint256 releasePeriod,
     uint256 amountReleasedPerPeriod,
     bool revocable,
@@ -169,6 +169,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
       releaseStartTime.add(numReleasePeriods.mul(releasePeriod)) > block.timestamp,
       "Release schedule end time must be in the future"
     );
+    require(!(revocable && _canValidate), "Revocable contracts cannot validate");
 
     setRegistry(registryAddress);
 
@@ -198,29 +199,32 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   }
 
   /**
-   * @notice Controls if the liquidity provision has been met.
-   *         If true, allows gold to be withdrawn.
+   * @notice Controls if the liquidity provision has been met, allowing gold to be withdrawn.
    */
-  function setLiquidityProvision(bool met) external onlyReleaseOwner {
-    liquidityProvisionMet = met;
-    emit LiquidityProvisionSet(beneficiary, met);
+  function setLiquidityProvision() external onlyReleaseOwner {
+    require(!liquidityProvisionMet, "Liquidity provision has already been set");
+    liquidityProvisionMet = true;
+    emit LiquidityProvisionSet(beneficiary);
   }
-
-  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   /**
    * @notice Controls the maximum distribution percentage.
    *         Calculates `distributionPercentage` of current `totalBalance()`
    *         and sets this value as the maximum allowed gold to be currently withdrawn.
+   * @param distributionPercentage Percentage in range [0, 100] indicating % of total balance
+   *                               available for distribution.
    */
   function setMaxDistribution(uint256 distributionPercentage) external onlyReleaseOwner {
-    if (distributionPercentage == FIXED1_UINT) {
+    require(
+      distributionPercentage >= 0 && distributionPercentage <= 100,
+      "Max distribution percentage must be within bounds"
+    );
+    // If percentage is 100%, we set maxDistribution to maxUint to account for future rewards.
+    if (distributionPercentage == 100) {
       maxDistribution = ~uint256(0);
     } else {
       uint256 totalBalance = getTotalBalance();
-      maxDistribution = FixidityLib.fromFixed(
-        FixidityLib.newFixed(totalBalance).multiply(FixidityLib.wrap(distributionPercentage))
-      );
+      maxDistribution = totalBalance.mul(distributionPercentage).div(100);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
   }
@@ -263,7 +267,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice Refund the releaseOwner and beneficiary after the release schedule has been revoked.
    */
   function refundAndFinalize() external nonReentrant onlyReleaseOwnerAndRevoked {
-    require(getRemainingLockedBalance() == 0, "Total gold balanace must be unlocked");
+    require(getRemainingLockedBalance() == 0, "Total gold balance must be unlocked");
     uint256 beneficiaryAmount = revocationInfo.releasedBalanceAtRevoke.sub(totalWithdrawn);
     require(
       getGoldToken().transfer(beneficiary, beneficiaryAmount),
@@ -332,7 +336,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
   function getCurrentReleasedTotalAmount() public view returns (uint256) {
-    if (block.timestamp < releaseSchedule.releaseCliff) {
+    if (block.timestamp < releaseSchedule.releaseCliff || !liquidityProvisionMet) {
       return 0;
     }
     uint256 totalBalance = getTotalBalance();
@@ -460,8 +464,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   /**
    * @notice A wrapper setter function for creating an account.
    */
-  function createAccount() external onlyWhenInProperState {
-    require(canVote, "Account cannot be created if voting is disabled");
+  function createAccount() external onlyCanVote onlyWhenInProperState {
     require(getAccounts().createAccount(), "Account creation failed");
   }
 
@@ -515,9 +518,10 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   function vote(address group, uint256 value, address lesser, address greater)
     external
     nonReentrant
+    onlyCanVote
     onlyWhenInProperState
   {
-    require(getElection().vote(group, value, lesser, greater), "Voting for a group failed");
+    getElection().vote(group, value, lesser, greater);
   }
 
   /**
@@ -526,7 +530,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @dev Pending votes cannot be activated until an election has been held.
    */
   function activate(address group) external nonReentrant onlyWhenInProperState {
-    require(getElection().activate(group), "Activating votes for a group failed");
+    getElection().activate(group);
   }
 
   /**
@@ -547,10 +551,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     address greater,
     uint256 index
   ) external nonReentrant onlyWhenInProperState {
-    require(
-      getElection().revokeActive(group, value, lesser, greater, index),
-      "Revoking active votes for a group failed"
-    );
+    getElection().revokeActive(group, value, lesser, greater, index);
   }
 
   /**
@@ -571,9 +572,6 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     address greater,
     uint256 index
   ) external nonReentrant onlyWhenInProperState {
-    require(
-      getElection().revokePending(group, value, lesser, greater, index),
-      "Revoking pending votes for a group failed"
-    );
+    getElection().revokePending(group, value, lesser, greater, index);
   }
 }
