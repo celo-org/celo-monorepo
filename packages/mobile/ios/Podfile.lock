@@ -450,7 +450,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
-  - react-native-contacts (from `../node_modules/react-native-contacts`)
+  - react-native-contacts (from `../../../node_modules/react-native-contacts`)
   - react-native-fast-crypto (from `../../../node_modules/react-native-fast-crypto`)
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
@@ -558,7 +558,7 @@ EXTERNAL SOURCES:
   react-native-config:
     :path: "../../../node_modules/react-native-config"
   react-native-contacts:
-    :path: "../node_modules/react-native-contacts"
+    :path: "../../../node_modules/react-native-contacts"
   react-native-fast-crypto:
     :path: "../../../node_modules/react-native-fast-crypto"
   react-native-geth:
