@@ -28,6 +28,45 @@ done
 
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 
+# Start the packager and wait until ready
+startPackager() {
+    echo "Starting metro packager"
+    yarn react-native start --max-workers=1 &
+
+    waitForPackager
+    preloadBundle
+}
+
+# Wait for the package to start
+waitForPackager() {
+  local -i max_attempts=60
+  local -i attempt_num=1
+
+  until curl -s http://localhost:8081/status | grep "packager-status:running" -q; do
+    if (( attempt_num == max_attempts )); then
+      echo "Packager did not respond in time. No more attempts left."
+      exit 1
+    else
+      (( attempt_num++ ))
+      echo "Packager did not respond. Retrying for attempt number $attempt_num..."
+      sleep 1
+    fi
+  done
+
+  echo "Packager is ready!"
+}
+
+# Preload bundle, this is to prevent random red screen "Could not connect to development server" on the CI
+preloadBundle() {
+  echo "Preloading bundle"
+  local response_code=$(curl --write-out %{http_code} --silent --output /dev/null "http://localhost:8081/index.bundle?platform=$PLATFORM&dev=true")
+  if [ "$response_code" != "200" ]; then
+    echo "Failed to preload bundle, http response code: $response_code"
+    exit 1
+  fi
+  echo "Preload bundle finished with http code: $response_code"
+}
+
 # Needed by metro packager to use .e2e.ts overrides
 # See metreo.config.js
 export CELO_TEST_CONFIG=e2e 
@@ -68,8 +107,7 @@ if [ $PLATFORM = "android" ]; then
   echo "Building detox"
   yarn detox build -c $CONFIG_NAME
 
-  echo "Starting the metro server"
-  yarn react-native start &
+  startPackager
 
   NUM_DEVICES=`adb devices -l | wc -l`
   if [ $NUM_DEVICES -gt 2 ]; then 
@@ -109,8 +147,7 @@ elif [ $PLATFORM = "ios" ]; then
   echo "Building detox"
   yarn detox build -c $CONFIG_NAME
 
-  echo "Starting the metro server"
-  yarn react-native start &
+  startPackager
 
   yarn detox test -c $CONFIG_NAME -l verbose
   STATUS=$?
