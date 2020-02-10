@@ -33,54 +33,46 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 1`] = `
 exports[`CodeRow renders correctly for all CodeRowStatus states 2`] = `
 <View
   style={
-    Object {
-      "position": "relative",
-    }
+    Array [
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "center",
+      },
+      Object {
+        "backgroundColor": "#FFF",
+        "borderColor": "#D1D5D8",
+        "borderRadius": 3,
+        "borderWidth": 1,
+        "flex": 0,
+        "height": 50,
+        "marginVertical": 5,
+      },
+    ]
   }
 >
-  <View
+  <TextInput
+    allowFontScaling={true}
+    onBlur={[Function]}
+    onChangeText={[MockFunction]}
+    onFocus={[Function]}
+    placeholder="placeholder"
+    rejectResponderTermination={true}
+    shouldShowClipboard={[MockFunction]}
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "flex": 1,
-          "flexDirection": "row",
-          "justifyContent": "center",
-        },
-        Object {
-          "backgroundColor": "#FFF",
-          "borderColor": "#D1D5D8",
-          "borderRadius": 3,
-          "borderWidth": 1,
-          "flex": 0,
-          "height": 50,
-          "marginVertical": 5,
-        },
-      ]
-    }
-  >
-    <TextInput
-      allowFontScaling={true}
-      onBlur={[Function]}
-      onChangeText={[MockFunction]}
-      onFocus={[Function]}
-      placeholder="placeholder"
-      rejectResponderTermination={true}
-      shouldShowClipboard={[MockFunction]}
-      style={
-        Object {
-          "backgroundColor": "#FFFFFF",
-          "borderColor": "#D1D5D8",
-          "borderRadius": 3,
-          "flex": 1,
-          "fontFamily": "Hind-Regular",
-          "padding": 8,
-        }
+      Object {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#D1D5D8",
+        "borderRadius": 3,
+        "flex": 1,
+        "fontFamily": "Hind-Regular",
+        "padding": 8,
       }
-      underlineColorAndroid="transparent"
-      value="test"
-    />
-  </View>
+    }
+    underlineColorAndroid="transparent"
+    value="test"
+  />
 </View>
 `;
 

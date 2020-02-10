@@ -107,6 +107,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
 
     const phoneHash = getPhoneHash(request.beneficiary)
+    console.info(`req(${snap.key}): Sending escrow payment for phone hash ${phoneHash}`)
     const escrowTx = await celo.escrowDollars(
       phoneHash,
       tempAddress,
