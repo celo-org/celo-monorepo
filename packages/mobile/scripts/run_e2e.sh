@@ -31,7 +31,7 @@ done
 # Start the packager and wait until ready
 startPackager() {
     echo "Starting metro packager"
-    yarn react-native start --max-workers=1 &
+    yarn react-native start &
 
     waitForPackager
     preloadBundle
