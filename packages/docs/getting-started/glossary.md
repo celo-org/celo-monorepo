@@ -141,6 +141,10 @@ See [Block](#block).
 
 Hardware Security Module. A hardware device that hosts one or more private keys and signs data without passing the key off the device.
 
+## Key Rotation
+
+The creation of a new cryptographic key to replace an existing key in active use.
+
 ## [Community Fund](../celo-codebase/protocol/proof-of-stake/community-fund.md)
 
 An account that supports the development and operational costs of the Celo protocol. The Community Fund is maintained by a transfer made as part of Epoch Rewards, and is intended to cover costs beyond the other specific incentives provided to validators and validator groups. Awards can be made through an on-chain governance proposal.
