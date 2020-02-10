@@ -280,7 +280,7 @@ export class ContractKit {
   }
 
   stop() {
-    // This should be true except that the user actively decide to change the web3 provider
+    // This should be true except when the user actively decide to change the web3 provider
     // after creating the kit
     if (this.web3.currentProvider && this.web3.currentProvider.hasOwnProperty('stop')) {
       // @ts-ignore

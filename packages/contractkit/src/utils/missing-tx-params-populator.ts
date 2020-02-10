@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { CeloTx } from './celo-tx'
+import { Tx } from 'web3/eth/types'
 import { IRpcCaller } from './rpc-caller'
 
 // Default gateway fee to send the serving full-node on each transaction.
@@ -12,7 +12,7 @@ export class MissingTxParamsPopulator {
 
   constructor(readonly rpc: IRpcCaller) {}
 
-  public async populate(celoTxParams: CeloTx): Promise<CeloTx> {
+  public async populate(celoTxParams: Tx): Promise<Tx> {
     const txParams = { ...celoTxParams }
 
     if (txParams.chainId == null) {
@@ -58,7 +58,7 @@ export class MissingTxParamsPopulator {
     return nonce
   }
 
-  private async getEstimateGas(txParams: CeloTx): Promise<string> {
+  private async getEstimateGas(txParams: Tx): Promise<string> {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas
     const gasResult = await this.rpc.call('eth_estimateGas', [txParams])
     const gas = gasResult.result.toString()

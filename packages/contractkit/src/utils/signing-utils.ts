@@ -3,8 +3,8 @@ import debugFactory from 'debug'
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 // @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
+import { Tx } from 'web3/eth/types'
 import { EncodedTransaction } from 'web3/types'
-import { CeloTx } from './celo-tx'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -138,13 +138,13 @@ export async function signTransaction(txn: any, privateKey: string): Promise<Enc
 
 // Recover transaction and sender address from a raw transaction.
 // This is used for testing.
-export function recoverTransaction(rawTx: string): [CeloTx, string] {
+export function recoverTransaction(rawTx: string): [Tx, string] {
   const rawValues = RLP.decode(rawTx)
   debug('signing-utils@recoverTransaction: values are %s', rawValues)
   const recovery = Bytes.toNumber(rawValues[9])
   // tslint:disable-next-line:no-bitwise
   const chainId = Bytes.fromNumber((recovery - 35) >> 1)
-  const celoTx: CeloTx = {
+  const celoTx: Tx = {
     nonce: rawValues[0].toLowerCase() === '0x' ? 0 : parseInt(rawValues[0], 16),
     gasPrice: rawValues[1].toLowerCase() === '0x' ? 0 : parseInt(rawValues[1], 16),
     gas: rawValues[2].toLowerCase() === '0x' ? 0 : parseInt(rawValues[2], 16),

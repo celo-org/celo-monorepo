@@ -1,12 +1,12 @@
+import { Tx } from 'web3/eth/types'
 import { JsonRPCResponse } from 'web3/providers'
-import { CeloTx } from './celo-tx'
 import { MissingTxParamsPopulator } from './missing-tx-params-populator'
 import { IRpcCaller } from './rpc-caller'
 
 describe('MissingTxParamsPopulator class', () => {
   let populator: MissingTxParamsPopulator
   let mockCallback: any
-  const completeCeloTx: CeloTx = {
+  const completeCeloTx: Tx = {
     nonce: 1,
     chainId: 1,
     from: 'test',
@@ -40,7 +40,7 @@ describe('MissingTxParamsPopulator class', () => {
 
   describe('when missing parameters', () => {
     test('will populate the chaindId', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.chainId = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.chainId).toBe(27)
@@ -49,7 +49,7 @@ describe('MissingTxParamsPopulator class', () => {
     })
 
     test('will retrieve only once the chaindId', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.chainId = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.chainId).toBe(27)
@@ -62,7 +62,7 @@ describe('MissingTxParamsPopulator class', () => {
     })
 
     test('will populate the nonce', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.nonce = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.nonce).toBe('27')
@@ -71,7 +71,7 @@ describe('MissingTxParamsPopulator class', () => {
     })
 
     test('will populate the gas', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.gas = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gas).toBe('27')
@@ -80,7 +80,7 @@ describe('MissingTxParamsPopulator class', () => {
     })
 
     test('will populate the gatewayFeeRecipient', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.gatewayFeeRecipient = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gatewayFeeRecipient).toBe('27')
@@ -89,7 +89,7 @@ describe('MissingTxParamsPopulator class', () => {
     })
 
     test('will retrieve only once the gatewayFeeRecipient', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.gatewayFeeRecipient = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gatewayFeeRecipient).toBe('27')
@@ -102,7 +102,7 @@ describe('MissingTxParamsPopulator class', () => {
     })
 
     test('will populate the gas price', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.gasPrice = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gasPrice).toBe('27')
@@ -111,7 +111,7 @@ describe('MissingTxParamsPopulator class', () => {
     })
 
     test('fails (for now) if the fee Currency has something', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
+      const celoTx: Tx = { ...completeCeloTx }
       celoTx.gasPrice = undefined
       celoTx.feeCurrency = 'celoMagic'
       await expect(populator.populate(celoTx)).rejects.toThrowError()

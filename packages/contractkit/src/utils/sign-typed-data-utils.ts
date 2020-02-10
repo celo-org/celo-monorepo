@@ -1,6 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
-import * as ethers from 'ethers'
+import coder from 'web3-eth-abi'
 
 export interface EIP712Parameter {
   name: string
@@ -93,7 +93,8 @@ function _encodeData(primaryType: string, data: EIP712Object, types: EIP712Types
       encodedValues.push(normalizedValue)
     }
   }
-  return ethers.utils.defaultAbiCoder.encode(encodedTypes, encodedValues)
+
+  return coder.encodeParameters(encodedTypes, encodedValues)
 }
 
 function _normalizeValue(type: string, value: any): EIP712ObjectValue {

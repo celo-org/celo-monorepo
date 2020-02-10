@@ -33,7 +33,6 @@
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
     "eth-lib": "^0.2.8",
-    "ethers": "4.0.0-beta.3",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
     "web3": "1.0.0-beta.37",

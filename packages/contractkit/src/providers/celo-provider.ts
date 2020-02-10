@@ -180,9 +180,7 @@ export class CeloProvider implements Provider {
   }
 
   private async handleSendTransaction(payload: JsonRPCRequest): Promise<any> {
-    const txParams = payload.params[0]
-    const filledParams = await this.paramsPopulator.populate(txParams)
-    const signedTx = await this.wallet.signTransaction(filledParams)
+    const signedTx = await this.handleSignTransaction(payload)
     const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
     return response.result
   }

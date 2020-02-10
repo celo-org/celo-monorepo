@@ -1,8 +1,8 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
+import { Tx } from 'web3/eth/types'
 import { EncodedTransaction } from 'web3/types'
-import { CeloTx } from './celo-tx'
-import { EIP712TypedData } from './sign_typed_data_utils'
+import { EIP712TypedData } from './sign-typed-data-utils'
 import { recoverTransaction } from './signing-utils'
 import { IWallet, normalizeKey, Wallet } from './wallet'
 
@@ -56,7 +56,7 @@ describe('Wallet class', () => {
       describe('using an unknown address', () => {
         const unknownAddress: string = ACCOUNT_ADDRESS2
         test('fails calling signTransaction', async () => {
-          const tsParams: CeloTx = {
+          const tsParams: Tx = {
             nonce: 'test',
             gas: 'test',
             to: 'test',
@@ -84,7 +84,7 @@ describe('Wallet class', () => {
 
       describe('using a known address', () => {
         describe('when calling signTransaction', () => {
-          let celoTransaction: CeloTx
+          let celoTransaction: Tx
 
           beforeEach(() => {
             celoTransaction = {

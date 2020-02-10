@@ -5,16 +5,16 @@ import {
   trimLeading0x,
 } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
+import { Tx } from 'web3/eth/types'
 import { EncodedTransaction } from 'web3/types'
-import { CeloTx } from './celo-tx'
-import { EIP712TypedData, generateTypedDataHash } from './sign_typed_data_utils'
+import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 import { signTransaction } from './signing-utils'
 
 export interface IWallet {
   addAccount: (privateKey: string) => void
   getAccounts: () => string[]
   hasAccount: (address: string) => boolean
-  signTransaction: (txParams: CeloTx) => Promise<EncodedTransaction>
+  signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
   signTypedData: (address: string, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: string, data: string) => Promise<string>
 }
@@ -49,7 +49,7 @@ export class Wallet implements IWallet {
     }
   }
 
-  async signTransaction(txParams: CeloTx): Promise<EncodedTransaction> {
+  async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
     return signTransaction(txParams, this.getPrivateKeyFor(txParams.from!))
   }
 

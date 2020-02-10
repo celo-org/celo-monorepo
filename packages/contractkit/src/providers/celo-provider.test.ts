@@ -1,7 +1,7 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { Tx } from 'web3/eth/types'
 import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
 import { CeloProvider } from '../providers/celo-provider'
-import { CeloTx } from '../utils/celo-tx'
 
 // Random private keys
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -61,7 +61,7 @@ describe('CeloProvider', () => {
 
   describe('when celo provider has a local account', () => {
     function paramsForMethod(method: string, from: string, to: string) {
-      const tx: CeloTx = {
+      const tx: Tx = {
         from,
         to,
         value: '1',
