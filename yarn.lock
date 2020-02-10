@@ -2679,13 +2679,13 @@
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
-"@celo/contractkit@0.2.10-beta1":
-  version "0.2.10-beta1"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.10-beta1.tgz#842bba1a608ed1aca68d73d68b62bbc00ac43fde"
-  integrity sha512-FAVRcdlNprI/8FAofbv76DG5Tse19AYIIkBMB8i6cr3NKrm4EEVpw607jjiGTbHkU4sA8LQdSk1dzOKXakt+pw==
+"@celo/contractkit@0.2.10":
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.10.tgz#d9b61df6529f21ccb57d6ba05290fb9d80b4427c"
+  integrity sha512-fMnaX85Tb/TFtnq50qAd6GTpNzRezuVQNHbY08BZIagt8hzmhXxmraQjD1Xzqb/GI74WBnMDvtcXEhXYlrZM6w==
   dependencies:
     "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "0.1.5"
+    "@celo/utils" "0.1.6"
     "@types/debug" "^4.1.5"
     bignumber.js "^7.2.0"
     cross-fetch "3.0.4"
@@ -2790,6 +2790,28 @@
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.5.tgz#aa5b5a939104dbc32f17d9c51a2ba2322f98de64"
   integrity sha512-lrEbo+HMxU+A1hhd49/XZUSqUWdNeYHUjQKS3mCNxeK5lAH86aZAlkybjwIdvL/JWwjtRFFOBKsOBMb+/n/3tw==
+  dependencies:
+    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
+    bigi "^1.1.0"
+    bignumber.js "^7.2.0"
+    bls12377js "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
+    bn.js "4.11.8"
+    buffer-reverse "^1.0.1"
+    country-data "^0.0.31"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.4.1"
+    ethereumjs-util "^5.2.0"
+    futoin-hkdf "^1.0.3"
+    google-libphonenumber "^3.2.4"
+    keccak256 "^1.0.0"
+    lodash "^4.17.14"
+    numeral "^2.0.6"
+    web3-utils "1.0.0-beta.37"
+
+"@celo/utils@0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.6.tgz#a3d30ba7f2a8556669f7517791f75b0767d13122"
+  integrity sha512-uQqFEyYBTNioS5OZpjZwJHxoSETZrsrOa8EPcRDPRdwHDn+aN2dlVxYiNdDYy4oOxMVU7vuoollB0dXCKjmYag==
   dependencies:
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"
@@ -6946,18 +6968,18 @@
   dependencies:
     "@types/ethereum-protocol" "*"
 
-"@types/web3@^1.0.18":
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.18.tgz#87a8651041d21fc37602ff02327df2c7ecf105d1"
-  integrity sha512-uXQL0LDszt2f476LEmYM6AvSv9F4vU4hWQvlUhwfLHNlIB6OyBXoYsCzWAIhhnc5U0HA7ZBcPybxRJ/yfA6THg==
+"@types/web3@1.0.19":
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.19.tgz#46b85d91d398ded9ab7c85a5dd57cb33ac558924"
+  integrity sha512-fhZ9DyvDYDwHZUp5/STa9XW2re0E8GxoioYJ4pEUZ13YHpApSagixj7IAdoYH5uAK+UalGq6Ml8LYzmgRA/q+A==
   dependencies:
     "@types/bn.js" "*"
     "@types/underscore" "*"
 
-"@types/web3@^1.0.19":
-  version "1.0.19"
-  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.19.tgz#46b85d91d398ded9ab7c85a5dd57cb33ac558924"
-  integrity sha512-fhZ9DyvDYDwHZUp5/STa9XW2re0E8GxoioYJ4pEUZ13YHpApSagixj7IAdoYH5uAK+UalGq6Ml8LYzmgRA/q+A==
+"@types/web3@^1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.18.tgz#87a8651041d21fc37602ff02327df2c7ecf105d1"
+  integrity sha512-uXQL0LDszt2f476LEmYM6AvSv9F4vU4hWQvlUhwfLHNlIB6OyBXoYsCzWAIhhnc5U0HA7ZBcPybxRJ/yfA6THg==
   dependencies:
     "@types/bn.js" "*"
     "@types/underscore" "*"

@@ -1,5 +1,4 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import { injectDebugProvider } from './debug-provider'
 import { getAddress } from './tx'
 
 export class CeloAdapter {
@@ -10,10 +9,10 @@ export class CeloAdapter {
   constructor({ pk, nodeUrl }: { pk: string; nodeUrl: string }) {
     // To add more logging:
     // Uncomment when in need for debug
+    // injectDebugProvider(this.kit.web3)
 
     this.kit = newKit(nodeUrl)
     console.log(`New kit from url: ${nodeUrl}`)
-    injectDebugProvider(this.kit.web3)
     this.privateKey = this.kit.web3.utils.isHexStrict(pk) ? pk : '0x' + pk
     this.defaultAddress = getAddress(this.kit.web3, this.privateKey)
     this.kit.addAccount(this.privateKey)
@@ -39,6 +38,8 @@ export class CeloAdapter {
   ) {
     const escrow = await this.kit.contracts.getEscrow()
     const stableToken = await this.kit.contracts.getStableToken()
+
+    await stableToken.approve(escrow.address, amount).sendAndWaitForReceipt()
     return escrow.transfer(
       phoneHash,
       stableToken.address,
