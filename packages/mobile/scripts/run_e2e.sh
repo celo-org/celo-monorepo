@@ -58,7 +58,7 @@ waitForPackager() {
 
 # Preload bundle, this is to prevent random red screen "Could not connect to development server" on the CI
 preloadBundle() {
-  echo "Preloading bundle"
+  echo "Preloading bundle..."
   local response_code=$(curl --write-out %{http_code} --silent --output /dev/null "http://localhost:8081/index.bundle?platform=$PLATFORM&dev=true")
   if [ "$response_code" != "200" ]; then
     echo "Failed to preload bundle, http response code: $response_code"
