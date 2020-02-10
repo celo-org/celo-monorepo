@@ -106,12 +106,12 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
     const { data } = this.props
     const validatorGroups = data ? this.cleanData(data) : []
     return (
-      <View style={styles.cover}>
-        <View>
+      <View style={[styles.cover, styles.pStatic]}>
+        <View style={[styles.pStatic]}>
           <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
             Validator Explorer
           </H1>
-          <View style={[styles.table]}>
+          <View style={[styles.table, styles.pStatic]}>
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
               <Text style={[styles.tableHeaderCell, styles.tableHeaderCellPadding]}>Name</Text>
               <Text style={[styles.tableHeaderCell, styles.sizeS]}>Elected/ Total</Text>
@@ -285,6 +285,10 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
 export default withNamespaces('dev')(ValidatorsListApp)
 
 const styles = StyleSheet.create({
+  pStatic: {
+    position: 'static',
+    zIndex: 'initial',
+  } as any,
   content: {
     paddingBottom: 10,
   },
@@ -292,7 +296,6 @@ const styles = StyleSheet.create({
     marginTop: HEADER_HEIGHT,
     backgroundColor: colors.dark,
     maxWidth: '100vw',
-    overflow: 'hidden',
   },
 
   // Table
@@ -312,6 +315,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderStyle: 'solid',
     borderColor: colors.white,
+    zIndex: 2,
+    top: 0,
+    backgroundColor: colors.dark,
+    ...({
+      position: 'sticky',
+    } as any),
   },
   tableHeaderCell: {
     color: colors.white,
