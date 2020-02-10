@@ -1,6 +1,6 @@
 {
   "mode": "modules",
-  "exclude": ["**/generated/*.ts", "**/*+(index|.test).ts"],
+  "exclude": ["**/generated/*.ts", "**/*+(index|.test).ts", "**/test-utils/*"],
   "excludeNotExported": true,
   "excludePrivate": true,
   "excludeProtected": true,
