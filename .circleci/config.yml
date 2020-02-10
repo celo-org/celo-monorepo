@@ -81,7 +81,12 @@ commands:
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
       - run:
           name: Create cached node_modules (if necessary)
-          command: if [ ! -e ~/.tmp/node_modules.tgz ]; then tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz; fi
+          command: |
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+              tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
+              # Dependencies have changed, create beacon file used by the check licenses step
+              touch ~/.tmp/yarn_deps_have_changed
+            fi
       - save_cache:
           name: Save cached node_modules
           key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
@@ -136,7 +141,16 @@ jobs:
 
       - run:
           name: Check licenses
-          command: yarn check-licenses
+          command: |
+            if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
+              # Internally `yarn check-licenses` downloads dependencies into its cache again even if node_modules are up-to-date
+              # which happens when we've restored our cached node_modules.
+              # Making `yarn check-licenses` take ~45secs instead of ~3secs (depending on network conditions and build machine)
+              # So here we skip checking when it's unnecessary
+              echo "Skipping checking licenses, dependencies haven't changed"
+              exit 0
+            fi
+            yarn check-licenses
 
       - persist_to_workspace:
           root: .
