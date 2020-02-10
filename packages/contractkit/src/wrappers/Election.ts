@@ -2,6 +2,7 @@ import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
+import { range } from 'lodash'
 import { EventLog } from 'web3/types'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/types/Election'
@@ -74,6 +75,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const { min, max } = await this.contract.methods.electableValidators().call()
     return { min: valueToBigNumber(min), max: valueToBigNumber(max) }
   }
+
   /**
    * Returns the current election threshold.
    * @returns Election threshold.
@@ -83,11 +85,43 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     undefined,
     valueToBigNumber
   )
+
+  /**
+   * Gets a validator address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator at the requested index.
+   */
+  validatorSignerAddressFromSet: (
+    signerIndex: number,
+    blockNumber: number
+  ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
+
+  /**
+   * Gets a validator address from the current validator set.
+   * @param index Index of requested validator in the validator set.
+   * @return Address of validator at the requested index.
+   */
   validatorSignerAddressFromCurrentSet: (index: number) => Promise<Address> = proxyCall(
     this.contract.methods.validatorSignerAddressFromCurrentSet,
     tupleParser<number, number>(identity)
   )
 
+  /**
+   * Gets the size of the validator set that must sign the given block number.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Size of the validator set.
+   */
+  numberValidatorsInSet: (blockNumber: number) => Promise<number> = proxyCall(
+    this.contract.methods.numberValidatorsInSet,
+    undefined,
+    valueToInt
+  )
+
+  /**
+   * Gets the size of the current elected validator set.
+   * @return Size of the current elected validator set.
+   */
   numberValidatorsInCurrentSet = proxyCall(
     this.contract.methods.numberValidatorsInCurrentSet,
     undefined,
@@ -95,12 +129,24 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   )
 
   /**
-   * Returns get current validator signers using the precompiles.
+   * Returns the current validator signers using the precompiles.
    * @return List of current validator signers.
    */
   async getCurrentValidatorSigners(blockNumber?: number): Promise<Address[]> {
     // @ts-ignore: Expected 0-1 arguments, but got 2
     return this.contract.methods.getCurrentValidatorSigners().call({}, blockNumber)
+  }
+
+  /**
+   * Returns the validator signers for block `blockNumber`.
+   * @param blockNumber Block number to retrieve signers for.
+   * @return Address of each signer in the validator set.
+   */
+  async getValidatorSigners(blockNumber: number): Promise<Address[]> {
+    const numValidators = await this.numberValidatorsInSet(blockNumber)
+    return concurrentMap(10, range(0, numValidators, 1), (i: number) =>
+      this.validatorSignerAddressFromSet(i, blockNumber)
+    )
   }
 
   /**
@@ -120,6 +166,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const votes = await this.contract.methods.getTotalVotesForGroup(group).call({}, blockNumber)
     return valueToBigNumber(votes)
   }
+
+  /**
+   * Returns the total votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The total votes for `group` made by `account`.
+   */
+  getTotalVotesForGroupByAccount = proxyCall(
+    this.contract.methods.getTotalVotesForGroupByAccount,
+    undefined,
+    valueToBigNumber
+  )
 
   /**
    * Returns the active votes for `group`.
@@ -326,7 +384,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   /**
    * Returns the current eligible validator groups and their total votes.
    */
-  private async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
+  async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip(
       (a, b) => ({
