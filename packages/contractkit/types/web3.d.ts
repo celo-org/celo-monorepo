@@ -1,8 +1,8 @@
-import '@types/web3'
+import * as web3types from '@types/web3/types'
 import 'web3/eth/types'
 
-declare module 'web3/types' {
-  export class Web3 {}
+declare module 'src/newtypes' {
+  export default web3types
 }
 
 declare module 'web3/eth/types' {
