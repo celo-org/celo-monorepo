@@ -48,7 +48,7 @@ rule totalPreserved(address account, method f) {
 	require(account != currentContract);
   require(account != 0);
 	uint256 _ercBalance = sinvoke ercBalanceOf(e, account); 
-	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(account);
+	uint256 _accountNonVoting = sinvoke getAccountNonvotingLockedGold(account);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(account);
 	// We limit the amount of pending records due to loop handling 
 	require(sinvoke getPendingWithdrawalsLength(account) <= 2);
@@ -65,12 +65,12 @@ rule totalPreserved(address account, method f) {
 	// We limit the amount of pending records due to loop handling 
 	uint length = sinvoke getPendingWithdrawalsLength(account);
 	require(length <= 1);
-	uint256 ercBalance_ = sinvoke ercBalanceOf(eF, account);
-	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(account);
+	uint256 ercBalance_ = sinvoke ercBalanceOf(e, account);
+	uint256 accountNonVoting_ = sinvoke getAccountNonvotingLockedGold(account);
 	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(account);
   assert(
-    _ercBalance + _accoutNonVoting + _accountTotalPendingWithdrawals ==
-    ercBalance_ + accoutNonVoting_ + accountTotalPendingWithdrawals_,
+    _ercBalance + _accountNonVoting + _accountTotalPendingWithdrawals ==
+    ercBalance_ + accountNonVoting_ + accountTotalPendingWithdrawals_,
     "Total of tokens not preserved"
   );
 }
