@@ -16,7 +16,7 @@ locals {
 resource "google_compute_instance_group" "internal" {
   name = "${local.name_prefix}-internal-group-${random_id.internal.hex}"
 
-  instances = slice(var.tx_node_self_links, 0, 1)
+  instances = slice(var.tx_node_self_links, 0, var.internal_tx_node_count)
 
   lifecycle {
     create_before_destroy = true

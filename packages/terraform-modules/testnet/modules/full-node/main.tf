@@ -20,7 +20,7 @@ resource "google_compute_instance" "full_node" {
 
   count = var.node_count
 
-  tags = concat(["${var.celo_env}-node"], var.instance_tags)
+  tags = concat(["${var.celo_env}-node"], var.internal_node_count < count.index ? var.internal_instance_tags : var.instance_tags)
 
   allow_stopping_for_update = true
 

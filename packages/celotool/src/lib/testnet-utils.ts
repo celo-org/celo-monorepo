@@ -6,7 +6,7 @@ import fetch from 'node-fetch'
 import * as path from 'path'
 import sleep from 'sleep-promise'
 import { getGenesisGoogleStorageUrl } from './endpoints'
-import { getEnvFile } from './env-utils'
+import { envVar, fetchEnv, getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
@@ -48,6 +48,7 @@ export async function getGenesisBlockFromGoogleStorage(networkName: string) {
 // This will throw an error if it fails to upload
 export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
+  const internalTxNodeCount = parseInt(fetchEnv(envVar.INTERNAL_TX_NODES))
   // Get node json file
   const nodesData: string[] | null = await retryCmd(() =>
     getEnodesWithExternalIPAddresses(networkName)
@@ -55,7 +56,9 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  const nodesJson = JSON.stringify(nodesData)
+  // Don't include nodes that are used for internal service RPCs
+  const publicNodes = nodesData.filter((_, i) => i >= internalTxNodeCount)
+  const nodesJson = JSON.stringify(publicNodes)
   console.debug('Static nodes are ' + nodesJson + '\n')
   await uploadDataToGoogleStorage(
     nodesJson,

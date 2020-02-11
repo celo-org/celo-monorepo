@@ -33,6 +33,11 @@ variable gcloud_vm_service_account_email {
   description = "The email of the service account to associate virtual machines with"
 }
 
+variable internal_tx_node_count {
+  type        = number
+  description = "Number of internal tx-nodes that are created"
+}
+
 variable letsencrypt_email {
   type        = string
   description = "The email to create letsencrypt certificates with"

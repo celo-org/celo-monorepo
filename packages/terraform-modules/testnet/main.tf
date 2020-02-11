@@ -32,9 +32,10 @@ locals {
   # any geth node (tx nodes & validators)
   target_tag_node = "${var.celo_env}-node"
 
-  target_tag_proxy     = "${var.celo_env}-proxy"
-  target_tag_tx_node   = "${var.celo_env}-tx-node"
-  target_tag_validator = "${var.celo_env}-validator"
+  target_tag_proxy            = "${var.celo_env}-proxy"
+  target_tag_tx_node          = "${var.celo_env}-tx-node"
+  target_tag_tx_node_internal = "${var.celo_env}-tx-node-internal"
+  target_tag_validator        = "${var.celo_env}-validator"
 
   target_tag_ssl = "${var.celo_env}-external-ssl"
 
@@ -94,6 +95,21 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
   }
 }
 
+resource "google_compute_firewall" "rpc_firewall_internal" {
+  name    = "${var.celo_env}-rpc-firewall-internal"
+  network = data.google_compute_network.network.name
+
+  target_tags = [local.target_tag_tx_node_internal]
+
+  # allow all IPs internal to the VPC
+  source_ranges = ["10.0.0.0/8"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8545", "8546"]
+  }
+}
+
 resource "google_compute_firewall" "rpc_firewall" {
   name    = "${var.celo_env}-rpc-firewall"
   network = data.google_compute_network.network.name
@@ -149,6 +165,8 @@ module "tx_node" {
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = [local.target_tag_tx_node]
+  internal_instance_tags                = [local.target_tag_tx_node_internal]
+  internal_node_count                   = var.internal_tx_node_count
   name                                  = "tx-node"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
@@ -166,6 +184,7 @@ module "tx_node_lb" {
   gcloud_credentials_path         = var.gcloud_credentials_path
   gcloud_project                  = var.gcloud_project
   gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
+  internal_tx_node_count          = var.internal_tx_node_count
   letsencrypt_email               = var.letsencrypt_email
   network_name                    = data.google_compute_network.network.name
   tx_node_self_links              = module.tx_node.self_links
@@ -192,6 +211,5 @@ module "validator" {
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   proxied_validator_count               = var.proxied_validator_count
-  tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
 }

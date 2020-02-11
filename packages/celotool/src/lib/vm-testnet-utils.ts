@@ -62,6 +62,7 @@ const testnetEnvVars: TerraformVars = {
   geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
   geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
   in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
+  internal_tx_node_count: envVar.INTERNAL_TX_NODES,
   istanbul_request_timeout_ms: envVar.ISTANBUL_REQUEST_TIMEOUT_MS,
   network_id: envVar.NETWORK_ID,
   proxied_validator_count: envVar.PROXIED_VALIDATORS,

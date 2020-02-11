@@ -98,6 +98,12 @@ variable in_memory_discovery_table {
   description = "Specifies whether to use an in memory discovery table"
 }
 
+variable internal_tx_node_count {
+  type        = number
+  description = "Number of tx-nodes that are created with RPC ports only internally exposed"
+  default     = 1
+}
+
 variable istanbul_request_timeout_ms {
   type        = number
   description = "The number of ms for the istanbul request timeout"
