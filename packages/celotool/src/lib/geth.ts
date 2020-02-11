@@ -886,6 +886,7 @@ export async function startGeth(
     '--consoleformat=term',
     '--nat',
     'extip:127.0.0.1',
+    '--allow-insecure-unlock',
   ]
 
   if (rpcport) {
