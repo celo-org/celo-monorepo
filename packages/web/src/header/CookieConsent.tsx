@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   container: {
     bottom: 0,
     position: 'fixed',
-    backgroundColor: '#3C9BF4',
+    backgroundColor: colors.deepBlue,
     width: '100%',
     minHeight: CONSENT_HEIGHT,
     display: 'flex',
