@@ -1,26 +1,24 @@
 import debugFactory from 'debug'
-import { Socket } from 'net'
 import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
 import { MissingTxParamsPopulator } from '../utils/missing-tx-params-populator'
-import { IRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
-import { IWallet, Wallet } from '../utils/wallet'
+import { stopProvider } from '../utils/provider-utils'
+import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
+import { DefaultWallet, Wallet } from '../utils/wallet'
 
-const debug = debugFactory('kit:provider:celo-provider:connection')
-const debugPayloadExistingProvider = debugFactory('kit:existing-provider:rpc:payload')
-const debugResponseExistingProvider = debugFactory('kit:existing-provider:rpc:response')
-const debugPayloadCeloProvider = debugFactory('kit:celo-provider:rpc:payload')
-const debugResponseCeloProvider = debugFactory('kit:celo-provider:rpc:response')
+const debug = debugFactory('kit:provider:connection')
+const debugPayload = debugFactory('kit:provider:payload')
+const debugResponse = debugFactory('kit:provider:response')
 
 export class CeloProvider implements Provider {
-  private readonly wallet: IWallet
-  private readonly rpcCaller: IRpcCaller
+  private readonly wallet: Wallet
+  private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: MissingTxParamsPopulator
   private alreadyStopped: boolean = false
 
   constructor(readonly existingProvider: Provider) {
-    this.rpcCaller = new RpcCaller(existingProvider)
+    this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new MissingTxParamsPopulator(this.rpcCaller)
-    this.wallet = new Wallet()
+    this.wallet = new DefaultWallet()
   }
 
   addAccount(privateKey: string) {
@@ -34,7 +32,7 @@ export class CeloProvider implements Provider {
   }
 
   isLocalAccount(address?: string): boolean {
-    return address != null && this.wallet.hasAccount(address.toLowerCase())
+    return this.wallet.hasAccount(address)
   }
 
   /**
@@ -44,17 +42,20 @@ export class CeloProvider implements Provider {
     let txParams: any
     let address: string
 
+    debugPayload('%O', payload)
+
+    const decoratedCallback = ((error: Error, result: JsonRPCResponse) => {
+      debugResponse('%O', result)
+      callback(error as any, result)
+    }) as Callback<JsonRPCResponse>
+
     if (this.alreadyStopped) {
       throw Error('CeloProvider already stopped')
     }
 
     switch (payload.method) {
       case 'eth_accounts': {
-        rpcCallHandler(
-          payload,
-          this.handleAccounts.bind(this),
-          this.celoCallback(payload, callback)
-        )
+        rpcCallHandler(payload, this.handleAccounts.bind(this), decoratedCallback)
         return
       }
       case 'eth_sendTransaction': {
@@ -62,13 +63,9 @@ export class CeloProvider implements Provider {
         txParams = payload.params[0]
 
         if (this.isLocalAccount(txParams.from)) {
-          rpcCallHandler(
-            payload,
-            this.handleSendTransaction.bind(this),
-            this.celoCallback(payload, callback)
-          )
+          rpcCallHandler(payload, this.handleSendTransaction.bind(this), decoratedCallback)
         } else {
-          this._forwardSend(payload, callback)
+          this.forwardSend(payload, callback)
         }
         return
       }
@@ -77,13 +74,9 @@ export class CeloProvider implements Provider {
         txParams = payload.params[0]
 
         if (this.isLocalAccount(txParams.from)) {
-          rpcCallHandler(
-            payload,
-            this.handleSignTransaction.bind(this),
-            this.celoCallback(payload, callback)
-          )
+          rpcCallHandler(payload, this.handleSignTransaction.bind(this), decoratedCallback)
         } else {
-          this._forwardSend(payload, callback)
+          this.forwardSend(payload, callback)
         }
         return
       }
@@ -97,9 +90,9 @@ export class CeloProvider implements Provider {
         address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
 
         if (this.isLocalAccount(address)) {
-          rpcCallHandler(payload, this.handleSign.bind(this), this.celoCallback(payload, callback))
+          rpcCallHandler(payload, this.handleSign.bind(this), decoratedCallback)
         } else {
-          this._forwardSend(payload, callback)
+          this.forwardSend(payload, callback)
         }
 
         return
@@ -109,19 +102,15 @@ export class CeloProvider implements Provider {
         address = payload.params[0]
 
         if (this.isLocalAccount(address)) {
-          rpcCallHandler(
-            payload,
-            this.handleSignTypedData.bind(this),
-            this.celoCallback(payload, callback)
-          )
+          rpcCallHandler(payload, this.handleSignTypedData.bind(this), decoratedCallback)
         } else {
-          this._forwardSend(payload, callback)
+          this.forwardSend(payload, callback)
         }
         return
       }
 
       default: {
-        this._forwardSend(payload, callback)
+        this.forwardSend(payload, callback)
         return
       }
     }
@@ -132,23 +121,7 @@ export class CeloProvider implements Provider {
       return
     }
     try {
-      if (this.existingProvider.hasOwnProperty('stop')) {
-        // @ts-ignore
-        this.existingProvider.stop()
-      }
-
-      // Close the web3 connection or the CLI hangs forever.
-      if (this.existingProvider && this.existingProvider.hasOwnProperty('connection')) {
-        // Close the web3 connection or the CLI hangs forever.
-        // @ts-ignore
-        const connection = this.existingProvider.connection
-        // Net (IPC provider)
-        if (connection instanceof Socket) {
-          connection.destroy()
-        } else {
-          connection.close()
-        }
-      }
+      stopProvider(this.existingProvider)
       this.alreadyStopped = true
     } catch (error) {
       debug(`Failed to close the connection: ${error}`)
@@ -185,42 +158,8 @@ export class CeloProvider implements Provider {
     return response.result
   }
 
-  private _forwardSend(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): void {
-    const decoratedCallback = this.debugDecoratorFn(
-      payload,
-      callback,
-      debugPayloadExistingProvider,
-      debugResponseExistingProvider
-    )
-    this.existingProvider.send(payload, decoratedCallback)
-  }
-
-  private celoCallback(
-    payload: JsonRPCRequest,
-    callback: Callback<JsonRPCResponse>
-  ): Callback<JsonRPCResponse> {
-    return this.debugDecoratorFn(
-      payload,
-      callback,
-      debugPayloadCeloProvider,
-      debugResponseCeloProvider
-    )
-  }
-
-  private debugDecoratorFn(
-    payload: JsonRPCRequest,
-    callback: Callback<JsonRPCResponse>,
-    payloadDebbug: debugFactory.Debugger,
-    responseDebbug: debugFactory.Debugger
-  ): Callback<JsonRPCResponse> {
-    payloadDebbug('%O', payload)
-
-    const decoratedCallback = (error: Error, result: JsonRPCResponse) => {
-      responseDebbug('%O', result)
-      callback(error as any, result)
-    }
-
-    return decoratedCallback as Callback<JsonRPCResponse>
+  private forwardSend(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): void {
+    this.rpcCaller.send(payload, callback)
   }
 
   private checkPayloadWithAtLeastNParams(payload: JsonRPCRequest, n: number) {

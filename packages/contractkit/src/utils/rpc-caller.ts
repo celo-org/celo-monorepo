@@ -1,18 +1,32 @@
+import debugFactory from 'debug'
 import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
+
+const debugRpcPayload = debugFactory('rpc:payload')
+const debugRpcResponse = debugFactory('rpc:response')
+const debugRpcCallback = debugFactory('rpc:callback:exception')
 
 export function rpcCallHandler(
   payload: JsonRPCRequest,
   handler: (p: JsonRPCRequest) => Promise<any>,
   callback: Callback<JsonRPCResponse>
 ) {
-  handler(payload).then(
-    (result) => {
-      callback(null, toRPCResponse(payload, result))
-    },
-    (error) => {
-      callback(error, toRPCResponse(payload, null, error))
-    }
-  )
+  try {
+    handler(payload)
+      .then(
+        (result) => {
+          callback(null, toRPCResponse(payload, result))
+        },
+        (error) => {
+          callback(error, toRPCResponse(payload, null, error))
+        }
+      )
+      .catch((error) => {
+        debugRpcCallback('Callback for handling the JsonRPCResponse fails')
+        debugRpcCallback('%O', error)
+      })
+  } catch (error) {
+    callback(error)
+  }
 }
 
 // Ported from: https://github.com/MetaMask/provider-engine/blob/master/util/random-id.js
@@ -43,10 +57,11 @@ function toRPCResponse(payload: JsonRPCRequest, result: any, error?: Error): Jso
   return response
 }
 
-export interface IRpcCaller {
+export interface RpcCaller {
   call: (method: string, params: any[]) => Promise<JsonRPCResponse>
+  send: (payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>) => void
 }
-export class RpcCaller implements IRpcCaller {
+export class DefaultRpcCaller implements RpcCaller {
   constructor(readonly provider: Provider, readonly jsonrpcVersion: string = '2.0') {}
 
   public async call(method: string, params: any[]): Promise<JsonRPCResponse> {
@@ -57,7 +72,7 @@ export class RpcCaller implements IRpcCaller {
         method,
         params,
       }
-      this.provider.send(payload, ((err: any, response: JsonRPCResponse) => {
+      this.send(payload, ((err: any, response: JsonRPCResponse) => {
         if (err != null) {
           reject(err)
         } else {
@@ -65,5 +80,16 @@ export class RpcCaller implements IRpcCaller {
         }
       }) as Callback<JsonRPCResponse>)
     })
+  }
+
+  public send(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>) {
+    debugRpcPayload('%O', payload)
+
+    const decoratedCallback = ((error: Error, result: JsonRPCResponse) => {
+      debugRpcResponse('%O', result)
+      callback(error as any, result)
+    }) as Callback<JsonRPCResponse>
+
+    this.provider.send(payload, decoratedCallback)
   }
 }

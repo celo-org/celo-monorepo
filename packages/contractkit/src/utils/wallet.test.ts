@@ -1,21 +1,21 @@
-import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
 import { EncodedTransaction } from 'web3/types'
 import { EIP712TypedData } from './sign-typed-data-utils'
 import { recoverTransaction } from './signing-utils'
-import { IWallet, normalizeKey, Wallet } from './wallet'
+import { DefaultWallet, Wallet } from './wallet'
 
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-const ACCOUNT_ADDRESS1 = normalizeKey(privateKeyToAddress(PRIVATE_KEY1))
+const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
-const ACCOUNT_ADDRESS2 = normalizeKey(privateKeyToAddress(PRIVATE_KEY2))
+const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
 
 describe('Wallet class', () => {
-  let wallet: IWallet
+  let wallet: Wallet
 
   beforeEach(() => {
-    wallet = new Wallet()
+    wallet = new DefaultWallet()
   })
 
   test('starts with no accounts', () => {
@@ -109,7 +109,9 @@ describe('Wallet class', () => {
           test('with same signer', async () => {
             const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
             const [, recoveredSigner] = recoverTransaction(signedTx.raw)
-            expect(normalizeKey(recoveredSigner)).toBe(normalizeKey(knownAddress))
+            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+              normalizeAddressWith0x(knownAddress)
+            )
           })
         })
 

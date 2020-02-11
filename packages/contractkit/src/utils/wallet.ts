@@ -1,49 +1,46 @@
 import {
-  ensureLeading0x,
   isHexString,
+  normalizeAddressWith0x,
   privateKeyToAddress,
   trimLeading0x,
 } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { Tx } from 'web3/eth/types'
 import { EncodedTransaction } from 'web3/types'
+import { Address } from '../base'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 import { signTransaction } from './signing-utils'
 
-export interface IWallet {
+export interface Wallet {
   addAccount: (privateKey: string) => void
-  getAccounts: () => string[]
-  hasAccount: (address: string) => boolean
+  getAccounts: () => Address[]
+  hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
   signTypedData: (address: string, typedData: EIP712TypedData) => Promise<string>
-  signPersonalMessage: (address: string, data: string) => Promise<string>
+  signPersonalMessage: (address: Address, data: string) => Promise<string>
 }
 
-export function normalizeKey(key: string) {
-  return ensureLeading0x(key).toLowerCase()
-}
-
-export class Wallet implements IWallet {
+export class DefaultWallet implements Wallet {
   // Account addresses are hex-encoded, lower case alphabets
-  private readonly accountAddressToPrivateKey = new Map<string, string>()
+  private readonly privateKeys = new Map<Address, string>()
 
   addAccount(privateKey: string) {
     // Prefix 0x here or else the signed transaction produces dramatically different signer!!!
-    privateKey = normalizeKey(privateKey)
-    const accountAddress = normalizeKey(privateKeyToAddress(privateKey))
-    if (this.accountAddressToPrivateKey.has(accountAddress)) {
+    privateKey = normalizeAddressWith0x(privateKey)
+    const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
+    if (this.privateKeys.has(accountAddress)) {
       return
     }
-    this.accountAddressToPrivateKey.set(accountAddress, privateKey)
+    this.privateKeys.set(accountAddress, privateKey)
   }
 
-  getAccounts(): string[] {
-    return Array.from(this.accountAddressToPrivateKey.keys())
+  getAccounts(): Address[] {
+    return Array.from(this.privateKeys.keys())
   }
 
-  hasAccount(address: string) {
+  hasAccount(address?: string) {
     if (address) {
-      return this.accountAddressToPrivateKey.has(normalizeKey(address))
+      return this.privateKeys.has(normalizeAddressWith0x(address))
     } else {
       return false
     }
@@ -64,7 +61,7 @@ export class Wallet implements IWallet {
    */
   async signPersonalMessage(address: string, data: string): Promise<string> {
     if (!isHexString(data)) {
-      throw Error('Expected data has to be an Hex String ')
+      throw Error('wallet@signPersonalMessage: Expected data has to be an Hex String ')
     }
     // ecsign needs a privateKey without 0x
     const pk = trimLeading0x(this.getPrivateKeyFor(address))
@@ -87,9 +84,9 @@ export class Wallet implements IWallet {
    * @param data the typed data object
    * @return Signature hex string (order: rsv)
    */
-  async signTypedData(address: string, typedData: EIP712TypedData): Promise<string> {
+  async signTypedData(address: Address, typedData: EIP712TypedData): Promise<string> {
     if (typedData === undefined) {
-      throw Error('TypedData Missing')
+      throw Error('wallet@signTypedData: TypedData Missing')
     }
 
     // ecsign needs a privateKey without 0x
@@ -103,13 +100,13 @@ export class Wallet implements IWallet {
     return rpcSig
   }
 
-  private getPrivateKeyFor(account: string): string {
+  private getPrivateKeyFor(account: Address): string {
     if (account) {
-      const maybePk = this.accountAddressToPrivateKey.get(normalizeKey(account))
+      const maybePk = this.privateKeys.get(normalizeAddressWith0x(account))
       if (maybePk != null) {
         return maybePk
       }
     }
-    throw Error(`tx-signing@getPrivateKey: ForPrivate key not found for ${account}`)
+    throw Error(`wallet@getPrivateKeyFor: Private key not found for ${account}`)
   }
 }

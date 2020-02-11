@@ -1,11 +1,11 @@
 import { Tx } from 'web3/eth/types'
-import { JsonRPCResponse } from 'web3/providers'
+import { Callback, JsonRPCRequest, JsonRPCResponse } from 'web3/providers'
 import { MissingTxParamsPopulator } from './missing-tx-params-populator'
-import { IRpcCaller } from './rpc-caller'
+import { RpcCaller } from './rpc-caller'
 
 describe('MissingTxParamsPopulator class', () => {
   let populator: MissingTxParamsPopulator
-  let mockCallback: any
+  let mockRpcCall: any
   const completeCeloTx: Tx = {
     nonce: 1,
     chainId: 1,
@@ -21,7 +21,7 @@ describe('MissingTxParamsPopulator class', () => {
   }
 
   beforeEach(() => {
-    mockCallback = jest.fn(
+    mockRpcCall = jest.fn(
       (_method: string, _params: any[]): Promise<JsonRPCResponse> => {
         return new Promise((resolve, _reject) =>
           resolve({
@@ -32,8 +32,10 @@ describe('MissingTxParamsPopulator class', () => {
         )
       }
     )
-    const rpcMock: IRpcCaller = {
-      call: mockCallback,
+    const rpcMock: RpcCaller = {
+      call: mockRpcCall,
+      // tslint:disable-next-line: no-empty
+      send: (_payload: JsonRPCRequest, _callback: Callback<JsonRPCResponse>): void => {},
     }
     populator = new MissingTxParamsPopulator(rpcMock)
   })
@@ -44,8 +46,8 @@ describe('MissingTxParamsPopulator class', () => {
       celoTx.chainId = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.chainId).toBe(27)
-      expect(mockCallback.mock.calls.length).toBe(1)
-      expect(mockCallback.mock.calls[0][0]).toBe('net_version')
+      expect(mockRpcCall.mock.calls.length).toBe(1)
+      expect(mockRpcCall.mock.calls[0][0]).toBe('net_version')
     })
 
     test('will retrieve only once the chaindId', async () => {
@@ -57,8 +59,8 @@ describe('MissingTxParamsPopulator class', () => {
       const newCeloTx2 = await populator.populate(celoTx)
       expect(newCeloTx2.chainId).toBe(27)
 
-      expect(mockCallback.mock.calls.length).toBe(1)
-      expect(mockCallback.mock.calls[0][0]).toBe('net_version')
+      expect(mockRpcCall.mock.calls.length).toBe(1)
+      expect(mockRpcCall.mock.calls[0][0]).toBe('net_version')
     })
 
     test('will populate the nonce', async () => {
@@ -66,8 +68,8 @@ describe('MissingTxParamsPopulator class', () => {
       celoTx.nonce = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.nonce).toBe('27')
-      expect(mockCallback.mock.calls.length).toBe(1)
-      expect(mockCallback.mock.calls[0][0]).toBe('eth_getTransactionCount')
+      expect(mockRpcCall.mock.calls.length).toBe(1)
+      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_getTransactionCount')
     })
 
     test('will populate the gas', async () => {
@@ -75,8 +77,8 @@ describe('MissingTxParamsPopulator class', () => {
       celoTx.gas = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gas).toBe('27')
-      expect(mockCallback.mock.calls.length).toBe(1)
-      expect(mockCallback.mock.calls[0][0]).toBe('eth_estimateGas')
+      expect(mockRpcCall.mock.calls.length).toBe(1)
+      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_estimateGas')
     })
 
     test('will populate the gatewayFeeRecipient', async () => {
@@ -84,8 +86,8 @@ describe('MissingTxParamsPopulator class', () => {
       celoTx.gatewayFeeRecipient = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gatewayFeeRecipient).toBe('27')
-      expect(mockCallback.mock.calls.length).toBe(1)
-      expect(mockCallback.mock.calls[0][0]).toBe('eth_coinbase')
+      expect(mockRpcCall.mock.calls.length).toBe(1)
+      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_coinbase')
     })
 
     test('will retrieve only once the gatewayFeeRecipient', async () => {
@@ -97,8 +99,8 @@ describe('MissingTxParamsPopulator class', () => {
       const newCeloTx2 = await populator.populate(celoTx)
       expect(newCeloTx2.gatewayFeeRecipient).toBe('27')
 
-      expect(mockCallback.mock.calls.length).toBe(1)
-      expect(mockCallback.mock.calls[0][0]).toBe('eth_coinbase')
+      expect(mockRpcCall.mock.calls.length).toBe(1)
+      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_coinbase')
     })
 
     test('will populate the gas price', async () => {
@@ -106,8 +108,8 @@ describe('MissingTxParamsPopulator class', () => {
       celoTx.gasPrice = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gasPrice).toBe('27')
-      expect(mockCallback.mock.calls.length).toBe(1)
-      expect(mockCallback.mock.calls[0][0]).toBe('eth_gasPrice')
+      expect(mockRpcCall.mock.calls.length).toBe(1)
+      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_gasPrice')
     })
 
     test('fails (for now) if the fee Currency has something', async () => {
@@ -115,7 +117,7 @@ describe('MissingTxParamsPopulator class', () => {
       celoTx.gasPrice = undefined
       celoTx.feeCurrency = 'celoMagic'
       await expect(populator.populate(celoTx)).rejects.toThrowError()
-      expect(mockCallback.mock.calls.length).toBe(0)
+      expect(mockRpcCall.mock.calls.length).toBe(0)
     })
   })
 })

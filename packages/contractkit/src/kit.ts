@@ -40,6 +40,14 @@ export function newKitFromWeb3(web3: Web3) {
   return new ContractKit(web3)
 }
 
+function assertIsCeloProvider(provider: any): asserts provider is CeloProvider {
+  if (!(provider instanceof CeloProvider)) {
+    throw new Error(
+      'A different Provider was manually added to the kit. The kit should have a CeloProvider'
+    )
+  }
+}
+
 export interface NetworkConfig {
   election: ElectionConfig
   exchange: ExchangeConfig
@@ -157,8 +165,8 @@ export class ContractKit {
   }
 
   addAccount(privateKey: string) {
-    const provider = this.web3.currentProvider as CeloProvider
-    provider.addAccount(privateKey)
+    assertIsCeloProvider(this.web3.currentProvider)
+    this.web3.currentProvider.addAccount(privateKey)
   }
 
   /**
@@ -280,11 +288,7 @@ export class ContractKit {
   }
 
   stop() {
-    // This should be true except when the user actively decide to change the web3 provider
-    // after creating the kit
-    if (this.web3.currentProvider && this.web3.currentProvider.hasOwnProperty('stop')) {
-      // @ts-ignore
-      this.web3.currentProvider.stop()
-    }
+    assertIsCeloProvider(this.web3.currentProvider)
+    this.web3.currentProvider.stop()
   }
 }

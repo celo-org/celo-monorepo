@@ -14,6 +14,8 @@ export const eqAddress = (a: Address, b: Address) => normalizeAddress(a) === nor
 
 export const normalizeAddress = (a: Address) => trimLeading0x(a).toLowerCase()
 
+export const normalizeAddressWith0x = (a: Address) => ensureLeading0x(a).toLowerCase()
+
 export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.slice(2) : input)
 
 export const ensureLeading0x = (input: string) => (input.startsWith('0x') ? input : `0x${input}`)
