@@ -48,7 +48,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
     return celoValidatorGroups
-      .map(({ account, affiliates, votes }) => {
+      .map(({ account, affiliates, votes, commission }) => {
         const group = account
         const rewards = 50 + Math.random() * 50
         const rewardsStyle =
@@ -62,6 +62,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             .dividedBy(totalVotes)
             .multipliedBy(100)
             .toString(),
+          commission: (+commission * 100) / 10 ** 24,
           rewards, // <-- Mock
           rewardsStyle, // <-- Mock
           validators: affiliates.edges.map(({ node: validator }) => {
@@ -80,12 +81,13 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
       })
       .map((group) => {
         const data = group.validators.reduce(
-          ({ elected, online, uptime }, validator) => ({
+          ({ elected, online, total, uptime }, validator) => ({
             elected: elected + +validator.elected,
             online: online + +validator.online,
+            total: total + 1,
             uptime: uptime + validator.uptime,
           }),
-          { elected: 0, online: 0, uptime: 0 }
+          { elected: 0, online: 0, total: 0, uptime: 0 }
         )
         data.uptime = data.uptime / group.validators.length
         return {
@@ -152,7 +154,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     <Text style={[styles.numberBlock, styles.numberBlockFirst]}>
                       {group.elected}
                     </Text>
-                    <Text style={[styles.numberBlock]}>{group.online}</Text>
+                    <Text style={[styles.numberBlock]}>{group.total}</Text>
                   </Text>
                   <Text style={[styles.tableCell, styles.sizeXL]}>3 percentages</Text>
                   <Text
@@ -167,7 +169,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {formatNumber(12, 0)}%
+                    {formatNumber(group.commission, 0)}%
                   </Text>
                   <Text
                     style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
