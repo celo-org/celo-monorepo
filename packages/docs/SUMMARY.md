@@ -16,6 +16,7 @@
 ## Operations Manual
 
 - [Key Management](operations-manual/key-management.md)
+- [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
 
 ## Celo Codebase
