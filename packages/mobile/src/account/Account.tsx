@@ -124,6 +124,10 @@ export class Account extends React.Component<Props, State> {
     navigateToURI(TOS_LINK)
   }
 
+  goToFiatExchange() {
+    navigate(Screens.FiatExchange)
+  }
+
   resetAppOpenedState = () => {
     this.props.resetAppOpenedState()
     Logger.showMessage('App onboarding state reset.')
@@ -232,6 +236,9 @@ export class Account extends React.Component<Props, State> {
             </View>
           </View>
           <View style={style.containerList}>
+            {features.SHOW_ADD_FUNDS && (
+              <SettingsItem title={t('addFunds')} onPress={this.goToFiatExchange} />
+            )}
             <SettingsItem
               title={t('backupKeyFlow6:backupAndRecovery')}
               onPress={this.goToBackupScreen}

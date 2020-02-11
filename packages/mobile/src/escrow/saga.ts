@@ -123,7 +123,7 @@ function* withdrawFromEscrow() {
     const receivedPayment = yield call(getEscrowedPayment, escrow, tempWalletAddress)
     const value = new BigNumber(receivedPayment[3])
     if (!value.isGreaterThan(0)) {
-      Logger.warn(TAG + '@withdrawFromEscrow', 'Escrow payment is empty, skpping.')
+      Logger.warn(TAG + '@withdrawFromEscrow', 'Escrow payment is empty, skipping.')
       return
     }
 

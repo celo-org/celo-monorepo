@@ -211,6 +211,24 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isDequeuedProposalExpired: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
+    this.contract.methods.isDequeuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+  /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isQueuedProposalExpired = proxyCall(
+    this.contract.methods.isQueuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+  /**
    * Returns the approver address for proposals and hotfixes.
    */
   getApprover = proxyCall(this.contract.methods.approver)
@@ -348,10 +366,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  async getDequeue() {
+  async getDequeue(filterZeroes = false) {
     const dequeue = await this.contract.methods.getDequeue().call()
     // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
-    return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
+    const dequeueIds = dequeue.map(valueToBigNumber)
+    return filterZeroes ? dequeueIds.filter((id) => !id.isZero()) : dequeueIds
   }
 
   /**
