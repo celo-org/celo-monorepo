@@ -8,10 +8,10 @@ pragma specify 0.1
 methods { 
 	init_state() 
 	getNonvotingLockedGold() returns uint256 envfree	
-	getAccountNonvotingLockedGold(address)  returns uint256
+	getAccountNonvotingLockedGold(address)  returns uint256 envfree
 	ercBalanceOf(address) returns uint256
-	getTotalPendingWithdrawals(address) returns uint256
-	getPendingWithdrawalsLength(address) returns uint256
+	getTotalPendingWithdrawals(address) returns uint256 envfree
+	getPendingWithdrawalsLength(address) returns uint256 envfree
 	getPendingWithdrawalsIndex(address,uint256) returns uint256 envfree	
 	getunlockingPeriod() returns uint256 envfree
 	incrementNonvotingAccountBalance(address, uint256) 
@@ -48,10 +48,10 @@ rule totalPreserved(address account, method f) {
 	require(account != currentContract);
   require(account != 0);
 	uint256 _ercBalance = sinvoke ercBalanceOf(e, account); 
-	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(e, account);
-	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(e, account);
+	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(account);
+	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(account);
 	// We limit the amount of pending records due to loop handling 
-	require(sinvoke getPendingWithdrawalsLength(e, account) <= 2);
+	require(sinvoke getPendingWithdrawalsLength(account) <= 2);
 	env eF;
 	require(eF.msg.sender == account);
 	// These three function are exceptions to the rule (they are designed to affect total)
@@ -63,11 +63,11 @@ rule totalPreserved(address account, method f) {
 	calldataarg arg;
 	sinvoke f(eF,arg);
 	// We limit the amount of pending records due to loop handling 
-	uint length = sinvoke getPendingWithdrawalsLength(ef, account);
+	uint length = sinvoke getPendingWithdrawalsLength(account);
 	require(length <= 1);
-	uint256 ercBalance_ = sinvoke ercBalanceOf(e, account);
-	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(e, account);
-	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(e, account);
+	uint256 ercBalance_ = sinvoke ercBalanceOf(eF, account);
+	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(account);
+	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(account);
   assert(
     _ercBalance + _accoutNonVoting + _accountTotalPendingWithdrawals ==
     ercBalance_ + accoutNonVoting_ + accountTotalPendingWithdrawals_,
