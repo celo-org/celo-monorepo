@@ -19,7 +19,9 @@ class CopyToClipboard extends React.PureComponent<Props, State> {
     hover: false,
   }
 
-  copy() {
+  copy(event) {
+    event.preventDefault()
+    event.stopPropagation()
     if (!this.state.copied) {
       copyToClipboad(this.props.content)
       this.setState({ copied: true })
