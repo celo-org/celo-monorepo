@@ -26,6 +26,8 @@ export default class Show extends BaseCommand {
     voter: Flags.address({ description: 'Voter to show rewards for' }),
     validator: Flags.address({ description: 'Validator to show rewards for' }),
     group: Flags.address({ description: 'Validator Group to show rewards for' }),
+    'from-block': flags.integer({ description: 'Start block' }),
+    'to-block': flags.integer({ description: 'Last block' }),
     epochs: flags.integer({
       default: 1,
       description: 'Show results for the last N epochs',
@@ -42,7 +44,8 @@ export default class Show extends BaseCommand {
       Boolean(res.flags.voter) || Boolean(res.flags.validator) || Boolean(res.flags.group)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const currentEpoch = (await validators.getEpochNumber()).toNumber()
+    const blockNumber = res.flags['to-block'] || (await this.web3.eth.getBlockNumber())
+    const currentEpoch = (await validators.getEpochNumberOfBlock(blockNumber)).toNumber()
     const checkBuilder = newCheckBuilder(this)
     const epochs = Math.max(1, res.flags.epochs || 1)
 

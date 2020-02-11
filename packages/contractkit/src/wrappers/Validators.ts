@@ -313,6 +313,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return concurrentMap(10, vgAddresses, (addr) => this.getValidatorGroup(addr, false))
   }
 
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
+  getEpochNumberOfBlock = proxyCall(
+    this.contract.methods.getEpochNumberOfBlock,
+    undefined,
+    valueToBigNumber
+  )
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
+
   /**
    * Registers a validator unaffiliated with any validator group.
    *
@@ -326,10 +335,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    */
-
-  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
-
-  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 
   registerValidator: (
     ecdsaPublicKey: string,
