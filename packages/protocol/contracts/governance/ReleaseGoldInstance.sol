@@ -506,25 +506,6 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   }
 
   /**
-   * @notice Increments the number of total and pending votes for `group`.
-   * @param group The validator group to vote for.
-   * @param value The amount of gold to use to vote.
-   * @param lesser The group receiving fewer votes than `group`, or 0 if `group` has the
-   *               fewest votes of any validator group.
-   * @param greater The group receiving more votes than `group`, or 0 if `group` has the
-   *                most votes of any validator group.
-   * @dev Fails if `group` is empty or not a validator group.
-   */
-  function vote(address group, uint256 value, address lesser, address greater)
-    external
-    nonReentrant
-    onlyCanVote
-    onlyWhenInProperState
-  {
-    getElection().vote(group, value, lesser, greater);
-  }
-
-  /**
    * @notice Converts `account`'s pending votes for `group` to active votes.
    * @param group The validator group to vote for.
    * @dev Pending votes cannot be activated until an election has been held.

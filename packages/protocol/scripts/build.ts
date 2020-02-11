@@ -28,7 +28,6 @@ export const ProxyContracts = [
   'SortedOraclesProxy',
   'RegistryProxy',
   'BlockchainParametersProxy',
-  'ReleaseGoldFactoryProxy',
 ]
 export const CoreContracts = [
   // common

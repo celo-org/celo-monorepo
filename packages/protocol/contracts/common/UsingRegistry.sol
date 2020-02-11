@@ -11,7 +11,6 @@ import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
-import "../governance/interfaces/IReleaseGoldFactory.sol";
 
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
