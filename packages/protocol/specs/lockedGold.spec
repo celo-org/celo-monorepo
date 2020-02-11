@@ -116,13 +116,13 @@ rule withdraw(uint256 index) {
 	uint256 val = sinvoke getPendingWithdrawalsIndex(e.msg.sender,index);
 	uint length = sinvoke getPendingWithdrawalsLength(e.msg.sender);
 	require(index < length);
-	require(val	> 0);
+	require(val > 0);
 	env eNew;
 	require(eNew.msg.sender == e.msg.sender);
 	sinvoke withdraw(eNew,index);
 	uint256 balance_ = sinvoke ercBalanceOf(eNew, eNew.msg.sender);
 	assert(
-    _balance + val == balance_,
+    _balance == balance_,
     "Withdraw did not affect balance as expected"
   );
 }
