@@ -48,7 +48,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
     return celoValidatorGroups
-      .map(({ account, affiliates, votes, commission }) => {
+      .map(({ account, affiliates, votes, commission, numMembers }) => {
         const group = account
         const rewards = 50 + Math.random() * 50
         const rewardsStyle =
@@ -65,6 +65,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
           commission: (+commission * 100) / 10 ** 24,
           rewards, // <-- Mock
           rewardsStyle, // <-- Mock
+          numMembers,
           validators: affiliates.edges.map(({ node: validator }) => {
             const { address, lastElected, lastOnline, name, usd, lockedGold, score } = validator
             return {
@@ -154,7 +155,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     <Text style={[styles.numberBlock, styles.numberBlockFirst]}>
                       {group.elected}
                     </Text>
-                    <Text style={[styles.numberBlock]}>{group.total}</Text>
+                    <Text style={[styles.numberBlock]}>{group.numMembers}</Text>
                   </Text>
                   <Text style={[styles.tableCell, styles.sizeXL]}>3 percentages</Text>
                   <Text

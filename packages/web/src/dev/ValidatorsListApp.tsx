@@ -70,6 +70,7 @@ const query = gql`
       lockedGold
       commission
       votes
+      numMembers
     }
   }
 `
