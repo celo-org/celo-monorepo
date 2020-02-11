@@ -73,6 +73,7 @@ commands:
           name: Fail if someone forgot to commit "yarn.lock"
           command: |
             if [[ $(git status --porcelain) ]]; then
+              git --no-pager diff
               echo "There are git differences after running yarn install"
               exit 1
             fi
@@ -332,6 +333,15 @@ jobs:
             set -euo pipefail
             cd packages/mobile
             bundle install
+      - run:
+          name: Fail if someone forgot to commit "Gemfile.lock"
+          command: |
+            set -euo pipefail
+            if [[ $(git status --porcelain) ]]; then
+              git --no-pager diff
+              echo "There are git differences after running bundle install"
+              exit 1
+            fi
       - restore_cache:
           keys:
             - pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
@@ -343,6 +353,15 @@ jobs:
             set -euo pipefail
             cd packages/mobile/ios
             bundle exec pod install
+      - run:
+          name: Fail if someone forgot to commit "Podfile.lock"
+          command: |
+            set -euo pipefail
+            if [[ $(git status --porcelain) ]]; then
+              git --no-pager diff
+              echo "There are git differences after running pod install"
+              exit 1
+            fi
       - save_cache:
           key: pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
           paths:
