@@ -8,10 +8,10 @@ pragma specify 0.1
 methods { 
 	init_state() 
 	getNonvotingLockedGold() returns uint256 envfree	
-	getAccountNonvotingLockedGold(address)  returns uint256 envfree
+	getAccountNonvotingLockedGold(address)  returns uint256
 	ercBalanceOf(address) returns uint256
-	getTotalPendingWithdrawals(address) returns uint256 envfree
-	getPendingWithdrawalsLength(address) returns uint256 envfree
+	getTotalPendingWithdrawals(address) returns uint256
+	getPendingWithdrawalsLength(address) returns uint256
 	getPendingWithdrawalsIndex(address,uint256) returns uint256 envfree	
 	getunlockingPeriod() returns uint256 envfree
 	incrementNonvotingAccountBalance(address, uint256) 
@@ -41,19 +41,20 @@ rule totalNonVotingGEAccountNonVoting(address a, method f) {
 /* 
  * Total here refers to the sum of address balance and locked gold (voting and nonvoting). 
  */
-rule totalPreserved(address a, method f) {
+rule totalPreserved(address account, method f) {
 	env e;
-	require(e.msg.sender == a);
+	require(e.msg.sender == account);
 	// We assume the sender is not the currentContract
-	require(a != currentContract);
-	uint256 _ercBalance = sinvoke ercBalanceOf(e,a); 
-	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
-	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
+	require(account != currentContract);
+  require(account != 0);
+	uint256 _ercBalance = sinvoke ercBalanceOf(e, account); 
+	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(e, account);
+	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(e, account);
 	// We limit the amount of pending records due to loop handling 
-	require(sinvoke getPendingWithdrawalsLength(a) <= 1);
+	require(sinvoke getPendingWithdrawalsLength(e, account) <= 2);
 	env eF;
-	require(eF.msg.sender == a);
-	// These two function are exceptions to the rule (they are meant to affect total)
+	require(eF.msg.sender == account);
+	// These three function are exceptions to the rule (they are designed to affect total)
 	require(
     f.selector != decrementNonvotingAccountBalance(address,uint256).selector &&
     f.selector != incrementNonvotingAccountBalance(address,uint256).selector &&
@@ -62,11 +63,11 @@ rule totalPreserved(address a, method f) {
 	calldataarg arg;
 	sinvoke f(eF,arg);
 	// We limit the amount of pending records due to loop handling 
-	uint length = sinvoke getPendingWithdrawalsLength(a);
+	uint length = sinvoke getPendingWithdrawalsLength(ef, account);
 	require(length <= 1);
-	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a);
-	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
-	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
+	uint256 ercBalance_ = sinvoke ercBalanceOf(e, account);
+	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(e, account);
+	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(e, account);
   assert(
     _ercBalance + _accoutNonVoting + _accountTotalPendingWithdrawals ==
     ercBalance_ + accoutNonVoting_ + accountTotalPendingWithdrawals_,
