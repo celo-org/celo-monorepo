@@ -1,13 +1,9 @@
 import * as crypto from 'crypto'
 import * as functions from 'firebase-functions'
-import { config, MOONPAY_PUBLIC_KEY, MOONPAY_SECRET_KEY, MOONPAY_URL } from './config'
+import { MOONPAY_PUBLIC_KEY, MOONPAY_SECRET_KEY, MOONPAY_URL } from './config'
 const URL = require('url').URL
 
 export const signMoonpay = functions.https.onRequest((request, response) => {
-  console.log(
-    `Public key is ${MOONPAY_PUBLIC_KEY}, secret key is ${MOONPAY_SECRET_KEY}, URL is ${MOONPAY_URL}`
-  )
-  console.log(config)
   const url =
     MOONPAY_URL +
     '?apiKey=' +
