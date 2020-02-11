@@ -13,6 +13,7 @@ export interface I18nProps {
 export default NextI18NextInstance
 export const { appWithTranslation, withTranslation } = NextI18NextInstance
 export const withNamespaces = withTranslation
+export const useTranslation = NextI18NextInstance.useTranslation
 
 export enum NameSpaces {
   common = 'common',

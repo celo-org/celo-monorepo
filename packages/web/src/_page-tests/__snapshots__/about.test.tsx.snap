@@ -27,7 +27,7 @@ exports[`About renders 1`] = `
         autoPlay={true}
         loop={true}
         muted={true}
-        poster="/static/AboutPreview.jpg"
+        poster="/images/AboutPreview.jpg"
         style={
           Object {
             "MozTransitionProperty": "filter",
@@ -63,7 +63,7 @@ exports[`About renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
-                "backgroundImage": "url(\\"/static/AboutPreview.jpg\\")",
+                "backgroundImage": "url(\\"/images/AboutPreview.jpg\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "cover",
@@ -82,7 +82,7 @@ exports[`About renders 1`] = `
             alt=""
             className="css-accessibilityImage-9pa8cd"
             draggable={false}
-            src="/static/AboutPreview.jpg"
+            src="/images/AboutPreview.jpg"
           />
         </div>
       </video>
@@ -114,8 +114,8 @@ exports[`About renders 1`] = `
               position: absolute;
               bottom: 60px;
               left: 0;
-              width: 100%;
-              height: calc(90% - 100px)
+              width: calc(100% - 5px);
+              height: calc(90% - 60px);
             }
 
             .ReactModal__Overlay {

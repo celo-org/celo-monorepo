@@ -7,7 +7,7 @@ import Topbar from 'src/brandkit/common/TopBar'
 import OpenGraph from 'src/header/OpenGraph'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Footer from 'src/shared/Footer.3'
+import Footer from 'src/shared/Footer'
 import menu, { hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles } from 'src/styles'
@@ -73,17 +73,16 @@ const PAGES = [
     href: ICONS_PATH,
     sections: [],
   },
+  {
+    title: 'Key Imagery',
+    href: IMAGERY_PATH,
 
-  // {
-  //   title: 'Key Imagery',
-  //   href: IMAGERY_PATH,
-
-  //   sections: [
-  //     { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
-  //     { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
-  //     { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
-  //   ],
-  // },
+    sections: [
+      { title: 'Overview', href: `${IMAGERY_PATH}#${hashNav.brandImagery.overview}` },
+      { title: 'Illustrations', href: `${IMAGERY_PATH}#${hashNav.brandImagery.illustrations}` },
+      { title: 'Abstract Graphics', href: `${IMAGERY_PATH}#${hashNav.brandImagery.graphics}` },
+    ],
+  },
 ]
 
 const THAW_DISTANCE = 600
