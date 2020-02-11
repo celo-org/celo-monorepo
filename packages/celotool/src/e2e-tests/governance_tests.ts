@@ -2,8 +2,11 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { eqAddress } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
@@ -107,6 +110,27 @@ async function newKeyRotator(
       }
     },
   }
+}
+
+async function calculateUptime(
+  kit: ContractKit,
+  signerIndex: number,
+  lastBlockNumberOfEpoch: number,
+  epochSize: number,
+  lookbackWindow: number
+): Promise<BigNumber> {
+  let signed = 0
+  const denominator = epochSize - lookbackWindow - 1
+  const blocks = await concurrentMap(10, [...Array(denominator).keys()], (i) =>
+    kit.web3.eth.getBlock(lastBlockNumberOfEpoch - denominator + i + 1)
+  )
+  for (const block of blocks) {
+    const bitmap = parseBlockExtraData(block.extraData).parentAggregatedSeal.bitmap
+    if (bitIsSet(bitmap, signerIndex)) {
+      signed++
+    }
+  }
+  return new BigNumber(signed / denominator)
 }
 
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
@@ -525,10 +549,9 @@ describe('governance tests', () => {
 
     it('should update the validator scores at the end of each epoch', async function(this: any) {
       this.timeout(0)
-      const adjustmentSpeed = fromFixed(
-        new BigNumber((await validators.methods.getValidatorScoreParameters().call())[1])
-      )
-      const uptime = 1
+      const scoreParams = await validators.methods.getValidatorScoreParameters().call()
+      const exponent = new BigNumber(scoreParams[0])
+      const adjustmentSpeed = fromFixed(new BigNumber(scoreParams[1]))
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
@@ -551,9 +574,17 @@ describe('governance tests', () => {
         )
         assert.isFalse(score.isNaN())
         assert.isFalse(previousScore.isNaN())
-        const expectedScore = adjustmentSpeed
-          .times(uptime)
-          .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
+
+        const electedValidators = await getValidatorSetAccountsAtBlock(blockNumber - 1)
+        const signerIndex = electedValidators.map(eqAddress.bind(null, validator)).indexOf(true)
+        const uptime = await calculateUptime(kit, signerIndex, blockNumber, epoch, 2)
+        const epochScore = uptime.exponentiatedBy(exponent)
+        const expectedScore = BigNumber.minimum(
+          epochScore,
+          adjustmentSpeed
+            .times(epochScore)
+            .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
+        )
         assertAlmostEqual(score, toFixed(expectedScore))
       }
 
@@ -561,7 +592,7 @@ describe('governance tests', () => {
         let expectUnchangedScores: string[]
         let expectChangedScores: string[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedScores = await getValidatorSetAccountsAtBlock(blockNumber)
+          expectChangedScores = await getValidatorSetAccountsAtBlock(blockNumber - 1)
           expectUnchangedScores = validatorAccounts.filter((x) => !expectChangedScores.includes(x))
         } else {
           expectUnchangedScores = validatorAccounts
