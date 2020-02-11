@@ -20,6 +20,34 @@ class Text extends RNText {
   }
 }
 
+interface HeaderCellProps {
+  style: any[]
+  name: string
+  order: boolean | null
+  onClick: () => void
+}
+
+const HeaderCell = React.memo(function HeaderCellFn({
+  style,
+  name,
+  order,
+  onClick,
+}: HeaderCellProps) {
+  return (
+    <View onClick={onClick} style={[styles.tableHeaderCell, ...((style || []) as any)]}>
+      <Text>{name}</Text>
+      <Text
+        style={[
+          styles.tableHeaderCellArrow,
+          ...(order !== null ? [styles.tableHeaderCellArrowVisible] : []),
+        ]}
+      >
+        <Chevron direction={order ? Direction.up : Direction.down} color={colors.white} size={10} />
+      </Text>
+    </View>
+  )
+})
+
 interface ValidatorsListProps {
   data: any
   isLoading: boolean
@@ -27,12 +55,27 @@ interface ValidatorsListProps {
 
 export interface State {
   expanded: number | undefined
+  orderBy: string
+  orderAsc: boolean
 }
 
 class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nProps, State> {
   state = {
     expanded: undefined,
+    orderBy: 'name',
+    orderAsc: true,
   }
+  private orderAccessors = {
+    name: (_) => _.name,
+    total: (_) => _.numMembers,
+    votes: (_) => _,
+    gold: (_) => _.gold,
+    commision: (_) => _.commission,
+    rewards: (_) => _.rewards,
+    uptime: (_) => _.uptime,
+  }
+  private defaultOrderAccessor = 'name'
+  private cachedCleanData
 
   expand(expanded: number) {
     if (this.state.expanded === expanded) {
@@ -42,12 +85,23 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
     }
   }
 
+  orderBy(orderBy: string) {
+    let orderAsc = true
+    if (orderBy === this.state.orderBy) {
+      orderAsc = !this.state.orderAsc
+    }
+    this.setState({ orderBy, orderAsc })
+  }
+
   cleanData({ celoValidatorGroups, latestBlock }: any) {
+    if (this.cachedCleanData) {
+      return this.cachedCleanData
+    }
     const totalVotes: BigNumber = celoValidatorGroups
       .map(({ votes }) => new BigNumber(votes))
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
-    return celoValidatorGroups
+    this.cachedCleanData = celoValidatorGroups
       .map(({ account, affiliates, votes, commission, numMembers }) => {
         const group = account
         const rewards = 50 + Math.random() * 50
@@ -96,12 +150,24 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
           ...data,
         }
       })
+    return this.cachedCleanData
+  }
+
+  sortData(data: any[]) {
+    const { orderBy, orderAsc } = this.state
+    const accessor = this.orderAccessors[orderBy]
+    const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
+    const dir = orderAsc ? 1 : -1
+
+    return data
+      .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
+      .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
   }
 
   render() {
-    const { expanded } = this.state
+    const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
-    const validatorGroups = data ? this.cleanData(data) : []
+    const validatorGroups = this.sortData(data ? this.cleanData(data) : [])
     return (
       <View style={[styles.cover, styles.pStatic]}>
         <View style={[styles.pStatic]}>
@@ -110,13 +176,48 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
           </H1>
           <View style={[styles.table, styles.pStatic]}>
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <Text style={[styles.tableHeaderCell, styles.tableHeaderCellPadding]}>Name</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeS]}>Elected/ Total</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeXL]}>Votes Available</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeM]}>Locked CGLD</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeM]}>Group Share</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeM]}>Voter Rewards</Text>
-              <Text style={[styles.tableHeaderCell, styles.sizeS]}>Uptime</Text>
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'name')}
+                style={[styles.tableHeaderCellPadding]}
+                name="Name"
+                order={orderBy === 'name' ? orderAsc : null}
+              />
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'total')}
+                style={[styles.sizeM]}
+                name="Elected/ Total"
+                order={orderBy === 'total' ? orderAsc : null}
+              />
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'votes')}
+                style={[styles.sizeXL]}
+                name="Votes Available"
+                order={orderBy === 'votes' ? orderAsc : null}
+              />
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'gold')}
+                style={[styles.sizeM]}
+                name="Locked CGLD"
+                order={orderBy === 'gold' ? orderAsc : null}
+              />
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'commision')}
+                style={[styles.sizeM]}
+                name="Group Share"
+                order={orderBy === 'commision' ? orderAsc : null}
+              />
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'rewards')}
+                style={[styles.sizeM]}
+                name="Voter Rewards"
+                order={orderBy === 'rewards' ? orderAsc : null}
+              />
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'uptime')}
+                style={[styles.sizeS]}
+                name="Uptime"
+                order={orderBy === 'uptime' ? orderAsc : null}
+              />
             </View>
             {validatorGroups.map((group, i) => (
               <View key={i}>
@@ -148,7 +249,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     </Text>
                   </View>
                   <Text
-                    style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
+                    style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
@@ -325,6 +426,9 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     textAlign: 'center',
     flexGrow: 0,
+    cursor: 'pointer',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   tableHeaderCellPadding: {
     textAlign: 'left',
@@ -333,6 +437,13 @@ const styles = StyleSheet.create({
   },
   tableHeaderCellLeft: {
     textAlign: 'left',
+  },
+  tableHeaderCellArrow: {
+    opacity: 0,
+    paddingLeft: 6,
+  },
+  tableHeaderCellArrowVisible: {
+    opacity: 0.6,
   },
   tableCell: {
     paddingVertical: 12,
