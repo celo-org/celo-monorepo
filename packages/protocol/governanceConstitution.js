@@ -67,6 +67,9 @@ const DefaultConstitution = {
   },
   goldToken: {
     default: 0.9,
+    transfer: 0.6,
+    transferWithComment: 0.6,
+    approve: 0.6,
   },
   governance: {
     default: 0.9,
@@ -134,6 +137,9 @@ const DefaultConstitution = {
     default: 0.8,
     setRegistry: 0.9,
     setInflationParameters: 0.9,
+    transfer: 0.6,
+    transferWithComment: 0.6,
+    approve: 0.6,
   },
   validators: {
     default: 0.7,
