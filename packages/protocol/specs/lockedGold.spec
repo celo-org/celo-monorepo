@@ -67,9 +67,11 @@ rule totalPreserved(address a, method f) {
 	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a);
 	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
-	assert(_ercBalance == ercBalance_, "Unexpected change to erc tokens");
-	assert(_accountTotalPendingWithdrawals == accountTotalPendingWithdrawals_, "Unexpected change to total pending");
-	assert(_accoutNonVoting == accoutNonVoting_, "Unexpected change to account nonvoting");
+  assert(
+    _ercBalance + _accoutNonVoting + _accountTotalPendingWithdrawals ==
+    ercBalance_ + accoutNonVoting_ + accountTotalPendingWithdrawals_,
+    "Total of tokens not preserved"
+  );
 }
 
 /*
@@ -118,7 +120,10 @@ rule withdraw(uint256 index) {
 	require(eNew.msg.sender == e.msg.sender);
 	sinvoke withdraw(eNew,index);
 	uint256 balance_ = sinvoke ercBalanceOf(eNew, eNew.msg.sender);
-	assert(balance_ + val ==_balance);
+	assert(
+    _balance + val == balance_,
+    "Withdraw did not affect balance as expected"
+  );
 }
 
 /*
