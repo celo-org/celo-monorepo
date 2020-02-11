@@ -41,9 +41,11 @@ beforeAll(
       if (e instanceof TimeoutError) {
         // tslint:disable-next-line: no-console
         console.error(
-          "This is a timeout error, it's most likely a synchronization issue.\n" +
-            'Please check https://github.com/wix/Detox/blob/master/docs/Troubleshooting.Synchronization.md\n' +
-            "and make sure there's no running animations or short timers (< 1.5secs) preventing Detox from detecting an idle state.\n" +
+          'This is a timeout error, please ensure the following:\n' +
+            '- The app was able to install and start\n' +
+            "- Verify there's not a synchronization issue:\n" +
+            'Check https://github.com/wix/Detox/blob/master/docs/Troubleshooting.Synchronization.md\n' +
+            'and make sure there are no running animations or short timers (< 1.5secs) preventing Detox from detecting an idle state.\n' +
             "Note: 'setTimeout', 'setInterval', 'requestAnimationFrame', end up using the JSTimer module\n" +
             'and are tracked by Detox, so check they are not called in a loop somewhere.\n'
         )
