@@ -1,7 +1,6 @@
 import { JSONRPCRequestPayload, Web3ProviderEngine } from '@0x/subproviders'
 import debugFactory from 'debug'
-import { JsonRPCResponse, Provider } from 'web3/providers'
-import { Callback } from 'web3/types'
+import { Callback, JsonRPCResponse, Provider } from 'web3/providers'
 import { CeloPrivateKeysWalletProvider } from './celo-private-keys-subprovider'
 import { WrappingSubprovider } from './wrapping-subprovider'
 
