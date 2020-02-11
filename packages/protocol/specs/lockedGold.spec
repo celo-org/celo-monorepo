@@ -23,7 +23,7 @@ methods {
  * Account's nonvoting gold cannot exceed total locked nonvoting gold.
  */
 rule totalNonVotingGEAccountNonVoting(address a, method f) {
-	require(sinvoke(getNonvotingLockedGold()) >= sinvoke(getAccountNonvotingLockedGold(a)));
+	require(sinvoke getNonvotingLockedGold()  >= sinvoke getAccountNonvotingLockedGold(a));
 	require(
     f.selector != decrementNonvotingAccountBalance(address,uint256).selector &&
     f.selector != incrementNonvotingAccountBalance(address,uint256).selector
@@ -34,8 +34,8 @@ rule totalNonVotingGEAccountNonVoting(address a, method f) {
     f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector
   );
 	calldataarg arg;
-	sinvoke(f(eF,arg));
-	assert(sinvoke(getNonvotingLockedGold()) >= sinvoke(getAccountNonvotingLockedGold(a)));
+	sinvoke f(eF,arg);
+	assert(sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a));
 }
 
 /* 
@@ -46,11 +46,11 @@ rule totalPreserved(address a, method f) {
 	require(e.msg.sender == a);
 	// We assume the sender is not the currentContract
 	require(a != currentContract);
-	uint256 _ercBalance = sinvoke(ercBalanceOf(e,a)); 
-	uint256 _accoutNonVoting = sinvoke(getAccountNonvotingLockedGold(a));
-	uint256 _accountTotalPendingWithdrawals =  sinvoke(getTotalPendingWithdrawals(a));
+	uint256 _ercBalance = sinvoke ercBalanceOf(e,a); 
+	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
+	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
 	// We limit the amount of pending records due to loop handling 
-	require(sinvoke(getPendingWithdrawalsLength(a) <= 1));
+	require(sinvoke getPendingWithdrawalsLength(a) <= 1);
 	env eF;
 	require(eF.msg.sender == a);
 	// These two function are exceptions to the rule (they are meant to affect total)
@@ -60,13 +60,13 @@ rule totalPreserved(address a, method f) {
     f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector
   );
 	calldataarg arg;
-	sinvoke(f(eF,arg));
+	sinvoke f(eF,arg);
 	// We limit the amount of pending records due to loop handling 
-	uint length = sinvoke(getPendingWithdrawalsLength(a));
+	uint length = sinvoke getPendingWithdrawalsLength(a);
 	require(length <= 1);
-	uint256 ercBalance_ = sinvoke(ercBalanceOf(e,a));
-	uint256 accoutNonVoting_ = sinvoke(getAccountNonvotingLockedGold(a));
-	uint256 accountTotalPendingWithdrawals_ =  sinvoke(getTotalPendingWithdrawals(a));
+	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a);
+	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
+	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
 	assert(_ercBalance == ercBalance_, "Unexpected change to erc tokens");
 	assert(_accountTotalPendingWithdrawals == accountTotalPendingWithdrawals_, "Unexpected change to total pending");
 	assert(_accoutNonVoting == accoutNonVoting_, "Unexpected change to account nonvoting");
@@ -81,11 +81,11 @@ rule noChangeByOther(address a, address b, method f) {
 	require(e.msg.sender == a);
 	// We assume the sender is not the currentContract
 	require(a != currentContract);
-	uint256 _ercBalance = sinvoke(ercBalanceOf(e,a));
-	uint256 _accoutNonVoting = sinvoke(getAccountNonvotingLockedGold(a));
-	uint256 _accountTotalPendingWithdrawals =  sinvoke(getTotalPendingWithdrawals(a));
+	uint256 _ercBalance = sinvoke ercBalanceOf(e,a);
+	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
+	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
 	// We limit the amount of pending records due to loop handling 
-	uint length = sinvoke(getPendingWithdrawalsLength(a));
+	uint length = sinvoke getPendingWithdrawalsLength(a);
 	require(length <= 1);
 	env eF;
 	require(eF.msg.sender == b);
@@ -95,10 +95,10 @@ rule noChangeByOther(address a, address b, method f) {
     f.selector != incrementNonvotingAccountBalance(address,uint256).selector &&
     f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector
   );
-	sinvoke(f(eF,arg));
-	uint256 ercBalance_ = sinvoke(ercBalanceOf(e,a));
-	uint256 accoutNonVoting_ = sinvoke(getAccountNonvotingLockedGold(a));
-	uint256 accountTotalPendingWithdrawals_ =  sinvoke(getTotalPendingWithdrawals(a));
+	sinvoke f(eF,arg);
+	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a);
+	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
+	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
 	assert(_ercBalance == ercBalance_, "Unexpected change to erc tokens");
 	assert(_accountTotalPendingWithdrawals == accountTotalPendingWithdrawals_, "Unexpected change to total pending");
 	assert(_accoutNonVoting == accoutNonVoting_, "Unexpected change to account nonvoting");
@@ -109,15 +109,15 @@ rule noChangeByOther(address a, address b, method f) {
  */
 rule withdraw(uint256 index) {
 	env e;
-	uint256 _balance = sinvoke(ercBalanceOf(e, e.msg.sender));
-	uint256 val = sinvoke(getPendingWithdrawalAtIndex(e.msg.sender,index));
-	uint length = sinvoke(getPendingWithdrawalsLength(e.msg.sender));
+	uint256 _balance = sinvoke ercBalanceOf(e, e.msg.sender);
+	uint256 val = sinvoke getPendingWithdrawalAtIndex(e.msg.sender,index);
+	uint length = sinvoke getPendingWithdrawalsLength(e.msg.sender);
 	require(index < length);
 	require(val	> 0);
 	env eNew;
 	require(eNew.msg.sender == e.msg.sender);
-	sinvoke(withdraw(eNew,index));
-	uint256 balance_ = sinvoke(ercBalanceOf(e, e.msg.sender));
+	sinvoke withdraw(eNew,index);
+	uint256 balance_ = sinvoke ercBalanceOf(e, e.msg.sender);
 	assert(balance_ + val ==_balance);
 }
 
@@ -127,18 +127,18 @@ rule withdraw(uint256 index) {
 rule noWithdrawBeforeUnlocking(address account, uint256 value, method f) {
 	env _e;
 	require(_e.msg.sender == account);
-	sinvoke(unlock(_e,value));
-	uint256 _total = sinvoke(getTotalPendingWithdrawals(account));
+	sinvoke unlock(_e,value);
+	uint256 _total = sinvoke getTotalPendingWithdrawals(account);
 	env eF;
 	require(eF.block.timestamp > _e.block.timestamp);
 	calldataarg arg;
-	sinvoke(f(eF,arg));
+	sinvoke f(eF,arg);
 	env e_;
 	require(e_.msg.sender == account);
 	require(e_.block.timestamp > eF.block.timestamp);
-	uint256 total_ = sinvoke(getTotalPendingWithdrawals(account));
+	uint256 total_ = sinvoke getTotalPendingWithdrawals(account);
 	assert(
-    e_.block.timestamp < _e.block.timestamp + sinvoke(getunlockingPeriod()) =>
+    e_.block.timestamp < _e.block.timestamp + sinvoke getunlockingPeriod() =>
 		total_ >= value
   );
 }
@@ -151,11 +151,11 @@ rule only_initializer_changes_initialized_field(method f) {
 	env eF;
 	env e_;
 
-	bool _isInitialized = sinvoke(initialized(_e));
+	bool _isInitialized = sinvoke initialized(_e);
 	require(f.selector != initialize(address,uint256).selector);
 	calldataarg arg;
 	invoke(f(eF,arg));
-	bool isInitialized_ = sinvoke(initialized(e_));
+	bool isInitialized_ = sinvoke initialized(e_);
 	assert(
     _isInitialized == isInitialized_,
     "Method $f is not expected to change initialization field from ${_isInitialized} to ${isInitialized_}"
@@ -172,11 +172,11 @@ rule check_initializer {
 	env eF;
 	env e_;
 	
-	bool _isInitialized = sinvoke(initialized(_e));
+	bool _isInitialized = sinvoke initialized(_e);
 	calldataarg arg;
 	invoke initialize(eF,arg);
 	bool successInit = !lastReverted;
-	bool isInitialized_ = sinvoke(initialized(e_));
+	bool isInitialized_ = sinvoke initialized(e_);
 	assert(
     _isInitialized => !successInit,
     "Initialize() must revert if already initialized"
