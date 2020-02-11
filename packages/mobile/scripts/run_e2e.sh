@@ -68,7 +68,7 @@ preloadBundle() {
 }
 
 # Needed by metro packager to use .e2e.ts overrides
-# See metreo.config.js
+# See metro.config.js
 export CELO_TEST_CONFIG=e2e 
 
 # Ensure jest is accessible to detox
