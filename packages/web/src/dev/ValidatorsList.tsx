@@ -64,21 +64,15 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             .toString(),
           rewards, // <-- Mock
           rewardsStyle, // <-- Mock
-          validators: affiliates.edges.map((validator) => {
-            const {
-              address,
-              elected,
-              online,
-              account: { name, usd, lockedGold },
-              score,
-            } = validator.node
+          validators: affiliates.edges.map(({ node: validator }) => {
+            const { address, lastElected, lastOnline, name, usd, lockedGold, score } = validator
             return {
               name,
               address,
               usd: weiToDecimal(usd),
               gold: weiToDecimal(lockedGold),
-              elected: elected === latestBlock,
-              online: online === latestBlock,
+              elected: lastElected >= latestBlock,
+              online: lastOnline >= latestBlock,
               uptime: (+score * 100) / 10 ** 24,
             }
           }),
@@ -124,10 +118,8 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             {validatorGroups.map((group, i) => (
               <View key={i}>
                 <View style={[styles.tableRow]}>
-                  <Text
+                  <View
                     style={[styles.tableCell, styles.tableCellTitle]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
                     onClick={this.expand.bind(this, i)}
                   >
                     <Text style={[styles.tableCell, styles.tableCellTitleArrow]}>
@@ -151,7 +143,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                         <CopyToClipboard content={group.address} />
                       </Text>
                     </Text>
-                  </Text>
+                  </View>
                   <Text
                     style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
                     numberOfLines={1}
@@ -197,7 +189,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     {formatNumber(group.uptime, 1)}%
                   </Text>
                 </View>
-                {i === 3 /*expanded*/ && (
+                {i === expanded && (
                   <View>
                     {group.validators.map((validator, j) => (
                       <View key={`${i}.${j}`} style={[styles.tableRow]}>
