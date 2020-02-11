@@ -117,7 +117,7 @@ rule withdraw(uint256 index) {
 	env eNew;
 	require(eNew.msg.sender == e.msg.sender);
 	sinvoke withdraw(eNew,index);
-	uint256 balance_ = sinvoke ercBalanceOf(e, e.msg.sender);
+	uint256 balance_ = sinvoke ercBalanceOf(eNew, eNew.msg.sender);
 	assert(balance_ + val ==_balance);
 }
 
@@ -134,8 +134,8 @@ rule noWithdrawBeforeUnlocking(address account, uint256 value, method f) {
 	calldataarg arg;
 	sinvoke f(eF,arg);
 	env e_;
-	require(e_.msg.sender == account);
-	require(e_.block.timestamp > eF.block.timestamp);
+	require(_e.msg.sender == account);
+	require(_e.block.timestamp > eF.block.timestamp);
 	uint256 total_ = sinvoke getTotalPendingWithdrawals(account);
 	assert(
     e_.block.timestamp < _e.block.timestamp + sinvoke getunlockingPeriod() =>
