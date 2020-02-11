@@ -17,6 +17,7 @@ Config.IS_E2E = true
 // see https://github.com/wix/Detox/issues/1513
 // Also victory-native ends up importing 2 different victory-core
 // so fix both until this is resolved upstream.
+// See https://github.com/FormidableLabs/victory-native/issues/535
 TimerContext._currentValue.transitionTimer.stop()
 TimerContext._currentValue.animationTimer.stop()
 // @ts-ignore
