@@ -10,7 +10,7 @@ contract LockedGoldHarness is LockedGold {
     return a.balance;
   }
 
-  function getPendingWithdrawalAtIndex(address account, uint256 index) public returns (uint256) {
+  function getPendingWithdrawalsIndex(address account, uint256 index) public returns (uint256) {
     require(getAccounts().isAccount(account), "Unknown account");
     require(
       index < balances[account].pendingWithdrawals.length,

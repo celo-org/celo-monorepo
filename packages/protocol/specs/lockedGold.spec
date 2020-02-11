@@ -110,7 +110,7 @@ rule noChangeByOther(address a, address b, method f) {
 rule withdraw(uint256 index) {
 	env e;
 	uint256 _balance = sinvoke ercBalanceOf(e, e.msg.sender);
-	uint256 val = sinvoke getPendingWithdrawalAtIndex(e.msg.sender,index);
+	uint256 val = sinvoke getPendingWithdrawalsIndex(e.msg.sender,index);
 	uint length = sinvoke getPendingWithdrawalsLength(e.msg.sender);
 	require(index < length);
 	require(val	> 0);
@@ -154,7 +154,7 @@ rule only_initializer_changes_initialized_field(method f) {
 	bool _isInitialized = sinvoke initialized(_e);
 	require(f.selector != initialize(address,uint256).selector);
 	calldataarg arg;
-	invoke(f(eF,arg));
+	invoke f(eF,arg);
 	bool isInitialized_ = sinvoke initialized(e_);
 	assert(
     _isInitialized == isInitialized_,
