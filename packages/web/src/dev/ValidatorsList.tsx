@@ -63,9 +63,9 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
     orderAsc: true,
   }
   private orderAccessors = {
-    name: (_) => _.name,
-    total: (_) => _.numMembers,
-    votes: (_) => _.votesAbsolute,
+    name: (_) => _.name.toLowerCase(),
+    total: (_) => _.numMembers * 1000 + _.elected,
+    votes: (_) => +_.votesAbsolute,
     gold: (_) => _.gold,
     commision: (_) => _.commission,
     rewards: (_) => _.rewards,
@@ -436,6 +436,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
     ...({
       position: 'sticky',
+      boxShadow: `960px 0 ${colors.dark}, -960px 0 ${colors.dark}`,
     } as any),
   },
   tableHeaderCell: {
