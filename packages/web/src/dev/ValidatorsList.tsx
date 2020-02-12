@@ -6,17 +6,14 @@ import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import CopyToClipboard from 'src/dev/CopyToClipboard'
+import ProgressCutBar from 'src/dev/ProgressCutBar'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles, typeFaces } from 'src/styles'
 import { cutAddress, formatNumber, weiToDecimal } from 'src/utils/utils'
 
 class Text extends RNText {
   render() {
-    return (
-      <RNText style={[{ fontFamily: typeFaces.futura }, this.props.style]}>
-        {this.props.children}
-      </RNText>
-    )
+    return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
   }
 }
 
@@ -68,7 +65,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
   private orderAccessors = {
     name: (_) => _.name,
     total: (_) => _.numMembers,
-    votes: (_) => _,
+    votes: (_) => _.votesAbsolute,
     gold: (_) => _.gold,
     commision: (_) => _.commission,
     rewards: (_) => _.rewards,
@@ -98,24 +95,28 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
       return this.cachedCleanData
     }
     const totalVotes: BigNumber = celoValidatorGroups
-      .map(({ votes }) => new BigNumber(votes))
+      .map(({ receivableVotes }) => new BigNumber(receivableVotes))
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
     this.cachedCleanData = celoValidatorGroups
-      .map(({ account, affiliates, votes, commission, numMembers }) => {
+      .map(({ account, affiliates, votes, receivableVotes, commission, numMembers }) => {
         const group = account
         const rewards = 50 + Math.random() * 50
         const rewardsStyle =
           rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
+        const receivableVotesPer = new BigNumber(receivableVotes)
+          .dividedBy(totalVotes)
+          .multipliedBy(100)
+        const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
+        const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
         return {
           name: group.name,
           address: group.address,
           usd: weiToDecimal(group.usd),
           gold: weiToDecimal(group.lockedGold),
-          votes: new BigNumber(votes)
-            .dividedBy(totalVotes)
-            .multipliedBy(100)
-            .toString(),
+          receivableVotes: receivableVotesPer.toString(),
+          votes: votesPer.toString(),
+          votesAbsolute: votesAbsolutePer.toString(),
           commission: (+commission * 100) / 10 ** 24,
           rewards, // <-- Mock
           rewardsStyle, // <-- Mock
@@ -220,7 +221,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
               />
             </View>
             {validatorGroups.map((group, i) => (
-              <View key={i}>
+              <View key={group.address}>
                 <View style={[styles.tableRow]}>
                   <View
                     style={[styles.tableCell, styles.tableCellTitle]}
@@ -243,7 +244,9 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                         {group.name}
                       </Text>
                       <Text style={[styles.tableCellTitleSecRow]}>
-                        <Text>{cutAddress(group.address)}</Text>
+                        <Text style={[{ color: colors.grayHeavy }]}>
+                          {cutAddress(group.address)}
+                        </Text>
                         <CopyToClipboard content={group.address} />
                       </Text>
                     </Text>
@@ -258,7 +261,20 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     </Text>
                     <Text style={[styles.numberBlock]}>{group.numMembers}</Text>
                   </Text>
-                  <Text style={[styles.tableCell, styles.sizeXL]}>3 percentages</Text>
+                  <Text style={[styles.tableCell, styles.sizeXL, styles.tableCellBars]}>
+                    <Text style={[styles.tableCellBarsValue]}>
+                      {formatNumber(group.votesAbsolute, 1)}%
+                    </Text>
+                    <Text style={[styles.tableCellBarsRows]}>
+                      <Text style={[styles.tableCellBarsRowValues]}>
+                        {formatNumber(group.votes, 1)}% of {formatNumber(group.receivableVotes, 1)}%
+                      </Text>
+                      <ProgressCutBar
+                        bars={Math.floor(+group.receivableVotes * 2) || 1}
+                        progress={Math.floor(+group.votes)}
+                      />
+                    </Text>
+                  </Text>
                   <Text
                     style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
                     numberOfLines={1}
@@ -393,6 +409,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
     maxWidth: '100vw',
   },
+  defaultText: {
+    fontFamily: typeFaces.futura,
+    color: colors.white,
+  },
 
   // Table
   table: {
@@ -419,7 +439,6 @@ const styles = StyleSheet.create({
     } as any),
   },
   tableHeaderCell: {
-    color: colors.white,
     fontSize: 16,
     lineHeight: 20,
     paddingHorizontal: 5,
@@ -448,7 +467,6 @@ const styles = StyleSheet.create({
   tableCell: {
     paddingVertical: 12,
     paddingHorizontal: 5,
-    color: colors.white,
     fontSize: 16,
     flexGrow: 0,
   },
@@ -458,6 +476,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     overflow: 'hidden',
     flexGrow: 1,
+    width: 272,
   },
   tableCellTitleRows: {
     display: 'flex',
@@ -512,7 +531,6 @@ const styles = StyleSheet.create({
     marginLeft: 16 + 20 + 24,
     opacity: 0.4,
     fontFamily: typeFaces.garamond,
-    color: colors.white,
     fontSize: 16,
   },
   tableCellTableContainer: {
@@ -523,6 +541,23 @@ const styles = StyleSheet.create({
   },
   tableSecondaryCell: {
     fontSize: 14,
+  },
+  tableCellBars: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  tableCellBarsValue: {
+    paddingRight: 8,
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  tableCellBarsRows: {},
+  tableCellBarsRowValues: {
+    fontSize: 14,
+    fontWeight: '500',
+    paddingBottom: 2,
+    display: 'flex',
+    color: colors.grayHeavy,
   },
 
   // Column sizes
