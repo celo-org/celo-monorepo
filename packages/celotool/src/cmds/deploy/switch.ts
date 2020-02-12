@@ -1,5 +1,5 @@
-import yargs from 'yargs'
 import { DeployArgv } from 'src/cmds/deploy'
+import yargs from 'yargs'
 export const command = 'switch <deployPackage>'
 
 export const describe = 'switch the exposed deployed service'
