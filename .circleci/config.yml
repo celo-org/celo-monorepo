@@ -392,6 +392,9 @@ jobs:
             # Create dummy Google services plist
             /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
             yarn run test:e2e:ios
+      - store_artifacts:
+          path: packages/mobile/e2e/artifacts
+          destination: mobile/e2e/artifacts
 
   lint-checks:
     <<: *defaults

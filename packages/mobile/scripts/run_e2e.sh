@@ -67,6 +67,17 @@ preloadBundle() {
   echo "Preload bundle finished with http code: $response_code"
 }
 
+runTest() {
+  yarn detox test \
+    --configuration $CONFIG_NAME \
+    --artifacts-location e2e/artifacts \
+    --take-screenshots=all \
+    --record-logs=failing \
+    --detectOpenHandles \
+    --loglevel verbose
+  TEST_STATUS=$?
+}
+
 # Needed by metro packager to use .e2e.ts overrides
 # See metro.config.js
 export CELO_TEST_CONFIG=e2e 
@@ -124,8 +135,7 @@ if [ $PLATFORM = "android" ]; then
     sleep 3 
   done
 
-  yarn detox test -c $CONFIG_NAME -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose
-  STATUS=$?
+  runTest
 
   echo "Closing emulator (if active)"
   adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
@@ -149,8 +159,7 @@ elif [ $PLATFORM = "ios" ]; then
 
   startPackager
 
-  yarn detox test -c $CONFIG_NAME -l verbose
-  STATUS=$?
+  runTest
 
 else
   echo "Invalid value for platform, must be 'android' or 'ios'"
@@ -160,5 +169,5 @@ fi
 echo "Done test, cleaning up"
 yarn react-native-kill-packager
 
-echo "Exiting with test result status $STATUS"
-exit $STATUS
+echo "Exiting with test result status $TEST_STATUS"
+exit $TEST_STATUS
