@@ -345,9 +345,9 @@ jobs:
       - restore_cache:
           name: Restore pods cache
           keys:
-            - pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
-            - pods-wallet-v1-{{ arch }}-{{ .Branch }}-
-            - pods-wallet-v1-{{ arch }}-
+            # Using a single cache key here as we don't want partial cache restoration
+            # i.e. when Podfile/Podfile.lock change, we want to start fresh again
+            - pods-wallet-v1-{{ arch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
       - run:
           name: Install pods
           command: |
@@ -365,7 +365,7 @@ jobs:
             fi
       - save_cache:
           name: Save pods cache
-          key: pods-wallet-v1-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
+          key: pods-wallet-v1-{{ arch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
           paths:
             - packages/mobile/ios/Pods
       - restore_cache:
