@@ -5,9 +5,11 @@ import { StyleSheet, View } from 'react-native'
 import { createAppContainer, NavigationState } from 'react-navigation'
 import { connect } from 'react-redux'
 import AlertBanner from 'src/alert/AlertBanner'
+import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { recordStateChange, setTopLevelNavigator } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import { RootState } from 'src/redux/reducers'
 import BackupPrompt from 'src/shared/BackupPrompt'
 import Logger from 'src/utils/Logger'
 
@@ -44,7 +46,11 @@ interface DispatchProps {
   setTopLevelNavigator: typeof setTopLevelNavigator
 }
 
-type Props = DispatchProps & WithTranslation
+interface StateProps {
+  appLocked: boolean
+}
+
+type Props = StateProps & DispatchProps & WithTranslation
 
 const AppContainer = createAppContainer(Navigator)
 
@@ -54,6 +60,7 @@ export class NavigatorWrapper extends React.Component<Props> {
   }
 
   render() {
+    const { appLocked } = this.props
     return (
       <View style={styles.container}>
         <AppContainer
@@ -61,8 +68,9 @@ export class NavigatorWrapper extends React.Component<Props> {
           onNavigationStateChange={navigationStateChange}
           {...getPersistenceFunctions()}
         />
+
         <View style={styles.floating}>
-          <BackupPrompt />
+          {!appLocked && <BackupPrompt />}
           <AlertBanner />
         </View>
       </View>
@@ -99,6 +107,12 @@ export const headerArea = {
   },
 }
 
-export default connect<null, DispatchProps>(null, {
+const mapStateToProps = (state: RootState) => {
+  return {
+    appLocked: getAppLocked(state),
+  }
+}
+
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   setTopLevelNavigator,
 })(NavigatorWrapper)

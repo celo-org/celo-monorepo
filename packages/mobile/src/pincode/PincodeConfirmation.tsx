@@ -19,13 +19,20 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { UNLOCK_DURATION } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigateBack } from 'src/navigator/NavigationService'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
+import { RootState } from 'src/redux/reducers'
+import { web3 } from 'src/web3/contracts'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface State {
   pin: string
+}
+
+interface StateProps {
+  currentAccount: string | null
 }
 
 interface DispatchProps {
@@ -33,24 +40,23 @@ interface DispatchProps {
 }
 
 interface NavProps {
-  resolve: () => void
-  reject: () => void
-  pinVerifier: null | ((password: string) => Promise<boolean>)
+  onValidPin: (pin: string) => void
   hideBackButton: null | boolean
-  shouldNavigateBack: null | boolean
 }
 
-type Props = DispatchProps & WithTranslation & NavigationInjectedProps
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 class PincodeConfirmation extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
+    let options
     if (navigation.getParam('hideBackButton')) {
-      return {
+      options = {
         headerLeft: null,
       }
     } else {
-      return nuxNavigationOptions
+      options = nuxNavigationOptions
     }
+    return { gesturesEnabled: false, ...options }
   }
   backHandler: null | NativeEventSubscription = null
 
@@ -96,12 +102,8 @@ class PincodeConfirmation extends React.Component<Props, State> {
   }
 
   onCorrectPin = (pin: string) => {
-    const resolve = this.props.navigation.getParam('resolve')
-    const shouldNavigateBack = this.props.navigation.getParam('shouldNavigateBack')
-    resolve(pin)
-    if (shouldNavigateBack) {
-      navigateBack()
-    }
+    const onValidPin = this.props.navigation.getParam('onValidPin')
+    onValidPin(pin)
   }
 
   onWrongPin = () => {
@@ -111,13 +113,11 @@ class PincodeConfirmation extends React.Component<Props, State> {
 
   onPressConfirm = () => {
     const { pin } = this.state
-    const pinVerifier = this.props.navigation.getParam('pinVerifier')
-    if (pinVerifier) {
-      pinVerifier(pin)
+    if (this.props.currentAccount) {
+      web3.eth.personal
+        .unlockAccount(this.props.currentAccount, pin, UNLOCK_DURATION)
         .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
         .catch(this.onWrongPin)
-    } else {
-      this.onCorrectPin(pin)
     }
   }
 
@@ -181,6 +181,10 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect(null, { showError })(
+const mapStateToProps = (state: RootState): StateProps => ({
+  currentAccount: currentAccountSelector(state),
+})
+
+export default connect(mapStateToProps, { showError })(
   withTranslation(Namespaces.nuxNamePin1)(PincodeConfirmation)
 )

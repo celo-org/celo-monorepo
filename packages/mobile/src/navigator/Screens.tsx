@@ -15,6 +15,7 @@ export enum Stacks {
 export enum Screens {
   Account = 'Account',
   Analytics = 'Analytics',
+  Background = 'Background',
   BackupIntroduction = 'BackupIntroduction',
   BackupPhrase = 'BackupPhrase',
   BackupQuiz = 'BackupQuiz',

@@ -8,7 +8,15 @@ require('numeral/locales/es')
 
 const TAG = 'app/actions'
 
+// https://facebook.github.io/react-native/docs/appstate
+export enum AppState {
+  Background = 'Background',
+  Active = 'Active',
+  Inactive = 'Inactive',
+}
+
 export enum Actions {
+  SET_APP_STATE = 'APP/SET_APP_STATE',
   SET_LOGGED_IN = 'APP/SET_LOGGED_IN',
   SET_NUMBER_VERIFIED = 'APP/SET_NUMBER_VERIFIED',
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
@@ -20,8 +28,13 @@ export enum Actions {
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
   NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
-  START_PIN_VERIFICATION = 'APP/START_PIN_VERIFICATION',
-  FINISH_PIN_VERIFICATION = 'APP/FINISH_PIN_VERIFICATION',
+  LOCK = 'APP/LOCK',
+  UNLOCK = 'APP/UNLOCK',
+}
+
+export interface SetAppState {
+  type: Actions.SET_APP_STATE
+  state: string
 }
 
 interface SetLoggedIn {
@@ -70,18 +83,18 @@ export interface NavigatePinProtected {
   type: Actions.NAVIGATE_PIN_PROTECTED
   routeName: string
   params?: NavigationParams
-  hideBackButton?: boolean
 }
 
-interface StartPinVerification {
-  type: Actions.START_PIN_VERIFICATION
+export interface Lock {
+  type: Actions.LOCK
 }
 
-interface FinishPinVerification {
-  type: Actions.FINISH_PIN_VERIFICATION
+export interface Unlock {
+  type: Actions.UNLOCK
 }
 
 export type ActionTypes =
+  | SetAppState
   | SetLoggedIn
   | SetNumberVerifiedAction
   | ResetAppOpenedState
@@ -92,8 +105,13 @@ export type ActionTypes =
   | SetAnalyticsEnabled
   | SetLockWithPinEnabled
   | NavigatePinProtected
-  | StartPinVerification
-  | FinishPinVerification
+  | Lock
+  | Unlock
+
+export const setAppState = (state: string) => ({
+  type: Actions.SET_APP_STATE,
+  state,
+})
 
 export const setLoggedIn = (loggedIn: boolean) => ({
   type: Actions.SET_LOGGED_IN,
@@ -151,19 +169,17 @@ export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled =
 
 export const navigatePinProtected = (
   routeName: string,
-  params?: NavigationParams,
-  hideBackButton?: boolean
+  params?: NavigationParams
 ): NavigatePinProtected => ({
   type: Actions.NAVIGATE_PIN_PROTECTED,
   routeName,
   params,
-  hideBackButton,
 })
 
-export const startPinVerification = (): StartPinVerification => ({
-  type: Actions.START_PIN_VERIFICATION,
+export const lock = (): Lock => ({
+  type: Actions.LOCK,
 })
 
-export const finishPinVerification = (): FinishPinVerification => ({
-  type: Actions.FINISH_PIN_VERIFICATION,
+export const unlock = (): Unlock => ({
+  type: Actions.UNLOCK,
 })

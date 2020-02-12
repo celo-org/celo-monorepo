@@ -10,6 +10,7 @@ import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
+import { pincodeTypeSelector, PincodeType } from 'src/account/reducer'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -30,6 +31,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
+import { fornoSelector } from 'src/web3/selectors'
 
 interface DispatchProps {
   revokeVerification: typeof revokeVerification
@@ -47,6 +49,8 @@ interface StateProps {
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
+  pincodeType: PincodeType
+  fornoMode: boolean
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -62,6 +66,8 @@ const mapStateToProps = (state: RootState): StateProps => {
     e164PhoneNumber: state.account.e164PhoneNumber,
     analyticsEnabled: state.app.analyticsEnabled,
     numberVerified: state.app.numberVerified,
+    pincodeType: pincodeTypeSelector(state),
+    fornoMode: fornoSelector(state),
   }
 }
 
@@ -229,7 +235,8 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account, numberVerified } = this.props
+    const { t, account, numberVerified, fornoMode, pincodeType } = this.props
+    const showSecurity = !fornoMode && pincodeType === PincodeType.CustomPin
 
     return (
       <ScrollView style={style.scrollView}>
@@ -265,7 +272,7 @@ export class Account extends React.Component<Props, State> {
             {features.SHOW_SHOW_REWARDS_APP_LINK && (
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
-            <SettingsItem title={t('security')} onPress={this.goToSecurity} />
+            {showSecurity && <SettingsItem title={t('security')} onPress={this.goToSecurity} />}
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
             <SettingsItem title={t('dataSaver')} onPress={this.goToDataSaver} />
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />

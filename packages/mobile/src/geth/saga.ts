@@ -1,4 +1,4 @@
-import { AppState, NativeEventEmitter, NativeModules } from 'react-native'
+import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import {
   all,
@@ -186,37 +186,9 @@ function* monitorGeth() {
   }
 }
 
-function createAppStateChannel() {
-  return eventChannel((emit: any) => {
-    AppState.addEventListener('change', emit)
-
-    const removeEventListener = () => {
-      AppState.removeEventListener('change', emit)
-    }
-    return removeEventListener
-  })
-}
-
-function* monitorAppState() {
-  Logger.debug(`${TAG}@monitorAppState`, 'Starting monitor app state saga')
-  const appStateChannel = yield createAppStateChannel()
-  while (true) {
-    try {
-      const newState = yield take(appStateChannel)
-      Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
-    } catch (error) {
-      Logger.error(`${TAG}@monitorAppState`, error)
-    } finally {
-      if (yield cancelled()) {
-        appStateChannel.close()
-      }
-    }
-  }
-}
-
 export function* gethSaga() {
   yield call(initGethSaga)
-  const gethRelatedSagas = yield all([fork(monitorAppState), fork(monitorGeth)])
+  const gethRelatedSagas = yield all([fork(monitorGeth)])
   yield take(Actions.CANCEL_GETH_SAGA)
   yield cancel(gethRelatedSagas)
   yield put(setGethConnected(true))

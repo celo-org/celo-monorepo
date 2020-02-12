@@ -1,6 +1,7 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
 import {
   NavigationActions,
+  NavigationBackActionPayload,
   NavigationContainerComponent,
   NavigationParams,
   NavigationState,
@@ -17,7 +18,7 @@ export enum NavActions {
   SET_NAVIGATOR = 'NAVIGATION/SET_NAVIGATOR',
 }
 
-let navigator: NavigationContainerComponent
+export let navigator: NavigationContainerComponent
 
 export const setTopLevelNavigator = (navigatorRef: any) => {
   Logger.debug(`${TAG}@setTopLevelNavigator`, 'Initialized')
@@ -68,9 +69,9 @@ export function recordStateChange(prevState: NavigationState, currentState: Navi
   CeloAnalytics.page(currentScreen, { previousScreen, currentScreen })
 }
 
-export function navigateBack() {
+export function navigateBack(params?: NavigationBackActionPayload) {
   Logger.debug(`${TAG}@navigate`, `Dispatch navigate back`)
-  navigator.dispatch(NavigationActions.back())
+  navigator.dispatch(NavigationActions.back(params))
 }
 
 export function navigateHome(params?: NavigationParams) {

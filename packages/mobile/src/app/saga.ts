@@ -8,26 +8,26 @@ import { showError } from 'src/alert/actions'
 import {
   Actions,
   NavigatePinProtected,
-  navigatePinProtected,
   OpenDeepLink,
+  SetAppState,
+  setAppState,
   setLanguage,
 } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getLockWithPinEnabled } from 'src/app/selectors'
+import { getAppLocked, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
-import { UNLOCK_DURATION } from 'src/geth/consts'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { NavActions, navigate } from 'src/navigator/NavigationService'
+import { NavActions, navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
+import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { toggleFornoMode } from 'src/web3/actions'
-import { isInitiallyFornoMode, web3 } from 'src/web3/contracts'
-import { getAccount } from 'src/web3/saga'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { isInitiallyFornoMode } from 'src/web3/contracts'
+import { fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 const TAG = 'app/saga'
 
@@ -59,17 +59,6 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
   }
 }
 
-export function* checkAppDeprecation() {
-  yield call(waitForRehydrate)
-  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
-  if (isDeprecated) {
-    Logger.warn(TAG, 'App version is deprecated')
-    navigate(Screens.UpgradeScreen)
-  } else {
-    Logger.debug(TAG, 'App version is valid')
-  }
-}
-
 // Upon every app restart, web3 is initialized according to .env file
 // This updates to the chosen forno mode in store
 export function* toggleToProperSyncMode() {
@@ -85,10 +74,17 @@ export function* toggleToProperSyncMode() {
 export function* navigateToProperScreen() {
   yield all([take(REHYDRATE), take(NavActions.SET_NAVIGATOR)])
 
-  const deepLink = yield call(Linking.getInitialURL)
-  const inSync = yield call(clockInSync)
+  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
+
+  if (isDeprecated) {
+    Logger.warn(TAG, 'App version is deprecated')
+    navigate(Screens.UpgradeScreen)
+    return
+  } else {
+    Logger.debug(TAG, 'App version is valid')
+  }
+
   const mappedState: PersistedStateProps = yield select(mapStateToProps)
-  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
 
   if (!mappedState) {
     navigate(Stacks.NuxStack)
@@ -104,6 +100,10 @@ export function* navigateToProperScreen() {
     hasSeenVerificationNux,
   } = mappedState
 
+  const deepLink = yield call(Linking.getInitialURL)
+  const inSync = yield call(clockInSync)
+  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
+
   if (language) {
     yield put(setLanguage(language))
   }
@@ -113,28 +113,31 @@ export function* navigateToProperScreen() {
     return
   }
 
+  const appLockedAwareNavigate =
+    account && lockWithPinEnabled
+      ? (routeName: string) => {
+          navigate('Background', {
+            onUnlock() {
+              navigate(routeName)
+            },
+          })
+        }
+      : navigate
+
   if (!language) {
-    navigate(Stacks.NuxStack)
+    appLockedAwareNavigate(Stacks.NuxStack)
   } else if (!inSync) {
-    navigate(Screens.SetClock)
+    appLockedAwareNavigate(Screens.SetClock)
   } else if (!e164Number) {
-    navigate(Screens.JoinCelo)
+    appLockedAwareNavigate(Screens.JoinCelo)
   } else if (pincodeType === PincodeType.Unset) {
-    navigate(Screens.PincodeEducation)
+    appLockedAwareNavigate(Screens.PincodeEducation)
   } else if (!redeemComplete && !account) {
-    navigate(Screens.EnterInviteCode)
+    appLockedAwareNavigate(Screens.EnterInviteCode)
   } else if (!hasSeenVerificationNux) {
-    if (lockWithPinEnabled) {
-      yield put(navigatePinProtected(Screens.VerificationEducationScreen, {}, true))
-    } else {
-      navigate(Screens.VerificationEducationScreen)
-    }
+    appLockedAwareNavigate(Screens.VerificationEducationScreen)
   } else {
-    if (lockWithPinEnabled) {
-      yield put(navigatePinProtected(Stacks.AppStack, {}, true))
-    } else {
-      navigate(Stacks.AppStack)
-    }
+    appLockedAwareNavigate(Stacks.AppStack)
   }
 }
 
@@ -153,25 +156,14 @@ export function* handleDeepLink(action: OpenDeepLink) {
   }
 }
 
-export function* navigateWithPinProtection(action: NavigatePinProtected) {
+export function* handleNavigatePinProtected(action: NavigatePinProtected) {
   const fornoMode = yield select(fornoSelector)
   try {
+    // TODO: Implement PIN protection for forno mode
     if (!fornoMode) {
-      const account = yield call(getAccount)
-      yield call(
-        getPincode,
-        false,
-        (password: string) => {
-          return web3.eth.personal.unlockAccount(account, password, UNLOCK_DURATION)
-        },
-        action.hideBackButton,
-        false
-      )
-      navigate(action.routeName, action.params)
-    } else {
-      // TODO: Implement PIN protection for forno mode
-      navigate(action.routeName, action.params)
+      yield call(getPincode, false)
     }
+    navigate(action.routeName, action.params)
   } catch (error) {
     Logger.error(TAG + '@showBackupAndRecovery', 'Incorrect pincode', error)
     yield put(showError(ErrorMessages.INCORRECT_PIN))
@@ -179,7 +171,7 @@ export function* navigateWithPinProtection(action: NavigatePinProtected) {
 }
 
 export function* watchNavigatePinProtected() {
-  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, navigateWithPinProtection)
+  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, handleNavigatePinProtected)
 }
 
 export function* watchDeepLinks() {
@@ -204,21 +196,7 @@ function* watchAppState() {
     try {
       const newState = yield take(appStateChannel)
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
-      if (newState === 'active') {
-        const account = yield select(currentAccountSelector)
-        const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-        if (account && lockWithPinEnabled) {
-          console.debug(account)
-          yield getPincode(
-            false,
-            (password: string) => {
-              return web3.eth.personal.unlockAccount(account, password, UNLOCK_DURATION)
-            },
-            true,
-            true
-          )
-        }
-      }
+      yield put(setAppState(newState))
     } catch (error) {
       Logger.error(`${TAG}@monitorAppState`, error)
     } finally {
@@ -229,11 +207,24 @@ function* watchAppState() {
   }
 }
 
+function* handleSetAppState(action: SetAppState) {
+  const appLocked = yield select(getAppLocked)
+  const cachedPin = getCachedPincode()
+  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
+  if (lockWithPinEnabled && action.state === 'background' && !appLocked && !cachedPin) {
+    navigate(Screens.Background, {
+      onUnlock() {
+        navigateBack({ immediate: true })
+      },
+    })
+  }
+}
+
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
-  yield spawn(checkAppDeprecation)
   yield spawn(watchNavigatePinProtected)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
+  yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)
 }
