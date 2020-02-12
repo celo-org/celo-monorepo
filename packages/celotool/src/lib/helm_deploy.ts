@@ -37,7 +37,8 @@ async function failIfSecretMissing(secretName: string, namespace: string) {
 
 async function copySecret(secretName: string, srcNamespace: string, destNamespace: string) {
   console.info(`Copying secret ${secretName} from namespace ${srcNamespace} to ${destNamespace}`)
-  await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} --export -o yaml |\
+  await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} -o yaml |\
+  grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid |\
   kubectl apply --namespace=${destNamespace} -f -`)
 }
 
@@ -67,7 +68,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 
   try {
     await execCmd(
-      `gcloud sql instances create ${instanceName} --gce-zone ${fetchEnv(
+      `gcloud sql instances create ${instanceName} --zone ${fetchEnv(
         envVar.KUBERNETES_CLUSTER_ZONE
       )} --database-version POSTGRES_9_6 --cpu 1 --memory 4G`
     )
@@ -79,7 +80,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   if (envType !== EnvTypes.DEVELOPMENT) {
     try {
       await execCmdWithExitOnFailure(
-        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --gce-zone ${fetchEnv(
+        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --zone ${fetchEnv(
           envVar.KUBERNETES_CLUSTER_ZONE
         )}`
       )
@@ -253,27 +254,36 @@ export async function installAndEnableMetricsDeps() {
   }
 }
 
-export async function grantRoles(
-  serviceAccountName: string,
-  role: string
-): Promise<[string, string]> {
+export async function grantRoles(serviceAccountName: string, role: string) {
   const projectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
 
   const serviceAccountFullName = `${serviceAccountName}@${projectName}.iam.gserviceaccount.com`
-  const cmd =
-    `gcloud projects add-iam-policy-binding ${projectName} ` +
-    `--role=${role} ` +
-    `--member=serviceAccount:${serviceAccountFullName}`
-  return execCmd(cmd)
+  const commandRolesAlreadyGranted = `gcloud projects get-iam-policy ${projectName}  \
+  --flatten="bindings[].members" \
+  --format='table(bindings.role)' \
+  --filter="bindings.members:serviceAccount:${serviceAccountFullName}"`
+  const rolesAlreadyGranted = await outputIncludes(
+    commandRolesAlreadyGranted,
+    role,
+    `Role ${role} already granted for account ${serviceAccountFullName}, skipping binding`
+  )
+  if (!rolesAlreadyGranted) {
+    const cmd =
+      `gcloud projects add-iam-policy-binding ${projectName} ` +
+      `--role=${role} ` +
+      `--member=serviceAccount:${serviceAccountFullName}`
+    await execCmd(cmd)
+  }
+  return
 }
 
 export async function retrieveCloudSQLConnectionInfo(celoEnv: string, instanceName: string) {
   await validateExistingCloudSQLInstance(instanceName)
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout --export -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout --export -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -577,8 +587,10 @@ async function helmParameters(celoEnv: string) {
 }
 
 async function helmCommand(command: string) {
-  if (isCelotoolVerbose()) {
+  if (isCelotoolVerbose() && !command.includes(' dep build ')) {
     await execCmdWithExitOnFailure(command + ' --dry-run --debug')
+  } else if (isCelotoolVerbose()) {
+    await execCmdWithExitOnFailure(command + ' --debug')
   }
 
   await execCmdWithExitOnFailure(command)
