@@ -1,6 +1,7 @@
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import cli from 'cli-ux'
+import humanizeDuration from 'humanize-duration'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -29,11 +30,13 @@ export default class ValidatorGroupRegister extends BaseCommand {
     const validators = await this.kit.contracts.getValidators()
     const commission = new BigNumber(res.flags.commission)
 
-    const requirements = await validators.getValidatorLockedGoldRequirements()
-
     if (!res.flags.yes) {
+      const requirements = await validators.getGroupLockedGoldRequirements()
+      const duration = requirements.duration.toNumber() * 1000
       const check = await cli.prompt(
-        `This will lock your gold for ${requirements.duration} blocks. Are you sure you want to continue? [yN]`,
+        `This will lock your gold for ${humanizeDuration(
+          duration
+        )}. Are you sure you want to continue? [yN]`,
         { required: false }
       )
       if (check !== 'y') {
