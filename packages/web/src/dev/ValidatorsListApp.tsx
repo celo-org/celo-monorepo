@@ -26,48 +26,27 @@ const query = gql`
   query ValidatorGroups {
     latestBlock
     celoValidatorGroups {
-      address
-      name
       account {
-        accountType
         address
-        attestationsFulfilled
-        attestationsRequested
         lockedGold
         name
-        nonvotingLockedGold
-        url
         usd
       }
       affiliates(first: 20) {
         edges {
           node {
             address
-            attestationsFulfilled
-            attestationsRequested
-            groupAddressHash
             lastElected
             lastOnline
             lockedGold
-            member
             name
-            nonvotingLockedGold
             score
-            signerAddressHash
-            url
             usd
           }
         }
       }
-      addressInfo {
-        contractCode
-        fetchedCoinBalance
-        fetchedCoinBalanceBlockNumber
-        hash
-      }
       accumulatedRewards
       accumulatedActive
-      lockedGold
       commission
       votes
       receivableVotes
