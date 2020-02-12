@@ -1,12 +1,11 @@
 import { BigNumber } from 'bignumber.js'
 import * as React from 'react'
 import { StyleSheet, Text as RNText, View } from 'react-native'
-// import css from 'src/dev/ValidatorsList.scss'
+import CopyToClipboard from 'src/dev/CopyToClipboard'
+import ProgressCutBar from 'src/dev/ProgressCutBar'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
-import CopyToClipboard from 'src/dev/CopyToClipboard'
-import ProgressCutBar from 'src/dev/ProgressCutBar'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles, typeFaces } from 'src/styles'
 import { cutAddress, formatNumber, weiToDecimal } from 'src/utils/utils'
@@ -298,7 +297,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     <Text style={[styles.barContainer]}>
                       <Text
                         style={[styles.bar, group.rewardsStyle, { width: `${group.rewards}%` }]}
-                      ></Text>
+                      />
                     </Text>
                   </Text>
                   <Text
@@ -354,7 +353,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                             ]}
                           />
                         </Text>
-                        <Text style={[styles.tableCell, styles.sizeXL]}></Text>
+                        <Text style={[styles.tableCell, styles.sizeXL]} />
                         <Text
                           style={[
                             styles.tableCell,
@@ -367,8 +366,8 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                         >
                           {formatNumber(validator.gold, 0)}
                         </Text>
-                        <Text style={[styles.tableCell, styles.sizeM]}></Text>
-                        <Text style={[styles.tableCell, styles.sizeM]}></Text>
+                        <Text style={[styles.tableCell, styles.sizeM]} />
+                        <Text style={[styles.tableCell, styles.sizeM]} />
                         <Text
                           style={[
                             styles.tableCell,

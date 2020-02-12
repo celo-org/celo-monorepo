@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import CopyIcon from 'src/icons/CopyIcon'
 import { colors } from 'src/styles'
 import { copyToClipboad } from 'src/utils/utils'
-import CopyIcon from 'src/icons/CopyIcon'
 
 interface Props {
   content: string
@@ -73,9 +73,6 @@ const styles = StyleSheet.create({
     height: 14,
 
     color: colors.grayHeavy,
-    // ':hover': {
-    //   color: colors.white,
-    // },
   },
   copied: {
     fontSize: 14,

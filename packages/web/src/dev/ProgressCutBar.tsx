@@ -26,7 +26,7 @@ const ProgressCutBar = React.memo(function ProgressCutBarFn({ bars, progress }: 
     <View style={[styles.barContainer]}>
       {blocks.map((width, i) => (
         <View key={i} style={[styles.bar]}>
-          <View style={[styles.barProgress, { width: `${width}%` }]}></View>
+          <View style={[styles.barProgress, { width: `${width}%` }]} />
         </View>
       ))}
     </View>
