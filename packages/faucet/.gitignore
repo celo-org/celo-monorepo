@@ -5,3 +5,5 @@ dist/
 
 
 serviceAccountKey.json
+
+firebase-debug.log
