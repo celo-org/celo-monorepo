@@ -16,7 +16,6 @@ interface IReleaseGoldInstance {
   function setAccountWalletAddress(address) external;
   function setAccountDataEncryptionKey(bytes calldata) external;
   function setAccountMetadataURL(string calldata) external;
-  function activate(address) external;
   function revokeActive(address, uint256, address, address, uint256) external;
   function revokePending(address, uint256, address, address, uint256) external;
 

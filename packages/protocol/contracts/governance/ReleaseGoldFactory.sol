@@ -34,6 +34,8 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
    * @param owner Address capable of revoking, setting the liquidity provision
    *              and setting the withdrawal amount.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
+   * @param initialDistributionPercentage Percentage of total rewards available for distribution.
+   *                                      Expressed to 3 significant figures [0, 1000].
    * @param _canValidate If this schedule's gold can be used for validating.
    * @param _canVote If this schedule's gold can be used for voting.
    * @return The address of the newly created release gold instance.
@@ -48,6 +50,7 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
     address payable beneficiary,
     address payable owner,
     bool subjectToLiquidityProvision,
+    uint256 initialDistributionPercentage,
     bool _canValidate,
     bool _canVote
   ) external onlyOwner returns (address) {
@@ -68,6 +71,7 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
         beneficiary,
         owner,
         subjectToLiquidityProvision,
+        initialDistributionPercentage,
         _canValidate,
         _canVote,
         address(registry)

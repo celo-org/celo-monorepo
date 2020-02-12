@@ -133,6 +133,8 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param _releaseOwner Address capable of revoking, setting the liquidity provision
    *              and setting the withdrawal amount.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
+   * @param initialDistributionPercentage Percentage of total rewards available for distribution.
+   *                                      Expressed to 3 significant figures [0, 1000].
    * @param _canValidate If this schedule's gold can be used for validating.
    * @param _canVote If this schedule's gold can be used for voting.
    * @param registryAddress Address of the deployed contracts registry.
@@ -147,6 +149,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     address payable _beneficiary,
     address payable _releaseOwner,
     bool subjectToLiquidityProvision,
+    uint256 initialDistributionPercentage,
     bool _canValidate,
     bool _canVote,
     address registryAddress
@@ -170,6 +173,10 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
       "Release schedule end time must be in the future"
     );
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
+    require(
+      initialDistributionPercentage >= 0 && initialDistributionPercentage <= 1000,
+      "Initial distribution percentage out of bounds"
+    );
 
     setRegistry(registryAddress);
 
@@ -183,8 +190,17 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
 
-    // Set maxDistribution default to maxUInt, i.e. no set max.
-    maxDistribution = ~uint256(0);
+    if (initialDistributionPercentage < 1000) {
+      // Cannot use `getTotalBalance()` here because the factory has not yet sent the gold.
+      uint256 totalGrant = releaseSchedule.amountReleasedPerPeriod.mul(
+        releaseSchedule.numReleasePeriods
+      );
+      // Initial percentage is expressed to 3 significant figures: [0, 1000].
+      maxDistribution = totalGrant.mul(initialDistributionPercentage).div(1000);
+    } else {
+      maxDistribution = ~uint256(0);
+    }
+
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
     canValidate = _canValidate;
     canVote = _canVote;
@@ -211,20 +227,20 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice Controls the maximum distribution percentage.
    *         Calculates `distributionPercentage` of current `totalBalance()`
    *         and sets this value as the maximum allowed gold to be currently withdrawn.
-   * @param distributionPercentage Percentage in range [0, 100] indicating % of total balance
-   *                               available for distribution.
+   * @param distributionPercentage Percentage in range [0, 1000] (3 significant figures)
+   *                               indicating % of total balance available for distribution.
    */
   function setMaxDistribution(uint256 distributionPercentage) external onlyReleaseOwner {
     require(
-      distributionPercentage >= 0 && distributionPercentage <= 100,
+      distributionPercentage >= 0 && distributionPercentage <= 1000,
       "Max distribution percentage must be within bounds"
     );
     // If percentage is 100%, we set maxDistribution to maxUint to account for future rewards.
-    if (distributionPercentage == 100) {
+    if (distributionPercentage == 1000) {
       maxDistribution = ~uint256(0);
     } else {
       uint256 totalBalance = getTotalBalance();
-      maxDistribution = totalBalance.mul(distributionPercentage).div(100);
+      maxDistribution = totalBalance.mul(distributionPercentage).div(1000);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
   }
@@ -360,10 +376,6 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param value The value of gold to be locked.
    */
   function lockGold(uint256 value) external nonReentrant onlyWhenInProperState {
-    require(
-      value <= address(this).balance,
-      "Gold amount to lock cannot exceed the currently available gold"
-    );
     getLockedGold().lock.gas(gasleft()).value(value)();
   }
 
@@ -503,15 +515,6 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    */
   function setAccountMetadataURL(string calldata metadataURL) external onlyWhenInProperState {
     getAccounts().setMetadataURL(metadataURL);
-  }
-
-  /**
-   * @notice Converts `account`'s pending votes for `group` to active votes.
-   * @param group The validator group to vote for.
-   * @dev Pending votes cannot be activated until an election has been held.
-   */
-  function activate(address group) external nonReentrant onlyWhenInProperState {
-    getElection().activate(group);
   }
 
   /**
