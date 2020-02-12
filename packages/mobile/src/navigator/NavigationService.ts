@@ -18,7 +18,7 @@ export enum NavActions {
   SET_NAVIGATOR = 'NAVIGATION/SET_NAVIGATOR',
 }
 
-export let navigator: NavigationContainerComponent
+let navigator: NavigationContainerComponent
 
 export const setTopLevelNavigator = (navigatorRef: any) => {
   Logger.debug(`${TAG}@setTopLevelNavigator`, 'Initialized')

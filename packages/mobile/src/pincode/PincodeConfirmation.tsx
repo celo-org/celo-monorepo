@@ -103,7 +103,9 @@ class PincodeConfirmation extends React.Component<Props, State> {
 
   onCorrectPin = (pin: string) => {
     const onValidPin = this.props.navigation.getParam('onValidPin')
-    onValidPin(pin)
+    if (onValidPin) {
+      onValidPin(pin)
+    }
   }
 
   onWrongPin = () => {
