@@ -22,6 +22,7 @@ files=(
   "packages/mobile/secrets.json"
   "packages/web/env-config.js"
   "packages/web/server-env-config.js"
+  "packages/moonpay-auth/.env"
   ".env.mnemonic"
   ".env.mnemonic.alfajores"
   ".env.mnemonic.alfajoresstaging"
