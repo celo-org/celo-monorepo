@@ -1,23 +1,32 @@
 import debugFactory from 'debug'
 import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
-import { MissingTxParamsPopulator } from '../utils/missing-tx-params-populator'
 import { stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
+import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
 import { DefaultWallet, Wallet } from '../utils/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
 const debugResponse = debugFactory('kit:provider:response')
 
+enum InterceptedMethods {
+  accounts = 'eth_accounts',
+  sendTransaction = 'eth_sendTransaction',
+  signTransaction = 'eth_signTransaction',
+  sign = 'eth_sign',
+  personalSign = 'personal_sign',
+  signTypedData = 'eth_signTypedData',
+}
+
 export class CeloProvider implements Provider {
   private readonly wallet: Wallet
   private readonly rpcCaller: RpcCaller
-  private readonly paramsPopulator: MissingTxParamsPopulator
+  private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
 
   constructor(readonly existingProvider: Provider) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
-    this.paramsPopulator = new MissingTxParamsPopulator(this.rpcCaller)
+    this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = new DefaultWallet()
   }
 
@@ -54,11 +63,11 @@ export class CeloProvider implements Provider {
     }
 
     switch (payload.method) {
-      case 'eth_accounts': {
+      case InterceptedMethods.accounts: {
         rpcCallHandler(payload, this.handleAccounts.bind(this), decoratedCallback)
         return
       }
-      case 'eth_sendTransaction': {
+      case InterceptedMethods.sendTransaction: {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
 
@@ -69,7 +78,7 @@ export class CeloProvider implements Provider {
         }
         return
       }
-      case 'eth_signTransaction': {
+      case InterceptedMethods.signTransaction: {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
 
@@ -80,24 +89,24 @@ export class CeloProvider implements Provider {
         }
         return
       }
-      case 'eth_sign':
-      case 'personal_sign': {
-        if (payload.method === 'eth_sign') {
+      case InterceptedMethods.sign:
+      case InterceptedMethods.personalSign: {
+        if (payload.method === InterceptedMethods.sign) {
           this.checkPayloadWithAtLeastNParams(payload, 1)
         } else {
           this.checkPayloadWithAtLeastNParams(payload, 2)
         }
-        address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
+        address = payload.method === InterceptedMethods.sign ? payload.params[0] : payload.params[1]
 
         if (this.isLocalAccount(address)) {
-          rpcCallHandler(payload, this.handleSign.bind(this), decoratedCallback)
+          rpcCallHandler(payload, this.handleSignPersonalMessage.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
         }
 
         return
       }
-      case 'eth_signTypedData': {
+      case InterceptedMethods.signTypedData: {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         address = payload.params[0]
 
@@ -138,7 +147,7 @@ export class CeloProvider implements Provider {
     return signature
   }
 
-  private async handleSign(payload: JsonRPCRequest): Promise<any> {
+  private async handleSignPersonalMessage(payload: JsonRPCRequest): Promise<any> {
     const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
     const data = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
     const ecSignatureHex = this.wallet.signPersonalMessage(address, data)

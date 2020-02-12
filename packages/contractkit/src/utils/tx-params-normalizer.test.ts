@@ -1,10 +1,10 @@
 import { Tx } from 'web3/eth/types'
 import { Callback, JsonRPCRequest, JsonRPCResponse } from 'web3/providers'
-import { MissingTxParamsPopulator } from './missing-tx-params-populator'
 import { RpcCaller } from './rpc-caller'
+import { TxParamsNormalizer } from './tx-params-normalizer'
 
-describe('MissingTxParamsPopulator class', () => {
-  let populator: MissingTxParamsPopulator
+describe('TxParamsNormalizer class', () => {
+  let populator: TxParamsNormalizer
   let mockRpcCall: any
   const completeCeloTx: Tx = {
     nonce: 1,
@@ -37,7 +37,7 @@ describe('MissingTxParamsPopulator class', () => {
       // tslint:disable-next-line: no-empty
       send: (_payload: JsonRPCRequest, _callback: Callback<JsonRPCResponse>): void => {},
     }
-    populator = new MissingTxParamsPopulator(rpcMock)
+    populator = new TxParamsNormalizer(rpcMock)
   })
 
   describe('when missing parameters', () => {

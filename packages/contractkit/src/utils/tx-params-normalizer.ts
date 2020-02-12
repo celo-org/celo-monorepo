@@ -16,7 +16,7 @@ function isEmpty(value: string | undefined) {
   )
 }
 
-export class MissingTxParamsPopulator {
+export class TxParamsNormalizer {
   private chainId: number | null = null
   private gatewayFeeRecipient: string | null = null
 
@@ -90,7 +90,7 @@ export class MissingTxParamsPopulator {
     return this.gatewayFeeRecipient
   }
 
-  private async getGasPrice(feeCurrency: string | undefined): Promise<string | undefined> {
+  private getGasPrice(feeCurrency: string | undefined): Promise<string | undefined> {
     // Gold Token
     if (!feeCurrency) {
       return this.getGasPriceInCeloGold()
