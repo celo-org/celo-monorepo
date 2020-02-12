@@ -1,4 +1,4 @@
-import { enterPin, skipTo, sleep } from './utils'
+import { skipTo, sleep } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -57,12 +57,7 @@ describe('Transfer Works', () => {
     await expect(element(by.id('SystemAuthTitle'))).toBeVisible()
     await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
 
-    if (device.getPlatform() === 'android') {
-      enterPin()
-    } else if (device.getPlatform() === 'ios') {
-      // iOS uses our custom keypad for now
-      // TODO
-    }
+    // TODO: enter pin using custom keypad
 
     await element(by.id('SystemAuthContinue')).tap()
   })
