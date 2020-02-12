@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
+import cli from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -11,6 +12,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Address for the Validator Group' }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
     commission: flags.string({
       required: true,
       description:
@@ -26,6 +28,19 @@ export default class ValidatorGroupRegister extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
     const commission = new BigNumber(res.flags.commission)
+
+    const requirements = await validators.getValidatorLockedGoldRequirements()
+
+    if (!res.flags.yes) {
+      const check = await cli.prompt(
+        `This will lock your gold for ${requirements.duration} blocks. Are you sure you want to continue? [yN]`,
+        { required: false }
+      )
+      if (check !== 'y') {
+        console.log('Cancelled')
+        return
+      }
+    }
 
     await newCheckBuilder(this, res.flags.from)
       .addCheck('Commission is in range [0,1]', () => commission.gte(0) && commission.lte(1))
