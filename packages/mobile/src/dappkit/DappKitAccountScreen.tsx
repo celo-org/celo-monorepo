@@ -20,7 +20,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'dappkit/DappKitAccountScreen'
 
 interface State {
-  dappName: string
+  dappName: string | null
 }
 interface OwnProps {
   errorMessage?: string
@@ -41,6 +41,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 class DappKitAccountAuthScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
+  state = {
+    dappName: null,
+  }
 
   componentDidMount() {
     if (!this.props.navigation) {
@@ -98,15 +101,16 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
 
   render() {
     const { t, account } = this.props
+    const { dappName } = this.state
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.logo}>
             <DappkitExchangeIcon />
           </View>
-          <Text style={styles.header}>
-            {t('connectToWallet', { dappname: this.state.dappName })}
-          </Text>
+          {dappName && (
+            <Text style={styles.header}>{t('connectToWallet', { dappname: dappName })}</Text>
+          )}
 
           <Text style={styles.share}>{t('shareInfo')}</Text>
 

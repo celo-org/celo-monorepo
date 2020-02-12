@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import CCLicense from 'src/brandkit/common/CCLicense'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import Fetch from 'src/brandkit/common/Fetch'
 import Page, { ICONS_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import IconShowcase from 'src/brandkit/common/Showcase'
-import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
 
 export default React.memo(

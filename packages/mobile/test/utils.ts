@@ -92,7 +92,7 @@ export function createMockStore(overrides: RecursivePartial<RootState> = {}) {
 export function getMockStoreData(overrides: RecursivePartial<RootState> = {}): RootState {
   const defaultSchema = getLatestSchema()
   const appConnectedData = {
-    geth: { initialized: InitializationState.INITIALIZED, connected: true },
+    geth: { ...defaultSchema.geth, initialized: InitializationState.INITIALIZED, connected: true },
   }
   const contactMappingData = {
     identity: {

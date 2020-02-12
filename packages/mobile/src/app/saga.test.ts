@@ -20,7 +20,7 @@ import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { web3 } from 'src/web3/contracts'
 import { getAccount } from 'src/web3/saga'
-import { zeroSyncSelector } from 'src/web3/selectors'
+import { fornoSelector } from 'src/web3/selectors'
 
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
@@ -83,7 +83,7 @@ describe('App saga', () => {
   it('Navigates after verifying PIN - Forno', async () => {
     const testRoute = { routeName: 'test', params: { a: '1' } }
     await expectSaga(navigatePinProtected, testRoute)
-      .provide([[select(zeroSyncSelector), true]])
+      .provide([[select(fornoSelector), true]])
       .run()
     expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
   })
@@ -92,7 +92,7 @@ describe('App saga', () => {
     const testRoute = { routeName: 'test', params: { a: '1' } }
     await expectSaga(navigatePinProtected, testRoute)
       .provide([
-        [select(zeroSyncSelector), false],
+        [select(fornoSelector), false],
         [call(getPincode, false), '123456'],
         [call(getAccount), 'account'],
         [call(web3.eth.personal.unlockAccount, 'account', '123456', UNLOCK_DURATION), undefined],

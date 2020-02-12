@@ -4145,11 +4145,15 @@ exports[`DevelopersPage renders 1`] = `
       style={
         Object {
           "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "center",
           "WebkitFlexGrow": 0,
           "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "center",
           "flexGrow": 0,
           "flexShrink": 0,
+          "justifyContent": "center",
           "msFlexNegative": 0,
+          "msFlexPack": "center",
           "msFlexPositive": 0,
           "paddingBottom": "10px",
           "paddingLeft": "10px",
@@ -4208,6 +4212,7 @@ exports[`DevelopersPage renders 1`] = `
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
+          href="https://c-labs.typeform.com/to/gj9aUp"
           role="link"
           style={
             Object {
@@ -4218,21 +4223,21 @@ exports[`DevelopersPage renders 1`] = `
               "WebkitFlexGrow": 0,
               "WebkitJustifyContent": "center",
               "alignItems": "center",
-              "backgroundColor": "rgba(69,214,138,0.70)",
-              "borderBottomColor": "rgba(69,214,138,0.70)",
+              "backgroundColor": "rgba(53,208,127,1.00)",
+              "borderBottomColor": "rgba(53,208,127,1.00)",
               "borderBottomLeftRadius": "3px",
               "borderBottomRightRadius": "3px",
               "borderBottomWidth": "1px",
-              "borderLeftColor": "rgba(69,214,138,0.70)",
+              "borderLeftColor": "rgba(53,208,127,1.00)",
               "borderLeftWidth": "1px",
-              "borderRightColor": "rgba(69,214,138,0.70)",
+              "borderRightColor": "rgba(53,208,127,1.00)",
               "borderRightWidth": "1px",
-              "borderTopColor": "rgba(69,214,138,0.70)",
+              "borderTopColor": "rgba(53,208,127,1.00)",
               "borderTopLeftRadius": "3px",
               "borderTopRightRadius": "3px",
               "borderTopWidth": "1px",
               "color": "rgba(255,255,255,1.00)",
-              "cursor": "not-allowed",
+              "cursor": "pointer",
               "display": "inline-flex",
               "flexGrow": 0,
               "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4255,7 +4260,7 @@ exports[`DevelopersPage renders 1`] = `
             }
           }
         >
-          Coming Soon
+          engage.contributeBtn
         </a>
       </div>
     </div>
@@ -4713,7 +4718,7 @@ exports[`DevelopersPage renders 1`] = `
                   }
                 }
               >
-                Brand
+                channels.brand.name
               </div>
             </a>
             <div
@@ -4729,7 +4734,7 @@ exports[`DevelopersPage renders 1`] = `
                 }
               }
             >
-              Design with Celo
+              channels.brand.text
             </div>
           </div>
         </div>
@@ -5053,7 +5058,7 @@ exports[`DevelopersPage renders 1`] = `
                   }
                 }
               >
-                GitHub
+                channels.github.name
               </div>
             </a>
             <div
@@ -5069,7 +5074,7 @@ exports[`DevelopersPage renders 1`] = `
                 }
               }
             >
-              Contribute to the codebase
+              channels.github.text
             </div>
           </div>
         </div>
@@ -5135,7 +5140,7 @@ exports[`DevelopersPage renders 1`] = `
                   }
                 }
               >
-                Discord
+                channels.discord.name
               </div>
             </a>
             <div
@@ -5151,8 +5156,7 @@ exports[`DevelopersPage renders 1`] = `
                 }
               }
             >
-              Collaborate and get
-developer support
+              channels.discord.text
             </div>
           </div>
         </div>
@@ -5216,7 +5220,7 @@ developer support
                   }
                 }
               >
-                Forum
+                channels.forum.name
               </div>
             </a>
             <div
@@ -5232,7 +5236,7 @@ developer support
                 }
               }
             >
-              Ask technical questions
+              channels.forum.text
             </div>
           </div>
         </div>
@@ -5317,7 +5321,7 @@ developer support
                   }
                 }
               >
-                Events
+                channels.events.name
               </div>
             </a>
             <div
@@ -5333,7 +5337,7 @@ developer support
                 }
               }
             >
-              Connect in Person
+              channels.events.text
             </div>
           </div>
         </div>
