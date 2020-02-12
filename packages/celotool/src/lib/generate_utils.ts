@@ -282,6 +282,8 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
           // ParentAggregatedSeal.Round
           new Buffer(0),
         ],
+        // Epoch data
+        new Buffer(0),
       ])
       .toString('hex')
   )
