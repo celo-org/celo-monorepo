@@ -48,19 +48,21 @@ export interface ProposalMetadata {
   deposit: BigNumber
   timestamp: BigNumber
   transactionCount: number
+  descriptionURL: string
 }
 
 export type ProposalParams = Parameters<Governance['methods']['propose']>
 export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
-export const proposalToParams = (proposal: Proposal): ProposalParams => {
+export const proposalToParams = (proposal: Proposal, descriptionURL: string): ProposalParams => {
   const data = proposal.map((tx) => stringToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
     proposal.map((tx) => tx.to),
     bufferToBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
+    descriptionURL,
   ]
 }
 
@@ -92,7 +94,7 @@ export interface Votes {
 
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
 export const hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams => {
-  const p = proposalToParams(proposal)
+  const p = proposalToParams(proposal, '') // no description URL for hotfixes
   return [p[0], p[1], p[2], p[3], bufferToString(salt)]
 }
 
@@ -177,6 +179,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       deposit: valueToBigNumber(res[1]),
       timestamp: valueToBigNumber(res[2]),
       transactionCount: valueToInt(res[3]),
+      descriptionURL: res[4],
     })
   )
 
@@ -204,6 +207,24 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isApproved: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
     this.contract.methods.isApproved,
+    tupleParser(valueToString)
+  )
+
+  /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isDequeuedProposalExpired: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
+    this.contract.methods.isDequeuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+  /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isQueuedProposalExpired = proxyCall(
+    this.contract.methods.isQueuedProposalExpired,
     tupleParser(valueToString)
   )
 
@@ -272,6 +293,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Submits a new governance proposal.
    * @param proposal Governance proposal
+   * @param descriptionURL A URL where further information about the proposal can be viewed
    */
   propose = proxySend(this.kit, this.contract.methods.propose, proposalToParams)
 
@@ -344,10 +366,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  async getDequeue() {
+  async getDequeue(filterZeroes = false) {
     const dequeue = await this.contract.methods.getDequeue().call()
     // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
-    return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
+    const dequeueIds = dequeue.map(valueToBigNumber)
+    return filterZeroes ? dequeueIds.filter((id) => !id.isZero()) : dequeueIds
   }
 
   /**

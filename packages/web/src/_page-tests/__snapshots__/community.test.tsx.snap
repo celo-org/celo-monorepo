@@ -5873,7 +5873,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              James applied his skills as a Fixer to organize comprehensive field research for the entire C Labs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.
+              James applied his skills as a Fixer to organize comprehensive field research for the entire cLabs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.
             </div>
           </div>
         </div>
@@ -7248,7 +7248,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  Brand
+                  channels.brand.name
                 </div>
               </a>
               <div
@@ -7264,7 +7264,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                Build On Celo
+                channels.brand.text
               </div>
             </div>
           </div>
@@ -7588,7 +7588,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  GitHub
+                  channels.github.name
                 </div>
               </a>
               <div
@@ -7604,7 +7604,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                Contribute to the codebase
+                channels.github.text
               </div>
             </div>
           </div>
@@ -7670,7 +7670,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  Discord
+                  channels.discord.name
                 </div>
               </a>
               <div
@@ -7686,8 +7686,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                Collaborate and get
-developer support
+                channels.discord.text
               </div>
             </div>
           </div>
@@ -7751,7 +7750,7 @@ developer support
                     }
                   }
                 >
-                  Forum
+                  channels.forum.name
                 </div>
               </a>
               <div
@@ -7767,7 +7766,7 @@ developer support
                   }
                 }
               >
-                Ask technical questions
+                channels.forum.text
               </div>
             </div>
           </div>
@@ -7852,7 +7851,7 @@ developer support
                     }
                   }
                 >
-                  Events
+                  channels.events.name
                 </div>
               </a>
               <div
@@ -7868,7 +7867,7 @@ developer support
                   }
                 }
               >
-                Connect in Person
+                channels.events.text
               </div>
             </div>
           </div>

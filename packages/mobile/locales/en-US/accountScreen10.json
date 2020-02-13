@@ -21,7 +21,8 @@
     "body": "In case of incorrect PIN, you will need to restart the app.",
     "understand": "I understand"
   },
-  "promptZeroSyncModal": {
+  "addFunds": "Add Funds",
+  "promptFornoModal": {
     "header": "Switch Connection Mode?",
     "body": "We’ve noticed you’re having some trouble connecting. We recommend enabling Data Saver mode to allow you to keep using the Celo Wallet with intermittent connection.",
     "switchToDataSaver": "Switch To Data Saver"

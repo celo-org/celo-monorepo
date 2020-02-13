@@ -8,14 +8,13 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import {
-  GethInstanceConfig,
-  getHooks,
-  GethTestConfig,
-  initAndStartGeth,
-  killInstance,
-  sleep,
-} from './utils'
+import { connectPeers, initAndStartGeth } from '../lib/geth'
+import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+
+const TMP_PATH = '/tmp/e2e'
+const verbose = false
 
 /**
  * Helper Class to change StableToken Inflation in tests
@@ -84,16 +83,21 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-const stableTokenTransferGasCost = 20325
+const stableTokenTransferGasCost = 20653
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
   update(): Promise<void>
+
   delta(address: string, token: CeloToken): BigNumber
+
   current(address: string, token: CeloToken): BigNumber
+
   initial(address: string, token: CeloToken): BigNumber
+
   debugPrint(address: string, token: CeloToken): void
 }
+
 async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<BalanceWatcher> {
   const stableToken = await kit.contracts.getStableToken()
   const goldToken = await kit.contracts.getGoldToken()
@@ -165,15 +169,39 @@ describe('Transfer tests', function(this: any) {
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
-  const gethConfig: GethTestConfig = {
+  const gethConfig: GethRunConfig = {
     migrateTo: 19,
+    networkId: 1101,
+    network: 'local',
+    runPath: TMP_PATH,
     instances: [
-      { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
+      {
+        name: 'validator',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
     ],
   }
+
   const hooks = getHooks(gethConfig)
+
   after(hooks.after)
   before(hooks.before)
+
+  // Spin up a node that we can sync with.
+  const fullInstance: GethInstanceConfig = {
+    name: 'txFull',
+    validating: false,
+    syncmode: 'full',
+    lightserv: true,
+    port: 30305,
+    rpcport: 8547,
+    // We need to set an etherbase here so that the full node will accept transactions from
+    // light clients.
+    etherbase: FeeRecipientAddress,
+  }
 
   const restartWithCleanNodes = async () => {
     await hooks.restart()
@@ -186,20 +214,9 @@ describe('Transfer tests', function(this: any) {
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
-    // Spin up a node that we can sync with.
-    const fullInstance = {
-      name: 'txFull',
-      validating: false,
-      syncmode: 'full',
-      lightserv: true,
-      port: 30305,
-      rpcport: 8547,
-      // We need to set an etherbase here so that the full node will accept transactions from
-      // light clients.
-      etherbase: FeeRecipientAddress,
-      peers: [8545],
-    }
-    await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
+    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
+    await connectPeers([...gethConfig.instances, fullInstance], verbose)
+    await waitToFinishInstanceSyncing(fullInstance)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -220,16 +237,26 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
-    // Spin up the node to run transfers as.
-    currentGethInstance = await initAndStartGeth(hooks.gethBinaryPath, {
+    const instance: GethInstanceConfig = {
       name: syncmode,
       validating: false,
       syncmode,
       port: 30307,
       rpcport: 8549,
+      lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
       privateKey: DEF_FROM_PK,
-      peers: [8547],
-    })
+    }
+
+    // Spin up the node to run transfers as.
+    currentGethInstance = await initAndStartGeth(
+      gethConfig,
+      hooks.gethBinaryPath,
+      instance,
+      verbose
+    )
+
+    await connectPeers([fullInstance, currentGethInstance])
+    await waitToFinishInstanceSyncing(currentGethInstance)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
