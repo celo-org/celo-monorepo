@@ -184,8 +184,6 @@ OPTIONS
   --lookback=lookback                                     [default: 100] how many blocks to look back for signer
                                                           activity
 
-  --no-truncate                                           Don't truncate fields to fit line
-
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
 
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the validator to check if elected and validating
