@@ -243,9 +243,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                         {group.name}
                       </Text>
                       <Text style={[styles.tableCellTitleSecRow]}>
-                        <Text style={[{ color: colors.grayHeavy }]}>
-                          {cutAddress(group.address)}
-                        </Text>
+                        <Text style={[styles.address]}>{cutAddress(group.address)}</Text>
                         <CopyToClipboard content={group.address} />
                       </Text>
                     </Text>
@@ -311,7 +309,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                 {i === expanded && (
                   <View>
                     {group.validators.map((validator, j) => (
-                      <View key={`${i}.${j}`} style={[styles.tableRow]}>
+                      <View key={`${group.address}.${j}`} style={[styles.tableRow]}>
                         <Text
                           style={[
                             styles.tableCell,
@@ -336,7 +334,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                                 styles.tableCellTitleSecondarySecRow,
                               ]}
                             >
-                              <Text>{cutAddress(validator.address)}</Text>
+                              <Text style={[styles.address]}>{cutAddress(validator.address)}</Text>
                               <CopyToClipboard content={validator.address} />
                             </Text>
                           </Text>
@@ -411,6 +409,9 @@ const styles = StyleSheet.create({
   defaultText: {
     fontFamily: typeFaces.futura,
     color: colors.white,
+  },
+  address: {
+    color: colors.grayHeavy,
   },
 
   // Table
@@ -588,6 +589,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   numberBlock: {
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderRightWidth: 0,
     paddingHorizontal: 10,
     borderLeftWidth: 1,
     borderLeftColor: colors.grayHeavy,
