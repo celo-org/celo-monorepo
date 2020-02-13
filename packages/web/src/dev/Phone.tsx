@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
     ],
   },
   line: {
-    borderBottomColor: colors.primary,
-    borderBottomWidth: 1,
     width: LINE_DISTANCE,
+    height: 1,
+    backgroundColor: colors.primary,
   },
 })

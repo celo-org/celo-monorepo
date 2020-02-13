@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import DeveloperPhoneCover from 'src/dev/DeveloperPhoneCover'
 import { Contribute, EngageAsDeveloper } from 'src/dev/Engage'
 import Features from 'src/dev/Features'
@@ -9,10 +9,12 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
+import { fonts, standardStyles, textStyles } from 'src/styles'
 const previewImage = require('src/dev/opengraph.jpg')
 
 class Developers extends React.PureComponent<I18nProps> {
   render() {
+    const { t } = this.props
     return (
       <View style={styles.container}>
         <OpenGraph
@@ -27,7 +29,11 @@ class Developers extends React.PureComponent<I18nProps> {
         <Sandbox />
         <FullStack />
         <Features />
-        <EngageAsDeveloper />
+        <EngageAsDeveloper action={t('getInvolved')}>
+          <Text style={[fonts.h6, textStyles.lean, standardStyles.elementalMarginBottom]}>
+            {t('engage.developers.verb')}
+          </Text>
+        </EngageAsDeveloper>
         <Contribute />
         <ConnectionFooter includeDividerLine={false} />
       </View>

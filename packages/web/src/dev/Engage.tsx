@@ -18,9 +18,12 @@ import { CeloLinks } from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
 
 export default React.memo(function _Engage() {
+  const { t } = useTranslation(NameSpaces.dev)
   return (
     <>
-      <EngageAsDeveloper />
+      <EngageAsDeveloper action={t('engage.developers.verb')} noun={t('engage.developers.noun')}>
+        <H2 style={standardStyles.elementalMarginBottom}>{t('engage.topTitle')}</H2>
+      </EngageAsDeveloper>
       <EngageAsValidator />
       <Contribute />
     </>
@@ -28,7 +31,7 @@ export default React.memo(function _Engage() {
 })
 
 interface ContentProps {
-  noun: string
+  noun?: string
   verb: string
   network: string
   caption: string
@@ -40,7 +43,7 @@ interface ContentProps {
 const Content = React.memo(function _Content(props: ContentProps) {
   return (
     <View style={styles.paragraphArea}>
-      <H3 style={standardStyles.elementalMarginBottom}>{props.noun}</H3>
+      {props.noun && <H3 style={standardStyles.elementalMarginBottom}>{props.noun}</H3>}
       <H4 style={standardStyles.elementalMarginBottom}>{props.verb}</H4>
       <Text style={fonts.h6}>{props.network}</Text>
       <Fade fraction={0.5} bottom={true} distance={'10px'}>
@@ -136,7 +139,13 @@ export function Contribute() {
   )
 }
 
-export function EngageAsDeveloper() {
+interface EngageProps {
+  children: React.ReactNode
+  action: string
+  noun?: string
+}
+
+export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
   const screen = useScreenSize()
   const { t } = useTranslation(NameSpaces.dev)
   return (
@@ -147,12 +156,12 @@ export function EngageAsDeveloper() {
       allStyle={styles.alignOut}
     >
       <Cell span={Spans.half}>
-        <H2 style={standardStyles.elementalMarginBottom}>{t('engage.topTitle')}</H2>
+        {children}
         <Content
           image={require('src/dev/cakeLayering.jpg')}
           screen={screen}
-          noun={t('engage.developers.noun')}
-          verb={t('engage.developers.verb')}
+          noun={noun}
+          verb={action}
           network={t('engage.developers.network')}
           caption={t('engage.developers.caption')}
           primaryAction={{

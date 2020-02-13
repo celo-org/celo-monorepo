@@ -24,6 +24,7 @@
   "developerSDKsubtitle": "Innovative tools to build native mobile dApps",
   "viewGitHub": "View on Github",
   "getStarted": "Get Wallet",
+  "getInvolved": "Get Involved",
   "seeTutorial": "See Tutorial",
   "featureTitle": "Platform Features",
   "techTitle": "Full Stack Approach",
@@ -55,7 +56,7 @@
       "noun": "For Developers",
       "verb": "Extend & Enrich the Ecosystem",
       "network": "Alfajores Testnet",
-      "caption": "Try out the Celo Protocol and Celo Wallet.\nBuild apps for the Celo platform.",
+      "caption": "Try out the Celo Protocol and Celo Wallet.\nBuild dApps for the Celo platform.",
       "primaryAction": "Get Wallet",
       "secondaryAction": "Explore Celo CLI"
     },
@@ -170,5 +171,11 @@
   },
   "stackBrowseTitle": "Browse the Code",
   "stackBrowseCopy": "Explore and contribute to the Celo codebase",
-  "stackBrowseButton": "View On Github"
+  "stackBrowseButton": "View On Github",
+  "sandbox": {
+    "overtitle": "Try it Out",
+    "title": "Sample Celo Integration",
+    "explainer": "This code snippet creates an account and transfers Celo Dollars to the account.",
+    "btn": "Try out the Code"
+  }
 }
