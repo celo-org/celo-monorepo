@@ -1,4 +1,4 @@
-import { enterPin, skipTo, sleep } from './utils'
+import { skipTo, sleep } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -29,8 +29,8 @@ async function bannerDismiss(inElement, tapElement) {
 
 describe('Transfer Works', () => {
   beforeEach(async () => {
-    bannerDismiss(by.id('errorBanner'))
-    bannerDismiss(by.id('SmartTopAlertButton'))
+    await bannerDismiss(by.id('errorBanner'))
+    await bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
   it('NUX->Language', async () => {
@@ -56,7 +56,8 @@ describe('Transfer Works', () => {
   it('NUX->Pin', async () => {
     await expect(element(by.id('SystemAuthTitle'))).toBeVisible()
     await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
-    enterPin()
+
+    // TODO: enter pin using custom keypad
 
     await element(by.id('SystemAuthContinue')).tap()
   })
