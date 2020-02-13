@@ -171,7 +171,7 @@ async function castVote(
   // Revoke existing vote(s) if any and update capacity of the group
   for (const vote of currentVotes) {
     const revokeTxs = await election.revoke(botAccount, vote.group, vote.pending.plus(vote.active))
-    await concurrentMap(10, revokeTxs, (tx) => {
+    await concurrentMap(10, revokeTxs, async (tx) => {
       return tx.sendAndWaitForReceipt({ from: botAccount })
     })
     const group = normalizeAddressWith0x(vote.group)
@@ -212,7 +212,7 @@ async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNu
 
   const validatorSigners = await election.getCurrentValidatorSigners()
   const validatorAccounts = (
-    await concurrentMap(10, validatorSigners, (acc) => {
+    await concurrentMap(10, validatorSigners, async (acc) => {
       return validators.getValidatorFromSigner(acc)
     })
   ).filter((v) => !!v.affiliation) // Skip unaffiliated
@@ -289,7 +289,9 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
     if (!(await election.hasActivatablePendingVotes(account))) {
       try {
         const activateTxs = await election.activate(account)
-        await concurrentMap(10, activateTxs, (tx) => tx.sendAndWaitForReceipt({ from: account }))
+        await concurrentMap(10, activateTxs, async (tx) =>
+          tx.sendAndWaitForReceipt({ from: account })
+        )
       } catch (error) {
         console.error(`Failed to activate pending votes for ${account}`)
       }
