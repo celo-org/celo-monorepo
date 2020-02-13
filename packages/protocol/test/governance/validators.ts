@@ -1149,6 +1149,72 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
+  describe('#updateKeys()', () => {
+    describe('when called by a registered validator', () => {
+      const validator = accounts[0]
+      beforeEach(async () => {
+        await registerValidator(validator)
+      })
+
+      describe('when called by the registered `Accounts` contract', () => {
+        beforeEach(async () => {
+          await registry.setAddressFor(CeloContractName.Accounts, accounts[0])
+        })
+
+        describe('when the public key matches the signer', () => {
+          let resp: any
+          let newPublicKey: string
+          const signer = accounts[9]
+          beforeEach(async () => {
+            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
+            // @ts-ignore Broken typechain typing for bytes
+            resp = await validators.updateEcdsaPublicKey(validator, signer, newPublicKey)
+          })
+
+          it('should set the validator ecdsa public key', async () => {
+            await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
+            const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+            assert.equal(parsedValidator.ecdsaPublicKey, newPublicKey)
+          })
+
+          it('should emit the ValidatorEcdsaPublicKeyUpdated event', async () => {
+            assert.equal(resp.logs.length, 1)
+            const log = resp.logs[0]
+            assertContainSubset(log, {
+              event: 'ValidatorEcdsaPublicKeyUpdated',
+              args: {
+                validator,
+                ecdsaPublicKey: newPublicKey,
+              },
+            })
+          })
+        })
+
+        describe('when the public key does not match the signer', () => {
+          let newPublicKey: string
+          const signer = accounts[9]
+          it('should revert', async () => {
+            newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
+            // @ts-ignore Broken typechain typing for bytes
+            await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
+          })
+        })
+      })
+
+      describe('when not called by the registered `Accounts` contract', () => {
+        describe('when the public key matches the signer', () => {
+          let newPublicKey: string
+          const signer = accounts[9]
+          it('should revert', async () => {
+            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
+            // @ts-ignore Broken typechain typing for bytes
+            await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
+          })
+        })
+      })
+    })
+  })
+
   describe('#updateBlsPublicKey()', () => {
     const newBlsPublicKey = web3.utils.randomHex(96)
     const newBlsPoP = web3.utils.randomHex(48)
