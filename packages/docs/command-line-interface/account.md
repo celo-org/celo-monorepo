@@ -14,6 +14,13 @@ USAGE
 
 OPTIONS
   -r, --role=vote|validator|attestation                (required) Role to delegate
+
+  --blsKey=0x                                          The BLS public key that the validator is using for consensus,
+                                                       should pass proof of possession. 96 bytes.
+
+  --blsPop=0x                                          The BLS public key proof-of-possession, which consists of a
+                                                       signature on the account address. 48 bytes.
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
 
   --signature=signature                                (required) Signature (a.k.a proof-of-possession) of the signer
