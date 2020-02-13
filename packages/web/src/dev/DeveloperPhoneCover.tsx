@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import CoverActions from 'src/dev/CoverActions'
 import Phone from 'src/dev/Phone'
-import { H1 } from 'src/fonts/Fonts'
+import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
@@ -35,6 +35,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           >
             {t('developerSDKTitle')}
           </H1>
+          <H4 style={[textStyles.center, textStyles.invert]}>{t('developerSDKsubtitle')}</H4>
         </Cell>
       </GridRow>
       <Fade ssrReveal={true} delay={DELAY_2} duration={DURATION} bottom={true} distance={'40px'}>

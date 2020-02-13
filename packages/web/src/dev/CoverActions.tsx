@@ -8,7 +8,7 @@ import { CeloLinks } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
 const docImage = require('src/dev/stable-coin-paper-dark-bg.png')
 const sdkImage = require('src/dev/code-coins-dark.png')
-const tutorialImg = require('src/dev/gold-code-dark-bg.png')
+const tutorialImg = require('src/dev/educate-dark-bg.png')
 
 type Props = I18nProps & ScreenProps
 
@@ -34,19 +34,18 @@ export default withNamespaces('dev')(
               link={{ text: t('coverAction.docs.link'), href: CeloLinks.sdkDocs }}
             />
             <CoverAction
-              graphic={sdkImage}
-              isMobile={screen === ScreenSizes.MOBILE}
-              title={t('coverAction.code.title')}
-              text={t('coverAction.code.text')}
-              link={{ text: t('coverAction.code.link'), href: CeloLinks.gitHub }}
-            />
-
-            <CoverAction
               graphic={tutorialImg}
               isMobile={screen === ScreenSizes.MOBILE}
               title={t('coverAction.tutorial.title')}
               text={t('coverAction.tutorial.text')}
               link={{ text: t('coverAction.tutorial.link'), href: CeloLinks.tutorial }}
+            />
+            <CoverAction
+              graphic={sdkImage}
+              isMobile={screen === ScreenSizes.MOBILE}
+              title={t('coverAction.code.title')}
+              text={t('coverAction.code.text')}
+              link={{ text: t('coverAction.code.link'), href: CeloLinks.gitHub }}
             />
           </Cell>
         </GridRow>

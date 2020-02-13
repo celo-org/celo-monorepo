@@ -4,11 +4,13 @@ import DeveloperPhoneCover from 'src/dev/DeveloperPhoneCover'
 import { Contribute, EngageAsDeveloper } from 'src/dev/Engage'
 import Features from 'src/dev/Features'
 import FullStack from 'src/dev/FullStack'
+import Sandbox from 'src/dev/Sandbox'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 const previewImage = require('src/dev/opengraph.jpg')
+
 class Developers extends React.PureComponent<I18nProps> {
   render() {
     return (
@@ -22,6 +24,7 @@ class Developers extends React.PureComponent<I18nProps> {
           }
         />
         <DeveloperPhoneCover />
+        <Sandbox />
         <FullStack />
         <Features />
         <EngageAsDeveloper />

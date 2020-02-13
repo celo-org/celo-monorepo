@@ -20,7 +20,8 @@
   "unitOfMeasure": "Baklava Testnet Units (BTUs)",
   "leaderboardTitle": "The Great Celo Stake Off\nLeaderboard",
   "prizeInfo": "The top 50 eligible participants may receive Celo Gold, subject to <0>Terms & Conditions</0>",
-  "developerSDKTitle": "Build on Celo",
+  "developerSDKTitle": "Celo SDK",
+  "developerSDKsubtitle": "Innovative tools to build native mobile dApps",
   "viewGitHub": "View on Github",
   "getStarted": "Get Wallet",
   "seeTutorial": "See Tutorial",
@@ -92,8 +93,8 @@
   "coverAction": {
     "docs": {
       "title": "Documentation",
-      "text": "Learn about the technology behind the Celo Protocol and Celo Wallet",
-      "link": "See Documentation"
+      "text": "Learn about the SDK and how it works",
+      "link": "Visit Docs"
     },
     "faucet": {
       "title": "Add Funds",
@@ -101,19 +102,14 @@
       "link": "Get Funds"
     },
     "code": {
-      "title": "Browse the Code",
-      "text": "Explore and contribute to the Celo codebase",
+      "title": "Code",
+      "text": "Read and contribute to the SDK codebase",
       "link": "View on GitHub"
     },
-    "sdk": {
-      "title": "SDK",
-      "text": "Build on the Celo Platform",
-      "link": "See Documentation"
-    },
     "tutorial": {
-      "title": "Tutorial",
-      "text": "Learn the Celo Platform",
-      "link": "Start Tutorial"
+      "title": "Tutorials",
+      "text": "Get started, learn how to deploy contracts, and more",
+      "link": "Get Started"
     }
   },
   "levelLabel": {
@@ -148,7 +144,8 @@
     "nonCustodial": "Non-custodial wallet",
     "mobileUltra": "Mobile ultralight client",
     "exchange": "Exchange between Celo Dollar and Celo Gold",
-    "qr": "QR Code Support"
+    "qr": "QR Code Support",
+    "sdk": "Mobile first SDK"
   },
   "protocol": {
     "title": "Core Contracts",

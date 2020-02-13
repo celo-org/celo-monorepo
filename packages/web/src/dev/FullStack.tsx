@@ -193,6 +193,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
               <Li style={textStyles.invert}>{t('mobile.mobileUltra')}</Li>
               <Li style={textStyles.invert}>{t('mobile.exchange')}</Li>
               <Li style={textStyles.invert}>{t('mobile.qr')}</Li>
+              <Li style={textStyles.invert}>{t('mobile.sdk')}</Li>
             </StackSection>
             <StackSection
               onPress={this.setL2}

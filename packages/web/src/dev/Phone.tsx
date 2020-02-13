@@ -33,11 +33,9 @@ function Phone() {
 
 function GreenLine() {
   return (
-    <View
-      style={[standardStyles.row, standardStyles.centered, styles.lightspeed, styles.animations]}
-    >
-      <View style={styles.line} />
-      <View style={styles.onLine}>
+    <View style={[standardStyles.row, standardStyles.centered]}>
+      <View style={[styles.line, styles.arrow, styles.animations]} />
+      <View style={[styles.arrowhead, styles.animations]}>
         <OvalCoin color={colors.primary} size={20} />
       </View>
     </View>
@@ -46,7 +44,7 @@ function GreenLine() {
 
 export default React.memo(Phone)
 
-const LINE_OFFSET = 150
+const LINE_DISTANCE = 280
 
 const svgStyle = {
   zIndex: 1,
@@ -55,12 +53,14 @@ const svgStyle = {
 const styles = StyleSheet.create({
   absoluteCenter: {
     position: 'absolute',
+    left: 0,
+    right: 0,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
   animations: {
-    animationDuration: '1.2s',
+    animationDuration: '1s',
     animationIterationCount: 1,
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
@@ -77,21 +77,31 @@ const styles = StyleSheet.create({
       },
     ],
   },
-  lightspeed: {
+  arrowhead: {
     animationKeyframes: [
       {
         '0%': {
-          transform: [{ translateX: `calc(-${LINE_OFFSET * 3}px)` }],
-        },
-        '40%': {
-          transform: [
-            {
-              translateX: `calc(-${LINE_OFFSET}px)`,
-            },
-          ],
+          opacity: 0.5,
+          transform: [{ translateX: -LINE_DISTANCE }],
         },
         '100%': {
-          transform: [{ translateX: 0 }],
+          opacity: 1,
+          transform: [{ translateX: -10 }],
+        },
+      },
+    ],
+  },
+  arrow: {
+    transformOrigin: 'left',
+    animationKeyframes: [
+      {
+        '0%': {
+          opacity: 0.6,
+          transform: [{ scaleX: 0 }],
+        },
+        '100%': {
+          opacity: 1,
+          transform: [{ scaleX: 1 }],
         },
       },
     ],
@@ -99,9 +109,6 @@ const styles = StyleSheet.create({
   line: {
     borderBottomColor: colors.primary,
     borderBottomWidth: 1,
-    width: `calc(50vw + ${LINE_OFFSET}px)`,
-  },
-  onLine: {
-    transform: [{ translateX: -5 }],
+    width: LINE_DISTANCE,
   },
 })
