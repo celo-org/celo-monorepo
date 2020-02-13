@@ -181,37 +181,42 @@ contract('Reserve', (accounts: string[]) => {
       await mockGoldToken.setBalanceOf(reserve.address, aValue)
       await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
       await reserve.addSpender(spender)
+      await reserve.addOtherReserveAddress(anAddress)
     })
 
     it('should allow a spender to call transferGold', async () => {
-      await reserve.transferGold(nonOwner, aValue, { from: spender })
+      await reserve.transferGold(anAddress, aValue, { from: spender })
     })
 
     it('should not allow a spender to transfer more than daily ratio', async () => {
       await reserve.setDailySpendingRatio(toFixed(0.2))
-      await assertRevert(reserve.transferGold(nonOwner, aValue / 2, { from: spender }))
+      await assertRevert(reserve.transferGold(anAddress, aValue / 2, { from: spender }))
     })
 
     it('daily spending accumulates', async () => {
       await reserve.setDailySpendingRatio(toFixed(0.15))
-      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
-      await assertRevert(reserve.transferGold(nonOwner, aValue * 0.1, { from: spender }))
+      await reserve.transferGold(anAddress, aValue * 0.1, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue * 0.1, { from: spender }))
     })
 
     it('daily spending limit should be reset after 24 hours', async () => {
       await reserve.setDailySpendingRatio(toFixed(0.15))
-      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await reserve.transferGold(anAddress, aValue * 0.1, { from: spender })
       await timeTravel(3600 * 24, web3)
-      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await reserve.transferGold(anAddress, aValue * 0.1, { from: spender })
     })
 
     it('should not allow a removed spender to call transferGold', async () => {
       await reserve.removeSpender(spender)
-      await assertRevert(reserve.transferGold(nonOwner, aValue, { from: spender }))
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
     })
 
     it('should not allow other addresses to call transferGold', async () => {
-      await assertRevert(reserve.transferGold(nonOwner, aValue, { from: nonOwner }))
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: nonOwner }))
+    })
+
+    it('can only transfer gold to other reverse addresses', async () => {
+      await assertRevert(reserve.transferGold(nonOwner, aValue, { from: spender }))
     })
   })
 
