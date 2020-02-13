@@ -297,9 +297,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
-    uint256 reserveGoldBalance = getGoldToken().balanceOf(
-      registry.getAddressForOrDie(RESERVE_REGISTRY_ID)
-    );
+    uint256 reserveGoldBalance = getReserve().getUnfrozenReserveGoldBalance();
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }
 

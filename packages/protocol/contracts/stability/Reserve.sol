@@ -253,7 +253,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
-      uint256 balance = getReserveGoldBalance();
+      uint256 balance = getUnfrozenReserveGoldBalance();
       lastSpendingDay = currentDay;
       spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
     }
@@ -334,7 +334,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = getReserveGoldBalance();
+    uint256 reserveGoldBalance = getUnfrozenReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
 
     for (uint256 i = 0; i < _tokens.length; i++) {
