@@ -13,7 +13,7 @@ RUN apt-get update && \
 
 
 # ensure yarn.lock is evaluated by kaniko cache diff
-COPY lerna.json package.json yarn.lock ./
+COPY lerna.json package.json yarn.lock .env.* ./
 COPY scripts/ scripts/
 COPY packages/utils/package.json packages/utils/
 COPY packages/dev-utils/package.json packages/dev-utils/
@@ -35,7 +35,7 @@ COPY packages/protocol packages/protocol/
 COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
-RUN yarn build
+RUN yarn build && rm -rf .env.*
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
