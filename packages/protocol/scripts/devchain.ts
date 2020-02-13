@@ -3,11 +3,14 @@ import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
+import * as targz from 'targz'
 import * as yargs from 'yargs'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 
 const gasLimit = 20000000
+
+const compressedNameDefault = 'compressedChain.tar.gz'
 
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
 
@@ -51,12 +54,28 @@ yargs
         .option('migration_override', {
           type: 'string',
           description: 'Path to JSON containing config values to use in migrations',
+        })
+        .option('targz', {
+          description: 'Compresses the result chain',
+          type: 'boolean',
+          default: false,
+          requiresArg: false,
+        })
+        .options('targz_name', {
+          description: 'If targz flag setted, this name will be used',
+          default: compressedNameDefault,
+          requiresArg: false,
+          type: 'string',
         }),
     (args) =>
       exitOnError(
         generateDevChain(args.datadir, {
           upto: args.upto,
           migrationOverride: args.migration_override,
+          targz: {
+            required: args.targz,
+            name: args.targz_name,
+          },
         })
       )
   ).argv
@@ -138,9 +157,9 @@ function exitOnError(p: Promise<unknown>) {
   })
 }
 
-async function resetDir(dir: string) {
+async function resetDir(dir: string, silent?: boolean) {
   if (fs.existsSync(dir)) {
-    await execCmd('rm', ['-rf', dir])
+    await execCmd('rm', ['-rf', dir], { silent })
   }
 }
 function createDirIfMissing(dir: string) {
@@ -184,7 +203,11 @@ async function runDevChain(
 
 async function generateDevChain(
   datadir: string,
-  opts: { upto?: number; migrationOverride?: string } = {}
+  opts: {
+    upto?: number
+    migrationOverride?: string
+    targz?: { required: boolean; name: string }
+  } = {}
 ) {
   const stopGanache = await runDevChain(datadir, {
     reset: true,
@@ -192,4 +215,39 @@ async function generateDevChain(
     migrationOverride: opts.migrationOverride,
   })
   await stopGanache()
+  if (opts.targz && opts.targz.required) {
+    await compressChain(datadir, opts.targz.name)
+  }
+}
+
+async function compressChain(datadir: string, filename: string): Promise<void> {
+  // Just in case to avoid
+  const chainCompressed: string = `compressedChain${Math.random()}.tar.gz`
+  const chainPath: string = `${datadir}/${filename}`
+  if (fs.existsSync(chainPath)) {
+    await execCmd('rm', [chainPath])
+  }
+  // tslint:disable-next-line: no-console
+  console.log('Compressing chain')
+  return new Promise((resolve, reject) => {
+    targz.compress({ src: datadir, dest: chainCompressed }, async (err: Error) => {
+      if (err) {
+        console.error(err)
+        reject(err)
+      } else {
+        // tslint:disable-next-line: no-console
+        console.log('Chain compressed')
+        await resetDir(datadir, true)
+        fs.mkdirSync(datadir)
+        fs.rename(chainCompressed, chainPath, (error: Error) => {
+          if (err) {
+            console.error(error)
+            reject(err)
+          } else {
+            resolve()
+          }
+        })
+      }
+    })
+  })
 }
