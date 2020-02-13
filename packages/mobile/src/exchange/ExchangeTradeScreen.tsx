@@ -136,14 +136,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   isExchangeInvalid = () => {
     const amount = parseInputAmount(this.state.inputAmount)
-    const dollarAmount = this.isDollarInput()
-      ? amount
-      : this.getOppositeInputTokenAmount(this.state.inputAmount)
 
-    const amountIsValid =
+    const amountIsInvalid =
       !this.inputAmountIsValid(amount) ||
-      dollarAmount.isLessThan(
-        this.isDollarToGold() ? DOLLAR_TRANSACTION_MIN_AMOUNT : GOLD_TRANSACTION_MIN_AMOUNT
+      amount.isLessThan(
+        this.isDollarInput() ? DOLLAR_TRANSACTION_MIN_AMOUNT : GOLD_TRANSACTION_MIN_AMOUNT
       )
 
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, this.state.makerToken)
@@ -155,7 +152,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       CURRENCIES[takerToken].displayDecimals
     ).isLessThanOrEqualTo(0)
 
-    return amountIsValid || exchangeRateIsInvalid || takerAmountIsInvalid || this.hasError()
+    return amountIsInvalid || exchangeRateIsInvalid || takerAmountIsInvalid || this.hasError()
   }
 
   isDollarToGold = () => {
