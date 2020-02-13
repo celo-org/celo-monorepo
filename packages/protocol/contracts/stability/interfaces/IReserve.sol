@@ -10,4 +10,5 @@ interface IReserve {
   function getUnfrozenReserveGoldBalance() external view returns (uint256);
   function getOrComputeTobinTax() external returns (uint256, uint256);
   function getTokens() external view returns (address[] memory);
+  function getReserveRatio() external view returns (uint256);
 }

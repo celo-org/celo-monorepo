@@ -1,19 +1,19 @@
 # adapted from https://github.com/CircleCI-Public/circleci-demo-react-native
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
-version: 2
+version: 2.1
 reference:
   workspace: &workspace ~/src
   ## Configurations
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "10.2.1"
+      xcode: '10.2.1'
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
+      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true'
 
 defaults: &defaults
   working_directory: ~/app
@@ -21,15 +21,15 @@ defaults: &defaults
     - image: celohq/node10-gcloud
   environment:
     # To avoid ENOMEM problem when running node
-    NODE_OPTIONS: "--max-old-space-size=4096"
+    NODE_OPTIONS: '--max-old-space-size=4096'
 
 android-defaults: &android-defaults
   <<: *defaults
   docker:
     - image: circleci/android:api-28-node
   environment:
-    _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-    GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
+    _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+    GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true'
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -40,9 +40,59 @@ e2e-defaults: &e2e-defaults
 
 general:
   artifacts:
-    - "mobile/coverage"
-    - "web/coverage"
-    - "protocol/coverage"
+    - 'mobile/coverage'
+    - 'web/coverage'
+    - 'protocol/coverage'
+
+commands:
+  yarn_install:
+    steps:
+      - run:
+          name: Create cache checksum files
+          command: |
+            mkdir -p ~/.tmp/checksumfiles
+            # Concatenate patches so we can use them as a part of the cache key
+            find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/patches
+      - restore_cache:
+          name: Restore cached node_modules
+          keys:
+            # Using a single cache key here as we don't want to fallback on restoring node_modules produced
+            # by a different yarn.lock and patches
+            - node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+      - run:
+          name: Extract cached node_modules (if present)
+          command: if [ -e ~/.tmp/node_modules.tgz ]; then tar -xf ~/.tmp/node_modules.tgz; fi
+
+      - run:
+          name: Install dependencies
+          command: |
+            # Deals with yarn install flakiness which can come due to yarnpkg.com being
+            # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
+            yarn install || yarn install
+      - run:
+          name: Fail if someone forgot to commit "yarn.lock"
+          command: |
+            if [[ $(git status --porcelain) ]]; then
+              git --no-pager diff
+              echo "There are git differences after running yarn install"
+              exit 1
+            fi
+
+      # Workaround save_cache not supporting globbing for the paths key
+      # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
+      - run:
+          name: Create cached node_modules (if necessary)
+          command: |
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+              tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
+              # Dependencies have changed, create beacon file used by the check licenses step
+              touch ~/.tmp/yarn_deps_have_changed
+            fi
+      - save_cache:
+          name: Save cached node_modules
+          key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          paths:
+            - ~/.tmp/node_modules.tgz
 
 jobs:
   install_dependencies:
@@ -61,7 +111,7 @@ jobs:
       - save_cache:
           key: source-v1-{{ .Branch }}-{{ .Revision }}
           paths:
-            - ".git"
+            - '.git'
 
       - run:
           name: Verify setup for incremental testing
@@ -79,37 +129,7 @@ jobs:
       - attach_workspace:
           at: ~/app
 
-      - restore_cache:
-          keys:
-            - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v2-{{ arch }}-{{ .Branch }}-
-            - yarn-v2-{{ arch }}-
-            - yarn-v2-
-
-      - run:
-          name: Delete @celo dir from node_modules (if its there)
-          command: rm -rf ~/app/node_modules/@celo
-
-      - run:
-          name: Install dependencies
-          command: |
-            # Deals with yarn install flakiness which can come due to yarnpkg.com being
-            # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
-            yarn install || yarn install
-      - run:
-          name: Fail if someone forgot to commit "yarn.lock"
-          command: |
-            if [[ $(git status --porcelain) ]]; then
-              echo "There are git differences after running yarn install"
-              exit 1
-            fi
-      - run: npm rebuild scrypt
-
-      - save_cache:
-          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
-            - packages/*/node_modules
+      - yarn_install
 
       - run:
           name: Build packages
@@ -122,7 +142,16 @@ jobs:
 
       - run:
           name: Check licenses
-          command: yarn check-licenses
+          command: |
+            if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
+              # Internally `yarn check-licenses` downloads dependencies into its cache again even if node_modules are up-to-date
+              # which happens when we've restored our cached node_modules.
+              # Making `yarn check-licenses` take ~45secs instead of ~3secs (depending on network conditions and build machine)
+              # So here we skip checking when it's unnecessary
+              echo "Skipping checking licenses, dependencies haven't changed"
+              exit 0
+            fi
+            yarn check-licenses
 
       - persist_to_workspace:
           root: .
@@ -267,6 +296,105 @@ jobs:
           paths:
             - ~/src/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
+
+  end-to-end-mobile-test-ios:
+    macos:
+      xcode: '11.3.1'
+    working_directory: ~/app_osx
+    steps:
+      - checkout
+      - run:
+          name: Configure environment variables
+          command: |
+            echo 'export PATH=/usr/local/opt/node@10/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Install needed tools
+          command: |
+            set -euo pipefail
+            export HOMEBREW_NO_AUTO_UPDATE=1
+            brew install node@10
+            brew tap wix/brew
+            brew install applesimutils
+            node -v
+      # Not using a workspace here as Node and Yarn versions
+      # differ between our macOS executor image and the Docker containers
+      - yarn_install
+      - run:
+          name: Build mobile dependencies
+          command: |
+            set -euo pipefail
+            yarn build \
+              --scope @celo/mobile \
+              --include-filtered-dependencies
+      - run:
+          name: Install bundle
+          command: |
+            set -euo pipefail
+            cd packages/mobile
+            bundle install
+      - run:
+          name: Fail if someone forgot to commit "Gemfile.lock"
+          command: |
+            set -euo pipefail
+            if [[ $(git status --porcelain) ]]; then
+              git --no-pager diff
+              echo "There are git differences after running bundle install"
+              exit 1
+            fi
+      - restore_cache:
+          name: Restore pods cache
+          keys:
+            # Using a single cache key here as we don't want partial cache restoration
+            # i.e. when Podfile/Podfile.lock change, we want to start fresh again
+            - pods-wallet-v1-{{ arch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
+      - run:
+          name: Install pods
+          command: |
+            set -euo pipefail
+            cd packages/mobile/ios
+            bundle exec pod install
+      - run:
+          name: Fail if someone forgot to commit "Podfile.lock"
+          command: |
+            set -euo pipefail
+            if [[ $(git status --porcelain) ]]; then
+              git --no-pager diff
+              echo "There are git differences after running pod install"
+              exit 1
+            fi
+      - save_cache:
+          name: Save pods cache
+          key: pods-wallet-v1-{{ arch }}-{{ checksum "packages/mobile/ios/Podfile" }}-{{ checksum "packages/mobile/ios/Podfile.lock" }}
+          paths:
+            - packages/mobile/ios/Pods
+      - restore_cache:
+          name: Restore built detox framework
+          keys:
+            - detox-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+      - run:
+          name: Build detox framework
+          command: |
+            set -euo pipefail
+            cd packages/mobile
+            # Make sure the detox framework is present
+            yarn run detox build-framework-cache
+      - save_cache:
+          name: Save built detox framework
+          key: detox-v1-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          paths:
+            - ~/Library/Detox/ios
+      - run:
+          name: Run e2e tests
+          command: |
+            set -euo pipefail
+            cd packages/mobile
+            # Create dummy Google services plist
+            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
+            yarn run test:e2e:ios
+      - store_artifacts:
+          path: packages/mobile/e2e/artifacts
+          destination: mobile/e2e/artifacts
 
   lint-checks:
     <<: *defaults
@@ -422,6 +550,15 @@ jobs:
       - run:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
+      - run:
+          name: Fail if someone forgot to commit contractkit docs
+          command: |
+            yarn --cwd=packages/contractkit docs
+            if [[ $(git status packages/docs/developer-resources/contractkit --porcelain) ]]; then
+              git --no-pager diff packages/docs/developer-resources/contractkit
+              echo "There are git differences after generating contractkit docs"
+              exit 1
+            fi
 
   walletkit-test:
     <<: *defaults
@@ -715,6 +852,7 @@ workflows:
       - mobile-test-build-app:
           requires:
             - mobile-test
+      - end-to-end-mobile-test-ios
       - verification-pool-api:
           requires:
             - lint-checks
@@ -757,7 +895,7 @@ workflows:
       - schedule:
           # 7 PM in UTC = noon in PDT.
           # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: "0 19 * * *"
+          cron: '0 19 * * *'
           filters:
             branches:
               only:
@@ -773,7 +911,7 @@ workflows:
       - schedule:
           # 1 PM in UTC = 6 AM in PDT.
           # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: "0 13 * * *"
+          cron: '0 13 * * *'
           filters:
             branches:
               only:

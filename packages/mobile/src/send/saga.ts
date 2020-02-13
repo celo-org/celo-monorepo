@@ -7,6 +7,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
+import { completePaymentRequest } from 'src/firebase/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentKey'
@@ -128,7 +129,7 @@ export function* sendPaymentOrInviteSaga({
   recipient,
   recipientAddress,
   inviteMethod,
-  onConfirm,
+  firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
   try {
     recipientAddress
@@ -157,13 +158,10 @@ export function* sendPaymentOrInviteSaga({
       )
     }
 
-    if (onConfirm) {
-      // TODO(jeanregisser): rework this, we don't want a callback like this in sagas
-      yield call(onConfirm)
-    } else {
-      yield call(navigate, Screens.WalletHome)
+    if (firebasePendingRequestUid) {
+      yield put(completePaymentRequest(firebasePendingRequestUid))
     }
-
+    yield call(navigate, Screens.WalletHome)
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
