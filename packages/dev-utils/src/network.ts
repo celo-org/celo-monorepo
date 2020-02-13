@@ -1,8 +1,10 @@
 import { spawn, SpawnOptions } from 'child_process'
+import sleep from 'sleep-promise'
 
 export async function waitForPortOpen(host: string, port: number, seconds: number) {
   const deadline = Date.now() + seconds * 1000
   do {
+    console.log('waitForPortOpen')
     if (await isPortOpen(host, port)) {
       return true
     }
@@ -11,7 +13,12 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
 }
 
 async function isPortOpen(host: string, port: number) {
-  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
+  console.log('is port open?')
+  if (true) {
+    await sleep(5000)
+    return true
+  }
+  return (await execCmd('nc', ['-z', host, port.toString()], { silent: false })) === 0
 }
 
 function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?: boolean }) {
@@ -20,6 +27,7 @@ function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?
     if (!silent) {
       console.debug('$ ' + [cmd].concat(args).join(' '))
     }
+    // console.log('is port open?')
     const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
     process.on('close', (code) => {
       try {
@@ -28,5 +36,8 @@ function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?
         reject(error)
       }
     })
+    process.on('message', console.info)
+    process.on('error', console.info)
+    // process.on('close', console.info)
   })
 }

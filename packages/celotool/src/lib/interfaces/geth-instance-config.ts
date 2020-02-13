@@ -19,4 +19,6 @@ export interface GethInstanceConfig {
   proxiedValidatorAddress?: string
   proxyAllowPrivateIp?: boolean
   ethstats?: string
+  maxPeers?: number
+  setNodeKey?: boolean
 }

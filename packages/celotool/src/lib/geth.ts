@@ -665,7 +665,7 @@ export const runGethNodes = async ({
     fs.mkdirSync(gethConfig.runPath, { recursive: true })
   }
 
-  await writeGenesis(gethConfig, validators, verbose)
+  writeGenesis(gethConfig, validators, verbose)
 
   if (verbose) {
     const validatorAddresses = validators.map((validator) => validator.address)
@@ -691,7 +691,7 @@ export function importGenesis(genesisPath: string) {
   return JSON.parse(fs.readFileSync(genesisPath).toString())
 }
 
-function getDatadir(runPath: string, instance: GethInstanceConfig) {
+export function getDatadir(runPath: string, instance: GethInstanceConfig) {
   const dir = path.join(getInstanceDir(runPath, instance), 'datadir')
   // @ts-ignore
   fs.mkdirSync(dir, { recursive: true })
@@ -740,12 +740,12 @@ export async function init(
 }
 
 export async function importPrivateKey(
-  getConfig: GethRunConfig,
+  gethConfig: GethRunConfig,
   gethBinaryPath: string,
   instance: GethInstanceConfig,
   verbose: boolean
 ) {
-  const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
+  const keyFile = path.join(getDatadir(gethConfig.runPath, instance), 'key.txt')
 
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
 
@@ -757,7 +757,7 @@ export async function importPrivateKey(
     'account',
     'import',
     '--datadir',
-    getDatadir(getConfig.runPath, instance),
+    getDatadir(gethConfig.runPath, instance),
     '--password',
     '/dev/null',
     keyFile,
@@ -859,6 +859,10 @@ export async function startGeth(
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
+  // Allow maxPeers to be zero
+  const maxPeers = instance.maxPeers !== undefined ? instance.maxPeers : gethConfig.instances.length
+  // Default to true
+  const setNodeKey = instance.setNodeKey !== undefined ? instance.setNodeKey : true
   const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
   let blocktime: number = 1
 
@@ -886,6 +890,8 @@ export async function startGeth(
     '--consoleformat=term',
     '--nat',
     'extip:127.0.0.1',
+    `--maxpeers=${maxPeers}`,
+    '--allow-insecure-unlock',
   ]
 
   if (rpcport) {
@@ -913,11 +919,17 @@ export async function startGeth(
   }
 
   if (lightserv) {
-    gethArgs.push('--lightserv=90')
+    gethArgs.push('--light.serve=90')
+  } else {
+    gethArgs.push('--light.serve=0')
+  }
+
+  if (setNodeKey) {
+    gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+    gethArgs.push('--mine', '--minerthreads=10')
 
     if (validatingGasPrice) {
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
@@ -927,6 +939,7 @@ export async function startGeth(
 
     if (isProxied) {
       gethArgs.push('--proxy.proxied')
+      gethArgs.push('--proxy.allowprivateip')
     }
   } else if (isProxy) {
     gethArgs.push('--proxy.proxy')
@@ -934,7 +947,6 @@ export async function startGeth(
       gethArgs.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
     }
     gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
-    // gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (bootnodeEnode) {
@@ -1130,9 +1142,12 @@ export async function connectPeers(instances: GethInstanceConfig[], verbose: boo
   )
 }
 
-// Add validator 0 as a peer of each other validator.
+// Peer every validator so they are fully connected
 export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   await connectPeers(
-    instances.filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
+    instances.filter(
+      ({ wsport, rpcport, validating, isProxy, isProxied }) =>
+        isProxy || (validating && !isProxied && (wsport || rpcport))
+    )
   )
 }

@@ -16,6 +16,7 @@ import {
   buildGeth,
   checkoutGethRepo,
   connectValidatorPeers,
+  getDatadir,
   getEnodeAddress,
   initAndStartGeth,
   resetDataDir,
@@ -30,7 +31,7 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
-const verboseOutput = false
+const verboseOutput = true
 
 export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
   const { wsport, rpcport } = instance
@@ -195,7 +196,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const branch = argv.branch || 'master'
 
   gethConfig.gethRepoPath = argv.localgeth || '/tmp/geth'
-  const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
+  const gethBinaryPath = getGethBinaryPath(gethConfig)
   const bootnodeBinaryPath = `${gethConfig.gethRepoPath}/build/bin/bootnode`
 
   const before = async () => {
@@ -214,7 +215,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 
-    await writeGenesis(gethConfig, validators, verbose)
+    writeGenesis(gethConfig, validators, verbose)
 
     let bootnodeEnode: string = ''
 
@@ -237,6 +238,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
 
         if (proxyEnode.length !== 1) {
+          console.log('proxyEnode yeeeeet', proxyEnode, proxyEnodes, instance.proxy, instance)
           throw new Error('proxied validator must have exactly one proxy')
         }
 
@@ -259,7 +261,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         const proxiedValidator = gethConfig.instances.filter(
           (x: GethInstanceConfig) => x.proxy === instance.name
         )
-
+        console.log('proxiedValidator yeeeeet', proxiedValidator)
         if (proxiedValidator.length !== 1) {
           throw new Error('proxied validator must have exactly one proxy')
         }
@@ -338,4 +340,44 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     validators,
     hooks: { before, after, restart, gethBinaryPath },
   }
+}
+
+export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
+  return new Promise((resolve, reject) => {
+    web3.currentProvider.send(
+      {
+        jsonrpc: '2.0',
+        method,
+        params,
+        // salt id generation, milliseconds might not be
+        // enough to generate unique ids
+        id: new Date().getTime() + Math.floor(Math.random() * (1 + 100 - 1)),
+      },
+      // @ts-ignore
+      (err: any, result: any) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(result)
+      }
+    )
+  })
+}
+
+export async function restartInstanceWithNewNodeKey(
+  gethConfig: GethRunConfig,
+  instance: GethInstanceConfig,
+  verbose: boolean = false
+) {
+  await killInstance(instance)
+  await restoreDatadir(gethConfig.runPath, instance)
+  fs.unlinkSync(joinPath(getDatadir(gethConfig.runPath, instance), 'Celo', 'nodekey'))
+  // if (!instance.privateKey && instance.validating) {
+  //   instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
+  // }
+  return startGeth(gethConfig, getGethBinaryPath(gethConfig), instance, verbose)
+}
+
+export function getGethBinaryPath(gethConfig: GethRunConfig) {
+  return `${gethConfig.gethRepoPath}/build/bin/geth`
 }
