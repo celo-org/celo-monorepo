@@ -37,21 +37,19 @@ exports[`DevelopersPage renders 1`] = `
             "alignItems": "center",
             "height": "100%",
             "justifyContent": "center",
+            "left": "0px",
             "msFlexAlign": "center",
             "msFlexPack": "center",
             "position": "absolute",
+            "right": "0px",
           }
         }
       >
         <div
-          className="css-view-1dbjc4n r-animationKeyframes-zsigsq"
+          className="css-view-1dbjc4n"
           style={
             Object {
               "WebkitAlignItems": "center",
-              "WebkitAnimationDuration": "1.2s",
-              "WebkitAnimationFillMode": "both",
-              "WebkitAnimationIterationCount": 1,
-              "WebkitAnimationTimingFunction": "linear",
               "WebkitBoxAlign": "center",
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
@@ -59,10 +57,6 @@ exports[`DevelopersPage renders 1`] = `
               "WebkitFlexDirection": "row",
               "WebkitJustifyContent": "center",
               "alignItems": "center",
-              "animationDuration": "1.2s",
-              "animationFillMode": "both",
-              "animationIterationCount": 1,
-              "animationTimingFunction": "linear",
               "flexDirection": "row",
               "justifyContent": "center",
               "msFlexAlign": "center",
@@ -72,21 +66,37 @@ exports[`DevelopersPage renders 1`] = `
           }
         >
           <div
-            className="css-view-1dbjc4n"
+            className="css-view-1dbjc4n r-animationKeyframes-2h9m4"
             style={
               Object {
-                "borderBottomColor": "rgba(53,208,127,1.00)",
-                "borderBottomWidth": "1px",
-                "width": "calc(50vw + 150px)",
+                "WebkitAnimationDuration": "1s",
+                "WebkitAnimationFillMode": "both",
+                "WebkitAnimationIterationCount": 1,
+                "WebkitAnimationTimingFunction": "linear",
+                "WebkitTransformOrigin": "left",
+                "animationDuration": "1s",
+                "animationFillMode": "both",
+                "animationIterationCount": 1,
+                "animationTimingFunction": "linear",
+                "backgroundColor": "rgba(53,208,127,1.00)",
+                "height": "1px",
+                "transformOrigin": "left",
+                "width": "280px",
               }
             }
           />
           <div
-            className="css-view-1dbjc4n"
+            className="css-view-1dbjc4n r-animationKeyframes-pzd4z1"
             style={
               Object {
-                "WebkitTransform": "translateX(-5px)",
-                "transform": "translateX(-5px)",
+                "WebkitAnimationDuration": "1s",
+                "WebkitAnimationFillMode": "both",
+                "WebkitAnimationIterationCount": 1,
+                "WebkitAnimationTimingFunction": "linear",
+                "animationDuration": "1s",
+                "animationFillMode": "both",
+                "animationIterationCount": 1,
+                "animationTimingFunction": "linear",
               }
             }
           >
@@ -130,11 +140,11 @@ exports[`DevelopersPage renders 1`] = `
           stroke="white"
           style={
             Object {
-              "WebkitAnimationDuration": "1.2s",
+              "WebkitAnimationDuration": "1s",
               "WebkitAnimationFillMode": "both",
               "WebkitAnimationIterationCount": 1,
               "WebkitAnimationTimingFunction": "linear",
-              "animationDuration": "1.2s",
+              "animationDuration": "1s",
               "animationFillMode": "both",
               "animationIterationCount": 1,
               "animationTimingFunction": "linear",
@@ -227,6 +237,25 @@ exports[`DevelopersPage renders 1`] = `
         >
           developerSDKTitle
         </h1>
+        <h4
+          aria-level="4"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "24px",
+              "lineHeight": "32px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          developerSDKsubtitle
+        </h4>
       </div>
     </div>
     <div
@@ -576,7 +605,7 @@ exports[`DevelopersPage renders 1`] = `
                     }
                   }
                 >
-                  coverAction.code.title
+                  coverAction.tutorial.title
                 </h3>
                 <div
                   className="css-text-901oao"
@@ -592,7 +621,7 @@ exports[`DevelopersPage renders 1`] = `
                     }
                   }
                 >
-                  coverAction.code.text
+                  coverAction.tutorial.text
                 </div>
               </div>
               <div
@@ -637,7 +666,7 @@ exports[`DevelopersPage renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="https://github.com/celo-org"
+                    href="https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client"
                     role="link"
                     style={
                       Object {
@@ -657,7 +686,7 @@ exports[`DevelopersPage renders 1`] = `
                       }
                     }
                   >
-                    coverAction.code.link
+                    coverAction.tutorial.link
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -772,7 +801,7 @@ exports[`DevelopersPage renders 1`] = `
                     }
                   }
                 >
-                  coverAction.tutorial.title
+                  coverAction.code.title
                 </h3>
                 <div
                   className="css-text-901oao"
@@ -788,7 +817,7 @@ exports[`DevelopersPage renders 1`] = `
                     }
                   }
                 >
-                  coverAction.tutorial.text
+                  coverAction.code.text
                 </div>
               </div>
               <div
@@ -833,7 +862,7 @@ exports[`DevelopersPage renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client"
+                    href="https://github.com/celo-org"
                     role="link"
                     style={
                       Object {
@@ -853,7 +882,7 @@ exports[`DevelopersPage renders 1`] = `
                       }
                     }
                   >
-                    coverAction.tutorial.link
+                    coverAction.code.link
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -884,6 +913,274 @@ exports[`DevelopersPage renders 1`] = `
                     </div>
                   </a>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "backgroundColor": "rgba(46,51,56,1.00)",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignSelf": "center",
+          "WebkitBoxDirection": "normal",
+          "WebkitBoxOrient": "vertical",
+          "WebkitFlexDirection": "column",
+          "alignSelf": "center",
+          "flexDirection": "column",
+          "marginTop": "50px",
+          "maxWidth": "100vw",
+          "msFlexDirection": "column",
+          "msFlexItemAlign": "center",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxFlex": 0,
+            "WebkitFlexGrow": 0,
+            "WebkitFlexShrink": 0,
+            "flexGrow": 0,
+            "flexShrink": 0,
+            "msFlexNegative": 0,
+            "msFlexPositive": 0,
+            "paddingBottom": "10px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "10px",
+            "width": "100%",
+          }
+        }
+      >
+        <h3
+          aria-level="3"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "24px",
+              "lineHeight": "32px",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          sandbox.overtitle
+        </h3>
+        <h2
+          aria-level="2"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "28px",
+              "lineHeight": "32px",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          sandbox.title
+        </h2>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          sandbox.explainer
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxPack": "center",
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "justifyContent": "center",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,1.00)",
+                "borderBottomColor": "rgba(12,218,110,1.00)",
+                "borderBottomWidth": "1px",
+                "borderLeftColor": "rgba(12,218,110,1.00)",
+                "borderLeftWidth": "1px",
+                "borderRightColor": "rgba(12,218,110,1.00)",
+                "borderRightWidth": "1px",
+                "borderTopColor": "rgba(12,218,110,1.00)",
+                "borderTopWidth": "1px",
+                "height": "400px",
+                "marginBottom": "30px",
+                "marginTop": "30px",
+                "width": "100%",
+              }
+            }
+          >
+            <code
+              style={
+                Object {
+                  "color": "#DDDDDD",
+                  "padding": 20,
+                }
+              }
+            >
+              const Web3 = require('web3')
+            </code>
+            <code
+              style={
+                Object {
+                  "color": "#DDDDDD",
+                  "padding": 20,
+                }
+              }
+            >
+              const ContractKit = require('@celo/contractkit')
+            </code>
+            <code
+              style={
+                Object {
+                  "color": "#DDDDDD",
+                  "padding": 20,
+                }
+              }
+            >
+              const provider = new Web3.providers.HttpProvider(\`https://alfajores-forno.celo-testnet.org\`)
+            </code>
+            <code
+              style={
+                Object {
+                  "color": "#DDDDDD",
+                  "padding": 20,
+                }
+              }
+            >
+              const web3 = new Web3(provider)
+            </code>
+            <code
+              style={
+                Object {
+                  "color": "#DDDDDD",
+                  "padding": 20,
+                }
+              }
+            >
+              const contractKit = ContractKit.newKitFromWeb3(web3)
+            </code>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "bottom": "0px",
+                  "position": "absolute",
+                  "right": "0px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://repl.it/@annakaz/contractkit"
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxFlex": 0,
+                      "WebkitBoxPack": "center",
+                      "WebkitFlexGrow": 0,
+                      "WebkitJustifyContent": "center",
+                      "alignItems": "center",
+                      "backgroundColor": "rgba(53,208,127,1.00)",
+                      "borderBottomColor": "rgba(53,208,127,1.00)",
+                      "borderBottomLeftRadius": "3px",
+                      "borderBottomRightRadius": "3px",
+                      "borderBottomWidth": "1px",
+                      "borderLeftColor": "rgba(53,208,127,1.00)",
+                      "borderLeftWidth": "1px",
+                      "borderRightColor": "rgba(53,208,127,1.00)",
+                      "borderRightWidth": "1px",
+                      "borderTopColor": "rgba(53,208,127,1.00)",
+                      "borderTopLeftRadius": "3px",
+                      "borderTopRightRadius": "3px",
+                      "borderTopWidth": "1px",
+                      "color": "rgba(255,255,255,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "flexGrow": 0,
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "justifyContent": "center",
+                      "lineHeight": "16px",
+                      "minWidth": "150px",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "center",
+                      "msFlexPositive": 0,
+                      "opacity": 1,
+                      "paddingBottom": "10px",
+                      "paddingLeft": "20px",
+                      "paddingRight": "20px",
+                      "paddingTop": "10px",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
+                      "width": "fit-content",
+                    }
+                  }
+                  target="_blank"
+                >
+                  sandbox.btn
+                </a>
               </div>
             </div>
           </div>
@@ -1042,14 +1339,14 @@ exports[`DevelopersPage renders 1`] = `
               "WebkitBoxFlex": 1,
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
-              "WebkitFlexBasis": "0%",
+              "WebkitFlexBasis": "auto",
               "WebkitFlexDirection": "row",
               "WebkitFlexGrow": 1,
               "WebkitFlexShrink": 1,
               "WebkitJustifyContent": "space-between",
               "WebkitTransitionDuration": "500ms",
               "WebkitTransitionProperty": "opacity",
-              "flexBasis": "0%",
+              "flexBasis": "auto",
               "flexDirection": "row",
               "flexGrow": 1,
               "flexShrink": 1,
@@ -1060,7 +1357,7 @@ exports[`DevelopersPage renders 1`] = `
               "msFlexNegative": 1,
               "msFlexPack": "justify",
               "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
+              "msFlexPreferredSize": "auto",
               "opacity": 1,
               "transitionDuration": "500ms",
               "transitionProperty": "opacity",
@@ -1209,6 +1506,25 @@ exports[`DevelopersPage renders 1`] = `
                 }
               >
                 mobile.qr
+              </li>
+              <li
+                className="css-reset-4rbku5 css-text-901oao"
+                dir="auto"
+                role="listitem"
+                style={
+                  Object {
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "list-item",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "listStyle": "disc",
+                    "marginBottom": "20px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                mobile.sdk
               </li>
             </ul>
           </div>
@@ -1391,14 +1707,14 @@ exports[`DevelopersPage renders 1`] = `
               "WebkitBoxFlex": 1,
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
-              "WebkitFlexBasis": "0%",
+              "WebkitFlexBasis": "auto",
               "WebkitFlexDirection": "row",
               "WebkitFlexGrow": 1,
               "WebkitFlexShrink": 1,
               "WebkitJustifyContent": "space-between",
               "WebkitTransitionDuration": "500ms",
               "WebkitTransitionProperty": "opacity",
-              "flexBasis": "0%",
+              "flexBasis": "auto",
               "flexDirection": "row",
               "flexGrow": 1,
               "flexShrink": 1,
@@ -1409,7 +1725,7 @@ exports[`DevelopersPage renders 1`] = `
               "msFlexNegative": 1,
               "msFlexPack": "justify",
               "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
+              "msFlexPreferredSize": "auto",
               "opacity": 1,
               "transitionDuration": "500ms",
               "transitionProperty": "opacity",
@@ -1721,14 +2037,14 @@ exports[`DevelopersPage renders 1`] = `
               "WebkitBoxFlex": 1,
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
-              "WebkitFlexBasis": "0%",
+              "WebkitFlexBasis": "auto",
               "WebkitFlexDirection": "row",
               "WebkitFlexGrow": 1,
               "WebkitFlexShrink": 1,
               "WebkitJustifyContent": "space-between",
               "WebkitTransitionDuration": "500ms",
               "WebkitTransitionProperty": "opacity",
-              "flexBasis": "0%",
+              "flexBasis": "auto",
               "flexDirection": "row",
               "flexGrow": 1,
               "flexShrink": 1,
@@ -1739,7 +2055,7 @@ exports[`DevelopersPage renders 1`] = `
               "msFlexNegative": 1,
               "msFlexPack": "justify",
               "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
+              "msFlexPreferredSize": "auto",
               "opacity": 1,
               "transitionDuration": "500ms",
               "transitionProperty": "opacity",
@@ -3310,25 +3626,23 @@ exports[`DevelopersPage renders 1`] = `
         }
       }
     >
-      <h2
-        aria-level="2"
-        className="css-reset-4rbku5 css-text-901oao"
+      <div
+        className="css-text-901oao"
         dir="auto"
-        role="heading"
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "28px",
-            "lineHeight": "32px",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "300",
+            "lineHeight": "18px",
             "marginBottom": "20px",
             "textRendering": "geometricPrecision",
-            "textTransform": "none",
           }
         }
       >
-        engage.topTitle
-      </h2>
+        engage.developers.verb
+      </div>
       <div
         className="css-view-1dbjc4n"
         style={
@@ -3337,25 +3651,6 @@ exports[`DevelopersPage renders 1`] = `
           }
         }
       >
-        <h3
-          aria-level="3"
-          className="css-reset-4rbku5 css-text-901oao"
-          dir="auto"
-          role="heading"
-          style={
-            Object {
-              "color": "rgba(46,51,56,1.00)",
-              "fontFamily": "Jost, futura-pt, futura, sans-serif",
-              "fontSize": "24px",
-              "lineHeight": "32px",
-              "marginBottom": "20px",
-              "textRendering": "geometricPrecision",
-              "textTransform": "none",
-            }
-          }
-        >
-          engage.developers.noun
-        </h3>
         <h4
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
@@ -3373,7 +3668,7 @@ exports[`DevelopersPage renders 1`] = `
             }
           }
         >
-          engage.developers.verb
+          getInvolved
         </h4>
         <div
           className="css-text-901oao"

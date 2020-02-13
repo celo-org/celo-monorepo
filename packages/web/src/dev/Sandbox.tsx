@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'

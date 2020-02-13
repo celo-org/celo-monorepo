@@ -1217,14 +1217,14 @@ exports[`BuildPage renders 1`] = `
               "WebkitBoxFlex": 1,
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
-              "WebkitFlexBasis": "0%",
+              "WebkitFlexBasis": "auto",
               "WebkitFlexDirection": "row",
               "WebkitFlexGrow": 1,
               "WebkitFlexShrink": 1,
               "WebkitJustifyContent": "space-between",
               "WebkitTransitionDuration": "500ms",
               "WebkitTransitionProperty": "opacity",
-              "flexBasis": "0%",
+              "flexBasis": "auto",
               "flexDirection": "row",
               "flexGrow": 1,
               "flexShrink": 1,
@@ -1235,7 +1235,7 @@ exports[`BuildPage renders 1`] = `
               "msFlexNegative": 1,
               "msFlexPack": "justify",
               "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
+              "msFlexPreferredSize": "auto",
               "opacity": 1,
               "transitionDuration": "500ms",
               "transitionProperty": "opacity",
@@ -1384,6 +1384,25 @@ exports[`BuildPage renders 1`] = `
                 }
               >
                 mobile.qr
+              </li>
+              <li
+                className="css-reset-4rbku5 css-text-901oao"
+                dir="auto"
+                role="listitem"
+                style={
+                  Object {
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "list-item",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "listStyle": "disc",
+                    "marginBottom": "20px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                mobile.sdk
               </li>
             </ul>
           </div>
@@ -1566,14 +1585,14 @@ exports[`BuildPage renders 1`] = `
               "WebkitBoxFlex": 1,
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
-              "WebkitFlexBasis": "0%",
+              "WebkitFlexBasis": "auto",
               "WebkitFlexDirection": "row",
               "WebkitFlexGrow": 1,
               "WebkitFlexShrink": 1,
               "WebkitJustifyContent": "space-between",
               "WebkitTransitionDuration": "500ms",
               "WebkitTransitionProperty": "opacity",
-              "flexBasis": "0%",
+              "flexBasis": "auto",
               "flexDirection": "row",
               "flexGrow": 1,
               "flexShrink": 1,
@@ -1584,7 +1603,7 @@ exports[`BuildPage renders 1`] = `
               "msFlexNegative": 1,
               "msFlexPack": "justify",
               "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
+              "msFlexPreferredSize": "auto",
               "opacity": 1,
               "transitionDuration": "500ms",
               "transitionProperty": "opacity",
@@ -1896,14 +1915,14 @@ exports[`BuildPage renders 1`] = `
               "WebkitBoxFlex": 1,
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
-              "WebkitFlexBasis": "0%",
+              "WebkitFlexBasis": "auto",
               "WebkitFlexDirection": "row",
               "WebkitFlexGrow": 1,
               "WebkitFlexShrink": 1,
               "WebkitJustifyContent": "space-between",
               "WebkitTransitionDuration": "500ms",
               "WebkitTransitionProperty": "opacity",
-              "flexBasis": "0%",
+              "flexBasis": "auto",
               "flexDirection": "row",
               "flexGrow": 1,
               "flexShrink": 1,
@@ -1914,7 +1933,7 @@ exports[`BuildPage renders 1`] = `
               "msFlexNegative": 1,
               "msFlexPack": "justify",
               "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
+              "msFlexPreferredSize": "auto",
               "opacity": 1,
               "transitionDuration": "500ms",
               "transitionProperty": "opacity",
