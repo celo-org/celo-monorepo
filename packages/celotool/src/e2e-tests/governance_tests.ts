@@ -114,23 +114,46 @@ async function newKeyRotator(
 
 async function calculateUptime(
   kit: ContractKit,
-  signerIndex: number,
+  validatorSetSize: number,
   lastBlockNumberOfEpoch: number,
   epochSize: number,
   lookbackWindow: number
-): Promise<BigNumber> {
-  let signed = 0
-  const denominator = epochSize - lookbackWindow - 1
-  const blocks = await concurrentMap(10, [...Array(denominator).keys()], (i) =>
-    kit.web3.eth.getBlock(lastBlockNumberOfEpoch - denominator + i + 1)
+): Promise<BigNumber[]> {
+  // The parentAggregateSeal is not counted for the first or last blocks of the epoch
+  const blocks = await concurrentMap(10, [...Array(epochSize - 2).keys()], (i) =>
+    kit.web3.eth.getBlock(lastBlockNumberOfEpoch - epochSize + 2 + i)
   )
+  const lastSignedBlock: number[] = new Array(validatorSetSize).fill(0)
+  const tally: number[] = new Array(validatorSetSize).fill(0)
+
+  // Follows updateUptime() in core/blockchain.go
+  let windowBlocks = 1
   for (const block of blocks) {
     const bitmap = parseBlockExtraData(block.extraData).parentAggregatedSeal.bitmap
-    if (bitIsSet(bitmap, signerIndex)) {
-      signed++
+
+    for (let signerIndex = 0; signerIndex < validatorSetSize; signerIndex++) {
+      if (bitIsSet(bitmap, signerIndex)) {
+        lastSignedBlock[signerIndex] = block.number - 1
+      }
+      if (windowBlocks < lookbackWindow) {
+        continue
+      }
+      const signedBlockWindowLastBlockNum = block.number - 1
+      const signedBlockWindowFirstBlockNum = signedBlockWindowLastBlockNum - (lookbackWindow - 1)
+      if (
+        signedBlockWindowFirstBlockNum <= lastSignedBlock[signerIndex] &&
+        lastSignedBlock[signerIndex] <= signedBlockWindowLastBlockNum
+      ) {
+        tally[signerIndex]++
+      }
+    }
+
+    if (windowBlocks < lookbackWindow) {
+      windowBlocks++
     }
   }
-  return new BigNumber(signed / denominator)
+  const denominator = epochSize - lookbackWindow - 1
+  return tally.map((signerTally) => new BigNumber(signerTally / denominator))
 }
 
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
@@ -565,7 +588,11 @@ describe('governance tests', () => {
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
-      const assertScoreChanged = async (validator: string, blockNumber: number) => {
+      const assertScoreChanged = async (
+        validator: string,
+        blockNumber: number,
+        uptime: BigNumber
+      ) => {
         const score = new BigNumber(
           (await validators.methods.getValidator(validator).call({}, blockNumber)).score
         )
@@ -575,9 +602,6 @@ describe('governance tests', () => {
         assert.isFalse(score.isNaN())
         assert.isFalse(previousScore.isNaN())
 
-        const electedValidators = await getValidatorSetAccountsAtBlock(blockNumber - 1)
-        const signerIndex = electedValidators.map(eqAddress.bind(null, validator)).indexOf(true)
-        const uptime = await calculateUptime(kit, signerIndex, blockNumber, epoch, 2)
         const epochScore = uptime.exponentiatedBy(exponent)
         const expectedScore = BigNumber.minimum(
           epochScore,
@@ -591,12 +615,18 @@ describe('governance tests', () => {
       for (const blockNumber of blockNumbers) {
         let expectUnchangedScores: string[]
         let expectChangedScores: string[]
+        let electedValidators: string[]
+        let uptime: BigNumber[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          expectChangedScores = await getValidatorSetAccountsAtBlock(blockNumber - 1)
+          expectChangedScores = await getValidatorSetAccountsAtBlock(blockNumber)
           expectUnchangedScores = validatorAccounts.filter((x) => !expectChangedScores.includes(x))
+          electedValidators = await getValidatorSetAccountsAtBlock(blockNumber)
+          uptime = await calculateUptime(kit, electedValidators.length, blockNumber, epoch, 2)
         } else {
           expectUnchangedScores = validatorAccounts
           expectChangedScores = []
+          electedValidators = []
+          uptime = []
         }
 
         for (const validator of expectUnchangedScores) {
@@ -604,7 +634,8 @@ describe('governance tests', () => {
         }
 
         for (const validator of expectChangedScores) {
-          await assertScoreChanged(validator, blockNumber)
+          const signerIndex = electedValidators.map(eqAddress.bind(null, validator)).indexOf(true)
+          await assertScoreChanged(validator, blockNumber, uptime[signerIndex])
         }
       }
     })
