@@ -1150,6 +1150,8 @@ contract('Validators', (accounts: string[]) => {
   })
 
   describe('#updateKeys()', () => {
+    const newBlsPublicKey = web3.utils.randomHex(96)
+    const newBlsPoP = web3.utils.randomHex(48)
     describe('when called by a registered validator', () => {
       const validator = accounts[0]
       beforeEach(async () => {
@@ -1168,7 +1170,13 @@ contract('Validators', (accounts: string[]) => {
           beforeEach(async () => {
             newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             // @ts-ignore Broken typechain typing for bytes
-            resp = await validators.updateEcdsaPublicKey(validator, signer, newPublicKey)
+            resp = await validators.updateKeys(
+              validator,
+              signer,
+              newPublicKey,
+              newBlsPublicKey,
+              newBlsPoP
+            )
           })
 
           it('should set the validator ecdsa public key', async () => {
@@ -1177,14 +1185,20 @@ contract('Validators', (accounts: string[]) => {
             assert.equal(parsedValidator.ecdsaPublicKey, newPublicKey)
           })
 
-          it('should emit the ValidatorEcdsaPublicKeyUpdated event', async () => {
-            assert.equal(resp.logs.length, 1)
-            const log = resp.logs[0]
-            assertContainSubset(log, {
+          it('should emit the events', async () => {
+            assert.equal(resp.logs.length, 2)
+            assertContainSubset(resp.logs[0], {
               event: 'ValidatorEcdsaPublicKeyUpdated',
               args: {
                 validator,
                 ecdsaPublicKey: newPublicKey,
+              },
+            })
+            assertContainSubset(resp.logs[1], {
+              event: 'ValidatorBlsPublicKeyUpdated',
+              args: {
+                validator,
+                blsPublicKey: newBlsPublicKey,
               },
             })
           })
@@ -1196,7 +1210,9 @@ contract('Validators', (accounts: string[]) => {
           it('should revert', async () => {
             newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
             // @ts-ignore Broken typechain typing for bytes
-            await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
+            await assertRevert(
+              validators.updateKeys(validator, signer, newPublicKey, newBlsPublicKey, newBlsPoP)
+            )
           })
         })
       })
@@ -1208,7 +1224,9 @@ contract('Validators', (accounts: string[]) => {
           it('should revert', async () => {
             newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             // @ts-ignore Broken typechain typing for bytes
-            await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
+            await assertRevert(
+              validators.updateKeys(validator, signer, newPublicKey, newBlsPublicKey, newBlsPoP)
+            )
           })
         })
       })

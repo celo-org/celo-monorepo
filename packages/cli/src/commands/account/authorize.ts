@@ -22,6 +22,14 @@ export default class Authorize extends BaseCommand {
       required: true,
     }),
     signer: Flags.address({ required: true }),
+    blsKey: Flags.blsPublicKey({
+      description:
+        'The BLS public key that the validator is using for consensus, should pass proof of possession. 96 bytes.',
+    }),
+    blsPop: Flags.blsProofOfPossession({
+      description:
+        'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
+    }),
   }
 
   static args = []
@@ -47,6 +55,13 @@ export default class Authorize extends BaseCommand {
     let tx: any
     if (res.flags.role === 'vote') {
       tx = await accounts.authorizeVoteSigner(res.flags.signer, sig)
+    } else if (res.flags.role === 'validator' && res.flags.blsKey) {
+      tx = await accounts.authorizeValidatorSignerAndBls(
+        res.flags.signer,
+        sig,
+        res.flags.blsKey,
+        res.flags.blsPop!
+      )
     } else if (res.flags.role === 'validator') {
       tx = await accounts.authorizeValidatorSigner(res.flags.signer, sig)
     } else if (res.flags.role === 'attestation') {

@@ -22,7 +22,10 @@ contract MockValidators is IValidators {
 
   function updateKeys(address, address, bytes calldata, bytes calldata, bytes calldata)
     external
-    returns (bool);
+    returns (bool)
+  {
+    return true;
+  }
 
   function setValidator(address account) external {
     isValidator[account] = true;
