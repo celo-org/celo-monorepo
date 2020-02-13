@@ -86,6 +86,7 @@
     "@types/mocha": "^5.2.1",
     "@types/nodemailer": "^4.6.5",
     "@types/targz": "^1.0.0",
+    "@types/tmp": "^0.1.0",
     "@types/underscore": "^1.8.8",
     "@types/web3": "^1.0.18",
     "@types/yargs": "^13.0.2",
@@ -93,6 +94,7 @@
     "eth-gas-reporter": "^0.1.2",
     "nodemailer": "^4.6.8",
     "targz": "^1.0.1",
+    "tmp": "^0.1.0",
     "truffle-typings": "^1.0.6",
     "yargs": "^14.0.0"
   }

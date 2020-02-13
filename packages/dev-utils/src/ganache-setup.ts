@@ -33,8 +33,8 @@ export const ACCOUNT_ADDRESSES = [
 ]
 
 export async function startGanache(
-  datadir: string,
-  opts: { verbose?: boolean; from_targz?: string } = {}
+  dataPath: string,
+  opts: { verbose?: boolean; from_targz?: boolean } = {}
 ) {
   const logFn = opts.verbose
     ? // tslint:disable-next-line: no-console
@@ -47,9 +47,9 @@ export async function startGanache(
   console.log(`Creating tmp folder: ${chainCopy.name}`)
 
   if (opts.from_targz) {
-    await decompressChain(`${datadir}/${opts.from_targz}`, chainCopy.name)
+    await decompressChain(dataPath, chainCopy.name)
   } else {
-    await copyChain(datadir, chainCopy.name)
+    await copyChain(dataPath, chainCopy.name)
   }
 
   const server = ganache.server({
@@ -120,10 +120,10 @@ function decompressChain(tarPath: string, copyChainPath: string): Promise<void> 
 }
 
 export default function setup(
-  dataDir: string,
-  opts: { verbose?: boolean; from_targz?: string } = {}
+  dataPath: string,
+  opts: { verbose?: boolean; from_targz?: boolean } = {}
 ) {
-  return startGanache(dataDir, opts)
+  return startGanache(dataPath, opts)
     .then((stopGanache) => {
       ;(global as any).stopGanache = stopGanache
     })
