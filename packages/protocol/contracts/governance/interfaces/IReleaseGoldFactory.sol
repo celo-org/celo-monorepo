@@ -9,6 +9,7 @@ interface IReleaseGoldFactory {
     uint256,
     bool,
     address payable,
+    address,
     address payable,
     bool,
     uint256,

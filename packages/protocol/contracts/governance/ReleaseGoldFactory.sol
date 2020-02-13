@@ -31,8 +31,11 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
    * @param amountReleasedPerPeriod The released gold amound per period.
    * @param revocable Whether the release schedule is revocable or not.
    * @param beneficiary Address of the beneficiary to whom released tokens are transferred.
-   * @param owner Address capable of revoking, setting the liquidity provision
-   *              and setting the withdrawal amount.
+   * @param releaseOwner Address capable of revoking, setting the liquidity provision
+   *                      and setting the withdrawal amount.
+   *                      Null if grant is not subject to these operations.
+   * @param refundAddress Address that receives refunded funds if contract is revoked.
+   *                       Null if contract is not revocable.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param initialDistributionPercentage Percentage of total rewards available for distribution.
    *                                      Expressed to 3 significant figures [0, 1000].
@@ -48,13 +51,21 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
     uint256 amountReleasedPerPeriod,
     bool revocable,
     address payable beneficiary,
-    address payable owner,
+    address releaseOwner,
+    address payable refundAddress,
     bool subjectToLiquidityProvision,
     uint256 initialDistributionPercentage,
     bool _canValidate,
     bool _canVote
   ) external onlyOwner returns (address) {
     uint256 releaseGoldAmount = numReleasePeriods.mul(amountReleasedPerPeriod);
+    ReleaseGoldInstance.ReleaseSchedule storage rs = ReleaseGoldInstance.ReleaseSchedule(
+      releaseStartTime,
+      releaseCliffTime,
+      numReleasePeriods,
+      releasePeriod,
+      amountReleasedPerPeriod
+    );
     require(
       getGoldToken().balanceOf(address(this)) >= releaseGoldAmount,
       "Factory balance is insufficient to create requested release gold contract"
@@ -62,14 +73,11 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
 
     address newReleaseGoldInstance = address(
       new ReleaseGoldInstance(
-        releaseStartTime,
-        releaseCliffTime,
-        numReleasePeriods,
-        releasePeriod,
-        amountReleasedPerPeriod,
+        rs,
         revocable,
         beneficiary,
-        owner,
+        releaseOwner,
+        refundAddress,
         subjectToLiquidityProvision,
         initialDistributionPercentage,
         _canValidate,

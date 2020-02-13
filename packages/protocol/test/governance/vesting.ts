@@ -59,6 +59,7 @@ interface IReleaseGoldInstance {
   revocable: boolean
   beneficiary: string
   releaseOwner: string
+  refundAddress: string
   subjectToLiquidityProvision: boolean
   initialDistributionPercentage: number
   canValidate: boolean
@@ -89,6 +90,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   const owner = accounts[0]
   const beneficiary = accounts[1]
   const releaseOwner = accounts[2]
+  const refundAddress = accounts[3]
   let accountsInstance: AccountsInstance
   let lockedGoldInstance: LockedGoldInstance
   let goldTokenInstance: GoldTokenInstance
@@ -107,6 +109,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     revocable: true,
     beneficiary,
     releaseOwner,
+    refundAddress,
     subjectToLiquidityProvision: false,
     initialDistributionPercentage: 1000, // No distribution limit
     canValidate: false,
@@ -127,6 +130,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.revocable,
       releaseGoldSchedule.beneficiary,
       releaseGoldSchedule.releaseOwner,
+      releaseGoldSchedule.refundAddress,
       releaseGoldSchedule.subjectToLiquidityProvision,
       releaseGoldSchedule.initialDistributionPercentage,
       releaseGoldSchedule.canValidate,
@@ -238,6 +242,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           releaseGoldSchedule.revocable,
           releaseGoldSchedule.beneficiary,
           releaseGoldSchedule.releaseOwner,
+          releaseGoldSchedule.refundAddress,
           releaseGoldSchedule.subjectToLiquidityProvision,
           releaseGoldSchedule.initialDistributionPercentage,
           releaseGoldSchedule.canValidate,
@@ -351,12 +356,6 @@ contract('ReleaseGold', (accounts: string[]) => {
     it('should revert when releaseGold beneficiary is the null address', async () => {
       const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
       releaseGoldSchedule.beneficiary = NULL_ADDRESS
-      await assertRevert(createNewReleaseGoldInstanceTx(releaseGoldSchedule, web3))
-    })
-
-    it('should revert when releaseGold releaseOwner is the null address', async () => {
-      const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-      releaseGoldSchedule.releaseOwner = NULL_ADDRESS
       await assertRevert(createNewReleaseGoldInstanceTx(releaseGoldSchedule, web3))
     })
 
@@ -852,6 +851,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         beforeEach(async () => {
           const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
           releaseGoldSchedule.revocable = false
+          releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
           releaseGoldSchedule.canValidate = true
           await createNewReleaseGoldInstanceTx(releaseGoldSchedule, web3)
           releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
@@ -1005,6 +1005,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     it('should revert if releaseGold is non-revocable', async () => {
       const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
       releaseGoldSchedule.revocable = false
+      releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
       await createNewReleaseGoldInstanceTx(releaseGoldSchedule, web3)
       const releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
       const releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
@@ -1055,14 +1056,14 @@ contract('ReleaseGold', (accounts: string[]) => {
         await assertRevert(releaseGoldInstance.refundAndFinalize({ from: releaseOwner }))
       })
 
-      it('should transfer gold proportions to both beneficiary and releaseOwner when no gold locked', async () => {
+      it('should transfer gold proportions to both beneficiary and refundAddress when no gold locked', async () => {
         const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
-        const releaseOwnerBalanceBefore = await goldTokenInstance.balanceOf(releaseOwner)
+        const refundAddressBalanceBefore = await goldTokenInstance.balanceOf(refundAddress)
         const [, releasedBalanceAtRevoke] = await releaseGoldInstance.revocationInfo()
         const beneficiaryRefundAmount = new BigNumber(releasedBalanceAtRevoke).minus(
           await releaseGoldInstance.totalWithdrawn()
         )
-        const releaseOwnerRefundAmount = new BigNumber(
+        const refundAddressRefundAmount = new BigNumber(
           await goldTokenInstance.balanceOf(releaseGoldInstance.address)
         ).minus(beneficiaryRefundAmount)
         await releaseGoldInstance.refundAndFinalize({ from: releaseOwner })
@@ -1070,15 +1071,15 @@ contract('ReleaseGold', (accounts: string[]) => {
           releaseGoldInstance.address
         )
         const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
-        const releaseOwnerBalanceAfter = await goldTokenInstance.balanceOf(releaseOwner)
+        const refundAddressBalanceAfter = await goldTokenInstance.balanceOf(refundAddress)
 
         assertEqualBN(
           new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
           beneficiaryRefundAmount
         )
         assertEqualBN(
-          new BigNumber(releaseOwnerBalanceAfter).minus(new BigNumber(releaseOwnerBalanceBefore)),
-          releaseOwnerRefundAmount
+          new BigNumber(refundAddressBalanceAfter).minus(new BigNumber(refundAddressBalanceBefore)),
+          refundAddressRefundAmount
         )
 
         assertEqualBN(contractBalanceAfterFinalize, 0)

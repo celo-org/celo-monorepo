@@ -39,7 +39,10 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
 
   // Address capable of (where applicable) revoking, setting the liquidity provision, and
   // adjusting the maximum withdrawal amount.
-  address payable public releaseOwner;
+  address public releaseOwner;
+
+  // Address that receives refunded gold if contract is revoked.
+  address payable public refundAddress;
 
   // Indicates how much of the released amount has been withdrawn so far.
   uint256 public totalWithdrawn;
@@ -131,7 +134,10 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param revocable Whether the release schedule is revocable or not.
    * @param _beneficiary Address of the beneficiary to whom released tokens are transferred.
    * @param _releaseOwner Address capable of revoking, setting the liquidity provision
-   *              and setting the withdrawal amount.
+   *                      and setting the withdrawal amount.
+   *                      Null if grant is not subject to these operations.
+   * @param _refundAddress Address that receives refunded funds if contract is revoked.
+   *                       Null if contract is not revocable.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param initialDistributionPercentage Percentage of total rewards available for distribution.
    *                                      Expressed to 3 significant figures [0, 1000].
@@ -147,29 +153,34 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     uint256 amountReleasedPerPeriod,
     bool revocable,
     address payable _beneficiary,
-    address payable _releaseOwner,
+    address _releaseOwner,
+    address payable _refundAddress,
     bool subjectToLiquidityProvision,
     uint256 initialDistributionPercentage,
     bool _canValidate,
     bool _canVote,
     address registryAddress
   ) public {
-    require(numReleasePeriods >= 1, "There must be at least one releasing period");
+    releaseSchedule.numReleasePeriods = numReleasePeriods;
+    releaseSchedule.amountReleasedPerPeriod = amountReleasedPerPeriod;
+    releaseSchedule.releasePeriod = releasePeriod;
+    releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
+    releaseSchedule.releaseStartTime = releaseStartTime;
+    require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
-      amountReleasedPerPeriod > 0,
+      releaseSchedule.amountReleasedPerPeriod > 0,
       "The released amount per period must be greater than zero"
     );
     require(
       _beneficiary != address(0),
       "The release schedule beneficiary cannot be the zero addresss"
     );
-    require(
-      _releaseOwner != address(0),
-      "The release schedule releaseOwner cannot be the zero address"
-    );
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(
-      releaseStartTime.add(numReleasePeriods.mul(releasePeriod)) > block.timestamp,
+      releaseSchedule.releaseStartTime.add(
+        releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
+      ) >
+        block.timestamp,
       "Release schedule end time must be in the future"
     );
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
@@ -177,18 +188,16 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
       initialDistributionPercentage >= 0 && initialDistributionPercentage <= 1000,
       "Initial distribution percentage out of bounds"
     );
+    require(
+      (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
+      "If contract is revocable there must be an address to refund"
+    );
 
     setRegistry(registryAddress);
-
-    releaseSchedule.numReleasePeriods = numReleasePeriods;
-    releaseSchedule.amountReleasedPerPeriod = amountReleasedPerPeriod;
-    releaseSchedule.releasePeriod = releasePeriod;
-    releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
-    releaseSchedule.releaseStartTime = releaseStartTime;
-
     beneficiary = _beneficiary;
     revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
+    refundAddress = _refundAddress;
 
     if (initialDistributionPercentage < 1000) {
       // Cannot use `getTotalBalance()` here because the factory has not yet sent the gold.
@@ -275,7 +284,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     totalWithdrawn = totalWithdrawn.add(amount);
     require(getGoldToken().transfer(beneficiary, amount), "Withdrawal of gold failed");
     if (getRemainingTotalBalance() == 0) {
-      selfdestruct(releaseOwner);
+      selfdestruct(refundAddress);
     }
   }
 
@@ -291,10 +300,10 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     );
     uint256 revokerAmount = getRemainingUnlockedBalance();
     require(
-      getGoldToken().transfer(releaseOwner, revokerAmount),
+      getGoldToken().transfer(refundAddress, revokerAmount),
       "Transfer of gold to releaseOwner failed"
     );
-    selfdestruct(releaseOwner);
+    selfdestruct(refundAddress);
   }
 
   /**
