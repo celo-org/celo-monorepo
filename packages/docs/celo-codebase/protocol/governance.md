@@ -35,6 +35,10 @@ Once the Approval phase is over, approved proposals graduate to the referendum p
 
 Proposals that graduate from the Referendum phase to the execution phase may be executed by anyone, triggering a “call” operation code with the arguments defined in the proposal, originating from the `Governance` smart contract. Proposals expire from this phase after two days.
 
+## Hotfix
+
+In addition to the standard governance process, there is a hotfix process designed to implement security sensitive patches. If disclosing the contents of a proposal publicly would compromise the security of the network, such as a vulnerability in a core contract, the hotfix process can be used to pass a proposal given the support of two thirds of the elected validator set. The validators will indicate their support for the proposal by whitelisting its hash through on-chain, allowing the contents to be distributed only among the validators until the proposal is approved and can be executed.
+
 ## Celo Blockchain Software Upgrades
 
 Some changes cannot be made through the on-chain governance process alone. Examples include changes to the underlying consensus protocol and changes which would result in a hard-fork. When Celo Blockchain software upgrades are required to continue operating correctly on the network, a "Minimum Client Version" parameter is set to indicate the minimum version that it required.
