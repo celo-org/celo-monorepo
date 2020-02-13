@@ -1,5 +1,8 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
+import Lock from '../lockedgold/lock'
+import ValidatorRegister from '../validator/register'
 import Authorize from './authorize'
 import Register from './register'
 
@@ -25,7 +28,19 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
     const accounts = await web3.eth.getAccounts()
     const newBlsPublicKey = web3.utils.randomHex(96)
     const newBlsPoP = web3.utils.randomHex(48)
+    const ecdsaPublicKey = await addressToPublicKey(accounts[0], web3.eth.sign)
     await Register.run(['--from', accounts[0]])
+    await Lock.run(['--from', accounts[0], '--value', '10000000000000000000000'])
+    await ValidatorRegister.run([
+      '--from',
+      accounts[0],
+      '--ecdsaKey',
+      ecdsaPublicKey,
+      '--blsKey',
+      '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00',
+      '--blsSignature',
+      '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
+    ])
     await Authorize.run([
       '--from',
       accounts[0],
