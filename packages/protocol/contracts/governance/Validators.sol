@@ -605,10 +605,14 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's ECDSA and BLS key.
+   * @notice Updates a validator's ECDSA and BLS keys.
    * @param account The address under which the validator is registered.
    * @param signer The address which the validator is using to sign consensus messages.
    * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
    * @return True upon success.
    */
   function updateValidatorKeys(
