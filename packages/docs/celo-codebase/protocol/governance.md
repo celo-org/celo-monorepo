@@ -34,3 +34,7 @@ Once the Approval phase is over, approved proposals graduate to the referendum p
 ## Execution
 
 Proposals that graduate from the Referendum phase to the execution phase may be executed by anyone, triggering a “call” operation code with the arguments defined in the proposal, originating from the `Governance` smart contract. Proposals expire from this phase after two days.
+
+## Celo Blockchain Software Upgrades
+
+Some changes cannot be made through the on-chain governance process alone. Examples include changes to the underlying consensus protocol and changes which would result in a hard-fork. When Celo Blockchain software upgrades are required to continue operating correctly on the network, a "Minimum Client Version" parameter is set to indicate the minimum version that it required.

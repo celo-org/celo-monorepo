@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -54,6 +54,7 @@ export interface ValidatorsConfig {
   groupLockedGoldRequirements: LockedGoldRequirements
   validatorLockedGoldRequirements: LockedGoldRequirements
   maxGroupSize: BigNumber
+  membershipHistoryLength: BigNumber
 }
 
 export interface GroupMembership {
@@ -119,11 +120,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidatorLockedGoldRequirements(),
       this.getGroupLockedGoldRequirements(),
       this.contract.methods.maxGroupSize().call(),
+      this.contract.methods.membershipHistoryLength().call(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
       maxGroupSize: valueToBigNumber(res[2]),
+      membershipHistoryLength: valueToBigNumber(res[3]),
     }
   }
 
@@ -448,7 +451,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
     }
 
-    const currentIdx = group.members.indexOf(validator)
+    const currentIdx = group.members.map(normalizeAddress).indexOf(normalizeAddress(validator))
     if (currentIdx < 0) {
       throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
@@ -514,5 +517,35 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const signerAddresses = await this.currentSignerSet()
     const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
     return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
+  }
+
+  /**
+   * Returns the group membership for `validator`.
+   * @param validator Address of validator to retrieve group membership for.
+   * @param blockNumber Block number to retrieve group membership at.
+   * @return Group and membership history index for `validator`.
+   */
+  async getValidatorMembershipHistoryIndex(
+    validator: Validator,
+    blockNumber?: number
+  ): Promise<{ group: Address; historyIndex: number }> {
+    const blockEpoch = await this.kit.getEpochNumberOfBlock(
+      blockNumber || (await this.kit.web3.eth.getBlockNumber())
+    )
+    const account = await this.validatorSignerToAccount(validator.signer)
+    const membershipHistory = await this.getValidatorMembershipHistory(account)
+    const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
+    const group = membershipHistory[historyIndex].group
+    return { group, historyIndex }
+  }
+
+  /**
+   * Returns the index into `history` for `epoch`.
+   * @param epoch The needle.
+   * @param history The haystack.
+   * @return Index for epoch or -1.
+   */
+  findValidatorMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
+    return history.reverse().findIndex((x) => x.epoch <= epoch)
   }
 }

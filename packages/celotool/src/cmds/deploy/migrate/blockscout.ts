@@ -18,6 +18,10 @@ export const handler = async (argv: TestnetArgv) => {
   await switchToClusterFromEnv()
 
   const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
+  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
+    'BLOCKSCOUT_DB_SUFFIX',
+    ''
+  )}`
 
   const [
     blockscoutDBUsername,
@@ -30,6 +34,7 @@ export const handler = async (argv: TestnetArgv) => {
   // Install the blockscout package
   await installHelmChart(
     argv.celoEnv,
+    helmReleaseName,
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName
