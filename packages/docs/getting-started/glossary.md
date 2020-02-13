@@ -37,7 +37,7 @@ A database maintained by a distributed set of computers that do not share a trus
 
 A form of consensus algorithm in which up to a third of participants can be faulty or malicious.
 
-## C Labs, Celo Labs
+## cLabs, Celo Labs
 
 The team currently leading the development of the Celo protocol and Celo Wallet application.
 

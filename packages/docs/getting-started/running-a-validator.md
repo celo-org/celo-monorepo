@@ -16,7 +16,7 @@ You can find more details about Celo mission and why to become a Validator [in o
 
 ## Register for the Stake Off
 
-Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the C-Labs team receives your registration, they will send you instructions to get fauceted funds to run a Validator on the Baklava testnet.** Do this first.
+Participation in The Great Celo Stake Off is subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/). If you agree to those, register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). **Once the cLabs team receives your registration, they will send you instructions to get fauceted funds to run a Validator on the Baklava testnet.** Do this first.
 
 ## Prerequisites
 
@@ -193,7 +193,7 @@ docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $
 
 ### Obtain and lock up some Celo Gold for staking
 
-To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the C-Labs team receives your registration, they'll send you instructions to get fauceted. Follow those instructions now. Then, while you wait, let's deploy the remaining components:
+To participate in The Great Celo Stake Off (aka TGCSO) and get fauceted it's necessary to register online via an [online form](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform). Once the cLabs team receives your registration, they'll send you instructions to get fauceted. Follow those instructions now. Then, while you wait, let's deploy the remaining components:
 
 ### Deploy a Validator
 
@@ -337,7 +337,7 @@ Note that if you are running the validator and the proxy on the same machine, th
 
 ### Register the Accounts
 
-You've now done all the infrastructure setup to get a validator and proxy running. The C-Labs team will review your submission to receive funds and send you 12,000 testnet Celo Gold to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via [`celocli`](../command-line-interface/introduction.md) and put up a stake to register as a validator and validator group.
+You've now done all the infrastructure setup to get a validator and proxy running. The cLabs team will review your submission to receive funds and send you 12,000 testnet Celo Gold to each of your Validator and Validator Group account addresses. These funds have no real world value but will allow you to submit transactions to the network via [`celocli`](../command-line-interface/introduction.md) and put up a stake to register as a validator and validator group.
 
 You can view your Celo Gold balances by running the following commands:
 
@@ -591,7 +591,7 @@ Twilio is the most common and popular provider. For that you will need to provis
 After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs will be very low (and on mainnet easily exceeded by the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`. In any case, you'll want to adjust your Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions).
 
 {% hint style="info" %}
-Make sure you can serve requests for numbers in US, Europe, Australia, Mexico, Argentina, the Philippines, and Kenya. 
+Make sure you can serve requests for numbers in US, Europe, Australia, Mexico, Argentina, the Philippines, and Kenya.
 {% endhint %}
 
 To actually be able to send SMS, you need to create a messaging service under [Programmable SMS > SMS](https://www.twilio.com/console/sms/services). The resulting `SID` you want to specify under the `TWILIO_MESSAGING_SERVICE_SID`. Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. To maximize the chances of reliable and prompt SMS sending (and thus attestation fee revenue), you can buy numbers in many locales, and Twilio will intelligently select the best number to send each SMS.
