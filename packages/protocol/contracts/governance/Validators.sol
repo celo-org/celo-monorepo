@@ -605,6 +605,32 @@ contract Validators is
   }
 
   /**
+   * @notice Updates a validator's ECDSA and BLS key.
+   * @param account The address under which the validator is registered.
+   * @param signer The address which the validator is using to sign consensus messages.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @return True upon success.
+   */
+  function updateValidatorKeys(
+    address account,
+    address signer,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
+    require(isValidator(account), "Not a validator");
+    Validator storage validator = validators[account];
+    require(
+      _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
+    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
+    return true;
+  }
+
+  /**
    * @notice Updates a validator's ECDSA key.
    * @param validator The validator whose ECDSA public key should be updated.
    * @param signer The address with which the validator is signing consensus messages.
