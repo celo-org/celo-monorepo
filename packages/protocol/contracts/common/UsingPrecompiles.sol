@@ -32,7 +32,7 @@ contract UsingPrecompiles {
     bool success;
     bytes memory out;
     (success, out) = FRACTION_MUL.staticcall(
-      abi.encodePacked(a, denominator, b, denominator, exponent, uint256(24))
+      abi.encodePacked(a, denominator, b, denominator, exponent, uint256(FixidityLib.digits()))
     );
     require(
       success,
