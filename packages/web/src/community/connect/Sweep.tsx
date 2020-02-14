@@ -10,7 +10,7 @@ import Svg from 'svgs'
 // since the coins animate in a delayed way the entire "animation" is longer than this
 const DURATION = 1500
 
-const INTERVAL_MS = DURATION * 4 // needs to be at least 4x DURATION to give the complete animation a chance to finish
+const INTERVAL_MS = DURATION * 2.1 // needs to be at least 4x DURATION to give the complete animation a chance to finish
 
 interface OwnProps {
   children: React.ReactNode
@@ -27,7 +27,7 @@ class Sweep extends React.Component<Props, State> {
   }
 
   componentDidMount = () => {
-    this.timer = setInterval(this.tick, INTERVAL_MS)
+    // this.timer = setInterval(this.tick, INTERVAL_MS)
   }
   componentWillUnmount = () => {
     clearInterval(this.timer)
@@ -78,17 +78,44 @@ class StableCircle extends React.PureComponent {
   render() {
     return (
       <G>
-        {VECTORS.map((path) => {
+        {VECTORS.map((path, index) => {
           return (
             <Path
               key={path.slice(0, 11)}
               d={path}
-              style={[styles.justCoin, { stroke: colors.screenGray }, baseCoinStyle]}
+              style={[
+                styles.justCoin,
+                {
+                  stroke: colors.screenGray,
+                  mixBlendMode: 'screen',
+                  animationIterationCount: 1,
+                  animationDelay: `${INTERVAL_MS + index * 30}ms`,
+                  animationFillMode: 'both',
+                  animationDuration: `${DURATION}ms`,
+                  animationKeyframes: solidFadeInFrames(
+                    quartColor(index),
+                    (index / VECTORS.length) * 200
+                  ),
+                },
+              ]}
             />
           )
         })}
       </G>
     )
+  }
+}
+
+function quartColor(index: number) {
+  const quarter = VECTORS.length / 4
+  if (index < quarter) {
+    return colors.greenScreen
+  } else if (index < quarter * 2) {
+    return colors.purpleScreen
+  } else if (index < quarter * 3) {
+    return colors.blueScreen
+  } else {
+    return colors.redScreen
   }
 }
 
@@ -108,7 +135,7 @@ const styles = StyleSheet.create({
     animationKeyframes: getKeyframes(),
   },
   sweepContainer: {
-    height: 1000,
+    height: 1100,
     width: '100%',
   },
   mobileSweepContainer: {
@@ -119,7 +146,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   lighting: {
-    height: 1000,
+    height: 1100,
     width: '100%',
     animationIterationCount: 1,
     animationDuration: `${DURATION * 2}ms`,
@@ -150,16 +177,15 @@ const styles = StyleSheet.create({
   },
 })
 
-const standard = {
-  stroke: colors.screenGray,
-  fill: 'transparent',
-}
-
 function getKeyframes() {
+  const standardStrokeFill = {
+    stroke: colors.screenGray,
+    fill: 'transparent',
+  }
   return [
     {
-      '0%': standard,
-      '24%': standard,
+      '0%': standardStrokeFill,
+      '24%': standardStrokeFill,
 
       '25%': colorFrame(colors.greenScreen),
       '35%': colorFrame(colors.greenScreen),
@@ -173,10 +199,18 @@ function getKeyframes() {
       '70%': colorFrame(colors.purpleScreen),
       '80%': colorFrame(colors.purpleScreen),
 
-      '85%': standard,
-      '100%': standard,
+      '85%': standardStrokeFill,
+      '100%': standardStrokeFill,
     },
   ]
+}
+
+function solidFadeInFrames(color: colors, donePercent: number) {
+  const standardStrokeFill = {
+    stroke: colors.screenGray,
+    fill: 'transparent',
+  }
+  return [{ '0%': standardStrokeFill, [donePercent]: colorFrame(color), '100%': colorFrame(color) }]
 }
 
 function colorFrame(color: colors) {
