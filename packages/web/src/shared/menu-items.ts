@@ -3,13 +3,17 @@ export const menuItems = {
     name: 'Home',
     link: '/',
   },
-  APPLICATIONS: {
-    name: 'Applications',
-    link: '/applications',
-  },
   ABOUT_US: {
     name: 'About',
     link: '/about',
+  },
+  ALLIANCE_COLLECTIVE: {
+    name: 'Collective',
+    link: '/collective',
+  },
+  APPLICATIONS: {
+    name: 'Applications',
+    link: '/applications',
   },
   BUILD: {
     name: 'Build',

@@ -91,7 +91,7 @@ class StableCircle extends React.PureComponent {
                   animationIterationCount: 1,
                   animationDelay: `${INTERVAL_MS + index * 30}ms`,
                   animationFillMode: 'both',
-                  animationDuration: `${DURATION}ms`,
+                  animationDuration: `${DURATION / 3}ms`,
                   animationKeyframes: solidFadeInFrames(
                     quartColor(index),
                     (index / VECTORS.length) * 200
