@@ -1,14 +1,13 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import CCLicense from 'src/brandkit/common/CCLicense'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import Fetch from 'src/brandkit/common/Fetch'
 import Page, { ICONS_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import IconShowcase from 'src/brandkit/common/Showcase'
-import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
-import InlineAnchor from 'src/shared/InlineAnchor'
-import { CeloLinks, hashNav } from 'src/shared/menu-items'
-import { fonts, standardStyles } from 'src/styles'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { hashNav } from 'src/shared/menu-items'
 
 export default React.memo(
   withNamespaces(NameSpaces.brand)(function IconsPage({ t }: I18nProps) {
@@ -36,16 +35,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
   return (
     <View style={styles.container}>
       <PageHeadline title={t('icons.title')} headline={t('icons.headline')} />
-      <Text style={[fonts.h5, brandStyles.gap, standardStyles.blockMarginTop]}>
-        {t('licenseTitle')}
-      </Text>
-      <Text style={[fonts.p, brandStyles.gap, standardStyles.elementalMargin]}>
-        <Trans ns={NameSpaces.brand} i18nKey="icons.license">
-          <InlineAnchor href={CeloLinks.iconsLicense}>
-            Creative Commons Attribution-NoDerivatives 4.0 International License
-          </InlineAnchor>
-        </Trans>
-      </Text>
+      <CCLicense textI18nKey="icons.license" />
       <View style={brandStyles.tiling}>
         <Fetch query="/brand/api/assets/icons">
           {({ loading, data }: { loading: boolean; data: IconData[] }) => {
@@ -54,6 +44,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
                 return (
                   <IconShowcase
                     size={160}
+                    ratio={1}
                     key={i}
                     loading={true}
                     name={'Celo Icon'}
@@ -67,6 +58,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
             return data.map((icon) => (
               <IconShowcase
                 key={icon.name}
+                ratio={1}
                 description={icon.description}
                 name={icon.name}
                 preview={{ uri: icon.preview }}

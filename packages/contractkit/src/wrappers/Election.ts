@@ -400,7 +400,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     })
     const validators = await this.kit.contracts.getValidators()
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      validators.getValidatorGroup(e.returnValues.group, true, blockNumber)
+      validators.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
@@ -435,16 +435,17 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       (e: GroupVoterReward) => normalizeAddress(e.group.address) in activeVoterVotes
     )
     return voterRewards.map(
-      (e: GroupVoterReward): VoterReward => ({
-        address,
-        addressPayment: e.groupVoterPayment.times(
-          activeVoterVotes[normalizeAddress(e.group.address)].dividedBy(
-            activeGroupVotes[normalizeAddress(e.group.address)]
-          )
-        ),
-        group: e.group,
-        epochNumber: e.epochNumber,
-      })
+      (e: GroupVoterReward): VoterReward => {
+        const group = normalizeAddress(e.group.address)
+        return {
+          address,
+          addressPayment: e.groupVoterPayment.times(
+            activeVoterVotes[group].dividedBy(activeGroupVotes[group])
+          ),
+          group: e.group,
+          epochNumber: e.epochNumber,
+        }
+      }
     )
   }
 }

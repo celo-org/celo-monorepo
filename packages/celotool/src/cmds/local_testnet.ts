@@ -1,7 +1,9 @@
-import { range } from 'lodash'
-import { GethInstanceConfig, getHooks, sleep } from 'src/e2e-tests/utils'
-import { Admin } from 'web3-eth-admin'
 import yargs from 'yargs'
+import { Admin } from 'web3-eth-admin'
+import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { getHooks, sleep } from 'src/e2e-tests/utils'
+import { range } from 'lodash'
 
 export const command = 'local-testnet'
 export const describe = 'command to run a local testnet of geth instances'
@@ -158,7 +160,12 @@ async function connectNodes(configs: GethInstanceConfig[]) {
 }
 
 export const handler = async (argv: LocalTestnetArgs) => {
-  const gethConfig = {
+  const repoPath = argv.localgeth || '/tmp/geth'
+
+  const gethConfig: GethRunConfig = {
+    network: 'local',
+    networkId: 1101,
+    runPath: '/tmp/e2e',
     migrateTo: argv.migrateto,
     instances: selectPorts([
       ...validatorConfigs(argv.validators),
@@ -168,7 +175,7 @@ export const handler = async (argv: LocalTestnetArgs) => {
       ...JSON.parse(argv.instances),
     ]),
     repository: {
-      path: argv.localgeth || '/tmp/geth',
+      path: repoPath,
       branch: argv.branch,
       remote: !argv.localgeth,
     },
