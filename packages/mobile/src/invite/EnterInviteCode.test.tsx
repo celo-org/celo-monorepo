@@ -73,6 +73,7 @@ describe('EnterInviteCode Screen', () => {
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
+          deepLinkInviteCode={''}
           account={null}
           {...getMockI18nProps()}
         />
@@ -98,6 +99,7 @@ describe('EnterInviteCode Screen', () => {
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
+          deepLinkInviteCode={''}
           account={null}
           {...getMockI18nProps()}
         />
@@ -121,6 +123,7 @@ describe('EnterInviteCode Screen', () => {
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
+          deepLinkInviteCode={''}
           account={null}
           {...getMockI18nProps()}
         />
@@ -144,6 +147,7 @@ describe('EnterInviteCode Screen', () => {
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
+          deepLinkInviteCode={''}
           account={null}
           {...getMockI18nProps()}
         />
@@ -167,6 +171,7 @@ describe('EnterInviteCode Screen', () => {
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
+          deepLinkInviteCode={''}
           account={null}
           {...getMockI18nProps()}
         />

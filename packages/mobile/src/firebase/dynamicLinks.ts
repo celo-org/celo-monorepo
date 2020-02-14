@@ -1,22 +1,27 @@
 import firebase from 'react-native-firebase'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'utils/dynamicLink'
+const TAG = 'firebase/dynamicLink'
 
-export async function generateDynamicShortLink(
-  playStoreUrl: string,
-  appStoreUrl: string,
-  androidPackageName: string,
-  iOSBundleId: string
-): Promise<string> {
+export async function generateShortInviteLink({
+  link,
+  playStoreUrl,
+  appStoreUrl,
+  bundleId,
+}: {
+  link: string
+  playStoreUrl: string
+  appStoreUrl: string
+  bundleId: string
+}): Promise<string> {
   try {
-    const firebaseLink = new firebase.links.DynamicLink(appStoreUrl, 'https://celol.page.link')
+    const firebaseLink = new firebase.links.DynamicLink(link, 'https://celol.page.link')
 
     firebaseLink.android.setFallbackUrl(playStoreUrl)
-    firebaseLink.android.setPackageName(androidPackageName)
+    firebaseLink.android.setPackageName(bundleId)
 
     firebaseLink.ios.setFallbackUrl(appStoreUrl)
-    firebaseLink.ios.setBundleId(iOSBundleId)
+    firebaseLink.ios.setBundleId(bundleId)
 
     // Please note other parameter than UNGUESSABLE is unsafe
     const shortUrl = await firebase.links().createShortDynamicLink(firebaseLink, 'UNGUESSABLE')
@@ -26,6 +31,6 @@ export async function generateDynamicShortLink(
     return shortUrl
   } catch (error) {
     Logger.error(TAG, 'Failed to shorten invite URL: ' + error.toString())
-    return playStoreUrl
+    return link
   }
 }

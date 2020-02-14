@@ -7,6 +7,7 @@ import { throwError } from 'redux-saga-test-plan/providers'
 import { call } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import {
   InviteBy,
   redeemInvite,
@@ -16,17 +17,16 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import {
-  generateLink,
+  generateInviteLink,
   watchRedeemInvite,
   watchSendInvite,
   withdrawFundsFromTempAccount,
 } from 'src/invite/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
-import { generateDynamicShortLink } from 'src/utils/dynamicLink'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
-import { mockAccount, mockE164Number, mockName } from 'test/values'
+import { mockAccount, mockE164Number } from 'test/values'
 
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const mockBalance = jest.fn()
@@ -48,9 +48,13 @@ jest.mock('@celo/walletkit', () => {
   }
 })
 
-jest.mock('src/utils/dynamicLink', () => ({
-  ...jest.requireActual('src/utils/dynamicLink'),
-  generateDynamicShortLink: jest.fn(async (x) => 'htttp://celo.page.link/PARAMS'),
+jest.mock('src/firebase/dynamicLinks', () => ({
+  ...jest.requireActual('src/firebase/dynamicLinks'),
+  generateShortInviteLink: jest.fn(async () => 'http://celo.page.link/PARAMS'),
+}))
+
+jest.mock('src/utils/appstore', () => ({
+  getAppStoreId: jest.fn(async () => 1482389446),
 }))
 
 jest.mock('src/account/actions', () => ({
@@ -83,7 +87,7 @@ jest.mock('src/web3/contracts', () => ({
     },
     utils: {
       fromWei: (x: any) => x / 1e18,
-      sha3: (x: any) => `a sha3 hash`,
+      sha3: () => `a sha3 hash`,
     },
   },
   contractKit: {
@@ -110,7 +114,7 @@ describe(watchSendInvite, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockName, mockE164Number, InviteBy.SMS))
+      .dispatch(sendInvite(mockE164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
       .put(storeInviteeData(mockKey, mockE164Number))
       .run()
@@ -125,7 +129,7 @@ describe(watchSendInvite, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockName, mockE164Number, InviteBy.WhatsApp))
+      .dispatch(sendInvite(mockE164Number, InviteBy.WhatsApp))
       .put(storeInviteeData(mockKey, mockE164Number))
       .dispatch(transactionConfirmed('a sha3 hash'))
       .run()
@@ -211,24 +215,20 @@ describe(watchRedeemInvite, () => {
   })
 })
 
-describe(generateLink, () => {
+describe(generateInviteLink, () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it('Generate invite link correctly', async () => {
-    const result = await generateLink(mockKey, 'martin')
-    expect(result.name).toBe('martin')
-    expect(result.code).toBe(mockKey)
-
-    expect(result.link).toBe('htttp://celo.page.link/PARAMS')
-
-    expect(generateDynamicShortLink).toBeCalledTimes(1)
-    expect(generateDynamicShortLink).toHaveBeenCalledWith(
-      'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores&referrer=invite-code%3D0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-      'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446',
-      'org.celo.mobile.alfajores',
-      '1482389446'
-    )
+    const result = await generateInviteLink(mockKey)
+    expect(result).toBe('http://celo.page.link/PARAMS')
+    expect(generateShortInviteLink).toBeCalledTimes(1)
+    expect(generateShortInviteLink).toHaveBeenCalledWith({
+      link: `celo://wallet/invitation/invite-code%3D${mockKey}`,
+      playStoreUrl: `https://play.store.link&referrer=invite-code%3D${mockKey}`,
+      appStoreUrl: 'https://app.store.link',
+      bundleId: 'org.celo.mobile.integration',
+    })
   })
 })

@@ -10,6 +10,7 @@ export interface State {
   invitees: Invitees
   redeemComplete: boolean
   redeemedInviteCode: string
+  deepLinkInviteCode: string
 }
 
 export const initialState: State = {
@@ -19,6 +20,7 @@ export const initialState: State = {
   invitees: {},
   redeemComplete: false,
   redeemedInviteCode: '',
+  deepLinkInviteCode: '',
 }
 
 export const inviteReducer = (
@@ -82,6 +84,11 @@ export const inviteReducer = (
         ...state,
         redeemComplete: false,
         isSkippingInvite: false,
+      }
+    case Actions.SET_DEEP_LINK_INVITE_CODE:
+      return {
+        ...state,
+        deepLinkInviteCode: action.inviteCode,
       }
     default:
       return state

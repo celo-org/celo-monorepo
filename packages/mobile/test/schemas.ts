@@ -115,6 +115,7 @@ export const vNeg1Schema = {
     invitees: {},
     redeemedInviteCode: '',
     redeemComplete: false,
+    deepLinkInviteCode: '',
   },
   escrow: {
     isReclaiming: false,

@@ -18,6 +18,8 @@ import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
+import { setDeepLinkInviteCode } from 'src/invite/actions'
+import { decodeInvite, extractValidInviteCode } from 'src/invite/utils'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { PersistedRootState } from 'src/redux/reducers'
@@ -136,6 +138,19 @@ export function* handleDeepLink(action: OpenDeepLink) {
   if (rawParams.path) {
     if (rawParams.path.startsWith('/v/')) {
       yield put(receiveAttestationMessage(rawParams.path.substr(3), CodeInputType.DEEP_LINK))
+    }
+
+    if (rawParams.path.startsWith('/invitation/')) {
+      const encodedInvite = rawParams.path.substr(3)
+      const { code } = decodeInvite(encodedInvite)
+      if (!code) {
+        return
+      }
+      const validCode = extractValidInviteCode(code.replace(' ', '+'))
+      if (!validCode) {
+        return
+      }
+      yield put(setDeepLinkInviteCode(validCode))
     }
 
     if (rawParams.path.startsWith('/dappkit')) {
