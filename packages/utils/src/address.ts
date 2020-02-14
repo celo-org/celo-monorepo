@@ -6,15 +6,21 @@ import {
   toChecksumAddress,
 } from 'ethereumjs-util'
 
+const HEX_REGEX = /^0x[0-9A-F]*$/i
+
 export type Address = string
 
 export const eqAddress = (a: Address, b: Address) => normalizeAddress(a) === normalizeAddress(b)
 
 export const normalizeAddress = (a: Address) => trimLeading0x(a).toLowerCase()
 
+export const normalizeAddressWith0x = (a: Address) => ensureLeading0x(a).toLowerCase()
+
 export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.slice(2) : input)
 
 export const ensureLeading0x = (input: string) => (input.startsWith('0x') ? input : `0x${input}`)
+
+export const isHexString = (imput: string) => HEX_REGEX.test(imput)
 
 export const hexToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
 
