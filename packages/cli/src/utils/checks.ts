@@ -117,7 +117,7 @@ class CheckBuilder {
         const match = (await g.getProposalStage(proposalID)) === stage
         if (!match) {
           const waitTimes = await g.timeUntilStages(proposalID)
-          printValueMap(waitTimes)
+          printValueMap({ waitTimes })
         }
         return match
       })

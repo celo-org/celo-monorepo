@@ -6,6 +6,7 @@ import { AccountPool, processRequest } from './database-helper'
 const PROCESSOR_RUNTIME_OPTS: functions.RuntimeOptions = {
   // When changing this, check that actionTimeoutMS is less than this number
   timeoutSeconds: 120,
+  memory: '512MB',
 }
 admin.initializeApp(functions.config().firebase)
 
