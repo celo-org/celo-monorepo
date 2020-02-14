@@ -21,7 +21,7 @@
 
 • **call**: *function*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L61)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L64)*
 
 #### Type declaration:
 
@@ -40,7 +40,7 @@ ___
 
 • **send**: *function*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L62)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L65)*
 
 #### Type declaration:
 

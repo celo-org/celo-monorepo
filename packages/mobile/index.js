@@ -2,6 +2,7 @@
 import 'node-libs-react-native/globals'
 import 'src/missingGlobals'
 import 'src/forceCommunityAsyncStorage'
+import 'src/setupE2eEnv' // This is only for E2E tests and has no effects when not running E2E tests
 import { AppRegistry } from 'react-native'
 import Logger from 'src/utils/Logger'
 import App from 'src/app/App'

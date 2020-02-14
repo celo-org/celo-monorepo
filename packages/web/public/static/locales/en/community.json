@@ -130,15 +130,5 @@
   "apply": "Apply",
   "recommend": "Recommend",
   "website": "WEBSITE",
-  "recap": "RECAP",
-  "stayConnected": "Stay connected",
-  "stayConnectedThanks": "Thanks for joining the Celo community, expect our newsletter soon.",
-  "readMoreFromOurBlog": "Read more on our blog",
-  "receiveUpdates": "Receive the latest updates to your inbox",
-  "signUp": "Sign Up",
-  "conductBtn": "Read Document",
-  "experienceLabel": "Experience",
-  "conductLabel": "Code of Conduct",
-  "conductText": "Shared norms and behaviors are the foundation of a beautiful community. Please read and respect our code of conduct.",
-  "socialLabel": "Engage"
+  "recap": "RECAP"
 }

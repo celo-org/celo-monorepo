@@ -30,7 +30,7 @@
 
 \+ **new DefaultRpcCaller**(`provider`: Provider, `jsonrpcVersion`: string): *[DefaultRpcCaller](_utils_rpc_caller_.defaultrpccaller.md)*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L64)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L67)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ Name | Type | Default |
 
 • **jsonrpcVersion**: *string*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L65)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L68)*
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **provider**: *Provider*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L65)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L68)*
 
 ## Methods
 
@@ -63,7 +63,7 @@ ___
 
 ▸ **call**(`method`: string, `params`: any[]): *Promise‹JsonRPCResponse›*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L67)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L70)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **send**(`payload`: JsonRPCRequest, `callback`: Callback‹JsonRPCResponse›): *void*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L85)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L88)*
 
 **Parameters:**
 

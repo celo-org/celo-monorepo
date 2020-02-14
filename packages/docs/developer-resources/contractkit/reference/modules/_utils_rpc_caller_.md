@@ -21,7 +21,7 @@
 
 ▸ **getRandomId**(): *number*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L33)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L36)*
 
 **Returns:** *number*
 
