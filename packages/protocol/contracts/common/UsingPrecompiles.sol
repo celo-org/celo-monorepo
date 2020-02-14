@@ -19,24 +19,20 @@ contract UsingPrecompiles {
   address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
 
   /**
-   * @notice calculate a * b^x for fractions a, b to `decimals` precision
-   * @param a Value of first Fraction
-   * @param b Value of exponentiated Fraction
-   * @param exponent exponent to raise b to
-   * @return Fraction of the computed quantity.
+   * @notice calculate a * b^x
+   * @param a Unwrapped Fraction.
+   * @param b Unwrapped Fraction.
+   * @param exponent Exponent to raise b to.
+   * @return Unwrapped Fraction of the computed quantity.
    */
-  function fractionMulExp(
-    FixidityLib.Fraction memory a,
-    FixidityLib.Fraction memory b,
-    uint256 exponent
-  ) public view returns (FixidityLib.Fraction memory) {
+  function fractionMulExp(uint256 a, uint256 b, uint256 exponent) public view returns (uint256) {
     uint256 denominator = FixidityLib.fixed1().unwrap();
     uint256 returnNumerator;
     uint256 returnDenominator;
     bool success;
     bytes memory out;
     (success, out) = FRACTION_MUL.staticcall(
-      abi.encodePacked(a.unwrap(), denominator, b.unwrap(), denominator, exponent, 24)
+      abi.encodePacked(a, denominator, b, denominator, exponent, uint256(24))
     );
     require(
       success,
@@ -44,7 +40,7 @@ contract UsingPrecompiles {
     );
     returnNumerator = getUint256FromBytes(out, 0);
     returnDenominator = getUint256FromBytes(out, 32);
-    return FixidityLib.newFixedFraction(returnNumerator, returnDenominator);
+    return FixidityLib.newFixedFraction(returnNumerator, returnDenominator).unwrap();
   }
 
   /**

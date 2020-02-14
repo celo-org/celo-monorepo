@@ -326,12 +326,24 @@ contract('StableToken', (accounts: string[]) => {
   describe('#fractionMulExp()', () => {
     it('can do generic computations', async () => {
       const value = await stableToken.fractionMulExp.call(toFixed(1 / 2), toFixed(3 / 4), 5)
-      assert.equal(fromFixed(value).times(1000000), 118652)
+      assert.equal(
+        fromFixed(value)
+          .times(1000000)
+          .integerValue()
+          .toNumber(),
+        118652
+      )
     })
 
     it('works with exponent zero', async () => {
       const value = await stableToken.fractionMulExp.call(toFixed(1 / 2), toFixed(3 / 4), 0)
-      assert.equal(fromFixed(value).times(1000000), 500000)
+      assert.equal(
+        fromFixed(value)
+          .times(1000000)
+          .integerValue()
+          .toNumber(),
+        500000
+      )
     })
   })
 

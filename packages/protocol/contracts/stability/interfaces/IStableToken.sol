@@ -12,12 +12,7 @@ interface IStableToken {
   function debitFrom(address, uint256) external;
   function creditTo(address, uint256) external;
   function setInflationParameters(uint256, uint256) external;
-
-  function fractionMulExp(FixidityLib.Fraction calldata, FixidityLib.Fraction calldata, uint256)
-    external
-    view
-    returns (FixidityLib.Fraction memory);
-
+  function fractionMulExp(uint256, uint256, uint256) external view returns (uint256);
   function valueToUnits(uint256) external view returns (uint256);
   function unitsToValue(uint256) external view returns (uint256);
   function getInflationParameters() external view returns (uint256, uint256, uint256, uint256);
