@@ -8,7 +8,7 @@ import Svg from 'svgs'
 
 // note this is the animation duration of a single coin,
 // since the coins animate in a delayed way the entire "animation" is longer than this
-const DURATION = 1500
+const DURATION = 1100
 
 const INTERVAL_MS = DURATION * 2.1 // needs to be at least 4x DURATION to give the complete animation a chance to finish
 
@@ -86,7 +86,7 @@ class StableCircle extends React.PureComponent {
               style={[
                 styles.justCoin,
                 {
-                  stroke: colors.screenGray,
+                  // stroke: colors.screenGray,
                   mixBlendMode: 'screen',
                   animationIterationCount: 1,
                   animationDelay: `${INTERVAL_MS + index * 30}ms`,
@@ -121,11 +121,11 @@ function quartColor(index: number) {
 
 const styles = StyleSheet.create({
   justCoin: {
-    opacity: 0.5,
+    opacity: 0.3,
     fill: 'transparent',
   },
   base: {
-    opacity: 0.5,
+    opacity: 0.2,
     animationIterationCount: 3,
     animationDuration: `${DURATION}ms`,
     animationFillMode: 'both',
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   lighting: {
-    height: 1100,
+    height: '100%',
     width: '100%',
     animationIterationCount: 1,
     animationDuration: `${DURATION * 2}ms`,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
 
 function getKeyframes() {
   const standardStrokeFill = {
-    stroke: colors.screenGray,
+    // stroke: colors.screenGray,
     fill: 'transparent',
   }
   return [
@@ -207,7 +207,7 @@ function getKeyframes() {
 
 function solidFadeInFrames(color: colors, donePercent: number) {
   const standardStrokeFill = {
-    stroke: colors.screenGray,
+    // stroke: colors.screenGray,
     fill: 'transparent',
   }
   return [{ '0%': standardStrokeFill, [donePercent]: colorFrame(color), '100%': colorFrame(color) }]
