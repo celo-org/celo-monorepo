@@ -19,6 +19,7 @@
 #import "RNFirebaseMessaging.h"
 #import "RNSplashScreen.h"
 
+#import "ReactNativeConfig.h"
 
 // Use same key as react-native-secure-key-store
 // so we don't reset already working installs
@@ -32,7 +33,10 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   // Note: react-native-secure-key-store also does that but is run too late
   // and hence can't clear Firebase credentials
   [self resetKeychainIfNecessary];
-  [FIRApp configure];
+  NSString *env = [ReactNativeConfig envFor:@"FIREBASE_ENABLED"];
+  if (env.boolValue) {
+    [FIRApp configure];
+  }
   [RNFirebaseNotifications configure];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
