@@ -16,5 +16,5 @@ Celo nodes can be interacted with through an RPC interface for common interactio
 
 Beyond the RPC interface, Celo nodes and services have other interfaces that actually need to be exposed to the public internet. While varying degrees of protection exist within the software, such as validating attestation requests against the blockchain or monitoring connections in the discovery protocol, additional measures are recommended to reduce the impact of malicious traffic. Examples include, but are not limited to:
 
-- **DDOS protection:** Protected public endpoints from a DDos attack is highly recommended to allow valid requests to be served
+- **DDoS protection:** Protected public endpoints from a DDoS attack is highly recommended to allow valid requests to be served
 - **Whitelist endpoints:** The attestation service exposes a [limited number of paths](https://github.com/celo-org/celo-monorepo/blob/master/packages/attestation-service/src/index.ts#L34) to function correctly. You could use a reverse proxy to reject paths that don't match them.
