@@ -221,7 +221,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             </View>
             {validatorGroups.map((group, i) => (
               <View key={group.address}>
-                <View style={[styles.tableRow]}>
+                <View style={[styles.tableRow, styles.tableRowCont]}>
                   <View
                     style={[styles.tableCell, styles.tableCellTitle]}
                     onClick={this.expand.bind(this, i)}
@@ -427,10 +427,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
+  tableRowCont: {
+    paddingTop: 10,
+  },
   tableHeaderRow: {
     borderBottomWidth: 1,
     borderStyle: 'solid',
-    borderColor: colors.white,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     zIndex: 2,
     top: 0,
     backgroundColor: colors.dark,
@@ -442,7 +445,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {
     fontSize: 16,
     lineHeight: 20,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     paddingVertical: 24,
     textAlign: 'center',
     flexGrow: 0,
@@ -467,7 +470,7 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     paddingVertical: 12,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     fontSize: 16,
     flexGrow: 0,
   },
@@ -477,7 +480,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     overflow: 'hidden',
     flexGrow: 1,
-    width: 272,
+    width: 236,
   },
   tableCellTitleRows: {
     display: 'flex',
@@ -562,11 +565,11 @@ const styles = StyleSheet.create({
   },
 
   // Column sizes
-  sizeXS: { minWidth: 64, maxWidth: 64 },
-  sizeS: { minWidth: 74, maxWidth: 74 },
-  sizeM: { minWidth: 110, maxWidth: 110 },
-  sizeL: { minWidth: 154, maxWidth: 154 },
-  sizeXL: { minWidth: 174, maxWidth: 174 },
+  sizeXS: { minWidth: 64 + 6, maxWidth: 64 + 6 },
+  sizeS: { minWidth: 74 + 6, maxWidth: 74 + 6 },
+  sizeM: { minWidth: 110 + 6, maxWidth: 110 + 6 },
+  sizeL: { minWidth: 154 + 6, maxWidth: 154 + 6 },
+  sizeXL: { minWidth: 174 + 6, maxWidth: 174 + 6 },
 
   // Circle
   circle: {
