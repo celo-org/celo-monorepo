@@ -436,24 +436,18 @@ contract StableToken is
       inflationState.updatePeriod
     );
 
-    (numerator, denominator) = fractionMulExp(
-      inflationState.factor.unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      inflationState.rate.unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      timesToApplyInflation,
-      decimals_
+    FixidityLib.Fraction memory currentInflationFactor = fractionMulExp(
+      inflationState.factor,
+      inflationState.rate,
+      timesToApplyInflation
     );
 
     // This should never happen. If something went wrong updating the
     // inflation factor, keep the previous factor
-    if (numerator == 0 || denominator == 0) {
+    if (currentInflationFactor == 0) {
       return (inflationState.factor, inflationState.factorLastUpdated);
     }
 
-    FixidityLib.Fraction memory currentInflationFactor = FixidityLib.wrap(numerator).divide(
-      FixidityLib.wrap(denominator)
-    );
     uint256 lastUpdated = inflationState.factorLastUpdated.add(
       inflationState.updatePeriod.mul(timesToApplyInflation)
     );

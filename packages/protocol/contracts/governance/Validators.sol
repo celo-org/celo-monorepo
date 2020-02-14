@@ -359,17 +359,14 @@ contract Validators is
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
-    uint256 numerator;
-    uint256 denominator;
-    (numerator, denominator) = fractionMulExp(
-      FixidityLib.fixed1().unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      uptime,
-      FixidityLib.fixed1().unwrap(),
-      validatorScoreParameters.exponent,
-      18
-    );
-    return FixidityLib.newFixedFraction(numerator, denominator).unwrap();
+    return
+      fractionMulExp(
+        FixidityLib.fixed1(),
+        FixidityLib.wrap(uptime),
+        validatorScoreParameters
+          .exponent
+      )
+        .unwrap();
   }
 
   /**

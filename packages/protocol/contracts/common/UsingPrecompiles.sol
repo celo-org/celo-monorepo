@@ -1,8 +1,10 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./FixidityLib.sol";
 
 contract UsingPrecompiles {
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
   address constant TRANSFER = address(0xff - 2);
@@ -18,29 +20,23 @@ contract UsingPrecompiles {
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
-   * @param aNumerator Numerator of first fraction
-   * @param aDenominator Denominator of first fraction
-   * @param bNumerator Numerator of exponentiated fraction
-   * @param bDenominator Denominator of exponentiated fraction
+   * @param a Value of first Fraction
+   * @param b Value of exponentiated Fraction
    * @param exponent exponent to raise b to
-   * @param _decimals precision
-   * @return numerator/denominator of the computed quantity (not reduced).
+   * @return Fraction of the computed quantity.
    */
   function fractionMulExp(
-    uint256 aNumerator,
-    uint256 aDenominator,
-    uint256 bNumerator,
-    uint256 bDenominator,
-    uint256 exponent,
-    uint256 _decimals
-  ) public view returns (uint256, uint256) {
-    require(aDenominator != 0 && bDenominator != 0);
+    FixidityLib.Fraction memory a,
+    FixidityLib.Fraction memory b,
+    uint256 exponent
+  ) public view returns (FixidityLib.Fraction memory) {
+    uint256 denominator = FixidityLib.fixed1().unwrap();
     uint256 returnNumerator;
     uint256 returnDenominator;
     bool success;
     bytes memory out;
     (success, out) = FRACTION_MUL.staticcall(
-      abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
+      abi.encodePacked(a.unwrap(), denominator, b.unwrap(), denominator, exponent, 24)
     );
     require(
       success,
@@ -48,7 +44,7 @@ contract UsingPrecompiles {
     );
     returnNumerator = getUint256FromBytes(out, 0);
     returnDenominator = getUint256FromBytes(out, 32);
-    return (returnNumerator, returnDenominator);
+    return FixidityLib.newFixedFraction(returnNumerator, returnDenominator);
   }
 
   /**
