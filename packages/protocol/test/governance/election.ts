@@ -858,7 +858,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#electValidatorSigners', () => {
+  describe.only('#electValidatorSigners', () => {
     let random: MockRandomInstance
     let totalLockedGold: number
     const group1 = accounts[0]
@@ -921,6 +921,7 @@ contract('Election', (accounts: string[]) => {
 
       it("should return that group's member list", async () => {
         await setRandomness(hash1)
+        await election.electValidatorSignersDebug()
         assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
@@ -939,6 +940,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should return maxElectableValidators elected validators', async () => {
         await setRandomness(hash1)
+        await election.electValidatorSignersDebug()
         assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
@@ -964,6 +966,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should elect only n members from that group', async () => {
         await setRandomness(hash1)
+        await election.electValidatorSignersDebug()
         assertSameAddresses(await election.electValidatorSigners(), [
           validator7,
           validator1,
@@ -986,6 +989,7 @@ contract('Election', (accounts: string[]) => {
 
       it('should not elect any members from that group', async () => {
         await setRandomness(hash1)
+        await election.electValidatorSignersDebug()
         assertSameAddresses(await election.electValidatorSigners(), [
           validator1,
           validator2,
