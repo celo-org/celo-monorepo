@@ -16,15 +16,18 @@ export function rpcCallHandler(
         (result) => {
           callback(null, toRPCResponse(payload, result))
         },
+        // Called if the Promise of the 'handler' fails
         (error) => {
           callback(error, toRPCResponse(payload, null, error))
         }
       )
       .catch((error) => {
+        // Called if the 'callback' fails
         debugRpcCallback('Callback for handling the JsonRPCResponse fails')
         debugRpcCallback('%O', error)
       })
   } catch (error) {
+    // Called if the handler fails before making the promise
     callback(error)
   }
 }
