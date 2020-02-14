@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import DeveloperPhoneCover from 'src/dev/DeveloperPhoneCover'
 import { Contribute, EngageAsDeveloper } from 'src/dev/Engage'
 import Features from 'src/dev/Features'
 import FullStack from 'src/dev/FullStack'
 import Sandbox from 'src/dev/Sandbox'
+import { H2, H3 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
-import { fonts, standardStyles, textStyles } from 'src/styles'
+import { standardStyles } from 'src/styles'
 const previewImage = require('src/dev/opengraph.jpg')
-
 class Developers extends React.PureComponent<I18nProps> {
   render() {
     const { t } = this.props
@@ -29,10 +29,9 @@ class Developers extends React.PureComponent<I18nProps> {
         <Sandbox />
         <FullStack />
         <Features />
-        <EngageAsDeveloper action={t('getInvolved')}>
-          <Text style={[fonts.h6, textStyles.lean, standardStyles.elementalMarginBottom]}>
-            {t('engage.developers.verb')}
-          </Text>
+        <EngageAsDeveloper>
+          <H3 style={standardStyles.elementalMarginBottom}>{t('engage.developers.verb')}</H3>
+          <H2 style={standardStyles.elementalMarginBottom}>{t('getInvolved')}</H2>
         </EngageAsDeveloper>
         <Contribute />
         <ConnectionFooter includeDividerLine={false} />

@@ -44,7 +44,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
   return (
     <View style={styles.paragraphArea}>
       {props.noun && <H3 style={standardStyles.elementalMarginBottom}>{props.noun}</H3>}
-      <H4 style={standardStyles.elementalMarginBottom}>{props.verb}</H4>
+      {props.verb && <H4 style={standardStyles.elementalMarginBottom}>{props.verb}</H4>}
       <Text style={fonts.h6}>{props.network}</Text>
       <Fade fraction={0.5} bottom={true} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
@@ -141,7 +141,7 @@ export function Contribute() {
 
 interface EngageProps {
   children: React.ReactNode
-  action: string
+  action?: string
   noun?: string
 }
 

@@ -5,7 +5,7 @@ import CodeEditor from 'src/dev/CodeEditor'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 export default function Sandbox() {
   const { t } = useTranslation(NameSpaces.dev)
@@ -30,6 +30,7 @@ export default function Sandbox() {
                   text={t('sandbox.btn')}
                   target="_blank"
                   onPress={trackSandBox}
+                  size={SIZE.big}
                 />
               </View>
             </View>

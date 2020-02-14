@@ -15,7 +15,6 @@ function Phone() {
         <Path
           d="M17.8473 2.64592L139.728 17.2761C147.016 18.1508 152.5 24.333 152.5 31.6727V327.146C152.5 334.517 146.969 340.716 139.645 341.552L17.7584 355.469C8.56117 356.519 0.5 349.326 0.5 340.069V18.0355C0.5 8.74263 8.62072 1.53839 17.8473 2.64592Z"
           stroke="white"
-          style={[styles.animations, styles.appear]}
         />
         <Line
           x1="1"
@@ -36,7 +35,7 @@ function GreenLine() {
     <View style={[standardStyles.row, standardStyles.centered]}>
       <View style={[styles.line, styles.arrow, styles.animations]} />
       <View style={[styles.arrowhead, styles.animations]}>
-        <OvalCoin color={colors.primary} size={20} />
+        <OvalCoin color={colors.primary} size={16} />
       </View>
     </View>
   )
@@ -44,7 +43,7 @@ function GreenLine() {
 
 export default React.memo(Phone)
 
-const LINE_DISTANCE = 280
+const LINE_DISTANCE = 270
 
 const svgStyle = {
   zIndex: 1,
@@ -65,18 +64,6 @@ const styles = StyleSheet.create({
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
   },
-  appear: {
-    animationKeyframes: [
-      {
-        '0%': {
-          opacity: 0.5,
-        },
-        '100%': {
-          opacity: 1,
-        },
-      },
-    ],
-  },
   arrowhead: {
     animationKeyframes: [
       {
@@ -86,7 +73,7 @@ const styles = StyleSheet.create({
         },
         '100%': {
           opacity: 1,
-          transform: [{ translateX: -10 }],
+          transform: [{ translateX: -5 }],
         },
       },
     ],
