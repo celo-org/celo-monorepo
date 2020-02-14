@@ -40,7 +40,9 @@ spec:
             memory: 500Mi
             cpu: 500m
         env:
-{{ include "celo.blockscout-env-vars" .  | indent 10 }}
+        - name: DISABLE_WEBAPP
+          value: "true"
+{{ include "celo.blockscout-env-vars" .  | indent 8 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:

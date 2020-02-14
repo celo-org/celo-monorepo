@@ -23,7 +23,7 @@ Celo Core Contract's Address Registry
 
 \+ **new AddressRegistry**(`kit`: [ContractKit](_kit_.contractkit.md)): *[AddressRegistry](_address_registry_.addressregistry.md)*
 
-*Defined in [packages/contractkit/src/address-registry.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L18)*
+*Defined in [contractkit/src/address-registry.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L18)*
 
 **Parameters:**
 
@@ -39,7 +39,7 @@ Name | Type |
 
 ▸ **addressFor**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *Promise‹[Address](../modules/_base_.md#address)›*
 
-*Defined in [packages/contractkit/src/address-registry.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L28)*
+*Defined in [contractkit/src/address-registry.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L28)*
 
 Get the address for a `CeloContract`
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **allAddresses**(): *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address)››*
 
-*Defined in [packages/contractkit/src/address-registry.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L48)*
+*Defined in [contractkit/src/address-registry.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L48)*
 
 Get the address for all possible `CeloContract`
 
