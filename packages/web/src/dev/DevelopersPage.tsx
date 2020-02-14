@@ -11,7 +11,7 @@ import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
-const previewImage = require('src/dev/opengraph.jpg')
+const previewImage = require('src/dev/dev-og.png')
 class Developers extends React.PureComponent<I18nProps> {
   render() {
     const { t } = this.props
@@ -20,9 +20,9 @@ class Developers extends React.PureComponent<I18nProps> {
         <OpenGraph
           image={previewImage}
           path={menuItems.BUILD.link}
-          title={'Build with Celo | Celo Developers'}
+          title={'Celo Developers | Celo SDK'}
           description={
-            "Documentation for Celo's open-source protocol. Celo is a proof-of-stake based blockchain with smart contracts that allows for an ecosystem of powerful applications built on top."
+            'Innovative tools to build native mobile dApps. Celo is a proof-of-stake based blockchain with smart contracts that allows for an ecosystem of powerful applications.'
           }
         />
         <DeveloperPhoneCover />

@@ -14,14 +14,16 @@ const GRAPHIC_SIZE = 80
 
 const FeatureComponent = React.memo(function Feature({ title, graphic, text }: Props) {
   return (
-    <View style={[standardStyles.centered, standardStyles.elementalMargin, styles.container]}>
+    <View style={[standardStyles.elementalMargin, styles.container]}>
       <FadeIn>
         {(load: func) => (
           <Image resizeMode="contain" onLoad={load} source={graphic} style={styles.graphic} />
         )}
       </FadeIn>
-      <Text style={[fonts.h6, textStyles.invert, textStyles.center, styles.title]}>{title}</Text>
-      <Text style={[fonts.mini, textStyles.center, textStyles.readingOnDark]}>{text}</Text>
+      <View style={{ width: '100%', flex: 1 }}>
+        <Text style={[fonts.h6, textStyles.invert, styles.title]}>{title}</Text>
+        <Text style={[fonts.p, textStyles.readingOnDark]}>{text}</Text>
+      </View>
     </View>
   )
 })
@@ -38,6 +40,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   container: {
-    marginHorizontal: 10,
+    marginRight: 20,
+    flexDirection: 'row',
+    flex: 0,
   },
 })

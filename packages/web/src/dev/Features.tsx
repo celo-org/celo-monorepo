@@ -34,24 +34,40 @@ export default withNamespaces('dev')(
               </Cell>
             </GridRow>
             <GridRow mobileStyle={styles.featuresMobile}>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
                 <Feature
                   title={t('feat.stableValueCurrencies')}
                   graphic={stableImg}
                   text={t('feat.stableText')}
                 />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
                 <Feature title={t('feat.phonePKI')} graphic={pkiImg} text={t('feat.pkiText')} />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
                 <Feature title={t('feat.onChainGov')} graphic={govImg} text={t('feat.govText')} />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+            </GridRow>
+            <GridRow>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
+                <Feature
+                  title={t('feat.selfCustody')}
+                  graphic={custodyImg}
+                  text={t('feat.custodyText')}
+                />
+              </Cell>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
                 <Feature
                   title={t('feat.proofOfStake')}
                   graphic={stakeImg}
                   text={t('feat.stakeText')}
+                />
+              </Cell>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
+                <Feature
+                  title={t('feat.fastUltraLight')}
+                  graphic={ultraImg}
+                  text={t('feat.ultraText')}
                 />
               </Cell>
             </GridRow>
@@ -60,28 +76,14 @@ export default withNamespaces('dev')(
               tabletStyle={standardStyles.sectionMarginBottomTablet}
               mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.featuresMobile]}
             >
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
-                <Feature
-                  title={t('feat.selfCustody')}
-                  graphic={custodyImg}
-                  text={t('feat.custodyText')}
-                />
-              </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
-                <Feature
-                  title={t('feat.fastUltraLight')}
-                  graphic={ultraImg}
-                  text={t('feat.ultraText')}
-                />
-              </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
                 <Feature
                   title={t('feat.gasMultiCurrency')}
                   graphic={gasImg}
                   text={t('feat.gasText')}
                 />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} mobileSpan={Spans.half}>
                 <Feature
                   title={t('feat.programmable')}
                   graphic={evmImg}

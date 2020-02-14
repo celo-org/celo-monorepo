@@ -7,7 +7,7 @@ import Svg from 'svgs'
 
 function Phone() {
   return (
-    <>
+    <View style={styles.container}>
       <View style={styles.absoluteCenter}>
         <GreenLine />
       </View>
@@ -26,7 +26,7 @@ function Phone() {
           strokeWidth="40"
         />
       </Svg>
-    </>
+    </View>
   )
 }
 
@@ -43,7 +43,7 @@ function GreenLine() {
 
 export default React.memo(Phone)
 
-const LINE_DISTANCE = 270
+const LINE_DISTANCE = 280
 
 const svgStyle = {
   zIndex: 1,
@@ -57,6 +57,10 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  container: {
+    maxHeight: 350,
+    height: '100%',
   },
   animations: {
     animationDuration: '1s',

@@ -141,10 +141,10 @@
   },
   "mobile": {
     "title": "Applications",
-    "text": "Send or Request Celo Dollar easily with anyone in your address book, powered by decentralized phone number verification",
+    "text": "Send or Request cUSD easily with anyone in your address book, powered by decentralized phone number verification",
     "nonCustodial": "Non-custodial wallet",
     "mobileUltra": "Mobile ultralight client",
-    "exchange": "Exchange between Celo Dollar and Celo Gold",
+    "exchange": "Exchange between cUSD and cGLD",
     "qr": "QR Code Support",
     "sdk": "Mobile first SDK"
   },
@@ -175,7 +175,7 @@
   "sandbox": {
     "overtitle": "Try it Out",
     "title": "Sample Celo Integration",
-    "explainer": "This code snippet creates an account and transfers Celo Dollars to the account.",
+    "explainer": "This code snippet creates an account and transfers cUSD to the account.",
     "btn": "Try out the Code"
   }
 }

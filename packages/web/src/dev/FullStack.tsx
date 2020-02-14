@@ -222,16 +222,22 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
               <Li style={textStyles.invert}>{t('proof.onChain')}</Li>
             </StackSection>
             <View
+              // @ts-ignore
               style={[
                 standardStyles.centered,
-                isDesktop ? standardStyles.sectionMargin : {},
+                isDesktop && standardStyles.blockMargin,
                 isBrowseCodeFaded && styles.faded,
                 styles.browseCodeArea,
               ]}
             >
               <H4 style={[textStyles.invert, textStyles.center]}>{t('stackBrowseTitle')}</H4>
               <Text
-                style={[standardStyles.elementalMarginBottom, textStyles.invert, textStyles.center]}
+                style={[
+                  standardStyles.elementalMarginBottom,
+                  fonts.legal,
+                  textStyles.invert,
+                  textStyles.center,
+                ]}
               >
                 {t('stackBrowseCopy')}{' '}
               </Text>
@@ -272,7 +278,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   browseCodeArea: {
-    paddingVertical: 100,
     transitionProperty: 'opacity',
     transitionDuration: '100ms',
   },

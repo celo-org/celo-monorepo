@@ -2250,8 +2250,6 @@ exports[`BuildPage renders 1`] = `
               "justifyContent": "center",
               "msFlexAlign": "center",
               "msFlexPack": "center",
-              "paddingBottom": "100px",
-              "paddingTop": "100px",
               "transitionDuration": "100ms",
               "transitionProperty": "opacity",
             }
@@ -2282,8 +2280,12 @@ exports[`BuildPage renders 1`] = `
             style={
               Object {
                 "color": "rgba(255,255,255,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "16px",
+                "lineHeight": "20px",
                 "marginBottom": "20px",
                 "textAlign": "center",
+                "textRendering": "geometricPrecision",
               }
             }
           >
@@ -2511,18 +2513,24 @@ exports[`BuildPage renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
                   "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
+                  "marginRight": "20px",
                   "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
                 }
               }
             >
@@ -2570,39 +2578,56 @@ exports[`BuildPage renders 1`] = `
                 />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
-                feat.stableValueCurrencies
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
+                    }
                   }
-                }
-              >
-                feat.stableText
+                >
+                  feat.stableValueCurrencies
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.stableText
+                </div>
               </div>
             </div>
           </div>
@@ -2629,18 +2654,24 @@ exports[`BuildPage renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
                   "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
+                  "marginRight": "20px",
                   "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
                 }
               }
             >
@@ -2688,39 +2719,56 @@ exports[`BuildPage renders 1`] = `
                 />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
-                feat.phonePKI
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
+                    }
                   }
-                }
-              >
-                feat.pkiText
+                >
+                  feat.phonePKI
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.pkiText
+                </div>
               </div>
             </div>
           </div>
@@ -2747,18 +2795,24 @@ exports[`BuildPage renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
                   "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
+                  "marginRight": "20px",
                   "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
                 }
               }
             >
@@ -2806,39 +2860,217 @@ exports[`BuildPage renders 1`] = `
                 />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
-                feat.onChainGov
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.onChainGov
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.govText
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignSelf": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "vertical",
+              "WebkitFlexDirection": "column",
+              "alignSelf": "center",
+              "flexDirection": "column",
+              "maxWidth": "100vw",
+              "msFlexDirection": "column",
+              "msFlexItemAlign": "center",
+              "paddingLeft": "10px",
+              "paddingRight": "10px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitFlexShrink": 0,
+                "flexGrow": 0,
+                "flexShrink": 0,
+                "msFlexNegative": 0,
+                "msFlexPositive": 0,
+                "paddingBottom": "10px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "10px",
+                "width": "50%",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
+                  "marginBottom": "20px",
+                  "marginRight": "20px",
+                  "marginTop": "20px",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitFlexBasis": "auto",
+                    "borderBottomColor": "rgba(46,51,56,1.00)",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(46,51,56,1.00)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(46,51,56,1.00)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(46,51,56,1.00)",
+                    "borderTopWidth": "1px",
+                    "flexBasis": "auto",
+                    "height": "80px",
+                    "msFlexPreferredSize": "auto",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                    "width": "112px",
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "backgroundPosition": "center",
+                      "backgroundRepeat": "no-repeat",
+                      "backgroundSize": "contain",
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "right": "0px",
+                      "top": "0px",
+                      "width": "100%",
+                      "zIndex": -1,
+                    }
+                  }
+                />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
-                feat.govText
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.selfCustody
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.custodyText
+                </div>
               </div>
             </div>
           </div>
@@ -2865,18 +3097,24 @@ exports[`BuildPage renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
                   "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
+                  "marginRight": "20px",
                   "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
                 }
               }
             >
@@ -2924,39 +3162,197 @@ exports[`BuildPage renders 1`] = `
                 />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
-                feat.proofOfStake
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.proofOfStake
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.stakeText
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitFlexShrink": 0,
+                "flexGrow": 0,
+                "flexShrink": 0,
+                "msFlexNegative": 0,
+                "msFlexPositive": 0,
+                "paddingBottom": "10px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "10px",
+                "width": "50%",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
+                  "marginBottom": "20px",
+                  "marginRight": "20px",
+                  "marginTop": "20px",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitFlexBasis": "auto",
+                    "borderBottomColor": "rgba(46,51,56,1.00)",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(46,51,56,1.00)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(46,51,56,1.00)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(46,51,56,1.00)",
+                    "borderTopWidth": "1px",
+                    "flexBasis": "auto",
+                    "height": "80px",
+                    "msFlexPreferredSize": "auto",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                    "width": "112px",
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "backgroundPosition": "center",
+                      "backgroundRepeat": "no-repeat",
+                      "backgroundSize": "contain",
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "right": "0px",
+                      "top": "0px",
+                      "width": "100%",
+                      "zIndex": -1,
+                    }
+                  }
+                />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
-                feat.stakeText
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.fastUltraLight
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.ultraText
+                </div>
               </div>
             </div>
           </div>
@@ -3008,18 +3404,24 @@ exports[`BuildPage renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
                   "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
+                  "marginRight": "20px",
                   "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
                 }
               }
             >
@@ -3067,39 +3469,56 @@ exports[`BuildPage renders 1`] = `
                 />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
-                feat.selfCustody
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
+                    }
                   }
-                }
-              >
-                feat.custodyText
+                >
+                  feat.gasMultiCurrency
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  feat.gasText
+                </div>
               </div>
             </div>
           </div>
@@ -3126,18 +3545,24 @@ exports[`BuildPage renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexBasis": "0%",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitFlexShrink": 0,
+                  "flexBasis": "0%",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "flexShrink": 0,
                   "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
+                  "marginRight": "20px",
                   "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "msFlexDirection": "row",
+                  "msFlexNegative": 0,
+                  "msFlexPositive": 0,
+                  "msFlexPreferredSize": "0%",
                 }
               }
             >
@@ -3185,275 +3610,56 @@ exports[`BuildPage renders 1`] = `
                 />
               </div>
               <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                feat.fastUltraLight
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                feat.ultraText
-              </div>
-            </div>
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "WebkitFlexShrink": 0,
-                "flexGrow": 0,
-                "flexShrink": 0,
-                "msFlexNegative": 0,
-                "msFlexPositive": 0,
-                "paddingBottom": "10px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "10px",
-                "width": "50%",
-              }
-            }
-          >
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                  "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
-                  "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                }
-              }
-            >
-              <div
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "WebkitFlexBasis": "auto",
-                    "borderBottomColor": "rgba(46,51,56,1.00)",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(46,51,56,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(46,51,56,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(46,51,56,1.00)",
-                    "borderTopWidth": "1px",
-                    "flexBasis": "auto",
-                    "height": "80px",
-                    "msFlexPreferredSize": "auto",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
-                    "width": "112px",
-                    "zIndex": 0,
+                    "WebkitBoxFlex": 1,
+                    "WebkitFlexBasis": "0%",
+                    "WebkitFlexGrow": 1,
+                    "WebkitFlexShrink": 1,
+                    "flexBasis": "0%",
+                    "flexGrow": 1,
+                    "flexShrink": 1,
+                    "msFlexNegative": 1,
+                    "msFlexPositive": 1,
+                    "msFlexPreferredSize": "0%",
+                    "width": "100%",
                   }
                 }
               >
                 <div
-                  className="css-view-1dbjc4n"
+                  className="css-text-901oao"
+                  dir="auto"
                   style={
                     Object {
-                      "backgroundColor": "rgba(0,0,0,0.00)",
-                      "backgroundPosition": "center",
-                      "backgroundRepeat": "no-repeat",
-                      "backgroundSize": "contain",
-                      "bottom": "0px",
-                      "height": "100%",
-                      "left": "0px",
-                      "position": "absolute",
-                      "right": "0px",
-                      "top": "0px",
-                      "width": "100%",
-                      "zIndex": -1,
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "10px",
+                      "marginTop": "10px",
+                      "textRendering": "geometricPrecision",
                     }
                   }
-                />
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                feat.gasMultiCurrency
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                feat.gasText
-              </div>
-            </div>
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "WebkitFlexShrink": 0,
-                "flexGrow": 0,
-                "flexShrink": 0,
-                "msFlexNegative": 0,
-                "msFlexPositive": 0,
-                "paddingBottom": "10px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "10px",
-                "width": "50%",
-              }
-            }
-          >
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                  "marginBottom": "20px",
-                  "marginLeft": "10px",
-                  "marginRight": "10px",
-                  "marginTop": "20px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                }
-              }
-            >
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitFlexBasis": "auto",
-                    "borderBottomColor": "rgba(46,51,56,1.00)",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(46,51,56,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(46,51,56,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(46,51,56,1.00)",
-                    "borderTopWidth": "1px",
-                    "flexBasis": "auto",
-                    "height": "80px",
-                    "msFlexPreferredSize": "auto",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
-                    "width": "112px",
-                    "zIndex": 0,
-                  }
-                }
-              >
+                >
+                  feat.programmable
+                </div>
                 <div
-                  className="css-view-1dbjc4n"
+                  className="css-text-901oao"
+                  dir="auto"
                   style={
                     Object {
-                      "backgroundColor": "rgba(0,0,0,0.00)",
-                      "backgroundPosition": "center",
-                      "backgroundRepeat": "no-repeat",
-                      "backgroundSize": "contain",
-                      "bottom": "0px",
-                      "height": "100%",
-                      "left": "0px",
-                      "position": "absolute",
-                      "right": "0px",
-                      "top": "0px",
-                      "width": "100%",
-                      "zIndex": -1,
+                      "color": "rgba(221,221,221,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "textRendering": "geometricPrecision",
                     }
                   }
-                />
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginBottom": "10px",
-                    "marginTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                feat.programmable
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "14px",
-                    "lineHeight": "16px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                feat.programmableText
+                >
+                  feat.programmableText
+                </div>
               </div>
             </div>
           </div>
