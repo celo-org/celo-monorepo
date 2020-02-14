@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import Analytics from 'src/analytics/analytics'
 import CodeEditor from 'src/dev/CodeEditor'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-
 export default function Sandbox() {
   const { t } = useTranslation(NameSpaces.dev)
   return (
@@ -29,6 +29,7 @@ export default function Sandbox() {
                   href="https://repl.it/@annakaz/contractkit"
                   text={t('sandbox.btn')}
                   target="_blank"
+                  onPress={trackSandBox}
                 />
               </View>
             </View>
@@ -37,6 +38,10 @@ export default function Sandbox() {
       </GridRow>
     </View>
   )
+}
+
+async function trackSandBox() {
+  await Analytics.track('sandbox_engaged_with')
 }
 
 const styles = StyleSheet.create({
