@@ -35,6 +35,7 @@ contract('Reserve', (accounts: string[]) => {
   const anAddress: string = '0x00000000000000000000000000000000deadbeef'
   const nonOwner: string = accounts[1]
   const spender: string = accounts[2]
+  const exchangeAddress: string = accounts[3]
   const aTobinTaxStalenessThreshold: number = 600
   const aDailySpendingRatio: string = '1000000000000000000000000'
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
@@ -45,6 +46,7 @@ contract('Reserve', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
+    await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
     await reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
   })
 
@@ -217,6 +219,27 @@ contract('Reserve', (accounts: string[]) => {
 
     it('can only transfer gold to other reverse addresses', async () => {
       await assertRevert(reserve.transferGold(nonOwner, aValue, { from: spender }))
+    })
+  })
+
+  describe('#transferExchangeGold()', () => {
+    const aValue = 10000
+    beforeEach(async () => {
+      await mockGoldToken.setBalanceOf(reserve.address, aValue)
+      await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
+      await reserve.addSpender(spender)
+    })
+
+    it('should allow a exchange to call transferExchangeGold', async () => {
+      await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
+    })
+
+    it('should not allow spenders to call transferExchangeGold', async () => {
+      await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: spender }))
+    })
+
+    it('should not allow other addresses to call transferExchangeGold', async () => {
+      await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
     })
   })
 
