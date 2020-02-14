@@ -1,6 +1,6 @@
 # Securing Celo nodes and services
 
-Running Celo nodes and services securely, especially as part of running a valdiator, is of utmost importance. Failure to do so can lead to severe consequences including, but not limited to loss of funds, slashing due to double signing, etc. Here are some additional tips and tricks:
+Running Celo nodes and services securely, especially as part of running a valdiator, is of utmost importance. Failure to do so can lead to severe consequences including, but not limited to loss of funds, slashing due to double signing, etc. Here are some recommendations:
 
 
 ### RPC Endpoints
