@@ -20,10 +20,10 @@ contract UsingPrecompiles {
 
   /**
    * @notice calculate a * b^x
-   * @param a Unwrapped Fraction.
-   * @param b Unwrapped Fraction.
+   * @param a First unwrapped Fraction.
+   * @param b The unwrapped Fraction to be exponentiated.
    * @param exponent Exponent to raise b to.
-   * @return Unwrapped Fraction of the computed quantity.
+   * @return The computed quantity as an unwrapped Fraction.
    */
   function fractionMulExp(uint256 a, uint256 b, uint256 exponent) public view returns (uint256) {
     uint256 denominator = FixidityLib.fixed1().unwrap();
