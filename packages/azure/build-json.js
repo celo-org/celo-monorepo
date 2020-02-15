@@ -35,7 +35,7 @@ function main() {
     .reduce((acc, val) => {
       return acc.concat(
         Object.entries(val.parameters || {})
-          .filter(([name, parameter]) => parameter.type === 'string')
+          .filter(([name, parameter]) => parameter.type === 'string' || parameter.type === 'int')
           .map(([name, parameter]) => `'${name}=', parameters('${name}'), ';'`)
       )
     }, [])

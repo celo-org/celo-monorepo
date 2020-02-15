@@ -119,8 +119,8 @@
       }
     },
     "gethVerbosity": {
-      "type": "string",
-      "defaultValue": "3",
+      "type": "int",
+      "defaultValue": 3,
       "metadata": {
         "description": "geth --verbosity argument"
       }
@@ -182,22 +182,22 @@
       }
     },
     "blockTime": {
-      "type": "string",
-      "defaultValue": "5",
+      "type": "int",
+      "defaultValue": 5,
       "metadata": {
         "description": "The ethereum network block time"
       }
     },
     "istanbulRequestTimeoutMs": {
-      "type": "string",
-      "defaultValue": "10000",
+      "type": "int",
+      "defaultValue": 10000,
       "metadata": {
         "description": "The ethereum request timeout"
       }
     },
     "proxyMaxPeers": {
-      "type": "string",
-      "defaultValue": "120",
+      "type": "int",
+      "defaultValue": 120,
       "metadata": {
         "description": "Max number of peers to connect with"
       }
@@ -238,8 +238,8 @@
       }
     },
     "validatorDiskSize": {
-      "type": "string",
-      "defaultValue": "1024",
+      "type": "int",
+      "defaultValue": 1024,
       "metadata": {
         "description": "Validator data disk size in gigabytes"
       }
@@ -266,8 +266,8 @@
       }
     },
     "proxyDiskSize": {
-      "type": "string",
-      "defaultValue": "1024",
+      "type": "int",
+      "defaultValue": 1024,
       "metadata": {
         "description": "Validator data disk size in gigabytes"
       }
@@ -301,8 +301,8 @@
       }
     },
     "attesterDiskSize": {
-      "type": "string",
-      "defaultValue": "1024",
+      "type": "int",
+      "defaultValue": 1024,
       "metadata": {
         "description": "Attester data disk size in gigabytes"
       }
