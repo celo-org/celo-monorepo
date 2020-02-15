@@ -14,16 +14,20 @@ export const menuItems = {
     link: '/about',
   },
   BUILD: {
-    name: 'Build',
-    link: '/build',
+    name: 'Validators',
+    link: '/validators',
   },
   BRAND: {
     name: 'Experience - Brand Kit',
     link: '/experience/brand',
   },
   COMMUNITY: {
-    name: 'Connect',
+    name: 'Community',
     link: '/community',
+  },
+  DEVELOPERS: {
+    name: 'Developers',
+    link: '/developers',
   },
   SDK_DEVELOPERS: {
     name: DevelopersPage,
@@ -41,6 +45,7 @@ export const menuItems = {
     name: 'Privacy Policy',
     link: '/privacy',
   },
+
   TECH: {
     name: 'Technology',
     link: '/technology',

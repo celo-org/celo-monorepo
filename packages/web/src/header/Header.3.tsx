@@ -23,7 +23,7 @@ const CookieConsent = dynamic(
   (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
 )
 
-const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
+const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.DEVELOPERS, menu.COMMUNITY]
 const DARK_PAGES = new Set([
   menu.HOME.link,
   menu.COMMUNITY.link,
