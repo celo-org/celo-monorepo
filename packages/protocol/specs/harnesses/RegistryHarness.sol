@@ -14,23 +14,11 @@ contract RegistryHarness is IRegistryExtended {
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
-  /*	
-	string constant ATTESTATIONS_REGISTRY_ID = "Attestations";
-	string constant LOCKED_GOLD_REGISTRY_ID = "LockedGold";
-	string constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = "GasCurrencyWhitelist";
-	string constant GOLD_TOKEN_REGISTRY_ID = "GoldToken";
-	string constant GOVERNANCE_REGISTRY_ID = "Governance";
-	string constant RESERVE_REGISTRY_ID = "Reserve";
-	string constant RANDOM_REGISTRY_ID = "Random";
-	string constant SORTED_ORACLES_REGISTRY_ID = "SortedOracles";
-	string constant VALIDATORS_REGISTRY_ID = "Validators";
-*/
+
   uint256 constant iamValidators = 1;
   uint256 constant iamGoldToken = 2;
   uint256 constant iamGovernance = 3;
   uint256 constant iamLockedGold = 4;
-
-  uint256 constant iamSpartacus = 10000000;
 
   uint256 whoami;
 
@@ -43,22 +31,22 @@ contract RegistryHarness is IRegistryExtended {
       whoami = iamGovernance;
     } else if (identifier == LOCKED_GOLD_REGISTRY_ID) {
       whoami = iamLockedGold;
-    } else {
-      whoami = iamSpartacus; // random! irrelevant!
     }
 
-    // Need to statically reason that registry always returns itself now. In particular if can call state-modifying code through the registry (goldToken?).
+    // Need to statically reason that registry always returns itself now.
+    // In particular if can call state-modifying code through the registry (goldToken?).
     return address(this);
   }
 
   function getAddressForOrDie(bytes32 identifier) external returns (address) {
     address _addr = getAddressFor(identifier);
 
-    require(_addr != address(0)); // This is the "or die" part
+    require(_addr != address(0), "Identifier not recognized");
     return _addr;
   }
 
-  // local fields from other contracts are prefixed with contract name, like this: contractName_fieldName
+  // Local fields from other contracts are prefixed with contract name.
+  // Ex: contractName_fieldName
   mapping(address => bool) validators_validating;
   mapping(address => bool) governance_isVoting;
   mapping(address => bool) validators_isVoting;
@@ -135,7 +123,6 @@ contract RegistryHarness is IRegistryExtended {
   }
 
   function transfer(address recipient, uint256 value) external returns (bool) {
-    // a broken, havocing (not fully though - would need to add another key to the map for that) implementation
     goldToken_balanceOf[msg.sender] = getRandomUInt256() - value;
     goldToken_balanceOf[recipient] = getRandomUInt256() + value;
     return getRandomBool();
