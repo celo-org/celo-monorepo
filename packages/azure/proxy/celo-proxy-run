@@ -44,7 +44,6 @@ set -x
       --maxpeers=${PROXY_MAX_PEERS} \
       --nat=extip:${PROXY_EXTERNAL_IP_ADDRESS} \
       --metrics \
-      $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       --proxy.proxy \
       --proxy.proxiedvalidatoraddress ${VALIDATOR_ACCOUNT_ADDRESS} \
       --proxy.internalendpoint :30503 \

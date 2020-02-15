@@ -61,7 +61,6 @@ docker run \
       --maxpeers=${VALIDATOR_MAX_PEERS} \
       --nat=extip:${VALIDATOR_INTERNAL_IP_ADDRESS} \
       --metrics \
-      $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       --nodiscover \
       --proxy.proxied \
       --proxy.proxyenodeurlpair=\"$PROXY_URL\" \

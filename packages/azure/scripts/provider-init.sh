@@ -9,7 +9,6 @@ ATTESTER_KEY_VAULT=${attesterKeyVaultName}
 GETH_NODE_DOCKER_IMAGE=${gethNodeDockerImageRepository}:${gethNodeDockerImageTag}
 GETH_EXPORTER_DOCKER_IMAGE=${gethExporterDockerImageRepository}:${gethExporterDockerImageTag}
 ATTESTATION_SERVICE_DOCKER_IMAGE=${attestationServiceDockerImageRepository}:${attestationServiceDockerImageTag}
-IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 NETWORK_ID=${networkId}
 GETH_VERBOSITY=${gethVerbosity}
 VALIDATOR_NAME=${validatorName}
