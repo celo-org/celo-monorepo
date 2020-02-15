@@ -25,14 +25,46 @@ contract UsingPrecompiles {
    * @param exponent Exponent to raise b to.
    * @return The computed quantity as an unwrapped Fraction.
    */
-  function fractionMulExp(uint256 a, uint256 b, uint256 exponent) public view returns (uint256) {
+  function mulExp(uint256 a, uint256 b, uint256 exponent) public view returns (uint256) {
     uint256 denominator = FixidityLib.fixed1().unwrap();
+    uint256 returnNumerator;
+    uint256 returnDenominator;
+    (returnNumerator, returnDenominator) = fractionMulExp(
+      a,
+      denominator,
+      b,
+      denominator,
+      exponent,
+      FixidityLib.digits()
+    );
+    return FixidityLib.newFixedFraction(returnNumerator, returnDenominator).unwrap();
+  }
+
+  /**
+   * @notice calculate a * b^x for fractions a, b to `decimals` precision
+   * @param aNumerator Numerator of first fraction
+   * @param aDenominator Denominator of first fraction
+   * @param bNumerator Numerator of exponentiated fraction
+   * @param bDenominator Denominator of exponentiated fraction
+   * @param exponent exponent to raise b to
+   * @param _decimals precision
+   * @return numerator/denominator of the computed quantity (not reduced).
+   */
+  function fractionMulExp(
+    uint256 aNumerator,
+    uint256 aDenominator,
+    uint256 bNumerator,
+    uint256 bDenominator,
+    uint256 exponent,
+    uint256 _decimals
+  ) public view returns (uint256, uint256) {
+    require(aDenominator != 0 && bDenominator != 0);
     uint256 returnNumerator;
     uint256 returnDenominator;
     bool success;
     bytes memory out;
     (success, out) = FRACTION_MUL.staticcall(
-      abi.encodePacked(a, denominator, b, denominator, exponent, uint256(FixidityLib.digits()))
+      abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
     );
     require(
       success,
@@ -40,7 +72,7 @@ contract UsingPrecompiles {
     );
     returnNumerator = getUint256FromBytes(out, 0);
     returnDenominator = getUint256FromBytes(out, 32);
-    return FixidityLib.newFixedFraction(returnNumerator, returnDenominator).unwrap();
+    return (returnNumerator, returnDenominator);
   }
 
   /**

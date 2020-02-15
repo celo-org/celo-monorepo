@@ -427,26 +427,33 @@ contract StableToken is
       return (inflationState.factor, inflationState.factorLastUpdated);
     }
 
+    uint256 numerator;
+    uint256 denominator;
+
     // TODO: handle retroactive updates given decreases to updatePeriod:
     // https://github.com/celo-org/celo-monorepo/issues/3929
     uint256 timesToApplyInflation = now.sub(inflationState.factorLastUpdated).div(
       inflationState.updatePeriod
     );
 
-    FixidityLib.Fraction memory currentInflationFactor = FixidityLib.wrap(
-      fractionMulExp(
-        inflationState.factor.unwrap(),
-        inflationState.rate.unwrap(),
-        timesToApplyInflation
-      )
+    (numerator, denominator) = fractionMulExp(
+      inflationState.factor.unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      inflationState.rate.unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      timesToApplyInflation,
+      decimals_
     );
 
     // This should never happen. If something went wrong updating the
     // inflation factor, keep the previous factor
-    if (currentInflationFactor.unwrap() == 0) {
+    if (numerator == 0 || denominator == 0) {
       return (inflationState.factor, inflationState.factorLastUpdated);
     }
 
+    FixidityLib.Fraction memory currentInflationFactor = FixidityLib.wrap(numerator).divide(
+      FixidityLib.wrap(denominator)
+    );
     uint256 lastUpdated = inflationState.factorLastUpdated.add(
       inflationState.updatePeriod.mul(timesToApplyInflation)
     );
