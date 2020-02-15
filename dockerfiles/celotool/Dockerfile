@@ -35,7 +35,7 @@ COPY packages/protocol packages/protocol/
 COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
-RUN yarn run lerna run build:ts --scope @celo/walletkit && yarn run lerna run build --ignore @celo/walletkit
+RUN yarn run lerna run build:ts --scope @celo/walletkit && yarn build --ignore @celo/walletkit
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
