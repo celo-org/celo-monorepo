@@ -3,7 +3,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const mergeARMTemplates = require('arm-template-merge')
+const merge = require('deepmerge')
 const mustache = require('mustache')
 
 function load(acc, pathname) {
@@ -63,7 +63,7 @@ function main() {
     validatorIps,
   }
   const objects = contents.map((content) => JSON.parse(mustache.render(content, context)))
-  const armTemplate = objects.slice(1).reduce((acc, val) => mergeARMTemplates(acc, val), objects[0])
+  const armTemplate = merge.all(objects)
   process.stdout.write(JSON.stringify(armTemplate, null, 2))
 }
 

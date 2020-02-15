@@ -14,7 +14,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
-    "arm-template-merge": "^1.1.4",
+    "deepmerge": "^4.2.2",
     "mustache": "^4.0.0"
   }
 }
