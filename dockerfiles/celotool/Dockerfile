@@ -35,6 +35,7 @@ COPY packages/protocol packages/protocol/
 COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
+# walletkit build is missing .env.alfajoresstaging, use build:ts instead.
 RUN yarn run lerna run build:ts --scope @celo/walletkit && yarn build --ignore @celo/walletkit
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
