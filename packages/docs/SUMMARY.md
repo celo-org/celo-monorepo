@@ -294,10 +294,11 @@
 ## Command Line Interface
 
 - [Introduction](command-line-interface/introduction.md)
-- [Config](command-line-interface/config.md)
 - [Account](command-line-interface/account.md)
+- [Config](command-line-interface/config.md)
 - [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
+- [Governance](command-line-interface/governance.md)
 - [Locked Gold](command-line-interface/lockedgold.md)
 - [Network](command-line-interface/network.md)
 - [Node](command-line-interface/node.md)

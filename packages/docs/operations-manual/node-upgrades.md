@@ -2,6 +2,10 @@
 
 When a new version of the Celo node is available, you can follow this guide to upgrade.
 
+{% hint style="info" %}
+When upgrading a node to the Geth 1.9 build (i.e. between phases 2 and 3 of the Stake Off) the `geth` data directory has been renamed to `Celo`. To preserve the chain data, rename the data directory after stopping your node.
+{% endhint %}
+
 ## When an upgrade is required
 
 Upgrades to the Celo node software will often be optional improvements, such as improvements to performance, new useful features, and non-critical bug fixes.
