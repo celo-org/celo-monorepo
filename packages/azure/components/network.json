@@ -112,7 +112,7 @@
             }
           },
           {
-            "name": "ProxyExternal",
+            "name": "Discovery",
             "properties": {
               "protocol": "*",
               "sourcePortRange": "*",
@@ -129,7 +129,7 @@
             }
           },
           {
-            "name": "ProxyInternal",
+            "name": "DiscoveryInternal",
             "properties": {
               "protocol": "TCP",
               "sourcePortRange": "*",
