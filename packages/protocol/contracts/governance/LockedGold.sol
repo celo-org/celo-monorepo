@@ -156,7 +156,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
-    account.pendingWithdrawals.push(PendingWithdrawal(value, available));
+    account.pendingWithdrawals.push(PendingWithdrawal(value, available)); // CERTORA: the slot containing the length could be MAX_UINT
     emit GoldUnlocked(msg.sender, value, available);
   }
 

@@ -1,14 +1,10 @@
 pragma specify 0.1
-/*
-  certoraRun.py locked_gold.conf  --path $PWD/contracts/  --cache celolockedloop3unwind --settings -patient=0,-b=3,-assumeUnwindCond
-
-*/
 
 methods { 
 	init_state() 
 	getNonvotingLockedGold() returns uint256 envfree	
 	getAccountNonvotingLockedGold(address)  returns uint256 envfree
-	ercBalanceOf(address) returns uint256
+	ercBalanceOf(address) returns uint256 envfree
 	getTotalPendingWithdrawals(address) returns uint256 envfree
 	getPendingWithdrawalsLength(address) returns uint256 envfree
 	getPendingWithdrawalsIndex(address,uint256) returns uint256 envfree	
@@ -16,25 +12,9 @@ methods {
 	incrementNonvotingAccountBalance(address, uint256) 
 	decrementNonvotingAccountBalance(address, uint256) 
 	unlock(uint256) 
+	pendingWithdrawalsNotFull(address) returns bool envfree
 }
 
-//for any address a, the totalNonVoting is always larget than the address' nonvoting gold
-
-// invariant totalNonVotingGEAccountNonVoting(env e, address a) 
-			// sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a) 
-			// {
-		// preserved incrementNonvotingAccountBalance(env e, address account, uint256 value) {
-			// require false;
-		// }
-		// preserved decrementNonvotingAccountBalance(env e,address account, uint256 value) {
-			// require false;
-		// }
-		//preserved unlock(env e, uint256 value) {
-		//need a way to express that env.msg.sender==a
-		//for now just writing it as a regular rule
-			// require e.msg.sender==a;
-		// }
-	// }
 
 rule totalNonVotingGEAccountNonVoting(address a,method f)  {
 	require sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a);
@@ -56,11 +36,9 @@ That is, the total amount of: ERC tokens (balance) AND totalPending AND nonVotin
 
 rule totalPreserved( address a,  method f)
 {
-	env e;
-	require e.msg.sender==a;
 	//we assume the sender is not the currentContract
 	require a!=currentContract;
-	uint256 _ercBalance = sinvoke ercBalanceOf(e,a); 
+	uint256 _ercBalance = sinvoke ercBalanceOf(a); 
 	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
 	// we limit the amount of pending records due to loop handling 
@@ -75,7 +53,7 @@ rule totalPreserved( address a,  method f)
 	// we limit the amount of pending records due to loop handling 
 	uint length = sinvoke getPendingWithdrawalsLength(a);
 	require length <= 1;
-	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a); 
+	uint256 ercBalance_ = sinvoke ercBalanceOf(a); 
 	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
 	assert _ercBalance + _accoutNonVoting + _accountTotalPendingWithdrawals == ercBalance_ + accoutNonVoting_ + accountTotalPendingWithdrawals_ , "Total of tokens not preserved";
@@ -87,12 +65,10 @@ one's nonvoting value,  erc balance and pending values can not be changed by oth
 
 rule noChangeByOther( address a, address b, method f )
 {
-	env e;
 	require a!=b;
-	require e.msg.sender==a;
 	//we assume the sender is not the currentContract
 	require a!=currentContract;
-	uint256 _ercBalance = sinvoke ercBalanceOf(e,a); 
+	uint256 _ercBalance = sinvoke ercBalanceOf(a); 
 	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
 	// we limit the amount of pending records due to loop handling 
@@ -103,7 +79,7 @@ rule noChangeByOther( address a, address b, method f )
 	calldataarg arg;
 	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector && f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector;
 	sinvoke f(eF,arg);
-	uint256 ercBalance_ = sinvoke ercBalanceOf(e,a); 
+	uint256 ercBalance_ = sinvoke ercBalanceOf(a); 
 	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
 	assert _ercBalance == ercBalance_, "unexpected change to erc tokens";
@@ -113,45 +89,39 @@ rule noChangeByOther( address a, address b, method f )
 
 
 
-
-// The withdraw rules checks that Certora Prover is modeling correctly the TRANSFER function that is called
-// from GoldToken._transfer
 rule withdraw(uint256 index)
 {
 	env e;
 	
-	uint256 _balance = sinvoke ercBalanceOf(e, e.msg.sender);
-	uint256 val = sinvoke getPendingWithdrawalsIndex(e.msg.sender,index);
-	uint length = sinvoke getPendingWithdrawalsLength(e.msg.sender);
-	require index < length;
-	require val	>0;
-	env eNew;
-	require eNew.msg.sender == e.msg.sender;
-	sinvoke withdraw(eNew,index);
-	uint256 balance_ = sinvoke ercBalanceOf(e, e.msg.sender);
-	assert balance_ ==_balance;
-	//assert false, "expecing withdraw to change balancae ";
-	
-
+	uint256 _balance = sinvoke ercBalanceOf(e.msg.sender);
+	uint256 val = sinvoke getPendingWithdrawalsIndex(e.msg.sender,index);	
+	sinvoke withdraw(e,index);
+	uint256 balance_ = sinvoke ercBalanceOf(e.msg.sender);
+	assert balance_ ==_balance+val;
 }
 
 
 
 rule noWithdrawBeforeUnlocking(address account, uint256 value, method f) {
+	// we must make sure the length of pending withdrawals is not MAX_UINT, since then the `push` will make the length 0.
+	// (this should have been checked by the solidity compiler)
+	require sinvoke pendingWithdrawalsNotFull(account);
+	
+	// unlock a value and add it to pending withdrawals
 	env _e;
 	require _e.msg.sender == account; 
 	sinvoke unlock(_e,value);
-	uint256 _total = sinvoke getTotalPendingWithdrawals(account);
+
+	// try to run any function - adversary's goal is to succeed in unlocking before time
 	env eF;
 	require eF.block.timestamp > _e.block.timestamp; 
 	calldataarg arg;
 	sinvoke f(eF,arg);
-	env e_;
-	require _e.msg.sender == account; 
-	require _e.block.timestamp > eF.block.timestamp;
-	uint256 total_ = sinvoke getTotalPendingWithdrawals(account);
-	assert  e_.block.timestamp < _e.block.timestamp + sinvoke getunlockingPeriod() =>
-		total_ >= value;
+
+	// we check if adversary succeeded
+	uint256 totalPendingWithdrawals_ = sinvoke getTotalPendingWithdrawals(account);
+	assert  eF.block.timestamp < _e.block.timestamp + sinvoke getunlockingPeriod() =>
+		sinvoke getAccountNonvotingLockedGold(account) + totalPendingWithdrawals_ >= value, "If we are before the unlock period passed, we cannot transfer the value outside the locked balance or pending balance";
 }
 
 
@@ -192,18 +162,3 @@ rule check_initializer {
 	assert successInit => isInitialized_, "When initialize() succeeds, must set initialization field to true";
 }
 
-/*
-A simple query to check which methods can change balance
-rule whoChangesBalance(address a,method f)
-{
-	env _e;
-	uint256 _balance = sinvoke ercBalanceOf(_e, a);	
-	env eF;
-	calldataarg arg;
-	sinvoke f(eF,arg);
-	env e_;
-	uint256 balance_ = sinvoke ercBalanceOf(e_, a);
-	assert balance_ ==_balance;
-	
-}
-*/
