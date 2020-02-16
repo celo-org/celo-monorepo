@@ -68,7 +68,7 @@ OPTIONS
   --accept                                           Accept a validator whose affiliation is already set to the group
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
   --remove                                           Remove a validator from the members list
-  --reorder=reorder                                  Reorder a validator within the members list
+  --reorder=reorder                                  Reorder a validator within the members list. Indices are 0 based
 
 EXAMPLES
   member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --accept 0x97f7333c51897469e8d98e7af8653aab468050a3
