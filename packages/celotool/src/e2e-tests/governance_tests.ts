@@ -713,30 +713,61 @@ describe('governance tests', () => {
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
           )
           assert.isFalse(activeVotes.isZero())
-          const targetVotingYield = new BigNumber(
-            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
-          )
-          assert.isFalse(targetVotingYield.isZero())
+
           // We need to calculate the rewards multiplier for the previous block, before
           // the rewards actually are awarded.
           const rewardsMultiplier = new BigNumber(
             await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
           )
           assert.isFalse(rewardsMultiplier.isZero())
-          const expectedEpochReward = activeVotes
+
+          // This is the array of rewards that should have been distributed
+          const targetRewards = await epochRewards.methods
+            .calculateTargetEpochRewards()
+            .call({}, blockNumber - 1)
+          // This is with reward multiplier
+          const perValidatorReward = new BigNumber(targetRewards[0])
+          const validatorSetSize = await election.methods
+            .numberValidatorsInCurrentSet()
+            .call({}, blockNumber - 1)
+          const exchangeRate = await getStableTokenExchangeRate(blockNumber)
+          // Calculate total validator reward in gold to calc infra reward
+          const maxPotentialValidatorReward = perValidatorReward
+            .times(validatorSetSize)
+            .div(exchangeRate)
+          // Calculate the expected voting reward
+          const targetVotingYield = new BigNumber(
+            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
+          )
+          assert.isFalse(targetVotingYield.isZero())
+          const expectedVoterRewards = activeVotes
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
-          const expectedInfraReward = new BigNumber(10).pow(18)
+
+          // infra: (x / (1 - x)) * predicted supply increase * rewards mult
+          const communityRewardFrac = new BigNumber(
+            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber)
+          )
+          const expectedCommunityReward = expectedVoterRewards
+            .plus(maxPotentialValidatorReward)
+            .times(fromFixed(communityRewardFrac))
+            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
-          const exchangeRate = await getStableTokenExchangeRate(blockNumber)
-          const expectedGoldTotalSupplyChange = expectedInfraReward
-            .plus(expectedEpochReward)
+          const expectedGoldTotalSupplyChange = expectedCommunityReward
+            .plus(expectedVoterRewards)
             .plus(stableTokenSupplyChange.div(exchangeRate))
-          await assertVotesChanged(blockNumber, expectedEpochReward)
-          await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
+          // Check TS calc'd rewards against solidity calc'd rewards
+          const totalVoterRewards = new BigNumber(targetRewards[1])
+          const totalCommunityReward = new BigNumber(targetRewards[2])
+          assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
+          assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
+          // Check TS calc'd rewards against what happened
+          await assertVotesChanged(blockNumber, expectedVoterRewards)
+          await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
           await assertGovernanceBalanceChanged(
             blockNumber,
-            expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
+            expectedCommunityReward.plus(await blockBaseGasFee(blockNumber))
           )
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
