@@ -21,7 +21,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
     }),
     reorder: flags.integer({
       exclusive: ['accept', 'remove'],
-      description: 'Reorder a validator within the members list',
+      description: 'Reorder a validator within the members list. Indices are 0 based.',
     }),
   }
 
