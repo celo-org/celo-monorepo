@@ -18,6 +18,7 @@ methods {
 	decrementNonvotingAccountBalance(address, uint256) 
 	unlock(uint256) 
 	pendingWithdrawalsNotFull(address) returns bool envfree
+	getGoldTokenExt() returns address envfree
 }
 
 /*
@@ -79,7 +80,9 @@ rule totalPreserved(address account, method f) {
 rule noChangeByOther(address a, address b, method f) {
 	require(a != b);
 	// We assume the sender is not the currentContract
-	require(a != currentContract);
+	require(
+    a != currentContract &&
+    (a == sinvoke getGoldTokenExt() => f.selector != withdraw(uint256).selector));
 	uint256 _ercBalance = sinvoke ercBalanceOf(a);
 	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);

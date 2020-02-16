@@ -1,8 +1,11 @@
 pragma solidity ^0.5.8;
 
 import "contracts/governance/LockedGold.sol";
+import "./GoldTokenHarness.sol";
 
 contract LockedGoldHarness is LockedGold {
+  GoldTokenHarness goldToken;
+
   /* solhint-disable-next-line no-empty-blocks */
   function init_state() public {}
 
@@ -46,5 +49,13 @@ contract LockedGoldHarness is LockedGold {
   function getPendingWithdrawalsLength(address account) external view returns (uint256) {
     uint256 length = balances[account].pendingWithdrawals.length;
     return length;
+  }
+
+  function getGoldToken() internal view returns (IERC20Token) {
+    return IERC20Token(goldToken);
+  }
+
+  function getGoldTokenExt() public view returns (address) {
+    return address(goldToken);
   }
 }
