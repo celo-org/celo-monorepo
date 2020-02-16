@@ -1,8 +1,10 @@
 pragma solidity ^0.5.8;
 
 import "contracts/governance/LockedGold.sol";
+import "./GoldTokenHarness.sol";
 
 contract LockedGoldHarness is LockedGold {
+  GoldTokenHarness goldToken;
   function init_state() public {}
 
   function ercBalanceOf(address a) public returns (uint256) {
@@ -42,4 +44,12 @@ contract LockedGoldHarness is LockedGold {
     return length;
   }
 
+
+  function getGoldToken() internal view returns (IERC20Token) {
+	return IERC20Token(goldToken);
+  }
+  
+  function getGoldTokenExt() public view returns (address) {
+	return address(goldToken);
+  }
 }

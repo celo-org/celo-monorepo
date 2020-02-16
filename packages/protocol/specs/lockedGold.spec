@@ -13,6 +13,7 @@ methods {
 	decrementNonvotingAccountBalance(address, uint256) 
 	unlock(uint256) 
 	pendingWithdrawalsNotFull(address) returns bool envfree
+	getGoldTokenExt() returns address envfree
 }
 
 
@@ -67,7 +68,8 @@ rule noChangeByOther( address a, address b, method f )
 {
 	require a!=b;
 	//we assume the sender is not the currentContract
-	require a!=currentContract;
+	require a!=currentContract && 
+			(a == sinvoke getGoldTokenExt() => f.selector != withdraw(uint256).selector);
 	uint256 _ercBalance = sinvoke ercBalanceOf(a); 
 	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
@@ -77,7 +79,9 @@ rule noChangeByOther( address a, address b, method f )
 	env eF;
 	require eF.msg.sender==b;
 	calldataarg arg;
-	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector && f.selector!=incrementNonvotingAccountBalance(address,uint256).selector && f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector;
+	require f.selector!=decrementNonvotingAccountBalance(address,uint256).selector &&
+			f.selector!=incrementNonvotingAccountBalance(address,uint256).selector && 
+			f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector;
 	sinvoke f(eF,arg);
 	uint256 ercBalance_ = sinvoke ercBalanceOf(a); 
 	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);

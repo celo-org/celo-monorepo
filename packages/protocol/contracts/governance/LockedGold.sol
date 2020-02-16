@@ -193,7 +193,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
     require(
-      getGoldToken() /* @certora GoldTokenHarness */
+      getGoldToken()
         .transfer(msg.sender, value),
       "Transfer failed"
     );
