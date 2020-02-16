@@ -29,11 +29,14 @@ contract LockedGoldHarness is LockedGold {
     uint256 total = 0;
     for (uint256 i = 0; i < length; i++) {
       uint256 pendingValue = balances[account].pendingWithdrawals[i].value;
-      require(total + pendingValue >= total);
+      require(total + pendingValue >= total, "Pending value must be greater than 0");
       total = total + pendingValue;
-
     }
     return total;
+  }
+
+  function pendingWithdrawalsNotFull(address account) public view returns (bool) {
+    return balances[account].pendingWithdrawals.length + 2 >= 2; // we can add 2 more additional elements
   }
 
   function pendingWithdrawalsNotFull(address account) public view returns (bool) {
