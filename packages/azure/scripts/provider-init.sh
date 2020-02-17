@@ -32,6 +32,8 @@ ATTESTER_DB_HOSTNAME="${attesterDBName}.postgres.database.azure.com"
 EOF
 cat ./libcelo.sh >> /etc/default/celo
 
+. /etc/default/celo
+
 apt update -y && apt upgrade -y
 
 apt install -y \
@@ -40,3 +42,45 @@ apt install -y \
 
 DISK_LUN=lun0
 DISK_PATH=`readlink -f /dev/disk/azure/scsi1/${DISK_LUN}`
+
+echo "Setting up persistent disk at $DISK_PATH..."
+
+DISK_FORMAT=ext4
+CURRENT_DISK_FORMAT=`lsblk -i -n -o fstype $DISK_PATH`
+
+echo "Checking if disk $DISK_PATH format $CURRENT_DISK_FORMAT matches desired $DISK_FORMAT..."
+
+# If the disk has already been formatted previously (this will happen
+# if this instance has been recreated with the same disk), we skip formatting
+if [[ $CURRENT_DISK_FORMAT == $DISK_FORMAT ]]; then
+  echo "Disk $DISK_PATH is correctly formatted as $DISK_FORMAT"
+else
+  echo "Disk $DISK_PATH is not formatted correctly, formatting as $DISK_FORMAT..."
+  mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard $DISK_PATH
+fi
+
+echo "Mounting $DISK_PATH onto $DATA_DIR"
+mkdir -p $DATA_DIR
+DISK_UUID=`blkid $DISK_PATH | cut -d \" -f 2`
+echo "UUID=${DISK_UUID}     $DATA_DIR   auto    discard,defaults    0    0" >> /etc/fstab
+mount $DATA_DIR
+
+echo "Installing Docker..."
+apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+apt update -y && apt upgrade -y
+apt install -y docker-ce
+systemctl start docker
+
+echo "Configuring Docker..."
+cat <<'EOF' > '/etc/docker/daemon.json'
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+EOF
+systemctl restart docker

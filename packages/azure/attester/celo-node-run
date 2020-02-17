@@ -36,6 +36,7 @@ docker run \
     --keystore=${SECRET_DIR} \
     --unlock=$ATTESTER_ACCOUNT_ADDRESS \
     --bootnodes="$BOOTNODES" \
+    --allow-insecure-unlock \
     --rpc \
     --rpcaddr 0.0.0.0 \
     --rpcapi=eth,net,web3,debug,admin \

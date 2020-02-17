@@ -39,6 +39,7 @@ docker run \
       --password=${SECRET_DIR}/validatorGethAccountSecret \
       --unlock=$VALIDATOR_ACCOUNT_ADDRESS \
       --mine \
+      --allow-insecure-unlock \
       --rpc \
       --rpcaddr 0.0.0.0 \
       --rpcapi=eth,net,web3 \
