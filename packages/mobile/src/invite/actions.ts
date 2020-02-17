@@ -14,7 +14,6 @@ export enum Actions {
   SKIP_INVITE = 'INVITE/SKIP_INVITE',
   SKIP_INVITE_SUCCESS = 'INVITE/SKIP_INVITE_SUCCESS',
   SKIP_INVITE_FAILURE = 'INVITE/SKIP_INVITE_FAILURE',
-  SET_DEEP_LINK_INVITE_CODE = 'INVITE/SET_DEEPLINK_INVITE_CODE',
 }
 
 export interface Invitees {
@@ -127,16 +126,6 @@ export const skipInviteFailure = (): SkipInviteFailureAction => ({
   type: Actions.SKIP_INVITE_FAILURE,
 })
 
-export interface SetDeepLinkInviteCode {
-  type: Actions.SET_DEEP_LINK_INVITE_CODE
-  inviteCode: string
-}
-
-export const setDeepLinkInviteCode = (inviteCode: string): SetDeepLinkInviteCode => ({
-  type: Actions.SET_DEEP_LINK_INVITE_CODE,
-  inviteCode,
-})
-
 export type ActionTypes =
   | StoreInviteeDataAction
   | SendInviteAction
@@ -148,4 +137,3 @@ export type ActionTypes =
   | SkipInviteAction
   | SkipInviteSuccessAction
   | SkipInviteFailureAction
-  | SetDeepLinkInviteCode

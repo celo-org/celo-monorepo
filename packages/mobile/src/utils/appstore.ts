@@ -6,7 +6,7 @@ interface AppInfo {
 }
 
 export async function getAppStoreId(bundleId: string) {
-  const appStoreLookupUrl = `http://itunes.apple.com/lookup?bundleId=${bundleId}`
+  const appStoreLookupUrl = `https://itunes.apple.com/lookup?bundleId=${bundleId}`
   const response = await fetch(appStoreLookupUrl)
   const appInfo: AppInfo = await response.json()
   if (appInfo.resultCount !== 1) {

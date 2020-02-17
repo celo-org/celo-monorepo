@@ -28,7 +28,6 @@ interface StateProps {
   isRedeemingInvite: boolean
   isSkippingInvite: boolean
   account: string | null
-  deepLinkInviteCode: string
 }
 
 interface State {
@@ -54,7 +53,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     redeemComplete: state.invite.redeemComplete,
     isRedeemingInvite: state.invite.isRedeemingInvite,
     isSkippingInvite: state.invite.isSkippingInvite,
-    deepLinkInviteCode: state.invite.deepLinkInviteCode,
     account: currentAccountSelector(state),
   }
 }
@@ -69,7 +67,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    this.checkIfValidCodeWasInDeepLink()
     await this.checkIfValidCodeInClipboard()
     await this.checkForReferrerCode()
   }
@@ -85,13 +82,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
   checkIfValidCodeInClipboard = async () => {
     const message = await Clipboard.getString()
     if (extractValidInviteCode(message)) {
-      this.onInputChange(message)
-    }
-  }
-
-  checkIfValidCodeWasInDeepLink = () => {
-    const message = this.props.deepLinkInviteCode
-    if (message && extractValidInviteCode(message)) {
       this.onInputChange(message)
     }
   }

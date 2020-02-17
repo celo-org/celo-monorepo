@@ -85,10 +85,11 @@ export function getInvitationVerificationFeeInWei() {
 export async function generateInviteLink(inviteCode: string) {
   let bundleId = DeviceInfo.getBundleId()
   bundleId = bundleId.replace(/\.debug$/g, '.integration')
+  bundleId = bundleId.replace(/\.dev$/g, '.alfajores')
   const encodedInvite = encodeURIComponent(`invite-code=${inviteCode}`)
 
   // Android part
-  const playStoreLink = await VersionCheck.getPlayStoreUrl({ androidPackageName: bundleId })
+  const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName: bundleId })
   const playStoreUrl = `${playStoreLink}&referrer=${encodedInvite}`
 
   // iOS part
@@ -96,7 +97,7 @@ export async function generateInviteLink(inviteCode: string) {
   const appStoreUrl = await VersionCheck.getAppStoreUrl({ appID: appStoreId })
 
   const shortUrl = await generateShortInviteLink({
-    link: `celo://wallet/invitation/${encodedInvite}`,
+    link: `https://celo.org/build/wallet`,
     playStoreUrl,
     appStoreUrl,
     bundleId,
