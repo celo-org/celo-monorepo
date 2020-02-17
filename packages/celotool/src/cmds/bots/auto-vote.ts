@@ -6,7 +6,6 @@ import { Address } from '@celo/contractkit/lib/base'
 import {
   ensureLeading0x,
   eqAddress,
-  normalizeAddress,
   NULL_ADDRESS,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
@@ -40,7 +39,7 @@ export const builder = (yargs: Argv) => {
         return addresses
           .split(',')
           .filter((a) => a.length > 0)
-          .map(normalizeAddressWith0x)
+          .map(ensureLeading0x)
       },
     })
 }
@@ -91,7 +90,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         // Note: though this returns an array, the bot process only ever chooses one group,
         // so this takes a shortcut and only looks at the first in the response
         const currentVote = (await election.getVoter(botAccount)).votes[0]
-        const currentGroup = currentVote ? normalizeAddressWith0x(currentVote.group) : undefined
+        const currentGroup = currentVote ? ensureLeading0x(currentVote.group) : undefined
 
         // Handle the case where the group the bot is currently voting for does not have a score
         if (
@@ -140,7 +139,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         }
       } catch (error) {
         console.error(`Failed to vote as ${botAccount}`)
-        console.info(error)
+        console.info(Object.keys(error))
       }
     }
   } catch (error) {
@@ -157,6 +156,7 @@ async function castVote(
   voteForGroup: Address,
   groupCapacities: Map<string, BigNumber>
 ) {
+  console.info(`trying to cast vote for ${voteForGroup}`)
   const lockedGold = await kit.contracts.getLockedGold()
   const election = await kit.contracts.getElection()
 
@@ -167,14 +167,14 @@ async function castVote(
   }
 
   const currentVotes = (await election.getVoter(botAccount)).votes
-
   // Revoke existing vote(s) if any and update capacity of the group
   for (const vote of currentVotes) {
+    console.info('revoking old vote')
     const revokeTxs = await election.revoke(botAccount, vote.group, vote.pending.plus(vote.active))
-    await concurrentMap(10, revokeTxs, async (tx) => {
-      return tx.sendAndWaitForReceipt({ from: botAccount })
-    })
-    const group = normalizeAddressWith0x(vote.group)
+    for (const tx of revokeTxs) {
+      await tx.sendAndWaitForReceipt({ from: botAccount })
+    }
+    const group = ensureLeading0x(vote.group)
     const oldCapacity = groupCapacities.get(group)!
     groupCapacities.set(group, oldCapacity.plus(vote.pending.plus(vote.active)))
   }
@@ -182,7 +182,8 @@ async function castVote(
   const groupCapacity = groupCapacities.get(voteForGroup)!
   const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
   const voteTx = await election.vote(voteForGroup, BigNumber.minimum(voteAmount))
-  await voteTx.sendAndWaitForReceipt({ from: botAccount })
+  console.info(voteTx)
+  await voteTx.sendAndWaitForReceipt()
   console.info(`Completed voting as ${botAccount}`)
 
   groupCapacities.set(voteForGroup, groupCapacity.minus(voteAmount))
@@ -198,7 +199,7 @@ async function calculateInitialGroupCapacities(kit: ContractKit): Promise<Map<st
   for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
     const vgv = await election.getValidatorGroupVotes(groupAddress)
     if (vgv.eligible) {
-      groupCapacities.set(normalizeAddressWith0x(groupAddress), vgv.capacity)
+      groupCapacities.set(ensureLeading0x(groupAddress), vgv.capacity)
     }
   }
 
@@ -218,7 +219,7 @@ async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNu
   ).filter((v) => !!v.affiliation) // Skip unaffiliated
 
   const validatorsByGroup = groupBy(validatorAccounts, (validator) =>
-    normalizeAddressWith0x(validator.affiliation!)
+    ensureLeading0x(validator.affiliation!)
   )
 
   const validatorGroupScores = mapValues(validatorsByGroup, (vals) => {
@@ -286,15 +287,13 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
   await concurrentMap(10, botKeys, async (key) => {
     kit.addAccount(key)
     const account = ensureLeading0x(privateKeyToAddress(key))
-    if (!(await election.hasActivatablePendingVotes(account))) {
-      try {
-        const activateTxs = await election.activate(account)
-        await concurrentMap(10, activateTxs, async (tx) =>
-          tx.sendAndWaitForReceipt({ from: account })
-        )
-      } catch (error) {
-        console.error(`Failed to activate pending votes for ${account}`)
+    try {
+      for (const tx of await election.activate(account)) {
+        console.info(`activating pending votes for ${account}`)
+        await tx.sendAndWaitForReceipt({ from: account })
       }
+    } catch (error) {
+      console.error(`Failed to activate pending votes for ${account}`)
     }
   })
 }
@@ -320,7 +319,7 @@ function shouldBeConsidered(
   excludedGroups: string[],
   groupCapacities: Map<string, BigNumber>
 ): boolean {
-  const normalizedGroupAddress = normalizeAddressWith0x(groupAddress)
+  const normalizedGroupAddress = ensureLeading0x(groupAddress)
   const capacity = groupCapacities.get(normalizedGroupAddress)
   return !!(
     !excludedGroups.includes(normalizedGroupAddress) &&
@@ -328,8 +327,4 @@ function shouldBeConsidered(
     capacity.isGreaterThan(0) &&
     (!currentGroup || !eqAddress(currentGroup, normalizedGroupAddress))
   )
-}
-
-function normalizeAddressWith0x(address: string): string {
-  return ensureLeading0x(normalizeAddress(address))
 }
