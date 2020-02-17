@@ -38,7 +38,7 @@ export default withNamespaces('dev')(
               isMobile={screen === ScreenSizes.MOBILE}
               title={t('coverAction.tutorial.title')}
               text={t('coverAction.tutorial.text')}
-              link={{ text: t('coverAction.tutorial.link'), href: CeloLinks.tutorial }}
+              link={{ text: t('coverAction.tutorial.link'), href: CeloLinks.sdkTutorial }}
             />
             <CoverAction
               graphic={sdkImage}

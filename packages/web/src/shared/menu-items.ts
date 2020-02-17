@@ -77,6 +77,7 @@ export enum CeloLinks {
   docs = 'https://docs.celo.org/',
   docsOverview = 'https://docs.celo.org/overview',
   sdkDocs = 'https://docs.celo.org/celo-sdk/introduction',
+  sdkTutorial = 'https://docs.celo.org/celo-sdk/start',
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
