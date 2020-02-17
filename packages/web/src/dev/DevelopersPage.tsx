@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
+import previewImage from 'src/dev/dev-og.png'
 import DeveloperPhoneCover from 'src/dev/DeveloperPhoneCover'
 import { Contribute, EngageAsDeveloper } from 'src/dev/Engage'
 import Features from 'src/dev/Features'
@@ -11,7 +12,6 @@ import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
-const previewImage = require('src/dev/dev-og.png')
 class Developers extends React.PureComponent<I18nProps> {
   render() {
     const { t } = this.props

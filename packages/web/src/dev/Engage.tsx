@@ -31,8 +31,8 @@ export default React.memo(function _Engage() {
 })
 
 interface ContentProps {
-  noun?: string
-  verb: string
+  h3Text?: string
+  h4Text: string
   network: string
   caption: string
   primaryAction: { text: string; href: string }
@@ -43,8 +43,8 @@ interface ContentProps {
 const Content = React.memo(function _Content(props: ContentProps) {
   return (
     <View style={styles.paragraphArea}>
-      {props.noun && <H3 style={standardStyles.elementalMarginBottom}>{props.noun}</H3>}
-      {props.verb && <H4 style={standardStyles.elementalMarginBottom}>{props.verb}</H4>}
+      {props.h3Text && <H3 style={standardStyles.elementalMarginBottom}>{props.h3Text}</H3>}
+      {props.h4Text && <H4 style={standardStyles.elementalMarginBottom}>{props.h4Text}</H4>}
       <Text style={fonts.h6}>{props.network}</Text>
       <Fade fraction={0.5} bottom={true} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
@@ -52,7 +52,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
         </AspectRatio>
       </Fade>
       <Text style={[fonts.p, standardStyles.elementalMarginTop]}>{props.caption}</Text>
-      <View style={[standardStyles.row, standardStyles.elementalMarginTop, styles.buttons]}>
+      <View style={styles.buttons}>
         <View style={styles.primaryButtonContainer}>
           <Button
             size={props.screen === ScreenSizes.MOBILE ? SIZE.small : SIZE.normal}
@@ -112,7 +112,7 @@ export function Contribute() {
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
-      allStyle={[standardStyles.elementalMarginBottom, styles.alignOut]}
+      allStyle={styles.contributeContainer}
       desktopStyle={standardStyles.blockMarginTop}
       tabletStyle={standardStyles.blockMarginTopTablet}
       mobileStyle={standardStyles.blockMarginTopMobile}
@@ -127,7 +127,7 @@ export function Contribute() {
         />
       </Cell>
       <Cell span={Spans.half} style={standardStyles.centered}>
-        <AspectRatio ratio={309 / 360} style={[standardStyles.image, styles.feastImage]}>
+        <AspectRatio ratio={309 / 360} style={styles.feastImage}>
           <Image
             source={require('src/dev/Feast.png')}
             style={styles.graphic}
@@ -160,8 +160,8 @@ export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
         <Content
           image={require('src/dev/cakeLayering.jpg')}
           screen={screen}
-          noun={noun}
-          verb={action}
+          h3Text={noun}
+          h4Text={action}
           network={t('engage.developers.network')}
           caption={t('engage.developers.caption')}
           primaryAction={{
@@ -206,8 +206,8 @@ export function EngageAsValidator() {
         <Content
           image={require('src/dev/chefs.png')}
           screen={screen}
-          noun={t('engage.validators.noun')}
-          verb={t('engage.validators.verb')}
+          h3Text={t('engage.validators.noun')}
+          h4Text={t('engage.validators.verb')}
           network={t('engage.validators.network')}
           caption={t('engage.validators.caption')}
           primaryAction={{
@@ -248,8 +248,14 @@ const styles = StyleSheet.create({
   primaryButtonContainer: {
     marginEnd: 20,
   },
+  contributeContainer: {
+    ...standardStyles.elementalMarginBottom,
+    justifyContent: 'space-between',
+  },
   buttons: {
     alignItems: 'center',
+    ...standardStyles.row,
+    ...standardStyles.elementalMarginTop,
   },
   graphicContainer: {
     maxWidth: 290,
@@ -261,6 +267,7 @@ const styles = StyleSheet.create({
   },
   feastImage: {
     maxWidth: 309,
+    ...standardStyles.image,
   },
   asideGraphic: { width: 60 },
   asideFrame: { flexBasis: 80 },

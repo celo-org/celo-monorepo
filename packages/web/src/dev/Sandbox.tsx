@@ -26,10 +26,10 @@ export default function Sandbox() {
               <View style={[styles.absoluteCenter, standardStyles.centered]}>
                 <Button
                   kind={BTN.PRIMARY}
-                  href="https://repl.it/@annakaz/contractkit"
+                  href="https://repl.it/@celoOrg/contractkit"
                   text={t('sandbox.btn')}
                   target="_blank"
-                  onPress={trackSandBox}
+                  onPress={trackSandBoxClick}
                   size={SIZE.big}
                 />
               </View>
@@ -41,7 +41,7 @@ export default function Sandbox() {
   )
 }
 
-async function trackSandBox() {
+async function trackSandBoxClick() {
   await Analytics.track('sandbox_engaged_with')
 }
 

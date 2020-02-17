@@ -136,11 +136,11 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
   modeStyle = () => {
     switch (this.state.mode) {
       case StickyMode.fixed:
-        return [styles.sticky, styles.base]
+        return styles.sticky
       case StickyMode.attachToBottom:
-        return [styles.attachToBottom, styles.base]
+        return styles.attachToBottom
       default:
-        return styles.base
+        return false
     }
   }
 
@@ -222,12 +222,10 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
               <Li style={textStyles.invert}>{t('proof.onChain')}</Li>
             </StackSection>
             <View
-              // @ts-ignore
               style={[
-                standardStyles.centered,
+                styles.browseCodeArea,
                 isDesktop && standardStyles.blockMargin,
                 isBrowseCodeFaded && styles.faded,
-                styles.browseCodeArea,
               ]}
             >
               <H4 style={[textStyles.invert, textStyles.center]}>{t('stackBrowseTitle')}</H4>
@@ -278,8 +276,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   browseCodeArea: {
-    transitionProperty: 'opacity',
+    transitionProperty: 'opacity' as 'opacity',
     transitionDuration: '100ms',
+    ...standardStyles.centered,
   },
-  base: {},
 })
