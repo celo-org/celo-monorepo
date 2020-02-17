@@ -223,6 +223,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
             </StackSection>
             <View
               style={[
+                standardStyles.centered,
                 styles.browseCodeArea,
                 isDesktop && standardStyles.blockMargin,
                 isBrowseCodeFaded && styles.faded,
@@ -278,6 +279,6 @@ const styles = StyleSheet.create({
   browseCodeArea: {
     transitionProperty: 'opacity' as 'opacity',
     transitionDuration: '100ms',
-    ...standardStyles.centered,
+    zIndex: 1,
   },
 })

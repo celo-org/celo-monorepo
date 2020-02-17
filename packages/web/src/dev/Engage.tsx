@@ -52,7 +52,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
         </AspectRatio>
       </Fade>
       <Text style={[fonts.p, standardStyles.elementalMarginTop]}>{props.caption}</Text>
-      <View style={styles.buttons}>
+      <View style={[standardStyles.row, standardStyles.elementalMarginTop, styles.buttons]}>
         <View style={styles.primaryButtonContainer}>
           <Button
             size={props.screen === ScreenSizes.MOBILE ? SIZE.small : SIZE.normal}
@@ -112,7 +112,7 @@ export function Contribute() {
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
-      allStyle={styles.contributeContainer}
+      allStyle={[styles.contributeContainer, standardStyles.elementalMarginBottom]}
       desktopStyle={standardStyles.blockMarginTop}
       tabletStyle={standardStyles.blockMarginTopTablet}
       mobileStyle={standardStyles.blockMarginTopMobile}
@@ -249,13 +249,10 @@ const styles = StyleSheet.create({
     marginEnd: 20,
   },
   contributeContainer: {
-    ...standardStyles.elementalMarginBottom,
     justifyContent: 'space-between',
   },
   buttons: {
     alignItems: 'center',
-    ...standardStyles.row,
-    ...standardStyles.elementalMarginTop,
   },
   graphicContainer: {
     maxWidth: 290,
