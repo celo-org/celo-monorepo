@@ -31,7 +31,7 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.2.13-dev",
+    "@celo/contractkit": "0.2.15-dev",
     "@celo/utils": "0.1.8-dev",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
