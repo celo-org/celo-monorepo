@@ -15,7 +15,7 @@ export const menuItems = {
     name: 'Build',
     link: '/build',
   },
-  VALIDATORS: {
+  VALIDATORS_LIST: {
     name: 'Validators List',
     link: '/build/validators',
   },

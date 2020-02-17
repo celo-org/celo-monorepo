@@ -36,7 +36,6 @@ export default ProgressCutBar
 
 const styles = StyleSheet.create({
   barContainer: {
-    // width: 60,
     height: 16,
     display: 'flex',
     flexDirection: 'row',

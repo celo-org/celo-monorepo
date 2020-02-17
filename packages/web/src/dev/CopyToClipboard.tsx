@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import CopyIcon from 'src/icons/CopyIcon'
+import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
 import { copyToClipboad } from 'src/utils/utils'
-import Hoverable from 'src/shared/Hoverable'
 
 interface Props {
   content: string
@@ -20,6 +20,9 @@ class CopyToClipboard extends React.PureComponent<Props, State> {
     hover: false,
   }
 
+  hoverIn = () => this.setState({ hover: true })
+  hoverOut = () => this.setState({ hover: false })
+
   copy(event) {
     event.preventDefault()
     event.stopPropagation()
@@ -28,10 +31,6 @@ class CopyToClipboard extends React.PureComponent<Props, State> {
       this.setState({ copied: true })
       setTimeout(() => this.setState({ copied: false }), 2000)
     }
-  }
-
-  hover(hover: boolean) {
-    this.setState({ hover })
   }
 
   render() {
@@ -43,15 +42,11 @@ class CopyToClipboard extends React.PureComponent<Props, State> {
           <Text style={[styles.copied]}>Copied</Text>
         ) : (
           <Text style={[styles.icon]}>
-            <Hoverable
-              onHoverIn={this.hover.bind(this, true)}
-              onHoverOut={this.hover.bind(this, false)}
-            >
+            <Hoverable onHoverIn={this.hoverIn} onHoverOut={this.hoverOut}>
               <CopyIcon color={hover ? colors.white : colors.grayHeavy} size={16} />
             </Hoverable>
           </Text>
         )}
-        <Text>{JSON.stringify(+hover)}</Text>
       </View>
     )
   }

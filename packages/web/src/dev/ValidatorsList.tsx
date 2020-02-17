@@ -49,16 +49,18 @@ interface ValidatorsListProps {
   isLoading: boolean
 }
 
+type orderByTypes = 'name' | 'total' | 'votes' | 'gold' | 'commision' | 'rewards' | 'uptime'
+
 export interface State {
   expanded: number | undefined
-  orderBy: string
+  orderBy: orderByTypes
   orderAsc: boolean
 }
 
 class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nProps, State> {
   state = {
     expanded: undefined,
-    orderBy: 'name',
+    orderBy: 'name' as orderByTypes,
     orderAsc: true,
   }
   private orderAccessors = {
@@ -81,7 +83,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
     }
   }
 
-  orderBy(orderBy: string) {
+  orderBy(orderBy: orderByTypes) {
     let orderAsc = true
     if (orderBy === this.state.orderBy) {
       orderAsc = !this.state.orderAsc
