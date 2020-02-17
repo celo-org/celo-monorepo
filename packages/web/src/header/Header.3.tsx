@@ -28,10 +28,11 @@ const DARK_PAGES = new Set([
   menu.HOME.link,
   menu.COMMUNITY.link,
   menu.BUILD.link,
+  menu.ALLIANCE_COLLECTIVE.link,
   CeloLinks.walletApp,
 ])
 
-const TRANSLUCENT_PAGES = new Set([menu.ABOUT_US.link])
+const TRANSLUCENT_PAGES = new Set([menu.ABOUT_US.link, menu.ALLIANCE_COLLECTIVE.link])
 
 interface OwnProps {
   router: Router

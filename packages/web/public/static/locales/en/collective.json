@@ -1,5 +1,6 @@
 {
   "title": "Celo Collective",
+  "thematicStatement": "Money can be beautiful",
   "mission": "Join mission-aligned organizations to create a more prosperous world",
   "form": {
     "name": "Name",
@@ -7,5 +8,16 @@
     "info": "How might you contribute ot the Collective?",
     "subscribe": "Join the Celo Newsletter",
     "mainAction": "Apply"
+  },
+  "benefits": {
+    "headline": "Benefits of collaborating on a mission-driven blockchain",
+    "title": "What the Collective offers",
+    "offerings": [
+      "Connect with like-minded members",
+      "Build and shape improvements to the Celo platform",
+      "Attend special programs and events",
+      "Access to education and support",
+      "Expand your reach to help more communities"
+    ]
   }
 }
