@@ -52,7 +52,7 @@ commands:
           command: |
             mkdir -p ~/.tmp/checksumfiles
             # Concatenate package.json so we can use them as a part of the cache key
-            find . -type f -name 'package.json' -maxdepth 3 -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/package.json
+            find . -maxdepth 3 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/package.json
             # Concatenate patches so we can use them as a part of the cache key
             find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/patches
       - restore_cache:
