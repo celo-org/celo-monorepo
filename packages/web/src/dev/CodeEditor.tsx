@@ -130,7 +130,7 @@ export default React.memo(function CodeEditor() {
         <Rect x="47" y="251" width="43" height="7" rx="3.5" stroke="#73DDFF" strokeWidth="2" />
         <Rect x="47" y="330" width="106" height="7" rx="3.5" stroke="#333333" strokeWidth="2" />
       </G>
-      <G style="mix-blend-mode:darken" opacity="0.7" filter="url(#filter0_f)">
+      <G style={{ mixBlendMode: 'darken' }} opacity="0.7" filter="url(#filter0_f)">
         <Ellipse cx="358" cy="201.5" rx="155" ry="60.5" fill="#2E3338" />
       </G>
       <defs>
