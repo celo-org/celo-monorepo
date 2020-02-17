@@ -62,7 +62,7 @@
     - [Ultralight Node Sync](celo-codebase/wallet/how-the-wallet-works/ultralight-node-sync.md)
 
 ## Developer Guide
-- [Quick Start]()
+- [Quick Start](developer-resources/start.md)
   - [Hello World]()
   - [Building a dApp with Contracts on Celo]()
 - [Overview]()
