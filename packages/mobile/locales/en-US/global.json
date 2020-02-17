@@ -87,7 +87,7 @@
   },
   "networkConnectionFailed":
     "Could not connect with the network, please check your data connection",
-  "firebaseFailed": "Couldn't connect to notification service",
+  "firebaseFailed": "Could not connect to Firebase",
   "gasPriceUpdateFailed": "Could not update fee",
   "appHasToBeUpdated": "App has to be updated",
   "thisVersionIsInsecure": "This version is insecure",
@@ -106,5 +106,8 @@
   "processing": "Processing",
   "moreWithCount": "+{{count }} more",
   "unknown": "Unknown",
-  "emptyList": "Empty list"
+  "emptyList": "Empty list",
+  "timeframes": {
+    "30d": "30 days"
+  }
 }

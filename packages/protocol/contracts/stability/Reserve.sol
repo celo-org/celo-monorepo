@@ -35,7 +35,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   address[] public otherReserveAddresses;
 
   bytes32[] public assetAllocationSymbols;
-  uint256[] public assetAllocationWeights;
+  mapping(bytes32 => uint256) public assetAllocationWeights;
 
   uint256 public lastSpendingDay;
   uint256 public spendingLimit;
@@ -117,8 +117,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       sum = sum.add(FixidityLib.wrap(weights[i]));
     }
     require(sum.equals(FixidityLib.fixed1()), "Sum of asset allocation must be 1");
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+      delete assetAllocationWeights[assetAllocationSymbols[i]];
+    }
     assetAllocationSymbols = symbols;
-    assetAllocationWeights = weights;
+    for (uint256 i = 0; i < symbols.length; i++) {
+      require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
+      assetAllocationWeights[symbols[i]] = weights[i];
+    }
+    require(assetAllocationWeights["cGLD"] != 0, "Must set cGLD asset weight");
     emit AssetAllocationSet(symbols, weights);
   }
 
@@ -267,7 +274,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function getAssetAllocationWeights() external view returns (uint256[] memory) {
-    return assetAllocationWeights;
+    uint256[] memory weights = new uint256[](assetAllocationSymbols.length);
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+      weights[i] = assetAllocationWeights[assetAllocationSymbols[i]];
+    }
+    return weights;
   }
 
   function getReserveGoldBalance() public view returns (uint256) {
@@ -281,15 +292,17 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   /*
    * Internal functions
    */
+
   /**
-   * @notice Computes a tobin tax based on the reserve ratio.
-   * @return The numerator of the tobin tax amount, where the denominator is 1000.
+   * @notice Computes the ratio of current reserve balance to total stable token valuation.
+   * @return Reserve ratio in a fixed point format.
    */
-  function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
+  function getReserveRatio() public view returns (uint256) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
     uint256 reserveGoldBalance = getReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
+    FixidityLib.Fraction memory cgldWeight = FixidityLib.wrap(assetAllocationWeights["cGLD"]);
 
     for (uint256 i = 0; i < _tokens.length; i++) {
       uint256 stableAmount;
@@ -299,11 +312,22 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
       stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
     }
+    return
+      FixidityLib
+        .newFixed(reserveGoldBalance)
+        .divide(cgldWeight)
+        .divide(FixidityLib.newFixed(stableTokensValueInGold))
+        .unwrap();
+  }
 
+  /**
+   * @notice Computes a tobin tax based on the reserve ratio.
+   * @return The numerator of the tobin tax amount, where the denominator is 1000.
+   */
+  function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 2.
-    // The protocol aims to keep half of the reserve value in gold, thus the reserve ratio
-    // is two when the value of gold in the reserve is equal to the total supply of stable tokens.
-    if (reserveGoldBalance >= stableTokensValueInGold) {
+    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
+    if (ratio.gte(FixidityLib.newFixed(2))) {
       return FixidityLib.wrap(0);
     } else {
       return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);

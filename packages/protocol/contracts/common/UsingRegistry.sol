@@ -11,6 +11,7 @@ import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
+import "../governance/interfaces/IVestingFactory.sol";
 
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
@@ -51,6 +52,7 @@ contract UsingRegistry is Ownable {
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
+  bytes32 constant VESTING_FACTORY_REGISTRY_ID = keccak256(abi.encodePacked("VestingFactory"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -61,16 +63,7 @@ contract UsingRegistry is Ownable {
   }
 
   modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
-    bool registered = false;
-    for (uint256 i = 0; i < identifierHashes.length; i++) {
-      if (registry.getAddressForOrDie(identifierHashes[i]) == msg.sender) {
-        registered = true;
-        break;
-      }
-    }
-    // TODO(lucas): remove once DowntimeSlasher is implemented.
-    bool isCLabsValZero = (msg.sender == address(0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D));
-    require(registered || isCLabsValZero, "only registered contracts");
+    require(registry.isOneOf(identifierHashes, msg.sender), "only registered contracts");
     _;
   }
 
@@ -134,5 +127,9 @@ contract UsingRegistry is Ownable {
 
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+  }
+
+  function getVestingFactory() internal view returns (IVestingFactory) {
+    return IVestingFactory(registry.getAddressForOrDie(VESTING_FACTORY_REGISTRY_ID));
   }
 }

@@ -12,7 +12,7 @@ import Octocat from 'src/icons/Octocat'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
-import Footer from 'src/shared/Footer.3'
+import Footer from 'src/shared/Footer'
 import Link from 'src/shared/Link'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
@@ -371,10 +371,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: '100vh',
     backgroundColor: colors.white,
-    // @ts-ignore
     overflowY: 'scroll',
   },
-  mobileMenuActive: { bottom: 0, height: 'auto' },
+  mobileMenuActive: {
+    bottom: 0,
+    top: 0,
+    height: 'auto',
+    position: 'absolute',
+    overflowY: 'hidden',
+  },
   activeTab: {
     position: 'absolute',
     height: 8,

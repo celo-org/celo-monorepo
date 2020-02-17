@@ -23,11 +23,15 @@ exports[`renders correctly with giant numbers 1`] = `
   >
     <View
       style={
-        Object {
-          "alignItems": "flex-start",
-          "flexDirection": "row",
-          "marginTop": 5,
-        }
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          undefined,
+        ]
       }
     >
       <Text
@@ -57,10 +61,10 @@ exports[`renders correctly with giant numbers 1`] = `
         style={
           Array [
             Object {
-              "paddingHorizontal": 3,
+              "fontFamily": "Hind-Regular",
             },
             Object {
-              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
             },
             Object {
               "color": "#42D689",
@@ -101,11 +105,15 @@ exports[`renders correctly with giant numbers 1`] = `
     </View>
     <View
       style={
-        Object {
-          "alignItems": "flex-start",
-          "flexDirection": "row",
-          "marginTop": 5,
-        }
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          undefined,
+        ]
       }
     >
       <Text
@@ -135,10 +143,10 @@ exports[`renders correctly with giant numbers 1`] = `
         style={
           Array [
             Object {
-              "paddingHorizontal": 3,
+              "fontFamily": "Hind-Regular",
             },
             Object {
-              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
             },
             Object {
               "color": "#FBCC5C",
@@ -373,18 +381,6 @@ exports[`renders correctly with giant numbers 1`] = `
           />
         </View>
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 20,
-          }
-        }
-      >
-        0.01
-      </Text>
     </View>
   </View>
   <View
@@ -542,11 +538,15 @@ exports[`renders correctly with no exchange rate 1`] = `
   >
     <View
       style={
-        Object {
-          "alignItems": "flex-start",
-          "flexDirection": "row",
-          "marginTop": 5,
-        }
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          undefined,
+        ]
       }
     >
       <Text
@@ -576,10 +576,10 @@ exports[`renders correctly with no exchange rate 1`] = `
         style={
           Array [
             Object {
-              "paddingHorizontal": 3,
+              "fontFamily": "Hind-Regular",
             },
             Object {
-              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
             },
             Object {
               "color": "#FBCC5C",
@@ -620,11 +620,15 @@ exports[`renders correctly with no exchange rate 1`] = `
     </View>
     <View
       style={
-        Object {
-          "alignItems": "flex-start",
-          "flexDirection": "row",
-          "marginTop": 5,
-        }
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          undefined,
+        ]
       }
     >
       <Text
@@ -654,10 +658,10 @@ exports[`renders correctly with no exchange rate 1`] = `
         style={
           Array [
             Object {
-              "paddingHorizontal": 3,
+              "fontFamily": "Hind-Regular",
             },
             Object {
-              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
             },
             Object {
               "color": "#42D689",
@@ -892,18 +896,6 @@ exports[`renders correctly with no exchange rate 1`] = `
           />
         </View>
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 20,
-          }
-        }
-      >
-        0.01
-      </Text>
     </View>
   </View>
   <View

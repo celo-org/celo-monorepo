@@ -13,7 +13,7 @@
     "pretest": "yarn run build",
     "test": "rm test/**/*.js ; node runTests.js",
     "test:coverage": "yarn run test --coverage",
-    "gas": "yarn run test:local --gas",
+    "gas": "yarn run test --gas",
     "build:ts": "rm -f migrations/*.js* && tsc -b",
     "build": "ts-node ./scripts/build.ts && yarn build:ts",
     "migrate": "./scripts/bash/migrate.sh",
@@ -42,7 +42,7 @@
     "@0x/sol-profiler": "^3.0.0",
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
-    "@celo/utils": "0.1.5-dev",
+    "@celo/utils": "0.1.7-dev",
     "apollo-client": "^2.4.13",
     "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
     "chai-subset": "^1.6.0",
@@ -72,6 +72,8 @@
     "typechain": "git+https://github.com/celo-org/TypeChain.git#832e628",
     "weak-map": "^1.0.5",
     "web3": "1.0.0-beta.37",
+    "bip39": "^3.0.2",
+    "ethereumjs-wallet": "^0.6.3",
     "web3-provider-engine": "^15.0.0"
   },
   "devDependencies": {
@@ -83,12 +85,16 @@
     "@types/mathjs": "^4.4.1",
     "@types/mocha": "^5.2.1",
     "@types/nodemailer": "^4.6.5",
+    "@types/targz": "^1.0.0",
+    "@types/tmp": "^0.1.0",
     "@types/underscore": "^1.8.8",
     "@types/web3": "^1.0.18",
     "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.1.2",
     "nodemailer": "^4.6.8",
+    "targz": "^1.0.1",
+    "tmp": "^0.1.0",
     "truffle-typings": "^1.0.6",
     "yargs": "^14.0.0"
   }

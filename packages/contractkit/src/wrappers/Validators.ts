@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -32,6 +32,7 @@ export interface ValidatorGroup {
   name: string
   address: Address
   members: Address[]
+  membersUpdated: number
   affiliates: Address[]
   commission: BigNumber
 }
@@ -53,11 +54,17 @@ export interface ValidatorsConfig {
   groupLockedGoldRequirements: LockedGoldRequirements
   validatorLockedGoldRequirements: LockedGoldRequirements
   maxGroupSize: BigNumber
+  membershipHistoryLength: BigNumber
 }
 
 export interface GroupMembership {
   epoch: number
   group: Address
+}
+
+export interface MembershipHistoryExtraData {
+  lastRemovedFromGroupTimestamp: number
+  tail: number
 }
 
 /**
@@ -113,11 +120,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidatorLockedGoldRequirements(),
       this.getGroupLockedGoldRequirements(),
       this.contract.methods.maxGroupSize().call(),
+      this.contract.methods.membershipHistoryLength().call(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
       maxGroupSize: valueToBigNumber(res[2]),
+      membershipHistoryLength: valueToBigNumber(res[3]),
     }
   }
 
@@ -243,6 +252,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       name,
       address,
       members: res[0],
+      membersUpdated: res[2].reduce(
+        (a: number, b: BigNumber.Value) => Math.max(a, new BigNumber(b).toNumber()),
+        0
+      ),
       commission: fromFixed(new BigNumber(res[1])),
       affiliates: affiliates.map((v) => v.address),
     }
@@ -258,6 +271,19 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     undefined,
     (res) =>
       zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
+  )
+
+  /**
+   * Returns extra data from the Validator's group membership history
+   * @param validator The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
+  getValidatorMembershipHistoryExtraData: (
+    validator: Address
+  ) => Promise<MembershipHistoryExtraData> = proxyCall(
+    this.contract.methods.getMembershipHistory,
+    undefined,
+    (res) => ({ lastRemovedFromGroupTimestamp: valueToInt(res[2]), tail: valueToInt(res[3]) })
   )
 
   /** Get the size (amount of members) of a ValidatorGroup */
@@ -425,9 +451,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
     }
 
-    const currentIdx = group.members.indexOf(validator)
+    const currentIdx = group.members.map(normalizeAddress).indexOf(normalizeAddress(validator))
     if (currentIdx < 0) {
-      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+      throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
       throw new Error(`Validator is already in position ${newIndex}`)
     }
@@ -461,16 +487,65 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidator(e.returnValues.validator, blockNumber)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, true, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
         epochNumber,
         validator: validator[index],
-        validatorPayment: e.returnValues.validatorPayment,
+        validatorPayment: valueToBigNumber(e.returnValues.validatorPayment),
         group: validatorGroup[index],
-        groupPayment: e.returnValues.groupPayment,
+        groupPayment: valueToBigNumber(e.returnValues.groupPayment),
       })
     )
+  }
+
+  /**
+   * Returns the current set of validator signer addresses
+   */
+  async currentSignerSet(): Promise<Address[]> {
+    const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
+    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+      this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
+    )
+  }
+
+  /**
+   * Returns the current set of validator signer and account addresses
+   */
+  async currentValidatorAccountsSet() {
+    const signerAddresses = await this.currentSignerSet()
+    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
+    return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
+  }
+
+  /**
+   * Returns the group membership for `validator`.
+   * @param validator Address of validator to retrieve group membership for.
+   * @param blockNumber Block number to retrieve group membership at.
+   * @return Group and membership history index for `validator`.
+   */
+  async getValidatorMembershipHistoryIndex(
+    validator: Validator,
+    blockNumber?: number
+  ): Promise<{ group: Address; historyIndex: number }> {
+    const blockEpoch = await this.kit.getEpochNumberOfBlock(
+      blockNumber || (await this.kit.web3.eth.getBlockNumber())
+    )
+    const account = await this.validatorSignerToAccount(validator.signer)
+    const membershipHistory = await this.getValidatorMembershipHistory(account)
+    const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
+    const group = membershipHistory[historyIndex].group
+    return { group, historyIndex }
+  }
+
+  /**
+   * Returns the index into `history` for `epoch`.
+   * @param epoch The needle.
+   * @param history The haystack.
+   * @return Index for epoch or -1.
+   */
+  findValidatorMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
+    return history.reverse().findIndex((x) => x.epoch <= epoch)
   }
 }

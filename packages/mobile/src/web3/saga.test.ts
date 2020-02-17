@@ -36,7 +36,7 @@ jest.mock('src/web3/contracts', () => ({
       getBlock: jest.fn(() => ({ number: 1000 })),
     },
   },
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+  isFornoMode: jest.fn().mockReturnValueOnce(false),
 }))
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()

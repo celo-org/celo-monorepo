@@ -1,11 +1,12 @@
+import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
+import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
-import { addLocalAccount } from './utils/web3-utils'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { ElectionConfig } from './wrappers/Election'
@@ -33,7 +34,18 @@ export function newKit(url: string) {
  * @param web3 Web3 instance
  */
 export function newKitFromWeb3(web3: Web3) {
+  if (!web3.currentProvider) {
+    throw new Error('Must have a valid Provider')
+  }
   return new ContractKit(web3)
+}
+
+function assertIsCeloProvider(provider: any): asserts provider is CeloProvider {
+  if (!(provider instanceof CeloProvider)) {
+    throw new Error(
+      'A different Provider was manually added to the kit. The kit should have a CeloProvider'
+    )
+  }
 }
 
 export interface NetworkConfig {
@@ -55,6 +67,13 @@ export interface KitOptions {
   from?: Address
 }
 
+interface AccountBalance {
+  gold: BigNumber
+  usd: BigNumber
+  total: BigNumber
+  lockedGold: BigNumber
+}
+
 export class ContractKit {
   /** core contract's address registry */
   readonly registry: AddressRegistry
@@ -69,10 +88,30 @@ export class ContractKit {
       feeCurrency: null,
       gasInflationFactor: 1.3,
     }
+    if (!(web3.currentProvider instanceof CeloProvider)) {
+      const celoProviderInstance = new CeloProvider(web3.currentProvider)
+      web3.setProvider(celoProviderInstance)
+    }
 
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+  }
+
+  async getTotalBalance(address: string): Promise<AccountBalance> {
+    const goldToken = await this.contracts.getGoldToken()
+    const stableToken = await this.contracts.getStableToken()
+    const lockedGold = await this.contracts.getLockedGold()
+    const exchange = await this.contracts.getExchange()
+    const goldBalance = await goldToken.balanceOf(address)
+    const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
+    const dollarBalance = await stableToken.balanceOf(address)
+    return {
+      gold: goldBalance,
+      lockedGold: lockedBalance,
+      usd: dollarBalance,
+      total: goldBalance.plus(lockedBalance).plus(await exchange.quoteUsdSell(dollarBalance)),
+    }
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
@@ -126,7 +165,8 @@ export class ContractKit {
   }
 
   addAccount(privateKey: string) {
-    addLocalAccount(this.web3, privateKey)
+    assertIsCeloProvider(this.web3.currentProvider)
+    this.web3.currentProvider.addAccount(privateKey)
   }
 
   /**
@@ -240,10 +280,30 @@ export class ContractKit {
     }
   }
 
+  /// TODO(jfoutts): correct epoch definitions below and elsewhere to match celo-blockchain istanbul
+  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
+    const validators = await this.contracts.getValidators()
+    const epochSize = await validators.getEpochSize()
+    // Follows protocol/contracts getEpochNumber()
+    return epochNumber * epochSize.toNumber() + 1
+  }
+
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
     // Reverses protocol/contracts getEpochNumber()
     return (epochNumber + 1) * epochSize.toNumber()
+  }
+
+  async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
+    const validators = await this.contracts.getValidators()
+    const epochSize = await validators.getEpochSize()
+    // Follows protocol/contracts getEpochNumber()
+    return Math.floor((blockNumber - 1) / epochSize.toNumber())
+  }
+
+  stop() {
+    assertIsCeloProvider(this.web3.currentProvider)
+    this.web3.currentProvider.stop()
   }
 }
