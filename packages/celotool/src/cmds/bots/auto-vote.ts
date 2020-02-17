@@ -6,6 +6,7 @@ import { Address } from '@celo/contractkit/lib/base'
 import {
   ensureLeading0x,
   eqAddress,
+  normalizeAddressWith0x,
   NULL_ADDRESS,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
@@ -39,7 +40,7 @@ export const builder = (yargs: Argv) => {
         return addresses
           .split(',')
           .filter((a) => a.length > 0)
-          .map(ensureLeading0x)
+          .map(normalizeAddressWith0x)
       },
     })
 }
@@ -90,7 +91,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
         // Note: though this returns an array, the bot process only ever chooses one group,
         // so this takes a shortcut and only looks at the first in the response
         const currentVote = (await election.getVoter(botAccount)).votes[0]
-        const currentGroup = currentVote ? ensureLeading0x(currentVote.group) : undefined
+        const currentGroup = currentVote ? normalizeAddressWith0x(currentVote.group) : undefined
 
         // Handle the case where the group the bot is currently voting for does not have a score
         if (
@@ -174,7 +175,7 @@ async function castVote(
     for (const tx of revokeTxs) {
       await tx.sendAndWaitForReceipt({ from: botAccount })
     }
-    const group = ensureLeading0x(vote.group)
+    const group = normalizeAddressWith0x(vote.group)
     const oldCapacity = groupCapacities.get(group)!
     groupCapacities.set(group, oldCapacity.plus(vote.pending.plus(vote.active)))
   }
@@ -199,7 +200,7 @@ async function calculateInitialGroupCapacities(kit: ContractKit): Promise<Map<st
   for (const groupAddress of await validators.getRegisteredValidatorGroupsAddresses()) {
     const vgv = await election.getValidatorGroupVotes(groupAddress)
     if (vgv.eligible) {
-      groupCapacities.set(ensureLeading0x(groupAddress), vgv.capacity)
+      groupCapacities.set(normalizeAddressWith0x(groupAddress), vgv.capacity)
     }
   }
 
@@ -219,7 +220,7 @@ async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNu
   ).filter((v) => !!v.affiliation) // Skip unaffiliated
 
   const validatorsByGroup = groupBy(validatorAccounts, (validator) =>
-    ensureLeading0x(validator.affiliation!)
+    normalizeAddressWith0x(validator.affiliation!)
   )
 
   const validatorGroupScores = mapValues(validatorsByGroup, (vals) => {
@@ -319,7 +320,7 @@ function shouldBeConsidered(
   excludedGroups: string[],
   groupCapacities: Map<string, BigNumber>
 ): boolean {
-  const normalizedGroupAddress = ensureLeading0x(groupAddress)
+  const normalizedGroupAddress = normalizeAddressWith0x(groupAddress)
   const capacity = groupCapacities.get(normalizedGroupAddress)
   return !!(
     !excludedGroups.includes(normalizedGroupAddress) &&
