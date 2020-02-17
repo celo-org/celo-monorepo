@@ -1,17 +1,6 @@
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
-import {
-  all,
-  call,
-  cancel,
-  cancelled,
-  delay,
-  fork,
-  put,
-  race,
-  select,
-  take,
-} from 'redux-saga/effects'
+import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/reducer'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
@@ -188,7 +177,7 @@ function* monitorGeth() {
 
 export function* gethSaga() {
   yield call(initGethSaga)
-  const gethRelatedSagas = yield all([fork(monitorGeth)])
+  const gethRelatedSagas = yield fork(monitorGeth)
   yield take(Actions.CANCEL_GETH_SAGA)
   yield cancel(gethRelatedSagas)
   yield put(setGethConnected(true))

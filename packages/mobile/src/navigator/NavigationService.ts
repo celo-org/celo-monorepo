@@ -49,6 +49,14 @@ export function navigate(routeName: string, params?: NavigationParams) {
     })
 }
 
+export function navigateAfterPinEntered(routeName: string, params?: NavigationParams) {
+  navigate('Background', {
+    onUnlock() {
+      navigate(routeName, params)
+    },
+  })
+}
+
 // Source: https://v1.reactnavigation.org/docs/screen-tracking.html
 export function recordStateChange(prevState: NavigationState, currentState: NavigationState) {
   const getCurrentRouteName = (navState: NavigationState): string => {

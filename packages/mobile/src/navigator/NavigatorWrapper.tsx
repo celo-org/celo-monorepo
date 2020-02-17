@@ -52,6 +52,12 @@ interface StateProps {
 
 type Props = StateProps & DispatchProps & WithTranslation
 
+const mapStateToProps = (state: RootState) => {
+  return {
+    appLocked: getAppLocked(state),
+  }
+}
+
 const AppContainer = createAppContainer(Navigator)
 
 export class NavigatorWrapper extends React.Component<Props> {
@@ -105,12 +111,6 @@ export const headerArea = {
       elevation: 0,
     },
   },
-}
-
-const mapStateToProps = (state: RootState) => {
-  return {
-    appLocked: getAppLocked(state),
-  }
 }
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {

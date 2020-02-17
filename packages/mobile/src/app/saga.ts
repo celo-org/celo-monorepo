@@ -19,7 +19,12 @@ import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { NavActions, navigate, navigateBack } from 'src/navigator/NavigationService'
+import {
+  NavActions,
+  navigate,
+  navigateAfterPinEntered,
+  navigateBack,
+} from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
@@ -113,16 +118,7 @@ export function* navigateToProperScreen() {
     return
   }
 
-  const appLockedAwareNavigate =
-    account && lockWithPinEnabled
-      ? (routeName: string) => {
-          navigate('Background', {
-            onUnlock() {
-              navigate(routeName)
-            },
-          })
-        }
-      : navigate
+  const appLockedAwareNavigate = account && lockWithPinEnabled ? navigateAfterPinEntered : navigate
 
   if (!language) {
     appLockedAwareNavigate(Stacks.NuxStack)
@@ -198,7 +194,7 @@ function* watchAppState() {
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
       yield put(setAppState(newState))
     } catch (error) {
-      Logger.error(`${TAG}@monitorAppState`, error)
+      Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)
     } finally {
       if (yield cancelled()) {
         appStateChannel.close()
