@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import CopyIcon from 'src/icons/CopyIcon'
 import { colors } from 'src/styles'
 import { copyToClipboad } from 'src/utils/utils'
+import Hoverable from 'src/shared/Hoverable'
 
 interface Props {
   content: string
@@ -29,29 +30,28 @@ class CopyToClipboard extends React.PureComponent<Props, State> {
     }
   }
 
-  // Simulating css hover
-  // hover(hover: boolean) {
-  //   this.setState({hover})
-  // }
+  hover(hover: boolean) {
+    this.setState({ hover })
+  }
 
   render() {
     const { copied, hover } = this.state
     const copy = this.copy.bind(this)
     return (
-      <View
-        style={[styles.container]}
-        onClick={copy}
-        /*onMouseOver={this.hover.bind(this, true)}*/
-        /*onMouseEnter={this.hover.bind(this, true)}*/
-        /*onMouseLeave={this.hover.bind(this, false)}*/
-      >
+      <View style={[styles.container]} onClick={copy}>
         {copied ? (
           <Text style={[styles.copied]}>Copied</Text>
         ) : (
           <Text style={[styles.icon]}>
-            <CopyIcon color={hover ? colors.white : colors.grayHeavy} size={16} />
+            <Hoverable
+              onHoverIn={this.hover.bind(this, true)}
+              onHoverOut={this.hover.bind(this, false)}
+            >
+              <CopyIcon color={hover ? colors.white : colors.grayHeavy} size={16} />
+            </Hoverable>
           </Text>
         )}
+        <Text>{JSON.stringify(+hover)}</Text>
       </View>
     )
   }
