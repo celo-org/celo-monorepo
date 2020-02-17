@@ -81,6 +81,8 @@ commands:
               # See https://github.com/yarnpkg/yarn/issues/6703
               # So here to workaround this issue, we skip the install if dependencies haven't changed
               echo "Skipping install, dependencies haven't changed"
+              # We still have to run postinstall though
+              yarn run postinstall
               exit 0
             fi
 
