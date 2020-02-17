@@ -13,7 +13,7 @@
 
 ▸ **getImplementationOfProxy**(`web3`: Web3, `proxyContractAddress`: string): *Promise‹string›*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L34)*
+*Defined in [contractkit/src/governance/proxy.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L34)*
 
 **Parameters:**
 
@@ -30,7 +30,7 @@ ___
 
 ▸ **setImplementationOnProxy**(`address`: string): *TransactionObject‹any›*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L42)*
+*Defined in [contractkit/src/governance/proxy.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L42)*
 
 **Parameters:**
 
