@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import defaultContent from 'src/../static/locales/en/codeofconduct.json'
+import defaultContent from 'src/../public/static/locales/en/codeofconduct.json'
 import { IntegratingAnimation } from 'src/community/connect/CodeOfConduct'
 import { H1, Li, Ul } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'

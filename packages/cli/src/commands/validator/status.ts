@@ -54,10 +54,6 @@ export default class ValidatorStatus extends BaseCommand {
       description: 'how many blocks to look back for signer activity',
       default: 100,
     }),
-    'no-truncate': flags.boolean({
-      description: "Don't truncate fields to fit line",
-      required: false,
-    }),
   }
 
   static examples = [
@@ -117,7 +113,7 @@ export default class ValidatorStatus extends BaseCommand {
     )
     cli.action.stop()
 
-    cli.table(validatorStatuses, statusTable, { 'no-truncate': res.flags['no-truncate'] })
+    cli.table(validatorStatuses, statusTable, { 'no-truncate': !res.flags.truncate })
   }
 
   private async getStatus(
@@ -133,9 +129,9 @@ export default class ValidatorStatus extends BaseCommand {
     let signatures = 0
     let eligible = 0
     for (const block of blocks) {
-      if (await electionCache.elected(signer, block.number)) {
+      if (await electionCache.elected(signer, block.number - 1)) {
         eligible++
-        if (await electionCache.signed(signer, block)) {
+        if (await electionCache.signedParent(signer, block)) {
           signatures++
         }
       }

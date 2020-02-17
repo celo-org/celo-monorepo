@@ -22,6 +22,7 @@ files=(
   "packages/mobile/secrets.json"
   "packages/web/env-config.js"
   "packages/web/server-env-config.js"
+  "packages/moonpay-auth/.env"
   ".env.mnemonic"
   ".env.mnemonic.alfajores"
   ".env.mnemonic.alfajoresstaging"
@@ -86,7 +87,7 @@ for file_path in "${files[@]}"; do
   # Encrypt or decrypt this file.
   gcloud kms $1 --ciphertext-file=$encrypted_file_path --plaintext-file=$file_path --key=github-key --keyring=celo-keyring --location=global --project celo-testnet
   if [[ $? -eq 1 ]]; then
-    echo "Only C Labs employees can $1 keys - skipping ${1}ion"
+    echo "Only cLabs employees can $1 keys - skipping ${1}ion"
     exit 0
   fi
 done
