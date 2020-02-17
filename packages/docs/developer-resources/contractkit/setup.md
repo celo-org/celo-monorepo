@@ -39,7 +39,7 @@ import { CeloContract } from '@celo/contractkit'
 
 // default from
 kit.defaultAccount = myAddress
-// paid gas in celo dollars
+// paid gas in cUSD
 await kit.setFeeCurrency(CeloContract.StableToken)
 ```
 

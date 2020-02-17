@@ -1,8 +1,8 @@
 # Examples
 
-## Interacting with cGold & cDollar
+## Interacting with cGLD & cUSD
 
-celo-blockchain has two initial coins: cGold and cDollar (stableToken).
+celo-blockchain has two initial coins: cGLD and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
@@ -23,7 +23,7 @@ const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
 
-To interact with cDollar, is the same but with a different contract:
+To interact with cUSD, is the same but with a different contract:
 
 ```ts
 const stabletoken = await kit.contract.getStableToken()
@@ -35,9 +35,12 @@ Apart from GoldToken and StableToken, there are many core contracts.
 
 For the moment, we have contract wrappers for:
 
+- Accounts
 - Exchange (Uniswap kind exchange between Gold and Stable tokens)
 - Validators
 - LockedGold
+- StableToken
+- Attestation
 
 In the following weeks, we will add some wrappers for all other contracts
 
@@ -52,6 +55,25 @@ const web3Exchange = await kit._web3Contracts.getExchange()
 ```
 
 We expose native wrappers for all Celo core contracts.
+
+The complete list of Celo Core contracts is:
+
+- Accounts
+- Attestations
+- LockedGold
+- Escrow
+- Exchange
+- FeeCurrencyWhitelist
+- GasPriceMinimum
+- GoldToken
+- Governance
+- MultiSig
+- Random
+- Registry
+- Reserve
+- SortedOracles
+- StableToken
+- Validators
 
 ## A Note About Contract Addresses
 
