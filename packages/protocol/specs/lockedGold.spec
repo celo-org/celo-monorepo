@@ -47,7 +47,7 @@ rule totalPreserved(address account, method f) {
 	// We assume the sender is not the currentContract
 	require(account != currentContract);
 	uint256 _ercBalance = sinvoke ercBalanceOf(account); 
-	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(account);
+	uint256 _accountNonVoting = sinvoke getAccountNonvotingLockedGold(account);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(account);
 	// We limit the amount of pending records due to loop handling 
 	require sinvoke getPendingWithdrawalsLength(account) <= 1;
@@ -84,7 +84,7 @@ rule noChangeByOther(address a, address b, method f) {
     a != currentContract &&
     (a == sinvoke getGoldTokenExt() => f.selector != withdraw(uint256).selector));
 	uint256 _ercBalance = sinvoke ercBalanceOf(a);
-	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
+	uint256 _accountNonVoting = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
 	// We limit the amount of pending records due to loop handling 
 	uint length = sinvoke getPendingWithdrawalsLength(a);
@@ -99,11 +99,11 @@ rule noChangeByOther(address a, address b, method f) {
   );
 	sinvoke f(eF,arg);
 	uint256 ercBalance_ = sinvoke ercBalanceOf(a); 
-	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
+	uint256 accountNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
 	assert(_ercBalance == ercBalance_, "Unexpected change to erc tokens");
 	assert(_accountTotalPendingWithdrawals == accountTotalPendingWithdrawals_, "Unexpected change to total pending");
-	assert(_accoutNonVoting == accoutNonVoting_, "Unexpected change to account nonvoting");
+	assert(_accountNonVoting == accountNonVoting_, "Unexpected change to account nonvoting");
 }
 
 /*
