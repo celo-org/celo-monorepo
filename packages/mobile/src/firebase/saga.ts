@@ -240,13 +240,11 @@ export function* syncLanguageSelection({ language }: SetLanguage) {
 }
 
 function* setFigureEightUserIdSaga({ userId }: SetFigureEightAccount) {
-  Logger.debug(TAG, 'setFigureEightUserIdSaga')
   const account = yield select(currentAccountSelector)
   yield call(setFigureEightUserId, userId, account)
 }
 
 function* refreshFigureEightEarnedSaga() {
-  Logger.debug(TAG, 'setFigureEightUserIdSaga')
   const userId = yield select(figureEightUserIdSelector)
   const earned = yield call(doRefreshFigureEightEarned, userId)
   yield put(setFigureEightEarned(earned))

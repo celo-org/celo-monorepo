@@ -227,7 +227,6 @@ export async function setFigureEightUserId(userId: string, account: string) {
   try {
     Logger.info(TAG, `Setting userId for user ${userId}`)
     const database = firebase.database().ref()
-    Logger.info(TAG, `Setting userId for user ${JSON.stringify(database)}`)
     await database
       .child(EARN_PILOT_DB)
       .child(userId)
