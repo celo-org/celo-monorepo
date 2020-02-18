@@ -6,7 +6,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -19,9 +19,11 @@ import { Screens } from 'src/navigator/Screens'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Logger from 'src/utils/Logger'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 
 interface StateProps {
   figureEightEarned: number | null
+  figureEightUserId: string | null
 }
 
 interface State {
@@ -37,6 +39,7 @@ interface DispatchProps {
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     figureEightEarned: state.app.figureEightEarned,
+    figureEightUserId: state.app.figureEightUserId,
   }
 }
 
@@ -44,7 +47,7 @@ type Props = DispatchProps & WithTranslation & StateProps
 
 export class Earn extends React.Component<Props, State> {
   state = {
-    userId: '',
+    userId: this.props.figureEightUserId,
   }
 
   onSubmitUserId = () => {
@@ -57,6 +60,17 @@ export class Earn extends React.Component<Props, State> {
     }
   }
 
+  onSubmitLogout = () => {
+    this.props.setFigureEightAccount('')
+    this.props.refreshFigureEightEarned()
+  }
+
+  onTransferToWallet = () => {
+    // TODO(anna) transfer balance to wallet
+    // TODO add notification
+    navigateHome()
+  }
+
   onChangeInput = (userId: string) => {
     this.setState({ userId })
   }
@@ -67,21 +81,34 @@ export class Earn extends React.Component<Props, State> {
 
   render() {
     // const { t } = this.props
+    const amountEarned = this.props.figureEightEarned || 0
     return (
       <ScrollView style={style.scrollView} keyboardShouldPersistTaps="handled">
-        <TextInput
-          onChangeText={this.onChangeInput}
-          value={this.state.userId}
-          // style={styles.nameInputField}
-          // placeholderTextColor={colors.inactive}
-          // underlineColorAndroid="transparent"
-          // enablesReturnKeyAutomatically={true}
-          // placeholder={t('fullName')}
-          // testID={'NameEntry'}
-        />
-        <TextButton onPress={this.onSubmitUserId}>{'Submit'}</TextButton>
-        <Text style={fontStyles.body}>{this.state.userId}</Text>
-        <Text style={fontStyles.body}>{this.props.figureEightEarned}</Text>
+        {this.props.figureEightUserId ? (
+          <View>
+            <Text style={fontStyles.body}>Work will go here</Text>
+            <Text style={fontStyles.body}>User ID: {this.props.figureEightUserId}</Text>
+            <TextButton onPress={this.onTransferToWallet}>{'Transfer to wallet'}</TextButton>
+            <Text style={fontStyles.body}>{`Amount earned: ${amountEarned} dollars`}</Text>
+            <TextButton onPress={this.onSubmitLogout}>{'Log out'}</TextButton>
+          </View>
+        ) : (
+          // Log In to work
+          <View>
+            <Text style={fontStyles.body}>Please enter your userId</Text>
+            <TextInput
+              onChangeText={this.onChangeInput}
+              value={this.state.userId}
+              style={style.inputField}
+              // placeholderTextColor={colors.inactive}
+              // underlineColorAndroid="transparent"
+              // enablesReturnKeyAutomatically={true}
+              // placeholder={t('fullName')}
+              // testID={'NameEntry'}
+            />
+            <TextButton onPress={this.onSubmitUserId}>{'Submit'}</TextButton>
+          </View>
+        )}
       </ScrollView>
     )
   }
@@ -99,5 +126,17 @@ const style = StyleSheet.create({
   scrollView: {
     flex: 1,
     backgroundColor: colors.background,
+    padding: 20,
+  },
+  inputField: {
+    marginTop: 25,
+    alignItems: 'center',
+    borderColor: colors.inputBorder,
+    borderRadius: 3,
+    borderWidth: 1,
+    marginBottom: 6,
+    paddingLeft: 9,
+    color: colors.inactive,
+    height: 50,
   },
 })
