@@ -13,7 +13,7 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
   using SafeMath for uint256;
 
   // Mapping between beneficiary addresses and associated release schedule contracts.
-  mapping(address => address[]) public releases;
+  mapping(address => ReleaseGoldInstance[]) public releases;
 
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
@@ -64,27 +64,26 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
       "Factory balance is insufficient to create requested release gold contract"
     );
 
-    address newReleaseGoldInstance = address(
-      new ReleaseGoldInstance(
-        releaseStartTime,
-        releaseCliffTime,
-        numReleasePeriods,
-        releasePeriod,
-        amountReleasedPerPeriod,
-        revocable,
-        beneficiary,
-        releaseOwner,
-        refundAddress,
-        subjectToLiquidityProvision,
-        initialDistributionPercentage,
-        _canValidate,
-        _canVote,
-        address(registry)
-      )
+    ReleaseGoldInstance newReleaseGoldInstance = new ReleaseGoldInstance(
+      releaseStartTime,
+      releaseCliffTime,
+      numReleasePeriods,
+      releasePeriod,
+      amountReleasedPerPeriod,
+      revocable,
+      beneficiary,
+      releaseOwner,
+      refundAddress,
+      subjectToLiquidityProvision,
+      initialDistributionPercentage,
+      _canValidate,
+      _canVote,
+      address(registry)
     );
     releases[beneficiary].push(newReleaseGoldInstance);
-    getGoldToken().transfer(newReleaseGoldInstance, releaseGoldAmount);
-    emit NewReleaseGoldInstanceCreated(beneficiary, newReleaseGoldInstance);
-    return newReleaseGoldInstance;
+    address releaseGoldInstanceAddress = address(newReleaseGoldInstance);
+    getGoldToken().transfer(releaseGoldInstanceAddress, releaseGoldAmount);
+    emit NewReleaseGoldInstanceCreated(beneficiary, releaseGoldInstanceAddress);
+    return releaseGoldInstanceAddress;
   }
 }

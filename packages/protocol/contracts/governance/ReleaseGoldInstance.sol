@@ -34,6 +34,8 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     uint256 revokeTime;
   }
 
+  uint256 internal constant MAX_UINT = 0xffffffffffffffffffffffffffffffff;
+
   // Beneficiary of the Celo Gold released in this contract.
   address payable public beneficiary;
 
@@ -67,11 +69,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   // Public struct housing params pertaining to revocation.
   RevocationInfo public revocationInfo;
 
-  event ReleaseScheduleRevoked(
-    address indexed beneficiary,
-    uint256 revokeTimestamp,
-    uint256 releasedBalanceAtRevoke
-  );
+  event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
 
@@ -113,6 +111,14 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     _;
   }
 
+  modifier onlyBeneficiaryAndNotRevoked() {
+    require(
+      msg.sender == beneficiary && !isRevoked(),
+      "Sender must be the beneficiary and state must not be revoked"
+    );
+    _;
+  }
+
   modifier onlyWhenInProperState() {
     bool isRevoked = isRevoked();
     require(
@@ -135,9 +141,9 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param _beneficiary Address of the beneficiary to whom released tokens are transferred.
    * @param _releaseOwner Address capable of revoking, setting the liquidity provision
    *                      and setting the withdrawal amount.
-   *                      Null if grant is not subject to these operations.
+   *                      0x0 if grant is not subject to these operations.
    * @param _refundAddress Address that receives refunded funds if contract is revoked.
-   *                       Null if contract is not revocable.
+   *                       0x0 if contract is not revocable.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param initialDistributionPercentage Percentage of total rewards available for distribution.
    *                                      Expressed to 3 significant figures [0, 1000].
@@ -204,7 +210,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
       // Initial percentage is expressed to 3 significant figures: [0, 1000].
       maxDistribution = totalGrant.mul(initialDistributionPercentage).div(1000);
     } else {
-      maxDistribution = ~uint256(0);
+      maxDistribution = MAX_UINT;
     }
 
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
@@ -240,7 +246,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     require(distributionPercentage <= 1000, "Max distribution percentage must be within bounds");
     // If percentage is 100%, we set maxDistribution to maxUint to account for future rewards.
     if (distributionPercentage == 1000) {
-      maxDistribution = ~uint256(0);
+      maxDistribution = MAX_UINT;
     } else {
       uint256 totalBalance = getTotalBalance();
       maxDistribution = totalBalance.mul(distributionPercentage).div(1000);
@@ -307,11 +313,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     require(!isRevoked(), "Release schedule instance must not already be revoked");
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = getCurrentReleasedTotalAmount();
-    emit ReleaseScheduleRevoked(
-      beneficiary,
-      revocationInfo.revokeTime,
-      revocationInfo.releasedBalanceAtRevoke
-    );
+    emit ReleaseScheduleRevoked(revocationInfo.revokeTime, revocationInfo.releasedBalanceAtRevoke);
   }
 
   /**
@@ -378,7 +380,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice A wrapper function for the lock gold method.
    * @param value The value of gold to be locked.
    */
-  function lockGold(uint256 value) external nonReentrant onlyWhenInProperState {
+  function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
     getLockedGold().lock.gas(gasleft()).value(value)();
   }
 
@@ -395,7 +397,11 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param index The index of the pending locked gold withdrawal.
    * @param value The value of gold to be relocked for the release schedule instance.
    */
-  function relockGold(uint256 index, uint256 value) external nonReentrant onlyWhenInProperState {
+  function relockGold(uint256 index, uint256 value)
+    external
+    nonReentrant
+    onlyBeneficiaryAndNotRevoked
+  {
     getLockedGold().relock(index, value);
   }
 
@@ -471,7 +477,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    */
   function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
     external
-    onlyWhenInProperState
+    onlyBeneficiaryAndNotRevoked
   {
     getAccounts().setAccount(name, dataEncryptionKey, walletAddress);
   }
@@ -479,7 +485,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   /**
    * @notice A wrapper setter function for creating an account.
    */
-  function createAccount() external onlyCanVote onlyWhenInProperState {
+  function createAccount() external onlyCanVote onlyBeneficiaryAndNotRevoked {
     require(getAccounts().createAccount(), "Account creation failed");
   }
 
@@ -487,7 +493,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice A wrapper setter function for the name of an account.
    * @param name A string to set as the name of the account.
    */
-  function setAccountName(string calldata name) external onlyWhenInProperState {
+  function setAccountName(string calldata name) external onlyBeneficiaryAndNotRevoked {
     getAccounts().setName(name);
   }
 
@@ -495,7 +501,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice A wrapper setter function for the wallet address of an account.
    * @param walletAddress The wallet address to set for the account.
    */
-  function setAccountWalletAddress(address walletAddress) external onlyWhenInProperState {
+  function setAccountWalletAddress(address walletAddress) external onlyBeneficiaryAndNotRevoked {
     getAccounts().setWalletAddress(walletAddress);
   }
 
@@ -507,7 +513,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    */
   function setAccountDataEncryptionKey(bytes calldata dataEncryptionKey)
     external
-    onlyWhenInProperState
+    onlyBeneficiaryAndNotRevoked
   {
     getAccounts().setAccountDataEncryptionKey(dataEncryptionKey);
   }
@@ -516,7 +522,10 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice A wrapper setter function for the metadata of an account.
    * @param metadataURL The URL to access the metadata..
    */
-  function setAccountMetadataURL(string calldata metadataURL) external onlyWhenInProperState {
+  function setAccountMetadataURL(string calldata metadataURL)
+    external
+    onlyBeneficiaryAndNotRevoked
+  {
     getAccounts().setMetadataURL(metadataURL);
   }
 
