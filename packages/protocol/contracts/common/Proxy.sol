@@ -143,6 +143,7 @@ contract Proxy {
   }
 
   function _setOwner(address newOwner) private {
+    require(newOwner != address(0), "owner cannot be 0");
     bytes32 position = OWNER_POSITION;
     assembly {
       sstore(position, newOwner)

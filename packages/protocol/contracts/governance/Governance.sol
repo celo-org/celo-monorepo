@@ -269,6 +269,7 @@ contract Governance is
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    */
   function setMinDeposit(uint256 _minDeposit) external onlyOwner {
+    require(_minDeposit > 0, "minDeposit must be larger than 0");
     require(_minDeposit != minDeposit, "Minimum deposit unchanged");
     minDeposit = _minDeposit;
     emit MinDepositSet(_minDeposit);
