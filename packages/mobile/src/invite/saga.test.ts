@@ -19,6 +19,7 @@ import {
 import { watchRedeemInvite, watchSendInvite, withdrawFundsFromTempAccount } from 'src/invite/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
+import { contractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance } from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
@@ -36,9 +37,9 @@ jest.mock('src/transactions/send', () => ({
 }))
 
 jest.mock('src/web3/contracts', () => {
-  const contractKit = require('@celo/contractkit')
+  const ck = require('@celo/contractkit').newKitFromWeb3
   return {
-    contractKit: contractKit.newKitFromWeb3(),
+    contractKit: ck(),
     web3: {
       eth: {
         accounts: {
@@ -157,9 +158,16 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but no money on key', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(0)) // temp account
-      .mockReturnValueOnce(new BigNumber(0)) // current account
+    const stableToken = await contractKit.contracts.getStableToken()
+    const ret = new Promise<BigNumber>((resolve) => {
+      console.log('hiii')
+      resolve(new BigNumber(0))
+    })
+    const mock = jest.fn()
+    stableToken.balanceOf = mock
+    mock
+      .mockReturnValueOnce(ret) // temp account
+      .mockReturnValueOnce(ret) // current account
 
     await expectSaga(watchRedeemInvite)
       .provide([
