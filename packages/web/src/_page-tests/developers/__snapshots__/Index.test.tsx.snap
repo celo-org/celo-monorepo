@@ -3555,6 +3555,7 @@ exports[`DevelopersPage renders 1`] = `
               "alignSelf": "center",
               "flexDirection": "row",
               "flexWrap": "wrap",
+              "marginBottom": "50px",
               "maxWidth": "100vw",
               "msFlexDirection": "row",
               "msFlexItemAlign": "center",

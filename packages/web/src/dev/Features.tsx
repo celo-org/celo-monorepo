@@ -33,7 +33,12 @@ export default withNamespaces('dev')(
                 <H3 style={textStyles.invert}>{t('featureTitle')}</H3>
               </Cell>
             </GridRow>
-            <GridRow allStyle={{ flexWrap: 'wrap' }} mobileStyle={styles.featuresMobile}>
+            <GridRow
+              allStyle={styles.featuresContainer}
+              desktopStyle={standardStyles.sectionMarginBottom}
+              tabletStyle={standardStyles.sectionMarginBottomTablet}
+              mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.featuresMobile]}
+            >
               <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.stableValueCurrencies')}
@@ -99,4 +104,5 @@ const styles = StyleSheet.create({
   darkBackground: {
     backgroundColor: colors.dark,
   },
+  featuresContainer: { flexWrap: 'wrap' },
 })
