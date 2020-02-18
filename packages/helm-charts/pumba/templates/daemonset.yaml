@@ -11,13 +11,19 @@ spec:
       name: {{ .Release.Namespace }}-pumba
     spec:
       containers:
-      - image: gaiaadm/pumba:master
+      - image: gaiaadm/pumba:0.7.0
         imagePullPolicy: Always
         name: pumba-delay
         # Pumba command: modify it to suite your needs
         # Currently: randomly try to kill some container every 3 minutes
         args:
+        # - --label
+        # - io.kubernetes.pod.name=faulty1-validators-0
+        # - --label
+        # - io.kubernetes.pod.namespace=faulty1
         - --random
+        - --log-level
+        - debug
         - --interval
         - {{ .Values.pumba.interval | quote }}
         - netem
@@ -40,13 +46,19 @@ spec:
         volumeMounts:
           - name: dockersocket
             mountPath: /var/run/docker.sock
-      - image: gaiaadm/pumba:master
+      - image: gaiaadm/pumba:0.7.0
         imagePullPolicy: Always
         name: pumba-loss
         # Pumba command: modify it to suite your needs
         # Currently: randomly try to kill some container every 3 minutes
         args:
+        # - --label
+        # - io.kubernetes.pod.name=faulty1-validators-0
+        # - --label
+        # - io.kubernetes.pod.namespace=faulty1
         - --random
+        - --log-level
+        - debug
         - --interval
         - {{ .Values.pumba.interval | quote }}
         - netem
@@ -67,13 +79,19 @@ spec:
         volumeMounts:
           - name: dockersocket
             mountPath: /var/run/docker.sock
-      - image: gaiaadm/pumba:master
+      - image: gaiaadm/pumba:0.7.0
         imagePullPolicy: Always
         name: pumba-rate
         # Pumba command: modify it to suite your needs
         # Currently: randomly try to kill some container every 3 minutes
         args:
+        # - --label
+        # - io.kubernetes.pod.name=faulty1-validators-0
+        # - --label
+        # - io.kubernetes.pod.namespace=faulty1
         - --random
+        - --log-level
+        - debug
         - --interval
         - {{ .Values.pumba.interval | quote }}
         - netem
