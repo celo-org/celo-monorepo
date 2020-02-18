@@ -7504,7 +7504,7 @@ exports[`Community renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                     data-focusable={true}
                     dir="auto"
-                    href="https://twitter.com/@celoHQ"
+                    href="https://twitter.com/@celoOrg"
                     role="link"
                     style={
                       Object {
@@ -7520,7 +7520,7 @@ exports[`Community renders 1`] = `
                       }
                     }
                   >
-                    @celoHQ
+                    @celoOrg
                   </a>
                 </div>
               </div>

@@ -60,11 +60,12 @@ export class ImportWallet extends React.Component<Props, State> {
   }
 
   checkCleanBackupPhrase() {
-    if (this.props.navigation.getParam('clean')) {
+    const { navigation } = this.props
+    if (navigation && navigation.getParam('clean')) {
       this.setState({
         backupPhrase: '',
       })
-      this.props.navigation.setParams({ clean: false })
+      navigation.setParams({ clean: false })
     }
   }
 
