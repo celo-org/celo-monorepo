@@ -15,6 +15,10 @@ export const menuItems = {
     name: 'Build',
     link: '/build',
   },
+  VALIDATORS_LIST: {
+    name: 'Validators List',
+    link: '/build/validators',
+  },
   BRAND: {
     name: 'Experience - Brand Kit',
     link: '/experience/brand',
