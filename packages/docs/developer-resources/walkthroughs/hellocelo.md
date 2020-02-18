@@ -37,25 +37,17 @@ We will be writing our Node.js app in the `helloCello.js` file.
 
 Importing the contract kit into our script is as easy as
 
-{% tabs %}
-{% tab title="helloCelo.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 ```
-{% endtab %}
-{% endtabs %}
 
 Now we can use the Kit to connect to the network.
 
-{% tabs %}
-{% tab title="helloCelo.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 
 const kit = Kit.newKit('https://alfajores-forno.celo-testnet.org')
 ```
-{% endtab %}
-{% endtabs %}
 
 {% hint style="info" %}
 At any point in the file you can `console.log()` variables to print their output when you run the script.
@@ -69,20 +61,14 @@ The Celo blockchain has two native assets, Celo Gold \(cGLD\) and the Celo Dolla
 
 Let's read some token balances from the blockchain. The cGLD asset is managed by the Celo Gold smart contract. We can access the gold contract with the SDK with `kit.contracts.getGoldToken()`. This function returns a promise, so we have to wait for it to resolve before we can interact with the gold token contract. If you are unfamiliar with Promises in Javascript, [check out this documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) Promises are a common tool in blockchain development. In this guide, we use the [async/await syntax for promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await). 
 
-{% tabs %}
-{% tab title="helloCelo.js" %}
 ```javascript
 let goldtoken = await kit.contracts.getGoldToken()
 ```
-{% endtab %}
-{% endtabs %}
 
 Adding this code to `helloCello.js` and running it will print the Gold Token Wrapper provided by ContractKit.
 
 We can get the cGLD balance of an account using the gold token wrapper with `goldtoken.balanceOf(address)`. Let's check the balance of this address `'0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'`
 
-{% tabs %}
-{% tab title="helloCelo.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 
@@ -98,8 +84,6 @@ async function awaitWrapper(){
 
 awaitWrapper()
 ```
-{% endtab %}
-{% endtabs %}
 
 The `balanceOf(address)` function also returns a Promise, so we wait for the promise to resolve then we print the result.
 
@@ -129,8 +113,6 @@ This is not the standard way of managing Celo accounts. In a production environm
 
 We can now use this `account` to get account information \(ie the private key and account address\) and to send transactions from `account.address`. We can read the account balance:
 
-{% tabs %}
-{% tab title="helloCello.js" %}
 ```javascript
 // add the following line to the top of your helloCelo.js
 const getAccount = require('./getAccount').getAccount
@@ -146,8 +128,6 @@ async function awaitWrapper(){
 
 awaitWrapper()
 ```
-{% endtab %}
-{% endtabs %}
 
 This will print `0`, as we have not funded the associated account yet.
 
@@ -171,8 +151,6 @@ After we read the receipt, we check the balance of our account again, using the 
 
 You may notice that the account balance is a bit smaller than the amount of tokens that we sent. This is because you have to pay for every update to the network.
 
-{% tabs %}
-{% tab title="helloCelo.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 const getAccount = require('./getAccount').getAccount
@@ -195,8 +173,6 @@ async function awaitWrapper(){
 
 awaitWrapper()
 ```
-{% endtab %}
-{% endtabs %}
 
 ## Wrapping Up
 

@@ -29,51 +29,28 @@ To interact with cUSD, is the same but with a different contract:
 const stabletoken = await kit.contract.getStableToken()
 ```
 
-## Interacting with Other Contracts
+## Interacting with Other Celo Contracts
 
 Apart from GoldToken and StableToken, there are many core contracts.
 
 For the moment, we have contract wrappers for:
 
 - Accounts
-- Exchange (Uniswap kind exchange between Gold and Stable tokens)
-- Validators
-- LockedGold
-- StableToken
-- Attestation
-
-In the following weeks, we will add some wrappers for all other contracts
-
-## Accessing web3 contract wrappers
-
-Some user might want to access web3 native contract wrappers.
-
-To do so, you can:
-
-```ts
-const web3Exchange = await kit._web3Contracts.getExchange()
-```
-
-We expose native wrappers for all Celo core contracts.
-
-The complete list of Celo Core contracts is:
-
-- Accounts
 - Attestations
-- LockedGold
+- BlockchainParameters
+- DobleSigningSlasher
+- DowntimeSlasher
+- Election
 - Escrow
-- Exchange
-- FeeCurrencyWhitelist
+- Exchange (Uniswap kind exchange between Gold and Stable tokens)
 - GasPriceMinimum
 - GoldToken
-- Governance
-- MultiSig
-- Random
-- Registry
+- Gobernance
+- LockedGold
 - Reserve
 - SortedOracles
-- StableToken
 - Validators
+- StableToken
 
 ## A Note About Contract Addresses
 
@@ -86,6 +63,42 @@ We expose the registry api, which can be accessed by:
 const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
 ```
 
+## Accessing web3 contract wrappers
+
+Some user might want to access web3 native contract wrappers.
+*We encourage to use the Celo contracts instead to avoid mistakes.*
+
+To do so, you can:
+
+```ts
+const web3Exchange = await kit._web3Contracts.getExchange()
+```
+
+We expose native wrappers for all Web3 contracts.
+
+The complete list is:
+
+- Accounts
+- Attestations
+- BlockchainParameters
+- DoubleSigningSlasher
+- DowntimeSlasher
+- Election
+- EpochRewards
+- Escrow
+- Exchange
+- FeeCurrencyWhiteList
+- GasPriceMinimum
+- GoldToken
+- Governance
+- LockedGold
+- Random
+- Registry
+- Reserve
+- SortedOracles
+- StableToken
+- Validators
+
 ## Sending Custom Transactions
 
 Celo transaction object is not the same as Ethereum's. There are three new fields present:
@@ -94,7 +107,7 @@ Celo transaction object is not the same as Ethereum's. There are three new field
 - gatewayFeeRecipient (coinbase address of the full serving the light client's trasactions)
 - gatewayFee (value paid to the gateway fee recipient, denominated in the fee currency)
 
-This means that using `web3.eth.sendTransaction` or `myContract.methods.transfer().send()` should be avoided.
+This means that using `web3.eth.sendTransaction` or `myContract.methods.transfer().send()` should be **avoided**.
 
 Instead, `kit` provides an utility method to send transaction in both scenarios. **If you use contract wrappers, there is no need to use this.**
 

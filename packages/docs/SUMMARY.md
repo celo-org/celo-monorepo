@@ -65,9 +65,9 @@
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
-  - [Building a dApp with Contracts on Celo]()
+  <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview]()
-  - [The Celo Protocol]()
+  <!-- - [The Celo Protocol]()
     - [Architecture]()
     - [Similarities with Ethereum]()
     - [Difference between Ethereum and Celo]()
@@ -79,52 +79,32 @@
         - [fees in dollars- link to Paying for Gas in Tokens]()
       - [Development Differences]()
     - [dApps on Celo]()
-      - [What is a dApp?]()
+      - [What is a dApp?]() -->
   - [The Celo SDK](developer-resources/introduction.md)
-    - [Architecture]()
+    <!-- - [Architecture]() -->
     - [ContractKit](developer-resources/contractkit/README.md)
-      - [What you can do with it](developer-resources/contrackit/what-you-can-do.rm)
       - [Setup](developer-resources/contractkit/setup.md)
-      - [Using Web3 with ContractKit](developer-resources/contractkit/web3-with-contractkit.md)
-        - [Local Signing problem](developer-resources/contractkit/local-signing.md)
-      - [Celo Core Contracts . Wrappers / Registry]()
-      - [Examples for all wrappers](developer-resources/contractkit/examples.md)
-    - [Forno]()
-      - [What it is / URLs]()
-      - [Example of querying (web3, kit)]()
-      - [Example of sending tx (kit)]()
-    - [Using Truffle]()
+      - [Using the kit](developer-resources/contractkit/usage.md)
+      - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
+      - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
+    - [Forno](developer-resources/forno/README.md)
+      <!-- - [Example of querying (web3, kit)]()
+      - [Example of sending tx (kit)]() -->
+    <!-- - [Using Truffle]()
       - [Setting up a Local node]()
-      - [Option: Using CeloProvider with Truffle]()
-    - [dAppKit](developer-resources/dappkit/README.md)
-      - [Going mobile first (true decentralization)]()
-      - [dApps and Wallets - Signing Transactions]()
+      - [Option: Using CeloProvider with Truffle]() -->
+    - [DAppKit](developer-resources/dappkit/README.md)
+      <!-- - [Going mobile first (true decentralization)]()
+      - [dApps and Wallets - Signing Transactions]() -->
       - [Setup](developer-resources/dappkit/setup.md)
-        - [React Native]()
-        - [Expo]()
-    - [Guide to Asset Custody]()
+        <!-- - [React Native]()
+        - [Expo]() -->
+      - [Usage](developer-resources/dappkit/usage.md)
+    <!-- - [Guide to Asset Custody]() -->
   - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
-- [Reference](developer-resources/contractkit/reference/SUMMARY.md)
-<!--- contractkit-reference-start --->
-<!--- contractkit-reference-start --->
-
-<!---
-## Celo SDK
-
--- [Introduction](developer-resources/introduction.md)
--- [DAppKit](developer-resources/dappkit/README.md)
-  -- [Getting Started](developer-resources/dappkit/setup.md)
-  - [Usage](developer-resources/dappkit/usage.md)
--- [ContractKit](developer-resources/contractkit/README.md)
-  -- [Getting Started](developer-resources/contractkit/setup.md)
-  -- [Examples](developer-resources/contractkit/examples.md)
--- [Walkthroughs](developer-resources/walkthroughs/README.md)
-  -- [Hello Celo: sending value with Celo](developer-resources/walkthroughs/hellocelo.md)
-  -- [Hello Contracts: writing and deploying Celo contracts](developer-resources/walkthroughs/hellocontracts.md)
-  -- [Building a dApp on Celo](developer-resources/walkthroughs/hellodapp.md)
-  -- [Deploying an Ethereum project to Celo](developer-resources/walkthroughs/hellodeploy.md)
--- [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
---->
+  - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
+<!-- contractkit-reference-start -->
+<!-- contractkit-reference-start -->
 
 ## Command Line Interface
 
