@@ -10,6 +10,7 @@ import {
   spawn,
   take,
   takeEvery,
+  takeLatest,
   takeLeading,
 } from 'redux-saga/effects'
 import {
@@ -22,7 +23,7 @@ import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { Actions as AppActions, SetLanguage } from 'src/app/actions'
+import { Actions as AppActions, SetFigureEightAccount, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import { updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
@@ -39,6 +40,7 @@ import {
   initializeAuth,
   initializeCloudMessaging,
   paymentRequestWriter,
+  setFigureEightUserId,
   setUserLanguage,
 } from 'src/firebase/firebase'
 import Logger from 'src/utils/Logger'
@@ -230,8 +232,18 @@ export function* syncLanguageSelection({ language }: SetLanguage) {
   }
 }
 
+function* setFigureEightUserIdSaga({ userId }: SetFigureEightAccount) {
+  Logger.debug(TAG, 'setFigureEightUserIdSaga')
+  const account = yield select(currentAccountSelector)
+  yield call(setFigureEightUserId, userId, account)
+}
+
 export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
+}
+
+export function* watchFigureEightAccount() {
+  yield takeLatest(AppActions.SET_FIGURE_EIGHT_ACCOUNT, setFigureEightUserIdSaga)
 }
 
 export function* watchWritePaymentRequest() {
@@ -301,6 +313,7 @@ export function* subscribeToCeloGoldExchangeRateHistory() {
 export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
+  yield spawn(watchFigureEightAccount)
   yield spawn(subscribeToIncomingPaymentRequests)
   yield spawn(subscribeToOutgoingPaymentRequests)
   yield spawn(subscribeToCeloGoldExchangeRateHistory)

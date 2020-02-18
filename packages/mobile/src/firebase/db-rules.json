@@ -28,6 +28,10 @@
       ".write": true,
       ".indexOn": ["requesterAddress", "requesteeAddress"]
     },
+    "earnPilot": {
+      ".read": true,
+      ".write": true
+    },
     "exchangeRates": {
       ".read": true,
       ".write": false,

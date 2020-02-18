@@ -220,3 +220,20 @@ export async function setUserLanguage(address: string, language: string) {
     throw error
   }
 }
+
+export async function setFigureEightUserId(userId: string, account: string) {
+  try {
+    Logger.info(TAG, `Setting userId for user ${userId}`)
+    const database = firebase.database().ref()
+    Logger.info(TAG, `Setting userId for user ${JSON.stringify(database)}`)
+    await database
+      .child('earnPilot')
+      .child('participants')
+      .child(userId)
+      .update({ account })
+    Logger.info(TAG, 'UserId and account synced successfully', userId)
+  } catch (error) {
+    Logger.error(TAG, 'Failed to sync userId', error)
+    throw error
+  }
+}
