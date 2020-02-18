@@ -10,7 +10,7 @@ const TestedWrappers: ValidWrappers[] = [
 ]
 
 function newWrapperCache() {
-  const kit = newKit('')
+  const kit = newKit('http://localhost:8545')
   const AnyContractAddress = '0xe832065fb5117dbddcb566ff7dc4340999583e38'
   jest.spyOn(kit.registry, 'addressFor').mockResolvedValue(AnyContractAddress)
   const contractCache = new WrapperCache(kit)
