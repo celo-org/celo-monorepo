@@ -237,15 +237,15 @@ library FixidityLib {
     x1y1 = fixed_x1y1;
 
     uint256 x2y1 = x2 * y1;
-    if (x2 != 0) require(x2y1 / x2 == y1, "overflow x2y1 detected"); 
+    if (x2 != 0) require(x2y1 / x2 == y1, "overflow x2y1 detected");
 
     uint256 x1y2 = x1 * y2;
-    if (x1 != 0) require(x1y2 / x1 == y2, "overflow x1y2 detected"); 
+    if (x1 != 0) require(x1y2 / x1 == y2, "overflow x1y2 detected");
 
     x2 = x2 / mulPrecision();
     y2 = y2 / mulPrecision();
     uint256 x2y2 = x2 * y2;
-    if (x2 != 0) require(x2y2 / x2 == y2, "overflow x2y2 detected"); 
+    if (x2 != 0) require(x2y2 / x2 == y2, "overflow x2y2 detected");
 
     // result = fixed1() * x1 * y1 + x1 * y2 + x2 * y1 + x2 * y2 / fixed1();
     Fraction memory result = Fraction(x1y1);
