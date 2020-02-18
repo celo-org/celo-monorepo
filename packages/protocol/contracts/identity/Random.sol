@@ -95,7 +95,7 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
    */
   function addRandomness(uint256 blockNumber, bytes32 randomness) internal {
     history[blockNumber] = randomness;
-    if ((blockNumber + 1) % getEpochSize() == 0) {
+    if (blockNumber % getEpochSize() == 0) {
       if (lastEpochBlock < historyFirst) {
         delete history[lastEpochBlock];
       }
@@ -105,18 +105,12 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
         historyFirst = blockNumber;
         historySize = 1;
       } else if (historySize > randomnessBlockRetentionWindow) {
-        if (historyFirst != lastEpochBlock) {
-          delete history[historyFirst];
-        }
-        if (historyFirst + 1 != lastEpochBlock) {
-          delete history[historyFirst + 1];
-        }
+        deleteHistoryIfNotLastEpochBlock(historyFirst);
+        deleteHistoryIfNotLastEpochBlock(historyFirst + 1);
         historyFirst += 2;
         historySize--;
       } else if (historySize == randomnessBlockRetentionWindow) {
-        if (historyFirst != lastEpochBlock) {
-          delete history[historyFirst];
-        }
+        deleteHistoryIfNotLastEpochBlock(historyFirst);
         historyFirst++;
       } else {
         // historySize < randomnessBlockRetentionWindow
@@ -167,5 +161,11 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
       "Cannot query randomness older than the stored history"
     );
     return history[blockNumber];
+  }
+
+  function deleteHistoryIfNotLastEpochBlock(uint256 blockNumber) internal {
+    if (blockNumber != lastEpochBlock) {
+      delete history[blockNumber];
+    }
   }
 }

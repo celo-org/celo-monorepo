@@ -114,7 +114,7 @@ contract('Random', (accounts: string[]) => {
       const retentionWindow = 5
       beforeEach(async () => {
         const epochNumber = await currentEpochNumber(web3)
-        currentBlock = (epochNumber + 1) * EPOCH - 1
+        currentBlock = (epochNumber + 1) * EPOCH
         await timeTravel(currentBlock, web3)
 
         await random.setRandomnessBlockRetentionWindow(retentionWindow)
@@ -122,7 +122,7 @@ contract('Random', (accounts: string[]) => {
         // Then it should add randomness for all of epoch i+1's blocks (including its last)
         // This should overlap the original lastEpochBlock.
         for (let i = 0; i <= EPOCH; i++) {
-          if ((currentBlock + 1) % EPOCH === 0) {
+          if (currentBlock % EPOCH === 0) {
             lastEpochBlock = currentBlock
             await random.addTestRandomness(currentBlock, randomValues[1])
           } else {
