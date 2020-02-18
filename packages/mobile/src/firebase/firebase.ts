@@ -18,6 +18,8 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'firebase/firebase'
 
+const EARN_PILOT_DB = 'earnPilot/participants'
+
 // only exported for testing
 export function* watchFirebaseNotificationChannel(
   channel: EventChannel<{ notification: Notification; stateType: NotificationReceiveState }>
@@ -227,7 +229,7 @@ export async function setFigureEightUserId(userId: string, account: string) {
     const database = firebase.database().ref()
     Logger.info(TAG, `Setting userId for user ${JSON.stringify(database)}`)
     await database
-      .child('earnPilot/participants')
+      .child(EARN_PILOT_DB)
       .child(userId)
       .update({ account })
     Logger.info(TAG, 'UserId and account synced successfully', userId)
@@ -240,7 +242,9 @@ export async function setFigureEightUserId(userId: string, account: string) {
 export async function doRefreshFigureEightEarned(userId: string) {
   const result = await firebase
     .database()
-    .ref('earnPilot/participants/' + userId + '/earned')
+    .ref(EARN_PILOT_DB)
+    .child(userId)
+    .child('earned')
     .once('value')
   return result.val()
 }

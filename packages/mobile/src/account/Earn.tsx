@@ -1,5 +1,4 @@
 import { RootState } from '@celo/mobile/src/redux/reducers'
-import LanguageSelectUI from '@celo/react-components/components/LanguageSelectUI'
 import TextButton from '@celo/react-components/components/TextButton'
 import TextInput from '@celo/react-components/components/TextInput'
 import colors from '@celo/react-components/styles/colors'
@@ -7,19 +6,13 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { refreshFigureEightEarned, setFigureEightAccount } from 'src/app/actions'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import logo from 'src/images/celo-logo.png'
-import { Screens } from 'src/navigator/Screens'
-import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import Logger from 'src/utils/Logger'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Namespaces, withTranslation } from 'src/i18n'
+import { navigateHome } from 'src/navigator/NavigationService'
 
 interface StateProps {
   figureEightEarned: number | null
@@ -52,11 +45,10 @@ export class Earn extends React.Component<Props, State> {
 
   onSubmitUserId = () => {
     if (this.state.userId) {
-      Logger.debug(`Setting userId: ${this.state.userId}`)
       this.props.setFigureEightAccount(this.state.userId)
       this.props.refreshFigureEightEarned()
     } else {
-      this.props.showError(ErrorMessages.INCORRECT_PIN) // TODO right error
+      this.props.showError(ErrorMessages.INVALID_FIGURE_EIGHT_USER_ID)
     }
   }
 
