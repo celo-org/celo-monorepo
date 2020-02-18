@@ -15,7 +15,7 @@ contract Random is IRandom, Ownable, Initializable {
   /* Stores most recent commitment per address */
   mapping(address => bytes32) public commitments;
 
-  uint256 public randomnessBlockRetentionWindow = 256;
+  uint256 public randomnessBlockRetentionWindow;
 
   mapping(uint256 => bytes32) private history;
   uint256 private historyFirst;
