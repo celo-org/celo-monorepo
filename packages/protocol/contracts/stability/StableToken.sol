@@ -274,6 +274,7 @@ contract StableToken is
     require(units <= balances[msg.sender], "value exceeded balance of sender");
     totalSupply_ = totalSupply_.sub(units);
     balances[msg.sender] = balances[msg.sender].sub(units);
+    emit Transfer(msg.sender, address(0), units);
     return true;
   }
 
@@ -491,6 +492,7 @@ contract StableToken is
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.sub(units);
     balances[from] = balances[from].sub(units);
+    emit Transfer(from, address(0), value);
   }
 
   /**
@@ -504,6 +506,7 @@ contract StableToken is
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
+    emit Transfer(address(0), to, value);
   }
 
   /**
