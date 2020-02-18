@@ -4,6 +4,7 @@
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import { NULL_ADDRESS } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -12,7 +13,6 @@ import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
-import { NULL_ADDRESS } from '@celo/utils/src/address'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
