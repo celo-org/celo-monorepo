@@ -10,6 +10,7 @@ export interface State {
   doingPinVerification: boolean
   analyticsEnabled: boolean
   figureEightUserId: string | null
+  figureEightEarned: number | null
 }
 
 const initialState = {
@@ -21,6 +22,7 @@ const initialState = {
   doingPinVerification: false,
   analyticsEnabled: true,
   figureEightUserId: null,
+  figureEightEarned: null,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -58,6 +60,11 @@ export const appReducer = (
         ...state,
         figureEightUserId: action.userId,
       }
+    case Actions.SET_FIGURE_EIGHT_EARNED:
+      return {
+        ...state,
+        figureEightEarned: action.amount,
+      }
     case Actions.RESET_APP_OPENED_STATE:
       return {
         ...state,
@@ -94,3 +101,5 @@ export const appReducer = (
       return state
   }
 }
+
+export const figureEightUserIdSelector = (state: RootState) => state.app.figureEightUserId

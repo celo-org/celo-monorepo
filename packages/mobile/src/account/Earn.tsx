@@ -12,8 +12,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { setFigureEightAccount } from 'src/app/actions'
-import { AVAILABLE_LANGUAGES } from 'src/config'
+import { refreshFigureEightEarned, setFigureEightAccount } from 'src/app/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import logo from 'src/images/celo-logo.png'
 import { Screens } from 'src/navigator/Screens'
@@ -21,16 +20,27 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Logger from 'src/utils/Logger'
 
+interface StateProps {
+  figureEightEarned: number | null
+}
+
 interface State {
   userId: string | null
 }
 
 interface DispatchProps {
   setFigureEightAccount: typeof setFigureEightAccount
+  refreshFigureEightEarned: typeof refreshFigureEightEarned
   showError: typeof showError
 }
 
-type Props = DispatchProps & WithTranslation
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    figureEightEarned: state.app.figureEightEarned,
+  }
+}
+
+type Props = DispatchProps & WithTranslation & StateProps
 
 export class Earn extends React.Component<Props, State> {
   state = {
@@ -41,6 +51,7 @@ export class Earn extends React.Component<Props, State> {
     if (this.state.userId) {
       Logger.debug(`Setting userId: ${this.state.userId}`)
       this.props.setFigureEightAccount(this.state.userId)
+      this.props.refreshFigureEightEarned()
     } else {
       this.props.showError(ErrorMessages.INCORRECT_PIN) // TODO right error
     }
@@ -48,6 +59,10 @@ export class Earn extends React.Component<Props, State> {
 
   onChangeInput = (userId: string) => {
     this.setState({ userId })
+  }
+
+  componentDidMount = () => {
+    this.props.refreshFigureEightEarned()
   }
 
   render() {
@@ -66,15 +81,18 @@ export class Earn extends React.Component<Props, State> {
         />
         <TextButton onPress={this.onSubmitUserId}>{'Submit'}</TextButton>
         <Text style={fontStyles.body}>{this.state.userId}</Text>
+        <Text style={fontStyles.body}>{this.props.figureEightEarned}</Text>
       </ScrollView>
     )
   }
 }
 
 export default componentWithAnalytics(
-  connect<any, DispatchProps, {}, RootState>(null, { setFigureEightAccount, showError })(
-    withTranslation(Namespaces.accountScreen10)(Earn)
-  )
+  connect<any, DispatchProps, {}, RootState>(mapStateToProps, {
+    refreshFigureEightEarned,
+    setFigureEightAccount,
+    showError,
+  })(withTranslation(Namespaces.accountScreen10)(Earn))
 )
 
 const style = StyleSheet.create({
