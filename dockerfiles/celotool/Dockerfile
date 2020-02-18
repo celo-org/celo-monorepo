@@ -35,7 +35,7 @@ COPY packages/protocol packages/protocol/
 COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
-RUN touch .env.alfajoresstaging && yarn build && rm -rf .env.alfajoresstaging
+RUN yarn build
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
