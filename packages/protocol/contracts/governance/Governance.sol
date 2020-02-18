@@ -213,27 +213,16 @@ contract Governance is
     uint256 baselineUpdateFactor,
     uint256 baselineQuorumFactor
   ) external initializer {
-    require(
-      _approver != address(0) &&
-        _concurrentProposals != 0 &&
-        _minDeposit != 0 &&
-        _queueExpiry != 0 &&
-        _dequeueFrequency != 0 &&
-        approvalStageDuration != 0 &&
-        referendumStageDuration != 0 &&
-        executionStageDuration != 0,
-      "Bad input"
-    );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    approver = _approver;
-    concurrentProposals = _concurrentProposals;
-    minDeposit = _minDeposit;
-    queueExpiry = _queueExpiry;
-    dequeueFrequency = _dequeueFrequency;
-    stageDurations.approval = approvalStageDuration;
-    stageDurations.referendum = referendumStageDuration;
-    stageDurations.execution = executionStageDuration;
+    setApprover(_approver);
+    setConcurrentProposals(_concurrentProposals);
+    setMinDeposit(_minDeposit);
+    setQueueExpiry(_queueExpiry);
+    setDequeueFrequency(_dequeueFrequency);
+    setApprovalStageDuration(approvalStageDuration);
+    setReferendumStageDuration(referendumStageDuration);
+    setExecutionStageDuration(executionStageDuration);
     setParticipationBaseline(participationBaseline);
     setParticipationFloor(participationFloor);
     setBaselineUpdateFactor(baselineUpdateFactor);

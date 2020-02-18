@@ -69,7 +69,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    unlockingPeriod = _unlockingPeriod;
+    setUnlockingPeriod(_unlockingPeriod);
   }
 
   /**
