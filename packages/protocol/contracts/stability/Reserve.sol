@@ -310,7 +310,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function getReserveGoldBalance() public view returns (uint256) {
-    return address(this).balance + getOtherReserveAddressesGoldBalance();
+    return address(this).balance.add(getOtherReserveAddressesGoldBalance());
   }
 
   function getOtherReserveAddressesGoldBalance() public view returns (uint256) {
@@ -322,17 +322,17 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function getUnfrozenReserveGoldBalance() public view returns (uint256) {
-    return getUnfrozenBalance() + getOtherReserveAddressesGoldBalance();
+    return getUnfrozenBalance().add(getOtherReserveAddressesGoldBalance());
   }
 
   function getFrozenReserveGoldBalance() public view returns (uint256) {
     uint256 currentDay = now / 1 days;
-    uint256 frozenDays = currentDay - frozenReserveGoldStartDay;
+    uint256 frozenDays = currentDay.sub(frozenReserveGoldStartDay);
     if (frozenDays >= frozenReserveGoldDays) return 0;
     return
-      frozenReserveGoldStartBalance -
-      (frozenReserveGoldStartBalance * frozenDays) /
-      frozenReserveGoldDays;
+      frozenReserveGoldStartBalance.sub(
+        frozenReserveGoldStartBalance.mul(frozenDays).div(frozenReserveGoldDays)
+      );
   }
 
   /*
