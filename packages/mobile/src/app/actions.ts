@@ -21,6 +21,7 @@ export enum Actions {
   NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
   START_PIN_VERIFICATION = 'APP/START_PIN_VERIFICATION',
   FINISH_PIN_VERIFICATION = 'APP/FINISH_PIN_VERIFICATION',
+  SET_FIGURE_EIGHT_ACCOUNT = 'APP/SET_FIGURE_EIGHT_ACCOUNT',
 }
 
 interface SetLoggedIn {
@@ -36,6 +37,11 @@ interface SetNumberVerifiedAction {
 export interface SetLanguage {
   type: Actions.SET_LANGUAGE
   language: string
+}
+
+export interface SetFigureEightAccount {
+  type: Actions.SET_FIGURE_EIGHT_ACCOUNT
+  userId: string
 }
 
 export interface OpenDeepLink {
@@ -86,6 +92,7 @@ export type ActionTypes =
   | NavigatePinProtected
   | StartPinVerification
   | FinishPinVerification
+  | SetFigureEightAccount
 
 export const setLoggedIn = (loggedIn: boolean) => ({
   type: Actions.SET_LOGGED_IN,
@@ -111,6 +118,11 @@ export const setLanguage = (language: string, nextScreen?: Screens) => {
     language,
   }
 }
+
+export const setFigureEightAccount = (userId: string) => ({
+  type: Actions.SET_FIGURE_EIGHT_ACCOUNT,
+  userId,
+})
 
 export const openDeepLink = (deepLink: string) => {
   return {
