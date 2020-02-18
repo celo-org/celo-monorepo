@@ -33,57 +33,50 @@ export default withNamespaces('dev')(
                 <H3 style={textStyles.invert}>{t('featureTitle')}</H3>
               </Cell>
             </GridRow>
-            <GridRow mobileStyle={styles.featuresMobile}>
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+            <GridRow allStyle={{ flexWrap: 'wrap' }} mobileStyle={styles.featuresMobile}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.stableValueCurrencies')}
                   graphic={stableImg}
                   text={t('feat.stableText')}
                 />
               </Cell>
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature title={t('feat.phonePKI')} graphic={pkiImg} text={t('feat.pkiText')} />
               </Cell>
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature title={t('feat.onChainGov')} graphic={govImg} text={t('feat.govText')} />
               </Cell>
-            </GridRow>
-            <GridRow>
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.selfCustody')}
                   graphic={custodyImg}
                   text={t('feat.custodyText')}
                 />
               </Cell>
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.proofOfStake')}
                   graphic={stakeImg}
                   text={t('feat.stakeText')}
                 />
               </Cell>
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.fastUltraLight')}
                   graphic={ultraImg}
                   text={t('feat.ultraText')}
                 />
               </Cell>
-            </GridRow>
-            <GridRow
-              desktopStyle={standardStyles.sectionMarginBottom}
-              tabletStyle={standardStyles.sectionMarginBottomTablet}
-              mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.featuresMobile]}
-            >
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.gasMultiCurrency')}
                   graphic={gasImg}
                   text={t('feat.gasText')}
                 />
               </Cell>
-              <Cell span={Spans.third} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.programmable')}
                   graphic={evmImg}
