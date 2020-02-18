@@ -23,8 +23,14 @@ import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { Actions as AppActions, SetFigureEightAccount, SetLanguage } from 'src/app/actions'
+import {
+  Actions as AppActions,
+  SetFigureEightAccount,
+  setFigureEightEarned,
+  SetLanguage,
+} from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { figureEightUserIdSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
 import { updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
 import { exchangeHistorySelector, ExchangeRate, MAX_HISTORY_RETENTION } from 'src/exchange/reducer'
@@ -37,6 +43,7 @@ import {
   UpdatePaymentRequestNotifiedAction,
 } from 'src/firebase/actions'
 import {
+  doRefreshFigureEightEarned,
   initializeAuth,
   initializeCloudMessaging,
   paymentRequestWriter,
@@ -238,12 +245,23 @@ function* setFigureEightUserIdSaga({ userId }: SetFigureEightAccount) {
   yield call(setFigureEightUserId, userId, account)
 }
 
+function* refreshFigureEightEarnedSaga() {
+  Logger.debug(TAG, 'setFigureEightUserIdSaga')
+  const userId = yield select(figureEightUserIdSelector)
+  const earned = yield call(doRefreshFigureEightEarned, userId)
+  yield put(setFigureEightEarned(earned))
+}
+
 export function* watchLanguage() {
   yield takeEvery(AppActions.SET_LANGUAGE, syncLanguageSelection)
 }
 
 export function* watchFigureEightAccount() {
   yield takeLatest(AppActions.SET_FIGURE_EIGHT_ACCOUNT, setFigureEightUserIdSaga)
+}
+
+export function* watchFigureEightEarned() {
+  yield takeLatest(AppActions.REFRESH_FIGURE_EIGHT_EARNED, refreshFigureEightEarnedSaga)
 }
 
 export function* watchWritePaymentRequest() {
@@ -314,6 +332,7 @@ export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
   yield spawn(watchFigureEightAccount)
+  yield spawn(watchFigureEightEarned)
   yield spawn(subscribeToIncomingPaymentRequests)
   yield spawn(subscribeToOutgoingPaymentRequests)
   yield spawn(subscribeToCeloGoldExchangeRateHistory)

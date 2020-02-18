@@ -227,8 +227,7 @@ export async function setFigureEightUserId(userId: string, account: string) {
     const database = firebase.database().ref()
     Logger.info(TAG, `Setting userId for user ${JSON.stringify(database)}`)
     await database
-      .child('earnPilot')
-      .child('participants')
+      .child('earnPilot/participants')
       .child(userId)
       .update({ account })
     Logger.info(TAG, 'UserId and account synced successfully', userId)
@@ -236,4 +235,12 @@ export async function setFigureEightUserId(userId: string, account: string) {
     Logger.error(TAG, 'Failed to sync userId', error)
     throw error
   }
+}
+
+export async function doRefreshFigureEightEarned(userId: string) {
+  const result = await firebase
+    .database()
+    .ref('earnPilot/participants/' + userId + '/earned')
+    .once('value')
+  return result.val()
 }
