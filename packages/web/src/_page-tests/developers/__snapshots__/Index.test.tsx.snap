@@ -3493,6 +3493,7 @@ exports[`DevelopersPage renders 1`] = `
               "WebkitFlexDirection": "column",
               "alignSelf": "center",
               "flexDirection": "column",
+              "marginBottom": "50px",
               "marginTop": "50px",
               "maxWidth": "100vw",
               "msFlexDirection": "column",

@@ -25,9 +25,9 @@ export default withNamespaces('dev')(
         <Fade bottom={true} distance={'40px'}>
           <View nativeID={hashNav.build.features}>
             <GridRow
-              desktopStyle={standardStyles.sectionMarginTop}
-              tabletStyle={standardStyles.sectionMarginTopTablet}
-              mobileStyle={standardStyles.sectionMarginTopMobile}
+              desktopStyle={standardStyles.sectionMargin}
+              tabletStyle={standardStyles.sectionMarginTablet}
+              mobileStyle={standardStyles.sectionMarginMobile}
             >
               <Cell span={Spans.full}>
                 <H3 style={textStyles.invert}>{t('featureTitle')}</H3>
