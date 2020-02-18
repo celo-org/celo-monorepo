@@ -72,11 +72,11 @@ export class Earn extends React.Component<Props, State> {
   }
 
   render() {
-    // const { t } = this.props
     const amountEarned = this.props.figureEightEarned || 0
     return (
       <ScrollView style={style.scrollView} keyboardShouldPersistTaps="handled">
         {this.props.figureEightUserId ? (
+          // Complete work when logged in
           <View>
             <Text style={fontStyles.body}>Work will go here</Text>
             <Text style={fontStyles.body}>User ID: {this.props.figureEightUserId}</Text>
@@ -85,14 +85,14 @@ export class Earn extends React.Component<Props, State> {
             <TextButton onPress={this.onSubmitLogout}>{'Log out'}</TextButton>
           </View>
         ) : (
-          // Log In to work
+          // Require log in before displaying work
           <View>
             <Text style={fontStyles.body}>Please enter your userId</Text>
             <TextInput
               onChangeText={this.onChangeInput}
               value={this.state.userId}
               style={style.inputField}
-              // placeholderTextColor={colors.inactive}
+              // placeholderTextColor={colors.inactive} // TODO(anna) styling
               // underlineColorAndroid="transparent"
               // enablesReturnKeyAutomatically={true}
               // placeholder={t('fullName')}
