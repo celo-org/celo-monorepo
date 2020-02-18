@@ -65,11 +65,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
               large={[styles.button, styles.disagreeButton]}
             >
               <View style={[styles.buttonMedium, styles.disagreeButton]} onClick={this.onDisagree}>
-                <Text style={[fonts.navigation, styles.buttonText]}>
-                  {t('cookiesDisagree')
-                    .toString()
-                    .toUpperCase()}
-                </Text>
+                <Text style={[fonts.navigation, styles.buttonText]}>{t('cookiesDisagree')}</Text>
               </View>
             </Responsive>
             <Responsive
@@ -77,11 +73,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
               large={[styles.button, styles.agreeButton]}
             >
               <View style={[styles.buttonMedium, styles.agreeButton]} onClick={this.onAgree}>
-                <Text style={[fonts.navigation, styles.buttonText]}>
-                  {t('cookiesAgree')
-                    .toString()
-                    .toUpperCase()}
-                </Text>
+                <Text style={[fonts.navigation, styles.buttonText]}>{t('cookiesAgree')}</Text>
               </View>
             </Responsive>
           </View>
@@ -95,7 +87,7 @@ const styles = StyleSheet.create({
   container: {
     bottom: 0,
     position: 'fixed',
-    backgroundColor: '#3C9BF4',
+    backgroundColor: colors.deepBlue,
     width: '100%',
     minHeight: CONSENT_HEIGHT,
     display: 'flex',
