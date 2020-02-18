@@ -15,6 +15,7 @@ import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
 import DollarEducation from 'src/account/DollarEducation'
+import Earn from 'src/account/Earn'
 import EditProfile from 'src/account/EditProfile'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
@@ -263,6 +264,7 @@ const SettingsStack = createStackNavigator(
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
     [Screens.FiatExchange]: { screen: FiatExchange },
+    [Screens.Earn]: { screen: Earn },
     ...verificationScreens,
   },
   {

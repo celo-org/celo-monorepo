@@ -27,6 +27,7 @@ export enum Screens {
   DappKitTxDataScreen = 'DappKitTxDataScreen',
   Debug = 'Debug',
   DollarEducation = 'DollarEducation',
+  Earn = 'Earn',
   EditProfile = 'EditProfile',
   EnterInviteCode = 'EnterInviteCode',
   ErrorScreen = 'ErrorScreen',
