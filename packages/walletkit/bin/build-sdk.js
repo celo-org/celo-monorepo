@@ -22,8 +22,13 @@ function getEnvFile(celoEnv) {
 }
 
 function isProduction(env) {
-  const envConfig = config({ path: getEnvFile(env) })
-  return envConfig.parsed['TESTNET_PROJECT_NAME'] === 'celo-testnet-production'
+  try {
+    const envConfig = config({ path: getEnvFile(env) })
+    return envConfig.parsed['TESTNET_PROJECT_NAME'] === 'celo-testnet-production'
+  } catch (e) {
+    console.log(`Error: `, e, `, setting isProduction = false`)
+    return false
+  }
 }
 
 // TODO(asa): Use @google-cloud/storage, tar-stream to do all of this directly in node
