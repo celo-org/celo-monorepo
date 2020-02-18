@@ -325,7 +325,11 @@ contract('StableToken', (accounts: string[]) => {
 
   describe('#fractionMulExp()', () => {
     it('can do generic computations', async () => {
-      const value = await stableToken.fractionMulExp.call(toFixed(1 / 2), toFixed(3 / 4), 5)
+      const [numerator, denominator] = await stableToken.fractionMulExp.call(1, 2, 3, 4, 5, 6)
+      assert.equal(numerator.toNumber(), 118652)
+      assert.equal(denominator.toNumber(), 1000000)
+
+      const value = await stableToken.mulExp.call(toFixed(1 / 2), toFixed(3 / 4), 5)
       assert.equal(
         fromFixed(value)
           .times(1000000)
@@ -336,7 +340,11 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('works with exponent zero', async () => {
-      const value = await stableToken.fractionMulExp.call(toFixed(1 / 2), toFixed(3 / 4), 0)
+      const [numerator, denominator] = await stableToken.fractionMulExp.call(1, 2, 3, 4, 0, 6)
+      assert.equal(numerator.toNumber(), 500000)
+      assert.equal(denominator.toNumber(), 1000000)
+
+      const value = await stableToken.mulExp.call(toFixed(1 / 2), toFixed(3 / 4), 0)
       assert.equal(
         fromFixed(value)
           .times(1000000)
@@ -344,6 +352,20 @@ contract('StableToken', (accounts: string[]) => {
           .toNumber(),
         500000
       )
+    })
+
+    it('works with precision zero', async () => {
+      const [numerator, denominator] = await stableToken.fractionMulExp.call(1, 2, 3, 4, 5, 0)
+      assert.equal(numerator.toNumber(), 0)
+      assert.equal(denominator.toNumber(), 1)
+    })
+
+    it('fails if a zero aDenominator is provided', async () => {
+      await assertRevert(stableToken.fractionMulExp(1, 0, 3, 4, 5, 6))
+    })
+
+    it('fails if a zero bDenominator is provided', async () => {
+      await assertRevert(stableToken.fractionMulExp(1, 2, 3, 0, 5, 6))
     })
   })
 
