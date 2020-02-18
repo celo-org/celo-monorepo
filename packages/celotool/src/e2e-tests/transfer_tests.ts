@@ -12,6 +12,7 @@ import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+import { NULL_ADDRESS } from '@celo/utils/src/address'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -338,6 +339,31 @@ describe('Transfer tests', function(this: any) {
     ok: boolean
     fees: Fees
     gas: GasUsage
+    events: any[]
+  }
+
+  const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+
+  function truncateTopic(hex: string) {
+    return '0x' + hex.substr(26)
+  }
+
+  function parseEvents(receipt: TransactionReceipt | undefined) {
+    if (!receipt) {
+      return []
+    }
+    if (receipt.events && receipt.events.Transfer) {
+      let events: any = receipt.events.Transfer
+      if (!(events instanceof Array)) {
+        events = [events]
+      }
+      return events.map((a: any) => ({ to: a.returnValues.to, from: a.returnValues.from }))
+    }
+    if (receipt.logs) {
+      return receipt.logs
+        .filter((a) => a.topics[0] === TRANSFER_TOPIC)
+        .map((a) => ({ to: truncateTopic(a.topics[2]), from: truncateTopic(a.topics[1]) }))
+    }
   }
 
   const runTestTransaction = async (
@@ -356,6 +382,8 @@ describe('Transfer tests', function(this: any) {
     } catch (err) {
       ok = false
     }
+
+    const events = parseEvents(receipt)
 
     if (receipt != null && receipt.gasUsed !== expectedGasUsed) {
       // tslint:disable-next-line: no-console
@@ -383,7 +411,7 @@ describe('Transfer tests', function(this: any) {
       used: receipt && receipt.gasUsed,
       expected: expectedGasUsed,
     }
-    return { ok, fees, gas }
+    return { ok, fees, gas, events }
   }
 
   function testTransferToken({
@@ -449,6 +477,13 @@ describe('Transfer tests', function(this: any) {
 
       it(`should increment the receiver's ${transferToken} balance by the transfer amount`, () =>
         assertEqualBN(balances.delta(ToAddress, transferToken), TransferAmount))
+
+      if (feeToken === CeloContract.StableToken) {
+        it('should have emitted transfer events for the fee token', () => {
+          assert(txRes.events.find((a) => a.to === NULL_ADDRESS))
+          assert(txRes.events.find((a) => a.from === NULL_ADDRESS))
+        })
+      }
 
       if (transferToken === feeToken) {
         it(`should decrement the sender's ${transferToken} balance by the transfer amount plus fees`, () => {
