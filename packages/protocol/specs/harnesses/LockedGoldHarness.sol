@@ -42,10 +42,6 @@ contract LockedGoldHarness is LockedGold {
     return balances[account].pendingWithdrawals.length + 2 >= 2; // we can add 2 more additional elements
   }
 
-  function pendingWithdrawalsNotFull(address account) public view returns (bool) {
-    return balances[account].pendingWithdrawals.length + 2 >= 2; // we can add 2 more additional elements
-  }
-
   function getPendingWithdrawalsLength(address account) external view returns (uint256) {
     uint256 length = balances[account].pendingWithdrawals.length;
     return length;
