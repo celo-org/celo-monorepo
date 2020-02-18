@@ -306,7 +306,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getUnfrozenBalance() public view returns (uint256) {
     uint256 balance = address(this).balance;
     uint256 frozenReserveGold = getFrozenReserveGoldBalance();
-    return balance > frozenReserveGold ? balance - frozenReserveGold : 0;
+    return balance > frozenReserveGold ? balance.sub(frozenReserveGold) : 0;
   }
 
   function getReserveGoldBalance() public view returns (uint256) {
