@@ -184,10 +184,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
       "Release schedule end time must be in the future"
     );
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
-    require(
-      initialDistributionPercentage >= 0 && initialDistributionPercentage <= 1000,
-      "Initial distribution percentage out of bounds"
-    );
+    require(initialDistributionPercentage <= 1000, "Initial distribution percentage out of bounds");
     require(
       (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
@@ -240,10 +237,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    *                               indicating % of total balance available for distribution.
    */
   function setMaxDistribution(uint256 distributionPercentage) external onlyReleaseOwner {
-    require(
-      distributionPercentage >= 0 && distributionPercentage <= 1000,
-      "Max distribution percentage must be within bounds"
-    );
+    require(distributionPercentage <= 1000, "Max distribution percentage must be within bounds");
     // If percentage is 100%, we set maxDistribution to maxUint to account for future rewards.
     if (distributionPercentage == 1000) {
       maxDistribution = ~uint256(0);
@@ -301,7 +295,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     uint256 revokerAmount = getRemainingUnlockedBalance();
     require(
       getGoldToken().transfer(refundAddress, revokerAmount),
-      "Transfer of gold to releaseOwner failed"
+      "Transfer of gold to refundAddress failed"
     );
     selfdestruct(refundAddress);
   }

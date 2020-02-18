@@ -59,13 +59,6 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
     bool _canVote
   ) external onlyOwner returns (address) {
     uint256 releaseGoldAmount = numReleasePeriods.mul(amountReleasedPerPeriod);
-    ReleaseGoldInstance.ReleaseSchedule storage rs = ReleaseGoldInstance.ReleaseSchedule(
-      releaseStartTime,
-      releaseCliffTime,
-      numReleasePeriods,
-      releasePeriod,
-      amountReleasedPerPeriod
-    );
     require(
       getGoldToken().balanceOf(address(this)) >= releaseGoldAmount,
       "Factory balance is insufficient to create requested release gold contract"
@@ -73,7 +66,11 @@ contract ReleaseGoldFactory is Initializable, UsingRegistry, IReleaseGoldFactory
 
     address newReleaseGoldInstance = address(
       new ReleaseGoldInstance(
-        rs,
+        releaseStartTime,
+        releaseCliffTime,
+        numReleasePeriods,
+        releasePeriod,
+        amountReleasedPerPeriod,
         revocable,
         beneficiary,
         releaseOwner,

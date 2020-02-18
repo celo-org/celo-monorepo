@@ -30,7 +30,6 @@ import {
   ReleaseGoldInstanceContract,
 } from 'types'
 import Web3 = require('web3')
-// TODO(lucas): rename to release_gold once approved
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
 
