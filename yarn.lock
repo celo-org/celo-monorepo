@@ -17994,7 +17994,7 @@ gitbook-plugin-lunr@^1.2.0:
     html-entities "1.2.0"
     lunr "0.5.12"
 
-gitbook-plugin-page-ref@^0.0.6:
+gitbook-plugin-page-ref@0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/gitbook-plugin-page-ref/-/gitbook-plugin-page-ref-0.0.6.tgz#58e8d7bd056efe22e17e063bc01c4bc07594cc26"
   integrity sha512-PSJl+IwSbjbtMxS/nrZY9uCxYsLPbzGtm4SdXhDTL4PI49VsFGPRWQPu39UwsLpQUCbc/Q/BbItlMRZTKFHuIw==
