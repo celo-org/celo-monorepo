@@ -15,7 +15,16 @@ const EPOCH = 20
 const TMP_PATH = '/tmp/e2e'
 
 describe('Validator handshake tests', () => {
-  let gethConfig = getGethConfig()
+  const gethConfig: GethRunConfig = {
+    networkId: 1101,
+    network: 'local',
+    runPath: TMP_PATH,
+    migrate: false,
+    instances: getInstances(),
+    genesisConfig: {
+      epoch: EPOCH,
+    },
+  }
   const context: any = getContext(gethConfig)
 
   before(async function(this: any) {
@@ -27,8 +36,9 @@ describe('Validator handshake tests', () => {
 
   describe('Validator handshake', () => {
     before(async function() {
-      // reset gethConfig for each test
-      gethConfig = getGethConfig()
+      // reset the instances for each test
+      gethConfig.instances = getInstances()
+      configureInstances(gethConfig)
       this.timeout(0)
       await context.hooks.restart()
     })
@@ -92,7 +102,7 @@ describe('Validator handshake tests', () => {
       )
     })
 
-    it.only('allows a new proxy to identify itself on behalf of its validator to a newly peered validator whose maxpeers is 0', async function(this: any) {
+    it('allows a new proxy to identify itself on behalf of its validator to a newly peered validator whose maxpeers is 0', async function(this: any) {
       this.timeout(100000) // 100 seconds
       // If a consensus round fails during this test, the results are inconclusive.
       // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
@@ -172,19 +182,6 @@ describe('Validator handshake tests', () => {
     })
   })
 })
-
-function getGethConfig(): GethRunConfig {
-  return {
-    networkId: 1101,
-    network: 'local',
-    runPath: TMP_PATH,
-    migrate: false,
-    instances: getInstances(),
-    genesisConfig: {
-      epoch: EPOCH,
-    },
-  }
-}
 
 function getInstances() {
   const instances: GethInstanceConfig[] = _.range(VALIDATORS - PROXIED_VALIDATORS).map((i) => ({
