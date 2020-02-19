@@ -29,6 +29,7 @@ const DARK_PAGES = new Set([
   menu.COMMUNITY.link,
   menu.BUILD.link,
   menu.SDK_DEVELOPERS.link,
+  menu.VALIDATORS_LIST.link,
   CeloLinks.walletApp,
 ])
 
