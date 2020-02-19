@@ -157,7 +157,7 @@ export class ContractKit {
 
   /**
    * Set CeloToken to use to pay for gas fees
-   * @param token cUsd or cGold
+   * @param token cUSD (StableToken) or cGLD (GoldToken)
    */
   async setFeeCurrency(token: CeloToken): Promise<void> {
     this.config.feeCurrency =
@@ -196,7 +196,7 @@ export class ContractKit {
    * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
    *
-   * Set to `null` to use cGold
+   * Set to `null` to use cGLD
    *
    * @param address ERC20 address
    */
