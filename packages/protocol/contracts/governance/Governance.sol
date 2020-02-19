@@ -175,7 +175,9 @@ contract Governance is
     _;
   }
 
-  function() external payable {} // solhint-disable no-empty-blocks
+  function() external payable {
+    require(msg.data.length == 0, "unknown method");
+  }
 
   /**
    * @notice Initializes critical variables.
