@@ -46,10 +46,12 @@ export async function setupVotingBotAccounts(celoEnv: string) {
     }
 
     const amountLocked = await lockedGold.getAccountTotalLockedGold(botAccount)
-    if (amountLocked.isZero()) {
-      const tx = await lockedGold.lock()
-      const amountToLock = goldBalance.multipliedBy(0.99).toFixed(0)
+    const totalAmountToBeLocked = goldBalance.multipliedBy(0.99)
 
+    if (amountLocked.isLessThan(totalAmountToBeLocked)) {
+      const amountToLock = totalAmountToBeLocked.minus(amountLocked).toFixed(0)
+      console.info(`locking ${amountToLock} for ${botAccount}`)
+      const tx = await lockedGold.lock()
       await tx.sendAndWaitForReceipt({
         to: lockedGold.address,
         value: amountToLock,

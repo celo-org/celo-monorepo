@@ -76,8 +76,7 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     const groupCapacities = await calculateInitialGroupCapacities(kit)
     const groupScores = await calculateGroupScores(kit)
     const groupWeights = calculateGroupWeights(groupScores, scoreSensitivity)
-
-    const unelectedGroups = Object.keys(groupCapacities).filter((k) => !groupScores.has(k))
+    const unelectedGroups = [...groupCapacities.keys()].filter((k) => !groupScores.has(k))
 
     for (const key of botKeysVotingThisRound) {
       const botAccount = ensureLeading0x(privateKeyToAddress(key))
