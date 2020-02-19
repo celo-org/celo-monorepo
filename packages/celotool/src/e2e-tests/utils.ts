@@ -31,7 +31,9 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
-const verboseOutput = true
+const verboseOutput = false
+const mnemonic =
+  'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
 
 export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
   const { wsport, rpcport } = instance
@@ -172,25 +174,11 @@ export function getHooks(gethConfig: GethRunConfig) {
 }
 
 export function getContext(gethConfig: GethRunConfig, verbose: boolean = verboseOutput) {
-  const mnemonic =
-    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
-
   const numValidators = validatorInstances.length
-
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidatorsInformation(mnemonic, numValidators)
-
-  const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
-  const numProxies = proxyInstances.length
-
-  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
-  const proxyEnodes = proxyPrivateKeys.map((x: string, i: number) => [
-    proxyInstances[i].name,
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport!),
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].port),
-  ])
 
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
@@ -223,52 +211,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
     }
 
-    let validatorIndex = 0
-    let proxyIndex = 0
-
-    for (const instance of gethConfig.instances) {
-      // Non proxied validators and proxies should connect to the bootnode
-      if (!instance.isProxied) {
-        if (gethConfig.useBootnode) {
-          instance.bootnodeEnode = bootnodeEnode
-        }
-      } else {
-        // Proxied validators should connect to only the proxy
-        // Find this proxied validator's proxy
-        const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
-
-        if (proxyEnode.length !== 1) {
-          console.log('proxyEnode yeeeeet', proxyEnode, proxyEnodes, instance.proxy, instance)
-          throw new Error('proxied validator must have exactly one proxy')
-        }
-
-        instance.proxies = [proxyEnode[0][1]!, proxyEnode[0][2]!]
-      }
-
-      // Set the private key for the validator or proxy instance
-      if (instance.validating) {
-        instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
-        validatorIndex++
-      } else if (instance.isProxy) {
-        instance.privateKey = instance.privateKey || proxyPrivateKeys[proxyIndex]
-        proxyIndex++
-      }
-    }
-
-    // The proxies will need to know their proxied validator's address
-    for (const instance of gethConfig.instances) {
-      if (instance.isProxy) {
-        const proxiedValidator = gethConfig.instances.filter(
-          (x: GethInstanceConfig) => x.proxy === instance.name
-        )
-        console.log('proxiedValidator yeeeeet', proxiedValidator)
-        if (proxiedValidator.length !== 1) {
-          throw new Error('proxied validator must have exactly one proxy')
-        }
-
-        instance.proxiedValidatorAddress = privateKeyToAddress(proxiedValidator[0].privateKey!)
-      }
-    }
+    configureInstances(gethConfig, bootnodeEnode)
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
@@ -342,6 +285,73 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   }
 }
 
+// Modifies gethConfig to properly configure proxies and proxied instances
+export function configureInstances(gethConfig: GethRunConfig, bootnodeEnode?: string) {
+  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
+
+  const numValidators = validatorInstances.length
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+
+  const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
+  const numProxies = proxyInstances.length
+
+  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
+  const proxyEnodes = proxyPrivateKeys.map((x: string, i: number) => {
+    const privateKey = proxyInstances[i].privateKey || x
+    return [
+      proxyInstances[i].name,
+      getEnodeAddress(privateKeyToPublicKey(privateKey), '127.0.0.1', proxyInstances[i].proxyport!),
+      getEnodeAddress(privateKeyToPublicKey(privateKey), '127.0.0.1', proxyInstances[i].port),
+    ]
+  })
+
+  let validatorIndex = 0
+  let proxyIndex = 0
+
+  for (const instance of gethConfig.instances) {
+    // Non proxied validators and proxies should connect to the bootnode
+    if (!instance.isProxied) {
+      if (gethConfig.useBootnode) {
+        instance.bootnodeEnode = bootnodeEnode
+      }
+    } else {
+      // Proxied validators should connect to only the proxy
+      // Find this proxied validator's proxy
+      const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
+
+      if (proxyEnode.length !== 1) {
+        console.log('proxyEnode yeeeeet', proxyEnode, proxyEnodes, instance.proxy, instance)
+        throw new Error('proxied validator must have exactly one proxy')
+      }
+
+      instance.proxies = [proxyEnode[0][1]!, proxyEnode[0][2]!]
+    }
+
+    // Set the private key for the validator or proxy instance
+    if (instance.validating) {
+      instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
+      validatorIndex++
+    } else if (instance.isProxy) {
+      instance.privateKey = instance.privateKey || proxyPrivateKeys[proxyIndex]
+      proxyIndex++
+    }
+  }
+
+  // The proxies will need to know their proxied validator's address
+  for (const instance of gethConfig.instances) {
+    if (instance.isProxy) {
+      const proxiedValidator = gethConfig.instances.filter(
+        (x: GethInstanceConfig) => x.proxy === instance.name
+      )
+      if (proxiedValidator.length !== 1) {
+        throw new Error('proxied validator must have exactly one proxy')
+      }
+
+      instance.proxiedValidatorAddress = privateKeyToAddress(proxiedValidator[0].privateKey!)
+    }
+  }
+}
+
 export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send(
@@ -364,14 +374,19 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
   })
 }
 
-export async function restartInstanceWithNewNodeKey(
+export async function restartInstance(
   gethConfig: GethRunConfig,
   instance: GethInstanceConfig,
+  removeNodeKey: boolean = false,
   verbose: boolean = false
 ) {
   await killInstance(instance)
   await restoreDatadir(gethConfig.runPath, instance)
-  fs.unlinkSync(joinPath(getDatadir(gethConfig.runPath, instance), 'Celo', 'nodekey'))
+
+  // Geth creates a "nodekey" file with a generated key when the nodekey is not set
+  if (!instance.setNodeKey && removeNodeKey) {
+    fs.unlinkSync(joinPath(getDatadir(gethConfig.runPath, instance), 'Celo', 'nodekey'))
+  }
   // if (!instance.privateKey && instance.validating) {
   //   instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
   // }
