@@ -27,7 +27,6 @@ function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?
     if (!silent) {
       console.debug('$ ' + [cmd].concat(args).join(' '))
     }
-    // console.log('is port open?')
     const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
     process.on('close', (code) => {
       try {
@@ -36,8 +35,5 @@ function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?
         reject(error)
       }
     })
-    process.on('message', console.info)
-    process.on('error', console.info)
-    // process.on('close', console.info)
   })
 }

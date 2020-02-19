@@ -320,7 +320,6 @@ export function configureInstances(gethConfig: GethRunConfig, bootnodeEnode?: st
       const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
 
       if (proxyEnode.length !== 1) {
-        console.log('proxyEnode yeeeeet', proxyEnode, proxyEnodes, instance.proxy, instance)
         throw new Error('proxied validator must have exactly one proxy')
       }
 

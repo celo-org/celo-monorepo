@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This test starts a standalone Geth node and runs transactions on it.
+# This tests nodes proving themselves as validators to bypass max peer checks.
 
 # For testing a particular branch of Geth repo (usually, on Circle CI)
-# Usage: ci_test_validator_order.sh checkout <branch_of_geth_repo_to_test>
+# Usage: ci_test_validator_handshake.sh checkout <branch_of_geth_repo_to_test>
 # For testing the local Geth dir (usually, for manual testing)
-# Usage: ci_test_validator_order.sh local <location_of_local_geth_dir>
+# Usage: ci_test_validator_handshake.sh local <location_of_local_geth_dir>
 
 if [ "${1}" == "checkout" ]; then
     # Test master by default.
