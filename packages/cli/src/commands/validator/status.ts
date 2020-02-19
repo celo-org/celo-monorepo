@@ -125,7 +125,7 @@ export default class ValidatorStatus extends BaseCommand {
     const accounts = await this.kit.contracts.getAccounts()
     const validator = await accounts.signerToAccount(signer)
     const name = (await accounts.getName(validator)) || ''
-    const proposedCount = blocks.filter((b) => b.miner === signer).length
+    const proposedCount = blocks.filter((b) => eqAddress(b.miner, signer)).length
     let signatures = 0
     let eligible = 0
     for (const block of blocks) {
