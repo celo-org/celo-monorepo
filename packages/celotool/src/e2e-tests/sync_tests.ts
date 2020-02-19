@@ -73,7 +73,7 @@ describe('sync tests', function(this: any) {
 
   after(hooks.after)
 
-  const syncModes = ['full', 'fast', 'light', 'ultralight']
+  const syncModes = ['full', 'fast', 'light', 'lightest']
   for (const syncmode of syncModes) {
     describe(`when syncing with a ${syncmode} node`, () => {
       let syncNode: GethInstanceConfig
@@ -86,7 +86,7 @@ describe('sync tests', function(this: any) {
           port: 30313,
           wsport: 9555,
           rpcport: 8555,
-          lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
+          lightserv: syncmode !== 'light' && syncmode !== 'lightest',
         }
         await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncNode, verbose)
         await connectPeers([fullNode, syncNode], verbose)
@@ -129,7 +129,7 @@ describe('sync tests', function(this: any) {
       await initAndStartGeth(gethConfig, hooks.gethBinaryPath, additionalInstance, verbose)
       await connectPeers([gethConfig.instances[0], additionalInstance], verbose)
       await waitToFinishInstanceSyncing(additionalInstance)
-      await sleep(120, true) // wait for round change / resync
+      await sleep(180, true) // wait for round change / resync
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
       for (let i = 0; i < gethConfig.instances.length; i++) {
