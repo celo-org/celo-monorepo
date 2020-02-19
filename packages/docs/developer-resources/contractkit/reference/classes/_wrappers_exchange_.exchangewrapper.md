@@ -339,17 +339,17 @@ ___
 
 *Defined in [contractkit/src/wrappers/Exchange.ts:205](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L205)*
 
-Returns the exchange rate for cGold estimated at the buyAmount
+Returns the exchange rate for cGLD estimated at the buyAmount
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`buyAmount` | BigNumber.Value | The amount of cGold in wei to estimate the exchange rate at |
+`buyAmount` | BigNumber.Value | The amount of cGLD in wei to estimate the exchange rate at |
 
 **Returns:** *Promise‹BigNumber‹››*
 
-The exchange rate (number of cUsd received for one cGold)
+The exchange rate (number of cUsd received for one cGLD)
 
 ___
 
@@ -369,7 +369,7 @@ Name | Type | Description |
 
 **Returns:** *Promise‹BigNumber‹››*
 
-The exchange rate (number of cGold received for one cUsd)
+The exchange rate (number of cGLD received for one cUsd)
 
 ___
 
@@ -380,13 +380,13 @@ ___
 *Defined in [contractkit/src/wrappers/Exchange.ts:162](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L162)*
 
 Returns the amount of cUsd a user would need to exchange to receive buyAmount of
-cGold.
+cGLD.
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`buyAmount` | BigNumber.Value | The amount of cGold the user would like to purchase. |
+`buyAmount` | BigNumber.Value | The amount of cGLD the user would like to purchase. |
 
 **Returns:** *Promise‹BigNumber‹››*
 
@@ -400,13 +400,13 @@ ___
 
 *Defined in [contractkit/src/wrappers/Exchange.ts:146](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L146)*
 
-Returns the amount of cUsd a user would get for sellAmount of cGold
+Returns the amount of cUsd a user would get for sellAmount of cGLD
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`sellAmount` | BigNumber.Value | The amount of cGold the user is selling to the exchange |
+`sellAmount` | BigNumber.Value | The amount of cGLD the user is selling to the exchange |
 
 **Returns:** *Promise‹BigNumber‹››*
 
@@ -420,7 +420,7 @@ ___
 
 *Defined in [contractkit/src/wrappers/Exchange.ts:154](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L154)*
 
-Returns the amount of cGold a user would need to exchange to receive buyAmount of
+Returns the amount of cGLD a user would need to exchange to receive buyAmount of
 cUsd.
 
 **Parameters:**
@@ -431,7 +431,7 @@ Name | Type | Description |
 
 **Returns:** *Promise‹BigNumber‹››*
 
-The corresponding cGold amount.
+The corresponding cGLD amount.
 
 ___
 
@@ -441,7 +441,7 @@ ___
 
 *Defined in [contractkit/src/wrappers/Exchange.ts:139](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L139)*
 
-Returns the amount of cGold a user would get for sellAmount of cUsd
+Returns the amount of cGLD a user would get for sellAmount of cUsd
 
 **Parameters:**
 
@@ -451,7 +451,7 @@ Name | Type | Description |
 
 **Returns:** *Promise‹BigNumber‹››*
 
-The corresponding cGold amount.
+The corresponding cGLD amount.
 
 ___
 
@@ -461,7 +461,7 @@ ___
 
 *Defined in [contractkit/src/wrappers/Exchange.ts:131](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L131)*
 
-Exchanges amount of cUsd in exchange for at least minGoldAmount of cGold
+Exchanges amount of cUsd in exchange for at least minGoldAmount of cGLD
 Requires the amount to have been approved to the exchange
 
 **Parameters:**
@@ -469,7 +469,7 @@ Requires the amount to have been approved to the exchange
 Name | Type | Description |
 ------ | ------ | ------ |
 `amount` | BigNumber.Value | The amount of cUsd the user is selling to the exchange |
-`minGoldAmount` | BigNumber.Value | The minimum amount of cGold the user has to receive for this transaction to succeed  |
+`minGoldAmount` | BigNumber.Value | The minimum amount of cGLD the user has to receive for this transaction to succeed  |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
 
@@ -481,14 +481,14 @@ ___
 
 *Defined in [contractkit/src/wrappers/Exchange.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L121)*
 
-Exchanges amount of cGold in exchange for at least minUsdAmount of cUsd
+Exchanges amount of cGLD in exchange for at least minUsdAmount of cUsd
 Requires the amount to have been approved to the exchange
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`amount` | BigNumber.Value | The amount of cGold the user is selling to the exchange |
+`amount` | BigNumber.Value | The amount of cGLD the user is selling to the exchange |
 `minUSDAmount` | BigNumber.Value | - |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
