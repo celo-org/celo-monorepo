@@ -237,7 +237,7 @@ contract UsingPrecompiles {
 
   /**
    * @notice Returns the minimum number of required signers for a given block number.
-   * @dev Computed in Geth as int(math.Ceil(float64(2*valSet.Size()) / 3))
+   * @dev Computed in celo-blockchain as int(math.Ceil(float64(2*valSet.Size()) / 3))
    */
   function minQuorumSize(uint256 blockNumber) internal view returns (uint256) {
     return numberValidatorsInSet(blockNumber).mul(2).add(2).div(3);
