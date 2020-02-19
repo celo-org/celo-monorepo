@@ -386,9 +386,6 @@ export async function restartInstance(
   if (!instance.setNodeKey && removeNodeKey) {
     fs.unlinkSync(joinPath(getDatadir(gethConfig.runPath, instance), 'Celo', 'nodekey'))
   }
-  // if (!instance.privateKey && instance.validating) {
-  //   instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
-  // }
   return startGeth(gethConfig, getGethBinaryPath(gethConfig), instance, verbose)
 }
 
