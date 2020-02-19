@@ -11,7 +11,7 @@ const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT
 
 const TMP_PATH = '/tmp/e2e'
 
-describe('governance tests', () => {
+describe('validator order tests', () => {
   const gethConfig: GethRunConfig = {
     networkId: 1101,
     network: 'local',

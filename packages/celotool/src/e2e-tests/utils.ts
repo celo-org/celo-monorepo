@@ -31,7 +31,7 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
-const verboseOutput = false
+const verboseOutput = true
 const mnemonic =
   'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
 

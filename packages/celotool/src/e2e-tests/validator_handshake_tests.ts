@@ -14,20 +14,9 @@ const EPOCH = 20
 
 const TMP_PATH = '/tmp/e2e'
 
-describe('governance tests', () => {
-  const gethConfig: GethRunConfig = {
-    networkId: 1101,
-    network: 'local',
-    runPath: TMP_PATH,
-    migrate: false,
-    instances: getInstances(),
-    genesisConfig: {
-      epoch: EPOCH,
-    },
-  }
-
+describe('Validator handshake tests', () => {
+  let gethConfig = getGethConfig()
   const context: any = getContext(gethConfig)
-  let web3: Web3
 
   before(async function(this: any) {
     this.timeout(0)
@@ -38,18 +27,20 @@ describe('governance tests', () => {
 
   describe('Validator handshake', () => {
     before(async function() {
+      // reset gethConfig for each test
+      gethConfig = getGethConfig()
       this.timeout(0)
-      web3 = new Web3('http://localhost:8545')
       await context.hooks.restart()
     })
 
-    it.only('allows a validator with a new enode to identify itself to a newly peered validator', async function(this: any) {
-      this.timeout(20000)
+    it('allows a validator with a new enode to identify itself to a newly peered validator whose maxpeers is 0', async function(this: any) {
+      this.timeout(20000) // 20 seconds
       // If a consensus round fails during this test, the results are inconclusive.
       // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
       this.retries(2)
 
       const val0Provider = `http://localhost:${gethConfig.instances[0].rpcport}`
+      const val0Web3 = new Web3(val0Provider)
       const val0Admin = new Admin(val0Provider)
       const val0InfoBefore = await val0Admin.getNodeInfo()
       const val0EnodeBefore = val0InfoBefore.enode
@@ -58,8 +49,12 @@ describe('governance tests', () => {
       const val1Web3 = new Web3(val1Provider)
       const val1Admin = new Admin(val1Provider)
 
+      // restart instance 1 with maxPeers as 0
+      gethConfig.instances[1].maxPeers = 0
+      await restartInstance(gethConfig, gethConfig.instances[1])
+
       // restart validator 0, and give it a new random nodekey
-      await restartInstance(gethConfig, gethConfig.instances[0], ['Celo/nodekey'])
+      await restartInstance(gethConfig, gethConfig.instances[0], true)
 
       const val0InfoAfter = await val0Admin.getNodeInfo()
       const val0EnodeAfter = val0InfoAfter.enode
@@ -80,9 +75,13 @@ describe('governance tests', () => {
         isValidatorPeer(val1Peers, val0EnodeNoPort),
         'Validator 0 is not a ValidatorPurpose peer with validator 1 after being restarted'
       )
+      // Verify that the peering was initiated by validator 0
+      const val0Peer = getPeer(val1Peers, val0EnodeNoPort)
+      assert(val0Peer, "Could not find validator 0 in validator 1's peers")
+      assert(val0Peer.network.inbound, 'Validator 0 peer to validator 1 is not inbound')
 
       const val1ValEnodeTable = (await jsonRpc(val1Web3, 'istanbul_getValEnodeTable', [])).result
-      const val0Address = await web3.eth.getCoinbase()
+      const val0Address = await val0Web3.eth.getCoinbase()
 
       const entry = getValEnodeTableEntry(val1ValEnodeTable, val0Address)
       assert(entry, `Did not find an entry for validator 0's address ${val0Address}`)
@@ -93,8 +92,8 @@ describe('governance tests', () => {
       )
     })
 
-    it('allows a new proxy to identify itself on behalf of its validator to a newly peered validator whose maxpeers is 0', async function(this: any) {
-      this.timeout(100000 /* 100 seconds */)
+    it.only('allows a new proxy to identify itself on behalf of its validator to a newly peered validator whose maxpeers is 0', async function(this: any) {
+      this.timeout(100000) // 100 seconds
       // If a consensus round fails during this test, the results are inconclusive.
       // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
       this.retries(2)
@@ -113,20 +112,19 @@ describe('governance tests', () => {
       const val0Web3 = new Web3(val0Provider)
 
       // TODO - change this to removing/adding a proxy once the RPCs are in a better state
-      const newGethConfig = Object.assign({}, gethConfig)
-      newGethConfig.instances[proxyIndex].privateKey =
+      gethConfig.instances[proxyIndex].privateKey =
         '26ad9dc2a8adcacdf3427e185ea358ba80aa3f205c8b7766acb16cd2beb1492a'
-      newGethConfig.instances[0].maxPeers = 0
-      configureInstances(newGethConfig)
+      gethConfig.instances[0].maxPeers = 0
+      configureInstances(gethConfig)
 
       // Stop validator 1 so it cannot share the new proxy enode via the normal announce protocol.
       // This leaves us with only validator 0, the proxied validator, and the proxy
-      await killInstance(newGethConfig.instances[1])
+      await killInstance(gethConfig.instances[1])
 
       // Restart validator 0 to have a max peers of 0.
       // It will still have its valEnodeTable, which will still have the old entry
       // for the proxied validator
-      await restartInstance(newGethConfig, newGethConfig.instances[0])
+      await restartInstance(gethConfig, gethConfig.instances[0])
       let val0ValEnodeTable = (await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])).result
       let val0ProxiedValEntry = getValEnodeTableEntry(val0ValEnodeTable, proxiedValAddress)
       assert(val0ProxiedValEntry, 'No entry in restarted validator 0 for old proxied validator')
@@ -135,8 +133,7 @@ describe('governance tests', () => {
       // The proxied validator will not connect to the new proxy because of the
       // incorrect enode, so at this point the proxy does not have any proof
       // it is on behalf of the proxied validator.
-      await restartInstance(newGethConfig, newGethConfig.instances[proxyIndex])
-      await sleep(2000)
+      await restartInstance(gethConfig, gethConfig.instances[proxyIndex])
       val0ValEnodeTable = (await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])).result
       let val0ProxiedValEntryOld = val0ProxiedValEntry
       val0ProxiedValEntry = getValEnodeTableEntry(val0ValEnodeTable, proxiedValAddress)
@@ -144,16 +141,15 @@ describe('governance tests', () => {
         val0ProxiedValEntry,
         'No entry in restarted validator 0 for proxied validator after restarting the proxy'
       )
-      // @ts-ignore
+
       assert(
+        // @ts-ignore
         val0ProxiedValEntryOld.enode === val0ProxiedValEntry.enode,
         'Proxied validator enode entry in validator 0 has changed'
       )
 
       // Restart the proxied validator to connect to the new proxy
-      await restartInstance(newGethConfig, newGethConfig.instances[proxiedValIndex], [
-        'Celo/nodekey',
-      ])
+      await restartInstance(gethConfig, gethConfig.instances[proxiedValIndex], true)
 
       // Give the proxy 30 seconds to connect to validator 0.
       // This extra amount of time is needed because the proxy will have already
@@ -176,6 +172,19 @@ describe('governance tests', () => {
     })
   })
 })
+
+function getGethConfig(): GethRunConfig {
+  return {
+    networkId: 1101,
+    network: 'local',
+    runPath: TMP_PATH,
+    migrate: false,
+    instances: getInstances(),
+    genesisConfig: {
+      epoch: EPOCH,
+    },
+  }
+}
 
 function getInstances() {
   const instances: GethInstanceConfig[] = _.range(VALIDATORS - PROXIED_VALIDATORS).map((i) => ({
