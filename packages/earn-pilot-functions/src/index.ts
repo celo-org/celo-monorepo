@@ -12,35 +12,38 @@ const FIGURE_EIGHT_KEY = functions.config().envs.secret_key
 
 exports.handleFigureEightConfirmation = functions.database
   .instance(REQUESTS_DB_NAME)
-  .ref('requests/{uid}')
+  .ref('confirmations/{uid}')
   .onWrite((change) => {
     const message = change.after.val()
 
     // Whenever a confirmation is written
-    const { confirmed, userId, adjAmount, jobTitle, conversionId } = message.payload
+    const { confirmed, userId, adjAmount, jobTitle, conversionId } = message
     const signature = message.signature
 
     if (!confirmed) {
-      // First request, will retrigger once confirmed
+      // No response needed until request is confirmed
       return null
     }
 
     if (!validSignature(signature, JSON.stringify(message.payload))) {
-      console.log('Invalid sig')
+      console.error('Invalid sig')
       return change.after.ref.update({
         valid: false,
       })
     }
 
+    console.info(`Updating confirmed payment to userId ${userId}`)
     const participantsDb = admin
       .app()
       .database(PILOT_PARTICIPANTS_DB_URL)
       .ref('earnPilot/participants')
-    const msgRoot = participantsDb.child(userId)
-    msgRoot.transaction((earned: number) => {
+    const msgRoot = participantsDb.child('annakaz')
+    msgRoot.child('earned').transaction((earned: number) => {
       return (earned || 0) + adjAmount
-    }) // TODO(anna) the earn and conversion updates are untested
-    msgRoot.child('conversions').push({ conversionId, jobTitle, adjAmount })
+    })
+    console.info(`Incremented balance by ${adjAmount}`)
+    msgRoot.child(`conversions/${conversionId}`).set({ jobTitle, adjAmount })
+    console.info(`Added conversion record (id: ${conversionId}) for job ${jobTitle}`)
     return change.after.ref.update({
       valid: true,
       updated: true,
