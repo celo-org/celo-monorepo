@@ -1,10 +1,8 @@
-import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
-import * as util from 'util'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
-import { Provider } from 'web3/providers'
+import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
 import { CeloProvider } from '../providers/celo-provider'
 import { recoverTransaction } from './signing-utils'
 
@@ -135,20 +133,32 @@ async function verifyLocalSigningInAllPermutations(
 }
 
 // These tests verify the signTransaction WITHOUT the ParamsPopulator
-testWithGanache('Transaction Utils', (web3: Web3) => {
-  let originalProvider: Provider
+describe('Transaction Utils', () => {
+  // only needed for the eth_coinbase rcp call
+  const mockProvider: Provider = {
+    send: (payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): any => {
+      if (payload.method === 'eth_coinbase') {
+        const response: JsonRPCResponse = {
+          jsonrpc: payload.jsonrpc,
+          id: payload.id,
+          result: '0xc94770007dda54cF92009BFF0dE90c06F603a09f',
+        }
+        callback(null, response)
+      } else {
+        callback(new Error(payload.method))
+      }
+    },
+  }
+  const web3: Web3 = new Web3()
+
   beforeEach(() => {
-    originalProvider = web3.currentProvider
-    web3.setProvider(new CeloProvider(web3.currentProvider))
+    web3.setProvider(new CeloProvider(mockProvider))
   })
+
   afterEach(() => {
     if (web3.currentProvider instanceof CeloProvider) {
-      ;(web3.currentProvider as CeloProvider).stop()
-    } else {
-      console.log(util.inspect(web3.currentProvider))
+      web3.currentProvider.stop()
     }
-    // Restore original provider
-    web3.currentProvider = originalProvider
   })
 
   describe('Signer Testing with single local account and pay gas in Celo Gold', () => {
