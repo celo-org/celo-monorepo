@@ -8,7 +8,7 @@ interface Props {
   error: any
 }
 
-class LeaderBoardError extends React.PureComponent<Props & I18nProps> {
+class ShowApolloError extends React.PureComponent<Props & I18nProps> {
   render() {
     const { t, error } = this.props
     return (
@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('dev')(LeaderBoardError)
+export default withNamespaces('dev')(ShowApolloError)

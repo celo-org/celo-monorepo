@@ -159,7 +159,7 @@ contract MultiSig is Initializable {
     notNull(newOwner)
     ownerDoesNotExist(newOwner)
   {
-    for (uint256 i = 0; i < owners.length - 1; i++)
+    for (uint256 i = 0; i < owners.length; i++)
       if (owners[i] == owner) {
         owners[i] = newOwner;
         break;
