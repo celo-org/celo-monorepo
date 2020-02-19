@@ -1,5 +1,10 @@
 // @ts-ignore
 import * as ganache from '@celo/ganache-cli'
+import ncp from 'ncp'
+import * as targz from 'targz'
+import * as tmp from 'tmp'
+
+tmp.setGracefulCleanup()
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 export const ACCOUNT_PRIVATE_KEYS = [
@@ -27,7 +32,10 @@ export const ACCOUNT_ADDRESSES = [
   '0x91c987bf62D25945dB517BDAa840A6c661374402',
 ]
 
-export async function startGanache(datadir: string, opts: { verbose?: boolean } = {}) {
+export async function startGanache(
+  dataPath: string,
+  opts: { verbose?: boolean; from_targz?: boolean } = {}
+) {
   const logFn = opts.verbose
     ? // tslint:disable-next-line: no-console
       (...args: any[]) => console.log(...args)
@@ -35,13 +43,22 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
         /*nothing*/
       }
 
+  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+  console.log(`Creating tmp folder: ${chainCopy.name}`)
+
+  if (opts.from_targz) {
+    await decompressChain(dataPath, chainCopy.name)
+  } else {
+    await copyChain(dataPath, chainCopy.name)
+  }
+
   const server = ganache.server({
     default_balance_ether: 1000000,
     logger: {
       log: logFn,
     },
     network_id: 1101,
-    db_path: datadir,
+    db_path: chainCopy.name,
     mnemonic: MNEMONIC,
     gasLimit: 20000000,
     allowUnlimitedContractSize: true,
@@ -60,6 +77,9 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
   return () =>
     new Promise((resolve, reject) => {
       server.close((err: any) => {
+        // remove it in both cases
+        console.log('Removing chain copy')
+        chainCopy.removeCallback()
         if (err) {
           reject(err)
         } else {
@@ -69,8 +89,41 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
     })
 }
 
-export default function setup(dataDir: string) {
-  return startGanache(dataDir)
+function copyChain(chainPath: string, copyChainPath: string) {
+  console.log('Copying chain')
+  return new Promise((resolve, reject) => {
+    ncp(chainPath, copyChainPath, (err) => {
+      if (err) {
+        console.error(err)
+        reject(err)
+      } else {
+        console.log('Chain copied')
+        resolve()
+      }
+    })
+  })
+}
+
+function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
+  console.log('Decompressing chain')
+  return new Promise((resolve, reject) => {
+    targz.decompress({ src: tarPath, dest: copyChainPath }, (err) => {
+      if (err) {
+        console.error(err)
+        reject(err)
+      } else {
+        console.log('Chain decompressed')
+        resolve()
+      }
+    })
+  })
+}
+
+export default function setup(
+  dataPath: string,
+  opts: { verbose?: boolean; from_targz?: boolean } = {}
+) {
+  return startGanache(dataPath, opts)
     .then((stopGanache) => {
       ;(global as any).stopGanache = stopGanache
     })
