@@ -117,7 +117,6 @@ contract Validators is
   uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
-  event ValidatorEpochPaymentSet(uint256 value);
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
