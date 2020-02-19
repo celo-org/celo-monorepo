@@ -67,7 +67,12 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
   ;['/applications', '/technology', '/dev', '/developer'].forEach((path) => {
     server.get(path, (_, res) => {
-      res.redirect('/build')
+      res.redirect('/developers')
+    })
+  })
+  ;['/build'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/validators')
     })
   })
   ;['/download', '/app', '/mobile-app', '/invite', 'build/download'].forEach((path) => {
