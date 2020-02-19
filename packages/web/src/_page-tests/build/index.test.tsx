@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import BuildPage from '../../../pages/build/index'
+import BuildPage from '../../../pages/validators/index'
 
 describe('BuildPage', () => {
   it('renders', () => {
