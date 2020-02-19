@@ -132,3 +132,11 @@ export function put(obj: any, key: string, elem: string) {
   lst.push(elem)
   obj[key] = lst
 }
+
+export function putNoDup(obj: any, key: string, elem: string) {
+  let lst: any[] = obj[key] || []
+  if (!lst.includes(elem)) {
+    lst.push(elem)
+  }
+  obj[key] = lst
+}
