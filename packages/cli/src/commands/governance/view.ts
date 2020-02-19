@@ -1,5 +1,6 @@
 import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
+import { BigNumber } from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMapRecursive } from '../../utils/cli'
@@ -30,6 +31,26 @@ export default class View extends BaseCommand {
       const jsonproposal = await proposalToJSON(this.kit, record.proposal)
       record.proposal = jsonproposal as any
     }
-    printValueMapRecursive(record)
+
+    // Identify the transaction with the highest constitutional requirement.
+    const proposal = await governance.getProposal(id)
+    let constitution = new BigNumber(0)
+    for (const tx of proposal) {
+      constitution = BigNumber.max(await governance.getConstitution(tx), constitution)
+    }
+
+    // Get the minimum number of participation required to pass a proposal.
+    const participationParams = await governance.getParticipationParameters()
+
+    printValueMapRecursive({
+      ...record,
+      requirements: {
+        participation: participationParams.baseline,
+        agreement: constitution.times(100).toString() + '%',
+      },
+      isApproved: await governance.isApproved(id),
+      isProposalPassing: await governance.isProposalPassing(id),
+      secondsUntilStages: await governance.timeUntilStages(id),
+    })
   }
 }

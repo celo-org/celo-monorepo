@@ -1,5 +1,6 @@
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Transaction } from 'web3-eth'
 import { Address } from '../base'
@@ -49,6 +50,13 @@ export interface GovernanceConfig {
   queueExpiry: BigNumber
   stageDurations: ProposalStageDurations
   participationParameters: ParticipationParameters
+}
+
+export interface GovernanceParticipationParameters {
+  baseline: BigNumber
+  baselineFloor: BigNumber
+  baselineUpdateFactor: BigNumber
+  baselineQuorumFactor: BigNumber
 }
 
 export interface ProposalMetadata {
@@ -273,10 +281,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   async timeUntilStages(proposalID: BigNumber.Value) {
     const meta = await this.getProposalMetadata(proposalID)
+    const now = Math.round(new Date().getTime() / 1000)
     const durations = await this.stageDurations()
-    const referendum = meta.timestamp.plus(durations.Approval)
+    const referendum = meta.timestamp.plus(durations.Approval).minus(now)
     const execution = referendum.plus(durations.Referendum)
-    const expiration = referendum.plus(durations.Execution)
+    const expiration = execution.plus(durations.Execution)
     return { referendum, execution, expiration }
   }
 
@@ -317,6 +326,30 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       passing,
     }
   }
+
+  /**
+   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal.
+   * @param tx Transaction to determine the constitution for running.
+   */
+  async getConstitution(tx: ProposalTransaction): Promise<BigNumber.Value> {
+    const callSignature = tx.input.slice(0, 10)
+    const value = await this.contract.methods.getConstitution(tx.to, callSignature).call()
+    return fromFixed(new BigNumber(value))
+  }
+
+  /**
+   * Returns the parameters that effect participation required to pass a proposal.
+   */
+  getParticipationParameters: () => Promise<GovernanceParticipationParameters> = proxyCall(
+    this.contract.methods.getParticipationParameters,
+    undefined,
+    (res) => ({
+      baseline: valueToBigNumber(res[0]),
+      baselineFloor: valueToBigNumber(res[1]),
+      baselineUpdateFactor: valueToBigNumber(res[2]),
+      baselineQuorumFactor: valueToBigNumber(res[3]),
+    })
+  )
 
   /**
    * Returns whether a given proposal is passing relative to the constitution's threshold.
