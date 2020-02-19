@@ -13,3 +13,5 @@
 
 /lib/**/*.test.*
 /lib/test-utils
+
+/tmp/

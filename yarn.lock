@@ -6577,13 +6577,6 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.7.tgz#315d570ccb56c53452ff8638738df60726d5b6ea"
   integrity sha512-NYrtPht0wGzhwe9+/idPaBB+TqkY9AhTvOLMkThm0IoEfLaiVQZwBwyJ5puCkO3AUCWrmcoePjp2mbFocKy4SQ==
 
-"@types/ncp@^2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@types/ncp/-/ncp-2.0.3.tgz#68429472698a68f2c85a984932e9d8014d5f2ed0"
-  integrity sha512-eZatZMWhPHUHY/1hUUqwGrWzBAE9deYR3L0QJMicpVkBUOrQslhWblw5Ye+rKuzvFG/UQ3jDolMcjhC2WKUQ5w==
-  dependencies:
-    "@types/node" "*"
-
 "@types/node-fetch@^2.1.2":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.1.2.tgz#8c5da14d70321e4c4ecd5db668e3f93cf6c7399f"
@@ -24851,7 +24844,7 @@ nconf@^0.10.0:
     secure-keys "^1.0.0"
     yargs "^3.19.0"
 
-ncp@^2.0.0, ncp@~2.0.0:
+ncp@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ncp/-/ncp-2.0.0.tgz#195a21d6c46e361d2fb1281ba38b91e9df7bdbb3"
   integrity sha1-GVoh1sRuNh0vsSgbo4uR6d9727M=
