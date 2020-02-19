@@ -197,6 +197,7 @@ export const textStyles = StyleSheet.create({
   left: {
     textAlign: 'left',
   },
+  lean: { fontWeight: '300' },
   medium: {
     fontWeight: '500',
   },

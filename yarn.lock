@@ -6582,6 +6582,13 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.7.tgz#315d570ccb56c53452ff8638738df60726d5b6ea"
   integrity sha512-NYrtPht0wGzhwe9+/idPaBB+TqkY9AhTvOLMkThm0IoEfLaiVQZwBwyJ5puCkO3AUCWrmcoePjp2mbFocKy4SQ==
 
+"@types/ncp@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/ncp/-/ncp-2.0.3.tgz#68429472698a68f2c85a984932e9d8014d5f2ed0"
+  integrity sha512-eZatZMWhPHUHY/1hUUqwGrWzBAE9deYR3L0QJMicpVkBUOrQslhWblw5Ye+rKuzvFG/UQ3jDolMcjhC2WKUQ5w==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node-fetch@^2.1.2":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.1.2.tgz#8c5da14d70321e4c4ecd5db668e3f93cf6c7399f"
@@ -6912,6 +6919,28 @@
   dependencies:
     "@types/superagent" "*"
 
+"@types/tar-fs@*":
+  version "1.16.2"
+  resolved "https://registry.yarnpkg.com/@types/tar-fs/-/tar-fs-1.16.2.tgz#6f5acea15d3b7777b8bf3f1c6d4e80ce71288f34"
+  integrity sha512-eds/pbRf0Fe0EKmrHDbs8mRkfbjz2upAdoUfREw14dPboZaHqqZ1Y+uVeoakoPavpZMpj22nhUTAYkX5bz3DXA==
+  dependencies:
+    "@types/node" "*"
+    "@types/tar-stream" "*"
+
+"@types/tar-stream@*":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@types/tar-stream/-/tar-stream-1.6.1.tgz#67d759068ff781d976cad978893bb7a334ec8809"
+  integrity sha512-pYCDOPuRE+4tXFk1rSMYiuI+kSrXiJ4av1bboQbkcEBA2rqwEWfIn9kdMSH+5nYu58WksHuxwx+7kVbtg0Le7w==
+  dependencies:
+    "@types/node" "*"
+
+"@types/targz@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.0.tgz#cca3b2c87548d98f961b57306dc36d06f9fd15b2"
+  integrity sha512-kNFPOpsmdtT+DMXHuu5H7gXD5LlMHtS/kSQjuVY3QqxHQqGFV854o+EimC1GZ5/+iYZWzk9dNRiAUFbI/mvUsQ==
+  dependencies:
+    "@types/tar-fs" "*"
+
 "@types/testing-library__dom@*", "@types/testing-library__dom@^6.0.0":
   version "6.11.1"
   resolved "https://registry.yarnpkg.com/@types/testing-library__dom/-/testing-library__dom-6.11.1.tgz#6058a6ac391db679f7c60dbb27b81f0620de2dd9"
@@ -6926,6 +6955,11 @@
   dependencies:
     "@types/react-dom" "*"
     "@types/testing-library__dom" "*"
+
+"@types/tmp@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.1.0.tgz#19cf73a7bcf641965485119726397a096f0049bd"
+  integrity sha512-6IwZ9HzWbCq6XoQWhxLpDjuADodH/MKXRUIDFudvgjcVdjFknvmR+DNsoUeer4XPrEnrZs04Jj+kfV9pFsrhmA==
 
 "@types/tough-cookie@*":
   version "2.3.4"
@@ -16685,6 +16719,20 @@ fined@^1.0.1:
     object.pick "^1.2.0"
     parse-filepath "^1.0.1"
 
+firebase-admin@^8.6.0, firebase-admin@^8.9.2:
+  version "8.9.2"
+  resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-8.9.2.tgz#248ba184dc13b4929b043870a2067787a0dd013e"
+  integrity sha512-ix4qcx+hHnr3mnc41Z8EzQa9Mr+2nhogLEv6ktkOCCpdKJ+9HxW9vikRCElSbC8ICHLD0KIH0GVOIZK80vbvqw==
+  dependencies:
+    "@firebase/database" "^0.5.17"
+    "@types/node" "^8.10.59"
+    dicer "^0.3.0"
+    jsonwebtoken "8.1.0"
+    node-forge "0.7.4"
+  optionalDependencies:
+    "@google-cloud/firestore" "^3.0.0"
+    "@google-cloud/storage" "^4.1.2"
+
 firebase-admin@^8.6.1:
   version "8.6.1"
   resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-8.6.1.tgz#b4fe5133a759a06afe06d1bf8dee6e302514a304"
@@ -16698,20 +16746,6 @@ firebase-admin@^8.6.1:
   optionalDependencies:
     "@google-cloud/firestore" "^2.0.0"
     "@google-cloud/storage" "^3.0.2"
-
-firebase-admin@^8.9.2:
-  version "8.9.2"
-  resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-8.9.2.tgz#248ba184dc13b4929b043870a2067787a0dd013e"
-  integrity sha512-ix4qcx+hHnr3mnc41Z8EzQa9Mr+2nhogLEv6ktkOCCpdKJ+9HxW9vikRCElSbC8ICHLD0KIH0GVOIZK80vbvqw==
-  dependencies:
-    "@firebase/database" "^0.5.17"
-    "@types/node" "^8.10.59"
-    dicer "^0.3.0"
-    jsonwebtoken "8.1.0"
-    node-forge "0.7.4"
-  optionalDependencies:
-    "@google-cloud/firestore" "^3.0.0"
-    "@google-cloud/storage" "^4.1.2"
 
 firebase-bolt@^0.8.4:
   version "0.8.4"
@@ -24827,7 +24861,7 @@ nconf@^0.10.0:
     secure-keys "^1.0.0"
     yargs "^3.19.0"
 
-ncp@~2.0.0:
+ncp@^2.0.0, ncp@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ncp/-/ncp-2.0.0.tgz#195a21d6c46e361d2fb1281ba38b91e9df7bdbb3"
   integrity sha1-GVoh1sRuNh0vsSgbo4uR6d9727M=
@@ -33456,7 +33490,7 @@ tape@^4.6.3, tape@^4.8.0:
     string.prototype.trim "~1.1.2"
     through "~2.3.8"
 
-tar-fs@^1.13.0, tar-fs@^1.15.3, tar-fs@^1.16.2:
+tar-fs@^1.13.0, tar-fs@^1.15.3, tar-fs@^1.16.2, tar-fs@^1.8.1:
   version "1.16.3"
   resolved "https://registry.yarnpkg.com/tar-fs/-/tar-fs-1.16.3.tgz#966a628841da2c4010406a82167cbd5e0c72d509"
   integrity sha512-NvCeXpYx7OsmOh8zIOP/ebG55zZmxLE0etfWRbWok+q2Qo8x/vOR/IJT1taADXPe+jsiu9axDb3X4B+iIgNlKw==
@@ -33526,6 +33560,13 @@ tar@4.4.10, tar@^2.1.1, tar@^4, tar@^4.0.2, tar@^4.3.0, tar@^4.4.10, tar@^4.4.2,
     mkdirp "^0.5.0"
     safe-buffer "^5.1.2"
     yallist "^3.0.3"
+
+targz@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/targz/-/targz-1.0.1.tgz#8f76a523694cdedfbb5d60a4076ff6eeecc5398f"
+  integrity sha1-j3alI2lM3t+7XWCkB2/27uzFOY8=
+  dependencies:
+    tar-fs "^1.8.1"
 
 tcp-port-used@^1.0.1:
   version "1.0.1"
