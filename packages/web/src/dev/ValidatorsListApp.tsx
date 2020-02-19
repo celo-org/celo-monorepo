@@ -8,10 +8,10 @@ import { ApolloProvider, Query } from 'react-apollo'
 import { StyleSheet, View } from 'react-native'
 import ShowApolloError from 'src/dev/ShowApolloError'
 import ValidatorsList from 'src/dev/ValidatorsList'
-import { I18nProps, withNamespaces } from 'src/i18n'
-import { standardStyles } from 'src/styles'
 import OpenGraph from 'src/header/OpenGraph'
+import { I18nProps, withNamespaces } from 'src/i18n'
 import menuItems from 'src/shared/menu-items'
+import { standardStyles } from 'src/styles'
 
 function createApolloClient() {
   return new ApolloClient({
