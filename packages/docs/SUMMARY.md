@@ -61,17 +61,49 @@
     - [Payments and Exchanging](celo-codebase/wallet/how-the-wallet-works/sending-and-requesting-payments.md)
     - [Ultralight Node Sync](celo-codebase/wallet/how-the-wallet-works/ultralight-node-sync.md)
 
-## Celo SDK
-
-- [Introduction](developer-resources/introduction.md)
-- [DAppKit](developer-resources/dappkit/README.md)
-  - [Getting Started](developer-resources/dappkit/setup.md)
-  - [Usage](developer-resources/dappkit/usage.md)
-- [ContractKit](developer-resources/contractkit/README.md)
-  - [Getting Started](developer-resources/contractkit/setup.md)
-  - [Examples](developer-resources/contractkit/examples.md)
-  - [Reference]()
-<!--contractkit-reference-start-->
+## Developer Guide
+- [Quick Start](developer-resources/start.md)
+  - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
+  - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
+  <!-- - [Building a dApp with Contracts on Celo]() -->
+- [Overview]()
+  <!-- - [The Celo Protocol]()
+    - [Architecture]()
+    - [Similarities with Ethereum]()
+    - [Difference between Ethereum and Celo]()
+      - [Mobile First]()
+      - [Architectural Differences]()
+        - [Validators, full node, light node]()
+      - [Protocol Differences]()
+        - [TX object - link to transactions]()
+        - [fees in dollars- link to Paying for Gas in Tokens]()
+      - [Development Differences]()
+    - [dApps on Celo]()
+      - [What is a dApp?]() -->
+  - [The Celo SDK](developer-resources/introduction.md)
+    <!-- - [Architecture]() -->
+    - [ContractKit](developer-resources/contractkit/README.md)
+      - [Setup](developer-resources/contractkit/setup.md)
+      - [Using the kit](developer-resources/contractkit/usage.md)
+      - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
+      - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
+    - [Forno](developer-resources/forno/README.md)
+      <!-- - [Example of querying (web3, kit)]()
+      - [Example of sending tx (kit)]() -->
+    <!-- - [Using Truffle]()
+      - [Setting up a Local node]()
+      - [Option: Using CeloProvider with Truffle]() -->
+    - [DAppKit](developer-resources/dappkit/README.md)
+      <!-- - [Going mobile first (true decentralization)]()
+      - [dApps and Wallets - Signing Transactions]() -->
+      - [Setup](developer-resources/dappkit/setup.md)
+        <!-- - [React Native]()
+        - [Expo]() -->
+      - [Usage](developer-resources/dappkit/usage.md)
+    <!-- - [Guide to Asset Custody]() -->
+  - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+  - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
+    <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
     - [External Modules]()
       - [address-registry](developer-resources/contractkit/reference/modules/_address_registry_.md)
@@ -299,8 +331,7 @@
       - [ValidatorGroup](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorgroup.md)
       - [ValidatorReward](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorreward.md)
       - [ValidatorsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorsconfig.md)
-<!--contractkit-reference-end-->
-- [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+    <!-- contractkit-reference-end -->
 
 ## Command Line Interface
 
