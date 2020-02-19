@@ -615,7 +615,7 @@ contract Validators is
    *   account address. 48 bytes.
    * @return True upon success.
    */
-  function updateKeys(
+  function updatePublicKeys(
     address account,
     address signer,
     bytes calldata ecdsaPublicKey,

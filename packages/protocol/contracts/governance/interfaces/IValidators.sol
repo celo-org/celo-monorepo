@@ -8,7 +8,7 @@ interface IValidators {
   function getNumRegisteredValidators() external view returns (uint256);
   function getTopGroupValidators(address, uint256) external view returns (address[] memory);
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool);
-  function updateKeys(address, address, bytes calldata, bytes calldata, bytes calldata)
+  function updatePublicKeys(address, address, bytes calldata, bytes calldata, bytes calldata)
     external
     returns (bool);
   function isValidator(address) external view returns (bool);

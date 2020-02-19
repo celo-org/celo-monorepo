@@ -223,7 +223,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     authorize(signer, v, r, s);
     account.signers.validator = signer;
     require(
-      getValidators().updateKeys(msg.sender, signer, ecdsaPublicKey, blsPublicKey, blsPop),
+      getValidators().updatePublicKeys(msg.sender, signer, ecdsaPublicKey, blsPublicKey, blsPop),
       "Failed to update validator keys"
     );
     emit ValidatorSignerAuthorized(msg.sender, signer);

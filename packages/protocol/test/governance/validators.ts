@@ -1100,7 +1100,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#updateKeys()', () => {
+  describe('#updatePublicKeys()', () => {
     const newBlsPublicKey: SolBytes = web3.utils.randomHex(96)
     const newBlsPoP: SolBytes = web3.utils.randomHex(48)
     describe('when called by a registered validator', () => {
@@ -1120,7 +1120,7 @@ contract('Validators', (accounts: string[]) => {
           const signer = accounts[9]
           beforeEach(async () => {
             newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
-            resp = await validators.updateKeys(
+            resp = await validators.updatePublicKeys(
               validator,
               signer,
               newPublicKey,
@@ -1159,7 +1159,13 @@ contract('Validators', (accounts: string[]) => {
           it('should revert', async () => {
             const newPublicKey = toBytes(await addressToPublicKey(accounts[8], web3.eth.sign))
             await assertRevert(
-              validators.updateKeys(validator, signer, newPublicKey, newBlsPublicKey, newBlsPoP)
+              validators.updatePublicKeys(
+                validator,
+                signer,
+                newPublicKey,
+                newBlsPublicKey,
+                newBlsPoP
+              )
             )
           })
         })
@@ -1171,7 +1177,13 @@ contract('Validators', (accounts: string[]) => {
           it('should revert', async () => {
             const newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
             await assertRevert(
-              validators.updateKeys(validator, signer, newPublicKey, newBlsPublicKey, newBlsPoP)
+              validators.updatePublicKeys(
+                validator,
+                signer,
+                newPublicKey,
+                newBlsPublicKey,
+                newBlsPoP
+              )
             )
           })
         })
