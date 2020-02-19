@@ -6,14 +6,14 @@ contract Freezable {
 
   // onlyFreezer functions can only be called by the specified `freezer` address
   modifier onlyFreezer() {
-    require(msg.sender == freezer);
+    require(msg.sender == freezer, "only freezer can make this call");
     _;
   }
 
   // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they will
   // revert.
   modifier onlyWhenNotFrozen() {
-    require(!frozen);
+    require(!frozen, "can't call when contract is frozen");
     _;
   }
 
