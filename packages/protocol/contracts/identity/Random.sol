@@ -65,6 +65,8 @@ contract Random is IRandom, Ownable, Initializable {
    * @param proposer Address of the block proposer.
    */
   function _revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) internal {
+    require(newCommitment != computeCommitment(0), "cannot commit zero randomness");
+
     // ensure revealed randomness matches previous commitment
     if (commitments[proposer] != 0) {
       require(randomness != 0, "randomness cannot be zero if there is a previous commitment");
