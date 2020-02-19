@@ -42,8 +42,6 @@ contract Proxy {
     // Avoid checking if address is a contract or executing delegated call when
     // implementation address is 0x0
     require(implementationAddress != address(0), "No Implementation set");
-    // if (implementationAddress == address(0)) return;
-
     require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
