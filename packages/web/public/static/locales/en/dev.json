@@ -175,7 +175,7 @@
   "sandbox": {
     "overtitle": "Try it Out",
     "title": "Sample Celo Integration",
-    "explainer": "This code snippet creates an account and transfers cUSD to the account.",
+    "explainer": "This code snippet uses an account to transfer cUSD.",
     "btn": "Try out the Code"
   }
 }
