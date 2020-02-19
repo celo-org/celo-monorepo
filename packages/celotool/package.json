@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@celo/contractkit": "0.2.15-dev",
-    "@celo/utils": "0.1.7-dev",
+    "@celo/utils": "0.1.8-dev",
     "@celo/verification-pool-api": "^1.0.0",
     "@celo/walletkit": "^0.0.15",
     "@google-cloud/monitoring": "0.7.1",
