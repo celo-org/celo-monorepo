@@ -15,6 +15,8 @@ declare module 'react-native' {
     isolation?: 'isolate'
     appearance?: string
     transformOrigin?: string | number
+    transitionProperty?: string
+    transitionDuration?: string
     animationDelay?: string
     animationDuration?: string
     animationFillMode?: 'both' | 'backwards' | 'forwards' | 'none'
