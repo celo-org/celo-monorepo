@@ -129,7 +129,7 @@ ___
 Set the ERC20 address for the token to use to pay for transaction fees.
 The ERC20 must be whitelisted for gas.
 
-Set to `null` to use cGold
+Set to `null` to use cGLD
 
 **Returns:** *null | string*
 
@@ -140,7 +140,7 @@ Set to `null` to use cGold
 Set the ERC20 address for the token to use to pay for transaction fees.
 The ERC20 must be whitelisted for gas.
 
-Set to `null` to use cGold
+Set to `null` to use cGLD
 
 **Parameters:**
 
@@ -336,7 +336,7 @@ Set CeloToken to use to pay for gas fees
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`token` | [CeloToken](../modules/_base_.md#celotoken) | cUsd or cGold  |
+`token` | [CeloToken](../modules/_base_.md#celotoken) | cUSD (StableToken) or cGLD (GoldToken)  |
 
 **Returns:** *Promise‹void›*
 
