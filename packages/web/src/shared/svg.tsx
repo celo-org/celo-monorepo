@@ -5,7 +5,7 @@ export function Path(props: PathProps) {
   return createElement('path', { ...props, onClick: props.onPress })
 }
 
-export function G(props: GProps & { children: React.ReactNode }) {
+export function G(props: GProps & { children: React.ReactNode; filter?: string }) {
   return createElement('g', props)
 }
 
