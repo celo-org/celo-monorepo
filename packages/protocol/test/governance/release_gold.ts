@@ -25,9 +25,8 @@ import {
   MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
-  ReleaseGoldFactoryContract,
-  ReleaseGoldFactoryInstance,
-  ReleaseGoldInstanceContract,
+  ReleaseGoldContract,
+  ReleaseGoldInstance,
 } from 'types'
 import Web3 = require('web3')
 
@@ -49,7 +48,7 @@ const authorizationTestDescriptions = {
   },
 }
 
-interface ReleaseGoldInstanceConfig {
+interface ReleaseGoldConfig {
   releaseStartTime: number
   releaseCliffTime: number
   numReleasePeriods: number
@@ -65,8 +64,7 @@ interface ReleaseGoldInstanceConfig {
   canVote: boolean
 }
 
-const ReleaseGoldFactory: ReleaseGoldFactoryContract = artifacts.require('ReleaseGoldFactory')
-const ReleaseGoldInstance: ReleaseGoldInstanceContract = artifacts.require('ReleaseGoldInstance')
+const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGoldInstance')
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
@@ -90,16 +88,16 @@ contract('ReleaseGold', (accounts: string[]) => {
   const beneficiary = accounts[1]
   const releaseOwner = accounts[2]
   const refundAddress = accounts[3]
+  let releaseGoldInstance: ReleaseGoldInstance
   let accountsInstance: AccountsInstance
   let lockedGoldInstance: LockedGoldInstance
   let goldTokenInstance: GoldTokenInstance
-  let releaseGoldFactoryInstance: ReleaseGoldFactoryInstance
   let mockElection: MockElectionInstance
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
 
-  const releaseGoldDefaultSchedule: ReleaseGoldInstanceConfig = {
+  const releaseGoldDefaultSchedule: ReleaseGoldConfig = {
     releaseStartTime: null, // To be adjusted on every run
     releaseCliffTime: HOUR,
     numReleasePeriods: 4,
@@ -116,11 +114,11 @@ contract('ReleaseGold', (accounts: string[]) => {
   }
 
   const createNewReleaseGoldInstance = async (
-    releaseGoldSchedule: ReleaseGoldInstanceConfig,
+    releaseGoldSchedule: ReleaseGoldConfig,
     web3: Web3
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
-    return releaseGoldFactoryInstance.createReleaseGoldInstance(
+    releaseGoldInstance = await ReleaseGold.new(
       releaseGoldSchedule.releaseStartTime,
       releaseGoldSchedule.releaseCliffTime,
       releaseGoldSchedule.numReleasePeriods,
@@ -134,7 +132,17 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.initialDistributionPercentage,
       releaseGoldSchedule.canValidate,
       releaseGoldSchedule.canVote,
+      registry.address,
       { from: owner }
+    )
+    await goldTokenInstance.transfer(
+      releaseGoldInstance.address,
+      releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
+        releaseGoldSchedule.numReleasePeriods
+      ),
+      {
+        from: owner,
+      }
     )
   }
 
@@ -146,7 +154,6 @@ contract('ReleaseGold', (accounts: string[]) => {
     accountsInstance = await Accounts.new()
     lockedGoldInstance = await LockedGold.new()
     goldTokenInstance = await GoldToken.new()
-    releaseGoldFactoryInstance = await ReleaseGoldFactory.new()
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
     mockGovernance = await MockGovernance.new()
@@ -155,123 +162,40 @@ contract('ReleaseGold', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, lockedGoldInstance.address)
     await registry.setAddressFor(CeloContractName.GoldToken, goldTokenInstance.address)
-    await registry.setAddressFor(
-      CeloContractName.ReleaseGoldFactory,
-      releaseGoldFactoryInstance.address
-    )
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGoldInstance.initialize(registry.address, UNLOCKING_PERIOD)
-    await releaseGoldFactoryInstance.initialize(registry.address)
     await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount({ from: beneficiary })
 
     // prefund the releaseGold factory instance with 2 gold tokens to simulate a well-funded factory contract in the genesis block
-    await goldTokenInstance.transfer(releaseGoldFactoryInstance.address, ONE_GOLDTOKEN.times(2), {
-      from: owner,
-    })
-  })
-
-  describe('#initialize', () => {
-    it('should set the owner', async () => {
-      const ReleaseGoldFactoryOwner: string = await releaseGoldFactoryInstance.owner()
-      assert.equal(ReleaseGoldFactoryOwner, owner)
-    })
-
-    it('should set the registry address', async () => {
-      const registryAddress: string = await releaseGoldFactoryInstance.registry()
-      assert.equal(registryAddress, registry.address)
-    })
-
-    it('should revert if already initialized', async () => {
-      await assertRevert(releaseGoldFactoryInstance.initialize(registry.address))
-    })
-  })
-
-  describe('#setRegistry', () => {
-    const anAddress: string = accounts[2]
-
-    it('should set the registry when called by the owner', async () => {
-      await releaseGoldFactoryInstance.setRegistry(anAddress)
-      assert.equal(await releaseGoldFactoryInstance.registry(), anAddress)
-    })
-
-    it('should revert when not called by the owner', async () => {
-      await assertRevert(releaseGoldFactoryInstance.setRegistry(anAddress, { from: beneficiary }))
-    })
   })
 
   describe('#payable', () => {
     it('should accept gold transfer by default from anyone', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      const releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      await goldTokenInstance.transfer(releaseGoldInstanceAddress, ONE_GOLDTOKEN.times(2), {
+      await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.times(2), {
         from: accounts[8],
       })
     })
   })
 
   describe('#creation', () => {
-    let newReleaseGoldInstanceTx: any
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
-
-    it('should fail if a non-owner attempts to create a releaseGold instance', async () => {
-      const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-      releaseGoldSchedule.releaseStartTime =
-        (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
-      await assertRevert(
-        releaseGoldFactoryInstance.createReleaseGoldInstance(
-          releaseGoldSchedule.releaseStartTime,
-          releaseGoldSchedule.releaseCliffTime,
-          releaseGoldSchedule.numReleasePeriods,
-          releaseGoldSchedule.releasePeriod,
-          releaseGoldSchedule.amountReleasedPerPeriod,
-          releaseGoldSchedule.revocable,
-          releaseGoldSchedule.beneficiary,
-          releaseGoldSchedule.releaseOwner,
-          releaseGoldSchedule.refundAddress,
-          releaseGoldSchedule.subjectToLiquidityProvision,
-          releaseGoldSchedule.initialDistributionPercentage,
-          releaseGoldSchedule.canValidate,
-          releaseGoldSchedule.canVote,
-          { from: accounts[5] }
-        )
-      )
-    })
-
-    it('should revert when releaseGold factory has insufficient balance to create new instance', async () => {
-      const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-      releaseGoldSchedule.numReleasePeriods = 3
-      releaseGoldSchedule.amountReleasedPerPeriod = ONE_GOLDTOKEN
-      await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
-    })
-
     describe('when an instance is properly created', () => {
       beforeEach(async () => {
-        newReleaseGoldInstanceTx = await createNewReleaseGoldInstance(
-          releaseGoldDefaultSchedule,
-          web3
-        )
-        releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-        releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
+        await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
       })
 
-      it('should create a new releaseGold instance and emit a proper event', async () => {
-        const newReleaseGoldInstanceCreatedEvent = _.find(newReleaseGoldInstanceTx.logs, {
-          event: 'NewReleaseGoldInstanceCreated',
-        })
-        assert.exists(newReleaseGoldInstanceCreatedEvent)
-        const newReleaseGoldInstanceBeneficiary =
-          newReleaseGoldInstanceCreatedEvent.args.beneficiary
-        const newReleaseGoldInstanceAddress = newReleaseGoldInstanceCreatedEvent.args.atAddress
-        assertLogMatches(newReleaseGoldInstanceCreatedEvent, 'NewReleaseGoldInstanceCreated', {
-          beneficiary: newReleaseGoldInstanceBeneficiary,
-          atAddress: newReleaseGoldInstanceAddress,
-        })
-        assert.equal(newReleaseGoldInstanceAddress, releaseGoldInstance.address)
-      })
+      // TODO(lucas): add log to releaseGoldInstance creation
+      // it('should create a new releaseGold instance and emit a proper event', async () => {
+      //   const newReleaseGoldInstanceAddress = newReleaseGoldInstanceCreatedEvent.args.atAddress
+      //   assertLogMatches(newReleaseGoldInstanceCreatedEvent, 'NewReleaseGoldInstanceCreated', {
+      //     beneficiary: newReleaseGoldInstanceBeneficiary,
+      //     atAddress: newReleaseGoldInstanceAddress,
+      //   })
+      //   assert.equal(newReleaseGoldInstanceAddress, releaseGoldInstance.address)
+      // })
 
       it('should have associated funds with a schedule upon creation', async () => {
         const allocatedFunds = await goldTokenInstance.balanceOf(releaseGoldInstance.address)
@@ -381,13 +305,8 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#createAccount', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
-
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
     })
 
     describe('when unrevoked', () => {
@@ -414,22 +333,19 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('reverts if anyone attempts account creation', async () => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await assertRevert(releaseGoldInstance.createAccount({ from: releaseOwner }))
+        await assertRevert(releaseGoldInstance.createAccount({ from: beneficiary }))
       })
     })
   })
 
   describe('#setAccount', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
     const accountName = 'name'
-    const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
+    const dataEncryptionKey: any =
+      '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
     const walletAddress = beneficiary
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
     })
 
     describe('when unrevoked', () => {
@@ -495,7 +411,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         assert.isFalse(isAccount)
         await assertRevert(
           releaseGoldInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
-            from: releaseOwner,
+            from: beneficiary,
           })
         )
       })
@@ -513,14 +429,10 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#setAccountName', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
     const accountName = 'name'
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
     })
 
     describe('when the account has not been created', () => {
@@ -561,14 +473,10 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#setAccountWalletAddress', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
     const walletAddress = beneficiary
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
     })
 
     describe('when the releaseGold account has not been created', () => {
@@ -619,14 +527,10 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#setAccountMetadataURL', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
     const metadataURL = 'meta'
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
     })
 
     describe('when the account has not been created', () => {
@@ -671,17 +575,14 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#setAccountDataEncryptionKey', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
-    const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
-    const longDataEncryptionKey =
+    const dataEncryptionKey: any =
+      '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
+    const longDataEncryptionKey: any =
       '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
       '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       await releaseGoldInstance.createAccount({ from: beneficiary })
     })
 
@@ -703,7 +604,8 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should allow setting a key with leading zeros', async () => {
-      const keyWithZeros = '0x00000000000000000000000000000000000000000000000f2f48ee19680706191111'
+      const keyWithZeros: any =
+        '0x00000000000000000000000000000000000000000000000f2f48ee19680706191111'
       await releaseGoldInstance.setAccountDataEncryptionKey(keyWithZeros, { from: beneficiary })
       // @ts-ignore
       const fetchedKey: string = await accountsInstance.getDataEncryptionKey(
@@ -713,8 +615,9 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should revert when the key is invalid', async () => {
+      const invalidKey: any = '0x32132931293'
       await assertRevert(
-        releaseGoldInstance.setAccountDataEncryptionKey('0x32132931293', { from: beneficiary })
+        releaseGoldInstance.setAccountDataEncryptionKey(invalidKey, { from: beneficiary })
       )
     })
 
@@ -731,13 +634,8 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#setMaxDistribution', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
-
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
     })
 
     describe('when the max distribution is set to 50%', () => {
@@ -766,8 +664,6 @@ contract('ReleaseGold', (accounts: string[]) => {
   describe('authorization tests:', () => {
     Object.keys(authorizationTestDescriptions).forEach((key) => {
       let authorizationTest: any
-      let releaseGoldInstanceAddress: any
-      let releaseGoldInstance: any
       const authorized = accounts[4] // the account that is to be authorized for whatever role
       let sig: any
 
@@ -778,8 +674,6 @@ contract('ReleaseGold', (accounts: string[]) => {
           releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
           releaseGoldSchedule.canValidate = true
           await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
-          releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-          releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
           await releaseGoldInstance.createAccount({ from: beneficiary })
 
           authorizationTests.voting = {
@@ -897,8 +791,6 @@ contract('ReleaseGold', (accounts: string[]) => {
   describe('#revoke', () => {
     it('releaseOwner should be able to revoke the releaseGold', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      const releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      const releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       const releaseOwnereleaseGoldTx = await releaseGoldInstance.revoke({ from: releaseOwner })
       const revokeBlockTimestamp = await getCurrentBlockchainTimestamp(web3)
       const [, , releaseGoldRevokeTime] = await releaseGoldInstance.revocationInfo()
@@ -912,15 +804,11 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should revert when non-releaseOwner attempts to revoke the releaseGold', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      const releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      const releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       await assertRevert(releaseGoldInstance.revoke({ from: accounts[5] }))
     })
 
     it('should revert if releaseGold is already revoked', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      const releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      const releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       await releaseGoldInstance.revoke({ from: releaseOwner })
       await assertRevert(releaseGoldInstance.revoke({ from: releaseOwner }))
     })
@@ -930,20 +818,13 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.revocable = false
       releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
       await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
-      const releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      const releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       await assertRevert(releaseGoldInstance.revoke({ from: releaseOwner }))
     })
   })
 
   describe('#refundAndFinalize', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
-
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       // wait some time for some gold to release
       const timeToTravel = 7 * MONTH
       await timeTravel(timeToTravel, web3)
@@ -1012,13 +893,9 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   describe('#lockGold', () => {
     let lockAmount = null
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       lockAmount = releaseGoldDefaultSchedule.amountReleasedPerPeriod.multipliedBy(
         releaseGoldDefaultSchedule.numReleasePeriods
       )
@@ -1067,13 +944,9 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   describe('#unlockGold', () => {
     let lockAmount: any
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       // beneficiary shall make the released gold instance an account
       await releaseGoldInstance.createAccount({ from: beneficiary })
       lockAmount = releaseGoldDefaultSchedule.amountReleasedPerPeriod.multipliedBy(
@@ -1150,8 +1023,6 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#withdrawLockedGold', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
     const value = 1000
     const index = 0
 
@@ -1159,8 +1030,6 @@ contract('ReleaseGold', (accounts: string[]) => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-        releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-        releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
         await releaseGoldInstance.createAccount({ from: beneficiary })
         await releaseGoldInstance.lockGold(value, { from: beneficiary })
         await releaseGoldInstance.unlockGold(value, { from: beneficiary })
@@ -1202,16 +1071,12 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#relockGold', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
     const pendingWithdrawalValue = 1000
     const index = 0
 
     beforeEach(async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       await releaseGoldInstance.createAccount({ from: beneficiary })
       await releaseGoldInstance.lockGold(pendingWithdrawalValue, { from: beneficiary })
       await releaseGoldInstance.unlockGold(pendingWithdrawalValue, { from: beneficiary })
@@ -1310,15 +1175,11 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   describe('#withdraw', () => {
     let initialreleaseGoldAmount: any
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
 
     beforeEach(async () => {
       const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
       releaseGoldSchedule.releaseStartTime = Math.round(Date.now() / 1000)
       await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       initialreleaseGoldAmount = releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
         releaseGoldSchedule.numReleasePeriods
       )
@@ -1433,7 +1294,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         describe('when max distribution is 100%', () => {
           beforeEach(async () => {
             // Simulate rewards of 0.5 Gold
-            await goldTokenInstance.transfer(releaseGoldInstanceAddress, ONE_GOLDTOKEN.div(2), {
+            await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.div(2), {
               from: owner,
             })
             // Default distribution is 100%
@@ -1478,7 +1339,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             await releaseGoldInstance.setMaxDistribution(500, { from: releaseOwner })
             // Simulate rewards of 0.5 Gold
             // Have to send after setting max distribution as mentioned above
-            await goldTokenInstance.transfer(releaseGoldInstanceAddress, ONE_GOLDTOKEN.div(2), {
+            await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.div(2), {
               from: owner,
             })
             const timeToTravel = 12 * MONTH + 1 * DAY
@@ -1604,8 +1465,6 @@ contract('ReleaseGold', (accounts: string[]) => {
         releaseGoldSchedule.subjectToLiquidityProvision = true
         await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
         // Withdraw `beforeEach` creates one instance, have to grab the second
-        releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 1)
-        releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
         const timeToTravel = 12 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
       })
@@ -1624,16 +1483,12 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#getCurrentReleasedTotalAmount', () => {
-    let releaseGoldInstanceAddress: any
-    let releaseGoldInstance: any
     let initialreleaseGoldAmount: any
 
     beforeEach(async () => {
       const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
       releaseGoldSchedule.releaseStartTime = Math.round(Date.now() / 1000)
       await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
-      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
-      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
       initialreleaseGoldAmount = releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
         releaseGoldSchedule.numReleasePeriods
       )

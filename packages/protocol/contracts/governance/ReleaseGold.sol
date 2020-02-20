@@ -3,12 +3,12 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./interfaces/IReleaseGoldInstance.sol";
+import "./interfaces/IReleaseGold.sol";
 import "../common/FixidityLib.sol";
 
 import "../common/UsingRegistry.sol";
 
-contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInstance {
+contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -69,6 +69,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   // Public struct housing params pertaining to revocation.
   RevocationInfo public revocationInfo;
 
+  // event ReleaseScheduleCreated(uint256 )
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);

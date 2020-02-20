@@ -1,6 +1,6 @@
 pragma solidity ^0.5.3;
 
-interface IReleaseGoldInstance {
+interface IReleaseGold {
   function isRevoked() external view returns (bool);
   function withdraw(uint256) external;
   function refundAndFinalize() external;
