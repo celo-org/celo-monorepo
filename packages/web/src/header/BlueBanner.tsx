@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
   container: {
     position: 'fixed',
     top: 0,
-    backgroundColor: '#3C9BF4',
+    backgroundColor: colors.deepBlue,
     width: '100%',
     maxWidth: '100vw',
     height: 0,

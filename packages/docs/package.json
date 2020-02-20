@@ -16,7 +16,8 @@
     "gitbook-cli": "^2.3.2"
   },
   "scripts": {
-    "build": "gitbook install && gitbook build"
+    "build": "gitbook install && gitbook build",
+    "preview": "gitbook install && gitbook serve"
   },
   "author": "",
   "license": "ISC"
