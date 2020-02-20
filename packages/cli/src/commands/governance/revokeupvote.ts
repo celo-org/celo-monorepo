@@ -1,4 +1,3 @@
-import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -25,6 +24,7 @@ export default class RevokeUpvote extends BaseCommand {
 
     // TODO(nategraf): Check whether there are upvotes to revoke before sending transaction.
     const governance = await this.kit.contracts.getGovernance()
+    const account = await (await this.kit.contracts.getAccounts()).voteSignerToAccount(signer)
     await displaySendTx(
       'revokeUpvoteTx',
       await governance.revokeUpvote(account),
