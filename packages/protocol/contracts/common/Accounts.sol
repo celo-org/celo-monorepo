@@ -107,6 +107,9 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   /**
    * @notice Setter for the wallet address for an account
    * @param walletAddress The wallet address to set for the account
+   * @dev Wallet address can be zero. This means that the owner of the wallet
+   *  does not want to be paid directly without interaction, and instead wants users to
+   * contact them, using the data encryption key, and arrange a payment.
    */
   function setWalletAddress(address walletAddress) public {
     require(isAccount(msg.sender), "Unknown account");
