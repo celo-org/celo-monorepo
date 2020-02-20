@@ -244,7 +244,7 @@ contract UsingPrecompiles {
    * @notice Computes byzantine quorum from current validator set size
    * @return Byzantine quorum of validators.
    */
-  function byzantineQuorumValidatorsInCurrentSet() public view returns (uint256) {
+  function minQuorumSizeInCurrentSet() internal view returns (uint256) {
     return minQuorumSize(block.number);
   }
 

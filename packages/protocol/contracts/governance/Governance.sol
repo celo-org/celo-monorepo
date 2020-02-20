@@ -959,7 +959,7 @@ contract Governance is
    * @return Whether validator whitelist tally >= validator byzantine quorum
    */
   function isHotfixPassing(bytes32 hash) public view returns (bool) {
-    return hotfixWhitelistValidatorTally(hash) >= byzantineQuorumValidatorsInCurrentSet();
+    return hotfixWhitelistValidatorTally(hash) >= minQuorumSizeInCurrentSet();
   }
 
   /**
