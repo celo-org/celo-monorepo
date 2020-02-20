@@ -1,5 +1,5 @@
-import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv, isVmBased } from 'src/lib/env-utils'
+import { getPrivateTxNodeClusterIP } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
@@ -18,12 +18,13 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string) {
-  let nodeUrl
+  let nodeIp
   if (isVmBased()) {
-    nodeUrl = `http://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8545`
+    nodeIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
   } else {
-    nodeUrl = getFornoUrl(celoEnv)
+    nodeIp = await getPrivateTxNodeClusterIP(celoEnv)
   }
+  const nodeUrl = `http://${nodeIp}:8545`
   return [
     `--set celotool.image.repository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
     `--set celotool.image.tag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,

@@ -55,7 +55,6 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  // Don't include nodes that are used for internal service RPCs
   const nodesJson = JSON.stringify(nodesData)
   console.debug('Static nodes are ' + nodesJson + '\n')
   await uploadDataToGoogleStorage(

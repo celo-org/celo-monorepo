@@ -33,8 +33,6 @@ export const handler = async (argv: Argv) => {
     `gcloud compute forwarding-rules list --format=json --project=${argv.project}`
   ).then(([body]) => JSON.parse(body))
 
-  console.log(rules)
-
   const candidates = rules.filter((rule) => rule.target && rule.target.includes('targetPools'))
 
   console.info('Determining health of rules')

@@ -493,7 +493,7 @@ export async function deleteStaticIPs(celoEnv: string) {
 export async function deletePersistentVolumeClaims(celoEnv: string) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
   try {
-    const componentLabels = ['validators', 'tx_nodes', 'proxy', 'private_tx_nodes']
+    const componentLabels = ['validators', 'tx_nodes', 'proxy', 'tx_nodes_private']
     for (const component of componentLabels) {
       const [output] = await execCmd(
         `kubectl delete pvc --selector='component=${component}' --namespace ${celoEnv}`
