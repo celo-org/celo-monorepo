@@ -8,7 +8,7 @@ const environments = {
       databaseURL: 'https://celo-faucet.firebaseio.com',
       projectId: 'celo-faucet',
     },
-    LEADERBOARD: {
+    BLOCKSCOUT: {
       pageLength: 5,
       uri: 'http://localhost:4000/graphiql',
     },

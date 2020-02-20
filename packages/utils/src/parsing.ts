@@ -2,13 +2,13 @@ import BigNumber from 'bignumber.js'
 const numeral = require('numeral')
 
 export const stringToBoolean = (inputString: string): boolean => {
-  const lowercasedInput = inputString.toLowerCase()
+  const lowercasedInput = inputString.toLowerCase().trim()
   if (lowercasedInput === 'true') {
     return true
   } else if (lowercasedInput === 'false') {
     return false
   }
-  throw new Error('Parsing error')
+  throw new Error(`Unable to parse '${inputString}' as boolean`)
 }
 
 export const parseInputAmount = (inputString: string): BigNumber => {

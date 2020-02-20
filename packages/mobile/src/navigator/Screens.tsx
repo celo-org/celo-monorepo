@@ -35,6 +35,7 @@ export enum Screens {
   ExchangeTradeScreen = 'ExchangeTradeScreen',
   FeeEducation = 'FeeEducation',
   FeeExchangeEducation = 'FeeExchangeEducation',
+  FiatExchange = 'FiatExchange',
   GoldEducation = 'GoldEducation',
   ImportWallet = 'ImportWallet',
   ImportWalletSocial = 'ImportWalletSocial',
