@@ -49,7 +49,15 @@ interface ValidatorsListProps {
   isLoading: boolean
 }
 
-type orderByTypes = 'name' | 'total' | 'votes' | 'gold' | 'commision' | 'rewards' | 'uptime'
+type orderByTypes =
+  | 'name'
+  | 'total'
+  | 'votes'
+  | 'gold'
+  | 'commision'
+  | 'rewards'
+  | 'uptime'
+  | 'attestation'
 
 export interface State {
   expanded: number | undefined
@@ -71,6 +79,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
     commision: (_) => _.commission,
     rewards: (_) => _.rewards,
     uptime: (_) => _.uptime,
+    attestation: (_) => _.attestation,
   }
   private defaultOrderAccessor = 'name'
   private cachedCleanData
@@ -124,7 +133,17 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
             rewardsStyle,
             numMembers,
             validators: affiliates.edges.map(({ node: validator }) => {
-              const { address, lastElected, lastOnline, name, usd, lockedGold, score } = validator
+              const {
+                address,
+                lastElected,
+                lastOnline,
+                name,
+                usd,
+                lockedGold,
+                score,
+                attestationsFulfilled,
+                attestationsRequested,
+              } = validator
               return {
                 name,
                 address,
@@ -133,6 +152,8 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                 elected: lastElected >= latestBlock,
                 online: lastOnline >= latestBlock,
                 uptime: (+score * 100) / 10 ** 24,
+                attestation:
+                  Math.max(0, attestationsFulfilled / (attestationsRequested || -1)) * 100,
               }
             }),
           }
@@ -140,15 +161,17 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
       )
       .map((group) => {
         const data = group.validators.reduce(
-          ({ elected, online, total, uptime }, validator) => ({
+          ({ elected, online, total, uptime, attestation }, validator) => ({
             elected: elected + +validator.elected,
             online: online + +validator.online,
             total: total + 1,
             uptime: uptime + validator.uptime,
+            attestation: attestation + validator.attestation,
           }),
-          { elected: 0, online: 0, total: 0, uptime: 0 }
+          { elected: 0, online: 0, total: 0, uptime: 0, attestation: 0 }
         )
         data.uptime = data.uptime / group.validators.length
+        data.attestation = data.attestation / group.validators.length
         return {
           ...group,
           ...data,
@@ -221,6 +244,12 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                 style={[styles.sizeS]}
                 name="Uptime"
                 order={orderBy === 'uptime' ? orderAsc : null}
+              />
+              <HeaderCell
+                onClick={this.orderBy.bind(this, 'attestation')}
+                style={[styles.sizeS]}
+                name="Attestation"
+                order={orderBy === 'attestation' ? orderAsc : null}
               />
             </View>
             {validatorGroups.map((group, i) => (
@@ -311,6 +340,13 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                   >
                     {formatNumber(group.uptime, 1)}%
                   </Text>
+                  <Text
+                    style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {formatNumber(group.attestation, 1)}%
+                  </Text>
                 </View>
                 {i === expanded && (
                   <View>
@@ -346,7 +382,7 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                           </Text>
                         </Text>
                         <Text
-                          style={[styles.tableSecondaryCell, styles.sizeS]}
+                          style={[styles.tableSecondaryCell, styles.sizeM]}
                           numberOfLines={1}
                           ellipsizeMode="tail"
                         >
@@ -383,6 +419,18 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                           ellipsizeMode="tail"
                         >
                           {formatNumber(validator.uptime, 1)}%
+                        </Text>
+                        <Text
+                          style={[
+                            styles.tableCell,
+                            styles.tableCellCenter,
+                            styles.tableSecondaryCell,
+                            styles.sizeS,
+                          ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {formatNumber(validator.attestation, 1)}%
                         </Text>
                       </View>
                     ))}
@@ -422,7 +470,7 @@ const styles = StyleSheet.create({
 
   // Table
   table: {
-    width: 960,
+    width: 1020,
     margin: 'auto',
     marginBottom: 100,
   },
@@ -461,7 +509,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderCellPadding: {
     textAlign: 'left',
-    paddingLeft: 16 + 20 + 24,
+    paddingLeft: 20 + 24,
     flexGrow: 1,
   },
   tableHeaderCellLeft: {
@@ -486,7 +534,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     overflow: 'hidden',
     flexGrow: 1,
-    width: 236,
+    width: 226,
   },
   tableCellTitleRows: {
     display: 'flex',
@@ -518,7 +566,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tableCellTitleNumber: {
-    marginLeft: 15 + 20 + 20,
+    marginLeft: 20 + 20,
     marginRight: 24,
     width: 10,
     fontSize: 14,
@@ -532,22 +580,6 @@ const styles = StyleSheet.create({
   },
   tableCellCenter: {
     textAlign: 'center',
-  },
-  tableCellDescription: {
-    alignSelf: 'flex-start',
-    maxWidth: 280,
-    minWidth: 280,
-    marginRight: 24,
-    marginLeft: 16 + 20 + 24,
-    opacity: 0.4,
-    fontFamily: typeFaces.garamond,
-    fontSize: 16,
-  },
-  tableCellTableContainer: {
-    flexGrow: 1,
-    alignSelf: 'flex-start',
-    paddingRight: 5,
-    maxWidth: 596,
   },
   tableSecondaryCell: {
     fontSize: 14,
@@ -575,7 +607,7 @@ const styles = StyleSheet.create({
   sizeS: { minWidth: 74 + 6, maxWidth: 74 + 6 },
   sizeM: { minWidth: 110 + 6, maxWidth: 110 + 6 },
   sizeL: { minWidth: 154 + 6, maxWidth: 154 + 6 },
-  sizeXL: { minWidth: 174 + 6, maxWidth: 174 + 6 },
+  sizeXL: { minWidth: 170, maxWidth: 170 },
 
   // Circle
   circle: {

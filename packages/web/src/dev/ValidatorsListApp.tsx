@@ -46,6 +46,8 @@ const query = gql`
             name
             score
             usd
+            attestationsFulfilled
+            attestationsRequested
           }
         }
       }
