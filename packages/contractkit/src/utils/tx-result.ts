@@ -1,7 +1,7 @@
 import { Future } from '@celo/utils/lib/future'
 import debugFactory from 'debug'
-import { TransactionReceipt } from 'src/newtypes'
 import PromiEvent from 'web3/promiEvent'
+import { TransactionReceipt } from '../newtypes'
 
 const debug = debugFactory('kit:tx:result')
 

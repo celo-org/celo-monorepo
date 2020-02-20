@@ -1,7 +1,7 @@
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
-import { EncodedTransaction } from 'web3/types'
+import { EncodedTransaction } from '../newtypes'
 import { EIP712TypedData } from './sign-typed-data-utils'
 import { recoverTransaction } from './signing-utils'
 import { DefaultWallet, Wallet } from './wallet'

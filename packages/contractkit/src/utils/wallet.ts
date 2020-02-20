@@ -6,8 +6,8 @@ import {
 } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { Tx } from 'web3/eth/types'
-import { EncodedTransaction } from 'web3/types'
 import { Address } from '../base'
+import { EncodedTransaction } from '../newtypes'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 import { signTransaction } from './signing-utils'
 
