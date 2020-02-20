@@ -11,6 +11,7 @@ import {
   UserTransactionsQueryVariables,
 } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { refreshAllBalances } from 'src/home/actions'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
@@ -42,6 +43,7 @@ interface StateProps {
 
 interface DispatchProps {
   removeStandbyTransaction: typeof removeStandbyTransaction
+  refreshAllBalances: typeof refreshAllBalances
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -156,7 +158,6 @@ function mapExchangeStandbyToFeedItem(
 
 function mapTransferStandbyToFeedItem(
   standbyTx: TransferStandby,
-  currency: CURRENCY_ENUM,
   localCurrencyCode: LocalCurrencyCode | null,
   localCurrencyExchangeRate: string | null | undefined
 ): FeedItem {
@@ -199,12 +200,7 @@ function mapStandbyTransactionToFeedItem(
     }
     // Otherwise it's a transfer
     else {
-      return mapTransferStandbyToFeedItem(
-        standbyTx,
-        currency,
-        localCurrencyCode,
-        localCurrencyExchangeRate
-      )
+      return mapTransferStandbyToFeedItem(standbyTx, localCurrencyCode, localCurrencyExchangeRate)
     }
   }
 }
@@ -234,6 +230,8 @@ export class TransactionsList extends React.PureComponent<Props> {
     if (transactions.length < 1) {
       return
     }
+    // Transaction list has changed and we need to refresh the balances
+    this.props.refreshAllBalances()
 
     const queryDataTxHashes = new Set(transactions.map((tx) => tx?.hash))
     const inQueryTxs = (tx: StandbyTransaction) =>
@@ -302,4 +300,5 @@ export class TransactionsList extends React.PureComponent<Props> {
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
   removeStandbyTransaction,
+  refreshAllBalances,
 })(TransactionsList)

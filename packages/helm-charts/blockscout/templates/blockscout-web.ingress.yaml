@@ -13,10 +13,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
+    - {{ .Release.Name }}.{{ .Values.domain.name }}.org
     secretName: {{ .Release.Name }}-web-tls
   rules:
-  - host: {{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
     http:
       paths:
       - path: /

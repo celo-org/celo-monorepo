@@ -41,12 +41,12 @@ import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
-import { zeroSyncSelector } from 'src/web3/selectors'
+import { fornoSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const INVITE_FEE = '0.2'
+const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
@@ -281,8 +281,8 @@ function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     let tempAccount: string | null = null
-    const zeroSyncMode = yield select(zeroSyncSelector)
-    if (zeroSyncMode) {
+    const fornoMode = yield select(fornoSelector)
+    if (fornoMode) {
       tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
       Logger.debug(
         TAG + '@redeemInviteCode',
@@ -312,8 +312,8 @@ export function* withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (!zeroSyncMode) {
+  const fornoMode = yield select(fornoSelector)
+  if (!fornoMode) {
     yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))

@@ -25,6 +25,7 @@ export interface State {
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  promptFornoIfNeeded: boolean
 }
 
 export enum PincodeType {
@@ -60,6 +61,7 @@ export const initialState = {
   dismissedEarnRewards: false,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
+  promptFornoIfNeeded: false,
 }
 
 export const reducer = (
@@ -178,6 +180,11 @@ export const reducer = (
           thumbnailPath: action.thumbnailPath,
         },
       }
+    case Actions.SET_PROMPT_FORNO:
+      return {
+        ...state,
+        promptFornoIfNeeded: action.promptIfNeeded,
+      }
     default:
       return state
   }
@@ -189,3 +196,4 @@ export const e164NumberSelector = (state: RootState) => state.account.e164PhoneN
 export const defaultCountryCodeSelector = (state: RootState) => state.account.defaultCountryCode
 export const userContactDetailsSelector = (state: RootState) => state.account.contactDetails
 export const pincodeTypeSelector = (state: RootState) => state.account.pincodeType
+export const promptFornoIfNeededSelector = (state: RootState) => state.account.promptFornoIfNeeded
