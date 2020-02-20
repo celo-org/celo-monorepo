@@ -32,9 +32,11 @@ The website uses [React.js](https://reactjs.org/), [Next.js](https://nextjs.org/
 
 The website is hosted on [Google App Engine](https://cloud.google.com/appengine/). In order to deploy it, you first need the [gcloud SDK](https://cloud.google.com/sdk/gcloud/).
 
-`brew install gcloud`
+` brew cask install google-cloud-sdk`
 
 You may need to log in and be granted additional permissions.
+
+`gcloud auth login`
 
 Make sure your dependencies are up to date. in this directory, run:
 
