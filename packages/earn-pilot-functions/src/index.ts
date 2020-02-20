@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import { transferDollars } from './sendTokens'
 const crypto = require('crypto')
 
 const admin = require('firebase-admin')
@@ -8,7 +9,9 @@ const REQUESTS_DB_NAME = 'celo-org-mobile-earn-pilot'
 const REQUESTS_DB_URL = 'https://celo-org-mobile-earn-pilot.firebaseio.com'
 const PILOT_PARTICIPANTS_DB_URL = 'https://celo-org-mobile-pilot.firebaseio.com'
 
-const FIGURE_EIGHT_KEY = functions.config().envs.secret_key
+const FIGURE_EIGHT_KEY = functions.config().envs
+  ? functions.config().envs.secret_key
+  : 'placeholder_for_local_dev'
 
 exports.handleFigureEightConfirmation = functions.database
   .instance(REQUESTS_DB_NAME)
@@ -20,6 +23,11 @@ exports.handleFigureEightConfirmation = functions.database
     const { confirmed, userId, adjAmount, jobTitle, conversionId } = message
     const signature = message.signature
     console.info(`Confirmed: ${confirmed}`)
+    if (typeof message.updated !== 'undefined') {
+      // Already updated
+      console.info('Already processed request, returning')
+      return null
+    }
 
     if (!confirmed) {
       // No response needed until request is confirmed
@@ -58,33 +66,50 @@ exports.transferEarnedBalance = functions.database
   .onWrite(async (change) => {
     const message = change.after.val()
 
-    console.info(`Message: ${message}`)
-    console.info(`Message type: ${typeof message}`)
-    // Cashout request
-    const { timestamp, userId } = message
+    const { timestamp, userId, amountEarned, account, processed, txId } = message
 
+    if (processed) {
+      console.info(`Already handled request for ${userId}, returning`)
+      return
+    }
     console.info(`Cashing out user ${userId}. Request time: ${timestamp}`)
+    const transferSuccess = await transferDollars(amountEarned, account)
+
+    if (!transferSuccess) {
+      console.error(`Unable to fulfill request ${txId}, returning unprocessed`)
+      return
+    }
+
     const participantsDb = admin
       .app()
       .database(PILOT_PARTICIPANTS_DB_URL)
       .ref('earnPilot/participants')
+    const msgRoot = participantsDb.child(userId)
+    msgRoot.child('earned').set(0)
+    msgRoot.child('cashedOut').transaction((cashedOut: number) => {
+      return (cashedOut || 0) + amountEarned
+    })
+    msgRoot.child('cashOutTxs').push({ txId, timestamp, userId, amountEarned })
+
+    // TODO confirm userId and address and amount match in database
+    /*
+    const snap = await admin
+      .app()
+      .database(PILOT_PARTICIPANTS_DB_URL)
+      // .ref('earnPilot/participants')
+      .once('value')
     console.info(`got participants db.`)
+    snap.forEach(async (val: any) => {
+      await console.log(val.key)
+    })
     const address = participantsDb.child(userId).child('address')
-    console.info(`got address`)
     const amountRef = participantsDb.child(userId).child('earned')
-    const amount = amountRef.getValue()
-    console.info(`Sending amount ${amount}.`)
-    amountRef.set(0) // Reset balance
-    // TODO send money
-    await transferDollars(amount, address)
+    const amount = amountRef.val()
+    */
     return change.after.ref.update({
       processed: true,
     })
   })
-
-const transferDollars = (amount: number, address: string) => {
-  console.info(`Sending ${amount} to ${address}`)
-}
 
 const validSignature = (signature: string, params: string) => {
   if (!FIGURE_EIGHT_KEY) {
