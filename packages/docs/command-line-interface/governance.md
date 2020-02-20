@@ -104,6 +104,25 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/governance/executehotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/executehotfix.ts)_
 
+### Hashhotfix
+
+Hash a governance hotfix specified by JSON and a salt
+
+```
+USAGE
+  $ celocli governance:hashhotfix
+
+OPTIONS
+  --jsonTransactions=jsonTransactions  (required) Path to json transactions of the hotfix
+  --salt=salt                          (required) Secret salt associated with hotfix
+
+EXAMPLE
+  hashhotfix --jsonTransactions ./transactions.json --salt
+  0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
+```
+
+_See code: [packages/cli/src/commands/governance/hashhotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/hashhotfix.ts)_
+
 ### List
 
 List live governance proposals (queued and ongoing)
