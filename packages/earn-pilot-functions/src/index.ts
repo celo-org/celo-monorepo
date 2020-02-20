@@ -19,9 +19,11 @@ exports.handleFigureEightConfirmation = functions.database
     // Whenever a confirmation is written
     const { confirmed, userId, adjAmount, jobTitle, conversionId } = message
     const signature = message.signature
+    console.info(`Confirmed: ${confirmed}`)
 
     if (!confirmed) {
       // No response needed until request is confirmed
+      console.info('Unconfirmed request, no update needed')
       return null
     }
 
@@ -37,7 +39,7 @@ exports.handleFigureEightConfirmation = functions.database
       .app()
       .database(PILOT_PARTICIPANTS_DB_URL)
       .ref('earnPilot/participants')
-    const msgRoot = participantsDb.child('annakaz')
+    const msgRoot = participantsDb.child(userId)
     msgRoot.child('earned').transaction((earned: number) => {
       return (earned || 0) + adjAmount
     })
@@ -49,6 +51,40 @@ exports.handleFigureEightConfirmation = functions.database
       updated: true,
     })
   })
+
+exports.transferEarnedBalance = functions.database
+  .instance(REQUESTS_DB_NAME)
+  .ref('requests/{uid}')
+  .onWrite(async (change) => {
+    const message = change.after.val()
+
+    console.info(`Message: ${message}`)
+    console.info(`Message type: ${typeof message}`)
+    // Cashout request
+    const { timestamp, userId } = message
+
+    console.info(`Cashing out user ${userId}. Request time: ${timestamp}`)
+    const participantsDb = admin
+      .app()
+      .database(PILOT_PARTICIPANTS_DB_URL)
+      .ref('earnPilot/participants')
+    console.info(`got participants db.`)
+    const address = participantsDb.child(userId).child('address')
+    console.info(`got address`)
+    const amountRef = participantsDb.child(userId).child('earned')
+    const amount = amountRef.getValue()
+    console.info(`Sending amount ${amount}.`)
+    amountRef.set(0) // Reset balance
+    // TODO send money
+    await transferDollars(amount, address)
+    return change.after.ref.update({
+      processed: true,
+    })
+  })
+
+const transferDollars = (amount: number, address: string) => {
+  console.info(`Sending ${amount} to ${address}`)
+}
 
 const validSignature = (signature: string, params: string) => {
   if (!FIGURE_EIGHT_KEY) {
