@@ -163,6 +163,8 @@ spec:
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
+          [[ "$CLEAN_VALIDATOR_ROUNTSTATE_FOLDER" == "true" ]] && rm -rf /root/.celo/Celo/roundstates
+
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
@@ -218,6 +220,8 @@ spec:
           value: "{{ default false .Values.geth.ping_ip_from_packet }}"
         - name: IN_MEMORY_DISCOVERY_TABLE
           value: "{{ default "false" .Values.geth.in_memory_discovery_table }}"
+        - name: CLEAN_VALIDATOR_ROUNTSTATE_FOLDER
+          value: "{{ default "false" .Values.geth.clean_validator_rountstate_folder }}"
         ports:
         - name: discovery-udp
           containerPort: 30303
