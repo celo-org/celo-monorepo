@@ -259,14 +259,13 @@ spec:
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
-          RPC_APIS="eth,net,web3,debug"
+          RPC_APIS={{ .rpc_apis }}
 
           {{ if .proxy }}
           VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
           ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }} --proxy.allowprivateip"
           {{ else }}
           ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
-          RPC_APIS=${RPC_APIS},txpool
           {{ end }}
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
