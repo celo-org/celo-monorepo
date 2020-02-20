@@ -819,7 +819,7 @@ contract Election is
    * @return The list of elected validators.
    */
   function electValidatorSigners() external view returns (address[] memory) {
-    return electValidatorSigneres(electableValidators.min, electableValidators.max);
+    return electValidatorSigners(electableValidators.min, electableValidators.max);
   }
 
   /**
