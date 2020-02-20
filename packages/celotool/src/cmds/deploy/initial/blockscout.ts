@@ -1,4 +1,4 @@
-import { installHelmChart } from 'src/lib/blockscout'
+import { createDefaultIngressIfNotExists, installHelmChart } from 'src/lib/blockscout'
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
 import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
@@ -42,6 +42,10 @@ export const handler = async (argv: BlockscoutInitialArgv) => {
   await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName)
 
   const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
+  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
+    'BLOCKSCOUT_DB_SUFFIX',
+    ''
+  )}`
 
   const [
     blockscoutDBUsername,
@@ -51,8 +55,11 @@ export const handler = async (argv: BlockscoutInitialArgv) => {
 
   await installHelmChart(
     argv.celoEnv,
+    helmReleaseName,
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName
   )
+
+  await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
 }

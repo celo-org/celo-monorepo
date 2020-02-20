@@ -5,7 +5,7 @@ import { getAddress } from '../src/tx'
 // Obtained from `yarn cli config:get --net alfajores`
 const Config = {
   stable_token_address: '0xd4b4fcaCAc9e23225680e89308E0a4C41Dd9C6B4',
-  node_url: 'http://35.185.236.10:8545',
+  node_url: 'https://alfajores-forno.celo-testnet.org',
   escrow_address: '0xEa1B07eb5E3D3f3b93bf0d0ca7e6E2ba6F566Af4',
   gold_token_address: '0x11CD75C45638Ec9f41C0e8Df78fc756201E48ff2',
 }
@@ -31,13 +31,10 @@ async function main() {
   }
 
   // Escrow address is an empty string, because we don't need that contract in this function
-  const celo = new CeloAdapter(
-    web3,
+  const celo = new CeloAdapter({
     pk,
-    Config.stable_token_address,
-    Config.escrow_address,
-    Config.gold_token_address
-  )
+    nodeUrl: Config.node_url,
+  })
 
   const printBalance = async (name: string, addr: string) => {
     console.log(`Account ${name}: ${addr}`)
@@ -53,12 +50,12 @@ async function main() {
   const dollarAmount = Web3.utils.toWei('1', 'ether')
 
   const goldTx = await celo.transferGold(to, goldAmount)
-  console.log('txhash', await goldTx.getHash())
-  console.log('receipt', await goldTx.waitReceipt())
+  console.log('txhash', await goldTx.sendAndWaitForReceipt())
+  console.log('receipt', await goldTx.sendAndWaitForReceipt)
 
   const dollarTx = await celo.transferDollars(to, dollarAmount)
-  console.log('txhash', await dollarTx.getHash())
-  console.log('receipt', await dollarTx.waitReceipt())
+  console.log('txhash', await dollarTx.sendAndWaitForReceipt())
+  console.log('receipt', await dollarTx.sendAndWaitForReceipt())
 
   await printBalance('Funder', celo.defaultAddress)
   await printBalance('Recipient', to)

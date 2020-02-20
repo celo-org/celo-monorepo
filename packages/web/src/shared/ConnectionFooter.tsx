@@ -90,4 +90,4 @@ const styles = StyleSheet.create({
   emailLogo: { width: 50, height: 50, marginVertical: 10 },
 })
 
-export default withNamespaces(NameSpaces.community)(ConnectionFooter)
+export default withNamespaces([NameSpaces.common, NameSpaces.community])(ConnectionFooter)
