@@ -137,6 +137,7 @@ contract('Attestations', (accounts: string[]) => {
     const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
+    await random.initialize(256)
     await random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
