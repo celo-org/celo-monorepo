@@ -74,21 +74,9 @@ variable in_memory_discovery_table {
   description = "Specifies whether to use an in memory discovery table"
 }
 
-variable internal_node_count {
-  type        = number
-  description = "Number of internal nodes that are created"
-  default     = 0
-}
-
 variable instance_tags {
   type        = list(string)
   description = "Tags to set for the instance"
-  default     = []
-}
-
-variable internal_instance_tags {
-  type        = list(string)
-  description = "Tags to set for internal instances"
   default     = []
 }
 

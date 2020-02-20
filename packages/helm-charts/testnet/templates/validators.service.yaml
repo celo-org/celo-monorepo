@@ -14,7 +14,7 @@
 ---
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "validators" "svc_name_suffix" "-tcp" "component_label" "validators" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
-  - name: discovery
+  - name: celo
     port: 30303
     protocol: TCP
 ---

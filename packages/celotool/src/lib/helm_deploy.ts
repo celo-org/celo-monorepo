@@ -38,7 +38,7 @@ async function failIfSecretMissing(secretName: string, namespace: string) {
 async function copySecret(secretName: string, srcNamespace: string, destNamespace: string) {
   console.info(`Copying secret ${secretName} from namespace ${srcNamespace} to ${destNamespace}`)
   await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} -o yaml |\
-  grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid |\
+  grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid | grep -v namespace |\
   kubectl apply --namespace=${destNamespace} -f -`)
 }
 
@@ -376,6 +376,10 @@ export async function createStaticIPs(celoEnv: string) {
     await Promise.all(
       range(numValdiators).map((i) => registerIPAddress(`${celoEnv}-validators-${i}`))
     )
+    const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    await Promise.all(
+      range(numPrivateTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    )
   }
 
   return
@@ -394,6 +398,17 @@ export async function upgradeStaticIPs(celoEnv: string) {
       'validators',
       prevValidatorNodeCount,
       newValidatorNodeCount
+    )
+    const prevPrivateTxNodeCount = await getStatefulSetReplicas(
+      celoEnv,
+      `${celoEnv}-tx-nodes-private`
+    )
+    const newPrivateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    await upgradeNodeTypeStaticIPs(
+      celoEnv,
+      'tx-nodes-private',
+      prevPrivateTxNodeCount,
+      newPrivateTxNodeCount
     )
   }
 }
@@ -466,15 +481,19 @@ export async function deleteStaticIPs(celoEnv: string) {
 
   await deleteIPAddress(`${celoEnv}-bootnode`)
 
-  const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  await Promise.all(range(numValdiators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
-  return
+  const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+  await Promise.all(range(numValidators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
+
+  const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  await Promise.all(
+    range(numPrivateTxNodes).map((i) => deleteIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+  )
 }
 
 export async function deletePersistentVolumeClaims(celoEnv: string) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
   try {
-    const componentLabels = ['validators', 'tx_nodes', 'proxy']
+    const componentLabels = ['validators', 'tx_nodes', 'proxy', 'private_tx_nodes']
     for (const component of componentLabels) {
       const [output] = await execCmd(
         `kubectl delete pvc --selector='component=${component}' --namespace ${celoEnv}`
@@ -527,6 +546,17 @@ async function helmIPParameters(celoEnv: string) {
     ipAddressParameters.push(...singleValidatorAddressParameters)
     const listOfValidatorAddresses = validatorsAddresses.join('/')
     ipAddressParameters.push(`--set geth.validator_ip_addresses=${listOfValidatorAddresses}`)
+
+    const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    const privateTxAddresses = await Promise.all(
+      range(numPrivateTxNodes).map((i) => retrieveIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    )
+    const privateTxAddressParameters = privateTxAddresses.map(
+      (address, i) => `--set geth.private_tx_nodes_${i}IpAddress=${address}`
+    )
+    ipAddressParameters.push(...privateTxAddressParameters)
+    const listOfAddresses = privateTxAddresses.join('/')
+    ipAddressParameters.push(`--set geth.private_tx_node_ip_addresses=${listOfAddresses}`)
   }
 
   return ipAddressParameters
@@ -571,6 +601,7 @@ async function helmParameters(celoEnv: string) {
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
+    `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,

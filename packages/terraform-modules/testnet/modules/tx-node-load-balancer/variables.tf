@@ -33,11 +33,6 @@ variable gcloud_vm_service_account_email {
   description = "The email of the service account to associate virtual machines with"
 }
 
-variable internal_tx_node_count {
-  type        = number
-  description = "Number of internal tx-nodes that are created"
-}
-
 variable letsencrypt_email {
   type        = string
   description = "The email to create letsencrypt certificates with"
@@ -48,7 +43,12 @@ variable network_name {
   description = "Name of the GCP network the tx-node load balancer is in"
 }
 
+variable private_tx_node_self_links {
+  type        = list(string)
+  description = "A list including the self_links of each private/internal tx-node"
+}
+
 variable tx_node_self_links {
   type        = list(string)
-  description = "A list including the self_links of each tx-node"
+  description = "A list including the self_links of each public/external tx-node"
 }
