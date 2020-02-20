@@ -4,7 +4,7 @@ Currency price oracle contract.
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹SortedOracles›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[SortedOracles](../enums/_base_.celocontract.md#sortedoracles)›
 
   ↳ **SortedOraclesWrapper**
 
@@ -41,7 +41,7 @@ Currency price oracle contract.
 
 ###  constructor
 
-\+ **new SortedOraclesWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: SortedOracles): *[SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)*
+\+ **new SortedOraclesWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [SortedOracles](../enums/_base_.celocontract.md#sortedoracles)): *[SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -52,7 +52,7 @@ Currency price oracle contract.
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | SortedOracles |
+`contract` | [SortedOracles](../enums/_base_.celocontract.md#sortedoracles) |
 
 **Returns:** *[SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)*
 

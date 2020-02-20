@@ -4,7 +4,7 @@ Contract for handling deposits needed for voting.
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Accounts›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Accounts](../enums/_base_.celocontract.md#accounts)›
 
   ↳ **AccountsWrapper**
 
@@ -55,7 +55,7 @@ Contract for handling deposits needed for voting.
 
 ###  constructor
 
-\+ **new AccountsWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Accounts): *[AccountsWrapper](_wrappers_accounts_.accountswrapper.md)*
+\+ **new AccountsWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Accounts](../enums/_base_.celocontract.md#accounts)): *[AccountsWrapper](_wrappers_accounts_.accountswrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -66,7 +66,7 @@ Contract for handling deposits needed for voting.
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | Accounts |
+`contract` | [Accounts](../enums/_base_.celocontract.md#accounts) |
 
 **Returns:** *[AccountsWrapper](_wrappers_accounts_.accountswrapper.md)*
 

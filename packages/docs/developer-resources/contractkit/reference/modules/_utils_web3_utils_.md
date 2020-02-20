@@ -11,7 +11,7 @@
 
 ### `Const` getAbiTypes
 
-▸ **getAbiTypes**(`abi`: ABIDefinition[], `methodName`: string): *string[]*
+▸ **getAbiTypes**(`abi`: ABIDefinition[], `methodName`: string): *any*
 
 *Defined in [contractkit/src/utils/web3-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L3)*
 
@@ -22,7 +22,7 @@ Name | Type |
 `abi` | ABIDefinition[] |
 `methodName` | string |
 
-**Returns:** *string[]*
+**Returns:** *any*
 
 ___
 
@@ -42,4 +42,4 @@ Name | Type |
 
 * **args**: *any[]*
 
-* **params**: *DecodedParamsObject*
+* **params**: *any*

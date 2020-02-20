@@ -4,7 +4,7 @@ Stores the gas price minimum
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹GasPriceMinimum›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[GasPriceMinimum](../enums/_base_.celocontract.md#gaspriceminimum)›
 
   ↳ **GasPriceMinimumWrapper**
 
@@ -34,7 +34,7 @@ Stores the gas price minimum
 
 ###  constructor
 
-\+ **new GasPriceMinimumWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: GasPriceMinimum): *[GasPriceMinimumWrapper](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)*
+\+ **new GasPriceMinimumWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [GasPriceMinimum](../enums/_base_.celocontract.md#gaspriceminimum)): *[GasPriceMinimumWrapper](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -45,7 +45,7 @@ Stores the gas price minimum
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | GasPriceMinimum |
+`contract` | [GasPriceMinimum](../enums/_base_.celocontract.md#gaspriceminimum) |
 
 **Returns:** *[GasPriceMinimumWrapper](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)*
 

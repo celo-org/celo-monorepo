@@ -4,6 +4,8 @@ description: Interact with on-chain governance proposals and hotfixes
 
 ## Commands
 
+<<<<<<< HEAD
+
 ### Approve
 
 Approve a dequeued governance proposal
@@ -59,6 +61,10 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/governance/dequeue.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/dequeue.ts)_
+
+=======
+
+> > > > > > > a607670b2... update docs
 
 ### Execute
 
@@ -155,6 +161,23 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/governance/propose.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/propose.ts)_
+
+### Revokeupvote
+
+Revoke upvotes for queued governance proposals
+
+```
+USAGE
+  $ celocli governance:revokeupvote
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
+
+EXAMPLE
+  revokeupvote --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/governance/revokeupvote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/revokeupvote.ts)_
 
 ### Upvote
 

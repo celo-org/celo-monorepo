@@ -4,7 +4,7 @@ Contract handling slashing for Validator downtime
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹DowntimeSlasher›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher)›
 
   ↳ **DowntimeSlasherWrapper**
 
@@ -35,7 +35,7 @@ Contract handling slashing for Validator downtime
 
 ###  constructor
 
-\+ **new DowntimeSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: DowntimeSlasher): *[DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)*
+\+ **new DowntimeSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher)): *[DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -46,7 +46,7 @@ Contract handling slashing for Validator downtime
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | DowntimeSlasher |
+`contract` | [DowntimeSlasher](../enums/_base_.celocontract.md#downtimeslasher) |
 
 **Returns:** *[DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)*
 

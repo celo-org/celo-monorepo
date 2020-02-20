@@ -4,7 +4,7 @@ Contract for handling reserve for stable currencies
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Escrow›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Escrow](../enums/_base_.celocontract.md#escrow)›
 
   ↳ **EscrowWrapper**
 
@@ -34,7 +34,7 @@ Contract for handling reserve for stable currencies
 
 ###  constructor
 
-\+ **new EscrowWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Escrow): *[EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)*
+\+ **new EscrowWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Escrow](../enums/_base_.celocontract.md#escrow)): *[EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -45,7 +45,7 @@ Contract for handling reserve for stable currencies
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | Escrow |
+`contract` | [Escrow](../enums/_base_.celocontract.md#escrow) |
 
 **Returns:** *[EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)*
 

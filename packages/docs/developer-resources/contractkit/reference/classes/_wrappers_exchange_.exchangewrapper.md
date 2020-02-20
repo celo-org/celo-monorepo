@@ -5,7 +5,7 @@ using a Constant Product Market Maker Model
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Exchange›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Exchange](../enums/_base_.celocontract.md#exchange)›
 
   ↳ **ExchangeWrapper**
 
@@ -49,7 +49,7 @@ using a Constant Product Market Maker Model
 
 ###  constructor
 
-\+ **new ExchangeWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Exchange): *[ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)*
+\+ **new ExchangeWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Exchange](../enums/_base_.celocontract.md#exchange)): *[ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -60,7 +60,7 @@ using a Constant Product Market Maker Model
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | Exchange |
+`contract` | [Exchange](../enums/_base_.celocontract.md#exchange) |
 
 **Returns:** *[ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)*
 

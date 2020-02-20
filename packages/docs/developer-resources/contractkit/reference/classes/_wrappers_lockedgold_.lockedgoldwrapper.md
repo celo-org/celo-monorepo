@@ -4,7 +4,7 @@ Contract for handling deposits needed for voting.
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹LockedGold›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[LockedGold](../enums/_base_.celocontract.md#lockedgold)›
 
   ↳ **LockedGoldWrapper**
 
@@ -44,7 +44,7 @@ Contract for handling deposits needed for voting.
 
 ###  constructor
 
-\+ **new LockedGoldWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: LockedGold): *[LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)*
+\+ **new LockedGoldWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [LockedGold](../enums/_base_.celocontract.md#lockedgold)): *[LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -55,7 +55,7 @@ Contract for handling deposits needed for voting.
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | LockedGold |
+`contract` | [LockedGold](../enums/_base_.celocontract.md#lockedgold) |
 
 **Returns:** *[LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)*
 

@@ -4,7 +4,7 @@ Contract for handling multisig actions
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹MultiSig›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[MultiSig](../enums/_base_.celocontract.md#multisig)›
 
   ↳ **MultiSigWrapper**
 
@@ -37,7 +37,7 @@ Contract for handling multisig actions
 
 ###  constructor
 
-\+ **new MultiSigWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: MultiSig): *[MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)*
+\+ **new MultiSigWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [MultiSig](../enums/_base_.celocontract.md#multisig)): *[MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -48,7 +48,7 @@ Contract for handling multisig actions
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | MultiSig |
+`contract` | [MultiSig](../enums/_base_.celocontract.md#multisig) |
 
 **Returns:** *[MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)*
 
@@ -200,7 +200,7 @@ ___
 
 ###  submitOrConfirmTransaction
 
-▸ **submitOrConfirmTransaction**(`destination`: string, `txObject`: TransactionObject‹any›): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*
+▸ **submitOrConfirmTransaction**(`destination`: string, `txObject`: TransactionObject‹any›): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
 
 *Defined in [contractkit/src/wrappers/MultiSig.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L32)*
 
@@ -215,4 +215,4 @@ Name | Type |
 `destination` | string |
 `txObject` | TransactionObject‹any› |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*

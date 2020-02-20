@@ -51,10 +51,10 @@ ___
 
 ###  waitReceipt
 
-▸ **waitReceipt**(): *Promise‹TransactionReceipt›*
+▸ **waitReceipt**(): *Promise‹any›*
 
 *Defined in [contractkit/src/utils/tx-result.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L59)*
 
 Get (& wait for) transaction receipt
 
-**Returns:** *Promise‹TransactionReceipt›*
+**Returns:** *Promise‹any›*

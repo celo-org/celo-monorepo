@@ -2,7 +2,7 @@
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Attestations›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Attestations](../enums/_base_.celocontract.md#attestations)›
 
   ↳ **AttestationsWrapper**
 
@@ -47,7 +47,7 @@
 
 ###  constructor
 
-\+ **new AttestationsWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Attestations): *[AttestationsWrapper](_wrappers_attestations_.attestationswrapper.md)*
+\+ **new AttestationsWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Attestations](../enums/_base_.celocontract.md#attestations)): *[AttestationsWrapper](_wrappers_attestations_.attestationswrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -58,7 +58,7 @@
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | Attestations |
+`contract` | [Attestations](../enums/_base_.celocontract.md#attestations) |
 
 **Returns:** *[AttestationsWrapper](_wrappers_attestations_.attestationswrapper.md)*
 
@@ -318,7 +318,7 @@ ___
 
 ###  complete
 
-▸ **complete**(`phoneNumber`: string, `account`: [Address](../modules/_base_.md#address), `issuer`: [Address](../modules/_base_.md#address), `code`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+▸ **complete**(`phoneNumber`: string, `account`: [Address](../modules/_base_.md#address), `issuer`: [Address](../modules/_base_.md#address), `code`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
 
 *Defined in [contractkit/src/wrappers/Attestations.ts:291](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L291)*
 
@@ -333,7 +333,7 @@ Name | Type | Description |
 `issuer` | [Address](../modules/_base_.md#address) | The issuer of the attestation |
 `code` | string | The code received by the validator  |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
 
 ___
 
@@ -435,7 +435,7 @@ ___
 
 ###  request
 
-▸ **request**(`phoneNumber`: string, `attestationsRequested`: number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+▸ **request**(`phoneNumber`: string, `attestationsRequested`: number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
 
 *Defined in [contractkit/src/wrappers/Attestations.ts:399](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L399)*
 
@@ -448,7 +448,7 @@ Name | Type | Description |
 `phoneNumber` | string | The phone number for which to request attestations for |
 `attestationsRequested` | number | The number of attestations to request  |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
 
 ___
 
@@ -473,7 +473,7 @@ ___
 
 ###  selectIssuers
 
-▸ **selectIssuers**(`phoneNumber`: string): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+▸ **selectIssuers**(`phoneNumber`: string): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown›*
 
 *Defined in [contractkit/src/wrappers/Attestations.ts:412](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L412)*
 
@@ -485,7 +485,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `phoneNumber` | string | The phone number for which to request attestations for  |
 
-**Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+**Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown›*
 
 ___
 

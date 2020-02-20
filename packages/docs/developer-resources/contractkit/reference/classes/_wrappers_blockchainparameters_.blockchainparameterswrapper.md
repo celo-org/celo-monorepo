@@ -4,7 +4,7 @@ Network parameters that are configurable by governance.
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹BlockchainParameters›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[BlockchainParameters](../enums/_base_.celocontract.md#blockchainparameters)›
 
   ↳ **BlockchainParametersWrapper**
 
@@ -30,7 +30,7 @@ Network parameters that are configurable by governance.
 
 ###  constructor
 
-\+ **new BlockchainParametersWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: BlockchainParameters): *[BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)*
+\+ **new BlockchainParametersWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [BlockchainParameters](../enums/_base_.celocontract.md#blockchainparameters)): *[BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -41,7 +41,7 @@ Network parameters that are configurable by governance.
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | BlockchainParameters |
+`contract` | [BlockchainParameters](../enums/_base_.celocontract.md#blockchainparameters) |
 
 **Returns:** *[BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)*
 
