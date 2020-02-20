@@ -317,7 +317,7 @@ if (enableFirebase.toBoolean()){
 // https://github.com/facebook/react-native/issues/26400#issuecomment-539395814
 configurations.all {
      resolutionStrategy {
-       force "com.facebook.soloader:soloader:0.8.0"
+       force "com.facebook.soloader:soloader:0.8.1"
      }
 }
 
