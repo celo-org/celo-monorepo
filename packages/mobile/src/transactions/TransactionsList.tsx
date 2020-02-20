@@ -223,11 +223,10 @@ function mapStandbyTransactionToFeedItem(
         localCurrencyCode,
         localCurrencyExchangeRate
       )
-    }
-    // Otherwise it's a transfer
-    else if (standbyTx.type === TokenTransactionType.Earn) {
+    } else if (standbyTx.type === TokenTransactionType.Earn) {
       return mapEarnStandbyToFeedItem(standbyTx, localCurrencyCode, localCurrencyExchangeRate)
     } else {
+      // Otherwise it's a transfer
       return mapTransferStandbyToFeedItem(standbyTx, localCurrencyCode, localCurrencyExchangeRate)
     }
   }

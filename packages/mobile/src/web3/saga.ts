@@ -338,7 +338,6 @@ export function* unlockAccount(account: string) {
       } else {
         Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in forno mode`)
         const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
-        Logger.info(TAG + '@unlockAccount', `private key is ${privateKey}`)
         addLocalAccount(web3, privateKey)
         accountAlreadyAddedInFornoMode = true
       }
@@ -416,7 +415,6 @@ export function* ensureAccountInWeb3Keystore() {
       )
       const pincode = yield call(getPincode)
       const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, pincode)
-      Logger.info(`Private key: ${privateKey}`)
       const account: string = yield call(
         addAccountToWeb3Keystore,
         privateKey,

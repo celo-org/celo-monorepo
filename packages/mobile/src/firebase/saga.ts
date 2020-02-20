@@ -259,12 +259,12 @@ function* initiateFigureEightCashoutSaga() {
     addStandbyTransaction({
       id: txId,
       type: TokenTransactionType.Earn,
-      comment: 'placeholder',
+      comment: '',
       status: TransactionStatus.Pending,
       value: amountEarned.toString(),
       symbol: CURRENCY_ENUM.DOLLAR,
-      timestamp: Math.floor(Date.now() / 1000),
-      address: '0x00',
+      timestamp: date,
+      address: '',
     })
   )
   yield call(initiateFigureEightCashout, userId, account, amountEarned, txId)
