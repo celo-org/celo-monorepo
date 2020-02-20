@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Faucet from '../../../pages/build/faucet'
+import Wallet from '../../../pages/developers/wallet'
 
-describe('Faucet', () => {
+describe('Wallet', () => {
   it('renders', () => {
-    const tree = renderer.create(<Faucet />).toJSON()
+    const tree = renderer.create(<Wallet />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })
