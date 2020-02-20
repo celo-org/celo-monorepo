@@ -28,8 +28,12 @@ export default class View extends BaseCommand {
     const governance = await this.kit.contracts.getGovernance()
     const record = await governance.getProposalRecord(id)
     if (!raw) {
-      const jsonproposal = await proposalToJSON(this.kit, record.proposal)
-      record.proposal = jsonproposal as any
+      try {
+        const jsonproposal = await proposalToJSON(this.kit, record.proposal)
+        record.proposal = jsonproposal as any
+      } catch (error) {
+        console.warn(`Could not decode proposal, displaying raw data: ${error}`)
+      }
     }
 
     // Identify the transaction with the highest constitutional requirement.
