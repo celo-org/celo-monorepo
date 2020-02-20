@@ -8,6 +8,14 @@ You can run the local version by first ensuring you have installed the latest de
 
 `yarn`
 
+then by decrypted the secrets file, this requires being authenticated on gcloud
+
+`brew cask install google-cloud-sdk` && `gcloud auth login` 
+
+from root of monorepo run `yarn run keys:decrypt` 
+
+
+
 and then running
 
 `yarn run dev`
@@ -32,7 +40,7 @@ The website uses [React.js](https://reactjs.org/), [Next.js](https://nextjs.org/
 
 The website is hosted on [Google App Engine](https://cloud.google.com/appengine/). In order to deploy it, you first need the [gcloud SDK](https://cloud.google.com/sdk/gcloud/).
 
-` brew cask install google-cloud-sdk`
+`brew cask install google-cloud-sdk`
 
 You may need to log in and be granted additional permissions.
 
