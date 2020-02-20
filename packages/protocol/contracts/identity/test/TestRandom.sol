@@ -9,4 +9,9 @@ contract TestRandom is Random {
   function getTestRandomness(uint256 blockNumber, uint256 cur) external view returns (bytes32) {
     return _getBlockRandomness(blockNumber, cur);
   }
+  function testRevealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer)
+    external
+  {
+    _revealAndCommit(randomness, newCommitment, proposer);
+  }
 }
