@@ -64,7 +64,7 @@ interface ReleaseGoldConfig {
   canVote: boolean
 }
 
-const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGoldInstance')
+const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGold')
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')

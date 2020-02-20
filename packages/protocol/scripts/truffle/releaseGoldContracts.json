@@ -1,0 +1,32 @@
+[
+  {
+  "releaseStartTime": 0,
+  "releaseCliffTime": 0,
+  "numReleasePeriods": 0,
+  "releasePeriod": 0,
+  "amountReleasedPerPeriod": 0,
+  "revocable": true,
+  "beneficiary": "0x0",
+  "releaseOwner": "0x0",
+  "refundAddress": "0x0",
+  "subjectToLiquidityProvision": true,
+  "initialDistributionPercentage": 1000,
+  "canValidate": false,
+  "canVote": true
+  },
+  {
+  "releaseStartTime": 0,
+  "releaseCliffTime": 0,
+  "numReleasePeriods": 0,
+  "releasePeriod": 0,
+  "amountReleasedPerPeriod": 2,
+  "revocable": true,
+  "beneficiary": "0x0",
+  "releaseOwner": "0x0",
+  "refundAddress": "0x0",
+  "subjectToLiquidityProvision": true,
+  "initialDistributionPercentage": 1000,
+  "canValidate": false,
+  "canVote": true
+  }
+]
