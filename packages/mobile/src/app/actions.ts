@@ -24,6 +24,7 @@ export enum Actions {
   SET_FIGURE_EIGHT_ACCOUNT = 'APP/SET_FIGURE_EIGHT_ACCOUNT',
   REFRESH_FIGURE_EIGHT_EARNED = 'APP/REFRESH_FIGURE_EIGHT_EARNED',
   SET_FIGURE_EIGHT_EARNED = 'APP/SET_FIGURE_EIGHT_EARNED',
+  INITIATE_FIGURE_EIGHT_CASHOUT = 'APP/INITIATE_FIGURE_EIGHT_CASHOUT',
 }
 
 interface SetLoggedIn {
@@ -53,6 +54,10 @@ export interface RefreshFigureEightEarned {
 export interface SetFigureEightEarned {
   type: Actions.SET_FIGURE_EIGHT_EARNED
   amount: number
+}
+
+export interface InitiateFigureEightCashout {
+  type: Actions.INITIATE_FIGURE_EIGHT_CASHOUT
 }
 
 export interface OpenDeepLink {
@@ -106,6 +111,7 @@ export type ActionTypes =
   | SetFigureEightAccount
   | RefreshFigureEightEarned
   | SetFigureEightEarned
+  | InitiateFigureEightCashout
 
 export const setLoggedIn = (loggedIn: boolean) => ({
   type: Actions.SET_LOGGED_IN,
@@ -140,6 +146,10 @@ export const setFigureEightAccount = (userId: string) => ({
 export const setFigureEightEarned = (amount: number) => ({
   type: Actions.SET_FIGURE_EIGHT_EARNED,
   amount,
+})
+
+export const initiateFigureEightCashout = () => ({
+  type: Actions.INITIATE_FIGURE_EIGHT_CASHOUT,
 })
 
 export const refreshFigureEightEarned = () => ({

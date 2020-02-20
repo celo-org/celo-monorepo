@@ -14,7 +14,7 @@ import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { faucetIcon } from 'src/images/Images'
+import { faucetIcon, threeChecks } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
 import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
@@ -47,6 +47,8 @@ const renderTopSection = (props: Props) => {
     type === TokenTransactionType.Faucet
   ) {
     return <Image source={faucetIcon} style={style.icon} />
+  } else if (type === TokenTransactionType.Earn) {
+    return <Image source={threeChecks} style={style.icon} /> // TODO(anna) different icon?
   } else {
     return (
       <Avatar
@@ -99,6 +101,15 @@ const renderBottomSection = (props: Props) => {
         {CURRENCIES[currency].symbol}
         {getMoneyDisplayValue(amount.value)}
         {t('receiveFlow8:receivedAmountFromCelo.1')}
+      </Text>
+    )
+  } else if (type === TokenTransactionType.Earn) {
+    return (
+      <Text style={[fontStyles.body, { textAlign: 'center' }]}>
+        {'Earned '}
+        {CURRENCIES[currency].symbol}
+        {getMoneyDisplayValue(amount.value)}
+        {' completing digital work through Figure Eight'}
       </Text>
     )
   } else if (type === TokenTransactionType.NetworkFee) {

@@ -19,6 +19,7 @@ import Logger from 'src/utils/Logger'
 const TAG = 'firebase/firebase'
 
 const EARN_PILOT_DB = 'earnPilot/participants'
+const EARN_PILOT_REQUESTS_DB = 'https://celo-org-mobile-earn-pilot.firebaseio.com'
 
 // only exported for testing
 export function* watchFirebaseNotificationChannel(
@@ -225,15 +226,53 @@ export async function setUserLanguage(address: string, language: string) {
 
 export async function setFigureEightUserId(userId: string, account: string) {
   try {
-    Logger.info(TAG, `Setting userId for user ${userId}`)
+    const uid = userId.toLowerCase()
+    Logger.info(TAG, `Setting userId for user ${uid}`)
     const database = firebase.database().ref()
     await database
       .child(EARN_PILOT_DB)
-      .child(userId)
+      .child(uid)
       .update({ account })
-    Logger.info(TAG, 'UserId and account synced successfully', userId)
+    Logger.info(TAG, 'UserId and account synced successfully', uid)
   } catch (error) {
     Logger.error(TAG, 'Failed to sync userId', error)
+    throw error
+  }
+}
+
+export async function initiateFigureEightCashout(
+  userId: string,
+  account: string,
+  amountEarned: number,
+  txId: string
+) {
+  try {
+    Logger.info(TAG, `Initiating cashout for user ${userId}`)
+    const database = firebase.database().ref()
+    Logger.info(TAG, 'Got database')
+    const accountInFirebase = await database
+      .child(EARN_PILOT_DB)
+      .child(userId)
+      .child('account')
+      .once('value')
+    if (account !== accountInFirebase.val()) {
+      // TODO throw error if accounts don't match
+      Logger.info(TAG, `Local account ${account} does not match remote ${accountInFirebase}`)
+      await showError(ErrorMessages.FIGURE_EIGHT_ADDRESS_NOT_UP_TO_DATE)
+      return
+    }
+    Logger.info(TAG, `Accounts are equal: ${account}`)
+    const db = firebase
+      .app()
+      // @ts-ignore to pass in pilot requests db
+      .database(EARN_PILOT_REQUESTS_DB)
+      .ref()
+      .child('requests')
+    Logger.info(TAG, `Got db`)
+    db.push({ userId, account, amountEarned, timestamp: new Date(), processed: false, txId })
+    Logger.info(TAG, `Requested cashout for ${userId}`)
+  } catch (error) {
+    Logger.error(TAG, 'Failed request cash out', error)
     throw error
   }
 }

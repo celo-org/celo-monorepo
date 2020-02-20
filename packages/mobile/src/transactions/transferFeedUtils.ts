@@ -51,6 +51,11 @@ export function getTransferFeedParams(
       info = t('feedItemVerificationRewardInfo')
       break
     }
+    case TokenTransactionType.Earn: {
+      title = 'cEarn payment'
+      info = 'Wage received for digital work'
+      break
+    }
     case TokenTransactionType.Faucet: {
       title = t('feedItemFaucetTitle')
       info = t('feedItemFaucetInfo', {

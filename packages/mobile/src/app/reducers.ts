@@ -103,3 +103,4 @@ export const appReducer = (
 }
 
 export const figureEightUserIdSelector = (state: RootState) => state.app.figureEightUserId
+export const figureEightEarnedSelector = (state: RootState) => state.app.figureEightEarned

@@ -9,9 +9,14 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { refreshFigureEightEarned, setFigureEightAccount } from 'src/app/actions'
+import {
+  initiateFigureEightCashout,
+  refreshFigureEightEarned,
+  setFigureEightAccount,
+} from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateHome } from 'src/navigator/NavigationService'
 
 interface StateProps {
@@ -26,6 +31,7 @@ interface State {
 interface DispatchProps {
   setFigureEightAccount: typeof setFigureEightAccount
   refreshFigureEightEarned: typeof refreshFigureEightEarned
+  initiateFigureEightCashout: typeof initiateFigureEightCashout
   showError: typeof showError
 }
 
@@ -39,6 +45,10 @@ const mapStateToProps = (state: RootState): StateProps => {
 type Props = DispatchProps & WithTranslation & StateProps
 
 export class Earn extends React.Component<Props, State> {
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+    headerTitle: 'Earn cUSD',
+  })
   state = {
     userId: this.props.figureEightUserId,
   }
@@ -58,7 +68,7 @@ export class Earn extends React.Component<Props, State> {
   }
 
   onTransferToWallet = () => {
-    // TODO(anna) transfer balance to wallet
+    this.props.initiateFigureEightCashout()
     // TODO add notification
     navigateHome()
   }
@@ -78,10 +88,23 @@ export class Earn extends React.Component<Props, State> {
         {this.props.figureEightUserId ? (
           // Complete work when logged in
           <View>
-            <Text style={fontStyles.body}>Work will go here</Text>
             <Text style={fontStyles.body}>User ID: {this.props.figureEightUserId}</Text>
-            <TextButton onPress={this.onTransferToWallet}>{'Transfer to wallet'}</TextButton>
-            <Text style={fontStyles.body}>{`Amount earned: ${amountEarned} dollars`}</Text>
+            <Text
+              style={fontStyles.body}
+            >{`Balance available for cash out: ${amountEarned} dollars`}</Text>
+            <View style={style.modalButtonsContainer}>
+              <TextButton style={style.modalSkipText} onPress={this.onTransferToWallet}>
+                {'Transfer to wallet'}
+              </TextButton>
+            </View>
+
+            <Text style={fontStyles.body}>Work placeholder</Text>
+            {/* <WebView
+              source={{
+                uri: 'https://tasks.figure-eight.work/channels/celo/tasks?uid=anna@celo.org',
+              }}
+            />*/}
+
             <TextButton onPress={this.onSubmitLogout}>{'Log out'}</TextButton>
           </View>
         ) : (
@@ -108,6 +131,7 @@ export class Earn extends React.Component<Props, State> {
 
 export default componentWithAnalytics(
   connect<any, DispatchProps, {}, RootState>(mapStateToProps, {
+    initiateFigureEightCashout,
     refreshFigureEightEarned,
     setFigureEightAccount,
     showError,
@@ -130,5 +154,17 @@ const style = StyleSheet.create({
     paddingLeft: 9,
     color: colors.inactive,
     height: 50,
+  },
+  modalSkipText: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    color: colors.celoGreen,
+    paddingLeft: 20,
+  },
+  modalButtonsContainer: {
+    marginTop: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
 })

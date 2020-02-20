@@ -44,6 +44,7 @@ type TransferTransactionType =
   | TokenTransactionType.InviteSent
   | TokenTransactionType.InviteReceived
   | TokenTransactionType.NetworkFee
+  | TokenTransactionType.Earn
 
 export interface State {
   standbyTransactions: StandbyTransaction[]

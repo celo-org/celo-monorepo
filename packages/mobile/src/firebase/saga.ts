@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import firebase from 'react-native-firebase'
 import { DataSnapshot } from 'react-native-firebase/database'
 import { eventChannel } from 'redux-saga'
@@ -23,6 +24,7 @@ import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { TokenTransactionType } from 'src/apollo/types'
 import {
   Actions as AppActions,
   SetFigureEightAccount,
@@ -30,7 +32,7 @@ import {
   SetLanguage,
 } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { figureEightUserIdSelector } from 'src/app/reducers'
+import { figureEightEarnedSelector, figureEightUserIdSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
 import { updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
 import { exchangeHistorySelector, ExchangeRate, MAX_HISTORY_RETENTION } from 'src/exchange/reducer'
@@ -46,10 +48,13 @@ import {
   doRefreshFigureEightEarned,
   initializeAuth,
   initializeCloudMessaging,
+  initiateFigureEightCashout,
   paymentRequestWriter,
   setFigureEightUserId,
   setUserLanguage,
 } from 'src/firebase/firebase'
+import { addStandbyTransaction } from 'src/transactions/actions'
+import { TransactionStatus } from 'src/transactions/reducer'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -244,6 +249,27 @@ function* setFigureEightUserIdSaga({ userId }: SetFigureEightAccount) {
   yield call(setFigureEightUserId, userId, account)
 }
 
+function* initiateFigureEightCashoutSaga() {
+  const userId = yield select(figureEightUserIdSelector)
+  const account = yield select(currentAccountSelector)
+  const amountEarned = yield select(figureEightEarnedSelector)
+  const date = Math.floor(Date.now() / 1000)
+  const txId = userId + date.toString()
+  yield put(
+    addStandbyTransaction({
+      id: txId,
+      type: TokenTransactionType.Earn,
+      comment: 'placeholder',
+      status: TransactionStatus.Pending,
+      value: amountEarned.toString(),
+      symbol: CURRENCY_ENUM.DOLLAR,
+      timestamp: Math.floor(Date.now() / 1000),
+      address: '0x00',
+    })
+  )
+  yield call(initiateFigureEightCashout, userId, account, amountEarned, txId)
+}
+
 function* refreshFigureEightEarnedSaga() {
   const userId = yield select(figureEightUserIdSelector)
   const earned = yield call(doRefreshFigureEightEarned, userId)
@@ -260,6 +286,10 @@ export function* watchFigureEightAccount() {
 
 export function* watchFigureEightEarned() {
   yield takeLatest(AppActions.REFRESH_FIGURE_EIGHT_EARNED, refreshFigureEightEarnedSaga)
+}
+
+export function* watchFigureEightCashout() {
+  yield takeLatest(AppActions.INITIATE_FIGURE_EIGHT_CASHOUT, initiateFigureEightCashoutSaga)
 }
 
 export function* watchWritePaymentRequest() {
@@ -331,6 +361,7 @@ export function* firebaseSaga() {
   yield spawn(watchLanguage)
   yield spawn(watchFigureEightAccount)
   yield spawn(watchFigureEightEarned)
+  yield spawn(watchFigureEightCashout)
   yield spawn(subscribeToIncomingPaymentRequests)
   yield spawn(subscribeToOutgoingPaymentRequests)
   yield spawn(subscribeToCeloGoldExchangeRateHistory)

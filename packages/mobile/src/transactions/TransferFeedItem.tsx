@@ -20,6 +20,8 @@ import { decryptComment, getTransferFeedParams } from 'src/transactions/transfer
 import { getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
+export const EARN_PILOT_FAUCET_ADDRESS = '0x7ad47f026f3a758ab6ed0625455de8d9486a414f'
+
 type Props = TransferItemFragment & {
   type: TokenTransactionType
   status: TransactionStatus
@@ -65,6 +67,10 @@ function navigateToTransactionReview({
 // so the parts that need to be identical stay the same as we change the code (main layout)
 export function TransferFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+
+  if (props.address === EARN_PILOT_FAUCET_ADDRESS) {
+    props.type = TokenTransactionType.Earn
+  }
 
   const onItemPress = () => {
     navigateToTransactionReview(props)

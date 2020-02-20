@@ -156,6 +156,32 @@ function mapExchangeStandbyToFeedItem(
   }
 }
 
+function mapEarnStandbyToFeedItem(
+  standbyTx: TransferStandby,
+  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyExchangeRate: string | null | undefined
+): FeedItem {
+  const { type, hash, status, timestamp, value, symbol, address, comment } = standbyTx
+
+  return {
+    __typename: 'TokenTransfer',
+    type,
+    hash: hash ?? '',
+    timestamp,
+    status,
+    amount: resolveAmount(
+      {
+        value,
+        currencyCode: CURRENCIES[symbol].code,
+      },
+      localCurrencyCode,
+      localCurrencyExchangeRate
+    ),
+    comment,
+    address,
+  }
+}
+
 function mapTransferStandbyToFeedItem(
   standbyTx: TransferStandby,
   localCurrencyCode: LocalCurrencyCode | null,
@@ -199,7 +225,9 @@ function mapStandbyTransactionToFeedItem(
       )
     }
     // Otherwise it's a transfer
-    else {
+    else if (standbyTx.type === TokenTransactionType.Earn) {
+      return mapEarnStandbyToFeedItem(standbyTx, localCurrencyCode, localCurrencyExchangeRate)
+    } else {
       return mapTransferStandbyToFeedItem(standbyTx, localCurrencyCode, localCurrencyExchangeRate)
     }
   }

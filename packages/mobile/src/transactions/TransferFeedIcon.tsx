@@ -32,6 +32,14 @@ export default function TransferFeedIcon(props: Props) {
         </View>
       )
     }
+    case TokenTransactionType.Earn: {
+      // TODO(anna) replace with fig8 icon
+      return (
+        <View style={styles.image}>
+          <RewardIcon height={38} />
+        </View>
+      )
+    }
     case TokenTransactionType.Received: // fallthrough
     case TokenTransactionType.Sent: // fallthrough
     case TokenTransactionType.EscrowSent:

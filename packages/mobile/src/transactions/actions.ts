@@ -6,6 +6,7 @@ import { Screens } from 'src/navigator/Screens'
 import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/reducer'
+import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 
 export enum Actions {
@@ -84,8 +85,12 @@ export const navigateToPaymentTransferReview = (
   timestamp: number,
   confirmationProps: TransferConfirmationCardProps
 ) => {
+  Logger.debug(`navigateToPaymentTransferReview, type: ${type}`)
   let headerText = ''
   switch (type) {
+    case TokenTransactionType.Earn:
+      headerText = 'cEarn payment'
+      break
     case TokenTransactionType.Sent:
       headerText = i18n.t('sendFlow7:sentPayment')
       break

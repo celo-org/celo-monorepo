@@ -157,6 +157,7 @@ export enum TokenTransactionType {
   InviteReceived = 'INVITE_RECEIVED',
   PayRequest = 'PAY_REQUEST',
   NetworkFee = 'NETWORK_FEE',
+  Earn = 'EARN',
 }
 
 export type TokenTransfer = TokenTransaction & {
