@@ -908,7 +908,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      -end-to-end-geth-validator-handshake-test:
+      - end-to-end-geth-validator-handshake-test:
           requires:
             - lint-checks
             - contractkit-test
