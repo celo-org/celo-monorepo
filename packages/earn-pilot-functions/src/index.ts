@@ -42,12 +42,14 @@ exports.handleFigureEightConfirmation = functions.database
       })
     }
 
-    console.info(`Updating confirmed payment to userId ${userId}`)
+    const uid = sanitizeId(userId)
+
+    console.info(`Updating confirmed payment to userId ${uid}`)
     const participantsDb = admin
       .app()
       .database(PILOT_PARTICIPANTS_DB_URL)
       .ref('earnPilot/participants')
-    const msgRoot = participantsDb.child(userId)
+    const msgRoot = participantsDb.child(uid)
     msgRoot.child('earned').transaction((earned: number) => {
       return (earned || 0) + adjAmount
     })
@@ -92,20 +94,7 @@ exports.transferEarnedBalance = functions.database
     msgRoot.child('cashOutTxs').push({ txId, timestamp, userId, amountEarned })
 
     // TODO confirm userId and address and amount match in database
-    /*
-    const snap = await admin
-      .app()
-      .database(PILOT_PARTICIPANTS_DB_URL)
-      // .ref('earnPilot/participants')
-      .once('value')
-    console.info(`got participants db.`)
-    snap.forEach(async (val: any) => {
-      await console.log(val.key)
-    })
-    const address = participantsDb.child(userId).child('address')
-    const amountRef = participantsDb.child(userId).child('earned')
-    const amount = amountRef.val()
-    */
+
     return change.after.ref.update({
       processed: true,
     })
@@ -125,8 +114,7 @@ const validSignature = (signature: string, params: string) => {
 }
 
 const sanitizeId = (uid: string) => {
-  // TODO may need to make lowercase
-  return uid
+  return uid.toLowerCase()
 }
 
 enum PostType {
