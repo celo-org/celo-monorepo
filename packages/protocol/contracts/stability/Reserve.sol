@@ -258,11 +258,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
-    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     return _transferGold(to, value);
   }
 
   function _transferGold(address to, uint256 value) internal returns (bool) {
+    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
       uint256 balance = getUnfrozenReserveGoldBalance();
