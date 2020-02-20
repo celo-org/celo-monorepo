@@ -220,6 +220,45 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     }
   }
 
+  /**
+   * Authorizes an address to sign consensus messages on behalf of the account. Also switch BLS key at the same time.
+   * @param signer The address of the signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return A CeloTransactionObject
+   */
+  async authorizeValidatorSignerAndBls(
+    signer: Address,
+    proofOfSigningKeyPossession: Signature,
+    blsPublicKey: string,
+    blsPop: string
+  ): Promise<CeloTransactionObject<void>> {
+    const account = this.kit.defaultAccount || (await this.kit.web3.eth.getAccounts())[0]
+    const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
+    const prefixedMsg = hashMessageWithPrefix(message)
+    const pubKey = signedMessageToPublicKey(
+      prefixedMsg,
+      proofOfSigningKeyPossession.v,
+      proofOfSigningKeyPossession.r,
+      proofOfSigningKeyPossession.s
+    )
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeValidatorSignerWithKeys(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s,
+        stringToBytes(pubKey),
+        stringToBytes(blsPublicKey),
+        stringToBytes(blsPop)
+      )
+    )
+  }
+
   async generateProofOfSigningKeyPossession(account: Address, signer: Address) {
     return this.getParsedSignatureOfAddress(
       account,
