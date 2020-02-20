@@ -6309,6 +6309,7 @@ exports[`DevelopersPage renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
                       "display": "inline",
@@ -6317,6 +6318,7 @@ exports[`DevelopersPage renders 1`] = `
                       "lineHeight": "20px",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                       "textRendering": "geometricPrecision",
                     }
                   }
@@ -6350,6 +6352,7 @@ exports[`DevelopersPage renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
                       "display": "inline",
@@ -6358,6 +6361,7 @@ exports[`DevelopersPage renders 1`] = `
                       "lineHeight": "20px",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                       "textRendering": "geometricPrecision",
                     }
                   }

@@ -74,25 +74,23 @@ async function newKeyRotator(
   const validator = (await kit.web3.eth.getAccounts())[0]
   const accountsWrapper = await kit.contracts.getAccounts()
 
-  async function authorizeValidatorSigner(signer: string, signerWeb3: any) {
+  async function authorizeValidatorSigner(
+    signer: string,
+    signerWeb3: any,
+    signerPrivateKey: string
+  ) {
     const signerKit = newKitFromWeb3(signerWeb3)
+    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
+    const blsPop = getBlsPoP(validator, signerPrivateKey)
     const pop = await (await signerKit.contracts.getAccounts()).generateProofOfSigningKeyPossession(
       validator,
       signer
     )
-    return (await accountsWrapper.authorizeValidatorSigner(signer, pop)).sendAndWaitForReceipt({
+    return (
+      await accountsWrapper.authorizeValidatorSignerAndBls(signer, pop, blsPublicKey, blsPop)
+    ).sendAndWaitForReceipt({
       from: validator,
     })
-  }
-
-  async function updateValidatorBlsKey(signerPrivateKey: string) {
-    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
-    const blsPop = getBlsPoP(validator, signerPrivateKey)
-    // TODO(asa): Send this from the signer instead.
-    const validatorsWrapper = await kit.contracts.getValidators()
-    return validatorsWrapper
-      .updateBlsPublicKey(blsPublicKey, blsPop)
-      .sendAndWaitForReceipt({ from: validator })
   }
 
   return {
@@ -101,10 +99,7 @@ async function newKeyRotator(
         const signerWeb3 = web3s[index]
         const signer: string = (await signerWeb3.eth.getAccounts())[0]
         const signerPrivateKey = privateKeys[index]
-        await Promise.all([
-          authorizeValidatorSigner(signer, signerWeb3),
-          updateValidatorBlsKey(signerPrivateKey),
-        ])
+        await authorizeValidatorSigner(signer, signerWeb3, signerPrivateKey)
         index += 1
         assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
       }

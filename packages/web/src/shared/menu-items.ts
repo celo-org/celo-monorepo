@@ -19,7 +19,7 @@ export const menuItems = {
   },
   VALIDATORS_LIST: {
     name: 'Validators List',
-    link: '/build/validators',
+    link: '/validators/explore',
   },
   BRAND: {
     name: 'Experience - Brand Kit',
