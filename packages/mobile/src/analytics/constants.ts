@@ -95,7 +95,6 @@ export enum CustomEventNames {
   backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase)
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
-  whatsapp_backup = 'whatsapp_backup', // (count # of taps on “Send with Whatsapp” in Backup_Share)
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
   social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
 
