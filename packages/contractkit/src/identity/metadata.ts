@@ -1,3 +1,4 @@
+import { eqAddress } from '@celo/utils/lib/address'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
@@ -100,7 +101,7 @@ export class IdentityMetadataWrapper {
   async addClaim(claim: Claim, signer: Signer) {
     switch (claim.type) {
       case ClaimTypes.ACCOUNT:
-        if (claim.address === this.data.meta.address) {
+        if (eqAddress(claim.address, this.data.meta.address)) {
           throw new Error("Can't claim self")
         }
         break

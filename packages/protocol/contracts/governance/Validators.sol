@@ -117,7 +117,6 @@ contract Validators is
   uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
-  event ValidatorEpochPaymentSet(uint256 value);
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -591,6 +590,36 @@ contract Validators is
       "Error updating ECDSA public key"
     );
     emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's ECDSA and BLS keys.
+   * @param account The address under which the validator is registered.
+   * @param signer The address which the validator is using to sign consensus messages.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @return True upon success.
+   */
+  function updatePublicKeys(
+    address account,
+    address signer,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
+    require(isValidator(account), "Not a validator");
+    Validator storage validator = validators[account];
+    require(
+      _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
+    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
     return true;
   }
 

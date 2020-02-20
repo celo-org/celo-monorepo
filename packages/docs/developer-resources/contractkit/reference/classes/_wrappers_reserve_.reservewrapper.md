@@ -36,7 +36,7 @@ Contract for handling reserve for stable currencies
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L14)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L14)*
 
 **Parameters:**
 
@@ -53,7 +53,7 @@ Name | Type |
 
 • **isSpender**: *function* = proxyCall(this.contract.methods.isSpender)
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L22)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L22)*
 
 #### Type declaration:
 
@@ -75,7 +75,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L17)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L17)*
 
 Query Tobin tax staleness threshold parameter.
 
@@ -97,7 +97,7 @@ ___
 
 • **transferGold**: *function* = proxySend(this.kit, this.contract.methods.transferGold)
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L23)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L23)*
 
 #### Type declaration:
 
@@ -117,7 +117,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L18)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L18)*
 
 Contract address
 
@@ -129,7 +129,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L28)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L28)*
 
 Returns current configuration parameters.
 

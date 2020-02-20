@@ -236,6 +236,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
+    require(isOtherReserveAddress[to], "can only transfer to other reserve address");
+    return _transferGold(to, value);
+  }
+
+  function _transferGold(address to, uint256 value) internal returns (bool) {
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
       uint256 balance = getReserveGoldBalance();
@@ -246,6 +251,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     spendingLimit = spendingLimit.sub(value);
     require(getGoldToken().transfer(to, value), "transfer of gold token failed");
     return true;
+  }
+
+  function transferExchangeGold(address to, uint256 value)
+    external
+    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+    returns (bool)
+  {
+    return _transferGold(to, value);
   }
 
   /**

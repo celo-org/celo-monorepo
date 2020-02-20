@@ -58,7 +58,7 @@ contract UsingPrecompiles {
     uint256 exponent,
     uint256 _decimals
   ) public view returns (uint256, uint256) {
-    require(aDenominator != 0 && bDenominator != 0);
+    require(aDenominator != 0 && bDenominator != 0, "a denominator is zero");
     uint256 returnNumerator;
     uint256 returnDenominator;
     bool success;
@@ -66,10 +66,7 @@ contract UsingPrecompiles {
     (success, out) = FRACTION_MUL.staticcall(
       abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
     );
-    require(
-      success,
-      "UsingPrecompiles :: fractionMulExp Unsuccessful invocation of fraction exponent"
-    );
+    require(success, "error calling fractionMulExp precompile");
     returnNumerator = getUint256FromBytes(out, 0);
     returnDenominator = getUint256FromBytes(out, 32);
     return (returnNumerator, returnDenominator);
@@ -83,7 +80,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked());
-    require(success);
+    require(success, "error calling getEpochSize precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -114,7 +111,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
-    require(success);
+    require(success, "error calling validatorSignerAddressFromCurrentSet precompile");
     return address(getUint256FromBytes(out, 0));
   }
 
@@ -132,7 +129,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
-    require(success);
+    require(success, "error calling validatorSignerAddressFromSet precompile");
     return address(getUint256FromBytes(out, 0));
   }
 
@@ -144,7 +141,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
-    require(success);
+    require(success, "error calling numberValidatorsInCurrentSet precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -157,7 +154,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
-    require(success);
+    require(success, "error calling numberValidatorsInSet precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -189,7 +186,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
-    require(success);
+    require(success, "error calling getBlockNumberFromHeader precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -202,7 +199,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
-    require(success);
+    require(success, "error calling hashHeader precompile");
     return getBytes32FromBytes(out, 0);
   }
 
@@ -215,7 +212,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
-    require(success);
+    require(success, "error calling getParentSealBitmap precompile");
     return getBytes32FromBytes(out, 0);
   }
 
@@ -230,7 +227,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
-    require(success);
+    require(success, "error calling getVerifiedSealBitmapFromHeader precompile");
     return getBytes32FromBytes(out, 0);
   }
 
