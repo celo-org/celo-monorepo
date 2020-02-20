@@ -102,4 +102,30 @@ contract('Random', (accounts: string[]) => {
       })
     })
   })
+
+  describe('#testRevealAndCommit', () => {
+    const hash0 = web3.utils.soliditySha3({ type: 'bytes32', v: '0x00' })
+    const hash1 = web3.utils.soliditySha3({ type: 'bytes32', v: '0x01' })
+    const hash2 = web3.utils.soliditySha3({ type: 'bytes32', v: '0x02' })
+    beforeEach(async () => {
+      await random.setRandomnessBlockRetentionWindow(256)
+    })
+    it('cannot add zero commitment', async () => {
+      await assertRevert(random.testRevealAndCommit('0x0', hash0, accounts[0]))
+    })
+    it('can add initial commitment', async () => {
+      await random.testRevealAndCommit('0x0', hash1, accounts[0])
+    })
+    it('can reveal initial commitment', async () => {
+      await random.testRevealAndCommit('0x0', hash1, accounts[0])
+      const resp = await random.testRevealAndCommit('0x01', hash2, accounts[0])
+      const blockNumber = resp.receipt.blockNumber
+      const lastRandomness = await random.getBlockRandomness(blockNumber - 1)
+      const expected = web3.utils.soliditySha3(
+        { type: 'bytes32', v: lastRandomness },
+        { type: 'bytes32', v: '0x01' }
+      )
+      assert.equal(await random.getBlockRandomness(blockNumber), expected)
+    })
+  })
 })

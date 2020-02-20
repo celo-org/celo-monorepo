@@ -5,9 +5,13 @@ import gql from 'graphql-tag'
 import getConfig from 'next/config'
 import * as React from 'react'
 import { ApolloProvider, Query } from 'react-apollo'
+import { StyleSheet, View } from 'react-native'
 import ShowApolloError from 'src/dev/ShowApolloError'
 import ValidatorsList from 'src/dev/ValidatorsList'
+import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import menuItems from 'src/shared/menu-items'
+import { standardStyles } from 'src/styles'
 
 function createApolloClient() {
   return new ApolloClient({
@@ -61,18 +65,39 @@ class ValidatorsListApp extends React.PureComponent<I18nProps> {
       return null
     }
     return (
-      <ApolloProvider client={createApolloClient()}>
-        <Query query={query}>
-          {({ loading, error, data }) => {
-            if (error) {
-              return <ShowApolloError error={error} />
-            }
-            return <ValidatorsList data={loading ? undefined : data} isLoading={loading} />
-          }}
-        </Query>
-      </ApolloProvider>
+      <>
+        <OpenGraph
+          title="Celo Validator Explorer"
+          path={menuItems.VALIDATORS_LIST.link}
+          description="View status of Validators on the Celo Network"
+        />
+        <ApolloProvider client={createApolloClient()}>
+          <Query query={query}>
+            {({ loading, error, data }) => {
+              if (error) {
+                return (
+                  <View
+                    style={[
+                      standardStyles.darkBackground,
+                      standardStyles.centered,
+                      styles.fullHeight,
+                    ]}
+                  >
+                    <ShowApolloError error={error} />
+                  </View>
+                )
+              }
+              return <ValidatorsList data={loading ? undefined : data} isLoading={loading} />
+            }}
+          </Query>
+        </ApolloProvider>
+      </>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  fullHeight: { minHeight: '100vh' },
+})
 
 export default withNamespaces('dev')(ValidatorsListApp)

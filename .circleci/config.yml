@@ -34,7 +34,7 @@ android-defaults: &android-defaults
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: celohq/circleci
+    - image: celohq/circleci:geth1.9
   environment:
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 
@@ -51,6 +51,8 @@ commands:
           name: Create cache checksum files
           command: |
             mkdir -p ~/.tmp/checksumfiles
+            # Concatenate package.json so we can use them as a part of the cache key
+            find . -maxdepth 3 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/package.json
             # Concatenate patches so we can use them as a part of the cache key
             find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/patches
       - restore_cache:
@@ -58,14 +60,34 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
-          command: if [ -e ~/.tmp/node_modules.tgz ]; then tar -xf ~/.tmp/node_modules.tgz; fi
+          command: |
+            if [ -e ~/.tmp/node_modules.tgz ]; then 
+              tar -xf ~/.tmp/node_modules.tgz
+            else
+              # Dependencies have changed, create beacon file used by the install and check licenses steps
+              touch ~/.tmp/yarn_deps_have_changed
+            fi
 
       - run:
           name: Install dependencies
           command: |
+            if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
+              # Though `yarn install` is instantaneous with up-to-date node_modules which is the case when we've restored cached node_modules,
+              # there's currently a bug with the generated node_modules/.yarn-integrity file which is apparently not entirely stable
+              # for a given `yarn.lock`, through different runs of `yarn install`
+              # This causes the `yarn check --integrity` step to fail
+              # and hence `yarn install` has to redo all the work again (taking unnecessary time, and making the current cache useless)
+              # See https://github.com/yarnpkg/yarn/issues/6703
+              # So here to workaround this issue, we skip the install if dependencies haven't changed
+              echo "Skipping install, dependencies haven't changed"
+              # We still have to run postinstall though
+              yarn run postinstall
+              exit 0
+            fi
+
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
             yarn install || yarn install
@@ -85,12 +107,10 @@ commands:
           command: |
             if [ ! -e ~/.tmp/node_modules.tgz ]; then 
               tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
-              # Dependencies have changed, create beacon file used by the check licenses step
-              touch ~/.tmp/yarn_deps_have_changed
             fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
 
