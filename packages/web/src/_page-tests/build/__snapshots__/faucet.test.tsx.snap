@@ -431,10 +431,12 @@ exports[`Faucet renders 1`] = `
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -465,10 +467,12 @@ exports[`Faucet renders 1`] = `
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
