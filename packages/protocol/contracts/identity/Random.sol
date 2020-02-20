@@ -16,7 +16,7 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
   /* Stores most recent commitment per address */
   mapping(address => bytes32) public commitments;
 
-  uint256 public randomnessBlockRetentionWindow = 256;
+  uint256 public randomnessBlockRetentionWindow;
 
   mapping(uint256 => bytes32) private history;
   uint256 private historyFirst;
@@ -67,6 +67,8 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
    * @param proposer Address of the block proposer.
    */
   function _revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) internal {
+    require(newCommitment != computeCommitment(0), "cannot commit zero randomness");
+
     // ensure revealed randomness matches previous commitment
     if (commitments[proposer] != 0) {
       require(randomness != 0, "randomness cannot be zero if there is a previous commitment");
