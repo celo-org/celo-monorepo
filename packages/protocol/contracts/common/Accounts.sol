@@ -201,6 +201,38 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
+   * @notice Authorizes an address to sign consensus messages on behalf of the account.
+   * @param signer The address of the signing key to authorize.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
+   */
+  function authorizeValidatorSignerWithKeys(
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external nonReentrant {
+    Account storage account = accounts[msg.sender];
+    authorize(signer, v, r, s);
+    account.signers.validator = signer;
+    require(
+      getValidators().updatePublicKeys(msg.sender, signer, ecdsaPublicKey, blsPublicKey, blsPop),
+      "Failed to update validator keys"
+    );
+    emit ValidatorSignerAuthorized(msg.sender, signer);
+  }
+
+  /**
    * @notice Authorizes an address to sign attestations on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
