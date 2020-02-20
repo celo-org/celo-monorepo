@@ -100,42 +100,44 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
     this.cachedCleanData = celoValidatorGroups
-      .map(({ account, affiliates, votes, receivableVotes, commission, numMembers }) => {
-        const group = account
-        const rewards = 50 + Math.random() * 50
-        const rewardsStyle =
-          rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
-        const receivableVotesPer = new BigNumber(receivableVotes)
-          .dividedBy(totalVotes)
-          .multipliedBy(100)
-        const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
-        const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
-        return {
-          name: group.name,
-          address: group.address,
-          usd: weiToDecimal(group.usd),
-          gold: weiToDecimal(group.lockedGold),
-          receivableVotes: receivableVotesPer.toString(),
-          votes: votesPer.toString(),
-          votesAbsolute: votesAbsolutePer.toString(),
-          commission: (+commission * 100) / 10 ** 24,
-          rewards, // <-- Mock
-          rewardsStyle, // <-- Mock
-          numMembers,
-          validators: affiliates.edges.map(({ node: validator }) => {
-            const { address, lastElected, lastOnline, name, usd, lockedGold, score } = validator
-            return {
-              name,
-              address,
-              usd: weiToDecimal(usd),
-              gold: weiToDecimal(lockedGold),
-              elected: lastElected >= latestBlock,
-              online: lastOnline >= latestBlock,
-              uptime: (+score * 100) / 10 ** 24,
-            }
-          }),
+      .map(
+        ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
+          const group = account
+          const rewards = rewardsRatio === null ? null : Math.round(rewardsRatio * 100 * 10) / 10
+          const rewardsStyle =
+            rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
+          const receivableVotesPer = new BigNumber(receivableVotes)
+            .dividedBy(totalVotes)
+            .multipliedBy(100)
+          const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
+          const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
+          return {
+            name: group.name,
+            address: group.address,
+            usd: weiToDecimal(group.usd),
+            gold: weiToDecimal(group.lockedGold),
+            receivableVotes: receivableVotesPer.toString(),
+            votes: votesPer.toString(),
+            votesAbsolute: votesAbsolutePer.toString(),
+            commission: (+commission * 100) / 10 ** 24,
+            rewards,
+            rewardsStyle,
+            numMembers,
+            validators: affiliates.edges.map(({ node: validator }) => {
+              const { address, lastElected, lastOnline, name, usd, lockedGold, score } = validator
+              return {
+                name,
+                address,
+                usd: weiToDecimal(usd),
+                gold: weiToDecimal(lockedGold),
+                elected: lastElected >= latestBlock,
+                online: lastOnline >= latestBlock,
+                uptime: (+score * 100) / 10 ** 24,
+              }
+            }),
+          }
         }
-      })
+      )
       .map((group) => {
         const data = group.validators.reduce(
           ({ elected, online, total, uptime }, validator) => ({
@@ -293,7 +295,9 @@ class ValidatorsListApp extends React.PureComponent<ValidatorsListProps & I18nPr
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    <Text>{formatNumber(group.rewards, 1)}%</Text>
+                    <Text>
+                      {group.rewards === null ? 'n/a' : formatNumber(group.rewards, 1) + '%'}
+                    </Text>
                     <Text style={[styles.barContainer]}>
                       <Text
                         style={[styles.bar, group.rewardsStyle, { width: `${group.rewards}%` }]}
