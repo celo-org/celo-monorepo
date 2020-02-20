@@ -182,7 +182,6 @@ async function castVote(
   const groupCapacity = groupCapacities.get(voteForGroup)!
   const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
   const voteTx = await election.vote(voteForGroup, BigNumber.minimum(voteAmount))
-  console.info(voteTx)
   await voteTx.sendAndWaitForReceipt()
   console.info(`Completed voting as ${botAccount}`)
 
