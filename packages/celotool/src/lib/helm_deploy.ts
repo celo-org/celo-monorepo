@@ -575,6 +575,7 @@ async function helmParameters(celoEnv: string) {
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
+    `--set geth.debug=${fetchEnvOrFallback('GETH_DEBUG', 'false')}`,
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
       'IN_MEMORY_DISCOVERY_TABLE',
