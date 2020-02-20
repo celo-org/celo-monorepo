@@ -1,3 +1,4 @@
+import { trimLeading0x } from '@celo/utils/lib/address'
 import { ec as EC } from 'elliptic'
 import Web3 from 'web3'
 import { LocalCommand } from '../../base'
@@ -26,7 +27,10 @@ export default class NewAccount extends LocalCommand {
 
   static getPublicKey(privateKey: string): string {
     const ec = new EC('secp256k1')
-    const ecKeyPair: EC.KeyPair = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'), 'hex')
+    const ecKeyPair: EC.KeyPair = ec.keyFromPrivate(
+      Buffer.from(trimLeading0x(privateKey), 'hex'),
+      'hex'
+    )
     const ecPublicKey: string = ecKeyPair.getPublic('hex')
     return ecPublicKey
   }
