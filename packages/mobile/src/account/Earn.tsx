@@ -18,6 +18,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateHome } from 'src/navigator/NavigationService'
+import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface StateProps {
   figureEightEarned: number | null
@@ -88,24 +89,39 @@ export class Earn extends React.Component<Props, State> {
         {this.props.figureEightUserId ? (
           // Complete work when logged in
           <View>
-            <Text style={fontStyles.body}>User ID: {this.props.figureEightUserId}</Text>
-            <Text
-              style={fontStyles.body}
-            >{`Balance available for cash out: ${amountEarned} dollars`}</Text>
-            <View style={style.modalButtonsContainer}>
-              <TextButton style={style.modalSkipText} onPress={this.onTransferToWallet}>
-                {'Transfer to wallet'}
-              </TextButton>
+            <View
+              style={{
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+              }}
+            >
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Text style={fontStyles.bodyBold}>{`${this.props.figureEightUserId} `}</Text>
+                <TextButton onPress={this.onSubmitLogout}>{'(log out)'}</TextButton>
+              </View>
+              <Text style={fontStyles.body}>{`$${getMoneyDisplayValue(
+                amountEarned
+              )} available`}</Text>
+              {amountEarned ? (
+                <>
+                  <TextButton style={style.modalSkipText} onPress={this.onTransferToWallet}>
+                    {`Transfer total`}
+                  </TextButton>
+                </>
+              ) : (
+                <></>
+              )}
             </View>
 
             <Text style={fontStyles.body}>Work placeholder</Text>
-            {/* <WebView
+            {/*<WebView
               source={{
-                uri: 'https://tasks.figure-eight.work/channels/celo/tasks?uid=anna@celo.org',
+                uri: 'https://www.google.com',
               }}
             />*/}
-
-            <TextButton onPress={this.onSubmitLogout}>{'Log out'}</TextButton>
           </View>
         ) : (
           // Require log in before displaying work
