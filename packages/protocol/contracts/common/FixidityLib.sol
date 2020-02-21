@@ -134,6 +134,8 @@ library FixidityLib {
   /**
    * @notice Converts two uint256 representing a fraction to fixed point units,
    * equivalent to multiplying dividend and divisor by 10^digits().
+   * @param numerator numerator must be <= maxNewFixed()
+   * @param denominator denominator must be <= maxNewFixed() and denominator can't be 0
    * @dev
    * Test newFixedFraction(maxFixedDividend()+1,1) fails
    * Test newFixedFraction(1,maxFixedDividend()+1) fails
@@ -148,9 +150,6 @@ library FixidityLib {
     pure
     returns (Fraction memory)
   {
-    require(numerator <= maxNewFixed(), "numerator must be <= maxNewFixed()");
-    require(denominator <= maxNewFixed(), "denominator must be <= maxNewFixed()");
-    require(denominator != 0, "denominator can't be 0");
     Fraction memory convertedNumerator = newFixed(numerator);
     Fraction memory convertedDenominator = newFixed(denominator);
     return divide(convertedNumerator, convertedDenominator);
