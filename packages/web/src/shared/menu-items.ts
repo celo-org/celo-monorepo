@@ -68,6 +68,7 @@ export const menuItems = {
   },
 }
 
+// TODO: Temporary link to the master branch documentation for 'sdkDocs' and 'sdkTutorial'
 export enum CeloLinks {
   agreement = '/user-agreement',
   faq = '/faq',
@@ -80,8 +81,8 @@ export enum CeloLinks {
   disclaimer = 'https://docs.celo.org/important-information/alfajores-testnet-disclaimer',
   docs = 'https://docs.celo.org/',
   docsOverview = 'https://docs.celo.org/overview',
-  sdkDocs = 'https://docs.celo.org/celo-sdk/introduction',
-  sdkTutorial = 'https://docs.celo.org/celo-sdk/start',
+  sdkDocs = 'https://docs.celo.org/v/master/developer-guide/overview/introduction',
+  sdkTutorial = 'https://docs.celo.org/v/master/developer-guide/start',
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
