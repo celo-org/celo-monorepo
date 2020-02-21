@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 // TODO: Remove this and use upstream when
 // https://github.com/OpenZeppelin/openzeppelin-contracts/pull/1926/files gets merged
 
-import "./SafeCast.sol";
+import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 contract SafeCastTest {
   using SafeCast for uint256;

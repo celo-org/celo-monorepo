@@ -1,8 +1,8 @@
 pragma solidity ^0.5.3;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "./Initializable.sol";
-import "./libraries/AddressesHelper.sol";
 
 /// @title Multisignature wallet - Allows multiple parties to agree on transactions before
 /// execution.
@@ -248,8 +248,7 @@ contract MultiSig is Initializable {
   {
     bool result;
 
-    if (dataLength > 0)
-      require(AddressesHelper.isContract(destination), "Invalid contract address");
+    if (dataLength > 0) require(Address.isContract(destination), "Invalid contract address");
 
     /* solhint-disable max-line-length */
     assembly {

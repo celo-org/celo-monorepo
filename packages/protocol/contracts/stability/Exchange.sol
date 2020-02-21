@@ -123,7 +123,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       stableBucket = stableBucket.add(sellAmount);
       goldBucket = goldBucket.sub(buyAmount);
       require(
-        IERC20Token(stable).transferFrom(msg.sender, address(this), sellAmount),
+        IERC20(stable).transferFrom(msg.sender, address(this), sellAmount),
         "Transfer of sell token failed"
       );
       IStableToken(stable).burn(sellAmount);

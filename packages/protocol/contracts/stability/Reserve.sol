@@ -133,7 +133,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Add a token that the reserve will stablize.
    * @param token The address of the token being stabilized.
    */
-  function addToken(address token) external onlyOwner nonReentrant returns (bool) {
+  function addToken(address token)
+    external
+    onlyOwner /*nonReentrant*/
+    returns (bool)
+  {
     require(!isToken[token], "token addr already registered");
     // Require an exchange rate between the new token and Gold exists.
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
@@ -321,7 +325,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       uint256 stableAmount;
       uint256 goldAmount;
       (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
-      uint256 stableTokenSupply = IERC20Token(_tokens[i]).totalSupply();
+      uint256 stableTokenSupply = IERC20(_tokens[i]).totalSupply();
       uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
       stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
     }

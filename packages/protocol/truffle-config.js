@@ -7,7 +7,7 @@ const { CoverageSubprovider } = require('@0x/sol-coverage')
 
 const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
 
-const SOLC_VERSION = '0.5.8'
+const SOLC_VERSION = '0.5.16'
 const ALFAJORES_NETWORKID = 44785
 const BAKLAVA_NETWORKID = 200110
 const BAKLAVASTAGING_NETWORKID = 31416
@@ -169,7 +169,7 @@ if (process.argv.includes('--gas')) {
   module.exports = {
     compilers: {
       solc: {
-        version: '0.5.8',
+        version: '0.5.16',
       },
     },
     plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
