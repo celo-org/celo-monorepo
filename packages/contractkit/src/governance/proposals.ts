@@ -96,13 +96,16 @@ export class ProposalBuilder {
 
   /**
    * Adds a transaction to set the implementation on a proxy to the given address.
-   * @param proxyAddress Address of the proxy which should have its implementation set.
+   * @param contract Celo contract name of the proxy which should have its implementation set.
    * @param newImplementationAddress Address of the new contract implementation.
    */
-  addProxyRepointingTx = (proxyAddress: string, newImplementationAddress: string) => {
-    this.addWeb3Tx(setImplementationOnProxy(newImplementationAddress), {
-      to: proxyAddress,
-      value: '0',
+  addProxyRepointingTx = (contract: CeloContract, newImplementationAddress: string) => {
+    this.builders.push(async () => {
+      const proxy = await this.kit._web3Contracts.getContract(contract)
+      return this.fromWeb3tx(setImplementationOnProxy(newImplementationAddress), {
+        to: proxy._address,
+        value: '0',
+      })
     })
   }
 
