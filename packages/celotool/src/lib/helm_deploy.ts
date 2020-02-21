@@ -697,13 +697,15 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
   const bootnodeName = `${celoEnv}-bootnode`
-  const proxyName = `${celoEnv}-proxy`
+  const proxySetName = `${celoEnv}-proxy`
+  const privateTxNodesSetname = `${celoEnv}-tx-nodes-private`
 
   // scale down nodes
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
   // allow to fail for the cases where a testnet does not include the proxy statefulset yet
-  await scaleResource(celoEnv, 'StatefulSet', proxyName, 0, true)
+  await scaleResource(celoEnv, 'StatefulSet', proxySetName, 0, true)
+  await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, 0, true)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
@@ -716,13 +718,15 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
   // assumes 1 proxy per proxied validator
   const numProxies = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
+  const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
 
   // Note(trevor): helm upgrade only compares the current chart to the
   // previously deployed chart when deciding what needs changing, so we need
   // to manually scale up to account for when a node count is the same
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, numTxNodes)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, numValdiators)
-  await scaleResource(celoEnv, 'StatefulSet', proxyName, numProxies)
+  await scaleResource(celoEnv, 'StatefulSet', proxySetName, numProxies)
+  await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, numPrivateTxNodes)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
 }
 
