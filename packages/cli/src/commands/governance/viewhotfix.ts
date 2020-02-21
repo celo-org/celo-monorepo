@@ -11,7 +11,9 @@ export default class ViewHotfix extends BaseCommand {
     ...BaseCommand.flags,
     hash: flags.string({ required: true, description: 'Hash of hotfix transactions' }),
     notyet: flags.boolean({
-      description: 'Whether to list validators who have or have not yet whitelisted',
+      description:
+        'If true, displays validators that have not whitelisted the hotfix instead of those that have',
+      default: false,
     }),
   }
 
@@ -40,12 +42,15 @@ export default class ViewHotfix extends BaseCommand {
 
       const validators = await this.kit.contracts.getValidators()
       const accounts = await validators.currentValidatorAccountsSet()
-      const whitelist = await concurrentMap(5, accounts, async (validator) => {
-        const whitelisted = await governance.isHotfixWhitelistedBy(hash, validator.signer)
-        return (await governance.isHotfixWhitelistedBy(hash, validator.account)) || whitelisted
-      })
+      const whitelist = await concurrentMap(
+        5,
+        accounts,
+        async (validator) =>
+          (await governance.isHotfixWhitelistedBy(hash, validator.signer)) ||
+          (await governance.isHotfixWhitelistedBy(hash, validator.account))
+      )
       printValueMapRecursive({
-        Validators: accounts.filter((_, idx) => res.flags.notyet !== whitelist[idx]),
+        Validators: accounts.filter((_, idx) => !res.flags.notyet === whitelist[idx]),
       })
     }
   }

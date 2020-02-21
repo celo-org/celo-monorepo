@@ -572,7 +572,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentValidatorAccountsSet() {
     const signerAddresses = await this.currentSignerSet()
-    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
+    const accountAddresses = await concurrentMap(
+      5,
+      signerAddresses,
+      this.validatorSignerToAccount.bind(this)
+    )
     return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
   }
 
