@@ -197,13 +197,11 @@ contract Validators is
   /**
    * @notice Updates the block delay for a ValidatorGroup's commission udpdate
    * @param delay Number of block to delay the update
-   * @return True upon success.
    */
-  function setCommissionUpdateDelay(uint256 delay) public onlyOwner returns (bool) {
+  function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
     require(delay != commissionUpdateDelay, "commission update delay not changed");
     commissionUpdateDelay = delay;
     emit CommissionUpdateDelaySet(delay);
-    return true;
   }
 
   /**
@@ -266,6 +264,14 @@ contract Validators is
    */
   function getMaxGroupSize() external view returns (uint256) {
     return maxGroupSize;
+  }
+
+  /**
+   * @notice Returns the block delay for a ValidatorGroup's commission udpdate.
+   * @return The block delay for a ValidatorGroup's commission udpdate.
+   */
+  function getCommissionUpdateDelay() external view returns (uint256) {
+    return commissionUpdateDelay;
   }
 
   /**
@@ -830,9 +836,8 @@ contract Validators is
    * @notice Queues an update to a validator group's commission.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members. Must be in the range [0, 1.0].
-   * @return True upon success.
    */
-  function queueCommissionUpdate(uint256 commission) external returns (bool) {
+  function queueCommissionUpdate(uint256 commission) external {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -842,13 +847,11 @@ contract Validators is
     group.nextCommission = FixidityLib.wrap(commission);
     group.nextCommissionBlock = block.number.add(commissionUpdateDelay);
     emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
-    return true;
   }
   /**
    * @notice Updates a validator group's commission based on the previously queued update
-   * @return True upon success.
    */
-  function updateCommission() external returns (bool) {
+  function updateCommission() external {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -859,8 +862,7 @@ contract Validators is
     group.commission = group.nextCommission;
     delete group.nextCommission;
     delete group.nextCommissionBlock;
-    emit ValidatorGroupCommissionUpdated(account, commission);
-    return true;
+    emit ValidatorGroupCommissionUpdated(account, group.commission.unwrap());
   }
 
   /**
@@ -947,13 +949,15 @@ contract Validators is
   function getValidatorGroup(address account)
     external
     view
-    returns (address[] memory, uint256, uint256[] memory, uint256, uint256)
+    returns (address[] memory, uint256, uint256, uint256, uint256[] memory, uint256, uint256)
   {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     return (
       group.members.getKeys(),
       group.commission.unwrap(),
+      group.nextCommission.unwrap(),
+      group.nextCommissionBlock,
       group.sizeHistory,
       group.slashInfo.multiplier.unwrap(),
       group.slashInfo.lastSlashed
