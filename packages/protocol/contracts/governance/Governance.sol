@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -14,6 +13,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**

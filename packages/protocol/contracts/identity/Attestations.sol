@@ -3,7 +3,6 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 import "./interfaces/IAttestations.sol";
@@ -15,6 +14,7 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract mapping identifiers to accounts

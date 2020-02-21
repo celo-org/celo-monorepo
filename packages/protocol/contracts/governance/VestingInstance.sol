@@ -1,11 +1,11 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IVestingInstance.sol";
 
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract VestingInstance is UsingRegistry, ReentrancyGuard, IVestingInstance {
   using SafeMath for uint256;

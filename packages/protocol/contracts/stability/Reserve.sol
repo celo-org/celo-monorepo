@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -11,6 +10,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Ensures price stability of StableTokens with respect to their pegs

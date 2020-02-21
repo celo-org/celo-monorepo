@@ -2,13 +2,13 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IAccounts.sol";
 
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;

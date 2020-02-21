@@ -3,7 +3,6 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/IValidators.sol";
@@ -15,6 +14,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
@@ -305,8 +305,8 @@ contract Validators is
   function registerValidator(
     bytes calldata ecdsaPublicKey,
     bytes calldata blsPublicKey,
-    bytes calldata blsPop /*nonReentrant*/
-  ) external returns (bool) {
+    bytes calldata blsPop
+  ) external nonReentrant returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
@@ -509,9 +509,7 @@ contract Validators is
    * @return True upon success.
    * @dev De-affiliates with the previously affiliated group if present.
    */
-  function affiliate(
-    address group /*nonReentrant*/
-  ) external returns (bool) {
+  function affiliate(address group) external nonReentrant returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account), "Not a validator");
     require(isValidatorGroup(group), "Not a validator group");
@@ -665,9 +663,7 @@ contract Validators is
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
    */
-  function registerValidatorGroup(
-    uint256 commission /*nonReentrant*/
-  ) external returns (bool) {
+  function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(!isValidator(account), "Already registered as validator");
@@ -716,9 +712,7 @@ contract Validators is
    * @dev Fails if `validator` has not set their affiliation to this account.
    * @dev Fails if the group has zero members.
    */
-  function addMember(
-    address validator /*nonReentrant*/
-  ) external returns (bool) {
+  function addMember(address validator) external nonReentrant returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements > 0, "Validator group empty");
     return _addMember(account, validator, address(0), address(0));
@@ -735,10 +729,8 @@ contract Validators is
    */
   function addFirstMember(address validator, address lesser, address greater)
     external
-    returns (
-      /*nonReentrant*/
-      bool
-    )
+    nonReentrant
+    returns (bool)
   {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements == 0, "Validator group not empty");
@@ -1211,11 +1203,7 @@ contract Validators is
    * @notice Sets the slashingMultiplierRestPeriod property if called by owner.
    * @param value New reset period for slashing multiplier.
    */
-  function setSlashingMultiplierResetPeriod(uint256 value)
-    public
-    /*nonReentrant*/
-    onlyOwner
-  {
+  function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
     slashingMultiplierResetPeriod = value;
   }
 
