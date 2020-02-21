@@ -467,7 +467,7 @@ exports[`DevelopersPage renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="https://docs.celo.org/developer-guide/introduction"
+                    href="https://docs.celo.org/v/master/developer-guide/overview/introduction"
                     role="link"
                     style={
                       Object {
@@ -663,7 +663,7 @@ exports[`DevelopersPage renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
-                    href="https://docs.celo.org/developer-guide/start"
+                    href="https://docs.celo.org/v/master/developer-guide/start"
                     role="link"
                     style={
                       Object {
