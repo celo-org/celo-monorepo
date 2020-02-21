@@ -214,7 +214,9 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
   componentDidMount = () => {
     this.createSectionObservers()
-    this.setLineVisibilityViaScroll()
+    if (this.props.screen !== ScreenSizes.MOBILE) {
+      this.setLineVisibilityViaScroll()
+    }
     window.addEventListener('hashchange', this.onChangeHash, false)
   }
 
