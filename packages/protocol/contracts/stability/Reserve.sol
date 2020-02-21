@@ -98,7 +98,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Get daily spending ratio.
    * @return Spending ratio as unwrapped Fraction.
    */
-  function getDailySpendingRatio() public view onlyOwner returns (uint256) {
+  function getDailySpendingRatio() public view returns (uint256) {
     return spendingRatio.unwrap();
   }
 

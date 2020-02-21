@@ -28,4 +28,4 @@ RUN yarn build
 
 WORKDIR /celo-monorepo/packages/leaderboard
 
-CMD ["yarn run ts-node src/board.ts"]
+CMD ["yarn run ts-node src/board.ts ; yarn run ts-node src/upload.ts"]
