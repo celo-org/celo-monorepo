@@ -69,7 +69,7 @@ export function migrationOverrides() {
     validators: {
       validatorKeys: validatorKeys(),
       attestationKeys: getAttestationKeys(),
-      comissionUpdateDelay: epoch, // at least an epoch
+      commissionUpdateDelay: epoch, // at least an epoch
     },
   }
 }
