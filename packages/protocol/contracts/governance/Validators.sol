@@ -56,8 +56,9 @@ contract Validators is
   struct ValidatorGroup {
     bool exists;
     LinkedList.List members;
-    // TODO(asa): Add a function that allows groups to update their commission.
     FixidityLib.Fraction commission;
+    FixidityLib.Fraction nextCommission;
+    uint256 nextCommissionBlock;
     // sizeHistory[i] contains the last time the group contained i members.
     uint256[] sizeHistory;
     SlashingInfo slashInfo;
@@ -114,9 +115,12 @@ contract Validators is
   ValidatorScoreParameters private validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
+  // The number of blocks to delay a ValidatorGroup's comission update
+  uint256 public comissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
+  event ComissionUpdateDelaySet(uint256 delay);
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -133,6 +137,7 @@ contract Validators is
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
+  event ValidatorGroupCommissionUpdateQueued(address indexed group, uint256 commission, uint activationBlock);
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
@@ -162,6 +167,7 @@ contract Validators is
    * @param validatorScoreAdjustmentSpeed The speed at which validator scores are adjusted.
    * @param _membershipHistoryLength The max number of entries for validator membership history.
    * @param _maxGroupSize The maximum group size.
+   * @param _comissionUpdateDelay The number of blocks to delay a ValidatorGroup's comission update
    * @dev Should be called only once.
    */
   function initialize(
@@ -174,7 +180,8 @@ contract Validators is
     uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
-    uint256 _maxGroupSize
+    uint256 _maxGroupSize,
+    uint256 _comissionUpdateDelay
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -182,8 +189,21 @@ contract Validators is
     setValidatorLockedGoldRequirements(validatorRequirementValue, validatorRequirementDuration);
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
+    setComissionUpdateDelay(_comissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
+  }
+
+  /**
+   * @notice Updates the block delay for a ValidatorGroup's comission udpdate
+   * @param delay Number of block to delay the update
+   * @return True upon success.
+   */
+  function setComissionUpdateDelay(uint256 delay) public onlyOwner returns (bool) {
+    require(delay != comissionUpdateDelay, "comission update delay not changed");
+    comissionUpdateDelay = delay;
+    emit ComissionUpdateDelaySet(delay);
+    return true;
   }
 
   /**
@@ -807,18 +827,38 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator group's commission.
+   * @notice Queues an update to a validator group's commission.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members. Must be in the range [0, 1.0].
    * @return True upon success.
    */
-  function updateCommission(uint256 commission) external returns (bool) {
+  function queueCommissionUpdate(uint256 commission) external returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     require(commission != group.commission.unwrap(), "Commission must be different");
-    group.commission = FixidityLib.wrap(commission);
+
+    group.nextCommission = FixidityLib.wrap(commission);
+    group.nextCommissionBlock = block.number.add(comissionUpdateDelay);
+    emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
+    return true;
+  }
+  /**
+   * @notice Updates a validator group's commission based on the previously queued update
+   * @return True upon success.
+   */
+  function updateCommission() external returns (bool) {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+
+    require(group.nextCommissionBlock != 0, "No comission update queued");
+    require(group.nextCommissionBlock <= block.number, "Can't apply comission update yet");
+
+    group.commission = group.nextCommission;
+    delete group.nextCommission;
+    delete group.nextCommissionBlock;
     emit ValidatorGroupCommissionUpdated(account, commission);
     return true;
   }
