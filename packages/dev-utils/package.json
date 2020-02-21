@@ -22,6 +22,7 @@
     "fs-extra": "^8.1.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^8.1.0"
   },
   "engines": {
     "node": ">=8.13.0"
