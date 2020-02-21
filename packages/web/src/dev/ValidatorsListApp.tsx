@@ -55,6 +55,7 @@ const query = gql`
       votes
       receivableVotes
       numMembers
+      rewardsRatio
     }
   }
 `
