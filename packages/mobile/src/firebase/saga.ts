@@ -253,7 +253,7 @@ function* initiateFigureEightCashoutSaga() {
   const userId = yield select(figureEightUserIdSelector)
   const account = yield select(currentAccountSelector)
   const amountEarned = yield select(figureEightEarnedSelector)
-  const date = Math.floor(Date.now() / 1000)
+  const date = Date.now()
   const txId = userId + date.toString()
   yield put(
     addStandbyTransaction({
