@@ -256,7 +256,6 @@ export async function initiateFigureEightCashout(
       .child('account')
       .once('value')
     if (account !== accountInFirebase.val()) {
-      // TODO throw error if accounts don't match
       Logger.info(TAG, `Local account ${account} does not match remote ${accountInFirebase}`)
       await showError(ErrorMessages.FIGURE_EIGHT_ADDRESS_NOT_UP_TO_DATE)
       return

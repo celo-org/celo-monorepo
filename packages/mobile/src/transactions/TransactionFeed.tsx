@@ -89,7 +89,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   keyExtractor = (item: TransactionFeedFragment) => {
-    return item.hash + item.timestamp.toString()
+    return item.amount.value.toString()
   }
 
   render() {

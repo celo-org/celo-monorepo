@@ -23,15 +23,13 @@ export const transferDollars = async (amount: number, address: string) => {
   console.log(`About to get stable token wrapper`)
   const stableTokenWrapper = await contractKit.contracts.getStableToken()
   console.log(`Got stable token wrapper`)
-  const bankBalanceInWei = await stableTokenWrapper.balanceOf(bankAddress)
-  if (weiTransferAmount > bankBalanceInWei) {
-    console.error(
-      `Not enough funds in bank balance to fulfill request: ${weiTransferAmount} > ${bankBalanceInWei}`
-    )
+  const bankBalance = await stableTokenWrapper.balanceOf(bankAddress)
+  if (amount > bankBalance) {
+    console.error(`Not enough funds in bank balance to fulfill request: ${amount} > ${bankBalance}`)
     return false
   }
   console.log(
-    `Bank balance of ${bankBalanceInWei.toString()} is sufficient to fulfill ${weiTransferAmount}`
+    `Bank balance of ${bankBalance.toString()} is sufficient to fulfill ${weiTransferAmount}`
   )
 
   contractKit.addAccount(bankPrivateKey)
