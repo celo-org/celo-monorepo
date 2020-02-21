@@ -194,7 +194,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
       return
     }
     this.observer = new IntersectionObserver(this.updateSectionHashWhenInView, {
-      threshold: [0.01, 0.1, 0.15, 0.5, 0.9, 1],
+      threshold: [0.1, 0.5, 0.9, 1],
     })
 
     Object.keys(this.sectionRefs).forEach((id) => {
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   },
   grayLine: {
     boxShadow: `0px 1px 1px -1px rgba(0,0,0,0.5)`,
-  } as any,
+  },
   topbar: {
     transitionProperty: 'box-shadow',
     transitionDuration: '400ms',
