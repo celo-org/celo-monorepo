@@ -115,12 +115,12 @@ contract Validators is
   ValidatorScoreParameters private validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
-  // The number of blocks to delay a ValidatorGroup's comission update
-  uint256 public comissionUpdateDelay;
+  // The number of blocks to delay a ValidatorGroup's commission update
+  uint256 public commissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
-  event ComissionUpdateDelaySet(uint256 delay);
+  event CommissionUpdateDelaySet(uint256 delay);
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -167,7 +167,7 @@ contract Validators is
    * @param validatorScoreAdjustmentSpeed The speed at which validator scores are adjusted.
    * @param _membershipHistoryLength The max number of entries for validator membership history.
    * @param _maxGroupSize The maximum group size.
-   * @param _comissionUpdateDelay The number of blocks to delay a ValidatorGroup's comission update
+   * @param _commissionUpdateDelay The number of blocks to delay a ValidatorGroup's commission update
    * @dev Should be called only once.
    */
   function initialize(
@@ -181,7 +181,7 @@ contract Validators is
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
-    uint256 _comissionUpdateDelay
+    uint256 _commissionUpdateDelay
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -189,20 +189,20 @@ contract Validators is
     setValidatorLockedGoldRequirements(validatorRequirementValue, validatorRequirementDuration);
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
-    setComissionUpdateDelay(_comissionUpdateDelay);
+    setCommissionUpdateDelay(_commissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
   }
 
   /**
-   * @notice Updates the block delay for a ValidatorGroup's comission udpdate
+   * @notice Updates the block delay for a ValidatorGroup's commission udpdate
    * @param delay Number of block to delay the update
    * @return True upon success.
    */
-  function setComissionUpdateDelay(uint256 delay) public onlyOwner returns (bool) {
-    require(delay != comissionUpdateDelay, "comission update delay not changed");
-    comissionUpdateDelay = delay;
-    emit ComissionUpdateDelaySet(delay);
+  function setCommissionUpdateDelay(uint256 delay) public onlyOwner returns (bool) {
+    require(delay != commissionUpdateDelay, "commission update delay not changed");
+    commissionUpdateDelay = delay;
+    emit CommissionUpdateDelaySet(delay);
     return true;
   }
 
@@ -840,7 +840,7 @@ contract Validators is
     require(commission != group.commission.unwrap(), "Commission must be different");
 
     group.nextCommission = FixidityLib.wrap(commission);
-    group.nextCommissionBlock = block.number.add(comissionUpdateDelay);
+    group.nextCommissionBlock = block.number.add(commissionUpdateDelay);
     emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
     return true;
   }
@@ -853,8 +853,8 @@ contract Validators is
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
 
-    require(group.nextCommissionBlock != 0, "No comission update queued");
-    require(group.nextCommissionBlock <= block.number, "Can't apply comission update yet");
+    require(group.nextCommissionBlock != 0, "No commission update queued");
+    require(group.nextCommissionBlock <= block.number, "Can't apply commission update yet");
 
     group.commission = group.nextCommission;
     delete group.nextCommission;
