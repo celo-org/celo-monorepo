@@ -103,10 +103,6 @@ const networks = {
     ...defaultConfig,
     from: INTEGRATION_FROM,
   },
-  testing: {
-    ...defaultConfig,
-    from: INTEGRATION_TESTING_FROM,
-  },
   argentinastaging: freeGasConfig,
   argentinaproduction: freeGasConfig,
 
