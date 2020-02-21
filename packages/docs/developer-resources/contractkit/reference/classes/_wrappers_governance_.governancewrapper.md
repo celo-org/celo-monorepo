@@ -17,7 +17,6 @@ Contract managing voting for governance proposals.
 ### Properties
 
 * [approveHotfix](_wrappers_governance_.governancewrapper.md#approvehotfix)
-* [byzantineQuorumValidators](_wrappers_governance_.governancewrapper.md#byzantinequorumvalidators)
 * [concurrentProposals](_wrappers_governance_.governancewrapper.md#concurrentproposals)
 * [dequeueFrequency](_wrappers_governance_.governancewrapper.md#dequeuefrequency)
 * [dequeueProposalsIfReady](_wrappers_governance_.governancewrapper.md#dequeueproposalsifready)
@@ -39,6 +38,7 @@ Contract managing voting for governance proposals.
 * [isQueued](_wrappers_governance_.governancewrapper.md#isqueued)
 * [isQueuedProposalExpired](_wrappers_governance_.governancewrapper.md#isqueuedproposalexpired)
 * [minDeposit](_wrappers_governance_.governancewrapper.md#mindeposit)
+* [minQuorumSize](_wrappers_governance_.governancewrapper.md#minquorumsize)
 * [prepareHotfix](_wrappers_governance_.governancewrapper.md#preparehotfix)
 * [proposalExists](_wrappers_governance_.governancewrapper.md#proposalexists)
 * [propose](_wrappers_governance_.governancewrapper.md#propose)
@@ -107,30 +107,6 @@ Marks the given hotfix approved by `sender`.
 #### Type declaration:
 
 ▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
-
-###  byzantineQuorumValidators
-
-• **byzantineQuorumValidators**: *function* = proxyCall(
-    this.contract.methods.byzantineQuorumValidatorsInCurrentSet,
-    undefined,
-    valueToBigNumber
-  )
-
-*Defined in [contractkit/src/wrappers/Governance.ts:578](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L578)*
-
-Returns the number of validators required to reach a Byzantine quorum
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *Promise‹Output›*
 
 **Parameters:**
 
@@ -657,6 +633,30 @@ ___
 Query minimum deposit required to make a proposal.
 
 **`returns`** Current minimum deposit.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  minQuorumSize
+
+• **minQuorumSize**: *function* = proxyCall(
+    this.contract.methods.minQuorumSizeInCurrentSet,
+    undefined,
+    valueToBigNumber
+  )
+
+*Defined in [contractkit/src/wrappers/Governance.ts:578](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L578)*
+
+Returns the number of validators required to reach a Byzantine quorum
 
 #### Type declaration:
 
