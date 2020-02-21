@@ -37,7 +37,11 @@ Proposals that graduate from the Referendum phase to the execution phase may be 
 
 ## Hotfix
 
-In addition to the standard governance process, there is a hotfix process designed to implement security sensitive patches. If disclosing the contents of a proposal publicly would compromise the security of the network, such as a vulnerability in a core contract, the hotfix process can be used to pass a proposal given the support of two thirds of the elected validator set. The validators will indicate their support for the proposal by whitelisting its hash through on-chain, allowing the contents to be distributed only among the validators until the proposal is approved and can be executed.
+The cadence and transparency of the standard on-chain governance protocol make it poorly suited for proposals that patch issues that may compromise the security of the network, especially when the patch would reveal an exploitable bug in one of the core contracts. Instead, these sorts of changes are better suited for the more responsive, and less transparent, hotfix protocol.
+
+Anyone can make a proposal in the hotfix protocol by submitting the hash of their proposal to the `Governance` smart contract. If that hash is approved by the `approver` and a quorum of validators, the proposer can execute the contents of that proposal immediately.
+
+Note that this means the validators may not always know the contents of the proposal that they are voting on. Revealing the contents of the proposal to all validators may compromise the integrity of the hotfix protocol, as only one validator would need to be malicious in order to exploit the vulnerability or share it publicly. Instead, to convince the validators that the hash represents a proposal that should be executed via the hotfix protocol, the proposer should consider contacting reputable, third party, security firms to publicly vouch for the contents of the proposal.
 
 ## Celo Blockchain Software Upgrades
 
