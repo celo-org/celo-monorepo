@@ -46,9 +46,11 @@ contract DowntimeSlasher is SlasherUtil {
 
   /**
    * @notice Test if a validator has been down.
-   * @param startBlock First block of the downtime.
-   * @param startSignerIndex Validator index at the first block.
-   * @param endSignerIndex Validator index at the last block.
+   * @param startBlock First block of the downtime. Last block will be computed from this.
+   * @param startSignerIndex Index of the signer within the validator set as of the start block.
+   * @param endSignerIndex Index of the signer within the validator set as of the end block.
+   * @return True if the validator signature does not appear in any block within the window.
+   * @dev Due to getParentSealBitmap, startBlock must be within 4 epochs of the current head.
    */
   function isDown(uint256 startBlock, uint256 startSignerIndex, uint256 endSignerIndex)
     public
