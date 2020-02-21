@@ -200,6 +200,28 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
+  return deploymentForContract(web3, artifacts, name, args, true, then);
+}
+
+export function deploymentForProxiedContract<ContractInstance extends Truffle.ContractInstance>(
+  web3: Web3,
+  artifacts: any,
+  name: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+) {
+  return deploymentForContract(web3, artifacts, name, args, false, then);
+
+}
+
+export function deploymentForContract<ContractInstance extends Truffle.ContractInstance>(
+  web3: Web3,
+  artifacts: any,
+  name: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
+  registerAddress: boolean,
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+) {
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
   return (deployer: any, networkName: string, _accounts: string[]) => {
@@ -213,8 +235,10 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
         ContractInstance
       >(web3, artifacts, name, ...(await args(networkName)))
 
-      const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-      await registry.setAddressFor(name, proxiedContract.address)
+      if (registerAddress) {
+        const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+        await registry.setAddressFor(name, proxiedContract.address)
+      }
 
       if (then) {
         await then(proxiedContract, web3, networkName)

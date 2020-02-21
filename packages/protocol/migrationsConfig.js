@@ -80,6 +80,10 @@ const DefaultConfig = {
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
   },
+  governanceApproverMultiSig: {
+    signatories: [0x5409ed021d9299bf6814279a6a1411a7e866a631],
+    numRequiredConfirmations: 1,
+  },
   lockedGold: {
     unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days divided by 24 to accelerate for Stake off
   },
@@ -96,6 +100,10 @@ const DefaultConfig = {
     goldBalance: 100000000,
     tobinTaxStalenessThreshold: 60 * 60, // 1 hour
     dailySpendingRatio: '1000000000000000000000000', // 100%
+  },
+  reserveSpenderMultiSig: {
+    signatories: [0x5409ed021d9299bf6814279a6a1411a7e866a631],
+    numRequiredConfirmations: 1,
   },
   stableToken: {
     decimals: 18,

@@ -170,7 +170,7 @@ describe('Transfer tests', function(this: any) {
 
   const syncModes = ['full', 'fast', 'light', 'lightest']
   const gethConfig: GethRunConfig = {
-    migrateTo: 19,
+    migrateTo: 20,
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,

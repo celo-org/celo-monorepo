@@ -7,7 +7,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { RegistryInstance, ReserveInstance } from 'types'
+import { RegistryInstance, ReserveInstance, ReserveSpenderMultiSigInstance } from 'types'
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<[string, number, string]> => {
@@ -35,7 +35,10 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       to: reserve.address,
       value: web3.utils.toWei(config.reserve.goldBalance.toString(), 'ether') as string,
     })
-    console.info(`Marking ${network.from} as a reserve spender`)
-    await reserve.addSpender(network.from)
+    const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<
+      ReserveSpenderMultiSigInstance
+    >(CeloContractName.ReserveSpenderMultiSig, artifacts)
+    console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
+    await reserve.addSpender(reserveSpenderMultiSig.address)
   }
 )
