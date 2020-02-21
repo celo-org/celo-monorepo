@@ -9,13 +9,11 @@ import App from 'src/app/App'
 import { installSentry } from 'src/sentry/Sentry'
 import * as Sentry from '@sentry/react-native'
 import { onBackgroundNotification } from 'src/firebase/firebase'
-import { YellowBox } from 'react-native'
 
 // Set this to true, if you are modifying Sentry and want to test your changes
 const enableSentryOnDebugBuild = false
 const isDevBuild = __DEV__
 const sentryEnabled = !isDevBuild || enableSentryOnDebugBuild
-YellowBox.ignoreWarnings(['Warning'])
 
 if (sentryEnabled) {
   installSentry()

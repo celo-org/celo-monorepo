@@ -17,8 +17,8 @@ import {
   setFigureEightAccount,
 } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { shinyDollar } from 'src/images/Images'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { shinyDollar } from 'src/images/Images'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -105,7 +105,6 @@ export class Earn extends React.Component<Props, State> {
                 style={{
                   flexDirection: 'column',
                   alignItems: 'flex-end',
-                  // justifyContent: 'space-between',
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -135,11 +134,6 @@ export class Earn extends React.Component<Props, State> {
                 onChangeText={this.onChangeInput}
                 value={this.state.userId}
                 style={style.inputField}
-                // placeholderTextColor={colors.inactive} // TODO(anna) styling
-                // underlineColorAndroid="transparent"
-                // enablesReturnKeyAutomatically={true}
-                // placeholder={t('fullName')}
-                // testID={'NameEntry'}
               />
               <TextButton onPress={this.onSubmitUserId}>{'Submit'}</TextButton>
             </View>
@@ -210,14 +204,12 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    // padding: 20,
     paddingTop: 0,
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
   h1: {
     ...fontStyles.h1,
-    // marginTop: 20,
   },
   body: {
     ...fontStyles.bodyLarge,
