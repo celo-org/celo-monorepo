@@ -14,7 +14,8 @@ import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles } from 'src/styles'
 
 const FOOTER_ID = 'experience-footer'
-
+const DISTANCE_TO_HIDE_AT = 25
+const THROTTLE_SCROLL_MS = 200
 export const ROOT = menu.BRAND.link
 
 export const LOGO_PATH = `${ROOT}/logo`
@@ -221,13 +222,13 @@ class Page extends React.Component<Props & ScreenProps, State> {
     window.addEventListener(
       'scroll',
       throttle((event) => {
-        const top = event.target.scrollingElement.scrollTop + 30
+        const top = event.target.scrollingElement.scrollTop + DISTANCE_TO_HIDE_AT
         if (top > HEADER_HEIGHT) {
           this.setState({ isLineVisible: true })
         } else {
           this.setState({ isLineVisible: false })
         }
-      }, 200)
+      }, THROTTLE_SCROLL_MS)
     )
   }
 
@@ -302,10 +303,12 @@ const styles = StyleSheet.create({
     marginTop: HEADER_HEIGHT,
   },
   grayLine: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray,
-  },
+    boxShadow: `0px 1px 1px -1px rgba(0,0,0,0.5)`,
+  } as any,
   topbar: {
+    transitionProperty: 'box-shadow',
+    transitionDuration: '400ms',
+    boxShadow: `0px 0px 0px 0px rgba(0,0,0,0)`,
     position: 'fixed',
     width: '100%',
     zIndex: 10,
