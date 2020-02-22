@@ -53,15 +53,15 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-    this.props.startVerification()
+    // this.props.startVerification()
   }
 
   componentDidUpdate() {
-    if (this.props.verificationStatus === VerificationStatus.Done) {
-      navigate(Screens.VerificationSuccessScreen)
-    } else if (this.props.verificationStatus === VerificationStatus.RevealingNumber) {
-      navigate(Screens.VerificationInterstitialScreen)
-    }
+    // if (this.props.verificationStatus === VerificationStatus.Done) {
+    //   navigate(Screens.VerificationSuccessScreen)
+    // } else if (this.props.verificationStatus === VerificationStatus.RevealingNumber) {
+    //   navigate(Screens.VerificationInterstitialScreen)
+    // }
   }
 
   componentWillUnmount() {
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   carouselContainer: {
-    marginVertical: 20,
+    paddingVertical: 20,
   },
 })
 

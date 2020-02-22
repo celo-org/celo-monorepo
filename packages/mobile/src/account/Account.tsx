@@ -7,6 +7,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
@@ -224,9 +225,9 @@ export class Account extends React.Component<Props, State> {
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
           <View style={style.accountProfile}>
-            <TouchableOpacity onPress={this.onPressAvatar}>
+            <TouchableWithoutFeedback onPress={this.onPressAvatar}>
               <AvatarSelf />
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
             <View>
               <TouchableOpacity onPress={this.onPressAddress}>
                 <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>

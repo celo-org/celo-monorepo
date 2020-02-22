@@ -112,21 +112,21 @@ export function* navigateToProperScreen() {
     return
   }
 
-  if (!language) {
-    navigate(Stacks.NuxStack)
-  } else if (!inSync) {
-    navigate(Screens.SetClock)
-  } else if (!e164Number) {
-    navigate(Screens.JoinCelo)
-  } else if (pincodeType === PincodeType.Unset) {
-    navigate(Screens.PincodeEducation)
-  } else if (!redeemComplete && !account) {
-    navigate(Screens.EnterInviteCode)
-  } else if (!hasSeenVerificationNux) {
-    navigate(Screens.VerificationEducationScreen)
-  } else {
-    navigate(Stacks.AppStack)
-  }
+  // if (!language) {
+  //   navigate(Stacks.NuxStack)
+  // } else if (!inSync) {
+  //   navigate(Screens.SetClock)
+  // } else if (!e164Number) {
+  //   navigate(Screens.JoinCelo)
+  // } else if (pincodeType === PincodeType.Unset) {
+  //   navigate(Screens.PincodeEducation)
+  // } else if (!redeemComplete && !account) {
+  //   navigate(Screens.EnterInviteCode)
+  // } else if (!hasSeenVerificationNux) {
+  navigate(Screens.VerificationLoadingScreen)
+  // } else {
+  //   navigate(Stacks.AppStack)
+  // }
 }
 
 export function* handleDeepLink(action: OpenDeepLink) {
