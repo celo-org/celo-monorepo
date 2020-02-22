@@ -371,7 +371,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @notice Updates the target voting yield based on the difference between the target and current
    *   voting Gold fraction.
    */
-  function _updateTargetVotingYield() internal {
+  function _updateTargetVotingYield() internal onlyWhenNotFrozen {
     FixidityLib.Fraction memory votingGoldFraction = FixidityLib.wrap(getVotingGoldFraction());
     if (votingGoldFraction.gt(targetVotingGoldFraction)) {
       FixidityLib.Fraction memory votingGoldFractionDelta = votingGoldFraction.subtract(
@@ -407,7 +407,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
-  function updateTargetVotingYield() external onlyWhenNotFrozen {
+  function updateTargetVotingYield() external {
     require(msg.sender == address(0), "Only VM can call");
     _updateTargetVotingYield();
   }

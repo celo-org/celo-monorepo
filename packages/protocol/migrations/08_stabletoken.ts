@@ -10,7 +10,6 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   FeeCurrencyWhitelistInstance,
   FreezerInstance,
-  ReserveInstance,
   SortedOraclesInstance,
   StableTokenInstance,
 } from 'types'
@@ -43,7 +42,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       await freezer.freeze(stableToken.address)
     }
 
-    console.log('Setting GoldToken/USD exchange rate')
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<
       SortedOraclesInstance
     >('SortedOracles', artifacts)
@@ -52,13 +50,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       console.info(`Adding ${oracle} as an Oracle for StableToken`)
       await sortedOracles.addOracle(stableToken.address, ensureLeading0x(oracle))
     }
-
-    const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
-      'Reserve',
-      artifacts
-    )
-    console.info('Adding StableToken to Reserve')
-    await reserve.addToken(stableToken.address)
 
     console.info('Whitelisting StableToken as a fee currency')
     const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract<

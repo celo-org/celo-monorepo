@@ -815,15 +815,12 @@ contract('EpochRewards', (accounts: string[]) => {
       await freezer.freeze(epochRewards.address)
     })
 
-    it('should make calculateTargetEpochRewards return zeroes', async () => {
-      const [
-        validatorPayment,
-        voterRewards,
-        communityReward,
-      ] = await epochRewards.calculateTargetEpochRewards()
-      assertEqualBN(validatorPayment, 0)
-      assertEqualBN(voterRewards, 0)
-      assertEqualBN(communityReward, 0)
+    it('should make calculateTargetEpochRewards revert', async () => {
+      await assertRevert(epochRewards.calculateTargetEpochRewards())
+    })
+
+    it('should make updateTargetVotingYield revert', async () => {
+      await assertRevert(epochRewards.updateTargetVotingYield())
     })
   })
 })

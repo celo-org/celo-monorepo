@@ -3,7 +3,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
-  transferOwnershipOfProxy,
   transferOwnershipOfProxyAndImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
@@ -36,13 +35,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
   CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    const proxyOwnedByGovernance = ['GoldToken']
-    await Promise.all(
-      proxyOwnedByGovernance.map((contractName) =>
-        transferOwnershipOfProxy(contractName, governance.address, artifacts)
-      )
-    )
-
     const proxyAndImplementationOwnedByGovernance = [
       'Accounts',
       'Attestations',
@@ -56,6 +48,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'FeeCurrencyWhitelist',
       'Freezer',
       'GasPriceMinimum',
+      'GoldToken',
       'Governance',
       'GovernanceSlasher',
       'LockedGold',

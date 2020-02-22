@@ -1,4 +1,4 @@
-import { toFixed } from '@celo/utils/lib/fixidity'
+const { toFixed } = require('@celo/utils/lib/fixidity')
 
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
@@ -111,8 +111,6 @@ const DefaultConfig = {
   },
   stableToken: {
     decimals: 18,
-    // TODO(asa): Need to support this somehow.
-    // goldPrice: 10,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
@@ -122,7 +120,7 @@ const DefaultConfig = {
       values: [],
     },
     oracles: [],
-    frozen: false,
+    frozen: true,
   },
   validators: {
     groupLockedGoldRequirements: {

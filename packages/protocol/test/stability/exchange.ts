@@ -104,6 +104,7 @@ contract('Exchange', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
     await mockReserve.setGoldToken(goldToken.address)
 
+    await goldToken.initialize(registry.address)
     // TODO: use MockStableToken for this
     await stableToken.initialize(
       'Celo Dollar',

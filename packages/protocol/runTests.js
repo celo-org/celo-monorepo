@@ -26,6 +26,7 @@ const migrationOverrides = {
     frozen: false,
   },
   stableToken: {
+    oracles: [network.from],
     frozen: false,
   },
 }

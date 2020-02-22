@@ -38,10 +38,12 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken, Freezable {
 
   /**
    * @notice Sets 'initialized' to true.
+   * @param registryAddress Address of the Registry contract.
    */
-  // solhint-disable-next-line no-empty-blocks
-  function initialize() external initializer {
+  function initialize(address registryAddress) external initializer {
     totalSupply_ = 0;
+    _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
   }
 
   /**
