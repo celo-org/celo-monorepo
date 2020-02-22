@@ -819,7 +819,7 @@ contract Election is
    * @return The list of elected validators.
    */
   function electValidatorSigners() external view returns (address[] memory) {
-    return electValidatorSigners(electableValidators.min, electableValidators.max);
+    return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 
   /**
@@ -828,7 +828,7 @@ contract Election is
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  function electValidatorSigners(uint256 minElectableValidators, uint256 maxElectableValidators)
+  function electNValidatorSigners(uint256 minElectableValidators, uint256 maxElectableValidators)
     public
     view
     returns (address[] memory)
