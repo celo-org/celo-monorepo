@@ -829,7 +829,7 @@ contract Election is
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
   function electValidatorSigners(uint256 minElectableValidators, uint256 maxElectableValidators)
-    external
+    public
     view
     returns (address[] memory)
   {
