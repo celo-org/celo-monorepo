@@ -479,7 +479,7 @@ contract Governance is
   /**
    * @notice Requires a proposal is dequeued and removes it if expired.
    * @param proposalId The ID of the proposal.
-   * @return The proposal storage struct and stage corresponding to `proposalId`. 
+   * @return The proposal storage struct and stage corresponding to `proposalId`.
    */
   function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
