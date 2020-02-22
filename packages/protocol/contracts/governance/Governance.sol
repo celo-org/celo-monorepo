@@ -271,6 +271,7 @@ contract Governance is
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    */
   function setMinDeposit(uint256 _minDeposit) external onlyOwner {
+    require(_minDeposit > 0, "minDeposit must be larger than 0");
     require(_minDeposit != minDeposit, "Minimum deposit unchanged");
     minDeposit = _minDeposit;
     emit MinDepositSet(_minDeposit);
@@ -956,18 +957,10 @@ contract Governance is
   /**
    * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
+   * @return Whether validator whitelist tally >= validator byzantine quorum
    */
   function isHotfixPassing(bytes32 hash) public view returns (bool) {
-    return hotfixWhitelistValidatorTally(hash) >= byzantineQuorumValidatorsInCurrentSet();
-  }
-
-  /**
-   * @notice Computes byzantine quorum from current validator set size
-   * @return Byzantine quorum of validators.
-   */
-  function byzantineQuorumValidatorsInCurrentSet() public view returns (uint256) {
-    return numberValidatorsInCurrentSet().mul(2).div(3).add(1);
+    return hotfixWhitelistValidatorTally(hash) >= minQuorumSizeInCurrentSet();
   }
 
   /**
