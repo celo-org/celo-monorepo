@@ -219,10 +219,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     emit MinimumReportsSet(newMininumReports);
   }
 
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
-  }
-
   /**
     * @notice Allows owner to set the Stable Token address
     * @param newStableToken The new address for Stable Token

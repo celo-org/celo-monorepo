@@ -135,10 +135,6 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     );
   }
 
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
-  }
-
   /**
    * @notice Sets the community reward percentage
    * @param value The percentage of the total reward to be sent to the community funds.
@@ -442,11 +438,12 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @return The per validator epoch reward, the total rewards to voters, and the total community
    * reward
    */
-  function calculateTargetEpochRewards() external view returns (uint256, uint256, uint256) {
-    if (frozen) {
-      return (0, 0, 0);
-    }
-
+  function calculateTargetEpochRewards()
+    external
+    view
+    onlyWhenNotFrozen
+    returns (uint256, uint256, uint256)
+  {
     uint256 targetVoterReward = getTargetVoterRewards();
     uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);

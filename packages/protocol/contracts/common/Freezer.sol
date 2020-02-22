@@ -3,7 +3,7 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./Initializable.sol";
-import "./interfaces/Freezable.sol";
+import "./interfaces/IFreezer.sol";
 
 contract Freezer is Ownable, Initializable, IFreezer {
   mapping(address => bool) public isFrozen;
@@ -19,13 +19,13 @@ contract Freezer is Ownable, Initializable, IFreezer {
    * @notice Freezes the contract, disabling `onlyWhenNotFrozen` functions.
    */
   function freeze(address destination) external onlyOwner {
-    frozen[destination] = true;
+    isFrozen[destination] = true;
   }
 
   /**
    * @notice Unreezes the contract, enabling `onlyWhenNotFrozen` functions.
    */
   function unfreeze(address destination) external onlyOwner {
-    frozen[destination] = false;
+    isFrozen[destination] = false;
   }
 }

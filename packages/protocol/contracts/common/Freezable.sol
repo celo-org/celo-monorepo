@@ -1,6 +1,6 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./UsingRegistry.sol";
 
 contract Freezable is UsingRegistry {
   // onlyWhenNotFrozen functions can only be called when `frozen` is false, otherwise they will

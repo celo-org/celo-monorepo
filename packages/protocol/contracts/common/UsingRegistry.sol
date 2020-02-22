@@ -2,10 +2,11 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./interfaces/IERC20Token.sol";
-import "./interfaces/IRegistry.sol";
 import "./interfaces/IAccounts.sol";
+import "./interfaces/IERC20Token.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
+import "./interfaces/IFreezer.sol";
+import "./interfaces/IRegistry.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
