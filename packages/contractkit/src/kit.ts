@@ -72,6 +72,7 @@ interface AccountBalance {
   usd: BigNumber
   total: BigNumber
   lockedGold: BigNumber
+  pending: BigNumber
 }
 
 export class ContractKit {
@@ -106,11 +107,21 @@ export class ContractKit {
     const goldBalance = await goldToken.balanceOf(address)
     const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
+    let pending = new BigNumber(0)
+    try {
+      pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
+    } catch (err) {
+      // Just means that it's not an account
+    }
     return {
       gold: goldBalance,
       lockedGold: lockedBalance,
       usd: dollarBalance,
-      total: goldBalance.plus(lockedBalance).plus(await exchange.quoteUsdSell(dollarBalance)),
+      total: goldBalance
+        .plus(lockedBalance)
+        .plus(await exchange.quoteUsdSell(dollarBalance))
+        .plus(pending),
+      pending,
     }
   }
 
@@ -157,7 +168,7 @@ export class ContractKit {
 
   /**
    * Set CeloToken to use to pay for gas fees
-   * @param token cUsd or cGold
+   * @param token cUSD (StableToken) or cGLD (GoldToken)
    */
   async setFeeCurrency(token: CeloToken): Promise<void> {
     this.config.feeCurrency =
@@ -196,7 +207,7 @@ export class ContractKit {
    * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
    *
-   * Set to `null` to use cGold
+   * Set to `null` to use cGLD
    *
    * @param address ERC20 address
    */

@@ -1,7 +1,7 @@
 import * as ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
-import * as fs from 'fs'
+import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as targz from 'targz'
 import * as tmp from 'tmp'
@@ -271,6 +271,8 @@ async function generateDevChain(
   if (opts.targz) {
     chainTmp = tmp.dirSync({ keep: false, unsafeCleanup: true })
     chainPath = chainTmp.name
+  } else {
+    fs.ensureDirSync(chainPath)
   }
   const stopGanache = await runDevChain(chainPath, {
     reset: !opts.targz,
@@ -289,6 +291,8 @@ async function compressChain(chainPath: string, filename: string): Promise<void>
   // tslint:disable-next-line: no-console
   console.log('Compressing chain')
   return new Promise((resolve, reject) => {
+    // ensures the path to the file
+    fs.ensureFileSync(filename)
     targz.compress({ src: chainPath, dest: filename }, async (err: Error) => {
       if (err) {
         console.error(err)

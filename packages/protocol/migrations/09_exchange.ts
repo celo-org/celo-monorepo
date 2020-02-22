@@ -7,7 +7,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { ExchangeInstance, ReserveInstance, StableTokenInstance } from 'types'
+import { ExchangeInstance, StableTokenInstance } from 'types'
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
@@ -33,12 +33,6 @@ module.exports = deploymentForCoreContract<ExchangeInstance>(
   CeloContractName.Exchange,
   initializeArgs,
   async (exchange: ExchangeInstance) => {
-    console.log('Setting Exchange as a Reserve spender')
-    const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
-      'Reserve',
-      artifacts
-    )
-    await reserve.addSpender(exchange.address)
     if (config.epochRewards.frozen) {
       await exchange.freeze()
     }

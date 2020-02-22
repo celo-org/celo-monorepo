@@ -235,7 +235,7 @@ exports[`InviteReview renders correctly 1`] = `
                   ]
                 }
               >
-                0.26
+                0.33
               </Text>
               <Text
                 style={
@@ -322,7 +322,7 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
-                    0.20
+                    0.25
                   </Text>
                 </View>
                 <Text
@@ -378,7 +378,7 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
-                    0.20
+                    0.25
                   </Text>
                 </View>
                 <View
@@ -512,7 +512,7 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
-                    0.20
+                    0.25
                   </Text>
                 </View>
               </View>
