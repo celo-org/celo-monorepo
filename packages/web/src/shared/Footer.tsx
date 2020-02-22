@@ -11,11 +11,12 @@ import YouTube from 'src/icons/YouTube'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
+import ChangeStory from 'src/shared/ChangeStory'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
+const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.DEVELOPERS, menu.COMMUNITY]
 
 interface Props {
   isVertical?: boolean
@@ -150,13 +151,7 @@ const YEAR = new Date().getFullYear()
 const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
   return (
     <View style={styles.details}>
-      <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
-        <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>
-          {t('trueGold.0')}
-          <Text style={styles.bar}>|</Text>
-          {t('trueGold.1')}
-        </Text>
-      </Responsive>
+      <ChangeStory />
       <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
         <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>{t('disclaimer')}</Text>
       </Responsive>
@@ -186,7 +181,6 @@ const styles = StyleSheet.create({
     paddingRight: 25,
   },
   details: {
-    paddingTop: 40,
     paddingBottom: 20,
   },
   detailsText: {
