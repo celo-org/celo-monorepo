@@ -245,7 +245,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     if (getAffiliates) {
       const validators = await this.getRegisteredValidators(blockNumber)
       affiliates = validators
-        .filter((v) => v.affiliation === address)
+        .filter((v) => v.affiliation && eqAddress(v.affiliation, address))
         .filter((v) => !res[0].includes(v.address))
     }
     return {

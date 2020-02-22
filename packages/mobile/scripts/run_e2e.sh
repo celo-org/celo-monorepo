@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Default ENVFILE if not set
+export ENVFILE="${ENVFILE:-.env.test}"
+
 # ========================================
 # Build and run the end-to-end tests
 # ========================================
