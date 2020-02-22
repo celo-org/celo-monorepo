@@ -7,7 +7,6 @@ export const newKitFromWeb3 = () => ({
     }),
     getStableToken: jest.fn(async () => ({
       balanceOf: jest.fn(async () => {
-        console.log('BALANCEOF')
         return new BigNumber(10000000000)
       }),
       decimals: jest.fn(async () => '10'),

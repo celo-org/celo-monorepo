@@ -54,7 +54,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     ])
     const escrow: EscrowWrapper = yield call([
       contractKit.contracts,
-      contractKit.contracts.getExchange,
+      contractKit.contracts.getEscrow,
     ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
