@@ -27,6 +27,7 @@ export const ProxyContracts = [
   'StableTokenProxy',
   'SortedOraclesProxy',
   'RegistryProxy',
+  'BlockchainParametersProxy',
 ]
 export const CoreContracts = [
   // common
@@ -46,6 +47,8 @@ export const CoreContracts = [
   'DowntimeSlasher',
   'LockedGold',
   'Validators',
+  'ReleaseGoldFactory',
+  'ReleaseGoldInstance',
 
   // identity
   'Attestations',

@@ -679,11 +679,19 @@ contract Election is
     ActiveVotes storage active = votes.active;
     active.total = active.total.sub(value);
 
-    uint256 unitsDelta = getActiveVotesUnitsDelta(group, value);
-
+    // Rounding may cause getActiveVotesUnitsDelta to return 0 for value != 0, preventing users
+    // from revoking the last of their votes. The case where value == activeVotes is special cased
+    // to prevent this.
+    uint256 unitsDelta = 0;
+    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
     GroupActiveVotes storage groupActive = active.forGroup[group];
-    groupActive.total = groupActive.total.sub(value);
+    if (activeVotes == value) {
+      unitsDelta = groupActive.unitsByAccount[account];
+    } else {
+      unitsDelta = getActiveVotesUnitsDelta(group, value);
+    }
 
+    groupActive.total = groupActive.total.sub(value);
     groupActive.totalUnits = groupActive.totalUnits.sub(unitsDelta);
     groupActive.unitsByAccount[account] = groupActive.unitsByAccount[account].sub(unitsDelta);
   }

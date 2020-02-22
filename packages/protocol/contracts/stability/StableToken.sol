@@ -10,6 +10,7 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../baklava/Freezable.sol";
 
 /**
  * @title An ERC20 compliant token with adjustable supply.
@@ -22,7 +23,8 @@ contract StableToken is
   Ownable,
   Initializable,
   UsingRegistry,
-  UsingPrecompiles
+  UsingPrecompiles,
+  Freezable
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -109,6 +111,10 @@ contract StableToken is
     require(inflationRate != 0, "Must provide a non-zero inflation rate.");
 
     _transferOwnership(msg.sender);
+
+    // At network launch, stable token transfers should be frozen.
+    frozen = true;
+
     totalSupply_ = 0;
     name_ = _name;
     symbol_ = _symbol;
@@ -125,6 +131,18 @@ contract StableToken is
       require(_mint(initialBalanceAddresses[i], initialBalanceValues[i]), "mint failed");
     }
     setRegistry(registryAddress);
+  }
+
+  function _transferOwnership(address owner) internal {
+    Ownable._transferOwnership(owner);
+    _setFreezer(owner);
+  }
+
+  /**
+    * @notice This overrides Freezable's `freeze` to disable refreezing StableToken.
+    */
+  function freeze() external {
+    require(false, "StableToken is not freezable again");
   }
 
   /**
@@ -160,6 +178,7 @@ contract StableToken is
     updateInflationFactor
     returns (bool)
   {
+    require(spender != address(0), "reserved address 0x0 cannot have allowance");
     uint256 oldValue = allowed[msg.sender][spender];
     uint256 newValue = oldValue.add(value);
     allowed[msg.sender][spender] = newValue;
@@ -192,6 +211,7 @@ contract StableToken is
    * @return True if the transaction succeeds.
    */
   function approve(address spender, uint256 value) external updateInflationFactor returns (bool) {
+    require(spender != address(0), "reserved address 0x0 cannot have allowance");
     allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
     return true;
@@ -234,6 +254,7 @@ contract StableToken is
   function transferWithComment(address to, uint256 value, string calldata comment)
     external
     updateInflationFactor
+    onlyWhenNotFrozen
     returns (bool)
   {
     bool succeeded = transfer(to, value);
@@ -268,6 +289,7 @@ contract StableToken is
   function transferFrom(address from, address to, uint256 value)
     external
     updateInflationFactor
+    onlyWhenNotFrozen
     returns (bool)
   {
     uint256 units = _valueToUnits(inflationState.factor, value);
@@ -448,7 +470,12 @@ contract StableToken is
    * @param value The amount to be transferred.
    */
   // solhint-disable-next-line no-simple-event-func-name
-  function transfer(address to, uint256 value) public updateInflationFactor returns (bool) {
+  function transfer(address to, uint256 value)
+    public
+    updateInflationFactor
+    onlyWhenNotFrozen
+    returns (bool)
+  {
     return _transfer(to, value);
   }
 
@@ -457,7 +484,12 @@ contract StableToken is
    * @param from The account to debit balance from
    * @param value The value of balance to debit
    */
-  function debitFrom(address from, uint256 value) external onlyVm updateInflationFactor {
+  function debitFrom(address from, uint256 value)
+    external
+    onlyVm
+    updateInflationFactor
+    onlyWhenNotFrozen
+  {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.sub(units);
     balances[from] = balances[from].sub(units);
@@ -470,7 +502,7 @@ contract StableToken is
    * @dev We can assume that the inflation factor is up to date as `debitFrom`
    * will have been called in the same transaction
    */
-  function creditTo(address to, uint256 value) external onlyVm {
+  function creditTo(address to, uint256 value) external onlyVm onlyWhenNotFrozen {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);

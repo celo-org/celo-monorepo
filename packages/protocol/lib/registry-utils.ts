@@ -19,6 +19,7 @@ export enum CeloContractName {
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
+  ReleaseGoldFactory = 'ReleaseGoldFactory',
 }
 
 // TODO(amy): Pull this list from the build artifacts instead

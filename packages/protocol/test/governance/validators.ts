@@ -7,7 +7,8 @@ import {
   assertEqualDpBN,
   assertRevert,
   assertSameAddress,
-  mineBlocks,
+  currentEpochNumber,
+  mineToNextEpoch,
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -35,6 +36,9 @@ const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
+
+type SolBytes = Array<string | BigNumber>
+const toBytes = (input: any): SolBytes => input
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -71,12 +75,6 @@ const parseMembershipHistory = (membershipHistory: any) => {
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
-// Hard coded in ganache.
-const EPOCH = 100
-
-function blockEpoch(blockNumber) {
-  return Math.floor((blockNumber - 1) / EPOCH)
-}
 
 contract('Validators', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
@@ -103,10 +101,12 @@ contract('Validators', (accounts: string[]) => {
   const maxGroupSize = new BigNumber(5)
 
   // A random 64 byte hex string.
-  const blsPublicKey =
+  const blsPublicKey = toBytes(
     '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00'
-  const blsPoP =
+  )
+  const blsPoP = toBytes(
     '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
+  )
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -139,16 +139,8 @@ contract('Validators', (accounts: string[]) => {
 
   const registerValidator = async (validator: string) => {
     await mockLockedGold.setAccountTotalLockedGold(validator, validatorLockedGoldRequirements.value)
-    const publicKey = await addressToPublicKey(validator, web3.eth.sign)
-    await validators.registerValidator(
-      // @ts-ignore bytes type
-      publicKey,
-      // @ts-ignore bytes type
-      blsPublicKey,
-      // @ts-ignore bytes type
-      blsPoP,
-      { from: validator }
-    )
+    const publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+    await validators.registerValidator(publicKey, blsPublicKey, blsPoP, { from: validator })
   }
 
   const registerValidatorGroup = async (group: string, numMembers: number = 1) => {
@@ -553,23 +545,15 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the account has authorized a validator signer', () => {
         let validatorRegistrationEpochNumber: number
-        let publicKey: string
+        let publicKey: SolBytes
         let signer: string
         beforeEach(async () => {
           signer = accounts[9]
           const sig = await getParsedSignatureOfAddress(web3, validator, signer)
           await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
-          publicKey = await addressToPublicKey(signer, web3.eth.sign)
-          resp = await validators.registerValidator(
-            // @ts-ignore bytes type
-            publicKey,
-            // @ts-ignore bytes type
-            blsPublicKey,
-            // @ts-ignore bytes type
-            blsPoP
-          )
-          const blockNumber = await web3.eth.getBlockNumber()
-          validatorRegistrationEpochNumber = blockEpoch(blockNumber)
+          publicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+          resp = await validators.registerValidator(publicKey, blsPublicKey, blsPoP)
+          validatorRegistrationEpochNumber = await currentEpochNumber(web3)
         })
 
         it('should mark the account as a validator', async () => {
@@ -628,7 +612,7 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the account is already a registered validator ', () => {
-      let publicKey: string
+      let publicKey: SolBytes
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
           validator,
@@ -637,25 +621,9 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        publicKey = await addressToPublicKey(validator, web3.eth.sign)
-        await validators.registerValidator(
-          // @ts-ignore bytes type
-          publicKey,
-          // @ts-ignore bytes type
-          blsPublicKey,
-          // @ts-ignore bytes type
-          blsPoP
-        )
-        await assertRevert(
-          validators.registerValidator(
-            // @ts-ignore bytes type
-            publicKey,
-            // @ts-ignore bytes type
-            blsPublicKey,
-            // @ts-ignore bytes type
-            blsPoP
-          )
-        )
+        publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+        await validators.registerValidator(publicKey, blsPublicKey, blsPoP)
+        await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
       })
     })
 
@@ -666,17 +634,8 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        const publicKey = await addressToPublicKey(validator, web3.eth.sign)
-        await assertRevert(
-          validators.registerValidator(
-            // @ts-ignore bytes type
-            publicKey,
-            // @ts-ignore bytes type
-            blsPublicKey,
-            // @ts-ignore bytes type
-            blsPoP
-          )
-        )
+        const publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+        await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
       })
     })
 
@@ -689,17 +648,8 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        const publicKey = await addressToPublicKey(validator, web3.eth.sign)
-        await assertRevert(
-          validators.registerValidator(
-            // @ts-ignore bytes type
-            publicKey,
-            // @ts-ignore bytes type
-            blsPublicKey,
-            // @ts-ignore bytes type
-            blsPoP
-          )
-        )
+        const publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+        await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
       })
     })
   })
@@ -823,7 +773,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the account has a registered validator', () => {
       beforeEach(async () => {
         await registerValidator(validator)
-        registrationEpoch = blockEpoch(await web3.eth.getBlockNumber())
+        registrationEpoch = await currentEpochNumber(web3)
       })
       describe('when affiliating with a registered validator group', () => {
         beforeEach(async () => {
@@ -904,9 +854,9 @@ contract('Validators', (accounts: string[]) => {
                   await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
                     from: group,
                   })
-                  additionEpoch = blockEpoch(await web3.eth.getBlockNumber())
+                  additionEpoch = await currentEpochNumber(web3)
                   resp = await validators.affiliate(otherGroup)
-                  affiliationEpoch = blockEpoch(await web3.eth.getBlockNumber())
+                  affiliationEpoch = await currentEpochNumber(web3)
                 })
 
                 it('should remove the validator from the group membership list', async () => {
@@ -1004,7 +954,7 @@ contract('Validators', (accounts: string[]) => {
     let registrationEpoch: number
     beforeEach(async () => {
       await registerValidator(validator)
-      registrationEpoch = blockEpoch(await web3.eth.getBlockNumber())
+      registrationEpoch = await currentEpochNumber(web3)
       await registerValidatorGroup(group)
       await validators.affiliate(group)
     })
@@ -1034,9 +984,9 @@ contract('Validators', (accounts: string[]) => {
       let resp: any
       beforeEach(async () => {
         await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
-        additionEpoch = blockEpoch(await web3.eth.getBlockNumber())
+        additionEpoch = await currentEpochNumber(web3)
         resp = await validators.deaffiliate()
-        deaffiliationEpoch = blockEpoch(await web3.eth.getBlockNumber())
+        deaffiliationEpoch = await currentEpochNumber(web3)
       })
 
       it('should remove the validator from the group membership list', async () => {
@@ -1103,11 +1053,10 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when the public key matches the signer', () => {
           let resp: any
-          let newPublicKey: string
+          let newPublicKey: SolBytes
           const signer = accounts[9]
           beforeEach(async () => {
-            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
-            // @ts-ignore Broken typechain typing for bytes
+            newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
             resp = await validators.updateEcdsaPublicKey(validator, signer, newPublicKey)
           })
 
@@ -1131,11 +1080,9 @@ contract('Validators', (accounts: string[]) => {
         })
 
         describe('when the public key does not match the signer', () => {
-          let newPublicKey: string
           const signer = accounts[9]
           it('should revert', async () => {
-            newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
-            // @ts-ignore Broken typechain typing for bytes
+            const newPublicKey = toBytes(await addressToPublicKey(accounts[8], web3.eth.sign))
             await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
           })
         })
@@ -1143,12 +1090,101 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when not called by the registered `Accounts` contract', () => {
         describe('when the public key matches the signer', () => {
-          let newPublicKey: string
           const signer = accounts[9]
           it('should revert', async () => {
-            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
-            // @ts-ignore Broken typechain typing for bytes
+            const newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
             await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
+          })
+        })
+      })
+    })
+  })
+
+  describe('#updatePublicKeys()', () => {
+    const newBlsPublicKey: SolBytes = web3.utils.randomHex(96)
+    const newBlsPoP: SolBytes = web3.utils.randomHex(48)
+    describe('when called by a registered validator', () => {
+      const validator = accounts[0]
+      beforeEach(async () => {
+        await registerValidator(validator)
+      })
+
+      describe('when called by the registered `Accounts` contract', () => {
+        beforeEach(async () => {
+          await registry.setAddressFor(CeloContractName.Accounts, accounts[0])
+        })
+
+        describe('when the public key matches the signer', () => {
+          let resp: any
+          let newPublicKey: SolBytes
+          const signer = accounts[9]
+          beforeEach(async () => {
+            newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+            resp = await validators.updatePublicKeys(
+              validator,
+              signer,
+              newPublicKey,
+              newBlsPublicKey,
+              newBlsPoP
+            )
+          })
+
+          it('should set the validator ecdsa public key', async () => {
+            await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
+            const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+            assert.equal(parsedValidator.ecdsaPublicKey, newPublicKey)
+          })
+
+          it('should emit the events', async () => {
+            assert.equal(resp.logs.length, 2)
+            assertContainSubset(resp.logs[0], {
+              event: 'ValidatorEcdsaPublicKeyUpdated',
+              args: {
+                validator,
+                ecdsaPublicKey: newPublicKey,
+              },
+            })
+            assertContainSubset(resp.logs[1], {
+              event: 'ValidatorBlsPublicKeyUpdated',
+              args: {
+                validator,
+                blsPublicKey: newBlsPublicKey,
+              },
+            })
+          })
+        })
+
+        describe('when the public key does not match the signer', () => {
+          const signer = accounts[9]
+          it('should revert', async () => {
+            const newPublicKey = toBytes(await addressToPublicKey(accounts[8], web3.eth.sign))
+            await assertRevert(
+              validators.updatePublicKeys(
+                validator,
+                signer,
+                newPublicKey,
+                newBlsPublicKey,
+                newBlsPoP
+              )
+            )
+          })
+        })
+      })
+
+      describe('when not called by the registered `Accounts` contract', () => {
+        describe('when the public key matches the signer', () => {
+          const signer = accounts[9]
+          it('should revert', async () => {
+            const newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+            await assertRevert(
+              validators.updatePublicKeys(
+                validator,
+                signer,
+                newPublicKey,
+                newBlsPublicKey,
+                newBlsPoP
+              )
+            )
           })
         })
       })
@@ -1167,7 +1203,6 @@ contract('Validators', (accounts: string[]) => {
       describe('when the keys are the right length', () => {
         let resp: any
         beforeEach(async () => {
-          // @ts-ignore Broken typechain typing for bytes
           resp = await validators.updateBlsPublicKey(newBlsPublicKey, newBlsPoP)
         })
 
@@ -1191,15 +1226,17 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the public key is not 96 bytes', () => {
         it('should revert', async () => {
-          // @ts-ignore Broken typechain typing for bytes
-          await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey + '01', newBlsPoP))
+          await assertRevert(
+            validators.updateBlsPublicKey(toBytes(newBlsPublicKey + '01'), newBlsPoP)
+          )
         })
       })
 
       describe('when the proof of possession is not 48 bytes', () => {
         it('should revert', async () => {
-          // @ts-ignore Broken typechain typing for bytes
-          await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey, newBlsPoP + '01'))
+          await assertRevert(
+            validators.updateBlsPublicKey(newBlsPublicKey, toBytes(newBlsPoP + '01'))
+          )
         })
       })
     })
@@ -1416,7 +1453,7 @@ contract('Validators', (accounts: string[]) => {
         let registrationEpoch: number
         beforeEach(async () => {
           await registerValidator(validator)
-          registrationEpoch = blockEpoch(await web3.eth.getBlockNumber())
+          registrationEpoch = await currentEpochNumber(web3)
           await validators.affiliate(group, { from: validator })
         })
 
@@ -1425,7 +1462,7 @@ contract('Validators', (accounts: string[]) => {
             let additionEpoch: number
             beforeEach(async () => {
               resp = await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
-              additionEpoch = blockEpoch(await web3.eth.getBlockNumber())
+              additionEpoch = await currentEpochNumber(web3)
             })
 
             it('should add the member to the list of members', async () => {
@@ -1605,8 +1642,7 @@ contract('Validators', (accounts: string[]) => {
       const membershipHistory = parseMembershipHistory(
         await validators.getMembershipHistory(validator)
       )
-      const latestBlock = await web3.eth.getBlock('latest')
-      const expectedEpoch = new BigNumber(blockEpoch(latestBlock.number))
+      const expectedEpoch = await currentEpochNumber(web3)
 
       // Depending on test timing, we may or may not span an epoch boundary between registration
       // and removal.
@@ -1620,6 +1656,7 @@ contract('Validators', (accounts: string[]) => {
         assertEqualBN(membershipHistory.epochs[1], expectedEpoch)
         assertSameAddress(membershipHistory.groups[1], NULL_ADDRESS)
       }
+      const latestBlock = await web3.eth.getBlock('latest')
       assert.equal(membershipHistory.lastRemovedFromGroupTimestamp, latestBlock.timestamp)
     })
 
@@ -1895,8 +1932,7 @@ contract('Validators', (accounts: string[]) => {
     let validatorRegistrationEpochNumber: number
     beforeEach(async () => {
       await registerValidator(validator)
-      const blockNumber = await web3.eth.getBlockNumber()
-      validatorRegistrationEpochNumber = blockEpoch(blockNumber)
+      validatorRegistrationEpochNumber = await currentEpochNumber(web3)
       for (const group of groups) {
         await registerValidatorGroup(group)
       }
@@ -1909,11 +1945,8 @@ contract('Validators', (accounts: string[]) => {
         const expectedMembershipHistoryGroups = [NULL_ADDRESS]
         const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
         for (let i = 0; i < numTests; i++) {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          await mineBlocks(blocksUntilNextEpoch, web3)
-
+          await mineToNextEpoch(web3)
+          const epochNumber = await currentEpochNumber(web3)
           let group = groups[0]
           await validators.affiliate(group)
           await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
@@ -1948,11 +1981,8 @@ contract('Validators', (accounts: string[]) => {
         const expectedMembershipHistoryGroups = [NULL_ADDRESS]
         const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          await mineBlocks(blocksUntilNextEpoch, web3)
-
+          await mineToNextEpoch(web3)
+          const epochNumber = await currentEpochNumber(web3)
           await validators.affiliate(groups[i])
           await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
             from: groups[i],
@@ -1984,10 +2014,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when changing groups more times than membership history length', () => {
       it('should always return the correct membership for the last epoch', async () => {
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          await mineBlocks(blocksUntilNextEpoch, web3)
+          await mineToNextEpoch(web3)
 
           await validators.affiliate(groups[i])
           await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
@@ -2086,9 +2113,7 @@ contract('Validators', (accounts: string[]) => {
       mockStableToken = await MockStableToken.new()
       await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
       // Fast-forward to the next epoch, so that the getMembershipInLastEpoch(validator) == group
-      const blockNumber = await web3.eth.getBlockNumber()
-      const epochNumber = blockEpoch(blockNumber)
-      await mineBlocks((epochNumber + 1) * EPOCH - blockNumber, web3)
+      await mineToNextEpoch(web3)
     })
 
     describe('when the validator score is non-zero', () => {
@@ -2223,11 +2248,9 @@ contract('Validators', (accounts: string[]) => {
         }
         // Start at 1 since we can't start with deaffiliate
         for (let i = 1; i < totalEpochs; i++) {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = blockEpoch(blockNumber)
-          const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
-          await mineBlocks(blocksUntilNextEpoch, web3)
+          await mineToNextEpoch(web3)
 
+          const epochNumber = await currentEpochNumber(web3)
           if (i % gapSize === 0) {
             const group =
               i % (gapSize * gapSize) !== 0
@@ -2285,16 +2308,14 @@ contract('Validators', (accounts: string[]) => {
         })
 
         it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = blockEpoch(blockNumber)
+          const epochNumber = await currentEpochNumber(web3)
           await assertRevert(
             validators.groupMembershipInEpoch(validator, epochNumber + 1, contractIndex)
           )
         })
 
         it('should revert when provided index is greater than greatest index on chain', async () => {
-          const blockNumber = await web3.eth.getBlockNumber()
-          const epochNumber = blockEpoch(blockNumber)
+          const epochNumber = await currentEpochNumber(web3)
           await assertRevert(
             validators.groupMembershipInEpoch(validator, epochNumber, contractIndex + 1)
           )

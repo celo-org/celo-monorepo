@@ -52,6 +52,7 @@ const DefaultConfig = {
     },
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
+    communityRewardFraction: 1 / 4,
     frozen: false,
   },
   exchange: {
@@ -108,6 +109,7 @@ const DefaultConfig = {
       values: [],
     },
     oracles: [],
+    unfreezeImmediately: true,
   },
   validators: {
     groupLockedGoldRequirements: {

@@ -126,5 +126,4 @@ contract UsingRegistry is Ownable {
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
-
 }

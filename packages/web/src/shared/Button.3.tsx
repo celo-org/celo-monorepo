@@ -342,6 +342,7 @@ function ButtonInline(props: Props) {
 const inlineStyle = StyleSheet.create({
   text: {
     cursor: 'pointer',
+    textDecorationStyle: 'solid',
     textDecorationLine: 'underline',
   },
   container: {

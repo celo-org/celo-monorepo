@@ -1,5 +1,6 @@
-import { fireEvent, getByTitle, render } from '@testing-library/react'
+import { getByTitle, render } from '@testing-library/react'
 import * as React from 'react'
+import { onPress } from 'src/_page-tests/test-utils'
 import MobileMenu from './MobileMenu'
 
 describe(MobileMenu, () => {
@@ -23,8 +24,7 @@ describe(MobileMenu, () => {
       expect(svgUp.getAttribute('transform')).toEqual('rotate(0)')
 
       // to get onPress to fire: see https://github.com/necolas/react-native-web/issues/1422
-      fireEvent.touchStart(getByTestId('toggle'))
-      fireEvent.touchEnd(getByTestId('toggle'))
+      onPress(getByTestId('toggle'))
 
       const svgDown = getByTitle(getByTestId('toggle'), 'triangle').parentElement
 
