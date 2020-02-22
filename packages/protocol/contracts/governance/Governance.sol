@@ -943,7 +943,7 @@ contract Governance is
     IAccounts accounts = getAccounts();
     for (uint256 idx = 0; idx < n; idx++) {
       address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
-      address validatorAccount = accounts.validatorSignerToAccount(validatorSigner);
+      address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
         isHotfixWhitelistedBy(hash, validatorAccount)

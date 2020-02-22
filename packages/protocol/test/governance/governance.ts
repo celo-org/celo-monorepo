@@ -2057,7 +2057,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#hotfixWhitelistValidatorTally', () => {
+  describe('#hotfixWhitelistValidatorTally', () => {
     const newHotfixHash = '0x' + keccak256('celo bug fix').toString('hex')
 
     const validators = zip(
