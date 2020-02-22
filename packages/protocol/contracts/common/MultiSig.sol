@@ -20,6 +20,7 @@ contract MultiSig is Initializable {
   event OwnerAddition(address indexed owner);
   event OwnerRemoval(address indexed owner);
   event RequirementChange(uint256 required);
+  event InternalRequirementChange(uint256 internalRequired);
 
   /*
    *  Constants
@@ -34,6 +35,7 @@ contract MultiSig is Initializable {
   mapping(address => bool) public isOwner;
   address[] public owners;
   uint256 public required;
+  uint256 public internalRequired;
   uint256 public transactionCount;
 
   struct Transaction {
@@ -104,11 +106,13 @@ contract MultiSig is Initializable {
    */
   /// @dev Contract constructor sets initial owners and required number of confirmations.
   /// @param _owners List of initial owners.
-  /// @param _required Number of required confirmations.
-  function initialize(address[] calldata _owners, uint256 _required)
+  /// @param _required Number of required confirmations for external transactions.
+  /// @param _internalRequired Number of required confirmations for internal transactions.
+  function initialize(address[] calldata _owners, uint256 _required, uint256 _internalRequired)
     external
     initializer
     validRequirement(_owners.length, _required)
+    validRequirement(_owners.length, _internalRequired)
   {
     for (uint256 i = 0; i < _owners.length; i++) {
       require(
@@ -119,6 +123,7 @@ contract MultiSig is Initializable {
     }
     owners = _owners;
     required = _required;
+    internalRequired = _internalRequired;
   }
 
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
@@ -128,7 +133,7 @@ contract MultiSig is Initializable {
     onlyWallet
     ownerDoesNotExist(owner)
     notNull(owner)
-    validRequirement(owners.length + 1, required)
+    validRequirement(owners.length + 1, internalRequired)
   {
     isOwner[owner] = true;
     owners.push(owner);
@@ -146,6 +151,7 @@ contract MultiSig is Initializable {
       }
     owners.length -= 1;
     if (required > owners.length) changeRequirement(owners.length);
+    if (internalRequired > owners.length) changeInternalRequirement(owners.length);
     emit OwnerRemoval(owner);
   }
 
@@ -180,6 +186,18 @@ contract MultiSig is Initializable {
   {
     required = _required;
     emit RequirementChange(_required);
+  }
+
+  /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
+  /// wallet.
+  /// @param _internalRequired Number of required confirmations for interal txs.
+  function changeInternalRequirement(uint256 _internalRequired)
+    public
+    onlyWallet
+    validRequirement(owners.length, _internalRequired)
+  {
+    internalRequired = _internalRequired;
+    emit InternalRequirementChange(_internalRequired);
   }
 
   /// @dev Allows an owner to submit and confirm a transaction.
@@ -278,7 +296,9 @@ contract MultiSig is Initializable {
     uint256 count = 0;
     for (uint256 i = 0; i < owners.length; i++) {
       if (confirmations[transactionId][owners[i]]) count += 1;
-      if (count == required) return true;
+      bool isInternal = transactions[transactionId].destination == address(this);
+      if ((isInternal && count == internalRequired) || (!isInternal && count == required))
+        return true;
     }
   }
 
