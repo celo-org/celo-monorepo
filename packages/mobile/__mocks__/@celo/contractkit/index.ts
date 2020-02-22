@@ -5,11 +5,16 @@ export const newKitFromWeb3 = () => ({
     getGasPriceMinimum: async () => ({
       getGasPriceMinimum: jest.fn(async (address: string) => new BigNumber(10000)),
     }),
-    getStableToken: async () => ({
-      balanceOf: jest.fn(async () => new BigNumber(10000000000)),
+    getStableToken: jest.fn(async () => ({
+      balanceOf: jest.fn(async () => {
+        console.log('BALANCEOF')
+        return new BigNumber(10000000000)
+      }),
       decimals: jest.fn(async () => '10'),
-      transferWithComment: jest.fn(async () => null),
-    }),
+      transferWithComment: jest.fn(async () => ({
+        txo: {},
+      })),
+    })),
     getGoldToken: async () => ({
       balanceOf: jest.fn(async () => new BigNumber(10000000000)),
       decimals: jest.fn(async () => '10'),
