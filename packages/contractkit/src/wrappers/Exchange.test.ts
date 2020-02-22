@@ -1,6 +1,8 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { ExchangeWrapper } from './Exchange'
+import { SortedOraclesWrapper } from './SortedOracles'
 
 /*
 TEST NOTES:
@@ -15,11 +17,16 @@ testWithGanache('Exchange Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   let accounts: string[] = []
   let exchange: ExchangeWrapper
+  let sortedOracles: SortedOraclesWrapper
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     exchange = await kit.contracts.getExchange()
+    sortedOracles = await kit.contracts.getSortedOracles()
+    // Set oracle exchange rate.
+    const tx = await sortedOracles.report(CeloContract.StableToken, 10, 1, accounts[0])
+    await tx.sendAndWaitForReceipt()
   })
 
   test('SBAT check buckets', async () => {

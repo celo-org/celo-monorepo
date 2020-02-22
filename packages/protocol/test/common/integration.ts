@@ -337,8 +337,6 @@ contract('Integration: Exchange', (accounts: string[]) => {
     reserve = await getDeployedProxiedContract('Reserve', artifacts)
     sortedOracles = await getDeployedProxiedContract('SortedOracles', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
-    // Fund the reserve with 100M cGLD
-    await goldToken.transfer(reserve.address, '100000000000000000000000000')
     // Set the USD/Celo Gold exchange rate to 10:1.
     await sortedOracles.report(stableToken.address, 10, 1, NULL_ADDRESS, NULL_ADDRESS)
   })

@@ -25,6 +25,9 @@ const migrationOverrides = {
   goldToken: {
     frozen: false,
   },
+  reserve: {
+    initialBalance: 100000000,
+  },
   stableToken: {
     oracles: [network.from],
     frozen: false,
