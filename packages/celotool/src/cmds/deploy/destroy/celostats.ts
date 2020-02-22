@@ -1,10 +1,10 @@
 import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
-import { removeHelmRelease } from 'src/lib/ethstats'
-import { DestroyArgv } from '../../deploy/destroy'
+import { removeHelmRelease } from 'src/lib/celostats'
+import { DestroyArgv } from '../destroy'
 
-export const command = 'ethstats'
+export const command = 'celostats'
 
-export const describe = 'destroy the ethstats package'
+export const describe = 'destroy the celostats package'
 
 export const builder = {}
 
