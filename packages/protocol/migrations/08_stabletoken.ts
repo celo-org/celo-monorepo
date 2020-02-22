@@ -1,6 +1,4 @@
 /* tslint:disable:no-console */
-import Web3 = require('web3')
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -11,12 +9,11 @@ import { ensureLeading0x } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   FeeCurrencyWhitelistInstance,
+  FreezerInstance,
   ReserveInstance,
   SortedOraclesInstance,
   StableTokenInstance,
 } from 'types'
-
-const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {
   const rate = toFixed(config.stableToken.inflationRate)
@@ -37,7 +34,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
   artifacts,
   CeloContractName.StableToken,
   initializeArgs,
-  async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
+  async (stableToken: StableTokenInstance) => {
     if (config.stableToken.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',

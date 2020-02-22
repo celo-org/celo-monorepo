@@ -1,3 +1,5 @@
+import { toFixed } from '@celo/utils/lib/fixidity'
+
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')

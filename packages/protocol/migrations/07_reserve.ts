@@ -1,6 +1,4 @@
 /* tslint:disable:no-console */
-import Web3 = require('web3')
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -8,7 +6,6 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, ReserveInstance } from 'types'
-const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<[string, number, string]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
@@ -27,8 +24,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
   artifacts,
   CeloContractName.Reserve,
   initializeArgs,
-  async (reserve: ReserveInstance, web3: Web3, networkName: string) => {
-    const network: any = truffle.networks[networkName]
+  async (reserve: ReserveInstance) => {
     config.reserve.spenders.forEach(async (spender) => {
       console.info(`Marking ${spender} as a reserve spender`)
       await reserve.addSpender(spender)

@@ -9,7 +9,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { ExchangeInstance, FreezerInstance, StableTokenInstance } from 'types'
 
-const initializeArgs = async (networkName: string): Promise<any[]> => {
+const initializeArgs = async (): Promise<any[]> => {
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
     'StableToken',
     artifacts

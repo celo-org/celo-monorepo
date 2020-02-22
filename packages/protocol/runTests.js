@@ -16,6 +16,18 @@ const migrationOverrides = {
   downtimeSlasher: {
     slashableDowntime: 60, // epoch length is 100 for unit tests
   },
+  epochRewards: {
+    frozen: false,
+  },
+  exchange: {
+    frozen: false,
+  },
+  goldToken: {
+    frozen: false,
+  },
+  stableToken: {
+    frozen: false,
+  },
 }
 
 async function startGanache() {

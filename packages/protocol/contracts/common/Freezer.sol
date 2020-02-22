@@ -13,19 +13,18 @@ contract Freezer is Ownable, Initializable, IFreezer {
   }
 
   /**
-   * @notice Associates the given address with the given identifier.
-   * @param identifier Identifier of contract whose address we want to set.
-  /**
-   * @notice Freezes the contract, disabling `onlyWhenNotFrozen` functions.
+   * @notice Freezes the target contract, disabling `onlyWhenNotFrozen` functions.
+   * @param target The address of the contract to freeze.
    */
-  function freeze(address destination) external onlyOwner {
-    isFrozen[destination] = true;
+  function freeze(address target) external onlyOwner {
+    isFrozen[target] = true;
   }
 
   /**
    * @notice Unreezes the contract, enabling `onlyWhenNotFrozen` functions.
+   * @param target The address of the contract to freeze.
    */
-  function unfreeze(address destination) external onlyOwner {
-    isFrozen[destination] = false;
+  function unfreeze(address target) external onlyOwner {
+    isFrozen[target] = false;
   }
 }
