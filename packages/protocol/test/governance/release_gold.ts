@@ -13,10 +13,10 @@ import * as _ from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
-  GoldTokenContract,
-  GoldTokenInstance,
   FreezerContract,
   FreezerInstance,
+  GoldTokenContract,
+  GoldTokenInstance,
   LockedGoldContract,
   LockedGoldInstance,
   MockElectionContract,
