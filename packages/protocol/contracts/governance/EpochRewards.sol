@@ -3,8 +3,8 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "../baklava/Freezable.sol";
 import "../common/FixidityLib.sol";
+import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
@@ -88,7 +88,6 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    */
   function initialize(
     address registryAddress,
-    address _freezer,
     uint256 targetVotingYieldInitial,
     uint256 targetVotingYieldMax,
     uint256 targetVotingYieldAdjustmentFactor,
@@ -100,7 +99,6 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 _communityRewardFraction
   ) external initializer {
     _transferOwnership(msg.sender);
-    setFreezer(_freezer);
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
     setRewardsMultiplierParameters(

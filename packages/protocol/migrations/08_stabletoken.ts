@@ -16,7 +16,6 @@ import {
   StableTokenInstance,
 } from 'types'
 
-const truffle = require('@celo/protocol/truffle-config.js')
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {
@@ -39,11 +38,12 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
   CeloContractName.StableToken,
   initializeArgs,
   async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
-    const minerAddress: string = truffle.networks[networkName].from
-
-    if (config.stableToken.unfreezeImmediately) {
-      console.log('Unfreezing StableToken')
-      await stableToken.unfreeze()
+    if (config.stableToken.frozen) {
+      const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
+        'Freezer',
+        artifacts
+      )
+      await freezer.freeze(stableToken.address)
     }
 
     console.log('Setting GoldToken/USD exchange rate')
@@ -55,20 +55,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       console.info(`Adding ${oracle} as an Oracle for StableToken`)
       await sortedOracles.addOracle(stableToken.address, ensureLeading0x(oracle))
     }
-
-    // We need to seed the exchange rate, and that must be done with an account
-    // that's accessible to the migrations. It's in an if statement in case this
-    // account happened to be included in config.stableToken.oracles
-    if (!(await sortedOracles.isOracle(stableToken.address, minerAddress))) {
-      await sortedOracles.addOracle(stableToken.address, minerAddress)
-    }
-    await sortedOracles.report(
-      stableToken.address,
-      config.stableToken.goldPrice,
-      1,
-      NULL_ADDRESS,
-      NULL_ADDRESS
-    )
 
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',

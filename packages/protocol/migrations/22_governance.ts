@@ -37,13 +37,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
   CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    console.info('Setting Governance as a Reserve spender')
-    const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
-      'Reserve',
-      artifacts
-    )
-    await reserve.addSpender(governance.address)
-
     const proxyOwnedByGovernance = ['GoldToken']
     await Promise.all(
       proxyOwnedByGovernance.map((contractName) =>
@@ -62,6 +55,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Escrow',
       'Exchange',
       'FeeCurrencyWhitelist',
+      'Freezer',
       'GasPriceMinimum',
       'Governance',
       'GovernanceSlasher',

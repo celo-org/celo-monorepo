@@ -3,13 +3,10 @@ import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { EpochRewardsInstance } from 'types'
-const truffle = require('@celo/protocol/truffle-config.js')
 
-const initializeArgs = async (networkName: string): Promise<any[]> => {
-  const network: any = truffle.networks[networkName]
+const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
-    network.from,
     toFixed(config.epochRewards.targetVotingYieldParameters.initial).toFixed(),
     toFixed(config.epochRewards.targetVotingYieldParameters.max).toFixed(),
     toFixed(config.epochRewards.targetVotingYieldParameters.adjustmentFactor).toFixed(),
@@ -29,7 +26,11 @@ module.exports = deploymentForCoreContract<EpochRewardsInstance>(
   initializeArgs,
   async (epochRewards: EpochRewardsInstance) => {
     if (config.epochRewards.frozen) {
-      await epochRewards.freeze()
+      const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
+        'Freezer',
+        artifacts
+      )
+      await freezer.freeze(epochRewards.address)
     }
   }
 )

@@ -58,19 +58,23 @@ const DefaultConfig = {
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
-    frozen: false,
+    frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE, // 5 minutes
+    // TODO(asa): This is too low
     minimumReports: 1,
-    frozen: false,
+    frozen: true,
   },
   gasPriceMinimum: {
     minimumFloor: 1000000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
+  },
+  goldToken: {
+    frozen: true,
   },
   governance: {
     queueExpiry: 4 * WEEK,
@@ -98,13 +102,15 @@ const DefaultConfig = {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    goldBalance: 120000000,
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
+    spenders: [],
+    otherAddresses: [],
   },
   stableToken: {
     decimals: 18,
-    goldPrice: 10,
+    // TODO(asa): Need to support this somehow.
+    // goldPrice: 10,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
@@ -114,7 +120,7 @@ const DefaultConfig = {
       values: [],
     },
     oracles: [],
-    unfreezeImmediately: true,
+    frozen: false,
   },
   validators: {
     groupLockedGoldRequirements: {

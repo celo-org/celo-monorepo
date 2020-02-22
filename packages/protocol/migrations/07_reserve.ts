@@ -29,13 +29,13 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
   initializeArgs,
   async (reserve: ReserveInstance, web3: Web3, networkName: string) => {
     const network: any = truffle.networks[networkName]
-    console.info('Sending the reserve an initial gold balance')
-    await web3.eth.sendTransaction({
-      from: network.from,
-      to: reserve.address,
-      value: web3.utils.toWei(config.reserve.goldBalance.toString(), 'ether') as string,
+    config.reserve.spenders.forEach(async (spender) => {
+      console.info(`Marking ${spender} as a reserve spender`)
+      await reserve.addSpender(spender)
     })
-    console.info(`Marking ${network.from} as a reserve spender`)
-    await reserve.addSpender(network.from)
+    config.reserve.otherAddresses.forEach(async (otherAddress) => {
+      console.info(`Marking ${otherAddress} as an "otherReserveAddress"`)
+      await reserve.addOtherReserveAddress(otherAddress)
+    })
   }
 )

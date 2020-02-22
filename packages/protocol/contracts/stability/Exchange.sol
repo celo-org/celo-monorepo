@@ -10,7 +10,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../baklava/Freezable.sol";
+import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
 
 /**
@@ -70,7 +70,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    */
   function initialize(
     address registryAddress,
-    address _freezer,
     address stableToken,
     uint256 _spread,
     uint256 _reserveFraction,
@@ -78,7 +77,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     uint256 _minimumReports
   ) external initializer {
     _transferOwnership(msg.sender);
-    setFreezer(_freezer);
     setRegistry(registryAddress);
     setStableToken(stableToken);
     setSpread(_spread);
