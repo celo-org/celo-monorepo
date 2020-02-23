@@ -280,6 +280,7 @@ contract MultiSig is Initializable {
       if (confirmations[transactionId][owners[i]]) count += 1;
       if (count == required) return true;
     }
+    return false;
   }
 
   /*
