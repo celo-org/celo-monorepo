@@ -1,9 +1,13 @@
 import * as ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
-import * as fs from 'fs'
+import * as fs from 'fs-extra'
 import * as path from 'path'
+import * as targz from 'targz'
+import * as tmp from 'tmp'
 import * as yargs from 'yargs'
+
+tmp.setGracefulCleanup()
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 
@@ -24,7 +28,7 @@ yargs
   .showHelpOnFail(true)
   .command(
     'run <datadir>',
-    "Run celo's devchain using given datadir",
+    "Run celo's devchain using given datadir without copying it",
     (args) =>
       args
         .positional('datadir', { type: 'string', description: 'Data Dir' })
@@ -36,7 +40,14 @@ yargs
           type: 'number',
           description: 'When reset, run upto given migration',
         }),
-    (args) => exitOnError(runDevChain(args.datadir, { reset: args.reset, upto: args.upto }))
+    (args) =>
+      exitOnError(runDevChain(args.datadir, { reset: args.reset, upto: args.upto, targz: false }))
+  )
+  .command(
+    'run-tar <filename>',
+    "Run celo's devchain using given tar filename. Generates a copy and then delete it",
+    (args) => args.positional('filename', { type: 'string', description: 'Chain tar filename' }),
+    (args) => exitOnError(runDevChainFromTar(args.filename))
   )
   .command(
     'generate <datadir>',
@@ -57,11 +68,39 @@ yargs
         generateDevChain(args.datadir, {
           upto: args.upto,
           migrationOverride: args.migration_override,
+          targz: false,
+        })
+      )
+  )
+  .command(
+    'generate-tar <filename>',
+    'Create a new devchain.tar.gz from scratch',
+    (args) =>
+      args
+        .positional('filename', { type: 'string', description: 'chain tar filename' })
+        .option('upto', {
+          type: 'number',
+          description: 'When reset, run upto given migration',
+        })
+        .option('migration_override', {
+          type: 'string',
+          description: 'Path to JSON containing config values to use in migrations',
+        }),
+    (args) =>
+      exitOnError(
+        generateDevChain(args.filename, {
+          upto: args.upto,
+          migrationOverride: args.migration_override,
+          targz: true,
         })
       )
   ).argv
 
-async function startGanache(datadir: string, opts: { verbose?: boolean }) {
+async function startGanache(
+  datadir: string,
+  opts: { verbose?: boolean },
+  chainCopy?: tmp.DirResult
+) {
   const logFn = opts.verbose
     ? // tslint:disable-next-line: no-console
       (...args: any[]) => console.log(...args)
@@ -97,6 +136,9 @@ async function startGanache(datadir: string, opts: { verbose?: boolean }) {
   return () =>
     new Promise((resolve, reject) => {
       server.close((err) => {
+        if (chainCopy) {
+          chainCopy.removeCallback()
+        }
         if (err) {
           reject(err)
         } else {
@@ -138,9 +180,9 @@ function exitOnError(p: Promise<unknown>) {
   })
 }
 
-async function resetDir(dir: string) {
+async function resetDir(dir: string, silent?: boolean) {
   if (fs.existsSync(dir)) {
-    await execCmd('rm', ['-rf', dir])
+    await execCmd('rm', ['-rf', dir], { silent })
   }
 }
 function createDirIfMissing(dir: string) {
@@ -164,16 +206,50 @@ function runMigrations(opts: { upto?: number; migrationOverride?: string } = {})
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
+async function runDevChainFromTar(filename: string) {
+  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+  // tslint:disable-next-line: no-console
+  console.log(`Creating tmp folder: ${chainCopy.name}`)
+
+  await decompressChain(filename, chainCopy.name)
+
+  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
+  return stopGanache
+}
+
+function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
+  // tslint:disable-next-line: no-console
+  console.log('Decompressing chain')
+  return new Promise((resolve, reject) => {
+    targz.decompress({ src: tarPath, dest: copyChainPath }, (err) => {
+      if (err) {
+        console.error(err)
+        reject(err)
+      } else {
+        // tslint:disable-next-line: no-console
+        console.log('Chain decompressed')
+        resolve()
+      }
+    })
+  })
+}
+
 async function runDevChain(
   datadir: string,
-  opts: { reset?: boolean; upto?: number; migrationOverride?: string } = {}
+  opts: {
+    reset?: boolean
+    upto?: number
+    migrationOverride?: string
+    targz?: boolean
+    runMigrations?: boolean
+  } = {}
 ) {
   if (opts.reset) {
     await resetDir(datadir)
   }
   createDirIfMissing(datadir)
   const stopGanache = await startGanache(datadir, { verbose: true })
-  if (opts.reset) {
+  if (opts.reset || opts.runMigrations) {
     const code = await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
     if (code !== 0) {
       throw Error('Migrations failed')
@@ -183,13 +259,49 @@ async function runDevChain(
 }
 
 async function generateDevChain(
-  datadir: string,
-  opts: { upto?: number; migrationOverride?: string } = {}
+  filePath: string,
+  opts: {
+    upto?: number
+    migrationOverride?: string
+    targz?: boolean
+  } = {}
 ) {
-  const stopGanache = await runDevChain(datadir, {
-    reset: true,
+  let chainPath = filePath
+  let chainTmp: tmp.DirResult
+  if (opts.targz) {
+    chainTmp = tmp.dirSync({ keep: false, unsafeCleanup: true })
+    chainPath = chainTmp.name
+  } else {
+    fs.ensureDirSync(chainPath)
+  }
+  const stopGanache = await runDevChain(chainPath, {
+    reset: !opts.targz,
+    runMigrations: true,
     upto: opts.upto,
     migrationOverride: opts.migrationOverride,
   })
   await stopGanache()
+  if (opts.targz && chainTmp) {
+    await compressChain(chainPath, filePath)
+    chainTmp.removeCallback()
+  }
+}
+
+async function compressChain(chainPath: string, filename: string): Promise<void> {
+  // tslint:disable-next-line: no-console
+  console.log('Compressing chain')
+  return new Promise((resolve, reject) => {
+    // ensures the path to the file
+    fs.ensureFileSync(filename)
+    targz.compress({ src: chainPath, dest: filename }, async (err: Error) => {
+      if (err) {
+        console.error(err)
+        reject(err)
+      } else {
+        // tslint:disable-next-line: no-console
+        console.log('Chain compressed')
+        resolve()
+      }
+    })
+  })
 }
