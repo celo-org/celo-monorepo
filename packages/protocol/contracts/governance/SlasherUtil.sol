@@ -64,6 +64,10 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) internal {
+    require(
+      slashingIncentives.penalty <= getValidators().getAccountLockedGoldRequirement(validator),
+      "Slash cannot exceed the locked gold requirement."
+    );
     ILockedGold lockedGold = getLockedGold();
     lockedGold.slash(
       validator,

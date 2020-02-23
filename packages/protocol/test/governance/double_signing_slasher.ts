@@ -108,6 +108,8 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     const headerB = ['0x13', '0x13', '0x13']
     const headerC = ['0x11', '0x13', '0x14']
     beforeEach(async () => {
+      await validators.setValidator(validator)
+      await validators.setAccountLockedGoldRequirement(validator, slashingPenalty)
       await slasher.setBlockNumber(headerA, blockNumber)
       await slasher.setBlockNumber(headerB, blockNumber + 1)
       await slasher.setBlockNumber(headerC, blockNumber)
@@ -157,6 +159,30 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       await assertRevert(
         slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       )
+    })
+
+    describe("when the validator's lockedgold requirement is less than the penalty", () => {
+      beforeEach(async () => {
+        await validators.setAccountLockedGoldRequirement(validator, slashingPenalty - 1)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(
+          await slasher.slash(
+            validator,
+            validatorIndex,
+            headerA,
+            headerC,
+            0,
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+          )
+        )
+      })
     })
   })
 })
