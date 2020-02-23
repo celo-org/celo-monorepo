@@ -166,7 +166,7 @@ library SortedLinkedList {
     //   1. The value is less than the current lowest value
     //   2. The value is greater than the current greatest value
     //   3. The value is just greater than the value for `lesserKey`
-    //   4. The value is just less than the value for `greaerKey`
+    //   4. The value is just less than the value for `greaterKey`
     if (lesserKey == bytes32(0) && isValueBetween(list, value, lesserKey, list.list.tail)) {
       return (lesserKey, list.list.tail);
     } else if (

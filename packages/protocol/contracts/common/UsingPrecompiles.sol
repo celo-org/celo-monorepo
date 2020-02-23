@@ -182,7 +182,7 @@ contract UsingPrecompiles {
   /**
    * @notice Gets the parent seal bitmap from the header at the given block number.
    * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current number.
-   * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
+   * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
    */
   function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
     bytes memory out;

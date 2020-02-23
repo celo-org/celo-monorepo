@@ -322,7 +322,7 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the parameters that goven how a validator's score is calculated.
+   * @notice Returns the parameters that govern how a validator's score is calculated.
    * @return The parameters that goven how a validator's score is calculated.
    */
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
@@ -353,8 +353,8 @@ contract Validators is
   /**
    * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @dev epoxh_score = uptime ** exponent
-   * @return Fixidity representation of the epoch score btween 0 and 1.
+   * @dev epoch_score = uptime ** exponent
+   * @return Fixidity representation of the epoch score between 0 and 1.
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
@@ -375,7 +375,7 @@ contract Validators is
    * @notice Calculates the aggregate score of a group for an epoch from individual uptimes.
    * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
    * @dev group_score = average(uptimes ** exponent)
-   * @return Fixidity representation of the group epoch score btween 0 and 1.
+   * @return Fixidity representation of the group epoch score between 0 and 1.
    */
   function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
     require(uptimes.length > 0, "Uptime array empty");

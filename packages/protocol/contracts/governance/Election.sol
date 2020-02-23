@@ -117,7 +117,7 @@ contract Election is
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param minElectableValidators The minimum number of validators that can be elected.
-   * @param _maxNumGroupsVotedFor The maximum number of groups that an acconut can vote for at once.
+   * @param _maxNumGroupsVotedFor The maximum number of groups that an account can vote for at once.
    * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
    *   be elected.
    * @dev Should be called only once.
