@@ -246,7 +246,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = 0; i < length; i++) {
+    for (uint256 i = 0; i < length; i = i.add(1)) {
       PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;
