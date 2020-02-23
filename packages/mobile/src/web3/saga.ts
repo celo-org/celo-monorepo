@@ -147,7 +147,19 @@ export function* getOrCreateAccount() {
     Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
 
     const wordlist = getWordlist(yield select(currentLanguageSelector))
-    const mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+    let mnemonic: string = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+
+    // Ensure no duplicates in mnemonic
+    const checkDuplicate = (someString: string) => {
+      return new Set(someString.split(' ')).size !== someString.split(' ').length
+    }
+    let duplicateInMnemonic = checkDuplicate(mnemonic)
+    while (duplicateInMnemonic) {
+      Logger.debug(TAG + '@getOrCreateAccount', 'Regenerating mnemonic to avoid duplicates')
+      mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+      duplicateInMnemonic = checkDuplicate(mnemonic)
+    }
+
     if (!mnemonic) {
       throw new Error('Failed to generate mnemonic')
     }
