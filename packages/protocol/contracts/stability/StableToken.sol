@@ -431,6 +431,7 @@ contract StableToken is
     uint256 denominator;
 
     // TODO: Handle retroactive updates given decreases to updatePeriod:
+    // https://github.com/celo-org/celo-monorepo/issues/3929
     uint256 timesToApplyInflation = now.sub(inflationState.factorLastUpdated).div(
       inflationState.updatePeriod
     );
