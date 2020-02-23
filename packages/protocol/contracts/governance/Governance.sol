@@ -418,7 +418,6 @@ contract Governance is
     external
     onlyOwner
   {
-    // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0), "Destination cannot be zero");
     require(
       threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap(),
