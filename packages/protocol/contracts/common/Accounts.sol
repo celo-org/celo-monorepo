@@ -62,7 +62,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param _registryAddress The address of the registry core smart contract.
+   * @param registryAddress The address of the registry core smart contract.
    */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);

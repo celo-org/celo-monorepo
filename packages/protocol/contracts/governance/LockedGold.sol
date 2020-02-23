@@ -68,7 +68,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param _registryAddress The address of the registry core smart contract.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _unlockingPeriod The unlocking period in seconds.
    */
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
