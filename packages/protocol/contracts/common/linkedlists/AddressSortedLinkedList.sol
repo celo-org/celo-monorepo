@@ -21,6 +21,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -38,6 +39,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(SortedLinkedList.List storage list, address key) public {
@@ -46,6 +48,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -64,6 +67,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -73,6 +77,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
@@ -101,6 +106,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns the minimum of `max` and the  number of elements in the list > threshold.
+   * @param list A storage pointer to the underlying list.
    * @param threshold The number that the element must exceed to be included.
    * @param max The maximum number returned by this function.
    * @return The minimum of `max` and the  number of elements in the list > threshold.
@@ -123,6 +129,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns the N greatest elements of the list.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to return.
    * @return The keys of the greatest elements.
    */
@@ -141,6 +148,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
   function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {
