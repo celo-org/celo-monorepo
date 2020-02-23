@@ -184,13 +184,13 @@ contract('SortedOracles', (accounts: string[]) => {
 
       it('should return true if report is expired', async () => {
         await timeTravel(aReportExpiry, web3)
-        let isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+        const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
         assert.isTrue(isReportExpired[0])
       })
 
       it('should return false if report is not expired', async () => {
-        let isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
-        assert.isNotTrue(isReportExpired[0])
+        const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+        assert.isFalse(isReportExpired[0])
       })
     })
   })
