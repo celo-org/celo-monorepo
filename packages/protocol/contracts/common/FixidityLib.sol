@@ -10,8 +10,8 @@ pragma solidity ^0.5.0;
  * right and check for limits, or with wrap() which expects a number already
  * in the internal representation of a fraction.
  * When using this library be sure to use maxNewFixed() as the upper limit for
- * creation of fixed point numbers. Use maxFixedMul(), maxFixedDividend() and
- * maxFixedAdd() if you want to be certain that those operations don't
+ * creation of fixed point numbers. Use maxFixedMul() and  maxFixedDividend()
+ * if you want to be certain that those operations don't
  * overflow.
  */
 library FixidityLib {
@@ -63,31 +63,13 @@ library FixidityLib {
   }
 
   /**
-   * @notice Maximum value that can be represented in a uint256
-   * @dev Test maxUint256() equals 2^256 -1
-   */
-  function maxUint256() internal pure returns (uint256) {
-    return 115792089237316195423570985008687907853269984665640564039457584007913129639935;
-  }
-
-  /**
    * @notice Maximum value that can be converted to fixed point. Optimize for
    * deployment.
    * @dev
    * Test maxNewFixed() equals maxUint256() / fixed1()
    */
-  function maxNewFixed() internal pure returns (uint256) {
+  function maxNewFixed() public pure returns (uint256) {
     return 115792089237316195423570985008687907853269984665640564;
-  }
-
-  /**
-   * @notice Maximum value that can be safely used as an addition operator.
-   * @dev Test maxFixedAdd() equals maxUint256()-1 / 2
-   * Test add(maxFixedAdd(),maxFixedAdd()) equals maxFixedAdd() + maxFixedAdd()
-   * Test add(maxFixedAdd()+1,maxFixedAdd()+1) throws
-   */
-  function maxFixedAdd() internal pure returns (uint256) {
-    return 57896044618658097711785492504343953926634992332820282019728792003956564819967;
   }
 
   /**
@@ -179,12 +161,7 @@ library FixidityLib {
   }
 
   /**
-   * @notice x+y. If any operator is higher than maxFixedAdd() it
-   * might overflow.
-   * @dev
-   * Test add(maxFixedAdd(),maxFixedAdd()) returns maxUint256()-1
-   * Test add(maxFixedAdd()+1,maxFixedAdd()+1) fails
-   * Test add(maxUint256(),maxUint256()) fails
+   * @notice x+y.
    */
   function add(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     uint256 z = x.value + y.value;
@@ -214,6 +191,7 @@ library FixidityLib {
    * Test multiply(maxFixedMul()+1,maxFixedMul()+1) fails
    */
   function multiply(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    require(x.value <= maxFixedMul() && y.value <= maxFixedMul());
     if (x.value == 0 || y.value == 0) return Fraction(0);
     if (y.value == FIXED1_UINT) return x;
     if (x.value == FIXED1_UINT) return y;
@@ -278,6 +256,7 @@ library FixidityLib {
    */
   function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     require(y.value != 0, "can't divide by 0");
+    require(x.value <= maxFixedDividend());
     uint256 X = x.value * FIXED1_UINT;
     require(X / FIXED1_UINT == x.value);
     return Fraction(X / y.value);
