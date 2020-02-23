@@ -1,5 +1,4 @@
 import { NetworkConfig, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { toFixed } from '@celo/utils/lib/fixidity'
 import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
@@ -36,7 +35,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   })
 
   describe('#report', () => {
-    const value = toFixed(16)
+    const value = 16
 
     describe('when reporting from a whitelisted Oracle', () => {
       it('should be able to report a rate', async () => {
@@ -51,7 +50,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
       describe('when inserting into the middle of the existing rates', () => {
         beforeEach(async () => {
-          const rates = [15, 20, 17].map((x) => toFixed(x))
+          const rates = [15, 20, 17]
           for (let i = 0; i < stableTokenOracles.length - 1; i++) {
             const tx = await sortedOracles.report(
               CeloContract.StableToken,
@@ -75,8 +74,8 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         it('passes the correct lesserKey and greaterKey as args', async () => {
           const tx = await sortedOracles.report(CeloContract.StableToken, value, oracleAddress)
           const actualArgs = tx.txo.arguments
-          expect(actualArgs[3]).toEqual(expectedLesserKey)
-          expect(actualArgs[4]).toEqual(expectedGreaterKey)
+          expect(actualArgs[2]).toEqual(expectedLesserKey)
+          expect(actualArgs[3]).toEqual(expectedGreaterKey)
 
           await tx.sendAndWaitForReceipt()
         })
@@ -133,7 +132,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
         // resulting in: 0.5, 1, 1.5, 2
         const tx = await sortedOracles.report(
           CeloContract.StableToken,
-          toFixed((i + 1) / 2),
+          (i + 1) / 2,
           stableTokenOracles[i]
         )
         await tx.sendAndWaitForReceipt()
@@ -150,9 +149,9 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     })
 
     it('returns the correct rate', async () => {
-      const expectedRates = [2, 1.5, 1, 0.5].map((x) => toFixed(x))
+      const expectedRates = [2, 1.5, 1, 0.5]
       const response = await sortedOracles.getRates(CeloContract.StableToken)
-      const actualRates = response.map((r) => r.rate.toString())
+      const actualRates = response.map((r) => r.rate.toNumber())
       expect(actualRates).toEqual(expectedRates)
     })
   })
@@ -208,7 +207,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
   describe('reportStableToken', () => {
     it('calls report with the address for StableToken', async () => {
-      const tx = await sortedOracles.reportStableToken(14, 1, oracleAddress)
+      const tx = await sortedOracles.reportStableToken(14, oracleAddress)
       await tx.sendAndWaitForReceipt()
       expect(tx.txo.arguments[0]).toEqual(stableTokenAddress)
     })

@@ -1,4 +1,5 @@
 import { eqAddress } from '@celo/utils/lib/address'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
@@ -87,25 +88,24 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param value The number of `token`s equal to one Celo Gold.
-   * @param denominator The amount of Celo Gold that the `numerator` tokens are equal to.
    */
   async report(
     token: CeloToken,
-    value: number,
+    value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
     const tokenAddress = await this.kit.registry.addressFor(token)
-    const fixedValue = toFixed(value)
+    const fixedValue = toFixed(valueToBigNumber(value))
 
     const { lesserKey, greaterKey } = await this.findLesserAndGreaterKeys(
       token,
-      fixedValue,
+      valueToBigNumber(value),
       oracleAddress
     )
 
     return toTransactionObject(
       this.kit,
-      this.contract.methods.report(tokenAddress, fixedValue, lesserKey, greaterKey),
+      this.contract.methods.report(tokenAddress, fixedValue.toFixed(), lesserKey, greaterKey),
       { from: oracleAddress }
     )
   }
@@ -115,7 +115,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @param value The number of Dollars equal to one Celo Gold.
    */
   async reportStableToken(
-    value: number,
+    value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
     return this.report(CeloContract.StableToken, value, oracleAddress)
@@ -146,26 +146,20 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.getRates(tokenAddress).call()
     const rates: OracleRate[] = []
-    const denominator = await this.getInternalDenominator()
-
     for (let i = 0; i < response[0].length; i++) {
       const medRelIndex = parseInt(response[2][i], 10)
       rates.push({
         address: response[0][i],
-        rate: valueToFrac(response[1][i], denominator),
+        rate: fromFixed(valueToBigNumber(response[1][i])),
         medianRelation: medRelIndex,
       })
     }
     return rates
   }
 
-  private async getInternalDenominator(): Promise<BigNumber> {
-    return valueToBigNumber(await this.contract.methods.DENOMINATOR().call())
-  }
-
   private async findLesserAndGreaterKeys(
     token: CeloToken,
-    value: BigNumber,
+    value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<{ lesserKey: Address; greaterKey: Address }> {
     const currentRates: OracleRate[] = await this.getRates(token)
