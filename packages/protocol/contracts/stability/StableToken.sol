@@ -178,6 +178,7 @@ contract StableToken is
     updateInflationFactor
     returns (bool)
   {
+    require(spender != address(0), "reserved address 0x0 cannot have allowance");
     uint256 oldValue = allowed[msg.sender][spender];
     uint256 newValue = oldValue.add(value);
     allowed[msg.sender][spender] = newValue;
@@ -210,6 +211,7 @@ contract StableToken is
    * @return True if the transaction succeeds.
    */
   function approve(address spender, uint256 value) external updateInflationFactor returns (bool) {
+    require(spender != address(0), "reserved address 0x0 cannot have allowance");
     allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
     return true;
@@ -234,7 +236,7 @@ contract StableToken is
    * @param to The account for which to mint tokens.
    * @param value The amount of StableToken to mint.
    */
-  function _mint(address to, uint256 value) private updateInflationFactor returns (bool) {
+  function _mint(address to, uint256 value) private returns (bool) {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);

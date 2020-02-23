@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     flex: 1,
+    flexBasis: 'auto',
     width: '100%',
     justifyContent: 'space-between',
     marginVertical: 20,

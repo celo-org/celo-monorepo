@@ -41,8 +41,7 @@ contract Proxy {
 
     // Avoid checking if address is a contract or executing delegated call when
     // implementation address is 0x0
-    if (implementationAddress == address(0)) return;
-
+    require(implementationAddress != address(0), "No Implementation set");
     require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
@@ -143,6 +142,7 @@ contract Proxy {
   }
 
   function _setOwner(address newOwner) private {
+    require(newOwner != address(0), "owner cannot be 0");
     bytes32 position = OWNER_POSITION;
     assembly {
       sstore(position, newOwner)

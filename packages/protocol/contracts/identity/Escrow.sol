@@ -103,6 +103,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
 
     EscrowedPayment storage newPayment = escrowedPayments[paymentId];
+    require(newPayment.timestamp == 0, "paymentId already used");
     newPayment.recipientIdentifier = identifier;
     newPayment.sender = msg.sender;
     newPayment.token = token;

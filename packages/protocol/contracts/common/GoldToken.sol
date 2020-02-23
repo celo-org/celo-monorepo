@@ -76,6 +76,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @return True if the transaction succeeds.
    */
   function approve(address spender, uint256 value) external returns (bool) {
+    require(spender != address(0), "cannot set allowance for 0");
     allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
     return true;
@@ -88,6 +89,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @return True if the transaction succeeds.
    */
   function increaseAllowance(address spender, uint256 value) external returns (bool) {
+    require(spender != address(0), "cannot set allowance for 0");
     uint256 oldValue = allowed[msg.sender][spender];
     uint256 newValue = oldValue.add(value);
     allowed[msg.sender][spender] = newValue;

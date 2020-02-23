@@ -128,7 +128,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       );
       IStableToken(stable).burn(sellAmount);
 
-      require(reserve.transferGold(msg.sender, buyAmount), "Transfer of buyToken failed");
+      require(reserve.transferExchangeGold(msg.sender, buyAmount), "Transfer of buyToken failed");
     }
 
     emit Exchanged(msg.sender, sellAmount, buyAmount, sellGold);
