@@ -669,8 +669,8 @@ contract Governance is
   }
 
   /**
-   * @notice Whitelists the hash of a hotfix transaction(s).
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
+   * @notice Approves the hash of a hotfix transaction(s).
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be approved.
    */
   function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyApprover {
     hotfixes[hash].approved = true;

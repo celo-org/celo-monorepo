@@ -18,7 +18,7 @@ library Signatures {
   }
 
   /**
-  * @notice Given a signed address, returns the signer of the address.
+  * @notice Given a message hash, returns the signer of the address.
   * @param messageHash The hash of a message.
   * @param v The recovery id of the incoming ECDSA signature.
   * @param r Output value r of the ECDSA signature.
