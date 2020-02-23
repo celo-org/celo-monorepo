@@ -7,10 +7,10 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import * as _ from 'lodash'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
-import { toFixed } from '@celo/utils/lib/fixidity'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')
 
@@ -166,7 +166,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should return true if there are no reports', async () => {
-      let isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
+      const isReportExpired = await sortedOracles.isOldestReportExpired(aToken)
       assert.isTrue(isReportExpired[0])
     })
 
