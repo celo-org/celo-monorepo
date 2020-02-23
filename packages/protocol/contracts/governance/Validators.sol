@@ -153,8 +153,8 @@ contract Validators is
   }
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param groupRequirementValue The Locked Gold requirement amount for groups.
    * @param groupRequirementDuration The Locked Gold requirement duration for groups.
    * @param validatorRequirementValue The Locked Gold requirement amount for validators.

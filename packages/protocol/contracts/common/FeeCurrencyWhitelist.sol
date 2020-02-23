@@ -12,6 +12,9 @@ import "../common/Initializable.sol";
 contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
   address[] public whitelist;
 
+  /**
+   * @notice Serves as the constructor for proxied contracts.
+   */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }

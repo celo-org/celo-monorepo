@@ -24,7 +24,7 @@ contract Random is IRandom, Ownable, Initializable {
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
   /**
-   * @notice Initializes the contract with initial parameters.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _randomnessBlockRetentionWindow Number of old random blocks whose randomness
    * values can be queried.
    */

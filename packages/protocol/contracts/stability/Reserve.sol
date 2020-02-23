@@ -59,8 +59,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function() external payable {} // solhint-disable no-empty-blocks
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    */
   function initialize(
