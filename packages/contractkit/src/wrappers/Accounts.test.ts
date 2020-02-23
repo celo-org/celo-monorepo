@@ -75,4 +75,15 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const sig = await getParsedSignatureOfAddress(account, signer)
     await accountsInstance.authorizeValidatorSigner(signer, sig)
   })
+
+  test('SBAT authorize validator key and change BLS key atomically', async () => {
+    const newBlsPublicKey = web3.utils.randomHex(96)
+    const newBlsPoP = web3.utils.randomHex(48)
+    const account = accounts[0]
+    const signer = accounts[1]
+    await accountsInstance.createAccount()
+    await setupValidator(account)
+    const sig = await getParsedSignatureOfAddress(account, signer)
+    await accountsInstance.authorizeValidatorSignerAndBls(signer, sig, newBlsPublicKey, newBlsPoP)
+  })
 })

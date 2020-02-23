@@ -23,6 +23,11 @@ contract MockReserve {
     return true;
   }
 
+  function transferExchangeGold(address to, uint256 value) external returns (bool) {
+    require(goldToken.transfer(to, value), "gold token transfer failed");
+    return true;
+  }
+
   function addToken(address token) external returns (bool) {
     tokens[token] = true;
     return true;

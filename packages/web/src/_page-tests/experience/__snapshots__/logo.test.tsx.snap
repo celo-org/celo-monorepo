@@ -1257,10 +1257,12 @@ exports[`Experience/Logo renders 1`] = `
                     role="link"
                     style={
                       Object {
+                        "WebkitTextDecorationStyle": "solid",
                         "cursor": "pointer",
                         "display": "inline",
                         "opacity": 1,
                         "textDecoration": "underline",
+                        "textDecorationStyle": "solid",
                       }
                     }
                   >
@@ -6415,7 +6417,7 @@ exports[`Experience/Logo renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="/build"
+                href="/validators"
                 role="link"
                 style={
                   Object {
@@ -6451,7 +6453,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                Build
+                Validators
               </a>
             </div>
           </div>
@@ -6524,7 +6526,7 @@ exports[`Experience/Logo renders 1`] = `
                   }
                 }
               >
-                Connect
+                Community
               </a>
             </div>
           </div>
@@ -6624,10 +6626,12 @@ exports[`Experience/Logo renders 1`] = `
                 role="link"
                 style={
                   Object {
+                    "WebkitTextDecorationStyle": "solid",
                     "cursor": "pointer",
                     "display": "inline",
                     "opacity": 1,
                     "textDecoration": "underline",
+                    "textDecorationStyle": "solid",
                   }
                 }
               >
