@@ -1,4 +1,4 @@
-import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { NetworkConfig, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { ExchangeWrapper } from './Exchange'
@@ -25,7 +25,12 @@ testWithGanache('Exchange Wrapper', (web3) => {
     exchange = await kit.contracts.getExchange()
     sortedOracles = await kit.contracts.getSortedOracles()
     // Set oracle exchange rate.
-    const tx = await sortedOracles.report(CeloContract.StableToken, 10, 1, accounts[0])
+    // Due to some funkiness in the test suite, setting the oracle exchange rate here
+    // seems to leak into other tests. Using the same oracle as SortedOracles.test.ts
+    // is (currently) necessary to get this to pass.
+    const stableTokenOracles: Address[] = NetworkConfig.stableToken.oracles
+    const oracleAddress = stableTokenOracles[stableTokenOracles.length - 1]
+    const tx = await sortedOracles.report(CeloContract.StableToken, 10, 1, oracleAddress)
     await tx.sendAndWaitForReceipt()
   })
 
