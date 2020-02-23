@@ -221,7 +221,7 @@ contract StableToken is
    * @param to The account for which to mint tokens.
    * @param value The amount of StableToken to mint.
    */
-  function _mint(address to, uint256 value) private updateInflationFactor returns (bool) {
+  function _mint(address to, uint256 value) private returns (bool) {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
