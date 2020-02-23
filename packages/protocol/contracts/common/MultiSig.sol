@@ -15,7 +15,6 @@ contract MultiSig is Initializable {
   event Revocation(address indexed sender, uint256 indexed transactionId);
   event Submission(uint256 indexed transactionId);
   event Execution(uint256 indexed transactionId);
-  event ExecutionFailure(uint256 indexed transactionId);
   event Deposit(address indexed sender, uint256 value);
   event OwnerAddition(address indexed owner);
   event OwnerRemoval(address indexed owner);
@@ -228,16 +227,14 @@ contract MultiSig is Initializable {
     confirmed(transactionId, msg.sender)
     notExecuted(transactionId)
   {
-    if (isConfirmed(transactionId)) {
-      Transaction storage txn = transactions[transactionId];
-      txn.executed = true;
-      if (external_call(txn.destination, txn.value, txn.data.length, txn.data))
-        emit Execution(transactionId);
-      else {
-        emit ExecutionFailure(transactionId);
-        txn.executed = false;
-      }
-    }
+    require(isConfirmed(transactionId), "Transaction not confirmed.");
+    Transaction storage txn = transactions[transactionId];
+    txn.executed = true;
+    require(
+      external_call(txn.destination, txn.value, txn.data.length, txn.data),
+      "Transaction failed to execute."
+    );
+    emit Execution(transactionId);
   }
 
   // call has been separated into its own function in order to take advantage
