@@ -68,7 +68,7 @@ library FixidityLib {
    * @dev
    * Test maxNewFixed() equals maxUint256() / fixed1()
    */
-  function maxNewFixed() public pure returns (uint256) {
+  function maxNewFixed() internal pure returns (uint256) {
     return 115792089237316195423570985008687907853269984665640564;
   }
 
