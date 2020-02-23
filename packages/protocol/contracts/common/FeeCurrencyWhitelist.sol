@@ -13,7 +13,7 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
   address[] public whitelist;
 
   /**
-   * @notice Serves as the constructor for proxied contracts.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
