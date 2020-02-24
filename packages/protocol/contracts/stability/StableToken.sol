@@ -108,7 +108,8 @@ contract StableToken is
     address[] calldata initialBalanceAddresses,
     uint256[] calldata initialBalanceValues
   ) external initializer {
-    require(inflationRate != 0, "Must provide a non-zero inflation rate.");
+    require(inflationRate != 0, "Must provide a non-zero inflation rate");
+    require(inflationFactorUpdatePeriod > 0, "inflationFactorUpdatePeriod must be > 0");
 
     _transferOwnership(msg.sender);
 
@@ -128,7 +129,7 @@ contract StableToken is
 
     require(initialBalanceAddresses.length == initialBalanceValues.length, "Array length mismatch");
     for (uint256 i = 0; i < initialBalanceAddresses.length; i = i.add(1)) {
-      require(_mint(initialBalanceAddresses[i], initialBalanceValues[i]), "mint failed");
+      _mint(initialBalanceAddresses[i], initialBalanceValues[i]);
     }
     setRegistry(registryAddress);
   }
@@ -156,6 +157,7 @@ contract StableToken is
     updateInflationFactor
   {
     require(rate != 0, "Must provide a non-zero inflation rate.");
+    require(updatePeriod > 0, "updatePeriod must be > 0");
     inflationState.rate = FixidityLib.wrap(rate);
     inflationState.updatePeriod = updatePeriod;
 
@@ -236,7 +238,9 @@ contract StableToken is
    * @param to The account for which to mint tokens.
    * @param value The amount of StableToken to mint.
    */
-  function _mint(address to, uint256 value) private updateInflationFactor returns (bool) {
+  function _mint(address to, uint256 value) private returns (bool) {
+    require(to != address(0), "0 is a reserved address");
+    require(value > 0, "mint value must be > 0");
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
