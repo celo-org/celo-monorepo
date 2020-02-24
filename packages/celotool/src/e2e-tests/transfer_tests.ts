@@ -480,7 +480,6 @@ describe('Transfer tests', function(this: any) {
 
       if (feeToken === CeloContract.StableToken) {
         it('should have emitted transfer events for the fee token', () => {
-          console.log(txRes.events, governanceAddress, FromAddress)
           assert(
             txRes.events.find(
               (a) => eqAddress(a.to, governanceAddress) && eqAddress(a.from, FromAddress)
