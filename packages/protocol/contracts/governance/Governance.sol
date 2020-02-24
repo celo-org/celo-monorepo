@@ -929,8 +929,8 @@ contract Governance is
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     IAccounts accounts = getAccounts();
-    for (uint256 idx = 0; idx < n; idx++) {
-      address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      address validatorSigner = validatorSignerAddressFromCurrentSet(i);
       address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||

@@ -111,7 +111,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
       token != address(0) && n < timestamps[token].getNumElements(),
       "token addr null or trying to remove too many reports"
     );
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       address oldest = timestamps[token].getTail();
       uint256 timestamp = timestamps[token].getValue(oldest);
       // solhint-disable-next-line not-rely-on-time
