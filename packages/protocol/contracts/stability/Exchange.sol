@@ -23,15 +23,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   using FixidityLib for FixidityLib.Fraction;
 
   event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
-
   event UpdateFrequencySet(uint256 updateFrequency);
-
   event MinimumReportsSet(uint256 minimumReports);
-
   event StableTokenSet(address stable);
-
   event SpreadSet(uint256 spread);
-
   event ReserveFractionSet(uint256 reserveFraction);
 
   FixidityLib.Fraction public spread;
@@ -158,7 +153,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     // than maxFixedDivisor.
     // Fortunately, we expect an integer result, so integer division gives us as
     // much precision as we could hope for.
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -179,7 +174,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       .multiply(FixidityLib.fixed1().subtract(spread));
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -286,7 +281,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     );
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
