@@ -75,7 +75,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
       validatorElectionIndices
     );
     address group = groupMembershipAtBlock(validator, startBlock, groupMembershipHistoryIndex);
-    if (group == address(0)) return; // Should never be true
+    assert(group != address(0));
     lockedGold.slash(
       group,
       slashingIncentives.penalty,

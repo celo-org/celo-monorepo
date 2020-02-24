@@ -1,8 +1,7 @@
 pragma solidity ^0.5.3;
 
-interface IVestingFactory {
-  function createVestingInstance(
-    address payable,
+interface IReleaseGoldFactory {
+  function createReleaseGoldInstance(
     uint256,
     uint256,
     uint256,
@@ -10,6 +9,11 @@ interface IVestingFactory {
     uint256,
     bool,
     address payable,
-    uint256
+    address,
+    address payable,
+    bool,
+    uint256,
+    bool,
+    bool
   ) external returns (address);
 }

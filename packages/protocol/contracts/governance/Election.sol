@@ -817,9 +817,22 @@ contract Election is
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
    * @return The list of elected validators.
-   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
   function electValidatorSigners() external view returns (address[] memory) {
+    return electNValidatorSigners(electableValidators.min, electableValidators.max);
+  }
+
+  /**
+   * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
+   *   method.
+   * @return The list of elected validators.
+   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
+   */
+  function electNValidatorSigners(uint256 minElectableValidators, uint256 maxElectableValidators)
+    public
+    view
+    returns (address[] memory)
+  {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
     uint256 requiredVotes = electabilityThreshold
@@ -829,7 +842,7 @@ contract Election is
     // max number of electable validators.
     uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(
       requiredVotes,
-      electableValidators.max
+      maxElectableValidators
     );
     address[] memory electionGroups = votes.total.eligible.headN(numElectionGroups);
     uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
@@ -837,7 +850,7 @@ contract Election is
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;
     // Assign a number of seats to each validator group.
-    while (totalNumMembersElected < electableValidators.max) {
+    while (totalNumMembersElected < maxElectableValidators) {
       uint256 groupIndex = 0;
       bool memberElected = false;
       (groupIndex, memberElected) = dHondt(
@@ -854,7 +867,7 @@ contract Election is
         break;
       }
     }
-    require(totalNumMembersElected >= electableValidators.min, "Not enough elected validators");
+    require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
@@ -916,8 +929,8 @@ contract Election is
   function getCurrentValidatorSigners() public view returns (address[] memory) {
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
-    for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorSignerAddressFromCurrentSet(idx);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      res[i] = validatorSignerAddressFromCurrentSet(i);
     }
     return res;
   }

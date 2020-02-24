@@ -35,18 +35,11 @@ contract DoubleSigningSlasher is SlasherUtil {
   function countSetBits(uint256 v) internal pure returns (uint256) {
     uint256 res = 0;
     uint256 acc = v;
-    for (uint256 i = 0; i < 256; i++) {
-      if (acc & 1 == 1) res++;
+    for (uint256 i = 0; i < 256; i = i.add(1)) {
+      if (acc & 1 == 1) res = res.add(1);
       acc = acc >> 1;
     }
     return res;
-  }
-
-  /**
-   * @notice Returns the minimum number of required signers for a given block number.
-   */
-  function minQuorumSize(uint256 blockNumber) internal view returns (uint256) {
-    return (2 * numberValidatorsInSet(blockNumber) + 2) / 3;
   }
 
   /**

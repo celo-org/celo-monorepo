@@ -4,7 +4,7 @@ export default {
   getApplicationName: jest.fn(),
   getBrand: jest.fn(),
   getBuildNumber: jest.fn(),
-  getBundleId: jest.fn(),
+  getBundleId: jest.fn(() => 'org.celo.mobile.debug'),
   getDeviceCountry: jest.fn(),
   getDeviceId: jest.fn(),
   getDeviceLocale: jest.fn(),

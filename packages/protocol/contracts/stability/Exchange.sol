@@ -23,15 +23,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   using FixidityLib for FixidityLib.Fraction;
 
   event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
-
   event UpdateFrequencySet(uint256 updateFrequency);
-
   event MinimumReportsSet(uint256 minimumReports);
-
   event StableTokenSet(address stable);
-
   event SpreadSet(uint256 spread);
-
   event ReserveFractionSet(uint256 reserveFraction);
 
   FixidityLib.Fraction public spread;
@@ -158,7 +153,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     // than maxFixedDivisor.
     // Fortunately, we expect an integer result, so integer division gives us as
     // much precision as we could hope for.
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -179,7 +174,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       .multiply(FixidityLib.fixed1().subtract(spread));
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -286,7 +281,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     );
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
@@ -330,18 +325,18 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   /*
    * Checks conditions required for bucket updates.
    * @return Whether or not buckets should be updated.
-   * TODO: check the oldest report isn't expired
    */
   function shouldUpdateBuckets() private view returns (bool) {
     ISortedOracles sortedOracles = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     );
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(stable);
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
     bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
-    return timePassed && enoughReports && medianReportRecent;
+    return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
   function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {

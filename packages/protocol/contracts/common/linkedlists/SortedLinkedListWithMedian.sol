@@ -141,7 +141,7 @@ library SortedLinkedListWithMedian {
   function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
     require(n <= list.list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       bytes32 key = list.list.list.head;
       keys[i] = key;
       remove(list, key);
