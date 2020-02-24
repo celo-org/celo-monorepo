@@ -5,10 +5,12 @@ import {
   assertGteBN,
   assertLogMatches,
   assertRevert,
+  assertSameAddress,
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
+import { sha3 } from 'ethereumjs-util'
 import * as _ from 'lodash'
 import {
   AccountsContract,
@@ -90,6 +92,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   const beneficiary = accounts[1]
   const releaseOwner = accounts[2]
   const refundAddress = accounts[3]
+  const newBeneficiary = accounts[4]
   let accountsInstance: AccountsInstance
   let lockedGoldInstance: LockedGoldInstance
   let goldTokenInstance: GoldTokenInstance
@@ -376,6 +379,44 @@ contract('ReleaseGold', (accounts: string[]) => {
         releaseGoldSchedule.numReleasePeriods = Number.MAX_SAFE_INTEGER
         releaseGoldSchedule.amountReleasedPerPeriod = new BigNumber(2).pow(300)
         await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
+      })
+
+      it('should emit the BeneficiarySet event', async () => {
+        // Log is not available on the outer transaction
+        assert.equal(
+          newReleaseGoldInstanceTx.receipt.rawLogs[2].topics[0],
+          '0x' + sha3('BeneficiarySet(address)').toString('hex')
+        )
+      })
+    })
+  })
+
+  describe('#setBeneficiary', () => {
+    let releaseGoldInstanceAddress: any
+    let releaseGoldInstance: any
+
+    beforeEach(async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+      releaseGoldInstanceAddress = await releaseGoldFactoryInstance.releases(beneficiary, 0)
+      releaseGoldInstance = await ReleaseGoldInstance.at(releaseGoldInstanceAddress)
+    })
+
+    it('should set a new beneficiary as the old beneficiary', async () => {
+      await releaseGoldInstance.setBeneficiary(newBeneficiary, { from: beneficiary })
+      const actualBeneficiary = await releaseGoldInstance.beneficiary()
+      assertSameAddress(actualBeneficiary, newBeneficiary)
+    })
+
+    it('should revert when setting a new beneficiary from the releas owner', async () => {
+      await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: releaseOwner }))
+    })
+
+    it('should emit the BeneficiarySet event', async () => {
+      const setNewBeneficiaryTx = await releaseGoldInstance.setBeneficiary(newBeneficiary, {
+        from: beneficiary,
+      })
+      assertLogMatches(setNewBeneficiaryTx.logs[0], 'BeneficiarySet', {
+        beneficiary: newBeneficiary,
       })
     })
   })
