@@ -81,6 +81,8 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
+    // this 1/1 multisig initialization is just a place holder.
+    // we will update this value prior to launch likely with a 5/2 signatory/confirmation ratio
     signatories: [0x5409ed021d9299bf6814279a6a1411a7e866a631],
     numRequiredConfirmations: 1,
   },
@@ -102,6 +104,8 @@ const DefaultConfig = {
     dailySpendingRatio: '1000000000000000000000000', // 100%
   },
   reserveSpenderMultiSig: {
+    // this 1/1 multisig initialization is just a place holder.
+    // we will update this value prior to launch likely with a 2/2 signatory/confirmation ratio
     signatories: [0x5409ed021d9299bf6814279a6a1411a7e866a631],
     numRequiredConfirmations: 1,
   },

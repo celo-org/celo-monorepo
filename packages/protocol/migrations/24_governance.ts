@@ -12,13 +12,13 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceInstance, GovernanceApproverMultiSigInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const governanceApprovalMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<
+  const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<
     GovernanceApproverMultiSigInstance
   >(CeloContractName.GovernanceApproverMultiSig, artifacts)
 
   return [
     config.registry.predeployedProxyAddress,
-    governanceApprovalMultiSig.address,
+    governanceApproverMultiSig.address,
     config.governance.concurrentProposals,
     web3.utils.toWei(config.governance.minDeposit.toString(), 'ether'),
     config.governance.queueExpiry,
@@ -46,7 +46,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       )
     )
 
-    //TODO @amyslawson do multisig implementations get added here?
     const proxyAndImplementationOwnedByGovernance = [
       'Accounts',
       'Attestations',

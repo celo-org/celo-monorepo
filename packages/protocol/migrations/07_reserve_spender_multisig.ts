@@ -1,5 +1,8 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { deploymentForProxiedContract } from '@celo/protocol/lib/web3-utils'
+import {
+  deploymentForProxiedContract,
+  transferOwnershipOfProxy,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { ReserveSpenderMultiSigInstance } from 'types'
 
@@ -14,5 +17,12 @@ module.exports = deploymentForProxiedContract<ReserveSpenderMultiSigInstance>(
   web3,
   artifacts,
   CeloContractName.ReserveSpenderMultiSig,
-  initializeArgs
+  initializeArgs,
+  async (reserveSpenderMultiSig: ReserveSpenderMultiSigInstance) => {
+    await transferOwnershipOfProxy(
+      CeloContractName.ReserveSpenderMultiSig,
+      reserveSpenderMultiSig.address,
+      artifacts
+    )
+  }
 )

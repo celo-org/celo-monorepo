@@ -12,13 +12,13 @@ import {
   ElectionInstance,
   ExchangeInstance,
   GoldTokenInstance,
+  GovernanceApproverMultiSigInstance,
   GovernanceInstance,
   GovernanceSlasherInstance,
   LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
   StableTokenInstance,
-  GovernanceApproverMultiSigInstance,
 } from 'types'
 
 enum VoteValue {
@@ -153,9 +153,9 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
 
   describe('When approving that proposal', () => {
     before(async () => {
+      await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
       let txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-      await timeTravel(config.governance.dequeueFrequency, web3)
       await multiSig.submitTransaction(governance.address, 0, txData, {
         from: accounts[0],
       })
@@ -290,9 +290,9 @@ contract('Integration: Governance', (accounts: string[]) => {
 
   describe('When approving that proposal', () => {
     before(async () => {
+      await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
       let txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-      await timeTravel(config.governance.dequeueFrequency, web3)
       await multiSig.submitTransaction(governance.address, 0, txData, {
         from: accounts[0],
       })
