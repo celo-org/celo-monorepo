@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Faucet from '../../../pages/build/faucet'
+import BuildPage from '../../../pages/validators/index'
 
-describe('Faucet', () => {
+describe('BuildPage', () => {
   it('renders', () => {
-    const tree = renderer.create(<Faucet />).toJSON()
+    const tree = renderer.create(<BuildPage />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

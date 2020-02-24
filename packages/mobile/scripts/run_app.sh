@@ -47,7 +47,7 @@ ENV_FILENAME="${ENVFILE:-.env}"
 export $(grep -v '^#' $ENV_FILENAME | xargs)
 
 if [ -z "$NETWORK" ]; then
-  echo "No network set, using $DEFAULT_TESTNET network set in .env file."
+  echo "No network set, using $DEFAULT_TESTNET network set in $ENV_FILENAME file."
   NETWORK=$DEFAULT_TESTNET
 fi
 
