@@ -468,7 +468,7 @@ contract Governance is
   /**
    * @notice Requires a proposal is dequeued and removes it if expired.
    * @param proposalId The ID of the proposal.
-   * @return The proposal storage struct and stage corresponding to `proposalId`. 
+   * @return The proposal storage struct and stage corresponding to `proposalId`.
    */
   function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
@@ -932,7 +932,7 @@ contract Governance is
     IAccounts accounts = getAccounts();
     for (uint256 idx = 0; idx < n; idx++) {
       address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
-      address validatorAccount = accounts.validatorSignerToAccount(validatorSigner);
+      address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
         isHotfixWhitelistedBy(hash, validatorAccount)
