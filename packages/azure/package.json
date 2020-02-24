@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "dependencies": {
     "deepmerge": "^4.2.2",
     "mustache": "^4.0.0"
