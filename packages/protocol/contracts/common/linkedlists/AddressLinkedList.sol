@@ -22,6 +22,7 @@ library AddressLinkedList {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param previousKey The key of the element that comes before the element to insert.
    * @param nextKey The key of the element that comes after the element to insert.
@@ -34,6 +35,7 @@ library AddressLinkedList {
 
   /**
    * @notice Inserts an element at the end of the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
   function push(LinkedList.List storage list, address key) public {
@@ -42,6 +44,7 @@ library AddressLinkedList {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(LinkedList.List storage list, address key) public {
@@ -50,6 +53,7 @@ library AddressLinkedList {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param previousKey The key of the element that comes before the updated element.
    * @param nextKey The key of the element that comes after the updated element.
@@ -62,6 +66,7 @@ library AddressLinkedList {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -71,6 +76,7 @@ library AddressLinkedList {
 
   /**
    * @notice Returns the N greatest elements of the list.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to return.
    * @return The keys of the greatest elements.
    * @dev Reverts if n is greater than the number of elements in the list.
@@ -86,6 +92,7 @@ library AddressLinkedList {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
   function getKeys(LinkedList.List storage list) public view returns (address[] memory) {

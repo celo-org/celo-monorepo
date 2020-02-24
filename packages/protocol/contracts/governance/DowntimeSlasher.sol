@@ -15,8 +15,8 @@ contract DowntimeSlasher is SlasherUtil {
   event SlashableDowntimeSet(uint256 interval);
 
   /**
-   * @notice Initializer
-   * @param registryAddress Sets the registry address. Useful for testing.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _penalty Penalty for the slashed signer.
    * @param _reward Reward that the observer gets.
    * @param  _slashableDowntime Slashable downtime in blocks.
