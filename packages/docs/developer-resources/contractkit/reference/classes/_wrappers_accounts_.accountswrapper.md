@@ -43,8 +43,8 @@ Contract for handling deposits needed for voting.
 * [authorizeValidatorSigner](_wrappers_accounts_.accountswrapper.md#authorizevalidatorsigner)
 * [authorizeValidatorSignerAndBls](_wrappers_accounts_.accountswrapper.md#authorizevalidatorsignerandbls)
 * [authorizeVoteSigner](_wrappers_accounts_.accountswrapper.md#authorizevotesigner)
-* [generateProofOfSigningKeyPossession](_wrappers_accounts_.accountswrapper.md#generateproofofsigningkeypossession)
-* [generateProofOfSigningKeyPossessionLocally](_wrappers_accounts_.accountswrapper.md#generateproofofsigningkeypossessionlocally)
+* [generateProofOfKeyPossession](_wrappers_accounts_.accountswrapper.md#generateProofOfKeyPossession)
+* [generateProofOfKeyPossessionLocally](_wrappers_accounts_.accountswrapper.md#generateProofOfKeyPossessionlocally)
 * [getAccountSummary](_wrappers_accounts_.accountswrapper.md#getaccountsummary)
 * [getName](_wrappers_accounts_.accountswrapper.md#getname)
 * [parseSignatureOfAddress](_wrappers_accounts_.accountswrapper.md#parsesignatureofaddress)
@@ -554,9 +554,9 @@ A CeloTransactionObject
 
 ___
 
-###  generateProofOfSigningKeyPossession
+###  generateProofOfKeyPossession
 
-▸ **generateProofOfSigningKeyPossession**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹object›*
+▸ **generateProofOfKeyPossession**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹object›*
 
 *Defined in [contractkit/src/wrappers/Accounts.ts:262](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L262)*
 
@@ -571,9 +571,9 @@ Name | Type |
 
 ___
 
-###  generateProofOfSigningKeyPossessionLocally
+###  generateProofOfKeyPossessionLocally
 
-▸ **generateProofOfSigningKeyPossessionLocally**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address), `privateKey`: string): *Promise‹object›*
+▸ **generateProofOfKeyPossessionLocally**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address), `privateKey`: string): *Promise‹object›*
 
 *Defined in [contractkit/src/wrappers/Accounts.ts:270](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L270)*
 

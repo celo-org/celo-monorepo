@@ -474,12 +474,24 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param name A string to set as the name of the account.
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Wallet address can be zero. This means that the owner of the wallet
+   *      does not want to be paid directly without interaction, and instead wants users to
+   *      contact them, using the data encryption key, and arrange a payment.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
    */
-  function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
-    external
-    onlyBeneficiaryAndNotRevoked
-  {
-    getAccounts().setAccount(name, dataEncryptionKey, walletAddress);
+  function setAccount(
+    string calldata name,
+    bytes calldata dataEncryptionKey,
+    address walletAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external onlyBeneficiaryAndNotRevoked {
+    getAccounts().setAccount(name, dataEncryptionKey, walletAddress, v, r, s);
   }
 
   /**
@@ -500,9 +512,20 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   /**
    * @notice A wrapper setter function for the wallet address of an account.
    * @param walletAddress The wallet address to set for the account.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Wallet address can be zero. This means that the owner of the wallet
+   *      does not want to be paid directly without interaction, and instead wants users to
+   *      contact them, using the data encryption key, and arrange a payment.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
    */
-  function setAccountWalletAddress(address walletAddress) external onlyBeneficiaryAndNotRevoked {
-    getAccounts().setWalletAddress(walletAddress);
+  function setAccountWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s)
+    external
+    onlyBeneficiaryAndNotRevoked
+  {
+    getAccounts().setWalletAddress(walletAddress, v, r, s);
   }
 
   /**
