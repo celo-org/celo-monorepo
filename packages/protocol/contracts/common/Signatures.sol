@@ -31,12 +31,12 @@ library Signatures {
     pure
     returns (address)
   {
-    uint256 v32 = v;
+    bytes32 vBytes = bytes32(uint256(v) << 248);
     bytes memory signature = new bytes(96);
     assembly {
       mstore(add(signature, 32), r)
       mstore(add(signature, 64), s)
-      mstore(add(signature, 96), v32)
+      mstore(add(signature, 96), vBytes)
     }
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(messageHash);
     return ECDSA.recover(prefixedHash, signature);
