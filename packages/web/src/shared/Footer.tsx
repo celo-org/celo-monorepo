@@ -59,7 +59,7 @@ export class Footer extends React.PureComponent<Props & I18nProps> {
 const Social = React.memo(function _Social() {
   const height = 30
   return (
-    <Responsive medium={styles.social}>
+    <Responsive large={[styles.social, styles.socialDesktop]} medium={styles.social}>
       <View style={[styles.social, styles.socialMobile]}>
         <View style={styles.socialIcon}>
           <MediumLogo color={colors.dark} height={height} />
@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   socialMobile: { alignSelf: 'center', justifyContent: 'center' },
+  socialDesktop: { marginTop: 10 },
   socialIcon: {
     paddingRight: 25,
   },
@@ -206,10 +207,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginBottom: 20,
   },
   menuTablet: {
     justifyContent: 'flex-start',
     flexDirection: 'row',
+    marginBottom: 20,
   },
   menuMobile: {
     justifyContent: 'center',
