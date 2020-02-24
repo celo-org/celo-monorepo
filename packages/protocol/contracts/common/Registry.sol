@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IRegistry.sol";
@@ -9,6 +10,8 @@ import "./Initializable.sol";
  * @title Routes identifiers to addresses.
  */
 contract Registry is IRegistry, Ownable, Initializable {
+  using SafeMath for uint256;
+
   mapping(bytes32 => address) public registry;
 
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address addr);
@@ -79,7 +82,7 @@ contract Registry is IRegistry, Ownable, Initializable {
     view
     returns (bool)
   {
-    for (uint256 i = 0; i < identifierHashes.length; i++) {
+    for (uint256 i = 0; i < identifierHashes.length; i = i.add(1)) {
       if (registry[identifierHashes[i]] == sender) {
         return true;
       }
