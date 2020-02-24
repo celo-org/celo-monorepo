@@ -204,7 +204,9 @@ contract MultiSig is Initializable {
   {
     confirmations[transactionId][msg.sender] = true;
     emit Confirmation(msg.sender, transactionId);
-    executeTransaction(transactionId);
+    if (isConfirmed(transactionId)) {
+      executeTransaction(transactionId);
+    }
   }
 
   /// @dev Allows an owner to revoke a confirmation for a transaction.
