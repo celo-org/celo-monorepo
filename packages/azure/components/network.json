@@ -112,7 +112,7 @@
             }
           },
           {
-            "name": "Discovery",
+            "name": "ProxyTcpExternal",
             "properties": {
               "protocol": "*",
               "sourcePortRange": "*",
@@ -129,9 +129,9 @@
             }
           },
           {
-            "name": "DiscoveryInternal",
+            "name": "ProxyTcpInternal",
             "properties": {
-              "protocol": "TCP",
+              "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "30503",
               "sourceAddressPrefix": "[parameters('virtualNetworkAddressPrefix')]",
@@ -169,7 +169,7 @@
             }
           },
           {
-            "name": "Discovery",
+            "name": "AttesterNodeAllExternal",
             "properties": {
               "protocol": "*",
               "sourcePortRange": "*",
@@ -177,7 +177,7 @@
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",
-              "priority": 101,
+              "priority": 100,
               "direction": "Inbound",
               "sourcePortRanges": [],
               "destinationPortRanges": [],
@@ -188,7 +188,7 @@
           {
             "name": "HTTP",
             "properties": {
-              "priority": 100,
+              "priority": 200,
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
