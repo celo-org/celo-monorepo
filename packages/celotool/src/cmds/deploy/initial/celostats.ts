@@ -1,5 +1,5 @@
-import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart } from 'src/lib/celostats'
+import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
 import yargs from 'yargs'
 import { InitialArgv } from '../initial'
 

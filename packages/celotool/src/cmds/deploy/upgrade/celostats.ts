@@ -1,5 +1,5 @@
-import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/celostats'
+import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../upgrade'
 
