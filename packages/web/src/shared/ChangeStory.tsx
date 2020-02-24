@@ -29,26 +29,27 @@ export default function ChangeStory() {
     <View style={[standardStyles.row, styles.container]}>
       <Image source={globe} style={[styles.globe, styles.symbols]} />
       <Text style={[styles.separator, styles.symbols]}>|</Text>
-      <Wipe count={count} text={CHANGE_STORY[count]} />
+      <Wipe text={CHANGE_STORY[count]} />
     </View>
   )
 }
 
-function Wipe({ text, count }) {
+interface WipeProps {
+  text: string
+}
+
+const Wipe = React.memo(function _Wipe({ text }: WipeProps) {
   return (
     <View>
-      <View
-        key={count}
-        // @ts-ignore
-        style={[styles.mask, count % 2 === 0 ? styles.left : styles.right]}
-      />
+      <View key={`hide-${text}`} style={[styles.mask, styles.hide]} />
       <Text style={[fonts.legal, textStyles.italic]}>"{text}"</Text>
+      <View key={`reveal-${text}`} style={[styles.mask, styles.reveal]} />
     </View>
   )
-}
+})
 
 const DURATION = 5000
-const TRANSITION_TIME = 1000
+const TRANSITION_TIME = 500
 
 const styles = StyleSheet.create({
   globe: {
@@ -63,17 +64,17 @@ const styles = StyleSheet.create({
   },
 
   mask: {
-    backgroundColor: colors.purpleScreen,
+    backgroundColor: colors.white,
     position: 'absolute',
     height: '100%',
     width: '101%',
     animationDuration: `${TRANSITION_TIME}ms`,
-    animationFillMode: 'both',
     animationIterationCount: 1,
     animationTimingFunction: 'linear',
+    animationFillMode: 'both',
   },
 
-  left: {
+  hide: {
     animationDelay: `${DURATION - TRANSITION_TIME * 2}ms`,
     animationKeyframes: [
       {
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
       },
     ],
   },
-  right: {
+  reveal: {
     animationKeyframes: [
       {
         '0%': {
