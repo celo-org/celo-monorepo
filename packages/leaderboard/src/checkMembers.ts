@@ -25,6 +25,7 @@ readFromSheet(async function(kit: ContractKit, data: any[]) {
       }
     }
   }
+  let groupMember: any = {}
   const election = await kit._web3Contracts.getElection()
   const validators = await kit._web3Contracts.getValidators()
   let fromBlock = 500000
@@ -37,6 +38,7 @@ readFromSheet(async function(kit: ContractKit, data: any[]) {
       // @ts-ignore
       const group = await validators.methods.getValidatorGroup(g).call({}, blockNumber)
       const members = group[0]
+      members.forEach((m: string) => putNoDup(groupMember, normalizeAddress(g), getCompetitor(m)))
       members.push(g)
       assocAll(members)
     }
@@ -44,5 +46,9 @@ readFromSheet(async function(kit: ContractKit, data: any[]) {
   const entries: Array<[string, string[]]> = Object.entries(assoc)
   for (const [g, info] of entries) {
     console.log(g, 'has associates', info)
+  }
+  const entries2: Array<[string, string[]]> = Object.entries(groupMember)
+  for (const [g, info] of entries2) {
+    console.log('Group', g, 'has competitors', info)
   }
 })
