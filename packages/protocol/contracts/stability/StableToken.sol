@@ -556,6 +556,7 @@ contract StableToken is
    */
   function refundGas(address to) external onlyVm onlyWhenNotFrozen {
     balances[to] = balances[to].add(reserved[to]);
+    reserved[to] = 0;
   }
 
   /**

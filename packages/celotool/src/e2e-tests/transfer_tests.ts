@@ -4,7 +4,7 @@
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { NULL_ADDRESS } from '@celo/utils/src/address'
+import { eqAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -480,8 +480,12 @@ describe('Transfer tests', function(this: any) {
 
       if (feeToken === CeloContract.StableToken) {
         it('should have emitted transfer events for the fee token', () => {
-          assert(txRes.events.find((a) => a.to === NULL_ADDRESS))
-          assert(txRes.events.find((a) => a.from === NULL_ADDRESS))
+          console.log(txRes.events, governanceAddress, FromAddress)
+          assert(
+            txRes.events.find(
+              (a) => eqAddress(a.to, governanceAddress) && eqAddress(a.from, FromAddress)
+            )
+          )
         })
       }
 
