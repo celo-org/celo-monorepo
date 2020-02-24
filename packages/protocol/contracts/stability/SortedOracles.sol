@@ -40,7 +40,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   event OracleReportRemoved(address indexed token, address indexed oracle);
 
-  event MedianUpdated(address token, uint256 numerator, uint256 denominator);
+  event MedianUpdated(address indexed token, uint256 numerator, uint256 denominator);
 
   event ReportExpirySet(uint256 reportExpiry);
 
@@ -51,14 +51,16 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   function initialize(uint256 _reportExpirySeconds) external initializer {
     _transferOwnership(msg.sender);
-    reportExpirySeconds = _reportExpirySeconds;
+    setReportExpiry(_reportExpirySeconds);
   }
 
   /**
    * @notice Sets the report expiry parameter.
    * @param _reportExpirySeconds Desired value of report expiry.
    */
-  function setReportExpiry(uint256 _reportExpirySeconds) external onlyOwner {
+  function setReportExpiry(uint256 _reportExpirySeconds) public onlyOwner {
+    require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
+    require(_reportExpirySeconds != reportExpirySeconds, "reportExpirySeconds hasn't changed");
     reportExpirySeconds = _reportExpirySeconds;
     emit ReportExpirySet(_reportExpirySeconds);
   }
@@ -109,16 +111,30 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
       token != address(0) && n < timestamps[token].getNumElements(),
       "token addr null or trying to remove too many reports"
     );
-    for (uint256 i = 0; i < n; i++) {
-      address oldest = timestamps[token].getTail();
-      uint256 timestamp = timestamps[token].getValue(oldest);
-      // solhint-disable-next-line not-rely-on-time
-      if (now.sub(timestamp) >= reportExpirySeconds) {
-        removeReport(token, oldest);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      (bool isExpired, address oldestAddress) = isOldestReportExpired(token);
+      if (isExpired) {
+        removeReport(token, oldestAddress);
       } else {
         break;
       }
     }
+  }
+
+  /**
+   * @notice Check if last report is expired.
+   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @return bool isExpired and the address of the last report
+   */
+  function isOldestReportExpired(address token) public view returns (bool, address) {
+    require(token != address(0));
+    address oldest = timestamps[token].getTail();
+    uint256 timestamp = timestamps[token].getValue(oldest);
+    // solhint-disable-next-line not-rely-on-time
+    if (now.sub(timestamp) >= reportExpirySeconds) {
+      return (true, oldest);
+    }
+    return (false, oldest);
   }
 
   /**

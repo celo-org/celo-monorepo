@@ -43,12 +43,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
-  event TokenAdded(address token);
-  event TokenRemoved(address token, uint256 index);
-  event SpenderAdded(address spender);
-  event SpenderRemoved(address spender);
-  event OtherReserveAddressAdded(address otherReserveAddress);
-  event OtherReserveAddressRemoved(address otherReserveAddress, uint256 index);
+  event TokenAdded(address indexed token);
+  event TokenRemoved(address indexed token, uint256 index);
+  event SpenderAdded(address indexed spender);
+  event SpenderRemoved(address indexed spender);
+  event OtherReserveAddressAdded(address indexed otherReserveAddress);
+  event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
 
   modifier isStableToken(address token) {
@@ -113,15 +113,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   {
     require(symbols.length == weights.length, "Array length mismatch");
     FixidityLib.Fraction memory sum = FixidityLib.wrap(0);
-    for (uint256 i = 0; i < weights.length; i++) {
+    for (uint256 i = 0; i < weights.length; i = i.add(1)) {
       sum = sum.add(FixidityLib.wrap(weights[i]));
     }
     require(sum.equals(FixidityLib.fixed1()), "Sum of asset allocation must be 1");
-    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i = i.add(1)) {
       delete assetAllocationWeights[assetAllocationSymbols[i]];
     }
     assetAllocationSymbols = symbols;
-    for (uint256 i = 0; i < symbols.length; i++) {
+    for (uint256 i = 0; i < symbols.length; i = i.add(1)) {
       require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
@@ -164,9 +164,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       "index into tokens list not mapped to token"
     );
     isToken[token] = false;
-    address lastItem = _tokens[_tokens.length - 1];
+    address lastItem = _tokens[_tokens.length.sub(1)];
     _tokens[index] = lastItem;
-    _tokens.length--;
+    _tokens.length = _tokens.length.sub(1);
     emit TokenRemoved(token, index);
     return true;
   }
@@ -204,9 +204,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       "index into reserve list not mapped to address"
     );
     isOtherReserveAddress[reserveAddress] = false;
-    address lastItem = otherReserveAddresses[otherReserveAddresses.length - 1];
+    address lastItem = otherReserveAddresses[otherReserveAddresses.length.sub(1)];
     otherReserveAddresses[index] = lastItem;
-    otherReserveAddresses.length--;
+    otherReserveAddresses.length = otherReserveAddresses.length.sub(1);
     emit OtherReserveAddressRemoved(reserveAddress, index);
     return true;
   }
@@ -288,7 +288,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   function getAssetAllocationWeights() external view returns (uint256[] memory) {
     uint256[] memory weights = new uint256[](assetAllocationSymbols.length);
-    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i = i.add(1)) {
       weights[i] = assetAllocationWeights[assetAllocationSymbols[i]];
     }
     return weights;
@@ -296,7 +296,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   function getReserveGoldBalance() public view returns (uint256) {
     uint256 reserveGoldBalance = address(this).balance;
-    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+    for (uint256 i = 0; i < otherReserveAddresses.length; i = i.add(1)) {
       reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
     return reserveGoldBalance;
@@ -317,7 +317,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     uint256 stableTokensValueInGold = 0;
     FixidityLib.Fraction memory cgldWeight = FixidityLib.wrap(assetAllocationWeights["cGLD"]);
 
-    for (uint256 i = 0; i < _tokens.length; i++) {
+    for (uint256 i = 0; i < _tokens.length; i = i.add(1)) {
       uint256 stableAmount;
       uint256 goldAmount;
       (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
