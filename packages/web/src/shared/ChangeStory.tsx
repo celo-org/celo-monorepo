@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import globe from 'src/shared/world-spin.gif'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
@@ -25,10 +26,15 @@ export default function ChangeStory() {
     return () => clearTimeout(timer)
   }, [count])
 
+  const { isMobile } = useScreenSize()
+
   return (
-    <View style={[standardStyles.row, styles.container]}>
-      <Image source={globe} style={[styles.globe, styles.symbols]} />
-      <Text style={[styles.separator, styles.symbols]}>|</Text>
+    <View style={[styles.container, isMobile ? standardStyles.centered : standardStyles.row]}>
+      <Image
+        source={globe}
+        style={[styles.globe, styles.symbols, isMobile && styles.globeMobile]}
+      />
+      {!isMobile && <Text style={[styles.separator, styles.symbols]}>|</Text>}
       <Wipe text={CHANGE_STORY[count]} />
     </View>
   )
@@ -56,6 +62,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
+  globeMobile: { marginBottom: 8 },
   symbols: {
     zIndex: 10,
   },

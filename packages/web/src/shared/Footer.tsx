@@ -123,8 +123,8 @@ const Navigation = React.memo(function _Navigation({
               style={[
                 styles.menuItem,
                 !isVertical && index === 0 && { marginLeft: 0 },
-                isVertical && linkIsToCurrentPage
-                  ? styles.currentMenuItem
+                isVertical
+                  ? linkIsToCurrentPage && styles.currentMenuItem
                   : styles.verticalMenuItem,
               ]}
             >
@@ -216,6 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 20,
+    marginBottom: 30,
   },
   verticalMenu: {
     alignItems: 'center',
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   verticalMenuItem: {
-    marginVertical: 30,
+    // marginVertical: 30,
   },
   currentMenuItem: {
     marginVertical: 30,
