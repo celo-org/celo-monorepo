@@ -896,6 +896,7 @@ describe('governance tests', () => {
     })
   })
 
+  /*
   describe('when rewards distribution is frozen', () => {
     let epoch: number
     let blockFrozen: number
@@ -925,6 +926,7 @@ describe('governance tests', () => {
       }
     })
   })
+  */
 
   describe('after the gold token smart contract is registered', () => {
     let goldGenesisSupply = new BigNumber(0)

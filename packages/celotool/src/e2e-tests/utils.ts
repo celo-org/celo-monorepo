@@ -106,11 +106,15 @@ export async function migrateContracts(
       exchange: {
         frozen: false,
       },
+      goldToken: {
+        frozen: false,
+      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+        frozen: false,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),
