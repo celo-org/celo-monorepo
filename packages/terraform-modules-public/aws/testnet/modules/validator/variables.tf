@@ -29,10 +29,16 @@ variable celo_network_id {
     description   = "Celo network ID to join"
 }
 
-variable proxies {
-  type          = map(object({
-      validator_name            = string
-      validator_signer_address  = string
-  }))
-  description   = "Map of proxy configurations."
+variable validators {
+    description     = "Map of validator configurations"
+    type            = map(object({
+      name                          = string
+      signer_address                = string
+      signer_private_key            = string
+      signer_private_key_password   = string
+      signer_private_key_filename   = string
+      proxy_enode                   = string
+      proxy_private_ip              = string
+      proxy_public_ip               = string
+    }))
 }

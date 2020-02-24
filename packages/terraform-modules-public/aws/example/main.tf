@@ -11,4 +11,5 @@ module "celo_cluster" {
   celo_image          = var.celo_image
   celo_network_id     = var.celo_network_id
   proxies             = var.proxies
+  validators          = var.validators
 }

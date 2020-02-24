@@ -82,3 +82,60 @@ variable proxies {
   #
   # }
 }
+
+variable validators {
+    description     = "Configuration for zero or more validators in each availability zone"
+    type            = object({ 
+      az1 = map(object({
+        name                          = string
+        signer_address                = string
+        signer_private_key            = string
+        signer_private_key_password   = string
+        signer_private_key_filename   = string
+        proxy_enode                   = string
+        proxy_private_ip              = string
+        proxy_public_ip               = string
+      }))
+      az2 = map(object({
+        name                          = string
+        signer_address                = string
+        signer_private_key            = string
+        signer_private_key_password   = string
+        signer_private_key_filename   = string
+        proxy_enode                   = string
+        proxy_private_ip              = string
+        proxy_public_ip               = string
+      }))
+    })
+    default = {
+      az1 = {}
+      az2 = {}
+    }
+  # Here is an example configuration. We recommend putting this into a secret.auto.tfvars file.
+  # default = {
+  #   az1 = {
+  #     myvalidator_az1_01 = {
+  #       name                          = "myvalidator_az1_01"
+  #       signer_address                = "0000000011111111222222223333333344444444"
+  #       signer_private_key            = "...Place the keystore file contents here Make sure to escape the double quotes. ..."
+  #       signer_private_key_password   = "mypassword"
+  #       signer_private_key_filename   = "UTC--2020-02-06T06-49-54.736290200Z--0000000011111111222222223333333344444444"
+  #       proxy_enode                   = "00000000000000001111111111111111222222222222222233333333333333334444444444444444555555555555555566666666666666667777777777777777"
+  #       proxy_private_ip              = "10.10.0.120"
+  #       proxy_public_ip               = "1.1.1.1"
+  #     }
+  #     myvalidator_az1_02 = {
+  #       ...
+  #     }
+  #   }
+  #   az2 = {
+  #     myvalidator_az2_01 = {
+  #       ...
+  #     }
+  #     myvalidator_az2_02 = {
+  #       ...
+  #     }
+  #   }
+  #
+  # }
+}

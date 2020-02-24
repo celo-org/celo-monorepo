@@ -61,3 +61,29 @@ variable proxies {
     }))
   })
 }
+
+variable validators {
+    description     = "Configuration for zero or more validators in each availability zone"
+    type            = object({ 
+      az1 = map(object({
+        name                          = string
+        signer_address                = string
+        signer_private_key            = string
+        signer_private_key_password   = string
+        signer_private_key_filename   = string
+        proxy_enode                   = string
+        proxy_private_ip              = string
+        proxy_public_ip               = string
+      }))
+      az2 = map(object({
+        name                          = string
+        signer_address                = string
+        signer_private_key            = string
+        signer_private_key_password   = string
+        signer_private_key_filename   = string
+        proxy_enode                   = string
+        proxy_private_ip              = string
+        proxy_public_ip               = string
+      }))
+    })
+}

@@ -50,3 +50,27 @@ module "celo_proxy_az2" {
 
     proxies           = var.proxies.az2
 }
+
+module "celo_validator_az1" {
+    source            = "./modules/validator"
+
+    subnet_id         = module.celo_vpc.subnet_ids.az1.private
+    key_pair_name     = var.key_pair_name
+    instance_type     = var.instance_types.proxy
+    celo_image        = var.celo_image
+    celo_network_id   = var.celo_network_id
+
+    validators         = var.validators.az1
+}
+
+module "celo_validator_az2" {
+    source            = "./modules/validator"
+
+    subnet_id         = module.celo_vpc.subnet_ids.az2.private
+    key_pair_name     = var.key_pair_name
+    instance_type     = var.instance_types.proxy
+    celo_image        = var.celo_image
+    celo_network_id   = var.celo_network_id
+
+    validators         = var.validators.az2
+}
