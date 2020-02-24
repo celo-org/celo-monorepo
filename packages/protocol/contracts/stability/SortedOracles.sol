@@ -40,7 +40,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   event OracleReportRemoved(address indexed token, address indexed oracle);
 
-  event MedianUpdated(address token, uint256 numerator, uint256 denominator);
+  event MedianUpdated(address indexed token, uint256 numerator, uint256 denominator);
 
   event ReportExpirySet(uint256 reportExpiry);
 
