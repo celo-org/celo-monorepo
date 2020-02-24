@@ -44,20 +44,6 @@ contract DowntimeSlasher is SlasherUtil {
     emit SlashableDowntimeSet(interval);
   }
 
-  function epochNumberOfBlock(uint256 blockNumber, uint256 epochSize)
-    internal
-    pure
-    returns (uint256)
-  {
-    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    uint256 epochNumber = blockNumber / epochSize;
-    if (blockNumber % epochSize == 0) {
-      return epochNumber;
-    } else {
-      return epochNumber + 1;
-    }
-  }
-
   /**
    * @notice Test if a validator has been down.
    * @param startBlock First block of the downtime.
