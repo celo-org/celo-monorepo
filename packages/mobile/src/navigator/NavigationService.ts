@@ -1,6 +1,7 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
 import {
   NavigationActions,
+  NavigationBackActionPayload,
   NavigationContainerComponent,
   NavigationParams,
   NavigationState,
@@ -48,6 +49,14 @@ export function navigate(routeName: string, params?: NavigationParams) {
     })
 }
 
+export function navigateAfterPinEntered(routeName: string, params?: NavigationParams) {
+  navigate('Background', {
+    onUnlock() {
+      navigate(routeName, params)
+    },
+  })
+}
+
 // Source: https://v1.reactnavigation.org/docs/screen-tracking.html
 export function recordStateChange(prevState: NavigationState, currentState: NavigationState) {
   const getCurrentRouteName = (navState: NavigationState): string => {
@@ -68,9 +77,9 @@ export function recordStateChange(prevState: NavigationState, currentState: Navi
   CeloAnalytics.page(currentScreen, { previousScreen, currentScreen })
 }
 
-export function navigateBack() {
+export function navigateBack(params?: NavigationBackActionPayload) {
   Logger.debug(`${TAG}@navigate`, `Dispatch navigate back`)
-  navigator.dispatch(NavigationActions.back())
+  navigator.dispatch(NavigationActions.back(params))
 }
 
 export function navigateHome(params?: NavigationParams) {

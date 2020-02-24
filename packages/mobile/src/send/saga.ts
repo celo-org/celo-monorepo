@@ -150,7 +150,6 @@ export function* sendPaymentOrInviteSaga({
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,
-        recipient.displayName,
         recipient.e164PhoneNumber,
         inviteMethod || InviteBy.SMS,
         amount,
