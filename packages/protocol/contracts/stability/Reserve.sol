@@ -63,8 +63,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function() external payable {} // solhint-disable no-empty-blocks
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    * @param _frozenGold The balance of reserve gold that is frozen.
    * @param _frozenDays The number of days during which the frozen gold thaws.
@@ -151,8 +151,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Add a token that the reserve will stablize.
+   * @notice Add a token that the reserve will stabilize.
    * @param token The address of the token being stabilized.
+   * @return Returns true if the transaction succeeds.
    */
   function addToken(address token) external onlyOwner nonReentrant returns (bool) {
     require(!isToken[token], "token addr already registered");
@@ -173,6 +174,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Remove a token that the reserve will no longer stabilize.
    * @param token The address of the token no longer being stabilized.
    * @param index The index of the token in _tokens.
+   * @return Returns true if the transaction succeeds.
    */
   function removeToken(address token, uint256 index)
     external
@@ -195,6 +197,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   /**
    * @notice Add a reserve address whose balance shall be included in the reserve ratio.
    * @param reserveAddress The reserve address to add.
+   * @return Returns true if the transaction succeeds.
    */
   function addOtherReserveAddress(address reserveAddress)
     external
@@ -213,6 +216,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Remove reserve address whose balance shall no longer be included in the reserve ratio.
    * @param reserveAddress The reserve address to remove.
    * @param index The index of the reserve address in otherReserveAddresses.
+   * @return Returns true if the transaction succeeds.
    */
   function removeOtherReserveAddress(address reserveAddress, uint256 index)
     external
@@ -254,6 +258,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Transfer gold.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
+   * @return Returns true if the transaction succeeds.
    */
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
@@ -296,18 +301,34 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return (uint256(tobinTaxCache.numerator), FixidityLib.fixed1().unwrap());
   }
 
+  /**
+   * @notice Returns the list of stabilized token addresses.
+   * @return An array of addresses of stabilized tokens.
+   */
   function getTokens() external view returns (address[] memory) {
     return _tokens;
   }
 
+  /**
+   * @notice Returns the list other addresses included in the reserve total.
+   * @return An array of other addresses included in the reserve total.
+   */
   function getOtherReserveAddresses() external view returns (address[] memory) {
     return otherReserveAddresses;
   }
 
+  /**
+   * @notice Returns a list of token symbols that have been allocated.
+   * @return An array of token symbols that have been allocated.
+   */
   function getAssetAllocationSymbols() external view returns (bytes32[] memory) {
     return assetAllocationSymbols;
   }
 
+  /**
+   * @notice Returns a list of weights used for the allocation of reserve assets.
+   * @return An array of a list of weights used for the allocation of reserve assets.
+   */
   function getAssetAllocationWeights() external view returns (uint256[] memory) {
     uint256[] memory weights = new uint256[](assetAllocationSymbols.length);
     for (uint256 i = 0; i < assetAllocationSymbols.length; i = i.add(1)) {
@@ -316,16 +337,28 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return weights;
   }
 
+  /**
+   * @notice Returns the amount of unfrozen Celo Gold in the reserve.
+   * @return The total unfrozen Celo Gold in the reserve.
+   */
   function getUnfrozenBalance() public view returns (uint256) {
     uint256 balance = address(this).balance;
     uint256 frozenReserveGold = getFrozenReserveGoldBalance();
     return balance > frozenReserveGold ? balance.sub(frozenReserveGold) : 0;
   }
 
+  /**
+   * @notice Returns the amount of Celo Gold included in the reserve.
+   * @return The Celo Gold amount included in the reserve.
+   */
   function getReserveGoldBalance() public view returns (uint256) {
     return address(this).balance.add(getOtherReserveAddressesGoldBalance());
   }
 
+  /**
+   * @notice Returns the amount of Celo Gold included in other reserve addresses.
+   * @return The Celo Gold amount included in other reserve addresses.
+   */
   function getOtherReserveAddressesGoldBalance() public view returns (uint256) {
     uint256 reserveGoldBalance = 0;
     for (uint256 i = 0; i < otherReserveAddresses.length; i = i.add(1)) {
@@ -334,10 +367,18 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return reserveGoldBalance;
   }
 
+  /**
+   * @notice Returns the amount of unfrozen Celo Gold included in the reserve.
+   * @return The unfrozen Celo Gold amount included in the reserve.
+   */
   function getUnfrozenReserveGoldBalance() public view returns (uint256) {
     return getUnfrozenBalance().add(getOtherReserveAddressesGoldBalance());
   }
 
+  /**
+   * @notice Returns the amount of frozen Celo Gold in the reserve.
+   * @return The total frozen Celo Gold in the reserve.
+   */
   function getFrozenReserveGoldBalance() public view returns (uint256) {
     uint256 currentDay = now / 1 days;
     uint256 frozenDays = currentDay.sub(frozenReserveGoldStartDay);
@@ -347,10 +388,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
         frozenReserveGoldStartBalance.mul(frozenDays).div(frozenReserveGoldDays)
       );
   }
-
-  /*
-   * Internal functions
-   */
 
   /**
    * @notice Computes the ratio of current reserve balance to total stable token valuation.
@@ -379,6 +416,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
         .unwrap();
   }
 
+  /*
+   * Internal functions
+   */
+
   /**
    * @notice Computes a tobin tax based on the reserve ratio.
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
@@ -398,6 +439,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param to The address that will receive the minted tokens.
    * @param token The address of the token to mint.
    * @param value The amount of tokens to mint.
+   * @return Returns true if the transaction succeeds.
    */
   function mintToken(address to, address token, uint256 value)
     private
