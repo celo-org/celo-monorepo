@@ -215,27 +215,16 @@ contract Governance is
     uint256 baselineUpdateFactor,
     uint256 baselineQuorumFactor
   ) external initializer {
-    require(
-      _approver != address(0) &&
-        _concurrentProposals != 0 &&
-        _minDeposit != 0 &&
-        _queueExpiry != 0 &&
-        _dequeueFrequency != 0 &&
-        approvalStageDuration != 0 &&
-        referendumStageDuration != 0 &&
-        executionStageDuration != 0,
-      "Bad input"
-    );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    approver = _approver;
-    concurrentProposals = _concurrentProposals;
-    minDeposit = _minDeposit;
-    queueExpiry = _queueExpiry;
-    dequeueFrequency = _dequeueFrequency;
-    stageDurations.approval = approvalStageDuration;
-    stageDurations.referendum = referendumStageDuration;
-    stageDurations.execution = executionStageDuration;
+    setApprover(_approver);
+    setConcurrentProposals(_concurrentProposals);
+    setMinDeposit(_minDeposit);
+    setQueueExpiry(_queueExpiry);
+    setDequeueFrequency(_dequeueFrequency);
+    setApprovalStageDuration(approvalStageDuration);
+    setReferendumStageDuration(referendumStageDuration);
+    setExecutionStageDuration(executionStageDuration);
     setParticipationBaseline(participationBaseline);
     setParticipationFloor(participationFloor);
     setBaselineUpdateFactor(baselineUpdateFactor);
@@ -248,7 +237,7 @@ contract Governance is
    * @notice Updates the address that has permission to approve proposals in the approval stage.
    * @param _approver The address that has permission to approve proposals in the approval stage.
    */
-  function setApprover(address _approver) external onlyOwner {
+  function setApprover(address _approver) public onlyOwner {
     require(_approver != address(0), "Approver cannot be 0");
     require(_approver != approver, "Approver unchanged");
     approver = _approver;
@@ -259,7 +248,7 @@ contract Governance is
    * @notice Updates the number of proposals to dequeue at a time.
    * @param _concurrentProposals The number of proposals to dequeue at at a time.
    */
-  function setConcurrentProposals(uint256 _concurrentProposals) external onlyOwner {
+  function setConcurrentProposals(uint256 _concurrentProposals) public onlyOwner {
     require(_concurrentProposals > 0, "Number of proposals must be larger than zero");
     require(_concurrentProposals != concurrentProposals, "Number of proposals unchanged");
     concurrentProposals = _concurrentProposals;
@@ -270,7 +259,7 @@ contract Governance is
    * @notice Updates the minimum deposit needed to make a proposal.
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    */
-  function setMinDeposit(uint256 _minDeposit) external onlyOwner {
+  function setMinDeposit(uint256 _minDeposit) public onlyOwner {
     require(_minDeposit > 0, "minDeposit must be larger than 0");
     require(_minDeposit != minDeposit, "Minimum deposit unchanged");
     minDeposit = _minDeposit;
@@ -281,7 +270,7 @@ contract Governance is
    * @notice Updates the number of seconds before a queued proposal expires.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    */
-  function setQueueExpiry(uint256 _queueExpiry) external onlyOwner {
+  function setQueueExpiry(uint256 _queueExpiry) public onlyOwner {
     require(_queueExpiry > 0, "QueueExpiry must be larger than 0");
     require(_queueExpiry != queueExpiry, "QueueExpiry unchanged");
     queueExpiry = _queueExpiry;
@@ -294,7 +283,7 @@ contract Governance is
    * @param _dequeueFrequency The number of seconds before the next batch of proposals can be
    *   dequeued.
    */
-  function setDequeueFrequency(uint256 _dequeueFrequency) external onlyOwner {
+  function setDequeueFrequency(uint256 _dequeueFrequency) public onlyOwner {
     require(_dequeueFrequency > 0, "dequeueFrequency must be larger than 0");
     require(_dequeueFrequency != dequeueFrequency, "dequeueFrequency unchanged");
     dequeueFrequency = _dequeueFrequency;
@@ -305,7 +294,7 @@ contract Governance is
    * @notice Updates the number of seconds proposals stay in the approval stage.
    * @param approvalStageDuration The number of seconds proposals stay in the approval stage.
    */
-  function setApprovalStageDuration(uint256 approvalStageDuration) external onlyOwner {
+  function setApprovalStageDuration(uint256 approvalStageDuration) public onlyOwner {
     require(approvalStageDuration > 0, "Duration must be larger than 0");
     require(approvalStageDuration != stageDurations.approval, "Duration unchanged");
     stageDurations.approval = approvalStageDuration;
@@ -316,7 +305,7 @@ contract Governance is
    * @notice Updates the number of seconds proposals stay in the referendum stage.
    * @param referendumStageDuration The number of seconds proposals stay in the referendum stage.
    */
-  function setReferendumStageDuration(uint256 referendumStageDuration) external onlyOwner {
+  function setReferendumStageDuration(uint256 referendumStageDuration) public onlyOwner {
     require(referendumStageDuration > 0, "Duration must be larger than 0");
     require(referendumStageDuration != stageDurations.referendum, "Duration unchanged");
     stageDurations.referendum = referendumStageDuration;
@@ -327,7 +316,7 @@ contract Governance is
    * @notice Updates the number of seconds proposals stay in the execution stage.
    * @param executionStageDuration The number of seconds proposals stay in the execution stage.
    */
-  function setExecutionStageDuration(uint256 executionStageDuration) external onlyOwner {
+  function setExecutionStageDuration(uint256 executionStageDuration) public onlyOwner {
     require(executionStageDuration > 0, "Duration must be larger than 0");
     require(executionStageDuration != stageDurations.execution, "Duration unchanged");
     stageDurations.execution = executionStageDuration;
@@ -478,7 +467,7 @@ contract Governance is
   /**
    * @notice Requires a proposal is dequeued and removes it if expired.
    * @param proposalId The ID of the proposal.
-   * @return The proposal storage struct and stage corresponding to `proposalId`. 
+   * @return The proposal storage struct and stage corresponding to `proposalId`.
    */
   function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
@@ -942,7 +931,7 @@ contract Governance is
     IAccounts accounts = getAccounts();
     for (uint256 idx = 0; idx < n; idx++) {
       address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
-      address validatorAccount = accounts.validatorSignerToAccount(validatorSigner);
+      address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
         isHotfixWhitelistedBy(hash, validatorAccount)
