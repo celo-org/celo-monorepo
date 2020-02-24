@@ -55,7 +55,7 @@
     "prettier-plugin-java": "^0.6.0",
     "prettier-plugin-solidity": "1.0.0-alpha.35",
     "pretty-quick": "^2.0.1",
-    "solc": "0.5.16",
+    "solc": "0.5.8",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
