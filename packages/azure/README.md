@@ -8,6 +8,10 @@ running a validator system (validator node, proxy, attestation
 service), and configures the software (_e.g._, `geth`,
 attestation-service) on the compute nodes.
 
+## Pre-built template
+
+[tempalte.json](./template.json) is a pre-built ARM template.
+
 ## Build
 
 The JSON files in [components/](components/) define resources for the
@@ -109,6 +113,8 @@ az network nic ip-config update \
 
 ## Future work
 
+1.  Use UniqueString for naming issues with Key Value and PostgreSQL.
+1.  Move validator, proxy, and attester to self-contained templates.
 1.  Tune the default values for resources sizes (*e.g.*, VM, disk, etc).
 1.  Convert to an [Azure Managed
     Application](https://docs.microsoft.com/en-us/azure/azure-resource-manager/managed-applications/overview).

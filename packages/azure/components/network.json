@@ -80,7 +80,7 @@
             "properties": {
               "priority": 300,
               "protocol": "TCP",
-              "access": "Allow",
+              "access": "Deny",
               "direction": "Inbound",
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
@@ -103,7 +103,7 @@
             "properties": {
               "priority": 300,
               "protocol": "TCP",
-              "access": "Allow",
+              "access": "Deny",
               "direction": "Inbound",
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
@@ -160,7 +160,7 @@
             "properties": {
               "priority": 300,
               "protocol": "TCP",
-              "access": "Allow",
+              "access": "Deny",
               "direction": "Inbound",
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
