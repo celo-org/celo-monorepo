@@ -108,15 +108,15 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
         historySize = 1;
       } else if (historySize > randomnessBlockRetentionWindow) {
         deleteHistoryIfNotLastEpochBlock(historyFirst);
-        deleteHistoryIfNotLastEpochBlock(historyFirst + 1);
-        historyFirst += 2;
-        historySize--;
+        deleteHistoryIfNotLastEpochBlock(historyFirst.add(1));
+        historyFirst = historyFirst.add(2);
+        historySize = historySize.sub(1);
       } else if (historySize == randomnessBlockRetentionWindow) {
         deleteHistoryIfNotLastEpochBlock(historyFirst);
-        historyFirst++;
+        historyFirst = historyFirst.add(1);
       } else {
         // historySize < randomnessBlockRetentionWindow
-        historySize++;
+        historySize = historySize.add(1);
       }
     }
   }
