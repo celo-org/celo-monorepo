@@ -1,13 +1,8 @@
-let toFail = false
+const createShortDynamicLink = jest.fn()
 
 function links() {
   return {
-    createShortDynamicLink: jest.fn(async () => {
-      if (toFail) {
-        throw new Error('test error')
-      }
-      return 'shortLink'
-    }),
+    createShortDynamicLink,
   }
 }
 
@@ -18,13 +13,10 @@ links.DynamicLink = jest.fn(() => ({
   },
   ios: {
     setFallbackUrl: jest.fn(),
-    setBundleId: jest.fn((bundleId) => {
-      if (!bundleId) {
-        toFail = true
-      }
-    }),
+    setBundleId: jest.fn(),
   },
 }))
+
 export default {
   links,
 }
