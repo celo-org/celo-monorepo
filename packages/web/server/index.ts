@@ -65,7 +65,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       res.redirect('/terms')
     })
   })
-  ;['/applications', '/technology', '/dev', '/develop', '/developer'].forEach((path) => {
+  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/developer'].forEach((path) => {
     server.get(path, (_, res) => {
       res.redirect('/developers')
     })
@@ -79,6 +79,10 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     server.get(path, (_, res) => {
       res.redirect('/validators/explore')
     })
+  })
+
+  server.get('/build/*', (req, res) => {
+    res.redirect(`/developers/${req.params[0]}`)
   })
   ;['/download', '/app', '/mobile-app', '/invite', 'build/download'].forEach((path) => {
     server.get(path, (_, res) => {

@@ -134,6 +134,8 @@ library FixidityLib {
   /**
    * @notice Converts two uint256 representing a fraction to fixed point units,
    * equivalent to multiplying dividend and divisor by 10^digits().
+   * @param numerator numerator must be <= maxNewFixed()
+   * @param denominator denominator must be <= maxNewFixed() and denominator can't be 0
    * @dev
    * Test newFixedFraction(maxFixedDividend()+1,1) fails
    * Test newFixedFraction(1,maxFixedDividend()+1) fails
@@ -148,9 +150,6 @@ library FixidityLib {
     pure
     returns (Fraction memory)
   {
-    require(numerator <= maxNewFixed(), "numerator must be <= maxNewFixed()");
-    require(denominator <= maxNewFixed(), "denominator must be <= maxNewFixed()");
-    require(denominator != 0, "denominator can't be 0");
     Fraction memory convertedNumerator = newFixed(numerator);
     Fraction memory convertedDenominator = newFixed(denominator);
     return divide(convertedNumerator, convertedDenominator);
@@ -210,7 +209,7 @@ library FixidityLib {
    * Test multiply(0,0) returns 0
    * Test multiply(maxFixedMul(),0) returns 0
    * Test multiply(0,maxFixedMul()) returns 0
-   * Test multiply(fixed1()/mulPrecision(),fixed1()*mulPrecision())
+   * Test multiply(fixed1()/mulPrecision(),fixed1()*mulPrecision()) returns fixed1()
    * Test multiply(maxFixedMul(),maxFixedMul()) is around maxUint256()
    * Test multiply(maxFixedMul()+1,maxFixedMul()+1) fails
    */
@@ -262,6 +261,7 @@ library FixidityLib {
    * Test reciprocal(fixed1()) returns fixed1()
    * Test reciprocal(fixed1()*fixed1()) returns 1 // Testing how the fractional is truncated
    * Test reciprocal(1+fixed1()*fixed1()) returns 0 // Testing how the fractional is truncated
+   * Test reciprocal(newFixedFraction(1, 1e24)) returns newFixed(1e24)
    */
   function reciprocal(Fraction memory x) internal pure returns (Fraction memory) {
     require(x.value != 0, "can't call reciprocal(0)");
