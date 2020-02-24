@@ -1,10 +1,8 @@
+import { Articles as ArticleProps } from 'fullstack/ArticleProps'
 import * as React from 'react'
 import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Articles from 'src/community/Articles'
-
-import { Articles as ArticleProps } from 'fullstack/ArticleProps'
-
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
@@ -44,7 +42,7 @@ class ArticlesSection extends React.PureComponent<Props> {
         >
           <Cell span={Spans.full} style={standardStyles.centered}>
             <Button
-              text={t('readMoreFromOurBlog')}
+              text={t('common:readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
               size={SIZE.normal}
               href={menuItems.MEDIUM.link}
