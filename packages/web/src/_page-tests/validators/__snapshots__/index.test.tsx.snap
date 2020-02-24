@@ -757,11 +757,13 @@ exports[`BuildPage renders 1`] = `
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "color": "rgba(255,255,255,1.00)",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >
@@ -1430,7 +1432,7 @@ exports[`BuildPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="/build/wallet"
+                href="/developers/wallet"
                 role="link"
                 style={
                   Object {
@@ -3842,7 +3844,7 @@ exports[`BuildPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="/build/wallet"
+                href="/developers/wallet"
                 role="link"
                 style={
                   Object {
@@ -4121,7 +4123,7 @@ exports[`BuildPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="/build/faucet"
+                href="/developers/faucet"
                 role="link"
                 style={
                   Object {
@@ -6083,6 +6085,7 @@ exports[`BuildPage renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
                       "display": "inline",
@@ -6091,6 +6094,7 @@ exports[`BuildPage renders 1`] = `
                       "lineHeight": "20px",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                       "textRendering": "geometricPrecision",
                     }
                   }
@@ -6124,6 +6128,7 @@ exports[`BuildPage renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
                       "display": "inline",
@@ -6132,6 +6137,7 @@ exports[`BuildPage renders 1`] = `
                       "lineHeight": "20px",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                       "textRendering": "geometricPrecision",
                     }
                   }

@@ -65,8 +65,10 @@ export function* getPincode(useCache = true) {
       }
     }
 
-    const pincodeEntered = new Promise((resolve, reject) => {
-      navigate(Screens.PincodeConfirmation, { resolve, reject })
+    const pincodeEntered = new Promise((resolve) => {
+      navigate(Screens.PincodeConfirmation, {
+        onValidPin: resolve,
+      })
     })
     const pin = yield pincodeEntered
     if (!pin) {

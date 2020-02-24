@@ -43,13 +43,6 @@ contract DoubleSigningSlasher is SlasherUtil {
   }
 
   /**
-   * @notice Returns the minimum number of required signers for a given block number.
-   */
-  function minQuorumSize(uint256 blockNumber) internal view returns (uint256) {
-    return (2 * numberValidatorsInSet(blockNumber) + 2) / 3;
-  }
-
-  /**
    * @notice Given two RLP encoded blocks, calls into precompiles to require that
    * the two block hashes are different, have the same height, have a
    * quorum of signatures, and that `signer` was part of the quorum.
