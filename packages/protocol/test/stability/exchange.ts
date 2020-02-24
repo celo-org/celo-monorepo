@@ -531,51 +531,97 @@ contract('Exchange', (accounts: string[]) => {
           .times(stableAmountForRate)
           .div(goldAmountForRate)
 
-        const expectedStableAmount = getBuyTokenAmount(
-          goldTokenAmount,
-          updatedGoldBucket,
-          updatedStableBucket
-        )
-
         beforeEach(async () => {
           await fundReserve()
           await timeTravel(updateFrequency, web3)
           await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
         })
 
-        it('the exchange should succeed', async () => {
-          await exchange.exchange(
+        describe('when the oldest oracle report is not expired', () => {
+          const expectedStableAmount = getBuyTokenAmount(
             goldTokenAmount,
-            expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
-            true,
-            {
-              from: user,
-            }
+            updatedGoldBucket,
+            updatedStableBucket
           )
-          const newStableBalance = await stableToken.balanceOf(user)
-          assertEqualBN(newStableBalance, expectedStableAmount)
+
+          it('the exchange should succeed', async () => {
+            await exchange.exchange(
+              goldTokenAmount,
+              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+              true,
+              {
+                from: user,
+              }
+            )
+            const newStableBalance = await stableToken.balanceOf(user)
+            assertEqualBN(newStableBalance, expectedStableAmount)
+          })
+
+          it('should update the buckets', async () => {
+            await exchange.exchange(
+              goldTokenAmount,
+              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+              true,
+              {
+                from: user,
+              }
+            )
+            const newGoldBucket = await exchange.goldBucket()
+            const newStableBucket = await exchange.stableBucket()
+
+            // The new value should be the updatedGoldBucket value, which is 2x the
+            // initial amount after fundReserve() is called, plus the amount of gold
+            // that was paid in the exchange.
+            assertEqualBN(newGoldBucket, updatedGoldBucket.plus(goldTokenAmount))
+
+            // The new value should be the updatedStableBucket (derived from the new
+            // Gold Bucket value), minus the amount purchased during the exchange
+            assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
+          })
         })
 
-        it('should update the buckets', async () => {
-          await exchange.exchange(
+        describe('when the oldest oracle report is expired', () => {
+          const expectedStableAmount = getBuyTokenAmount(
             goldTokenAmount,
-            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-            true,
-            {
-              from: user,
-            }
+            initialGoldBucket,
+            initialStableBucket
           )
-          const newGoldBucket = await exchange.goldBucket()
-          const newStableBucket = await exchange.stableBucket()
 
-          // The new value should be the updatedGoldBucket value, which is 2x the
-          // initial amount after fundReserve() is called, plus the amount of gold
-          // that was paid in the exchange.
-          assertEqualBN(newGoldBucket, updatedGoldBucket.plus(goldTokenAmount))
+          beforeEach(async () => {
+            await mockSortedOracles.setOldestReportExpired(stableToken.address)
+          })
 
-          // The new value should be the updatedStableBucket (derived from the new
-          // Gold Bucket value), minus the amount purchased during the exchange
-          assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
+          it('the exchange should succeed', async () => {
+            await exchange.exchange(
+              goldTokenAmount,
+              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+              true,
+              {
+                from: user,
+              }
+            )
+            const newStableBalance = await stableToken.balanceOf(user)
+            assertEqualBN(newStableBalance, expectedStableAmount)
+          })
+
+          it('should not update the buckets', async () => {
+            await exchange.exchange(
+              goldTokenAmount,
+              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+              true,
+              {
+                from: user,
+              }
+            )
+            const newGoldBucket = await exchange.goldBucket()
+            const newStableBucket = await exchange.stableBucket()
+
+            // The new value should be the initialGoldBucket value plus the goldTokenAmount.
+            assertEqualBN(newGoldBucket, initialGoldBucket.plus(goldTokenAmount))
+
+            // The new value should be the initialStableBucket minus the amount purchased during the exchange
+            assertEqualBN(newStableBucket, initialStableBucket.minus(expectedStableAmount))
+          })
         })
       })
     })
