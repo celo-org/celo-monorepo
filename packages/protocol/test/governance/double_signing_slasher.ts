@@ -168,19 +168,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          await slasher.slash(
-            validator,
-            validatorIndex,
-            headerA,
-            headerC,
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          )
+          slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
         )
       })
     })
