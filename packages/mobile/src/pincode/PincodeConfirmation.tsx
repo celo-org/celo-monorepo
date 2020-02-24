@@ -6,25 +6,77 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  BackHandler,
+  NativeEventSubscription,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
+import { connect } from 'react-redux'
+import { showError } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import { UNLOCK_DURATION } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigateBack } from 'src/navigator/NavigationService'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
+import { RootState } from 'src/redux/reducers'
+import { web3 } from 'src/web3/contracts'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface State {
   pin: string
 }
 
-type Props = WithTranslation & NavigationInjectedProps
+interface StateProps {
+  currentAccount: string | null
+}
+
+interface DispatchProps {
+  showError: typeof showError
+}
+
+interface NavProps {
+  onValidPin: (pin: string) => void
+  hideBackButton: null | boolean
+}
+
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 class PincodeConfirmation extends React.Component<Props, State> {
-  static navigationOptions = nuxNavigationOptions
+  static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
+    let options
+    if (navigation.getParam('hideBackButton')) {
+      options = {
+        headerLeft: null,
+      }
+    } else {
+      options = nuxNavigationOptions
+    }
+    return { gesturesEnabled: false, ...options }
+  }
+  backHandler: null | NativeEventSubscription = null
 
   state = {
     pin: '',
+  }
+
+  componentDidMount() {
+    if (this.props.navigation.getParam('hideBackButton')) {
+      this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        BackHandler.exitApp()
+        return true
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.backHandler) {
+      this.backHandler.remove()
+    }
   }
 
   onChangePin = (pin: string) => {
@@ -49,17 +101,26 @@ class PincodeConfirmation extends React.Component<Props, State> {
     })
   }
 
-  onPressCancel = () => {
-    const reject = this.props.navigation.getParam('reject')
-    reject()
-    navigateBack()
+  onCorrectPin = (pin: string) => {
+    const onValidPin = this.props.navigation.getParam('onValidPin')
+    if (onValidPin) {
+      onValidPin(pin)
+    }
+  }
+
+  onWrongPin = () => {
+    this.props.showError(ErrorMessages.INCORRECT_PIN)
+    this.setState({ pin: '' })
   }
 
   onPressConfirm = () => {
     const { pin } = this.state
-    const resolver = this.props.navigation.getParam('resolve')
-    resolver(pin)
-    navigateBack()
+    if (this.props.currentAccount) {
+      web3.eth.personal
+        .unlockAccount(this.props.currentAccount, pin, UNLOCK_DURATION)
+        .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
+        .catch(this.onWrongPin)
+    }
   }
 
   render() {
@@ -122,4 +183,10 @@ const style = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.nuxNamePin1)(PincodeConfirmation)
+const mapStateToProps = (state: RootState): StateProps => ({
+  currentAccount: currentAccountSelector(state),
+})
+
+export default connect(mapStateToProps, { showError })(
+  withTranslation(Namespaces.nuxNamePin1)(PincodeConfirmation)
+)

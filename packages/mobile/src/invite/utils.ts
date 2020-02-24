@@ -53,6 +53,12 @@ interface ReferrerDataError {
   message: string
 }
 
+export function decodeInvite(encodedInvite: string) {
+  const params = new URLSearchParamsReal(decodeURIComponent(encodedInvite))
+  const code: string = params.get('invite-code')
+  return { code }
+}
+
 export const getValidInviteCodeFromReferrerData = async () => {
   if (Platform.OS === 'android') {
     const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
@@ -61,12 +67,9 @@ export const getValidInviteCodeFromReferrerData = async () => {
       'Referrer Data: ' + JSON.stringify(referrerData)
     )
     if (referrerData && referrerData.hasOwnProperty('installReferrer')) {
-      const params = new URLSearchParamsReal(
-        decodeURIComponent((referrerData as ReferrerData).installReferrer)
-      )
-      const inviteCode = params.get('invite-code')
-      if (inviteCode) {
-        const sanitizedCode = inviteCode.replace(' ', '+')
+      const { code } = decodeInvite((referrerData as ReferrerData).installReferrer)
+      if (code) {
+        const sanitizedCode = code.replace(' ', '+')
         // Accept invite codes which are either base64 encoded or direct hex keys
         if (isValidPrivateKey(sanitizedCode)) {
           return sanitizedCode
