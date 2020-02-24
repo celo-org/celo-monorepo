@@ -10,6 +10,7 @@ import "./LinkedList.sol";
  */
 library AddressLinkedList {
   using LinkedList for LinkedList.List;
+  using SafeMath for uint256;
 
   function toBytes(address a) public pure returns (bytes32) {
     return bytes32(uint256(a) << 96);
@@ -77,7 +78,7 @@ library AddressLinkedList {
   function headN(LinkedList.List storage list, uint256 n) public view returns (address[] memory) {
     bytes32[] memory byteKeys = list.headN(n);
     address[] memory keys = new address[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       keys[i] = toAddress(byteKeys[i]);
     }
     return keys;
