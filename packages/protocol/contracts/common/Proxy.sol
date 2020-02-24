@@ -35,6 +35,7 @@ contract Proxy {
 
     address implementationAddress;
 
+    // Load the address of the implementation contract from an explicit storage slot.
     assembly {
       implementationAddress := sload(implementationPosition)
     }
@@ -45,11 +46,13 @@ contract Proxy {
     require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
+      // Extract the position of the transaction data (i.e. function ID and arguments).
       let newCallDataPosition := mload(0x40)
       mstore(0x40, add(newCallDataPosition, calldatasize))
-
       calldatacopy(newCallDataPosition, 0, calldatasize)
 
+      // Call the smart contract at `implementationAddress` in the context of the proxy contract,
+      // with the same msg.sender and value.
       let delegatecallSuccess := delegatecall(
         gas,
         implementationAddress,
@@ -59,11 +62,13 @@ contract Proxy {
         0
       )
 
+      // Copy the return value of the call so it can be returned.
       let returnDataSize := returndatasize
       let returnDataPosition := mload(0x40)
       mstore(0x40, add(returnDataPosition, returnDataSize))
       returndatacopy(returnDataPosition, 0, returnDataSize)
 
+      // Revert or return depending on whether or not the call was successful.
       switch delegatecallSuccess
         case 0 {
           revert(returnDataPosition, returnDataSize)
@@ -108,6 +113,7 @@ contract Proxy {
    */
   function _getImplementation() external view returns (address implementation) {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
+    // Load the address of the implementation contract from an explicit storage slot.
     assembly {
       implementation := sload(implementationPosition)
     }
@@ -124,6 +130,7 @@ contract Proxy {
 
     require(AddressesHelper.isContract(implementation), "Invalid contract address");
 
+    // Store the address of the implementation contract in an explicit storage slot.
     assembly {
       sstore(implementationPosition, implementation)
     }
@@ -136,6 +143,7 @@ contract Proxy {
    */
   function _getOwner() public view returns (address owner) {
     bytes32 position = OWNER_POSITION;
+    // Load the address of the contract owner from an explicit storage slot.
     assembly {
       owner := sload(position)
     }
@@ -144,6 +152,7 @@ contract Proxy {
   function _setOwner(address newOwner) private {
     require(newOwner != address(0), "owner cannot be 0");
     bytes32 position = OWNER_POSITION;
+    // Store the address of the contract owner in an explicit storage slot.
     assembly {
       sstore(position, newOwner)
     }
