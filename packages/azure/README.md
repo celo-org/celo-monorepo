@@ -113,9 +113,9 @@ az network nic ip-config update \
 
 ## Future work
 
-1.  Use UniqueString for naming issues with Key Value and PostgreSQL.
-1.  Move validator, proxy, and attester to self-contained templates.
-1.  Instructions for "Running a Validator on Azure".
-1.  Tune the default values for resources sizes (*e.g.*, VM, disk, etc).
+1.  Use UniqueString for naming issues with Key Value and PostgreSQL. <https://github.com/celo-org/celo-monorepo/issues/2920>
+1.  Move validator, proxy, and attester to self-contained templates. <https://github.com/celo-org/celo-monorepo/issues/2921>
+1.  Instructions for "Running a Validator on Azure". <https://github.com/celo-org/celo-monorepo/issues/2922>
+1.  Tune the default values for resources sizes (*e.g.*, VM, disk, etc). <https://github.com/celo-org/celo-monorepo/issues/2923>
 1.  Convert to an [Azure Managed
     Application](https://docs.microsoft.com/en-us/azure/azure-resource-manager/managed-applications/overview).
