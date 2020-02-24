@@ -107,8 +107,7 @@ const logos: Logo[] = [
   {
     source: coindesk,
     size: {},
-    url:
-      'https://www.coindesk.com/a16z-polychain-invest-25-million-into-crypto-payments-startup-celo',
+    url: 'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project',
   },
   {
     source: techcrunch,
