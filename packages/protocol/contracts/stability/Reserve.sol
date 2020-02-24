@@ -43,12 +43,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
-  event TokenAdded(address token);
-  event TokenRemoved(address token, uint256 index);
-  event SpenderAdded(address spender);
-  event SpenderRemoved(address spender);
-  event OtherReserveAddressAdded(address otherReserveAddress);
-  event OtherReserveAddressRemoved(address otherReserveAddress, uint256 index);
+  event TokenAdded(address indexed token);
+  event TokenRemoved(address indexed token, uint256 index);
+  event SpenderAdded(address indexed spender);
+  event SpenderRemoved(address indexed spender);
+  event OtherReserveAddressAdded(address indexed otherReserveAddress);
+  event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
 
   modifier isStableToken(address token) {
