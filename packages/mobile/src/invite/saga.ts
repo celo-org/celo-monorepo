@@ -85,20 +85,18 @@ export function getInvitationVerificationFeeInWei() {
 export async function generateInviteLink(inviteCode: string) {
   let bundleId = DeviceInfo.getBundleId()
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
-  const encodedInvite = encodeURIComponent(`invite-code=${inviteCode}`)
 
-  // Android part
-  const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName: bundleId })
-  const playStoreUrl = `${playStoreLink}&referrer=${encodedInvite}`
-
-  // iOS part
-  const appStoreId = await getAppStoreId(bundleId)
-  const appStoreUrl = await VersionCheck.getAppStoreUrl({ appID: appStoreId })
+  // trying to fetch appStoreId needed to build a dynamic link
+  let appStoreId
+  try {
+    appStoreId = await getAppStoreId(bundleId)
+  } catch (error) {
+    Logger.error(TAG, 'Failed to load AppStore ID: ' + error.toString())
+  }
 
   const shortUrl = await generateShortInviteLink({
-    link: `https://celo.org/build/wallet`,
-    playStoreUrl,
-    appStoreUrl,
+    link: `https://celo.org/build/wallet?invite-code=${inviteCode}`,
+    appStoreId,
     bundleId,
   })
 
@@ -142,11 +140,14 @@ export function* sendInvite(
 ) {
   yield call(getConnectedUnlockedAccount)
   try {
-    const temporaryWalletAccount = web3.eth.accounts.create()
-    const temporaryAddress = temporaryWalletAccount.address
-    const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
+    // const temporaryWalletAccount = web3.eth.accounts.create()
+    // const temporaryAddress = temporaryWalletAccount.address
+    // const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
+    const inviteCode = '0kMUJPMWvLoYXvtC12QMvuyqadX9y1fwFccmj9Vuz+0%3D'
 
     const link = yield call(generateInviteLink, inviteCode)
+    console.log(link)
+    return
     const msg = i18n.t(amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS', {
       code: inviteCode,
       link,

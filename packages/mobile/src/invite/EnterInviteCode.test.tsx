@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Clipboard } from 'react-native'
-import RNInstallReferrer from 'react-native-install-referrer'
 import SendIntentAndroid from 'react-native-send-intent'
 import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
@@ -39,7 +38,6 @@ const INVALID_REFERRER_INVITE = {
 SendIntentAndroid.openSMSApp = jest.fn()
 
 const clipboardGetStringMock = (Clipboard.getString = jest.fn())
-const getReferrerMock = RNInstallReferrer.getReferrer as jest.Mock
 
 describe('EnterInviteCode Screen', () => {
   beforeAll(() => {

@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://l.celo.org</string>
+		<string>https://celol.page.link</string>
+	</array>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -25,6 +32,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>celo</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>celo</string>
@@ -50,10 +59,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Celo Wallet needs camera access to scan QR codes.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Celo Wallet needs access to save your QR code to your photos.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Celo Wallet can import your contacts so you can transact with them.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Celo Wallet needs access to save your QR code to your photos.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>

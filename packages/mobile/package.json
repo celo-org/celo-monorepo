@@ -91,7 +91,6 @@
     "react-native-fs": "^2.14.1",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-geth": "https://github.com/celo-org/react-native-geth#6f993d9",
-    "react-native-install-referrer": "git://github.com/celo-org/react-native-install-referrer#343bf3d",
     "react-native-keep-awake": "^4.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-localize": "^1.3.0",

@@ -67,19 +67,19 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    await this.checkIfValidCodeInClipboard()
-    await this.checkForReferrerCode()
+    await this.checkInviteCode()
   }
 
-  checkForReferrerCode = async () => {
+  checkInviteCode = async () => {
+    // Check deeplink
     const validCode = await getValidInviteCodeFromReferrerData()
+    console.log('validCode', validCode)
     if (validCode) {
       this.setState({ inputValue: validCode })
       this.props.redeemInvite(validCode)
+      return
     }
-  }
-
-  checkIfValidCodeInClipboard = async () => {
+    // Check clipboard
     const message = await Clipboard.getString()
     if (extractValidInviteCode(message)) {
       this.onInputChange(message)

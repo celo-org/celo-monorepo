@@ -29868,10 +29868,6 @@ react-native-gesture-handler@^1.5.2:
   version "0.1.0-development"
   resolved "https://github.com/celo-org/react-native-geth#6f993d958645cbe85db4d070d31947f52e6d5f89"
 
-"react-native-install-referrer@git://github.com/celo-org/react-native-install-referrer#343bf3d":
-  version "2.0.0"
-  resolved "git://github.com/celo-org/react-native-install-referrer#343bf3d1c3af6f72b8e16622826c2f8092ef45eb"
-
 react-native-iphone-x-helper@^1.0.3:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.2.1.tgz#645e2ffbbb49e80844bb4cbbe34a126fda1e6772"
