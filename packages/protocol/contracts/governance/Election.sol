@@ -929,8 +929,8 @@ contract Election is
   function getCurrentValidatorSigners() public view returns (address[] memory) {
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
-    for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorSignerAddressFromCurrentSet(idx);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      res[i] = validatorSignerAddressFromCurrentSet(i);
     }
     return res;
   }
