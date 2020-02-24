@@ -300,6 +300,7 @@ contract MultiSig is Initializable {
       if ((isInternal && count == internalRequired) || (!isInternal && count == required))
         return true;
     }
+    return false;
   }
 
   /*
