@@ -51,14 +51,16 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   function initialize(uint256 _reportExpirySeconds) external initializer {
     _transferOwnership(msg.sender);
-    reportExpirySeconds = _reportExpirySeconds;
+    setReportExpiry(_reportExpirySeconds);
   }
 
   /**
    * @notice Sets the report expiry parameter.
    * @param _reportExpirySeconds Desired value of report expiry.
    */
-  function setReportExpiry(uint256 _reportExpirySeconds) external onlyOwner {
+  function setReportExpiry(uint256 _reportExpirySeconds) public onlyOwner {
+    require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
+    require(_reportExpirySeconds != reportExpirySeconds, "reportExpirySeconds hasn't changed");
     reportExpirySeconds = _reportExpirySeconds;
     emit ReportExpirySet(_reportExpirySeconds);
   }
