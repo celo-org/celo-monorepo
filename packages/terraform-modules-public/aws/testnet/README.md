@@ -19,13 +19,9 @@ Inside the [testnet](./testnet) folder you will find a module (and submodules) t
 
 All nodes run on the Ubuntu LTS 18.04 AMI. Running `terraform apply` will select the latest available AMI.
 
-## CloudWatch
-
-All of the Celo nodes support logging to AWS CloudWatch by setting the CloudWatch variables in the modules. If these variables are not set, 
-
 ## Hardening & Security
 
-Celo nodes also support hardening scripts that will apply recommended security settings from Celo's Security Audit team. These are turned on by default, but you can turn these off by setting the `apply_hardening` variable to false.
+Celo nodes will get provisioned with some recommended security settings from Celo's Security Audit team. Most of this hardening is done in `install-base.sh` and `final-hardening.sh`. 
 
 ## Requirements
 
