@@ -16,3 +16,8 @@ variable cidr_blocks {
       allowed_ssh_clients = "0.0.0.0/0"
     }
 }
+
+variable key_pair_name {
+    type            = string
+    description     = "SSH key pair name"
+}

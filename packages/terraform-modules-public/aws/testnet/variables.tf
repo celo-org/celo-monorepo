@@ -15,3 +15,17 @@ variable cidr_blocks {
       allowed_ssh_clients = "0.0.0.0/0"
     }
 }
+
+variable instance_types {
+  description = "The instance type for each component"
+  type        = map(string)
+
+  default = {
+    bastion             = "t3.micro"
+  }
+}
+
+variable key_pair_name {
+  type        = string
+  description = "AWS Key Pair name for SSH access"
+}
