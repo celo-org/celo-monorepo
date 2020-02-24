@@ -13,6 +13,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -30,6 +31,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(SortedLinkedList.List storage list, uint256 key) public {
@@ -38,6 +40,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -56,6 +59,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Inserts an element at the end of the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
   function push(SortedLinkedList.List storage list, uint256 key) public {
@@ -64,6 +68,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Removes N elements from the head of the list and returns their keys.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to pop.
    * @return The keys of the popped elements.
    */
@@ -78,6 +83,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -87,6 +93,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
@@ -96,6 +103,7 @@ library IntegerSortedLinkedList {
 
   /**
    * @notice Gets all elements from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return An unpacked list of elements from largest to smallest.
    */
   function getElements(SortedLinkedList.List storage list)
