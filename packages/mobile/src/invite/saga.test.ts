@@ -123,10 +123,6 @@ describe(watchRedeemInvite, () => {
   })
 
   it('works with a valid private key and enough money on it', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
@@ -140,10 +136,6 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but unsuccessful transfer', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-      .mockReturnValueOnce(new BigNumber(0)) // new account
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
@@ -158,16 +150,16 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but no money on key', async () => {
-    const stableToken = await contractKit.contracts.getStableToken()
-    const ret = new Promise<BigNumber>((resolve) => {
-      console.log('hiii')
-      resolve(new BigNumber(0))
-    })
-    const mock = jest.fn()
-    stableToken.balanceOf = mock
-    mock
-      .mockReturnValueOnce(ret) // temp account
-      .mockReturnValueOnce(ret) // current account
+    // @ts-ignore
+    contractKit.contracts.getStableToken.mockImplementation(async () => ({
+      balanceOf: async () => {
+        return new BigNumber(0)
+      },
+      decimals: async () => '10',
+      transferWithComment: async () => ({
+        txo: {},
+      }),
+    }))
 
     await expectSaga(watchRedeemInvite)
       .provide([
@@ -182,7 +174,16 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with error creating account', async () => {
-    mockContractKitBalance.mockReturnValueOnce(new BigNumber(10)) // temp account
+    // @ts-ignore
+    contractKit.contracts.getStableToken.mockImplementation(async () => ({
+      balanceOf: async () => {
+        return new BigNumber(10)
+      },
+      decimals: async () => '10',
+      transferWithComment: async () => ({
+        txo: {},
+      }),
+    }))
 
     await expectSaga(watchRedeemInvite)
       .provide([

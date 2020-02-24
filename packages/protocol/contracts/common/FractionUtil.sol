@@ -64,7 +64,7 @@ library FractionUtil {
    * @return x - y
    */
   function sub(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
-    require(isGreaterThanOrEqualTo(x, y));
+    require(isGreaterThanOrEqualTo(x, y), "x must be >= y");
     return
       Fraction(
         x.numerator.mul(y.denominator).sub(y.numerator.mul(x.denominator)),
@@ -99,7 +99,7 @@ library FractionUtil {
    * @return 1 / x
    */
   function inverse(Fraction memory x) internal pure returns (Fraction memory) {
-    require(x.numerator != 0);
+    require(x.numerator != 0, "numerator can't be 0");
     return Fraction(x.denominator, x.numerator);
   }
 
@@ -110,7 +110,7 @@ library FractionUtil {
    * @return x / y
    */
   function div(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
-    require(y.numerator != 0);
+    require(y.numerator != 0, "y numerator can't be 0");
     return Fraction(x.numerator.mul(y.denominator), x.denominator.mul(y.numerator));
   }
 

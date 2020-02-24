@@ -1,3 +1,5 @@
+import DevelopersPage from 'pages/developers'
+
 export const menuItems = {
   HOME: {
     name: 'Home',
@@ -12,16 +14,28 @@ export const menuItems = {
     link: '/about',
   },
   BUILD: {
-    name: 'Build',
-    link: '/build',
+    name: 'Validators',
+    link: '/validators',
+  },
+  VALIDATORS_LIST: {
+    name: 'Validators List',
+    link: '/validators/explore',
   },
   BRAND: {
     name: 'Experience - Brand Kit',
     link: '/experience/brand',
   },
   COMMUNITY: {
-    name: 'Connect',
+    name: 'Community',
     link: '/community',
+  },
+  DEVELOPERS: {
+    name: 'Developers',
+    link: '/developers',
+  },
+  SDK_DEVELOPERS: {
+    name: DevelopersPage,
+    link: '/developers',
   },
   JOBS: {
     name: 'Join',
@@ -35,6 +49,7 @@ export const menuItems = {
     name: 'Privacy Policy',
     link: '/privacy',
   },
+
   TECH: {
     name: 'Technology',
     link: '/technology',
@@ -53,22 +68,25 @@ export const menuItems = {
   },
 }
 
+// TODO: Temporary link to the master branch documentation for 'sdkDocs' and 'sdkTutorial'
 export enum CeloLinks {
   agreement = '/user-agreement',
   faq = '/faq',
-  faucet = '/build/faucet',
+  faucet = '/developers/faucet',
   iconsLicense = 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',
   discord = 'https://discord.gg/6yWMkgM',
   discourse = 'https://forum.celo.org/',
-  walletApp = '/build/wallet',
+  walletApp = '/developers/wallet',
   blockscout = 'http://alfajores-blockscout.celo-testnet.org/',
   disclaimer = 'https://docs.celo.org/important-information/alfajores-testnet-disclaimer',
   docs = 'https://docs.celo.org/',
   docsOverview = 'https://docs.celo.org/overview',
-  sdkDocs = 'https://docs.celo.org/celo-sdk/introduction',
+  sdkDocs = 'https://docs.celo.org/v/master/developer-guide/overview/introduction',
+  sdkTutorial = 'https://docs.celo.org/v/master/developer-guide/start',
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
+  fundingRequest = 'https://c-labs.typeform.com/to/gj9aUp',
   linkedIn = 'https://www.linkedin.com/company/celohq/',
   monorepo = 'https://github.com/celo-org/celo-monorepo',
   blockChainRepo = 'https://github.com/celo-org/celo-blockchain',
