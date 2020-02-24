@@ -139,3 +139,77 @@ variable validators {
   #
   # }
 }
+
+
+variable celo_image_attestation {
+  type        = string
+  description = "Docker image for Celo attestation service"
+  default     = "us.gcr.io/celo-testnet/celo-monorepo:attestation-service-baklava"
+}
+
+variable twilio_messaging_service_sid {
+  type            = string
+}
+
+variable twilio_account_sid {
+  type            = string
+}
+
+variable twilio_blacklist {
+  type            = string
+}
+
+variable twilio_auth_token {
+  type            = string
+}
+
+variable attestation_services {
+  description     = "Configuration for zero or more attestation nodes in each availability zone"
+  type            = object({
+    az1 = map(object({
+      validator_name                            = string
+      validator_address                         = string
+      attestation_signer_address                = string
+      attestation_signer_private_key            = string
+      attestation_signer_private_key_password   = string
+      attestation_signer_private_key_filename   = string
+    }))
+    az2 = map(object({
+      validator_name                            = string
+      validator_address                         = string
+      attestation_signer_address                = string
+      attestation_signer_private_key            = string
+      attestation_signer_private_key_password   = string
+      attestation_signer_private_key_filename   = string
+    }))
+  })
+  default = {
+    az1 = {}
+    az2 = {}
+  }
+  # Here is an example configuration. We recommend putting this into a secret.auto.tfvars file.
+  # default = {
+  #   az1 = {
+  #     myvalidator_az1_01 = {
+  #       validator_name                            = "myvalidator_az1_01"
+  #       validator_address                         = "1234567812345678123456781234567812345678"
+  #       attestation_signer_address                = "2323232345454545676767678989898910101010"
+  #       attestation_signer_private_key            = "...Place the keystore file contents here Make sure to escape the double quotes. ..."
+  #       attestation_signer_private_key_password   = "mypassword"
+  #       attestation_signer_private_key_filename   = "UTC--2020-02-06T06-49-54.736290200Z--2323232345454545676767678989898910101010"
+  #     }
+  #     myvalidator_az1_02 = {
+  #       ...
+  #     }
+  #   }
+  #   az2 = {
+  #     myvalidator_az2_01 = {
+  #       ...
+  #     }
+  #     myvalidator_az2_02 = {
+  #       ...
+  #     }
+  #   }
+  #
+  # }
+}

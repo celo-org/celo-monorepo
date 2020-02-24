@@ -30,6 +30,8 @@ variable instance_types {
   default = {
     bastion             = "t3.micro"
     proxy               = "c5.xlarge"
+    validator           = "c5.xlarge"
+    attestation_service = "t3.large"
   }
 }
 
@@ -46,6 +48,27 @@ variable celo_image {
 variable celo_network_id {
   type        = string
   description = "ID of the Celo network to join"
+}
+
+variable celo_image_attestation {
+  type        = string
+  description = "Docker image for Celo attestation service"
+}
+
+variable twilio_messaging_service_sid {
+  type            = string
+}
+
+variable twilio_account_sid {
+  type            = string
+}
+
+variable twilio_blacklist {
+  type            = string
+}
+
+variable twilio_auth_token {
+  type            = string
 }
 
 variable proxies {
@@ -84,6 +107,28 @@ variable validators {
         proxy_enode                   = string
         proxy_private_ip              = string
         proxy_public_ip               = string
+      }))
+    })
+}
+
+variable attestation_services {
+    description     = "Configuration for zero or more attestation nodes in each availability zone"
+    type            = object({
+      az1 = map(object({
+        validator_name                            = string
+        validator_address                         = string
+        attestation_signer_address                = string
+        attestation_signer_private_key            = string
+        attestation_signer_private_key_password   = string
+        attestation_signer_private_key_filename   = string
+      }))
+      az2 = map(object({
+        validator_name                            = string
+        validator_address                         = string
+        attestation_signer_address                = string
+        attestation_signer_private_key            = string
+        attestation_signer_private_key_password   = string
+        attestation_signer_private_key_filename   = string
       }))
     })
 }
