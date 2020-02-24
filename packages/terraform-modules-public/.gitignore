@@ -1,2 +1,3 @@
 plan/
-terraform.tfstate*
+*.tfstate*
+*secret*.tfvars
