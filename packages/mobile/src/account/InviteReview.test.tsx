@@ -56,6 +56,6 @@ describe('InviteReview', () => {
 
     fireEvent.press(inviteReview.getByTestId('inviteWhatsApp'))
     expect(hideAlert).toHaveBeenCalled()
-    expect(sendInvite).toHaveBeenCalledWith('John Doe', '+14155550000', 'WhatsApp')
+    expect(sendInvite).toHaveBeenCalledWith('+14155550000', 'WhatsApp')
   })
 })

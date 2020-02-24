@@ -1,6 +1,7 @@
 package org.celo.mobile;
 
 import android.os.Bundle;
+import android.view.WindowManager;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactFragmentActivity;
 import com.facebook.react.ReactInstanceManager;
@@ -36,12 +37,15 @@ public class MainActivity
   public void onResume() {
     super.onResume();
     getReactInstanceManager().addReactInstanceEventListener(this);
+    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
   }
 
   @Override
   public void onPause() {
     super.onPause();
     getReactInstanceManager().removeReactInstanceEventListener(this);
+    getWindow()
+      .setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
   }
 
   @Override
