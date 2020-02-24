@@ -1,1 +1,2 @@
 plan/
+terraform.tfstate*
