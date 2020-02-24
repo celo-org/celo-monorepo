@@ -20,7 +20,7 @@ import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { gethStartedThisSessionSelector } from 'src/geth/selectors'
-import { navigate, navigateToError } from 'src/navigator/NavigationService'
+import { navigate, navigateBack, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { restartApp } from 'src/utils/AppRestart'
@@ -343,6 +343,7 @@ export function* unlockAccount(account: string) {
     }
 
     const pincode = yield call(getPincode)
+    navigateBack()
     const fornoMode = yield select(fornoSelector)
     if (fornoMode) {
       if (accountAlreadyAddedInFornoMode) {
