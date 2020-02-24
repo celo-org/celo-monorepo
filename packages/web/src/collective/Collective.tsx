@@ -7,7 +7,7 @@ import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import menuItems from 'src/shared/menu-items'
-import { textStyles, standardStyles } from 'src/styles'
+import { colors, standardStyles } from 'src/styles'
 
 export default function Collective() {
   const { t } = useTranslation(NameSpaces.collective)
@@ -21,7 +21,57 @@ export default function Collective() {
       <View style={standardStyles.darkBackground}>
         <View style={styles.sweepContainer}>
           <Sweep>
-            <H4 style={textStyles.invert}>{t('thematicStatement')}</H4>
+            <View
+              style={{
+                // @ts-ignore
+
+                animationDuration: '4000ms',
+                animationIterationCount: 1,
+                animationFillMode: 'forwards',
+                animationTimingFunction: 'cubic-bezier(1,.06,1,.35)',
+                animationKeyframes: [
+                  {
+                    '0%': {
+                      opacity: 0.1,
+                      background: `linear-gradient(90deg, rgba(12,218,110,1) 21%, rgba(255,101,83,1) 40%, rgba(159,105,255,1) 60%, rgba(82,182,255,1) 80%)`,
+                    },
+                    '15%': {
+                      background: `linear-gradient(90deg, rgba(82,182,255,1) 18%, rgba(12,218,110,1) 39%, rgba(255,101,83,1) 63%, rgba(159,105,255,1) 80%)`,
+                    },
+                    '30%': {
+                      background: `linear-gradient(90deg, rgba(159,105,255,1) 22%, rgba(82,182,255,1) 38%, rgba(12,218,110,1) 62%, rgba(255,101,83,1) 81%)`,
+                    },
+                    '45%': {
+                      background: `linear-gradient(90deg, rgba(255,101,83,1) 20%, rgba(159,105,255,1) 40%, rgba(82,182,255,1) 62%, rgba(12,218,110,1) 84%)`,
+                    },
+                    '60%': {
+                      background: `linear-gradient(90deg, rgba(12,218,110,1) 21%, rgba(255,101,83,1) 40%, rgba(159,105,255,1) 60%, rgba(82,182,255,1) 80%)`,
+                    },
+                    '75%': {
+                      background: `linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(12,218,110,1) 23%, rgba(255,101,83,1) 44%, rgba(159,105,255,1) 68%, rgba(82,182,255,1) 90%)`,
+                    },
+                    '80%': {
+                      background: `linear-gradient(90deg, rgba(255,255,255,1) 22%, rgba(12,218,110,1) 43%, rgba(255,101,83,1) 66%, rgba(159,105,255,1) 88%, rgba(82,182,255,1) 100%)`,
+                    },
+                    '85%': {
+                      background: `linear-gradient(90deg, rgba(255,255,255,1) 42%, rgba(12,218,110,1) 65%, rgba(255,101,83,1) 87%, rgba(159,105,255,1) 100%, rgba(82,182,255,1) 100%)`,
+                    },
+                    '90%': {
+                      background: `linear-gradient(90deg, rgba(255,255,255,1) 64%, rgba(12,218,110,1) 81%, rgba(255,101,83,1) 98%, rgba(159,105,255,1) 100%, rgba(82,182,255,1) 100%)`,
+                    },
+                    '95%': {
+                      background: `linear-gradient(90deg, rgba(255,255,255,1) 86%, rgba(12,218,110,1) 97%, rgba(255,101,83,1) 98%, rgba(159,105,255,1) 100%, rgba(82,182,255,1) 100%)`,
+                    },
+                    '100%': {
+                      opacity: 1,
+                      backgroundColor: colors.white,
+                    },
+                  },
+                ],
+              }}
+            >
+              <H4 style={[styles.sparkle, { mixBlendMode: 'darken' }]}>{t('thematicStatement')}</H4>
+            </View>
           </Sweep>
         </View>
         <CollectiveMission />
@@ -34,5 +84,9 @@ export default function Collective() {
 const styles = StyleSheet.create({
   sweepContainer: {
     transform: [{ translateY: -200 }],
+  },
+  sparkle: {
+    color: colors.white,
+    backgroundColor: colors.dark,
   },
 })
