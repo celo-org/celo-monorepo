@@ -149,7 +149,7 @@ library LinkedList {
     require(n <= list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     bytes32 key = list.head;
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       keys[i] = key;
       key = list.elements[key].previousKey;
     }

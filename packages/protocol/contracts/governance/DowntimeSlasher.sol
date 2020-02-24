@@ -64,7 +64,7 @@ contract DowntimeSlasher is SlasherUtil {
     returns (bool)
   {
     uint256 endBlock = getEndBlock(startBlock);
-    require(endBlock < block.number - 1, "end block must be smaller than current block");
+    require(endBlock < block.number.sub(1), "end block must be smaller than current block");
     require(
       startSignerIndex < numberValidatorsInSet(startBlock),
       "Bad validator index at start block"
@@ -79,13 +79,13 @@ contract DowntimeSlasher is SlasherUtil {
     );
     uint256 sz = getEpochSize();
     uint256 startEpoch = epochNumberOfBlock(startBlock, sz);
-    for (uint256 n = startBlock; n <= endBlock; n++) {
+    for (uint256 n = startBlock; n <= endBlock; n = n.add(1)) {
       uint256 signerIndex = epochNumberOfBlock(n, sz) == startEpoch
         ? startSignerIndex
         : endSignerIndex;
       // We want to check signers for block n,
       // so we get the parent seal bitmap for the next block
-      if (uint256(getParentSealBitmap(n + 1)) & (1 << signerIndex) != 0) return false;
+      if (uint256(getParentSealBitmap(n.add(1))) & (1 << signerIndex) != 0) return false;
     }
     return true;
   }
@@ -94,7 +94,7 @@ contract DowntimeSlasher is SlasherUtil {
    * @notice Returns the end block for the interval.
    */
   function getEndBlock(uint256 startBlock) internal view returns (uint256) {
-    return startBlock + slashableDowntime - 1;
+    return startBlock.add(slashableDowntime).sub(1);
   }
 
   function checkIfAlreadySlashed(address validator, uint256 startBlock) internal {

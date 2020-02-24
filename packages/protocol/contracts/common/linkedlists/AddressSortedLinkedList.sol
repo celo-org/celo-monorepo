@@ -2,13 +2,14 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./AddressLinkedList.sol";
+
 import "./SortedLinkedList.sol";
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
  */
 library AddressSortedLinkedList {
+  using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
 
   function toBytes(address a) public pure returns (bytes32) {
@@ -97,7 +98,7 @@ library AddressSortedLinkedList {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
-    for (uint256 i = 0; i < byteKeys.length; i++) {
+    for (uint256 i = 0; i < byteKeys.length; i = i.add(1)) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.values[byteKeys[i]];
     }
@@ -118,7 +119,7 @@ library AddressSortedLinkedList {
   ) public view returns (uint256) {
     uint256 revisedMax = Math.min(max, list.list.numElements);
     bytes32 key = list.list.head;
-    for (uint256 i = 0; i < revisedMax; i++) {
+    for (uint256 i = 0; i < revisedMax; i = i.add(1)) {
       if (list.getValue(key) < threshold) {
         return i;
       }
@@ -140,7 +141,7 @@ library AddressSortedLinkedList {
   {
     bytes32[] memory byteKeys = list.headN(n);
     address[] memory keys = new address[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       keys[i] = toAddress(byteKeys[i]);
     }
     return keys;
