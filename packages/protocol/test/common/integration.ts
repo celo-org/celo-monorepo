@@ -155,7 +155,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
-      let txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
       await multiSig.submitTransaction(governance.address, 0, txData, {
         from: accounts[0],
       })
@@ -292,7 +292,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
       // @ts-ignore
-      let txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
       await multiSig.submitTransaction(governance.address, 0, txData, {
         from: accounts[0],
       })

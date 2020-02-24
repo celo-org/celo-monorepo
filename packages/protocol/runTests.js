@@ -18,9 +18,11 @@ const migrationOverrides = {
   },
   governanceApproverMultiSig: {
     signatories: [network.from],
+    numRequiredConfirmations: 1,
   },
   reserveSpenderMultiSig: {
     signatories: [network.from],
+    numRequiredConfirmations: 1,
   },
 }
 
