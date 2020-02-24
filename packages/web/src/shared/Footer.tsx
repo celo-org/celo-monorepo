@@ -227,9 +227,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-around',
   },
-  verticalMenuItem: {
-    // marginVertical: 30,
-  },
+  verticalMenuItem: {},
   currentMenuItem: {
     marginVertical: 30,
   },
