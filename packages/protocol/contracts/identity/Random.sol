@@ -100,15 +100,15 @@ contract Random is IRandom, Ownable, Initializable {
       historySize = 1;
     } else if (historySize > randomnessBlockRetentionWindow) {
       delete history[historyFirst];
-      delete history[historyFirst + 1];
-      historyFirst += 2;
-      historySize--;
+      delete history[historyFirst.add(1)];
+      historyFirst = historyFirst.add(2);
+      historySize = historySize.sub(1);
     } else if (historySize == randomnessBlockRetentionWindow) {
       delete history[historyFirst];
-      historyFirst++;
+      historyFirst = historyFirst.add(1);
     } else {
       // historySize < randomnessBlockRetentionWindow
-      historySize++;
+      historySize = historySize.add(1);
     }
   }
 
