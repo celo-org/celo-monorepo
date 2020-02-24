@@ -19,7 +19,7 @@ The change procedure happens in the following phases:
 
 ## Proposal
 
-Any user may submit a “Proposal” to the `Governance` smart contract, along with a commitment of Locked Celo Gold. This commitment is required to avoid spam proposals. A “Proposal” consists of a timestamp and the information needed to the “call” the operation code that will run if the proposal is accepted. This information includes an address, data, and value. Submitted proposals are added to the queue of proposals and expire from this list after one week.
+Any user may submit a “Proposal” to the `Governance` smart contract, along with a small deposit of Celo Gold. This deposit is required to avoid spam proposals, and is refunded to the proposer if the community decides the proposal is worthy of voting on. A “Proposal” consists of a timestamp and the information needed to the “call” the operation code that will run if the proposal is accepted. This information includes an address, data, and value. Submitted proposals are added to the queue of proposals and expire from this list after one week.
 
 Once added to the queue, a proposal needs to get voted on by Celo Gold holders to pass to the next “Approval” phase. Every Celo Gold holder with a Locked Gold account may vote for at most one proposal and in order to be eligible to do so, the account must put up a commitment, which involves sending Celo Gold to a smart contract and specifying a notice period to wait once the withdrawal is requested. This Locked Gold commitment can be the same as the funds used for validator elections and earning epoch rewards. The list of proposals is sorted by the weight of the votes they have received.
 
