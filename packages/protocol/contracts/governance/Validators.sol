@@ -137,7 +137,11 @@ contract Validators is
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
-  event ValidatorGroupCommissionUpdateQueued(address indexed group, uint256 commission, uint activationBlock);
+  event ValidatorGroupCommissionUpdateQueued(
+    address indexed group,
+    uint256 commission,
+    uint256 activationBlock
+  );
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
