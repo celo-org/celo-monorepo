@@ -8,12 +8,11 @@ Infrastructure and all kind of cloud resources are defined in modules, and Terra
 
 Inside the [testnet](./testnet) folder you will find a module (and submodules) to create the setup for running a Celo Validator on AWS. The next logic resources can be created:
 
-- `vpc` module for setting up a VPC with a public and private subnet on multiple availability zones. Validator nodes go in the private subnet while bastion, proxy, tx-node, and attestation nodes go in the public subnet.
+- `vpc` module for setting up a VPC with a public and private subnet on multiple availability zones. Validator nodes go in the private subnet while bastion, proxy, and attestation nodes go in the public subnet.
 - `bastion` module for an SSH bastion node. For security purposes, this is the only node that accepts external SSH traffic. All other nodes only accept SSH from the bastion.
 - `proxy` module for creating a Proxy connected to a validator
 - `validator` module for deploying a Validator
-- `tx-node` for deploying a transaction node (also known as full-node), thought to expose the rpc interface and allows interaction with the network easily
-- `attestation-service` for deploying the Attestation Service (https://docs.celo.org/getting-started/baklava-testnet/running-a-validator#running-the-attestation-service). Note that only Twilio is supported at this time.
+- `attestation-service` for deploying the Attestation Service (https://docs.celo.org/getting-started/baklava-testnet/running-a-validator#running-the-attestation-service). Each attestation service will connect to the same multi-AZ RDS DB instance. Only Twilio is supported at this time.
 
 ## Operating System
 
