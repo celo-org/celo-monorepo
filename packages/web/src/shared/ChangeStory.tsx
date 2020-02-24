@@ -7,8 +7,9 @@ import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 const CHANGE_STORY = [
   'Change the Story', // en
   'Cambia la historia', // es
-  'Muda a história', // pt
   '改变故事', // cn
+  'Muda a história', // pt
+
   // '', // ko
 ]
 
@@ -48,14 +49,16 @@ const Wipe = React.memo(function _Wipe({ text }: WipeProps) {
   return (
     <View>
       <View key={`hide-${text}`} style={[styles.mask, styles.hide]} />
-      <Text style={[fonts.legal, textStyles.italic]}>"{text}"</Text>
+      <Text key={text} style={[fonts.legal, textStyles.italic, styles.textFadeIn]}>
+        "{text}"
+      </Text>
       <View key={`reveal-${text}`} style={[styles.mask, styles.reveal]} />
     </View>
   )
 })
 
-const DURATION = 5000
-const TRANSITION_TIME = 500
+const DURATION = 4000
+const TRANSITION_TIME = 250
 
 const styles = StyleSheet.create({
   globe: {
@@ -69,7 +72,19 @@ const styles = StyleSheet.create({
   separator: {
     marginHorizontal: 10,
   },
-
+  textFadeIn: {
+    animationFillMode: 'both',
+    animationIterationCount: 1,
+    animationDuration: '750ms',
+    animationKeyframes: [
+      {
+        from: {
+          opacity: 0,
+        },
+        to: { opacity: 1 },
+      },
+    ],
+  },
   mask: {
     backgroundColor: colors.white,
     position: 'absolute',
