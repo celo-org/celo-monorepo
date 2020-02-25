@@ -433,21 +433,4 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
     }
   }
-
-  /**
-   * @notice Mint tokens.
-   * @param to The address that will receive the minted tokens.
-   * @param token The address of the token to mint.
-   * @param value The amount of tokens to mint.
-   * @return Returns true if the transaction succeeds.
-   */
-  function mintToken(address to, address token, uint256 value)
-    private
-    isStableToken(token)
-    returns (bool)
-  {
-    IStableToken stableToken = IStableToken(token);
-    stableToken.mint(to, value);
-    return true;
-  }
 }
