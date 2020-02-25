@@ -9,7 +9,6 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { BigNumber } from 'bignumber.js'
 import { RegistryInstance, ReserveInstance } from 'types'
 const truffle = require('@celo/protocol/truffle-config.js')
 
@@ -20,7 +19,7 @@ const initializeArgs = async (): Promise<[
   number,
   number,
   string[],
-  BigNumber[]
+  string[]
 ]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
@@ -35,7 +34,7 @@ const initializeArgs = async (): Promise<[
     config.reserve.assetAllocationSymbols.map((assetSymbol) =>
       Web3Utils.padRight(Web3Utils.utf8ToHex(assetSymbol), 64)
     ),
-    config.reserve.assetAllocationWeights.map((assetWeight) => toFixed(assetWeight)),
+    config.reserve.assetAllocationWeights.map((assetWeight) => toFixed(assetWeight).toFixed()),
   ]
 }
 
