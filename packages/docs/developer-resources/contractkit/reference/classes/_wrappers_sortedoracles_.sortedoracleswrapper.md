@@ -214,7 +214,7 @@ Updates an oracle value and the median.
 Name | Type | Description |
 ------ | ------ | ------ |
 `token` | [CeloToken](../modules/_base_.md#celotoken) | The address of the token for which the Celo Gold exchange rate is being reported. |
-`value` | BigNumber.Value | The number of `token`s equal to one Celo Gold.  |
+`value` | BigNumber.Value | The amount of `token` equal to one Celo Gold.  |
 `oracleAddress` | [Address](../modules/_base_.md#address) | - |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
@@ -233,7 +233,7 @@ Updates an oracle value and the median.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`value` | BigNumber.Value | The number of Dollars equal to one Celo Gold.  |
+`value` | BigNumber.Value | The amount of US Dollars equal to one Celo Gold.  |
 `oracleAddress` | [Address](../modules/_base_.md#address) | - |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
