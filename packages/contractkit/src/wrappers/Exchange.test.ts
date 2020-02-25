@@ -30,7 +30,7 @@ testWithGanache('Exchange Wrapper', (web3) => {
     // is (currently) necessary to get this to pass.
     const stableTokenOracles: Address[] = NetworkConfig.stableToken.oracles
     const oracleAddress = stableTokenOracles[stableTokenOracles.length - 1]
-    const tx = await sortedOracles.report(CeloContract.StableToken, 10, 1, oracleAddress)
+    const tx = await sortedOracles.report(CeloContract.StableToken, 10, oracleAddress)
     await tx.sendAndWaitForReceipt()
   })
 

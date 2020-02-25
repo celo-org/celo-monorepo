@@ -36,7 +36,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
   beforeEach(async () => {
     // Set oracle exchange rate.
-    const tx = await sortedOracles.report(CeloContract.StableToken, 10, 1, oracleAddress)
+    const tx = await sortedOracles.report(CeloContract.StableToken, 10, oracleAddress)
     await tx.sendAndWaitForReceipt()
   })
 
