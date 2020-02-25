@@ -85,6 +85,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
       this.onInputChange(message)
     }
   }
+
   onPressImportClick = async () => {
     navigate(Screens.ImportWallet)
   }

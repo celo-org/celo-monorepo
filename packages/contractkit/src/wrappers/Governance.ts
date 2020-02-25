@@ -582,8 +582,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the number of validators required to reach a Byzantine quorum
    */
-  byzantineQuorumValidators = proxyCall(
-    this.contract.methods.byzantineQuorumValidatorsInCurrentSet,
+  minQuorumSize = proxyCall(
+    this.contract.methods.minQuorumSizeInCurrentSet,
     undefined,
     valueToBigNumber
   )
