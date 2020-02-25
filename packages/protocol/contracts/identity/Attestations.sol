@@ -575,23 +575,6 @@ contract Attestations is
     return (matches, new address[](totalAddresses));
   }
 
-  function getPossibleAttestationIssuers() public view returns (address[] memory, uint256) {
-    IAccounts accounts = getAccounts();
-    uint256 n = numberValidatorsInCurrentSet();
-    address[] memory res = new address[](n);
-    uint256 len = 0;
-    for (uint256 idx = 0; idx < n; idx++) {
-      address signer = validatorSignerAddressFromCurrentSet(idx);
-      address issuer = accounts.signerToAccount(signer);
-      if (!accounts.hasAuthorizedAttestationSigner(issuer)) {
-        continue;
-      }
-      res[len] = issuer;
-      len = len.add(1);
-    }
-    return (res, len);
-  }
-
   /**
    * @notice Adds additional attestations given the current randomness.
    * @param identifier The hash of the identifier to be attested.
@@ -604,35 +587,46 @@ contract Attestations is
     bytes32 seed = getRandom().getBlockRandomness(
       uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)
     );
-    (address[] memory issuers, uint256 issuersLength) = getPossibleAttestationIssuers();
+    IAccounts accounts = getAccounts();
+    uint256 issuersLength = numberValidatorsInCurrentSet();
+    uint256[] memory issuers = new uint256[](issuersLength);
+    for (uint256 i = 0; i < issuersLength; i++) issuers[i] = i;
 
     require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
 
     uint256 currentIndex = 0;
-    address issuer;
 
+    // The length of the list (variable issuersLength) is decremented in each round, so the loop always terminates
     while (currentIndex < unselectedRequest.attestationsRequested) {
+      require(issuersLength > 0, "not enough issuers");
       seed = keccak256(abi.encodePacked(seed));
       uint256 idx = uint256(seed) % issuersLength;
-      issuer = issuers[idx];
+      address signer = validatorSignerAddressFromCurrentSet(issuers[idx]);
+      address issuer = accounts.signerToAccount(signer);
 
       Attestation storage attestation = state.issuedAttestations[issuer];
 
-      currentIndex = currentIndex.add(1);
-      attestation.status = AttestationStatus.Incomplete;
-      attestation.blockNumber = unselectedRequest.blockNumber;
-      attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
-      state.selectedIssuers.push(issuer);
+      if (
+        attestation.status == AttestationStatus.None &&
+        accounts.hasAuthorizedAttestationSigner(issuer)
+      ) {
+        currentIndex = currentIndex.add(1);
+        attestation.status = AttestationStatus.Incomplete;
+        attestation.blockNumber = unselectedRequest.blockNumber;
+        attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
+        state.selectedIssuers.push(issuer);
 
+        emit AttestationIssuerSelected(
+          identifier,
+          msg.sender,
+          issuer,
+          unselectedRequest.attestationRequestFeeToken
+        );
+      }
+
+      // Remove the validator that was selected from the list, by replacing it by the last element in the list
       issuersLength = issuersLength.sub(1);
       issuers[idx] = issuers[issuersLength];
-
-      emit AttestationIssuerSelected(
-        identifier,
-        msg.sender,
-        issuer,
-        unselectedRequest.attestationRequestFeeToken
-      );
     }
   }
 
