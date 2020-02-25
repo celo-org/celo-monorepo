@@ -385,7 +385,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
     sortedOracles = await getDeployedProxiedContract('SortedOracles', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
     // Set the USD/Celo Gold exchange rate to 10:1.
-    await sortedOracles.report(stableToken.address, 10, 1, NULL_ADDRESS, NULL_ADDRESS)
+    await sortedOracles.report(stableToken.address, 10, NULL_ADDRESS, NULL_ADDRESS)
   })
 
   describe('When selling gold', () => {
