@@ -2,16 +2,17 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
+import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/IERC20Token.sol";
 import "./interfaces/ICeloToken.sol";
 
-contract GoldToken is Initializable, IERC20Token, ICeloToken {
+contract GoldToken is Initializable, CalledByVm, IERC20Token, ICeloToken {
   using SafeMath for uint256;
 
   // Address of the TRANSFER precompiled contract.
   // solhint-disable state-visibility
-  address constant TRANSFER = address(0xfd);
+  address constant TRANSFER = address(0xff - 2);
   string constant NAME = "Celo Gold";
   string constant SYMBOL = "cGLD";
   uint8 constant DECIMALS = 18;
@@ -27,18 +28,8 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
   /**
-   * Only VM would be able to set the caller address to 0x0 unless someone
-   * really has the private key for 0x0
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
-  modifier onlyVm() {
-    require(msg.sender == address(0), "sender was not vm (reserved 0x0 addr)");
-    _;
-  }
-
-  /**
-   * @notice Sets 'initialized' to true.
-   */
-  // solhint-disable-next-line no-empty-blocks
   function initialize() external initializer {
     totalSupply_ = 0;
   }
@@ -77,6 +68,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @return True if the transaction succeeds.
    */
   function approve(address spender, uint256 value) external returns (bool) {
+    require(spender != address(0), "cannot set allowance for 0");
     allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
     return true;
@@ -89,6 +81,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
    * @return True if the transaction succeeds.
    */
   function increaseAllowance(address spender, uint256 value) external returns (bool) {
+    require(spender != address(0), "cannot set allowance for 0");
     uint256 oldValue = allowed[msg.sender][spender];
     uint256 newValue = oldValue.add(value);
     allowed[msg.sender][spender] = newValue;
