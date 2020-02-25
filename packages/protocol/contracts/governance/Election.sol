@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
+import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
@@ -19,7 +20,8 @@ contract Election is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  UsingPrecompiles
+  UsingPrecompiles,
+  CalledByVm
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -117,7 +119,7 @@ contract Election is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param minElectableValidators The minimum number of validators that can be elected.
-   * @param _maxNumGroupsVotedFor The maximum number of groups that an acconut can vote for at once.
+   * @param _maxNumGroupsVotedFor The maximum number of groups that an account can vote for at once.
    * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
    *   be elected.
    * @dev Should be called only once.
@@ -525,8 +527,8 @@ contract Election is
    */
   function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
     external
+    onlyVm
   {
-    require(msg.sender == address(0), "Only VM can call");
     _distributeEpochRewards(group, value, lesser, greater);
   }
 

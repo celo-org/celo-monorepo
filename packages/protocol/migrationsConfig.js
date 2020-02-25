@@ -106,6 +106,9 @@ const DefaultConfig = {
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
+    // TODO(Roman): Set these appropriately.
+    frozenGold: 0,
+    frozenDays: 0,
     spenders: [],
     otherAddresses: [],
   },

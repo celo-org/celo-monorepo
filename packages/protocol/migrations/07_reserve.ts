@@ -11,7 +11,7 @@ import { RegistryInstance, ReserveInstance } from 'types'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
-const initializeArgs = async (): Promise<[string, number, string]> => {
+const initializeArgs = async (): Promise<[string, number, string, number, number]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
     artifacts
@@ -20,6 +20,8 @@ const initializeArgs = async (): Promise<[string, number, string]> => {
     registry.address,
     config.reserve.tobinTaxStalenessThreshold,
     config.reserve.dailySpendingRatio,
+    config.reserve.frozenGold,
+    config.reserve.frozenDays,
   ]
 }
 
