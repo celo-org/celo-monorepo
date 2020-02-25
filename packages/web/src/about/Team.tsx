@@ -41,6 +41,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
                     team={person.team}
                     company={person.company}
                     purpose={person.purpose}
+                    preview={{ uri: person.preview }}
                     source={{ uri: person.photo }}
                   />
                 </React.Fragment>
@@ -55,6 +56,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
 
 interface PortraitProps {
   source: ImageURISource
+  preview: ImageURISource
   name: string
   purpose: string
   team?: string
@@ -67,6 +69,7 @@ const Portrait = React.memo(function _Portrait({
   name,
   team,
   company,
+  preview,
   purpose,
   url,
 }: PortraitProps) {
@@ -74,18 +77,21 @@ const Portrait = React.memo(function _Portrait({
     <>
       <Responsive medium={styles.mediumPerson} large={styles.largePerson}>
         <View style={styles.person}>
-          <LazyLoadFadin placeholder={<ContributorPlaceHolder />}>
-            {(onLoad) => (
-              <AspectRatio ratio={1}>
-                <Image
-                  accessibilityLabel={`Photo of ${name}`}
-                  source={source}
-                  onLoad={onLoad}
-                  style={styles.photo}
-                />
-              </AspectRatio>
-            )}
-          </LazyLoadFadin>
+          <ContributorPlaceHolder uri={preview.uri} />
+          <View style={styles.realImageContainer}>
+            <LazyLoadFadin>
+              {(onLoad) => (
+                <AspectRatio ratio={1}>
+                  <Image
+                    accessibilityLabel={`Photo of ${name}`}
+                    source={source}
+                    onLoad={onLoad}
+                    style={styles.photo}
+                  />
+                </AspectRatio>
+              )}
+            </LazyLoadFadin>
+          </View>
 
           <View style={standardStyles.row}>
             <Text style={[fonts.p, textStyles.heavy, styles.name]}>{name}</Text>
@@ -109,18 +115,10 @@ const Portrait = React.memo(function _Portrait({
   )
 })
 
-function ContributorPlaceHolder() {
+function ContributorPlaceHolder({ uri }) {
   return (
     <AspectRatio ratio={1}>
-      <Image
-        accessibilityLabel={`Placeholder`}
-        source={{
-          uri:
-            // TODO download and use locally
-            'https://dl.airtable.com/.attachmentThumbnails/1a9a0eb9124b3d5ef15091b9a50ddbd1/dda3632d',
-        }}
-        style={styles.photo}
-      />
+      <Image source={{ uri }} style={styles.imagePreview} />
     </AspectRatio>
   )
 }
@@ -155,6 +153,13 @@ const styles = StyleSheet.create({
     gridTemplateColumns: `repeat(2, 1fr)`,
   },
   photo: {
+    height: '100%',
+    width: '100%',
+  },
+  realImageContainer: { position: 'absolute', height: '100%', width: '100%' },
+  imagePreview: {
+    opacity: 0.5,
+    filter: `blur(20px)`,
     height: '100%',
     width: '100%',
   },
