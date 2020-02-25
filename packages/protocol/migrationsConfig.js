@@ -2,6 +2,7 @@ const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')
 const lodash = require('lodash')
+const web3 = require('web3')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
@@ -125,6 +126,14 @@ const DefaultConfig = {
     },
     oracles: [],
     unfreezeImmediately: true,
+  },
+  transferWhitelist: {
+    addresses: [], // TODO(Alec): get whitelist of addresses.
+    registryIds: [
+      web3.utils.soliditySha3('Governance'),
+      web3.utils.soliditySha3('LockedGold'),
+      web3.utils.soliditySha3('Reserve'),
+    ],
   },
   validators: {
     groupLockedGoldRequirements: {

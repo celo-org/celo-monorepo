@@ -1,16 +1,16 @@
 import { assertRevert } from '@celo/protocol/lib/test-utils'
 import {
-  GoldWhitelistContract,
-  GoldWhitelistInstance,
   RegistryContract,
   RegistryInstance,
+  TransferWhitelistContract,
+  TransferWhitelistInstance,
 } from 'types'
 
-const GoldWhitelist: GoldWhitelistContract = artifacts.require('GoldWhitelist')
+const TransferWhitelist: TransferWhitelistContract = artifacts.require('TransferWhitelist')
 const Registry: RegistryContract = artifacts.require('Registry')
 
-contract('GoldWhitelist', (accounts: string[]) => {
-  let goldWhitelist: GoldWhitelistInstance
+contract('TransferWhitelist', (accounts: string[]) => {
+  let TransferWhitelist: TransferWhitelistInstance
   let registry: RegistryInstance
 
   const anAddress = '0x000000000000000000000000000000000000ce10'
@@ -21,60 +21,62 @@ contract('GoldWhitelist', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   beforeEach(async () => {
-    goldWhitelist = await GoldWhitelist.new()
+    TransferWhitelist = await TransferWhitelist.new()
   })
 
   describe('#addAddress()', () => {
     it('should allow the owner to add an address', async () => {
-      await goldWhitelist.addAddress(anAddress)
-      const whitelist = await goldWhitelist.getWhitelist()
+      await TransferWhitelist.addAddress(anAddress)
+      const whitelist = await TransferWhitelist.getWhitelist()
       assert.sameMembers(whitelist, [anAddress])
     })
 
     it('should not allow a non-owner to add a token', async () => {
-      await assertRevert(goldWhitelist.addAddress(anAddress, { from: nonOwner }))
+      await assertRevert(TransferWhitelist.addAddress(anAddress, { from: nonOwner }))
     })
   })
 
   describe('#addRegisteredContract()', () => {
     it('should allow the owner to add a registry id', async () => {
-      await goldWhitelist.addRegisteredContract(anIdentifier)
+      await TransferWhitelist.addRegisteredContract(anIdentifier)
       // @ts-ignore
-      const registeredContracts = await goldWhitelist.registeredContracts.call()
+      const registeredContracts = await TransferWhitelist.registeredContracts.call()
       assert.sameMembers(registeredContracts, [anIdentifier])
     })
 
     it('should not allow a non-owner to add a registry id', async () => {
-      await assertRevert(goldWhitelist.addRegisteredContract(anIdentifier, { from: nonOwner }))
+      await assertRevert(TransferWhitelist.addRegisteredContract(anIdentifier, { from: nonOwner }))
     })
   })
 
   describe('#setWhitelist()', () => {
     it('should allow the owner to set the whitelist', async () => {
-      await goldWhitelist.setWhitelist([anAddress, anotherAddress])
+      await TransferWhitelist.setWhitelist([anAddress, anotherAddress])
       // @ts-ignore
-      const whitelist = await goldWhitelist.whitelist.call()
+      const whitelist = await TransferWhitelist.whitelist.call()
       assert.sameMembers(whitelist, [anAddress, anotherAddress])
     })
 
     it('should not allow a non-owner to set the whitelist', async () => {
       await assertRevert(
-        goldWhitelist.setWhitelist([anAddress, anotherAddress], { from: nonOwner })
+        TransferWhitelist.setWhitelist([anAddress, anotherAddress], { from: nonOwner })
       )
     })
   })
 
   describe('#setRegisteredContracts()', () => {
     it('should allow the owner to set the list of registered contracts', async () => {
-      await goldWhitelist.setRegisteredContracts([anIdentifier, anotherIdentifier])
+      await TransferWhitelist.setRegisteredContracts([anIdentifier, anotherIdentifier])
       // @ts-ignore
-      const registeredContracts = await goldWhitelist.registeredContracts.call()
+      const registeredContracts = await TransferWhitelist.registeredContracts.call()
       assert.sameMembers(registeredContracts, [anIdentifier, anotherIdentifier])
     })
 
     it('should not allow a non-owner to set the list of registered contracts', async () => {
       await assertRevert(
-        goldWhitelist.setRegisteredContracts([anIdentifier, anotherIdentifier], { from: nonOwner })
+        TransferWhitelist.setRegisteredContracts([anIdentifier, anotherIdentifier], {
+          from: nonOwner,
+        })
       )
     })
   })
@@ -84,12 +86,12 @@ contract('GoldWhitelist', (accounts: string[]) => {
       registry = await Registry.new()
       await registry.initialize()
       await registry.setAddressFor(anIdentifier, anAddress)
-      await goldWhitelist.addRegisteredContract(anIdentifier)
-      await goldWhitelist.addAddress(anotherAddress)
+      await TransferWhitelist.addRegisteredContract(anIdentifier)
+      await TransferWhitelist.addAddress(anotherAddress)
     })
 
     it('should return the full whitelist of addresses', async () => {
-      const whitelist = await goldWhitelist.getWhitelist({ from: nonOwner })
+      const whitelist = await TransferWhitelist.getWhitelist({ from: nonOwner })
       assert.sameMembers(whitelist, [anAddress, anotherAddress])
     })
   })
