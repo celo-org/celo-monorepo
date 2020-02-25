@@ -899,7 +899,7 @@ contract('Election', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.Random, random.address)
     })
 
-    describe.only('when there is a large number of groups', () => {
+    describe('when there is a large number of groups', () => {
       const numbers: any = {}
       beforeEach(async () => {
         await mockLockedGold.setTotalLockedGold(new BigNumber(1e25))
@@ -942,7 +942,7 @@ contract('Election', (accounts: string[]) => {
           prev = pad('0x00' + i)
         }
       })
-      it('can elect validators', async () => {
+      it('can elect correct validators', async () => {
         const lst = await election.electValidatorSigners()
         const smallest = lst
           .map(normalizeAddressWith0x)
