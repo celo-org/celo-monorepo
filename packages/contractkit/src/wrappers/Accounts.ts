@@ -313,7 +313,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param name A string to set as the name of the account
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account
-   * @param
+   * @param proofOfPossession Signature from the wallet address key over the sender's address
    */
   setAccount(
     name: string,
