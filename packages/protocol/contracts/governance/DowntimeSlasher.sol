@@ -44,14 +44,6 @@ contract DowntimeSlasher is SlasherUtil {
     emit SlashableDowntimeSet(interval);
   }
 
-  function epochNumberOfBlock(uint256 blockNumber, uint256 epochSize)
-    internal
-    pure
-    returns (uint256)
-  {
-    return blockNumber.add(epochSize).sub(1) / epochSize;
-  }
-
   /**
    * @notice Test if a validator has been down.
    * @param startBlock First block of the downtime.
