@@ -15,6 +15,7 @@ export enum Stacks {
 export enum Screens {
   Account = 'Account',
   Analytics = 'Analytics',
+  Background = 'Background',
   BackupIntroduction = 'BackupIntroduction',
   BackupPhrase = 'BackupPhrase',
   BackupQuiz = 'BackupQuiz',
@@ -59,6 +60,7 @@ export enum Screens {
   ReclaimPaymentConfirmationScreen = 'ReclaimPaymentConfirmationScreen',
   PaymentRequestConfirmation = 'PaymentRequestConfirmation',
   SelectLocalCurrency = 'SelectLocalCurrency',
+  Security = 'Security',
   Send = 'Send',
   SendAmount = 'SendAmount',
   SendConfirmation = 'SendConfirmation',

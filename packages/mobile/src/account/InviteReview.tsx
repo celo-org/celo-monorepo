@@ -112,7 +112,7 @@ export class InviteReview extends React.Component<Props, State> {
       throw new Error("Can't send to recipient without valid e164 number")
     }
 
-    this.props.sendInvite(recipient.displayName, recipient.e164PhoneNumber, inviteMode)
+    this.props.sendInvite(recipient.e164PhoneNumber, inviteMode)
   }
 
   onEdit = () => {

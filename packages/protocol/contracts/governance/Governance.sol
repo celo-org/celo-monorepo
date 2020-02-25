@@ -180,7 +180,7 @@ contract Governance is
   }
 
   /**
-   * @notice Initializes critical variables.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
    * @param _concurrentProposals The number of proposals to dequeue at once.
@@ -407,7 +407,6 @@ contract Governance is
     external
     onlyOwner
   {
-    // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0), "Destination cannot be zero");
     require(
       threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap(),
@@ -468,7 +467,7 @@ contract Governance is
   /**
    * @notice Requires a proposal is dequeued and removes it if expired.
    * @param proposalId The ID of the proposal.
-   * @return The proposal storage struct and stage corresponding to `proposalId`. 
+   * @return The proposal storage struct and stage corresponding to `proposalId`.
    */
   function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
@@ -930,9 +929,9 @@ contract Governance is
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     IAccounts accounts = getAccounts();
-    for (uint256 idx = 0; idx < n; idx++) {
-      address validatorSigner = validatorSignerAddressFromCurrentSet(idx);
-      address validatorAccount = accounts.validatorSignerToAccount(validatorSigner);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      address validatorSigner = validatorSignerAddressFromCurrentSet(i);
+      address validatorAccount = accounts.signerToAccount(validatorSigner);
       if (
         isHotfixWhitelistedBy(hash, validatorSigner) ||
         isHotfixWhitelistedBy(hash, validatorAccount)
