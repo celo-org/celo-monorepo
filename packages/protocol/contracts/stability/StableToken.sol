@@ -544,7 +544,7 @@ contract StableToken is
    * @notice Refund balance after making payments for gas in this StableToken currency.
    * @param to The account to credit balance to
    * @param value The amount of balance to refund
-   * @dev We can assume that the inflation factor is up to date as `debitFrom`
+   * @dev We can assume that the inflation factor is up to date as `reserveGas`
    * will have been called in the same transaction
    */
   function refundGas(address to, uint256 value) external onlyVm onlyWhenNotFrozen {
@@ -558,7 +558,7 @@ contract StableToken is
    * @param from The account to debit balance from
    * @param to The account to credit balance to
    * @param value The amount of balance to credit
-   * @dev We can assume that the inflation factor is up to date as `debitFrom`
+   * @dev We can assume that the inflation factor is up to date as `reserveGas`
    * will have been called in the same transaction
    */
   function creditGas(address from, address to, uint256 value) external onlyVm onlyWhenNotFrozen {
