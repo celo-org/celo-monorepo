@@ -191,6 +191,7 @@ spec:
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
             --metrics \
+            --allow-insecure-unlock \
             ${PING_IP_FROM_PACKET_FLAG} \
             ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
             ${PROXIED_FLAGS}
