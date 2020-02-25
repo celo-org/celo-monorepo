@@ -28,9 +28,9 @@ resource "aws_instance" "attestation_service" {
         templatefile("${path.module}/../startup-scripts/run-attestation-service.sh", {
             validator_address                               = each.value.validator_address
             attestation_signer_address                      = each.value.attestation_signer_address
-            attestation_signer_private_key                  = each.value.attestation_signer_private_key
-            attestation_signer_private_key_password         = each.value.attestation_signer_private_key_password
             attestation_signer_private_key_filename         = each.value.attestation_signer_private_key_filename
+            attestation_signer_private_key_file_contents    = each.value.attestation_signer_private_key_file_contents
+            attestation_signer_private_key_password         = each.value.attestation_signer_private_key_password
             database_url                                    = var.database_url
             twilio_messaging_service_sid                    = var.twilio_messaging_service_sid
             twilio_account_sid                              = var.twilio_account_sid

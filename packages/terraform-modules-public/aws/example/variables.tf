@@ -87,24 +87,24 @@ variable validators {
     description     = "Configuration for zero or more validators in each availability zone"
     type            = object({ 
       az1 = map(object({
-        name                          = string
-        signer_address                = string
-        signer_private_key            = string
-        signer_private_key_password   = string
-        signer_private_key_filename   = string
-        proxy_enode                   = string
-        proxy_private_ip              = string
-        proxy_public_ip               = string
+        name                                        = string
+        signer_address                              = string
+        signer_private_key_filename                 = string
+        signer_private_key_file_contents            = string
+        signer_private_key_password                 = string
+        proxy_enode                                 = string
+        proxy_private_ip                            = string
+        proxy_public_ip                             = string
       }))
       az2 = map(object({
-        name                          = string
-        signer_address                = string
-        signer_private_key            = string
-        signer_private_key_password   = string
-        signer_private_key_filename   = string
-        proxy_enode                   = string
-        proxy_private_ip              = string
-        proxy_public_ip               = string
+        name                                        = string
+        signer_address                              = string
+        signer_private_key_filename                 = string
+        signer_private_key_file_contents            = string
+        signer_private_key_password                 = string
+        proxy_enode                                 = string
+        proxy_private_ip                            = string
+        proxy_public_ip                             = string
       }))
     })
     default = {
@@ -115,14 +115,14 @@ variable validators {
   # default = {
   #   az1 = {
   #     myvalidator_az1_01 = {
-  #       name                          = "myvalidator_az1_01"
-  #       signer_address                = "0000000011111111222222223333333344444444"
-  #       signer_private_key            = "...Place the keystore file contents here Make sure to escape the double quotes. ..."
-  #       signer_private_key_password   = "mypassword"
-  #       signer_private_key_filename   = "UTC--2020-02-06T06-49-54.736290200Z--0000000011111111222222223333333344444444"
-  #       proxy_enode                   = "00000000000000001111111111111111222222222222222233333333333333334444444444444444555555555555555566666666666666667777777777777777"
-  #       proxy_private_ip              = "10.10.0.120"
-  #       proxy_public_ip               = "1.1.1.1"
+  #       name                                        = "myvalidator_az1_01"
+  #       signer_address                              = "0000000011111111222222223333333344444444"
+  #       signer_private_key_filename                 = "UTC--2020-02-06T06-49-54.736290200Z--0000000011111111222222223333333344444444" # Use the name of the private key file generated when you created your signer address key. This will be in the keystore folder on the node where you created the signer account.
+  #       signer_private_key_file_contents            = "<The contents of the file described in the attestation_signer_private_key_filename comment>"
+  #       signer_private_key_password                 = "<The password used then you created the signer key>"
+  #       proxy_enode                                 = "00000000000000001111111111111111222222222222222233333333333333334444444444444444555555555555555566666666666666667777777777777777"
+  #       proxy_private_ip                            = "10.10.0.120"
+  #       proxy_public_ip                             = "1.1.1.1"
   #     }
   #     myvalidator_az1_02 = {
   #       ...
@@ -167,20 +167,20 @@ variable attestation_services {
   description     = "Configuration for zero or more attestation nodes in each availability zone"
   type            = object({
     az1 = map(object({
-      validator_name                            = string
-      validator_address                         = string
-      attestation_signer_address                = string
-      attestation_signer_private_key            = string
-      attestation_signer_private_key_password   = string
-      attestation_signer_private_key_filename   = string
+      validator_name                                          = string
+      validator_address                                       = string
+      attestation_signer_address                              = string
+      attestation_signer_private_key_filename                 = string
+      attestation_signer_private_key_file_contents            = string
+      attestation_signer_private_key_password                 = string
     }))
     az2 = map(object({
-      validator_name                            = string
-      validator_address                         = string
-      attestation_signer_address                = string
-      attestation_signer_private_key            = string
-      attestation_signer_private_key_password   = string
-      attestation_signer_private_key_filename   = string
+      validator_name                                          = string
+      validator_address                                       = string
+      attestation_signer_address                              = string
+      attestation_signer_private_key_filename                 = string
+      attestation_signer_private_key_file_contents            = string
+      attestation_signer_private_key_password                 = string
     }))
   })
   default = {
@@ -191,12 +191,12 @@ variable attestation_services {
   # default = {
   #   az1 = {
   #     myvalidator_az1_01 = {
-  #       validator_name                            = "myvalidator_az1_01"
-  #       validator_address                         = "1234567812345678123456781234567812345678"
-  #       attestation_signer_address                = "2323232345454545676767678989898910101010"
-  #       attestation_signer_private_key            = "...Place the keystore file contents here Make sure to escape the double quotes. ..."
-  #       attestation_signer_private_key_password   = "mypassword"
-  #       attestation_signer_private_key_filename   = "UTC--2020-02-06T06-49-54.736290200Z--2323232345454545676767678989898910101010"
+  #       validator_name                                          = "myvalidator_az1_01"
+  #       validator_address                                       = "1234567812345678123456781234567812345678"
+  #       attestation_signer_address                              = "2323232345454545676767678989898910101010"
+  #       attestation_signer_private_key_filename                 = "UTC--2020-02-06T06-49-54.736290200Z--2323232345454545676767678989898910101010" # Use the name of the private key file generated when you created your signer address key. This will be in the keystore folder on the node where you created the signer account.
+  #       attestation_signer_private_key_file_contents            = "<The contents of the file described in the attestation_signer_private_key_filename comment>"
+  #       attestation_signer_private_key_password                 = "<The password used then you created the signer key>"
   #     }
   #     myvalidator_az1_02 = {
   #       ...

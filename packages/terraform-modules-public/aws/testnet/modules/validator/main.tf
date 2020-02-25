@@ -27,7 +27,7 @@ resource "aws_instance" "celo_validator" {
             celo_image                                  = var.celo_image
             celo_network_id                             = var.celo_network_id
             validator_signer_address                    = each.value.signer_address
-            validator_signer_private_key                = each.value.signer_private_key
+            validator_signer_private_key_file_contents  = each.value.signer_private_key_file_contents
             validator_signer_private_key_filename       = each.value.signer_private_key_filename
             validator_signer_private_key_password       = each.value.signer_private_key_password
             validator_name                              = each.value.name

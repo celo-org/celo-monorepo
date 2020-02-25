@@ -32,13 +32,13 @@ variable celo_network_id {
 variable validators {
     description     = "Map of validator configurations"
     type            = map(object({
-      name                          = string
-      signer_address                = string
-      signer_private_key            = string
-      signer_private_key_password   = string
-      signer_private_key_filename   = string
-      proxy_enode                   = string
-      proxy_private_ip              = string
-      proxy_public_ip               = string
+      name                                        = string
+      signer_address                              = string
+      signer_private_key_file_contents            = string
+      signer_private_key_password                 = string
+      signer_private_key_filename                 = string
+      proxy_enode                                 = string
+      proxy_private_ip                            = string
+      proxy_public_ip                             = string
     }))
 }

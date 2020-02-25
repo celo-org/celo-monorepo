@@ -89,24 +89,24 @@ variable validators {
     description     = "Configuration for zero or more validators in each availability zone"
     type            = object({ 
       az1 = map(object({
-        name                          = string
-        signer_address                = string
-        signer_private_key            = string
-        signer_private_key_password   = string
-        signer_private_key_filename   = string
-        proxy_enode                   = string
-        proxy_private_ip              = string
-        proxy_public_ip               = string
+        name                                        = string
+        signer_address                              = string
+        signer_private_key_filename                 = string
+        signer_private_key_file_contents            = string
+        signer_private_key_password                 = string
+        proxy_enode                                 = string
+        proxy_private_ip                            = string
+        proxy_public_ip                             = string
       }))
       az2 = map(object({
-        name                          = string
-        signer_address                = string
-        signer_private_key            = string
-        signer_private_key_password   = string
-        signer_private_key_filename   = string
-        proxy_enode                   = string
-        proxy_private_ip              = string
-        proxy_public_ip               = string
+        name                                        = string
+        signer_address                              = string
+        signer_private_key_filename                 = string
+        signer_private_key_file_contents            = string
+        signer_private_key_password                 = string
+        proxy_enode                                 = string
+        proxy_private_ip                            = string
+        proxy_public_ip                             = string
       }))
     })
 }
@@ -115,20 +115,20 @@ variable attestation_services {
     description     = "Configuration for zero or more attestation nodes in each availability zone"
     type            = object({
       az1 = map(object({
-        validator_name                            = string
-        validator_address                         = string
-        attestation_signer_address                = string
-        attestation_signer_private_key            = string
-        attestation_signer_private_key_password   = string
-        attestation_signer_private_key_filename   = string
+        validator_name                                          = string
+        validator_address                                       = string
+        attestation_signer_address                              = string
+        attestation_signer_private_key_filename                 = string
+        attestation_signer_private_key_file_contents            = string
+        attestation_signer_private_key_password                 = string
       }))
       az2 = map(object({
-        validator_name                            = string
-        validator_address                         = string
-        attestation_signer_address                = string
-        attestation_signer_private_key            = string
-        attestation_signer_private_key_password   = string
-        attestation_signer_private_key_filename   = string
+        validator_name                                          = string
+        validator_address                                       = string
+        attestation_signer_address                              = string
+        attestation_signer_private_key_filename                 = string
+        attestation_signer_private_key_file_contents            = string
+        attestation_signer_private_key_password                 = string
       }))
     })
 }

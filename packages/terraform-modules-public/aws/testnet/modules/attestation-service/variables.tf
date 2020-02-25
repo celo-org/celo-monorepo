@@ -54,11 +54,11 @@ variable twilio_auth_token {
 variable attestation_services {
     description = "Configuration for attestation nodes."
     type        = map(object({
-      validator_name                            = string
-      validator_address                         = string
-      attestation_signer_address                = string
-      attestation_signer_private_key            = string
-      attestation_signer_private_key_password   = string
-      attestation_signer_private_key_filename   = string
+      validator_name                                          = string
+      validator_address                                       = string
+      attestation_signer_address                              = string
+      attestation_signer_private_key_filename                 = string
+      attestation_signer_private_key_file_contents            = string
+      attestation_signer_private_key_password                 = string
     }))
 }
