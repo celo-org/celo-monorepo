@@ -180,7 +180,7 @@ contract Governance is
   }
 
   /**
-   * @notice Initializes critical variables.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
    * @param _concurrentProposals The number of proposals to dequeue at once.
@@ -407,7 +407,6 @@ contract Governance is
     external
     onlyOwner
   {
-    // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0), "Destination cannot be zero");
     require(
       threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap(),
