@@ -3,19 +3,20 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/ISortedOracles.sol";
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
-// TODO: Move SortedOracles to Fixidity
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
 contract SortedOracles is ISortedOracles, Ownable, Initializable {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
-  // All oracle rates are assumed to have a denominator of 2 ^ 64.
-  uint256 public constant DENOMINATOR = 0x10000000000000000;
+  using FixidityLib for FixidityLib.Fraction;
+
+  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   // Maps a token address to a sorted list of report values.
   mapping(address => SortedLinkedListWithMedian.List) private rates;
@@ -27,21 +28,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   uint256 public reportExpirySeconds;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
-
   event OracleRemoved(address indexed token, address indexed oracleAddress);
-
-  event OracleReported(
-    address token,
-    address oracle,
-    uint256 timestamp,
-    uint256 numerator,
-    uint256 denominator
-  );
-
+  event OracleReported(address token, address oracle, uint256 timestamp, uint256 value);
   event OracleReportRemoved(address indexed token, address indexed oracle);
-
-  event MedianUpdated(address indexed token, uint256 numerator, uint256 denominator);
-
+  event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
 
   modifier onlyOracle(address token) {
@@ -146,21 +136,16 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   /**
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param numerator The amount of tokens equal to `denominator` Celo Gold.
-   * @param denominator The amount of Celo Gold equal to `numerator` tokens.
+   * @param value The amount of `token` equal to one Celo Gold, expressed as a fixidity value.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
    */
-  function report(
-    address token,
-    uint256 numerator,
-    uint256 denominator,
-    address lesserKey,
-    address greaterKey
-  ) external onlyOracle(token) {
+  function report(address token, uint256 value, address lesserKey, address greaterKey)
+    external
+    onlyOracle(token)
+  {
     uint256 originalMedian = rates[token].getMedianValue();
-    uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
 
@@ -185,10 +170,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
       timestamps[token].getHead(),
       address(0)
     );
-    emit OracleReported(token, msg.sender, now, value, DENOMINATOR);
+    emit OracleReported(token, msg.sender, now, value);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian, DENOMINATOR);
+      emit MedianUpdated(token, newMedian);
     }
   }
 
@@ -207,7 +192,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @return The median exchange rate for `token`.
    */
   function medianRate(address token) external view returns (uint256, uint256) {
-    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : DENOMINATOR);
+    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
   }
 
   /**
@@ -278,7 +263,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     emit OracleReportRemoved(token, oracle);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian, numRates(token) == 0 ? 0 : DENOMINATOR);
+      emit MedianUpdated(token, newMedian);
     }
   }
 }
