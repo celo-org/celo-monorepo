@@ -522,8 +522,6 @@ contract StableToken is
     return true;
   }
 
-  mapping(address => uint256) reserved;
-
   /**
    * @notice Reserve balance for making payments for gas in this StableToken currency.
    * @param from The account to reserve balance from
