@@ -536,6 +536,7 @@ contract StableToken is
     updateInflationFactor
   {
     uint256 units = _valueToUnits(inflationState.factor, value);
+    totalSupply_ = totalSupply_.sub(units);
     balances[from] = balances[from].sub(units);
   }
 
@@ -547,7 +548,9 @@ contract StableToken is
    * will have been called in the same transaction
    */
   function refundGas(address to, uint256 value) external onlyVm onlyWhenNotFrozen {
-    balances[to] = balances[to].add(value);
+    uint256 units = _valueToUnits(inflationState.factor, value);
+    totalSupply_ = totalSupply_.add(units);
+    balances[to] = balances[to].add(units);
   }
 
   /**
@@ -560,6 +563,7 @@ contract StableToken is
    */
   function creditGas(address from, address to, uint256 value) external onlyVm onlyWhenNotFrozen {
     uint256 units = _valueToUnits(inflationState.factor, value);
+    totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
     emit Transfer(from, to, value);
   }
