@@ -4,5 +4,6 @@ export interface Contributor {
   team?: string
   company: string
   photo: string
+  preview: string
   url: string
 }

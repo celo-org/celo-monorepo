@@ -64,8 +64,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     }
     await sortedOracles.report(
       stableToken.address,
-      config.stableToken.goldPrice,
-      1,
+      toFixed(config.stableToken.goldPrice),
       NULL_ADDRESS,
       NULL_ADDRESS
     )
