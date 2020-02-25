@@ -36,9 +36,8 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
   }
 
   /**
-   * @notice Sets 'initialized' to true.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
-  // solhint-disable-next-line no-empty-blocks
   function initialize() external initializer {
     totalSupply_ = 0;
   }
