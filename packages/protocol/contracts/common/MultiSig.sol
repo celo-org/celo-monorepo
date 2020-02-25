@@ -266,8 +266,7 @@ contract MultiSig is Initializable {
     private
     returns (bool, bytes memory)
   {
-    if (data.length > 0)
-      require(Address.isContract(destination), "Invalid contract address");
+    if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
     bool success;
     bytes memory returnData;
     (success, returnData) = destination.call.value(value)(data);
