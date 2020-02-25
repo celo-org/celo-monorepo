@@ -127,7 +127,7 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    commissionUpdateDelay: 51840,  // Approximately 3 days
+    commissionUpdateDelay: 51840, // Approximately 3 days
     maxGroupSize: '5',
     // 30 Days divided by 24 to accelerate for Stake off
     slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24,
