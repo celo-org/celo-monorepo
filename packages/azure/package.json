@@ -8,7 +8,7 @@
     "build-json": "node build-json.js components/ > template.json",
     "build-docs": "node build-docs.js > README.md",
     "build": "npm run build-sh && npm run build-json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "exit 0"
   },
   "keywords": [],
   "author": "",
