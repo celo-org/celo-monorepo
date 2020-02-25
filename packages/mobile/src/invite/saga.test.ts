@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-import { FetchMock } from 'jest-fetch-mock'
 import { Linking } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import { expectSaga } from 'redux-saga-test-plan'
@@ -8,6 +7,7 @@ import { throwError } from 'redux-saga-test-plan/providers'
 import { call } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import {
   InviteBy,
   redeemInvite,
@@ -16,16 +16,31 @@ import {
   sendInvite,
   storeInviteeData,
 } from 'src/invite/actions'
-import { watchRedeemInvite, watchSendInvite, withdrawFundsFromTempAccount } from 'src/invite/saga'
+import {
+  generateInviteLink,
+  watchRedeemInvite,
+  watchSendInvite,
+  withdrawFundsFromTempAccount,
+} from 'src/invite/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { contractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance } from 'test/utils'
-import { mockAccount, mockE164Number, mockName } from 'test/values'
+import { mockAccount, mockE164Number } from 'test/values'
 
-const mockFetch = fetch as FetchMock
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
+const mockKeyEncoded = 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ='
+const mockBalance = jest.fn()
+
+jest.mock('src/firebase/dynamicLinks', () => ({
+  ...jest.requireActual('src/firebase/dynamicLinks'),
+  generateShortInviteLink: jest.fn(async () => 'http://celo.page.link/PARAMS'),
+}))
+
+jest.mock('src/utils/appstore', () => ({
+  getAppStoreId: jest.fn(async () => 1482389446),
+}))
 
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),
@@ -43,24 +58,23 @@ jest.mock('src/web3/contracts', () => {
     web3: {
       eth: {
         accounts: {
-          privateKeyToAccount: () =>
-            '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+          privateKeyToAccount: () => mockAccount,
           wallet: {
             add: () => null,
           },
           create: () => ({
-            address: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+            address: mockAccount,
             privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
           }),
         },
         personal: {
-          importRawKey: () => '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+          importRawKey: () => mockAccount,
           unlockAccount: async () => true,
         },
       },
       utils: {
         fromWei: (x: any) => x / 1e18,
-        sha3: (x: any) => `a sha3 hash`,
+        sha3: () => `a sha3 hash`,
       },
     },
     isFornoMode: () => false,
@@ -74,12 +88,6 @@ const state = createMockStore({ web3: { account: mockAccount } }).getState()
 describe(watchSendInvite, () => {
   beforeAll(() => {
     jest.useRealTimers()
-
-    mockFetch.mockResponse(
-      JSON.stringify({
-        shortLink: 'hi',
-      })
-    )
   })
 
   it('sends an SMS invite as expected', async () => {
@@ -89,9 +97,9 @@ describe(watchSendInvite, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockName, mockE164Number, InviteBy.SMS))
+      .dispatch(sendInvite(mockE164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
-      .put(storeInviteeData(mockKey, mockE164Number))
+      .put(storeInviteeData(mockAccount.toLowerCase(), mockKeyEncoded, mockE164Number))
       .run()
 
     expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
@@ -104,9 +112,9 @@ describe(watchSendInvite, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockName, mockE164Number, InviteBy.WhatsApp))
-      .put(storeInviteeData(mockKey, mockE164Number))
+      .dispatch(sendInvite(mockE164Number, InviteBy.WhatsApp))
       .dispatch(transactionConfirmed('a sha3 hash'))
+      .put(storeInviteeData(mockAccount.toLowerCase(), mockKeyEncoded, mockE164Number))
       .run()
 
     expect(Linking.openURL).toHaveBeenCalled()
@@ -195,5 +203,23 @@ describe(watchRedeemInvite, () => {
       .put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
       .put(redeemInviteFailure())
       .run()
+  })
+})
+
+describe(generateInviteLink, () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('Generate invite link correctly', async () => {
+    const result = await generateInviteLink(mockKey)
+    expect(result).toBe('http://celo.page.link/PARAMS')
+    expect(generateShortInviteLink).toBeCalledTimes(1)
+    expect(generateShortInviteLink).toHaveBeenCalledWith({
+      link: `https://celo.org/build/wallet`,
+      playStoreUrl: `https://play.store.link&referrer=invite-code%3D${mockKey}`,
+      appStoreUrl: 'https://app.store.link',
+      bundleId: 'org.celo.mobile.alfajores',
+    })
   })
 })

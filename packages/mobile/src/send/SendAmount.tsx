@@ -161,10 +161,6 @@ export class SendAmount extends React.Component<Props, State> {
     this.fetchLatestPhoneAddress()
   }
 
-  componentWillUnmount() {
-    this.props.hideAlert()
-  }
-
   fetchLatestPhoneAddress = () => {
     const recipient = this.getRecipient()
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
