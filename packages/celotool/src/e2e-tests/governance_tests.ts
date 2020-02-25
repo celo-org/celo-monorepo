@@ -294,6 +294,7 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
+  /*
   const waitForBlock = async (blockNumber: number) => {
     // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
     let currentBlock: number
@@ -302,6 +303,7 @@ describe('governance tests', () => {
       await sleep(0.1)
     } while (currentBlock < blockNumber)
   }
+  */
 
   const waitForEpochTransition = async (epoch: number) => {
     // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
