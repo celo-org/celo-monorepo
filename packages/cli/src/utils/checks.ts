@@ -263,6 +263,13 @@ class CheckBuilder {
       `${address} is not registered as an account. Try running account:register`
     )
 
+  isNotVoting = (address: Address) =>
+    this.addCheck(
+      `${address} is not currently voting on a governance proposal`,
+      this.withGovernance((gov) => negate(gov.isVoting(address))),
+      `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
+    )
+
   hasEnoughGold = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(`Account has at least ${valueInEth} cGLD`, () =>
