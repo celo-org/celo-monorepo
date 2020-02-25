@@ -22,6 +22,7 @@ import {
   RegistryContract,
   RegistryInstance,
 } from 'types'
+import { normalizeAddressWith0x } from '@celo/utils/src/address'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
@@ -944,11 +945,27 @@ contract('Election', (accounts: string[]) => {
         }
       })
       it('can elect validators', async () => {
-        console.log(await election.electValidatorSigners({ gas: 100e6, from: accounts[0] }))
-        console.log(await election.electValidatorSigners({ gas: 50e6, from: accounts[0] }))
+        console.log(await election.electValidatorSignersDebug({ gas: 19e6, from: accounts[0] }))
+        const lst = await election.electValidatorSigners()
+        const smallest = lst
+          .map(normalizeAddressWith0x)
+          .map((a) => numbers[a])
+          .sort()[0]
+        const number100th = Object.values(numbers).sort((a: any, b: any) => b - a)[99]
+        assert.equal(smallest, number100th)
+        lst.map(normalizeAddressWith0x).forEach((a) => console.log(a, numbers[a]))
+        console.log(
+          'smallest',
+          smallest,
+          '100th',
+          Object.values(numbers).sort((a: any, b: any) => b - a)[99]
+        )
+        console.log(await election.electValidatorSigners({ gas: 1e6, from: accounts[0] }))
+        /*
+        console.log(await election.electValidatorSignersDebug({ gas: 100e6, from: accounts[0] }))
         console.log(await election.electValidatorSigners({ gas: 20e6, from: accounts[0] }))
         console.log(await election.electValidatorSigners({ gas: 10e6, from: accounts[0] }))
-        console.log(await election.electValidatorSigners({ gas: 5e6, from: accounts[0] }))
+        console.log(await election.electValidatorSigners({ gas: 1e6, from: accounts[0] }))*/
       })
     })
 
