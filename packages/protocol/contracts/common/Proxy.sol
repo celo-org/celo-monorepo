@@ -8,9 +8,11 @@ import "./libraries/AddressesHelper.sol";
  */
 contract Proxy {
   // Used to store the address of the owner.
-  bytes32 private constant OWNER_POSITION = keccak256("org.celo.owner");
+  bytes32 private constant OWNER_POSITION = bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
   // Used to store the address of the implementation contract.
-  bytes32 private constant IMPLEMENTATION_POSITION = keccak256("org.celo.implementation");
+  bytes32 private constant IMPLEMENTATION_POSITION = bytes32(
+    uint256(keccak256("eip1967.proxy.implementation")) - 1
+  );
 
   event OwnerSet(address indexed owner);
   event ImplementationSet(address indexed implementation);
