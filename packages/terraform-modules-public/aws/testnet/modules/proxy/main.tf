@@ -23,6 +23,7 @@ resource "aws_instance" "celo_proxy" {
     templatefile("${path.module}/../startup-scripts/run-proxy-node.sh", {
       celo_image               = var.celo_image
       celo_network_id          = var.celo_network_id
+      ethstats_host            = var.ethstats_host
       validator_name           = each.value.validator_name
       validator_signer_address = each.value.validator_signer_address
     }),

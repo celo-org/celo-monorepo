@@ -41,6 +41,12 @@ variable celo_network_id {
   default     = "200110"
 }
 
+variable ethstats_host {
+  type        = string
+  description = "Hostname for ethstats"
+  default     = "baklava-ethstats.celo-testnet.org"
+}
+
 variable proxies {
   description = "Configuration for zero or more proxies in each availability zone."
   type = object({

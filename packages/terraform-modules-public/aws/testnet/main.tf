@@ -38,6 +38,7 @@ module "celo_proxy_az1" {
   instance_type     = var.instance_types.proxy
   celo_image        = var.celo_image
   celo_network_id   = var.celo_network_id
+  ethstats_host     = var.ethstats_host
 
   proxies = var.proxies.az1
 }
@@ -51,6 +52,7 @@ module "celo_proxy_az2" {
   instance_type     = var.instance_types.proxy
   celo_image        = var.celo_image
   celo_network_id   = var.celo_network_id
+  ethstats_host     = var.ethstats_host
 
   proxies = var.proxies.az2
 }
@@ -64,6 +66,7 @@ module "celo_validator_az1" {
   instance_type     = var.instance_types.validator
   celo_image        = var.celo_image
   celo_network_id   = var.celo_network_id
+  ethstats_host     = var.ethstats_host
 
   validators = var.validators.az1
 }
@@ -77,6 +80,7 @@ module "celo_validator_az2" {
   instance_type     = var.instance_types.validator
   celo_image        = var.celo_image
   celo_network_id   = var.celo_network_id
+  ethstats_host     = var.ethstats_host
 
   validators = var.validators.az2
 }

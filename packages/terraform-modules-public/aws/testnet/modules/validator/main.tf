@@ -22,6 +22,7 @@ resource "aws_instance" "celo_validator" {
     templatefile("${path.module}/../startup-scripts/run-validator-node.sh", {
       celo_image                                 = var.celo_image
       celo_network_id                            = var.celo_network_id
+      ethstats_host                              = var.ethstats_host
       validator_signer_address                   = each.value.signer_address
       validator_signer_private_key_file_contents = each.value.signer_private_key_file_contents
       validator_signer_private_key_filename      = each.value.signer_private_key_filename

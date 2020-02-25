@@ -34,6 +34,11 @@ variable celo_network_id {
   description = "Celo network ID to join"
 }
 
+variable ethstats_host {
+  type        = string
+  description = "Hostname for ethstats"
+}
+
 variable validators {
   description = "Map of validator configurations"
   type = map(object({

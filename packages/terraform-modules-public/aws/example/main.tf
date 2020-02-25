@@ -26,6 +26,7 @@ module "celo_cluster" {
   celo_image                   = var.celo_image
   celo_network_id              = var.celo_network_id
   celo_image_attestation       = var.celo_image_attestation
+  ethstats_host                = var.ethstats_host
   twilio_messaging_service_sid = var.twilio_messaging_service_sid
   twilio_account_sid           = var.twilio_account_sid
   twilio_blacklist             = var.twilio_blacklist

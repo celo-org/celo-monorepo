@@ -55,6 +55,11 @@ variable celo_image_attestation {
   description = "Docker image for Celo attestation service"
 }
 
+variable ethstats_host {
+  type        = string
+  description = "Hostname for ethstats"
+}
+
 variable twilio_messaging_service_sid {
   type = string
 }
