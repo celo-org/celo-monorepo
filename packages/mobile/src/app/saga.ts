@@ -157,9 +157,12 @@ export function* handleNavigatePinProtected(action: NavigatePinProtected) {
   try {
     // TODO: Implement PIN protection for forno mode
     if (!fornoMode) {
-      yield call(getPincode, false)
+      yield call(getPincode, false, () => {
+        navigate(action.routeName, action.params)
+      })
+    } else {
+      navigate(action.routeName, action.params)
     }
-    navigate(action.routeName, action.params)
   } catch (error) {
     Logger.error(TAG + '@showBackupAndRecovery', 'Incorrect pincode', error)
     yield put(showError(ErrorMessages.INCORRECT_PIN))

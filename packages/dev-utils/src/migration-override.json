@@ -38,5 +38,8 @@
     "executionStageDuration": 100,
     "minDeposit": 1,
     "concurrentProposals": 5
+  },
+  "governanceApproverMultiSig": {
+    "useMultiSig": false
   }
 }

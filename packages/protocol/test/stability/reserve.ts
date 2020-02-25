@@ -47,7 +47,13 @@ contract('Reserve', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
-    await reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+    await reserve.initialize(
+      registry.address,
+      aTobinTaxStalenessThreshold,
+      aDailySpendingRatio,
+      0,
+      0
+    )
   })
 
   describe('#initialize()', () => {
@@ -68,7 +74,7 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not be callable again', async () => {
       await assertRevert(
-        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio, 0, 0)
       )
     })
   })
@@ -228,6 +234,7 @@ contract('Reserve', (accounts: string[]) => {
       await mockGoldToken.setBalanceOf(reserve.address, aValue)
       await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
       await reserve.addSpender(spender)
+      await reserve.addOtherReserveAddress(anAddress)
     })
 
     it('should allow a exchange to call transferExchangeGold', async () => {
@@ -240,6 +247,28 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not allow other addresses to call transferExchangeGold', async () => {
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
+    })
+
+    it('should not allow freezing more gold than is available', async () => {
+      await assertRevert(reserve.setFrozenGold(aValue + 1, 1))
+    })
+
+    it('should not allow a spender to transfer more gold than is unfrozen', async () => {
+      await reserve.setFrozenGold(1, 1)
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
+    })
+
+    it('unfrozen gold should increase every 24 hours', async () => {
+      await reserve.setFrozenGold(3, 3)
+      await assertRevert(reserve.transferGold(anAddress, aValue - 2, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue - 2, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue - 1, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue - 1, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue, { from: spender })
     })
   })
 
