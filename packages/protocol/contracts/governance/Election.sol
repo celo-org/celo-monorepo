@@ -824,6 +824,22 @@ contract Election is
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 
+  function possibleGroups() public view returns (address[] memory) {
+    uint256 maxElectableValidators = electableValidators.max;
+    // Groups must have at least `electabilityThreshold` proportion of the total votes to be
+    // considered for the election.
+    uint256 requiredVotes = electabilityThreshold
+      .multiply(FixidityLib.newFixed(getTotalVotes()))
+      .fromFixed();
+    // Only consider groups with at least `requiredVotes` but do not consider more groups than the
+    // max number of electable validators.
+    uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(
+      requiredVotes,
+      maxElectableValidators
+    );
+    return votes.total.eligible.headN(numElectionGroups);
+  }
+
   /**
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
@@ -912,6 +928,7 @@ contract Election is
       uint256 tmpKey = keys[i];
       keys[i] = keys[largest];
       keys[largest] = tmpKey;
+      i = largest;
     }
   }
 
