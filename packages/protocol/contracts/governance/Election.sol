@@ -117,7 +117,7 @@ contract Election is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param minElectableValidators The minimum number of validators that can be elected.
-   * @param _maxNumGroupsVotedFor The maximum number of groups that an acconut can vote for at once.
+   * @param _maxNumGroupsVotedFor The maximum number of groups that an account can vote for at once.
    * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
    *   be elected.
    * @dev Should be called only once.
