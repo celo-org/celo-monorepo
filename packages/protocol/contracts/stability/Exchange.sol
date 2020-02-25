@@ -52,8 +52,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   /**
-   * @dev Initializes the exchange, setting initial bucket sizes
-   * @param registryAddress Address of the Registry contract
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param stableToken Address of the stable token
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
@@ -292,9 +292,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
-    uint256 reserveGoldBalance = getGoldToken().balanceOf(
-      registry.getAddressForOrDie(RESERVE_REGISTRY_ID)
-    );
+    uint256 reserveGoldBalance = getReserve().getUnfrozenReserveGoldBalance();
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }
 
