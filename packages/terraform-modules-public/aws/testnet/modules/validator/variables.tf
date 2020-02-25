@@ -20,7 +20,7 @@ variable key_pair_name {
 
 variable volume_size {
   type          = number
-  description   = "Size of the EBS volume for this instance"
+  description   = "GB size for the EBS volume"
   default       = 256
 }
 
