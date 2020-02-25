@@ -263,7 +263,7 @@ class CheckBuilder {
     this.addCheck(
       `${address} is not currently voting`,
       this.withGovernance((gov) => negate(gov.isVoting(address))),
-      `${address} is currently voting. Wait until the referendum ends.`
+      `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
     )
 
   hasEnoughGold = (account: Address, value: BigNumber) => {
