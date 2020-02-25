@@ -84,6 +84,7 @@ const DefaultConfig = {
     //Placeholder until addresses for 2/5 multsig are generated.
     signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
     numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
     useMultiSig: true,
   },
   lockedGold: {
@@ -102,11 +103,14 @@ const DefaultConfig = {
     goldBalance: 100000000,
     tobinTaxStalenessThreshold: 60 * 60, // 1 hour
     dailySpendingRatio: '1000000000000000000000000', // 100%
+    frozenGold: 0,
+    frozenDays: 0,
   },
   reserveSpenderMultiSig: {
     //Placeholder until addresses for 2/2 multsig are generated.
     signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
     numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
   },
   stableToken: {
     decimals: 18,

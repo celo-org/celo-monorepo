@@ -10,6 +10,7 @@ const initializeArgs = async (): Promise<any[]> => {
   return [
     config.reserveSpenderMultiSig.signatories,
     config.reserveSpenderMultiSig.numRequiredConfirmations,
+    config.reserveSpenderMultiSig.numInternalRequiredConfirmations,
   ]
 }
 
