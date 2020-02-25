@@ -1,11 +1,11 @@
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import fs = require('fs')
 import {
   MultiSigContract,
   RegistryInstance,
   ReleaseGoldContract,
   ReleaseGoldProxyContract,
 } from 'types'
-import fs = require('fs')
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -22,22 +22,22 @@ module.exports = async (callback: (error?: any) => number) => {
         throw err
       }
       data = JSON.parse(data)
-      const entity = data['entity']
-      const releaseGoldConfigs = data['grants']
+      const entity = data.entity
+      const releaseGoldConfigs = data.grants
       for (const releaseGoldConfig of releaseGoldConfigs) {
-        const releaseStartTime = new Date(releaseGoldConfig['releaseStartTime'])
-        const releaseCliffTime = releaseGoldConfig['releaseCliffTime']
-        const numReleasePeriods = releaseGoldConfig['numReleasePeriods']
-        const releasePeriod = releaseGoldConfig['releasePeriod']
-        const amountReleasedPerPeriod = releaseGoldConfig['amountReleasedPerPeriod']
-        const revocable = releaseGoldConfig['revocable']
-        const beneficiary = releaseGoldConfig['beneficiary']
-        const releaseOwner = releaseGoldConfig['releaseOwner']
-        const refundAddress = releaseGoldConfig['refundAddress']
-        const subjectToLiquidityProvision = releaseGoldConfig['subjectToLiquidityProvision']
-        const initialDistributionPercentage = releaseGoldConfig['initialDistributionPercentage']
-        const canValidate = releaseGoldConfig['canValidate']
-        const canVote = releaseGoldConfig['canVote']
+        const releaseStartTime = new Date(releaseGoldConfig.releaseStartTime)
+        const releaseCliffTime = releaseGoldConfig.releaseCliffTime
+        const numReleasePeriods = releaseGoldConfig.numReleasePeriods
+        const releasePeriod = releaseGoldConfig.releasePeriod
+        const amountReleasedPerPeriod = releaseGoldConfig.amountReleasedPerPeriod
+        const revocable = releaseGoldConfig.revocable
+        const beneficiary = releaseGoldConfig.beneficiary
+        const releaseOwner = releaseGoldConfig.releaseOwner
+        const refundAddress = releaseGoldConfig.refundAddress
+        const subjectToLiquidityProvision = releaseGoldConfig.subjectToLiquidityProvision
+        const initialDistributionPercentage = releaseGoldConfig.initialDistributionPercentage
+        const canValidate = releaseGoldConfig.canValidate
+        const canVote = releaseGoldConfig.canVote
         const releaseGoldInstance = await ReleaseGold.new(
           releaseStartTime.getTime() / 1000,
           releaseCliffTime,
@@ -65,6 +65,7 @@ module.exports = async (callback: (error?: any) => number) => {
           multiSigInstance.address,
         ])
       }
+      // tslint:disable-next-line: no-console
       console.log(releases)
     }
     fs.readFile(argv.grants, handleJSONFile)
