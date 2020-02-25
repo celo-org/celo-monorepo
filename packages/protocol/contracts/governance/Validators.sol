@@ -171,7 +171,8 @@ contract Validators is
    * @param validatorScoreAdjustmentSpeed The speed at which validator scores are adjusted.
    * @param _membershipHistoryLength The max number of entries for validator membership history.
    * @param _maxGroupSize The maximum group size.
-   * @param _commissionUpdateDelay The number of blocks to delay a ValidatorGroup's commission update
+   * @param _commissionUpdateDelay The number of blocks to delay a ValidatorGroup's commission
+   * update.
    * @dev Should be called only once.
    */
   function initialize(
