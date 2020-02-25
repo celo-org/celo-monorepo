@@ -13,7 +13,7 @@ testWithGanache('validatorgroup:comission cmd', (web3: Web3) => {
 
     await AccountRegister.run(['--from', accounts[0]])
     await Lock.run(['--from', accounts[0], '--value', '10000000000000000000000'])
-    await ValidatorGroupRegister.run(['--from', accounts[0], '--commission', '0.1'])
+    await ValidatorGroupRegister.run(['--from', accounts[0], '--commission', '0.1', '--yes'])
   }
 
   test('can queue update', async () => {
