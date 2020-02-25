@@ -311,3 +311,26 @@ export async function sendEscrowedPayment(
   const expirySeconds = 60 * 60 * 24 * 5 // 5 days
   await escrow.transfer(phoneHash, contract.address, value.toString(), expirySeconds, paymentID, 0)
 }
+
+/*
+* Builds and returns mapping of function names to selectors.
+* Each function name maps to an array of selectors to account for overloading.
+*/
+export function getFunctionSelectorsForContract(contract: any, contractName: string, artifacts: Truffle.Artifacts) {
+  const selectors: { [index: string]: string[] } = {}
+  const proxy: any = artifacts.require(contractName + 'Proxy')
+  proxy.abi
+    .concat(contract.abi)
+    .filter((abiEntry: any) => abiEntry.type === 'function')
+    .forEach((func: any) => {
+      if (typeof selectors[func.name] === 'undefined') {
+        selectors[func.name] = []
+      }
+      if (typeof func.signature === 'undefined') {
+        selectors[func.name].push(web3.eth.abi.encodeFunctionSignature(func))
+      } else {
+        selectors[func.name].push(func.signature)
+      }
+    })
+  return selectors
+}

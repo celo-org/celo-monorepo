@@ -18,7 +18,7 @@ library Signatures {
   }
 
   /**
-  * @notice Given a signed address, returns the signer of the address.
+  * @notice Given a message hash, returns the signer of the address.
   * @param messageHash The hash of a message.
   * @param v The recovery id of the incoming ECDSA signature.
   * @param r Output value r of the ECDSA signature.
@@ -31,6 +31,8 @@ library Signatures {
   {
     bytes memory prefix = "\x19Ethereum Signed Message:\n32";
     bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, messageHash));
-    return ecrecover(prefixedHash, v, r, s);
+    address signer = ecrecover(prefixedHash, v, r, s);
+    require(signer != address(0));
+    return signer;
   }
 }

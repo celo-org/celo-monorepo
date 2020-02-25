@@ -117,6 +117,16 @@ contract Attestations is
   event SelectIssuersWaitBlocksSet(uint256 value);
   event MaxAttestationsSet(uint256 value);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   * @param _attestationExpiryBlocks The new limit on blocks allowed to come between requesting
+   * an attestation and completing it.
+   * @param _selectIssuersWaitBlocks The wait period in blocks to call selectIssuers on attestation
+   * requests.
+   * @param attestationRequestFeeTokens The address of tokens that fees should be payable in.
+   * @param attestationRequestFeeValues The corresponding fee values.
+   */
   function initialize(
     address registryAddress,
     uint256 _attestationExpiryBlocks,
@@ -236,7 +246,12 @@ contract Attestations is
     attestation.blockNumber = block.number.toUint32();
     attestation.status = AttestationStatus.Complete;
     delete attestation.attestationRequestFeeToken;
-    identifiers[identifier].attestations[msg.sender].completed++;
+    AttestedAddress storage attestedAddress = identifiers[identifier].attestations[msg.sender];
+    require(
+      attestedAddress.completed < attestedAddress.completed + 1,
+      "SafeMath32 integer overflow"
+    );
+    attestedAddress.completed = attestedAddress.completed + 1;
 
     pendingWithdrawals[token][issuer] = pendingWithdrawals[token][issuer].add(
       attestationRequestFees[token]
@@ -268,7 +283,7 @@ contract Attestations is
       identifiers[identifier].accounts[index] = identifiers[identifier].accounts[newNumAccounts];
     }
     identifiers[identifier].accounts[newNumAccounts] = address(0x0);
-    identifiers[identifier].accounts.length--;
+    identifiers[identifier].accounts.length = identifiers[identifier].accounts.length.sub(1);
   }
 
   /**
@@ -362,17 +377,16 @@ contract Attestations is
     uint64[] memory total = new uint64[](addresses.length);
 
     uint256 currentIndex = 0;
-    for (uint256 i = 0; i < identifiersToLookup.length; i++) {
+    for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
       address[] memory addrs = identifiers[identifiersToLookup[i]].accounts;
-      for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex++) {
+      for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex = matchIndex.add(1)) {
         addresses[currentIndex] = getAccounts().getWalletAddress(addrs[matchIndex]);
         completed[currentIndex] = identifiers[identifiersToLookup[i]]
           .attestations[addrs[matchIndex]]
           .completed;
         total[currentIndex] = identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]]
           .requested;
-
-        currentIndex++;
+        currentIndex = currentIndex.add(1);
       }
     }
 
@@ -565,7 +579,7 @@ contract Attestations is
     uint256 totalAddresses = 0;
     uint256[] memory matches = new uint256[](identifiersToLookup.length);
 
-    for (uint256 i = 0; i < identifiersToLookup.length; i++) {
+    for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
       uint256 count = identifiers[identifiersToLookup[i]].accounts.length;
 
       totalAddresses = totalAddresses + count;
