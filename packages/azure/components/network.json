@@ -1,0 +1,291 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2019-09-01",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": ["[parameters('virtualNetworkAddressPrefix')]"]
+        },
+        "subnets": [
+          {
+            "name": "default",
+            "properties": {
+              "addressPrefix": "[parameters('defaultNetworkAddressPrefix')]",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql",
+                  "locations": [
+                    "[parameters('location')]"
+                  ]
+                }
+              ],
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('bastionNetworkAddressPrefix')]",
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          }
+        ],
+        "virtualNetworkPeerings": [],
+        "enableDdosProtection": false,
+        "enableVmProtection": false
+      }
+    },
+    {
+      "name": "[variables('proxyPublicIpAddressName')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2019-02-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "[parameters('proxyPublicIpAddressType')]"
+      },
+      "sku": {
+        "name": "[parameters('proxyPublicIpAddressSku')]"
+      }
+    },
+    {
+      "name": "[variables('attesterPublicIpAddressName')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2019-02-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "[parameters('attesterPublicIpAddressType')]"
+      },
+      "sku": {
+        "name": "[parameters('attesterPublicIpAddressSku')]"
+      }
+    },
+    {
+      "name": "[variables('validatorNetworkSecurityGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-02-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "SSH",
+            "properties": {
+              "priority": 300,
+              "protocol": "TCP",
+              "access": "Deny",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "22"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('proxyNetworkSecurityGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-02-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "SSH",
+            "properties": {
+              "priority": 300,
+              "protocol": "TCP",
+              "access": "Deny",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "22"
+            }
+          },
+          {
+            "name": "ProxyTcpExternal",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "30303",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+            }
+          },
+          {
+            "name": "ProxyTcpInternal",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "30503",
+              "sourceAddressPrefix": "[parameters('virtualNetworkAddressPrefix')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('attesterNetworkSecurityGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-02-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "SSH",
+            "properties": {
+              "priority": 300,
+              "protocol": "TCP",
+              "access": "Deny",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "22"
+            }
+          },
+          {
+            "name": "AttesterNodeAllExternal",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "30303",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+            }
+          },
+          {
+            "name": "HTTP",
+            "properties": {
+              "priority": 200,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "80"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('validatorNetworkInterfaceName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[variables('validatorNetworkSecurityGroupName')]"],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetId')]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id":
+            "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('validatorNetworkSecurityGroupName'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('proxyNetworkInterfaceName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('proxyNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/publicIpAddresses/', variables('proxyPublicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetId')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id":
+                  "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('proxyPublicIpAddressName'))]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id":
+            "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('proxyNetworkSecurityGroupName'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('attesterNetworkInterfaceName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('attesterNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/publicIpAddresses/', variables('attesterPublicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetId')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id":
+                  "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('attesterPublicIpAddressName'))]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id":
+            "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('attesterNetworkSecurityGroupName'))]"
+        }
+      }
+    }
+  ]
+}
