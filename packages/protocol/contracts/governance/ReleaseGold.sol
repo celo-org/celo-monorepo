@@ -69,7 +69,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold {
   // Public struct housing params pertaining to revocation.
   RevocationInfo public revocationInfo;
 
-  // event ReleaseScheduleCreated(uint256 )
+  event ReleaseGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
@@ -217,6 +217,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold {
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
     canValidate = _canValidate;
     canVote = _canVote;
+    emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 
   /**

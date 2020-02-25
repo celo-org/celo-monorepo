@@ -185,16 +185,6 @@ contract('ReleaseGold', (accounts: string[]) => {
         await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
       })
 
-      // TODO(lucas): add log to releaseGoldInstance creation
-      // it('should create a new releaseGold instance and emit a proper event', async () => {
-      //   const newReleaseGoldInstanceAddress = newReleaseGoldInstanceCreatedEvent.args.atAddress
-      //   assertLogMatches(newReleaseGoldInstanceCreatedEvent, 'NewReleaseGoldInstanceCreated', {
-      //     beneficiary: newReleaseGoldInstanceBeneficiary,
-      //     atAddress: newReleaseGoldInstanceAddress,
-      //   })
-      //   assert.equal(newReleaseGoldInstanceAddress, releaseGoldInstance.address)
-      // })
-
       it('should have associated funds with a schedule upon creation', async () => {
         const allocatedFunds = await goldTokenInstance.balanceOf(releaseGoldInstance.address)
         assertEqualBN(
