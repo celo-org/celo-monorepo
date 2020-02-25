@@ -25,8 +25,18 @@ const migrationOverrides = {
   goldToken: {
     frozen: false,
   },
+  governanceApproverMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+  },
   reserve: {
     initialBalance: 100000000,
+  },
+  reserveSpenderMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
   },
   stableToken: {
     oracles: [network.from],

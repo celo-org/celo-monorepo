@@ -91,6 +91,13 @@ const DefaultConfig = {
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
   },
+  governanceApproverMultiSig: {
+    //Placeholder until addresses for 2/5 multsig are generated.
+    signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+    useMultiSig: true,
+  },
   lockedGold: {
     unlockingPeriod: 3 * DAY,
   },
@@ -111,6 +118,12 @@ const DefaultConfig = {
     frozenDays: 0,
     spenders: [],
     otherAddresses: [],
+  },
+  reserveSpenderMultiSig: {
+    //Placeholder until addresses for 2/2 multsig are generated.
+    signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
   },
   stableToken: {
     decimals: 18,

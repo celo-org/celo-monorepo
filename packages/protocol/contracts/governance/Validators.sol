@@ -451,6 +451,7 @@ contract Validators is
     // The group that should be paid is the group that the validator was a member of at the
     // time it was elected.
     address group = getMembershipInLastEpoch(account);
+    require(group != address(0), "Validator not registered with a group");
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
     if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {

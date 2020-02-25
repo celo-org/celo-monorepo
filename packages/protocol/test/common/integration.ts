@@ -18,6 +18,7 @@ import {
   ElectionInstance,
   ExchangeInstance,
   GoldTokenInstance,
+  GovernanceApproverMultiSigInstance,
   GovernanceInstance,
   GovernanceSlasherInstance,
   LockedGoldInstance,
@@ -93,6 +94,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   const dequeuedIndex = 0
   let lockedGold: LockedGoldInstance
   let election: ElectionInstance
+  let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let governanceSlasher: GovernanceSlasherInstance
   let proposalTransactions: any
@@ -107,6 +109,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
 
+    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
     value = await lockedGold.getAccountTotalLockedGold(accounts[0])
@@ -158,7 +161,11 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
-      await governance.approve(proposalId, dequeuedIndex)
+      // @ts-ignore
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      await multiSig.submitTransaction(governance.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should set the proposal to approved', async () => {
@@ -219,6 +226,7 @@ contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
   let lockedGold: LockedGoldInstance
+  let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
@@ -229,6 +237,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
     value = await lockedGold.getAccountTotalLockedGold(accounts[0])
+    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
     proposalTransactions = [
@@ -318,7 +327,11 @@ contract('Integration: Governance', (accounts: string[]) => {
   describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
-      await governance.approve(proposalId, dequeuedIndex)
+      // @ts-ignore
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      await multiSig.submitTransaction(governance.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should set the proposal to approved', async () => {

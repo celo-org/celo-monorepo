@@ -25,6 +25,12 @@
 // so we don't reset already working installs
 static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
 
+@interface AppDelegate ()
+
+@property (nonatomic, weak) UIView *blurView;
+
+@end
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -104,34 +110,28 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
   return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+  // Prevent sensitive information from appearing in the task switcher
+  // See https://developer.apple.com/library/archive/qa/qa1838/_index.html
   
-  // fill screen with celo green colour
-  UIView *colourView = [[UIView alloc]initWithFrame:self.window.frame];
-  colourView.backgroundColor = [UIColor colorWithRed:0.26 green:0.84 blue:0.54 alpha:1.0];;
-  colourView.tag = 1234;
-  colourView.alpha = 0;
-  [self.window addSubview:colourView];
-  [self.window bringSubviewToFront:colourView];
+  if (self.blurView) {
+    // Shouldn't happen ;)
+    return;
+  }
   
-  // fade in the view
-  [UIView animateWithDuration:0.5 animations:^{
-    colourView.alpha = 1;
-  }];
+  UIVisualEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+  UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+  blurView.frame = self.window.bounds;
+  self.blurView = blurView;
+  [self.window addSubview:blurView];
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-  
-  // grab a reference to our coloured view
-  UIView *colourView = [self.window viewWithTag:1234];
-  
-  // fade away colour view from main view
-  [UIView animateWithDuration:0.5 animations:^{
-    colourView.alpha = 0;
-  } completion:^(BOOL finished) {
-    // remove when finished fading
-    [colourView removeFromSuperview];
-  }];
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+  // Remove our blur
+  [self.blurView removeFromSuperview];
+  self.blurView = nil;
 }
 
 @end

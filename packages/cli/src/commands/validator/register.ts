@@ -1,7 +1,9 @@
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
+import { flags } from '@oclif/command'
+import humanizeDuration from 'humanize-duration'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
+import { binaryPrompt, displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorRegister extends BaseCommand {
@@ -13,6 +15,7 @@ export default class ValidatorRegister extends BaseCommand {
     ecdsaKey: Flags.ecdsaPublicKey({ required: true }),
     blsKey: Flags.blsPublicKey({ required: true }),
     blsSignature: Flags.blsProofOfPossession({ required: true }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
   }
 
   static examples = [
@@ -25,6 +28,21 @@ export default class ValidatorRegister extends BaseCommand {
 
     const validators = await this.kit.contracts.getValidators()
     const accounts = await this.kit.contracts.getAccounts()
+
+    if (!res.flags.yes) {
+      const requirements = await validators.getValidatorLockedGoldRequirements()
+      const duration = requirements.duration.toNumber() * 1000
+      const check = await binaryPrompt(
+        `This will lock ${requirements.value.shiftedBy(-18)} cGLD for ${humanizeDuration(
+          duration
+        )}. Are you sure you want to continue?`,
+        true
+      )
+      if (!check) {
+        console.log('Cancelled')
+        return
+      }
+    }
 
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
