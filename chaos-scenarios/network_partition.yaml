@@ -1,0 +1,27 @@
+apiVersion: pingcap.com/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-partition
+  namespace: scenario1
+spec:
+  action: partition
+  mode: one
+  #value: "50"
+  selector:
+    namespaces:
+      - scenario1
+    labelSelectors:
+      "component": "validators"
+  direction: from
+  target:
+    selector:
+      namespaces:
+        - scenario1
+      labelSelectors:
+        "component": "validators"
+    mode: one
+    #value: "50"
+  duration: "600s"
+  scheduler:
+    cron: "@every 1000h"
+

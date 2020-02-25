@@ -1,0 +1,18 @@
+apiVersion: pingcap.com/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-all
+  namespace: scenario1
+spec:
+  action: pod-kill
+  mode: fixed-percent
+  value: "100"
+  selector:
+    namespaces:
+      - scenario1
+    labelSelectors:
+      "component": "validators"
+      #"component": "proxy"
+  scheduler:
+    cron: "@every 100m"
+

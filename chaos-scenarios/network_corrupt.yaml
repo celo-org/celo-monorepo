@@ -1,0 +1,21 @@
+apiVersion: pingcap.com/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-corrupt
+  namespace: scenario1
+spec:
+  action: corrupt
+  mode: fixed
+  value: "20"
+  selector:
+    namespaces:
+      - scenario1
+    labelSelectors:
+      "component": "validators"
+  corrupt:
+    corrupt: "95"
+    correlation: "25"
+  duration: "10s"
+  scheduler:
+    cron: "@every 15s"
+
