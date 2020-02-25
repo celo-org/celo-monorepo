@@ -30,7 +30,7 @@ contract MockAttestations {
     identifiers[identifier].attestations[msg.sender].completed++;
   }
 
-  function getMaxAttestations() external view returns (uint256) {
+  function getMaxAttestations() external pure returns (uint256) {
     return 20;
   }
 

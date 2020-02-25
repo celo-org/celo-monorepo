@@ -554,6 +554,20 @@ contract('Attestations', (accounts: string[]) => {
           })
         })
 
+        describe('when more attestations were requested', () => {
+          beforeEach(async () => {
+            await attestations.selectIssuers(phoneHash)
+            await attestations.request(phoneHash, 8, mockStableToken.address)
+            expectedRequestBlockNumber = await web3.eth.getBlockNumber()
+            const requestBlockNumber = await web3.eth.getBlockNumber()
+            await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
+          })
+
+          it('should revert if too many issuers attempted', async () => {
+            await assertRevert(attestations.selectIssuers(phoneHash))
+          })
+        })
+
         describe('after attestationExpiryBlocks', () => {
           beforeEach(async () => {
             await attestations.selectIssuers(phoneHash)
