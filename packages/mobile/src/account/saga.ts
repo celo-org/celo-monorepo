@@ -9,7 +9,7 @@ import {
 import { PincodeType, pincodeTypeSelector } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getCachedPincode, setCachedPincode } from 'src/pincode/PincodeCache'
 import { getPinFromKeystore, setPinInKeystore } from 'src/pincode/PincodeUtils'
@@ -39,7 +39,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
   }
 }
 
-export function* getPincode(useCache = true) {
+export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
   const pincodeType = yield select(pincodeTypeSelector)
 
   if (pincodeType === PincodeType.Unset) {
@@ -67,7 +67,14 @@ export function* getPincode(useCache = true) {
 
     const pincodeEntered = new Promise((resolve) => {
       navigate(Screens.PincodeConfirmation, {
-        onValidPin: resolve,
+        onValidPin: (code: string) => {
+          if (onValidCustomPin) {
+            onValidCustomPin()
+          } else {
+            navigateBack()
+          }
+          resolve(code)
+        },
       })
     })
     const pin = yield pincodeEntered
