@@ -8,6 +8,11 @@ variable subnet_id {
   description   = "Subnet ID to place this proxy. This should be a public subnet from your Celo VPC."
 }
 
+variable security_group_id {
+    type            = string
+    description     = "VPC Security group for this instance"
+}
+
 variable key_pair_name {
   type          = string
   description   = "Name of the SSH key pair to access this node from the bastion"

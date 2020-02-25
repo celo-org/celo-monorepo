@@ -2,17 +2,13 @@ module "ami" {
     source = "../ami"
 }
 
-data "aws_security_group" "validator" {
-    name = "celo-validator"
-}
-
 resource "aws_instance" "celo_validator" {
     for_each                    = var.validators
 
     ami                         = module.ami.ami_ids.ubuntu_18_04
     instance_type               = var.instance_type
     subnet_id                   = var.subnet_id
-    vpc_security_group_ids      = [data.aws_security_group.validator.id]
+    vpc_security_group_ids      = [var.security_group_id]
     key_name                    = var.key_pair_name
 
     root_block_device {

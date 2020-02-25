@@ -13,6 +13,7 @@ module "celo_bastion_az1" {
     source            = "./modules/bastion"
 
     subnet_id         = module.celo_vpc.subnet_ids.az1.public
+    security_group_id = module.celo_vpc.security_group_ids.bastion
     key_pair_name     = var.key_pair_name
     name              = "celo-bastion-az1"
     instance_type     = var.instance_types.bastion
@@ -22,6 +23,7 @@ module "celo_bastion_az2" {
     source            = "./modules/bastion"
 
     subnet_id         = module.celo_vpc.subnet_ids.az2.public
+    security_group_id = module.celo_vpc.security_group_ids.bastion
     key_pair_name     = var.key_pair_name
     name              = "celo-bastion-az2"
     instance_type     = var.instance_types.bastion
@@ -31,6 +33,7 @@ module "celo_proxy_az1" {
     source            = "./modules/proxy"
 
     subnet_id         = module.celo_vpc.subnet_ids.az1.public
+    security_group_id = module.celo_vpc.security_group_ids.proxy
     key_pair_name     = var.key_pair_name
     instance_type     = var.instance_types.proxy
     celo_image        = var.celo_image
@@ -43,6 +46,7 @@ module "celo_proxy_az2" {
     source            = "./modules/proxy"
 
     subnet_id         = module.celo_vpc.subnet_ids.az2.public
+    security_group_id = module.celo_vpc.security_group_ids.proxy
     key_pair_name     = var.key_pair_name
     instance_type     = var.instance_types.proxy
     celo_image        = var.celo_image
@@ -55,6 +59,7 @@ module "celo_validator_az1" {
     source            = "./modules/validator"
 
     subnet_id         = module.celo_vpc.subnet_ids.az1.private
+    security_group_id = module.celo_vpc.security_group_ids.validator
     key_pair_name     = var.key_pair_name
     instance_type     = var.instance_types.validator
     celo_image        = var.celo_image
@@ -67,6 +72,7 @@ module "celo_validator_az2" {
     source            = "./modules/validator"
 
     subnet_id         = module.celo_vpc.subnet_ids.az2.private
+    security_group_id = module.celo_vpc.security_group_ids.validator
     key_pair_name     = var.key_pair_name
     instance_type     = var.instance_types.validator
     celo_image        = var.celo_image
@@ -116,6 +122,7 @@ module "celo_attestation_service_az1" {
     source                        = "./modules/attestation-service"
 
     subnet_id                     = module.celo_vpc.subnet_ids.az1.public
+    security_group_id             = module.celo_vpc.security_group_ids.attestation_service
     key_pair_name                 = var.key_pair_name
     instance_type                 = var.instance_types.attestation_service
     celo_image                    = var.celo_image
@@ -134,6 +141,7 @@ module "celo_attestation_service_az2" {
     source                        = "./modules/attestation-service"
 
     subnet_id                     = module.celo_vpc.subnet_ids.az2.public
+    security_group_id             = module.celo_vpc.security_group_ids.attestation_service
     key_pair_name                 = var.key_pair_name
     instance_type                 = var.instance_types.attestation_service
     celo_image                    = var.celo_image

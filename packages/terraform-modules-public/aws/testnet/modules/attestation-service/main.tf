@@ -2,17 +2,13 @@ module "ami" {
     source = "../ami"
 }
 
-data "aws_security_group" "attestation_service" {
-    name = "celo-attestation-service"
-}
-
 resource "aws_instance" "attestation_service" {
     for_each                            = var.attestation_services
 
     ami                                 = module.ami.ami_ids.ubuntu_18_04
     instance_type                       = var.instance_type
     subnet_id                           = var.subnet_id
-    vpc_security_group_ids              = [data.aws_security_group.attestation_service.id]
+    vpc_security_group_ids              = [var.security_group_id]
     key_name                            = var.key_pair_name
     associate_public_ip_address         = true
     

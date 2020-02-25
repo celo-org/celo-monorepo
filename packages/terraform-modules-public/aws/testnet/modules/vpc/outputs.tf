@@ -4,7 +4,7 @@ output security_group_ids {
         attestation_db          = aws_security_group.attestation_db.id
         bastion                 = aws_security_group.bastion.id
         full_node               = aws_security_group.full_node.id
-        private_node            = aws_security_group.validator.id
+        validator               = aws_security_group.validator.id
         proxy                   = aws_security_group.proxy.id
     }
 }

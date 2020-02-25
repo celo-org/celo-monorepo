@@ -3,6 +3,11 @@ variable subnet_id {
     description     = "Subnet for the SSH Bastion"
 }
 
+variable security_group_id {
+    type            = string
+    description     = "VPC Security group for this instance"
+}
+
 variable key_pair_name {
     type            = string
     description     = "SSH Key Pair name"
