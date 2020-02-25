@@ -1,12 +1,17 @@
+import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   assertEqualBN,
   isSameAddress,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import {
+  getDeployedProxiedContract,
+  getFunctionSelectorsForContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
@@ -248,6 +253,35 @@ contract('Integration: Governance', (accounts: string[]) => {
         ),
       },
     ]
+  })
+
+  describe('Checking governance thresholds', () => {
+    for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
+      it('should have correct thresholds for ' + contractName, async () => {
+        const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifacts
+        )
+
+        const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+        selectors.default = ['0x00000000']
+
+        const thresholds = { ...constitution.proxy, ...constitution[contractName] }
+        await Promise.all(
+          Object.keys(thresholds).map((func) =>
+            Promise.all(
+              selectors[func].map(async (selector) => {
+                assertEqualBN(
+                  await governance.getConstitution(contract.address, selector),
+                  toFixed(thresholds[func]),
+                  'Threshold set incorrectly for function ' + func
+                )
+              })
+            )
+          )
+        )
+      })
+    }
   })
 
   describe('When making a governance proposal', () => {

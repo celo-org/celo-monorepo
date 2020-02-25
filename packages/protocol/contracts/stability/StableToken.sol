@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/ICeloToken.sol";
+import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/UsingRegistry.sol";
@@ -17,14 +18,15 @@ import "../baklava/Freezable.sol";
  */
 // solhint-disable-next-line max-line-length
 contract StableToken is
-  IStableToken,
-  IERC20Token,
-  ICeloToken,
   Ownable,
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  Freezable
+  Freezable,
+  CalledByVm,
+  IStableToken,
+  IERC20Token,
+  ICeloToken
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -62,15 +64,6 @@ contract StableToken is
   }
 
   InflationState inflationState;
-
-  /**
-   * Only VM would be able to set the caller address to 0x0 unless someone
-   * really has the private key for 0x0
-   */
-  modifier onlyVm() {
-    require(msg.sender == address(0), "sender was not vm (reserved 0x0 addr)");
-    _;
-  }
 
   /**
    * @notice recomputes and updates inflation factor if more than `updatePeriod`

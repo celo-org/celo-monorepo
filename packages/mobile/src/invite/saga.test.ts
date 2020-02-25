@@ -228,7 +228,7 @@ describe(generateInviteLink, () => {
       link: `https://celo.org/build/wallet`,
       playStoreUrl: `https://play.store.link&referrer=invite-code%3D${mockKey}`,
       appStoreUrl: 'https://app.store.link',
-      bundleId: 'org.celo.mobile.integration',
+      bundleId: 'org.celo.mobile.alfajores',
     })
   })
 })
