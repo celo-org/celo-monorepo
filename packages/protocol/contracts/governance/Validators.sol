@@ -10,6 +10,7 @@ import "./interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 
+import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -25,7 +26,8 @@ contract Validators is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  UsingPrecompiles
+  UsingPrecompiles,
+  CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
@@ -140,11 +142,6 @@ contract Validators is
     address indexed group,
     uint256 groupPayment
   );
-
-  modifier onlyVm() {
-    require(msg.sender == address(0), "Only VM can call");
-    _;
-  }
 
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
