@@ -79,7 +79,7 @@ contract EpochRewards is
   event TargetVotingYieldUpdated(uint256 fraction);
 
   /**
-   * @notice Initializes critical variables.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param targetVotingYieldInitial The initial relative target block reward for voters.
    * @param targetVotingYieldMax The max relative target block reward for voters.
