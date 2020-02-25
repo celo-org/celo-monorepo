@@ -131,7 +131,7 @@ export function* navigateToProperScreen() {
   } else if (!redeemComplete && !account) {
     appLockedAwareNavigate(Screens.EnterInviteCode)
   } else if (!hasSeenVerificationNux) {
-    appLockedAwareNavigate(Screens.VerificationEducationScreen)
+    appLockedAwareNavigate(Screens.VerificationLoadingScreen)
   } else {
     appLockedAwareNavigate(Stacks.AppStack)
   }

@@ -24,27 +24,22 @@ export interface CarouselItem {
 }
 
 function renderItem({ item, index }: { item: CarouselItem; index: number }) {
-  let comp
-  if (Platform.OS === 'android') {
-    comp = (
-      <BoxShadow setting={shadowOpt}>
+  return (
+    <View style={styles.itemWrapper}>
+      {Platform.OS === 'android' ? (
+        <BoxShadow setting={shadowOpt}>
+          <View style={styles.itemContainer}>
+            {item.icon}
+            <Text style={styles.itemText}>{item.text}</Text>
+          </View>
+        </BoxShadow>
+      ) : (
         <View style={styles.itemContainer}>
           {item.icon}
           <Text style={styles.itemText}>{item.text}</Text>
         </View>
-      </BoxShadow>
-    )
-  } else {
-    comp = (
-      <View style={styles.itemContainer}>
-        {item.icon}
-        <Text style={styles.itemText}>{item.text}</Text>
-      </View>
-    )
-  }
-
-  return (
-    <View style={{ paddingVertical: 15, position: 'relative', overflow: 'visible' }}>{comp}</View>
+      )}
+    </View>
   )
 }
 
@@ -120,6 +115,11 @@ const styles = StyleSheet.create({
     shadowRadius: RADIUS,
     shadowColor: colors.dark,
     shadowOffset: { height: 0, width: 0 },
+  },
+  itemWrapper: {
+    paddingVertical: 15,
+    position: 'relative',
+    overflow: 'visible',
   },
   itemText: {
     ...fontStyles.bodyLarge,
