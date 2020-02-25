@@ -113,6 +113,16 @@ contract Attestations is
   event AttestationRequestFeeSet(address indexed token, uint256 value);
   event SelectIssuersWaitBlocksSet(uint256 value);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   * @param _attestationExpiryBlocks The new limit on blocks allowed to come between requesting
+   * an attestation and completing it.
+   * @param _selectIssuersWaitBlocks The wait period in blocks to call selectIssuers on attestation
+   * requests.
+   * @param attestationRequestFeeTokens The address of tokens that fees should be payable in.
+   * @param attestationRequestFeeValues The corresponding fee values.
+   */
   function initialize(
     address registryAddress,
     uint256 _attestationExpiryBlocks,
