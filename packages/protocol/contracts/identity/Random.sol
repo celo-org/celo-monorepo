@@ -4,13 +4,14 @@ import "./interfaces/IRandom.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
 
 /**
  * @title Provides randomness for verifier selection
  */
-contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
+contract Random is IRandom, Ownable, Initializable, UsingPrecompiles, CalledByVm {
   using SafeMath for uint256;
 
   /* Stores most recent commitment per address */
@@ -26,7 +27,7 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
   /**
-   * @notice Initializes the contract with initial parameters.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _randomnessBlockRetentionWindow Number of old random blocks whose randomness
    * values can be queried.
    */
@@ -55,8 +56,10 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles {
    * `randomness` and `newCommitment`. Before running regular transactions, this function should be
    * called.
    */
-  function revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) external {
-    require(msg.sender == address(0), "only VM can call");
+  function revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer)
+    external
+    onlyVm
+  {
     _revealAndCommit(randomness, newCommitment, proposer);
   }
 

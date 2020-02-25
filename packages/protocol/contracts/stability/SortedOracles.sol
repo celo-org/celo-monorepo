@@ -49,6 +49,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     _;
   }
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
+   */
   function initialize(uint256 _reportExpirySeconds) external initializer {
     _transferOwnership(msg.sender);
     setReportExpiry(_reportExpirySeconds);
@@ -56,7 +60,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   /**
    * @notice Sets the report expiry parameter.
-   * @param _reportExpirySeconds Desired value of report expiry.
+   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
    */
   function setReportExpiry(uint256 _reportExpirySeconds) public onlyOwner {
     require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
@@ -82,7 +86,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   /**
    * @notice Removes an Oracle.
+   * @param token The address of the token.
    * @param oracleAddress The address of the oracle.
+   * @param index The index of `oracleAddress` in the list of oracles.
    */
   function removeOracle(address token, address oracleAddress, uint256 index) external onlyOwner {
     require(
@@ -262,7 +268,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
-   * However, a > 1 elements reports list should alwas be maintained
+   * However, a > 1 elements reports list should always be maintained
    */
   function removeReport(address token, address oracle) private {
     if (numTimestamps(token) == 1 && reportExists(token, oracle)) return;

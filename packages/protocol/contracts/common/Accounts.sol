@@ -60,6 +60,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -523,7 +527,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
-   * @notice Authorizes some role of of `msg.sender`'s account to another address.
+   * @notice Authorizes some role of `msg.sender`'s account to another address.
    * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
