@@ -6,6 +6,7 @@ import {
   mineBlocks,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { normalizeAddressWith0x } from '@celo/utils/lib/address'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -22,7 +23,6 @@ import {
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import { normalizeAddressWith0x } from '@celo/utils/src/address'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
@@ -933,11 +933,9 @@ contract('Election', (accounts: string[]) => {
           numbers[pad('0x2a' + i)] = randomVotes[i] / 2
           numbers[pad('0x3a' + i)] = randomVotes[i] / 3
           numbers[pad('0x4a' + i)] = randomVotes[i] / 4
-          console.log('mark', pad('0x00' + i), randomVotes[i], prev, NULL_ADDRESS, prev)
           await registry.setAddressFor(CeloContractName.Validators, accounts[0])
           await election.markGroupEligible(pad('0x00' + i), NULL_ADDRESS, prev)
           await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-          console.log('vote', pad('0x00' + i), randomVotes[i], NULL_ADDRESS, prev)
           await election.vote(pad('0x00' + i), randomVotes[i], NULL_ADDRESS, prev, {
             from: voter1.address,
           })
@@ -945,27 +943,16 @@ contract('Election', (accounts: string[]) => {
         }
       })
       it('can elect validators', async () => {
-        console.log(await election.electValidatorSignersDebug({ gas: 19e6, from: accounts[0] }))
+        for (let i = 10; i < 410; i += 10) {
+          await election.setElectableValidators(10, i)
+        }
         const lst = await election.electValidatorSigners()
         const smallest = lst
           .map(normalizeAddressWith0x)
           .map((a) => numbers[a])
-          .sort()[0]
+          .sort((a, b) => a - b)[0]
         const number100th = Object.values(numbers).sort((a: any, b: any) => b - a)[99]
         assert.equal(smallest, number100th)
-        lst.map(normalizeAddressWith0x).forEach((a) => console.log(a, numbers[a]))
-        console.log(
-          'smallest',
-          smallest,
-          '100th',
-          Object.values(numbers).sort((a: any, b: any) => b - a)[99]
-        )
-        console.log(await election.electValidatorSigners({ gas: 1e6, from: accounts[0] }))
-        /*
-        console.log(await election.electValidatorSignersDebug({ gas: 100e6, from: accounts[0] }))
-        console.log(await election.electValidatorSigners({ gas: 20e6, from: accounts[0] }))
-        console.log(await election.electValidatorSigners({ gas: 10e6, from: accounts[0] }))
-        console.log(await election.electValidatorSigners({ gas: 1e6, from: accounts[0] }))*/
       })
     })
 
