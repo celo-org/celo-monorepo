@@ -140,7 +140,7 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    maxGroupSize: '5',
+    maxGroupSize: 5,
     // 30 Days divided by 24 to accelerate for Stake off
     slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24,
 
