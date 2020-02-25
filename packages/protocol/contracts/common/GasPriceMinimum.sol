@@ -29,6 +29,13 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction public adjustmentSpeed;
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param _registryAddress The address of the registry core smart contract.
+   * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
+   * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
+   * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
+   */
   function initialize(
     address _registryAddress,
     uint256 _gasPriceMinimumFloor,
@@ -45,6 +52,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
 
   /**
    * @notice Set a multiplier that impacts how quickly gas price minimum is adjusted.
+   * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
   function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
@@ -55,6 +63,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
 
   /**
    * @notice Set the block density targeted by the gas price minimum algorithm.
+   * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
   function setTargetDensity(uint256 _targetDensity) public onlyOwner {
@@ -65,6 +74,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
 
   /**
    * @notice Set the minimum gas price treshold.
+   * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
    * @dev Value is expected to be > 0.
    */
   function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner {

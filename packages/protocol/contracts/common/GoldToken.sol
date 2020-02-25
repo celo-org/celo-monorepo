@@ -12,7 +12,7 @@ contract GoldToken is Initializable, CalledByVm, IERC20Token, ICeloToken {
 
   // Address of the TRANSFER precompiled contract.
   // solhint-disable state-visibility
-  address constant TRANSFER = address(0xfd);
+  address constant TRANSFER = address(0xff - 2);
   string constant NAME = "Celo Gold";
   string constant SYMBOL = "cGLD";
   uint8 constant DECIMALS = 18;
@@ -28,9 +28,8 @@ contract GoldToken is Initializable, CalledByVm, IERC20Token, ICeloToken {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
   /**
-   * @notice Sets 'initialized' to true.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
-  // solhint-disable-next-line no-empty-blocks
   function initialize() external initializer {
     totalSupply_ = 0;
   }

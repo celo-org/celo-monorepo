@@ -116,8 +116,8 @@ contract Election is
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param minElectableValidators The minimum number of validators that can be elected.
    * @param _maxNumGroupsVotedFor The maximum number of groups that an acconut can vote for at once.
    * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
@@ -931,8 +931,8 @@ contract Election is
   function getCurrentValidatorSigners() public view returns (address[] memory) {
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
-    for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorSignerAddressFromCurrentSet(idx);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      res[i] = validatorSignerAddressFromCurrentSet(i);
     }
     return res;
   }
