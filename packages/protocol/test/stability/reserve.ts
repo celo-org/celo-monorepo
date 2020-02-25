@@ -606,7 +606,7 @@ contract('Reserve', (accounts: string[]) => {
         reserve.setAssetAllocations(newAssetAllocationSymbols, badAssetAllocationWeights)
       )
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
-      assert.equal(assetAllocationWeights.length, 0)
+      assert.equal(assetAllocationWeights.length, initialAssetAllocationWeights.length)
     })
 
     it('should fail if the asset allocation includes multiple weights for one symbol', async () => {
@@ -616,7 +616,7 @@ contract('Reserve', (accounts: string[]) => {
         reserve.setAssetAllocations(badAssetAllocationSymbols, newAssetAllocationWeights)
       )
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
-      assert.equal(assetAllocationWeights.length, 0)
+      assert.equal(assetAllocationWeights.length, initialAssetAllocationWeights.length)
     })
 
     it("should fail if the asset allocation doesn't include cGLD", async () => {
@@ -626,7 +626,7 @@ contract('Reserve', (accounts: string[]) => {
         reserve.setAssetAllocations(badAssetAllocationSymbols, newAssetAllocationWeights)
       )
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
-      assert.equal(assetAllocationWeights.length, 0)
+      assert.equal(assetAllocationWeights.length, initialAssetAllocationWeights.length)
     })
   })
 
