@@ -116,6 +116,7 @@ function ContributorPlaceHolder() {
         accessibilityLabel={`Placeholder`}
         source={{
           uri:
+            // TODO download and use locally
             'https://dl.airtable.com/.attachmentThumbnails/1a9a0eb9124b3d5ef15091b9a50ddbd1/dda3632d',
         }}
         style={styles.photo}
