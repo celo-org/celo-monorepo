@@ -1,11 +1,13 @@
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-import fs = require('fs')
 import {
-  MultiSigContract,
+  GoldTokenInstance,
   RegistryInstance,
   ReleaseGoldContract,
+  ReleaseGoldMultiSigContract,
+  ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -13,7 +15,13 @@ module.exports = async (callback: (error?: any) => number) => {
       string: ['network', 'grants'],
     })
     const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-    const Multisig: MultiSigContract = artifacts.require('MultiSig')
+    const goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
+    const ReleaseGoldMultiSig: ReleaseGoldMultiSigContract = artifacts.require(
+      'ReleaseGoldMultiSig'
+    )
+    const ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract = artifacts.require(
+      'ReleaseGoldMultiSigProxy'
+    )
     const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGold')
     const ReleaseGoldProxy: ReleaseGoldProxyContract = artifacts.require('ReleaseGoldProxy')
     const releases = []
@@ -21,10 +29,7 @@ module.exports = async (callback: (error?: any) => number) => {
       if (err) {
         throw err
       }
-      data = JSON.parse(data)
-      const entity = data.entity
-      const releaseGoldConfigs = data.grants
-      for (const releaseGoldConfig of releaseGoldConfigs) {
+      for (const releaseGoldConfig of JSON.parse(data)) {
         const releaseStartTime = new Date(releaseGoldConfig.releaseStartTime)
         const releaseCliffTime = releaseGoldConfig.releaseCliffTime
         const numReleasePeriods = releaseGoldConfig.numReleasePeriods
@@ -55,14 +60,28 @@ module.exports = async (callback: (error?: any) => number) => {
           registry.address
         )
         const releaseGoldProxyInstance = await ReleaseGoldProxy.new()
+        const releaseGoldMultiSigProxyInstance = await ReleaseGoldMultiSigProxy.new()
+        await goldToken.transfer(
+          releaseGoldProxyInstance.address,
+          amountReleasedPerPeriod * numReleasePeriods,
+          { from: releaseOwner }
+        )
+        // const initializeAbi = (releaseGoldProxyInstance as any).abi.find(
+        //   (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+        // )
+        // const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, [])
+        // await releaseGoldProxyInstance._setAndInitializeImplementation(releaseGoldInstance.address, callData)
         await releaseGoldProxyInstance._setImplementation(releaseGoldInstance.address)
-        const multiSigInstance = await Multisig.new()
-        await multiSigInstance.initialize([entity, beneficiary], 2)
-        await releaseGoldProxyInstance._transferOwnership(multiSigInstance.address)
+        const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
+        await releaseGoldMultiSigInstance.initialize([releaseOwner, beneficiary], 2)
+        await releaseGoldProxyInstance._transferOwnership(releaseGoldMultiSigInstance.address)
+        await releaseGoldMultiSigProxyInstance._setImplementation(
+          releaseGoldMultiSigInstance.address
+        )
         releases.push([
           releaseGoldConfig.beneficiary,
           releaseGoldProxyInstance.address,
-          multiSigInstance.address,
+          releaseGoldMultiSigProxyInstance.address,
         ])
       }
       // tslint:disable-next-line: no-console

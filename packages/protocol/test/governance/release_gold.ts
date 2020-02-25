@@ -59,7 +59,7 @@ interface ReleaseGoldConfig {
   releaseOwner: string
   refundAddress: string
   subjectToLiquidityProvision: boolean
-  initialDistributionPercentage: number
+  initialDistributionRatio: number
   canValidate: boolean
   canVote: boolean
 }
@@ -108,7 +108,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     releaseOwner,
     refundAddress,
     subjectToLiquidityProvision: false,
-    initialDistributionPercentage: 1000, // No distribution limit
+    initialDistributionRatio: 1000, // No distribution limit
     canValidate: false,
     canVote: true,
   }
@@ -129,7 +129,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.releaseOwner,
       releaseGoldSchedule.refundAddress,
       releaseGoldSchedule.subjectToLiquidityProvision,
-      releaseGoldSchedule.initialDistributionPercentage,
+      releaseGoldSchedule.initialDistributionRatio,
       releaseGoldSchedule.canValidate,
       releaseGoldSchedule.canVote,
       registry.address,
@@ -1320,7 +1320,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           })
         })
 
-        // Max distribution should set a static value of `percentage` of total funds at call time of `setMaxDistribution`
+        // Max distribution should set a static value of `ratio` of total funds at call time of `setMaxDistribution`
         // So this is testing that the maxDistribution is unrelated to rewards, except the 100% special case.
         describe('when max distribution is 50% and all gold is released', () => {
           beforeEach(async () => {

@@ -27,6 +27,5 @@ if ! nc -z 127.0.0.1 8545 ; then
 fi
 
 yarn run build && \
-# yarn run truffle-config -n $NETWORK && \
 yarn run truffle exec ./scripts/truffle/deploy_release_contracts.js \
   --network $NETWORK --grants $GRANTS_FILE --build_directory $PWD/build/$NETWORK \
