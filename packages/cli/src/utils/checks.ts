@@ -261,7 +261,7 @@ class CheckBuilder {
 
   isNotVoting = (address: Address) =>
     this.addCheck(
-      `${address} is not currently voting`,
+      `${address} is not currently voting on a governance proposal`,
       this.withGovernance((gov) => negate(gov.isVoting(address))),
       `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
     )
