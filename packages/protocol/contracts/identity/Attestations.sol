@@ -596,7 +596,8 @@ contract Attestations is
 
     uint256 currentIndex = 0;
 
-    // The length of the list (variable issuersLength) is decremented in each round, so the loop always terminates
+    // The length of the list (variable issuersLength) is decremented in each round,
+    // so the loop always terminates
     while (currentIndex < unselectedRequest.attestationsRequested) {
       require(issuersLength > 0, "not enough issuers");
       seed = keccak256(abi.encodePacked(seed));
@@ -624,7 +625,8 @@ contract Attestations is
         );
       }
 
-      // Remove the validator that was selected from the list, by replacing it by the last element in the list
+      // Remove the validator that was selected from the list,
+      // by replacing it by the last element in the list
       issuersLength = issuersLength.sub(1);
       issuers[idx] = issuers[issuersLength];
     }
