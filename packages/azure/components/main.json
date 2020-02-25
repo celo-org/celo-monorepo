@@ -320,7 +320,7 @@
     "virtualNetworkId":
       "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetId": "[concat(variables('virtualNetworkId'), '/subnets/default')]",
-    "validatorKeyVaultName": "[concat(deployment().name, '-validatorKeyVault')]",
+    "validatorKeyVaultName": "[concat('validator-', celo.globalName('keyvault'))]",
     "validatorPrivateKeyName": "validatorPrivateKey",
     "validatorGethAccountSecretName": "validatorGethAccountSecret",
     "validatorDataDiskName": "validatorDataDisk",
@@ -329,7 +329,7 @@
     "validatorNetworkSecurityGroupName": "validatorNetworkSecurityGroup",
     "validatorUserAssignedIdentityName":
       "[concat(deployment().name, '-validatorUserAssignedIdentity')]",
-    "proxyKeyVaultName": "[concat(deployment().name, '-proxyKeyVault')]",
+    "proxyKeyVaultName": "[concat('proxy-', celo.globalName('keyvault'))]",
     "proxyPrivateKeyName": "proxyPrivateKey",
     "proxyPublicIpAddressName": "proxyPublicIpAddress",
     "proxyNetworkSecurityGroupName": "proxyNetworkSecurityGroup",
@@ -337,7 +337,7 @@
     "proxyVirtualMachineName": "proxyVirtualMachine",
     "proxyNetworkInterfaceName": "proxyNetworkInterface",
     "proxyUserAssignedIdentityName": "[concat(deployment().name, '-proxyUserAssignedIdentity')]",
-    "attesterKeyVaultName": "[concat(deployment().name, '-attesterKeyVault')]",
+    "attesterKeyVaultName": "[concat('attester-', celo.globalName('keyvault'))]",
     "attesterPrivateKeyName": "attesterPrivateKey",
     "attesterTwilioAuthTokenName": "attesterTwilioAuthToken",
     "attesterGethAccountSecretName": "attesterGethAccountSecret",
@@ -348,7 +348,7 @@
     "attesterUserAssignedIdentityName":
       "[concat(deployment().name, '-attesterUserAssignedIdentity')]",
     "attesterDataDiskName": "attesterDataDisk",
-    "attesterDBName": "[concat(deployment().name, '-attesterDB')]",
+    "attesterDBName": "[concat('attester-', celo.globalName('postgresql'))]",
     "attesterPostgreSQLVersion": "9.6",
     "attesterPostgreSQLStorageProfile": {
       "storageMB": 51200,
@@ -369,5 +369,24 @@
       "sku": "9-backports",
       "version": "latest"
     }
-  }
+  },
+  "functions": [
+    {
+      "namespace": "celo",
+      "members": {
+        "globalName": {
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string"
+            }
+          ],
+          "output": {
+            "type": "string",
+            "value": "[uniqueString(subscription().subscriptionId, resourceGroup().name, parameters('name'))]"
+          }
+        }
+      }
+    }
+  ]
 }
