@@ -72,6 +72,7 @@
   "quitApp": "Dejar",
   "loading": "Cargando…",
   "inviteFailed": "Falló el envío de la invitación",
+  "inviteOpenAppFailed": "No se pudo abrir la aplicación de mensajería, el código de invitación se copió al portapapeles",
   "importContactsFailed": "Error al importar contactos",
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",

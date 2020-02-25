@@ -28,12 +28,18 @@ export enum InviteBy {
 export interface StoreInviteeDataAction {
   type: Actions.STORE_INVITEE_DATA
   address: string
+  inviteCode: string
   e164Number: string
 }
 
-export const storeInviteeData = (address: string, e164Number: string): StoreInviteeDataAction => ({
+export const storeInviteeData = (
+  address: string,
+  inviteCode: string,
+  e164Number: string
+): StoreInviteeDataAction => ({
   type: Actions.STORE_INVITEE_DATA,
   address,
+  inviteCode,
   e164Number,
 })
 
