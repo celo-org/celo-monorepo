@@ -282,7 +282,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
       "Insufficient unlocked balance to withdraw amount"
     );
     totalWithdrawn = totalWithdrawn.add(amount);
-    require(getGoldToken().transfer(beneficiary, amount), "Withdrawal of gold failed");
+    beneficiary.transfer(amount);
     if (getRemainingTotalBalance() == 0) {
       selfdestruct(refundAddress);
     }
@@ -294,15 +294,9 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   function refundAndFinalize() external nonReentrant onlyReleaseOwnerAndRevoked {
     require(getRemainingLockedBalance() == 0, "Total gold balance must be unlocked");
     uint256 beneficiaryAmount = revocationInfo.releasedBalanceAtRevoke.sub(totalWithdrawn);
-    require(
-      getGoldToken().transfer(beneficiary, beneficiaryAmount),
-      "Transfer of gold to beneficiary failed"
-    );
+    beneficiary.transfer(beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
-    require(
-      getGoldToken().transfer(refundAddress, revokerAmount),
-      "Transfer of gold to refundAddress failed"
-    );
+    refundAddress.transfer(revokerAmount);
     selfdestruct(refundAddress);
   }
 
