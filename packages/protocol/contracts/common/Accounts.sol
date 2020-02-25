@@ -60,6 +60,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -100,7 +104,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function setName(string memory name) public {
     require(isAccount(msg.sender), "Unknown account");
-    accounts[msg.sender].name = name;
+    Account storage account = accounts[msg.sender];
+    account.name = name;
     emit AccountNameSet(msg.sender, name);
   }
 
@@ -113,7 +118,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function setWalletAddress(address walletAddress) public {
     require(isAccount(msg.sender), "Unknown account");
-    accounts[msg.sender].walletAddress = walletAddress;
+    Account storage account = accounts[msg.sender];
+    account.walletAddress = walletAddress;
     emit AccountWalletAddressSet(msg.sender, walletAddress);
   }
 
@@ -123,7 +129,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
     require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
-    accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
+    Account storage account = accounts[msg.sender];
+    account.dataEncryptionKey = dataEncryptionKey;
     emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
   }
 
@@ -133,7 +140,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function setMetadataURL(string calldata metadataURL) external {
     require(isAccount(msg.sender), "Unknown account");
-    accounts[msg.sender].metadataURL = metadataURL;
+    Account storage account = accounts[msg.sender];
+    account.metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
   }
 
@@ -519,7 +527,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
-   * @notice Authorizes some role of of `msg.sender`'s account to another address.
+   * @notice Authorizes some role of `msg.sender`'s account to another address.
    * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
