@@ -168,20 +168,15 @@ contract('MultiSig', (accounts: any) => {
     it('should not allow adding the null address', async () => {
       // @ts-ignore
       const txData = multiSig.contract.methods.addOwner(NULL_ADDRESS).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
-
       // @ts-ignore: TODO(mcortesi): fix typings
       const txEvent = _.find(tx.logs, {
         event: 'Confirmation',
       })
       const txId = txEvent.args.transactionId
-      // @ts-ignore: TODO(mcortesi): fix typings
-      const events = (await multiSig.confirmTransaction(txId, { from: accounts[1] })).logs
-      assert.equal(events.length, 2)
-      assert.equal(events[1].event, 'ExecutionFailure')
+      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
     })
   })
 
@@ -241,20 +236,15 @@ contract('MultiSig', (accounts: any) => {
     it('should not allow an owner to be replaced by the null address', async () => {
       // @ts-ignore
       const txData = multiSig.contract.methods.replaceOwner(accounts[1], NULL_ADDRESS).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
-
       // @ts-ignore: TODO(mcortesi): fix typings
       const txEvent = _.find(tx.logs, {
         event: 'Confirmation',
       })
       const txId = txEvent.args.transactionId
-      // @ts-ignore: TODO(mcortesi): fix typings
-      const events = (await multiSig.confirmTransaction(txId, { from: accounts[1] })).logs
-      assert.equal(events.length, 2)
-      assert.equal(events[1].event, 'ExecutionFailure')
+      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
     })
   })
 
