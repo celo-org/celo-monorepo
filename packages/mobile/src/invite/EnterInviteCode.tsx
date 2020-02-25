@@ -73,7 +73,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
   checkInviteCode = async () => {
     // Check deeplink
     const validCode = await getValidInviteCodeFromReferrerData()
-    console.log('validCode', validCode)
     if (validCode) {
       this.setState({ inputValue: validCode })
       this.props.redeemInvite(validCode)

@@ -26,8 +26,7 @@ export async function generateShortInviteLink({
     }
 
     // Please note other parameter than UNGUESSABLE is unsafe
-    // const shortUrl = await firebase.links().createShortDynamicLink(firebaseLink, 'UNGUESSABLE')
-    const shortUrl = await firebase.links().createDynamicLink(firebaseLink)
+    const shortUrl = await firebase.links().createShortDynamicLink(firebaseLink, 'UNGUESSABLE')
 
     // It is NOT recommended to shorten this link with another
     // shortener (e.g. bit.ly) because it can break deep links

@@ -6,7 +6,6 @@ import { Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -140,14 +139,11 @@ export function* sendInvite(
 ) {
   yield call(getConnectedUnlockedAccount)
   try {
-    // const temporaryWalletAccount = web3.eth.accounts.create()
-    // const temporaryAddress = temporaryWalletAccount.address
-    // const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
-    const inviteCode = '0kMUJPMWvLoYXvtC12QMvuyqadX9y1fwFccmj9Vuz+0%3D'
+    const temporaryWalletAccount = web3.eth.accounts.create()
+    const temporaryAddress = temporaryWalletAccount.address
+    const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
     const link = yield call(generateInviteLink, inviteCode)
-    console.log(link)
-    return
     const msg = i18n.t(amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS', {
       code: inviteCode,
       link,

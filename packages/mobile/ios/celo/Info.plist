@@ -2,13 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>FirebaseDynamicLinksCustomDomains</key>
-	<array>
-		<string>https://l.celo.org</string>
-		<string>https://celol.page.link</string>
-	</array>
-	<key>LSApplicationCategoryType</key>
-	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -33,7 +26,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>celo</string>
+			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>celo</string>
@@ -42,6 +35,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>16</string>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://l.celo.org</string>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
