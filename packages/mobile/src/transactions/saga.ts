@@ -12,7 +12,7 @@ import {
   removeStandbyTransaction,
   transactionConfirmed,
 } from 'src/transactions/actions'
-import { sendTransactionPromises } from 'src/transactions/send'
+import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'transactions/saga'
@@ -40,17 +40,21 @@ export function* sendAndMonitorTransaction(
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
-    const { transactionHash, confirmation } = yield call(
-      sendTransactionPromises,
-      tx,
-      account,
-      TAG,
-      txId
-    )
-    const hash = yield transactionHash
-    yield put(addHashToStandbyTransaction(txId, hash))
+    const sendTxMethod = function*() {
+      const { transactionHash, confirmation } = yield call(
+        sendTransactionPromises,
+        tx,
+        account,
+        TAG,
+        txId
+      )
+      const hash = yield transactionHash
+      yield put(addHashToStandbyTransaction(txId, hash))
+      const result = yield confirmation
+      return result
+    }
+    yield call(wrapSendTransactionWithRetry, txId, sendTxMethod)
 
-    yield confirmation
     yield put(transactionConfirmed(txId))
 
     if (currency === CURRENCY_ENUM.GOLD) {

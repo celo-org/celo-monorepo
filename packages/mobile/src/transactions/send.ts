@@ -1,26 +1,26 @@
 import {
-  awaitConfirmation,
   getStableTokenContract,
   sendTransactionAsync,
   sendTransactionAsyncWithWeb3Signing,
   SendTransactionLogEvent,
   SendTransactionLogEventType,
 } from '@celo/walletkit'
-import { call, select } from 'redux-saga/effects'
+import { StableToken } from '@celo/walletkit/types/StableToken'
+import { call, delay, race, select, take } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
+import { assertNever } from 'src/utils/typescript'
 import { web3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 import { TransactionObject } from 'web3/eth/types'
 
 const TAG = 'transactions/send'
-
-// As per https://www.typescriptlang.org/docs/handbook/advanced-types.html#exhaustiveness-checking
-function assertNever(x: never): never {
-  throw new Error('Unexpected object: ' + x)
-}
+const TX_NUM_RETRIES = 3
+const TX_RETRY_DELAY = 1000 // 1s
+const TX_TIMEOUT = 20000 // 20s
 
 const getLogger = (tag: string, txId: string) => {
   return (event: SendTransactionLogEvent) => {
@@ -60,17 +60,22 @@ const getLogger = (tag: string, txId: string) => {
 
 // Sends a transaction and async returns promises for the txhash, confirmation, and receipt
 // Only use this method if you need more granular control of the different events
+// WARNING: this method doesn't have retry and timeout logic built in, turns out that's tricky
+// to get right with this promise set interface. Prefer sendTransaction below
 export function* sendTransactionPromises(
   tx: TransactionObject<any>,
   account: string,
   tag: string,
   txId: string,
-  staticGas?: number | undefined
+  staticGas?: number
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
-  const stableToken = yield call(getStableTokenContract, web3)
-  // This if-else case is temprary and will disappear once we move from `walletkit` to `contractkit`.
-  const fornoMode = yield select(fornoSelector)
+  // Use stabletoken to pay for gas by default
+  const stableToken: StableToken = yield call(getStableTokenContract, web3)
+  const fornoMode: boolean = yield select(fornoSelector)
+
+  Logger.debug(`${TAG}@sendTransactionPromises`, `Sending tx ${txId} in forno mode ${fornoMode}`)
+  // This if-else case is temporary and will disappear once we move from `walletkit` to `contractkit`.
   if (fornoMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
     // ensures that we get a more meaningful error if the forno server is down, which
@@ -78,10 +83,6 @@ export function* sendTransactionPromises(
     if (__DEV__) {
       yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
-    Logger.debug(
-      `${TAG}@sendTransactionPromises`,
-      `Sending transaction with id ${txId} using web3 signing`
-    )
     const transactionPromises = yield call(
       sendTransactionAsyncWithWeb3Signing,
       web3,
@@ -116,11 +117,58 @@ export function* sendTransaction(
   account: string,
   tag: string,
   txId: string,
-  staticGas?: number | undefined
+  staticGas?: number,
+  cancelAction?: string
 ) {
-  const txPromises = yield call(sendTransactionPromises, tx, account, tag, txId, staticGas)
-  const confirmation = yield call(awaitConfirmation, txPromises)
-  return confirmation
+  const sendTxMethod = function*() {
+    const { confirmation } = yield call(sendTransactionPromises, tx, account, tag, txId, staticGas)
+    const result = yield confirmation
+    return result
+  }
+  yield call(wrapSendTransactionWithRetry, txId, sendTxMethod, cancelAction)
+}
+
+export function* wrapSendTransactionWithRetry(
+  txId: string,
+  sendMethod: any,
+  cancelAction?: string
+) {
+  for (let i = 0; i < TX_NUM_RETRIES; i++) {
+    try {
+      const { result, timeout, cancel } = yield race({
+        result: call(sendMethod),
+        timeout: delay(TX_TIMEOUT),
+        ...(cancelAction && {
+          cancel: take(cancelAction),
+        }),
+      })
+
+      if (result === true) {
+        Logger.debug(`${TAG}@wrapSendTransactionWithRetry`, `tx ${txId} result true`)
+        return result
+      } else if (result === false) {
+        Logger.error(`${TAG}@wrapSendTransactionWithRetry`, `tx ${txId} result false`)
+        throw new Error(ErrorMessages.TRANSACTION_FAILED)
+      } else if (timeout) {
+        Logger.error(`${TAG}@wrapSendTransactionWithRetry`, `tx ${txId} timeout`)
+        throw new Error(ErrorMessages.TRANSACTION_TIMEOUT)
+      } else if (cancel) {
+        Logger.warn(`${TAG}@wrapSendTransactionWithRetry`, `tx ${txId} cancelled`)
+        return null
+      } else {
+        Logger.warn(`${TAG}@wrapSendTransactionWithRetry`, `Unexpected case, no result or failure`)
+      }
+    } catch (err) {
+      Logger.error(`${TAG}@wrapSendTransactionWithRetry`, `Tx ${txId} failed`, err)
+      //TODO add check for web3 error and maybe don't retry?
+      if (i + 1 < TX_NUM_RETRIES) {
+        yield delay(TX_RETRY_DELAY)
+        Logger.debug(`${TAG}@wrapSendTransactionWithRetry`, `Tx ${txId} retrying attempt ${i + 1}`)
+      } else {
+        throw err
+      }
+    }
+  }
 }
 
 async function verifyUrlWorksOrThrow(url: string) {
