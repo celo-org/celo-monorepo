@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native'
-import BlueBanner, { styles as bannerStyle } from 'src/header/BlueBanner'
+import { styles as bannerStyle } from 'src/header/BlueBanner'
 import cssStyles from 'src/header/Header.3.scss'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
@@ -19,6 +19,7 @@ import OvalCoin from 'src/shared/OvalCoin'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
+const BlueBanner = dynamic(import('src/header/BlueBanner'))
 const CookieConsent = dynamic(
   (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
 )
@@ -62,6 +63,15 @@ const HAMBURGER_INNER = cssStyles['hamburger-inner']
 export class Header extends React.PureComponent<Props, State> {
   lastScrollOffset: number
 
+  state = {
+    showDesktopMenu: false,
+    menuFaded: false,
+    mobileMenuActive: false,
+    belowFoldUpScroll: false,
+    isBannerShowing: false,
+    bannerHeight: 0,
+  }
+
   handleScroll = throttle(() => {
     const goingUp = this.lastScrollOffset > scrollOffset()
     const belowFold = scrollOffset() > menuHidePoint()
@@ -90,19 +100,6 @@ export class Header extends React.PureComponent<Props, State> {
       this.closeMenu()
     }
   }, 200)
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      showDesktopMenu: false,
-      menuFaded: false,
-      mobileMenuActive: false,
-      belowFoldUpScroll: false,
-      isBannerShowing: false,
-      bannerHeight: 0,
-    }
-  }
 
   componentDidMount() {
     this.windowResize({ window: Dimensions.get('window') })
@@ -148,6 +145,7 @@ export class Header extends React.PureComponent<Props, State> {
   getForegroundColor = () => {
     return this.isDarkMode() ? colors.white : colors.dark
   }
+
   getBackgroundColor = () => {
     if (this.isTranslucent() && !this.state.belowFoldUpScroll) {
       return 'transparent'
@@ -161,6 +159,10 @@ export class Header extends React.PureComponent<Props, State> {
 
   setBannerHeight = (height: number) => {
     this.setState({ bannerHeight: height })
+  }
+
+  allWhiteLogo = () => {
+    return this.props.router.pathname === menu.ABOUT_US.link && !this.state.belowFoldUpScroll
   }
 
   render() {
@@ -218,10 +220,7 @@ export class Header extends React.PureComponent<Props, State> {
                       ]}
                     >
                       {this.isDarkMode() ? (
-                        <LogoDarkBg
-                          height={30}
-                          allWhite={this.isTranslucent() && !this.state.belowFoldUpScroll}
-                        />
+                        <LogoDarkBg height={30} allWhite={this.allWhiteLogo()} />
                       ) : (
                         <LogoLightBg height={30} />
                       )}

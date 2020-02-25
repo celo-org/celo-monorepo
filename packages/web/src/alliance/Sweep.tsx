@@ -135,8 +135,9 @@ const styles = StyleSheet.create({
     animationKeyframes: getKeyframes(),
   },
   sweepContainer: {
-    height: 1100,
     width: '100%',
+    height: '100vh',
+    transform: [{ translateY: -200 }],
   },
   mobileSweepContainer: {
     height: '180vw',
