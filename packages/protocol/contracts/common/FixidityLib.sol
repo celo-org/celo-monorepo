@@ -10,8 +10,8 @@ pragma solidity ^0.5.0;
  * right and check for limits, or with wrap() which expects a number already
  * in the internal representation of a fraction.
  * When using this library be sure to use maxNewFixed() as the upper limit for
- * creation of fixed point numbers. Use maxFixedMul(), maxFixedDividend() and
- * maxFixedAdd() if you want to be certain that those operations don't
+ * creation of fixed point numbers. Use maxFixedMul() and  maxFixedDividend()
+ * if you want to be certain that those operations don't
  * overflow.
  */
 library FixidityLib {
@@ -63,51 +63,11 @@ library FixidityLib {
   }
 
   /**
-   * @notice Maximum value that can be represented in a uint256
-   * @dev Test maxUint256() equals 2^256 -1
-   */
-  function maxUint256() internal pure returns (uint256) {
-    return 115792089237316195423570985008687907853269984665640564039457584007913129639935;
-  }
-
-  /**
-   * @notice Maximum value that can be converted to fixed point. Optimize for
-   * deployment.
+   * @notice Maximum value that can be converted to fixed point. Optimize for deployment.
    * @dev
    * Test maxNewFixed() equals maxUint256() / fixed1()
    */
   function maxNewFixed() internal pure returns (uint256) {
-    return 115792089237316195423570985008687907853269984665640564;
-  }
-
-  /**
-   * @notice Maximum value that can be safely used as an addition operator.
-   * @dev Test maxFixedAdd() equals maxUint256()-1 / 2
-   * Test add(maxFixedAdd(),maxFixedAdd()) equals maxFixedAdd() + maxFixedAdd()
-   * Test add(maxFixedAdd()+1,maxFixedAdd()+1) throws
-   */
-  function maxFixedAdd() internal pure returns (uint256) {
-    return 57896044618658097711785492504343953926634992332820282019728792003956564819967;
-  }
-
-  /**
-   * @notice Maximum value that can be safely used as a multiplication operator.
-   * @dev Calculated as sqrt(maxUint256()*fixed1()).
-   * Test multiply(maxFixedMul(),maxFixedMul()) is around maxFixedMul() * maxFixedMul()
-   * Test multiply(maxFixedMul(),maxFixedMul()+1) throws
-   */
-  function maxFixedMul() internal pure returns (uint256) {
-    return 340282366920938463463374607431768211455999999999999;
-  }
-
-  /**
-   * @notice Maximum value that can be safely used as a dividend.
-   * @dev divide(maxFixedDividend,newFixedFraction(1,fixed1())) is around maxUint256().
-   * Test maxFixedDividend() equals maxUint256()/fixed1()
-   * Test divide(maxFixedDividend(),1) equals maxFixedDividend()*(fixed1)
-   * Test divide(maxFixedDividend()+1,multiply(mulPrecision(),mulPrecision())) throws
-   */
-  function maxFixedDividend() internal pure returns (uint256) {
     return 115792089237316195423570985008687907853269984665640564;
   }
 
@@ -179,12 +139,12 @@ library FixidityLib {
   }
 
   /**
-   * @notice x+y. If any operator is higher than maxFixedAdd() it
-   * might overflow.
-   * @dev
-   * Test add(maxFixedAdd(),maxFixedAdd()) returns maxUint256()-1
-   * Test add(maxFixedAdd()+1,maxFixedAdd()+1) fails
-   * Test add(maxUint256(),maxUint256()) fails
+   * @notice x+y.
+   * @dev The maximum value that can be safely used as an addition operator is defined as
+   * maxFixedAdd = maxUint256()-1 / 2, or
+   * 57896044618658097711785492504343953926634992332820282019728792003956564819967.
+   * Test add(maxFixedAdd,maxFixedAdd) equals maxFixedAdd + maxFixedAdd
+   * Test add(maxFixedAdd+1,maxFixedAdd+1) throws
    */
   function add(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     uint256 z = x.value + y.value;
@@ -205,13 +165,14 @@ library FixidityLib {
   /**
    * @notice x*y. If any of the operators is higher than maxFixedMul() it
    * might overflow.
-   * @dev
+   * @dev The maximum value that can be safely used as a multiplication operator is calculated is
+   * sqrt(maxUint256()*fixed1()), or 340282366920938463463374607431768211455999999999999
    * Test multiply(0,0) returns 0
-   * Test multiply(maxFixedMul(),0) returns 0
-   * Test multiply(0,maxFixedMul()) returns 0
+   * Test multiply(maxFixedMul,0) returns 0
+   * Test multiply(0,maxFixedMul) returns 0
    * Test multiply(fixed1()/mulPrecision(),fixed1()*mulPrecision()) returns fixed1()
-   * Test multiply(maxFixedMul(),maxFixedMul()) is around maxUint256()
-   * Test multiply(maxFixedMul()+1,maxFixedMul()+1) fails
+   * Test multiply(maxFixedMul,maxFixedMul) is around maxUint256()
+   * Test multiply(maxFixedMul+1,maxFixedMul+1) fails
    */
   function multiply(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     if (x.value == 0 || y.value == 0) return Fraction(0);
@@ -269,12 +230,17 @@ library FixidityLib {
   }
 
   /**
-   * @notice x/y. If the dividend is higher than maxFixedDividend() it
+   * @notice x/y. If the dividend is higher than the max fixed dividend, it
    * might overflow. You can use multiply(x,reciprocal(y)) instead.
-   * @dev
+   * @dev The maximum value that can be safely used as a dividend is defined as
+   * divide(maxFixedDividend,newFixedFraction(1,fixed1())) is around maxUint256().
+   * This yields the value 115792089237316195423570985008687907853269984665640564.
+   * Test maxFixedDividend equals maxUint256()/fixed1()
+   * Test divide(maxFixedDividend,1) equals maxFixedDividend*(fixed1)
+   * Test divide(maxFixedDividend+1,multiply(mulPrecision(),mulPrecision())) throws
    * Test divide(fixed1(),0) fails
-   * Test divide(maxFixedDividend(),1) = maxFixedDividend()*(10^digits())
-   * Test divide(maxFixedDividend()+1,1) throws
+   * Test divide(maxFixedDividend,1) = maxFixedDividend*(10^digits())
+   * Test divide(maxFixedDividend+1,1) throws
    */
   function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     require(y.value != 0, "can't divide by 0");
