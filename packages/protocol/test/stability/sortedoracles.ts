@@ -174,14 +174,9 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(
-          aToken,
-          toFixed(new BigNumber(1)),
-          1,
-          NULL_ADDRESS,
-          NULL_ADDRESS,
-          { from: anOracle }
-        )
+        await sortedOracles.report(aToken, toFixed(new BigNumber(1)), NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
       })
 
       it('should return true if report is expired', async () => {
