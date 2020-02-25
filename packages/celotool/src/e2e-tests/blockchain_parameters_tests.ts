@@ -18,7 +18,7 @@ describe('Blockchain parameters tests', function(this: any) {
   let parameters: BlockchainParametersWrapper
 
   const gethConfig: GethRunConfig = {
-    migrateTo: 19,
+    migrateTo: 20,
     runPath: TMP_PATH,
     keepData: false,
     networkId: 1101,
