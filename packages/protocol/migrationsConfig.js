@@ -152,7 +152,7 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    maxGroupSize: '5',
+    maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.

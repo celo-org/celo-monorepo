@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
@@ -11,6 +10,7 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
@@ -114,7 +114,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       stableBucket = stableBucket.add(sellAmount);
       goldBucket = goldBucket.sub(buyAmount);
       require(
-        IERC20Token(stable).transferFrom(msg.sender, address(this), sellAmount),
+        IERC20(stable).transferFrom(msg.sender, address(this), sellAmount),
         "Transfer of sell token failed"
       );
       IStableToken(stable).burn(sellAmount);

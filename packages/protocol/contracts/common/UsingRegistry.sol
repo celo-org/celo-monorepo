@@ -1,6 +1,7 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IAccounts.sol";
 import "./interfaces/IERC20Token.sol";
@@ -101,8 +102,8 @@ contract UsingRegistry is Ownable {
     return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
   }
 
-  function getGoldToken() internal view returns (IERC20Token) {
-    return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  function getGoldToken() internal view returns (IERC20) {
+    return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
   function getGovernance() internal view returns (IGovernance) {

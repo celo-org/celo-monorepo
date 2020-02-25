@@ -1,14 +1,14 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./CalledByVm.sol";
 import "./Freezable.sol";
 import "./Initializable.sol";
-import "./interfaces/IERC20Token.sol";
 import "./interfaces/ICeloToken.sol";
 
-contract GoldToken is Initializable, CalledByVm, Freezable, IERC20Token, ICeloToken {
+contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   using SafeMath for uint256;
 
   // Address of the TRANSFER precompiled contract.
