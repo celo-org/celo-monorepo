@@ -143,7 +143,7 @@ spec:
         - |-
           set -euo pipefail
           if [[ "$GETH_DEBUG" != "true" ]]; then
-            rm /root/.celo/pkey
+            rm /root/.celo/pkey || true
           fi
 
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
@@ -155,7 +155,11 @@ spec:
           [[ "$GETH_DEBUG" == "true" ]] && PROXY_ALLOW_PRIVATE_IP_FLAG="--proxy.allowprivateip"
 
           PROXIED_FLAGS=""
-          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` --nodiscover $PROXY_ALLOW_PRIVATE_IP_FLAG"
+          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="\
+          --proxy.proxied \
+          --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` \
+          --nodiscover $PROXY_ALLOW_PRIVATE_IP_FLAG \
+          --proxy.allowprivateip"
 
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
