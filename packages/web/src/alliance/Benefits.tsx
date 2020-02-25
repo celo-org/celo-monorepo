@@ -1,17 +1,15 @@
 import * as React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
+import eductateImg from 'src/dev/devEvents.png'
 import { H2 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { standardStyles, fonts, textStyles } from 'src/styles'
-import { ImageSourcePropType } from 'react-native'
-
-import eductateImg from 'src/dev/devEvents.png'
+import { fonts, standardStyles, textStyles } from 'src/styles'
 
 const OFFERINGS = [eductateImg, eductateImg, eductateImg, eductateImg, eductateImg]
 
 export default React.memo(function Benefits() {
-  const { t } = useTranslation(NameSpaces.collective)
+  const { t } = useTranslation(NameSpaces.alliance)
   return (
     <GridRow
       desktopStyle={standardStyles.blockMargin}

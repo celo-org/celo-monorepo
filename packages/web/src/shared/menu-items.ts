@@ -8,8 +8,8 @@ export const menuItems = {
     link: '/about',
   },
   ALLIANCE_COLLECTIVE: {
-    name: 'Collective',
-    link: '/collective',
+    name: 'Alliance',
+    link: '/alliance',
   },
   APPLICATIONS: {
     name: 'Applications',

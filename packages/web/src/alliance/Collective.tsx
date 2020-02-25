@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import Benefits from 'src/collective/Benefits'
-import CollectiveMission from 'src/collective/CollectiveMission'
-import Sweep from 'src/collective/Sweep'
+import Benefits from 'src/alliance/Benefits'
+import CollectiveMission from 'src/alliance/CollectiveMission'
+import Sweep from 'src/alliance/Sweep'
 import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
@@ -10,7 +10,7 @@ import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
 export default function Collective() {
-  const { t } = useTranslation(NameSpaces.collective)
+  const { t } = useTranslation(NameSpaces.alliance)
   return (
     <View>
       <OpenGraph

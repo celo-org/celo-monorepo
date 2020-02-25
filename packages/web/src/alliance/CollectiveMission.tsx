@@ -1,11 +1,11 @@
-import { useTranslation, NameSpaces } from 'src/i18n'
-import { textStyles, standardStyles } from 'src/styles'
-import { H1, H4 } from 'src/fonts/Fonts'
 import { View } from 'react-native'
-import ColLogo from 'src/collective/ColLogo'
+import ColLogo from 'src/alliance/ColLogo'
+import { H1, H4 } from 'src/fonts/Fonts'
+import { NameSpaces, useTranslation } from 'src/i18n'
+import { standardStyles, textStyles } from 'src/styles'
 
 export default function CollectiveMission() {
-  const { t } = useTranslation(NameSpaces.collective)
+  const { t } = useTranslation(NameSpaces.alliance)
   return (
     <View style={standardStyles.centered}>
       <ColLogo />
