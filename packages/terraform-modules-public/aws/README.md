@@ -20,9 +20,9 @@ All nodes run on the Ubuntu LTS 18.04 AMI. Running `terraform apply` will select
 
 ## Hardening & Security
 
-Celo nodes will get provisioned with some recommended security settings from Celo's Security Audit team. Most of this hardening is done in `install-base.sh` and `final-hardening.sh`. 
+Celo nodes will get provisioned with some recommended security settings from cLab's Security Audit team. Most of this hardening is done in `install-base.sh` and `final-hardening.sh`. 
 
 ## Requirements
 
-Inside the [example](./example) folder you can find an example tf to use the module. We recommend you to use that tf as base file for your deployment, modifying the account variables used for your convenience.
+Inside the [example](./example) folder you can find an example tf to use the module. Use that tf as base file for your deployment, modifying the account variables used for your convenience.
 Alternatively you can take that tf files as base for customizing your deployment. Please take care specially about the VPC network configuration. The validators nodes deployed have not a public IP so the access to them is restricted. In order to provide outbound connection of these nodes the VPC network has to be configured with a NAT service allowing external traffic.
