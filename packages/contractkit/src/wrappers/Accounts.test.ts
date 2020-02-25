@@ -97,4 +97,8 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const signature = await accountsInstance.generateProofOfKeyPossession(accounts[0], accounts[1])
     await accountsInstance.setWalletAddress(accounts[1], signature)
   })
+
+  test('SNBAT to set to a different wallet address without a signature', async () => {
+    await expect(accountsInstance.setWalletAddress(accounts[1])).rejects
+  })
 })
