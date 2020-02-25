@@ -198,8 +198,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     );
 
     setRegistry(registryAddress);
-    beneficiary = _beneficiary;
-    emit BeneficiarySet(beneficiary);
+    _setBeneficiary(_beneficiary);
     revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
     refundAddress = _refundAddress;
@@ -261,6 +260,14 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param newBeneficiary The address of the new beneficiary
    */
   function setBeneficiary(address payable newBeneficiary) external onlyBeneficiary {
+    _setBeneficiary(newBeneficiary);
+  }
+
+  /**
+   * @notice Sets the beneficiary of the instance
+   * @param newBeneficiary The address of the new beneficiary
+   */
+  function _setBeneficiary(address payable newBeneficiary) private {
     require(newBeneficiary != address(0x0), "Can't set the beneficiary to the zero address");
     beneficiary = newBeneficiary;
     emit BeneficiarySet(newBeneficiary);

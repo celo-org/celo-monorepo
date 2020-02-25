@@ -407,7 +407,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       assertSameAddress(actualBeneficiary, newBeneficiary)
     })
 
-    it('should revert when setting a new beneficiary from the releas owner', async () => {
+    it('should revert when setting a new beneficiary from the release owner', async () => {
       await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: releaseOwner }))
     })
 
