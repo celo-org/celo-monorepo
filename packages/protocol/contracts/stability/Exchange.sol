@@ -7,7 +7,6 @@ import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
-import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../baklava/Freezable.sol";
@@ -19,7 +18,6 @@ import "../common/UsingRegistry.sol";
  */
 contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard, Freezable {
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
   using FixidityLib for FixidityLib.Fraction;
 
   event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
@@ -286,8 +284,12 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
     uint256 updatedGoldBucket = getUpdatedGoldBucket();
-    uint256 updatedStableBucket = getOracleExchangeRate().mul(updatedGoldBucket);
-
+    uint256 exchangeRateNumerator;
+    uint256 exchangeRateDenominator;
+    (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate();
+    uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedGoldBucket).div(
+      exchangeRateDenominator
+    );
     return (updatedGoldBucket, updatedStableBucket);
   }
 
@@ -339,13 +341,13 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
-  function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {
+  function getOracleExchangeRate() private view returns (uint256, uint256) {
     uint256 rateNumerator;
     uint256 rateDenominator;
     (rateNumerator, rateDenominator) = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     )
       .medianRate(stable);
-    return FractionUtil.Fraction(rateNumerator, rateDenominator);
+    return (rateNumerator, rateDenominator);
   }
 }
