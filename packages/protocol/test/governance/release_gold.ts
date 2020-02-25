@@ -168,8 +168,6 @@ contract('ReleaseGold', (accounts: string[]) => {
     await lockedGoldInstance.initialize(registry.address, UNLOCKING_PERIOD)
     await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount({ from: beneficiary })
-
-    // prefund the releaseGold factory instance with 2 gold tokens to simulate a well-funded factory contract in the genesis block
   })
 
   describe('#payable', () => {

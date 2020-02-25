@@ -66,8 +66,7 @@ contract UsingPrecompiles {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
-    uint256 sz = getEpochSize();
-    return blockNumber.sub(1) / sz;
+    return epochNumberOfBlock(blockNumber, getEpochSize());
   }
 
   /**
@@ -76,6 +75,26 @@ contract UsingPrecompiles {
    */
   function getEpochNumber() public view returns (uint256) {
     return getEpochNumberOfBlock(block.number);
+  }
+
+  /**
+   * @notice Returns the epoch number at a block.
+   * @param blockNumber Block number where epoch number is calculated.
+   * @param epochSize The epoch size in blocks.
+   * @return Epoch number.
+   */
+  function epochNumberOfBlock(uint256 blockNumber, uint256 epochSize)
+    internal
+    pure
+    returns (uint256)
+  {
+    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    uint256 epochNumber = blockNumber / epochSize;
+    if (blockNumber % epochSize == 0) {
+      return epochNumber;
+    } else {
+      return epochNumber + 1;
+    }
   }
 
   /**
@@ -182,7 +201,7 @@ contract UsingPrecompiles {
   /**
    * @notice Gets the parent seal bitmap from the header at the given block number.
    * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current number.
-   * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
+   * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
    */
   function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
     bytes memory out;
@@ -231,4 +250,21 @@ contract UsingPrecompiles {
     }
     return x;
   }
+
+  /**
+   * @notice Returns the minimum number of required signers for a given block number.
+   * @dev Computed in celo-blockchain as int(math.Ceil(float64(2*valSet.Size()) / 3))
+   */
+  function minQuorumSize(uint256 blockNumber) public view returns (uint256) {
+    return numberValidatorsInSet(blockNumber).mul(2).add(2).div(3);
+  }
+
+  /**
+   * @notice Computes byzantine quorum from current validator set size
+   * @return Byzantine quorum of validators.
+   */
+  function minQuorumSizeInCurrentSet() public view returns (uint256) {
+    return minQuorumSize(block.number);
+  }
+
 }
