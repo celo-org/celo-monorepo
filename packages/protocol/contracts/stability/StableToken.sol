@@ -537,18 +537,17 @@ contract StableToken is
   {
     uint256 units = _valueToUnits(inflationState.factor, value);
     balances[from] = balances[from].sub(units);
-    reserved[from] = reserved[from].add(units);
   }
 
   /**
    * @notice Refund balance after making payments for gas in this StableToken currency.
    * @param to The account to credit balance to
+   * @param value The amount of balance to refund
    * @dev We can assume that the inflation factor is up to date as `debitFrom`
    * will have been called in the same transaction
    */
-  function refundGas(address to) external onlyVm onlyWhenNotFrozen {
-    balances[to] = balances[to].add(reserved[to]);
-    reserved[to] = 0;
+  function refundGas(address to, uint256 value) external onlyVm onlyWhenNotFrozen {
+    balances[to] = balances[to].add(value);
   }
 
   /**
@@ -562,7 +561,6 @@ contract StableToken is
   function creditGas(address from, address to, uint256 value) external onlyVm onlyWhenNotFrozen {
     uint256 units = _valueToUnits(inflationState.factor, value);
     balances[to] = balances[to].add(units);
-    reserved[from] = reserved[from].sub(units);
     emit Transfer(from, to, value);
   }
 
