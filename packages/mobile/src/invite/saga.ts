@@ -2,7 +2,7 @@ import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { Linking, Platform } from 'react-native'
+import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
@@ -12,6 +12,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -31,8 +32,7 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
@@ -147,13 +147,16 @@ export function* sendInvite(
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
     const link = yield call(generateInviteLink, inviteCode)
-    const msg = i18n.t(amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS', {
-      code: inviteCode,
-      link,
-    })
+    const message = i18n.t(
+      amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS',
+      {
+        code: inviteCode,
+        link,
+      }
+    )
 
     // Store the Temp Address locally so we know which transactions were invites
-    yield put(storeInviteeData(temporaryAddress.toLowerCase(), e164Number))
+    yield put(storeInviteeData(temporaryAddress.toLowerCase(), inviteCode, e164Number))
 
     const txId = generateStandbyTransactionId(temporaryAddress)
 
@@ -167,7 +170,7 @@ export function* sendInvite(
     )
 
     yield call(waitForTransactionWithId, txId)
-    Logger.debug(TAG + '@sendInviteSaga', 'sent money to new wallet')
+    Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
@@ -176,42 +179,60 @@ export function* sendInvite(
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.TRANSACTION_FAILED))
+        yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
       }
+    } else {
+      Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
 
-    switch (inviteMode) {
-      case InviteBy.SMS: {
-        yield call(sendSms, e164Number, msg)
-        break
-      }
-      case InviteBy.WhatsApp: {
-        yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(msg)}`)
-        break
-      }
-    }
-
-    // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
-    yield delay(100)
+    yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }
 }
 
-export function* sendInviteSaga(action: SendInviteAction) {
+function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, message: string) {
+  try {
+    switch (inviteMode) {
+      case InviteBy.SMS: {
+        yield call(sendSms, e164Number, message)
+        break
+      }
+      case InviteBy.WhatsApp: {
+        yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
+        break
+      }
+      default:
+        throw new Error('Unsupported invite mode type: ' + inviteMode)
+    }
+
+    // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
+    yield delay(100)
+  } catch (error) {
+    // Not a critical error, allow saga to proceed
+    Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
+    yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
+    // TODO(Rossy): We need a UI for users to review their sent invite codes and
+    // redeem them in case they are unused or unsent like this case, see #2639
+    // For now just copying the code to the clipboard and notifying user
+    Clipboard.setString(message)
+  }
+}
+
+function* sendInviteSaga(action: SendInviteAction) {
   const { e164Number, inviteMode, amount, currency } = action
 
   try {
     yield call(sendInvite, e164Number, inviteMode, amount, currency)
-
     yield put(showMessage(i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number))
-    yield call(navigate, Screens.WalletHome)
+    navigateHome()
     yield put(sendInviteSuccess())
   } catch (e) {
     Logger.error(TAG, 'Send invite error: ', e)
     yield put(showError(ErrorMessages.INVITE_FAILED))
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
+    navigateHome()
   }
 }
 
