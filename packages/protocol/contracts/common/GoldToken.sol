@@ -32,7 +32,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20Token, ICeloTo
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress Address of the Registry contract.
    */
-  function initialize(registryAddress) external initializer {
+  function initialize(uint256 registryAddress) external initializer {
     totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
