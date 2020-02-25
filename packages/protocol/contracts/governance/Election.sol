@@ -824,10 +824,6 @@ contract Election is
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 
-  function electValidatorSignersDebug() external returns (address[] memory) {
-    return electNValidatorSigners(electableValidators.min, electableValidators.max);
-  }
-
   /**
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.

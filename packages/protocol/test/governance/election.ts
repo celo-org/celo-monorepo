@@ -943,9 +943,6 @@ contract('Election', (accounts: string[]) => {
         }
       })
       it('can elect validators', async () => {
-        for (let i = 10; i < 410; i += 10) {
-          await election.setElectableValidators(10, i)
-        }
         const lst = await election.electValidatorSigners()
         const smallest = lst
           .map(normalizeAddressWith0x)
