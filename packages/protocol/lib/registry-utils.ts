@@ -13,13 +13,15 @@ export enum CeloContractName {
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   GovernanceSlasher = 'GovernanceSlasher',
+  GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
   LockedGold = 'LockedGold',
   Random = 'Random',
   Reserve = 'Reserve',
+  ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
-  VestingFactory = 'VestingFactory',
+  ReleaseGoldFactory = 'ReleaseGoldFactory',
 }
 
 // TODO(amy): Pull this list from the build artifacts instead
@@ -47,5 +49,4 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Reserve,
   CeloContractName.SortedOracles,
   CeloContractName.StableToken,
-  CeloContractName.VestingFactory,
 ]

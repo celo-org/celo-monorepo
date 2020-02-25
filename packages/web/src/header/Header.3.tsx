@@ -14,7 +14,7 @@ import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
 import Footer from 'src/shared/Footer'
 import Link from 'src/shared/Link'
-import menu, { CeloLinks } from 'src/shared/menu-items'
+import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, HEADER_HEIGHT } from 'src/shared/Styles'
@@ -24,12 +24,14 @@ const CookieConsent = dynamic(
   (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
 )
 
-const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
+const menuItems = MAIN_MENU
 const DARK_PAGES = new Set([
   menu.HOME.link,
   menu.COMMUNITY.link,
   menu.BUILD.link,
   menu.ALLIANCE_COLLECTIVE.link,
+  menu.DEVELOPERS.link,
+  menu.VALIDATORS_LIST.link,
   CeloLinks.walletApp,
 ])
 

@@ -23,6 +23,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -73,6 +74,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(List storage list, bytes32 key) public {
@@ -105,6 +107,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -127,6 +130,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Inserts an element at the tail of the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
   function push(List storage list, bytes32 key) public {
@@ -135,13 +139,14 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Removes N elements from the head of the list and returns their keys.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to pop.
    * @return The keys of the popped elements.
    */
   function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
     require(n <= list.list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       bytes32 key = list.list.list.head;
       keys[i] = key;
       remove(list, key);
@@ -151,6 +156,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -160,6 +166,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
@@ -169,6 +176,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns the median value of the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @return The median value.
    */
   function getMedianValue(List storage list) public view returns (uint256) {
@@ -177,6 +185,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns the key of the first element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the first element in the list.
    */
   function getHead(List storage list) external view returns (bytes32) {
@@ -185,6 +194,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns the key of the median element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the median element in the list.
    */
   function getMedian(List storage list) external view returns (bytes32) {
@@ -193,6 +203,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns the key of the last element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the last element in the list.
    */
   function getTail(List storage list) external view returns (bytes32) {
@@ -201,6 +212,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns the number of elements in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The number of elements in the list.
    */
   function getNumElements(List storage list) external view returns (uint256) {
@@ -209,6 +221,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Gets all elements from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return An unpacked list of elements from largest to smallest.
    */
   function getElements(List storage list)
@@ -228,6 +241,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
   function getKeys(List storage list) public view returns (bytes32[] memory) {
@@ -236,6 +250,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Moves the median pointer right or left of its current value.
+   * @param list A storage pointer to the underlying list.
    * @param action Which direction to move the median pointer.
    */
   function updateMedian(List storage list, MedianAction action) private {

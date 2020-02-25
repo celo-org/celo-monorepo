@@ -66,17 +66,22 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 reward
   );
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   * @param _unlockingPeriod The unlocking period in seconds.
+   */
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    unlockingPeriod = _unlockingPeriod;
+    setUnlockingPeriod(_unlockingPeriod);
   }
 
   /**
    * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
    * @param value The unlocking period in seconds.
    */
-  function setUnlockingPeriod(uint256 value) external onlyOwner {
+  function setUnlockingPeriod(uint256 value) public onlyOwner {
     require(value != unlockingPeriod, "Unlocking period not changed");
     unlockingPeriod = value;
     emit UnlockingPeriodSet(value);
@@ -246,7 +251,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = 0; i < length; i++) {
+    for (uint256 i = 0; i < length; i = i.add(1)) {
       PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;

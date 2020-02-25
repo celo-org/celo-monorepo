@@ -61,6 +61,10 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
   // Maps senders' addresses to a list of sent escrowed payment IDs.
   mapping(address => address[]) public sentPaymentIds;
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -99,6 +103,7 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
 
     EscrowedPayment storage newPayment = escrowedPayments[paymentId];
+    require(newPayment.timestamp == 0, "paymentId already used");
     newPayment.recipientIdentifier = identifier;
     newPayment.sender = msg.sender;
     newPayment.token = token;

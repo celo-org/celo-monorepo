@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "../baklava/Freezable.sol";
+import "../common/CalledByVm.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -12,7 +13,14 @@ import "../common/UsingPrecompiles.sol";
 /**
  * @title Contract for calculating epoch rewards.
  */
-contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry, Freezable {
+contract EpochRewards is
+  Ownable,
+  Initializable,
+  UsingPrecompiles,
+  UsingRegistry,
+  Freezable,
+  CalledByVm
+{
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -71,7 +79,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   event TargetVotingYieldUpdated(uint256 fraction);
 
   /**
-   * @notice Initializes critical variables.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param targetVotingYieldInitial The initial relative target block reward for voters.
    * @param targetVotingYieldMax The max relative target block reward for voters.
@@ -413,8 +421,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
-  function updateTargetVotingYield() external onlyWhenNotFrozen {
-    require(msg.sender == address(0), "Only VM can call");
+  function updateTargetVotingYield() external onlyVm onlyWhenNotFrozen {
     _updateTargetVotingYield();
   }
 
