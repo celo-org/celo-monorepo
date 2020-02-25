@@ -11,14 +11,18 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
 
-const initializeArgs = async (): Promise<any[]> => {
+const initializeArgs = async (networkName: string): Promise<any[]> => {
   const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<
     GovernanceApproverMultiSigInstance
   >(CeloContractName.GovernanceApproverMultiSig, artifacts)
+  const networkFrom: string = require('@celo/protocol/truffle-config.js').networks[networkName].from
+  const approver: string = config.governanceApproverMultiSig.useMultiSig
+    ? governanceApproverMultiSig.address
+    : networkFrom
 
   return [
     config.registry.predeployedProxyAddress,
-    governanceApproverMultiSig.address,
+    approver,
     config.governance.concurrentProposals,
     web3.utils.toWei(config.governance.minDeposit.toString(), 'ether'),
     config.governance.queueExpiry,

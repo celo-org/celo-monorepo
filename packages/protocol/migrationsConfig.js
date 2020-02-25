@@ -84,6 +84,7 @@ const DefaultConfig = {
     //Placeholder until addresses for 2/5 multsig are generated.
     signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
     numRequiredConfirmations: 1,
+    useMultiSig: true,
   },
   lockedGold: {
     unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days divided by 24 to accelerate for Stake off
