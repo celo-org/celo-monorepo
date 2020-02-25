@@ -5,9 +5,16 @@ import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Clipboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
