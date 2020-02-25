@@ -87,7 +87,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param value The number of `token`s equal to one Celo Gold.
+   * @param value The amount of `token` equal to one Celo Gold.
    */
   async report(
     token: CeloToken,
@@ -112,7 +112,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Updates an oracle value and the median.
-   * @param value The number of Dollars equal to one Celo Gold.
+   * @param value The amount of US Dollars equal to one Celo Gold.
    */
   async reportStableToken(
     value: BigNumber.Value,
