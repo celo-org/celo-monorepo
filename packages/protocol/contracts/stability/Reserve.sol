@@ -74,13 +74,16 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     uint256 _tobinTaxStalenessThreshold,
     uint256 _spendingRatio,
     uint256 _frozenGold,
-    uint256 _frozenDays
+    uint256 _frozenDays,
+    bytes32[] calldata _assetAllocationSymbols,
+    uint256[] calldata _assetAllocationWeights
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
     setFrozenGold(_frozenGold, _frozenDays);
+    setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
   }
 
   /**
@@ -128,8 +131,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
-  function setAssetAllocations(bytes32[] calldata symbols, uint256[] calldata weights)
-    external
+  function setAssetAllocations(bytes32[] memory symbols, uint256[] memory weights)
+    public
     onlyOwner
   {
     require(symbols.length == weights.length, "Array length mismatch");

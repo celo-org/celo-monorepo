@@ -98,6 +98,8 @@ const DefaultConfig = {
     dailySpendingRatio: '1000000000000000000000000', // 100%
     frozenGold: 0,
     frozenDays: 0,
+    assetAllocationSymbols: ['cGLD'],
+    assetAllocationWeights: [1.0],
   },
   stableToken: {
     decimals: 18,
