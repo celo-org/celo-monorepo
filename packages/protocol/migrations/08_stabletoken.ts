@@ -40,6 +40,12 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
   initializeArgs,
   async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
     const minerAddress: string = truffle.networks[networkName].from
+
+    if (config.stableToken.unfreezeImmediately) {
+      console.log('Unfreezing StableToken')
+      await stableToken.unfreeze()
+    }
+
     console.log('Setting GoldToken/USD exchange rate')
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<
       SortedOraclesInstance
@@ -58,8 +64,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     }
     await sortedOracles.report(
       stableToken.address,
-      config.stableToken.goldPrice,
-      1,
+      toFixed(config.stableToken.goldPrice),
       NULL_ADDRESS,
       NULL_ADDRESS
     )

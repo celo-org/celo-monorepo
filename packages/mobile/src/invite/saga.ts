@@ -3,6 +3,7 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import VersionCheck from 'react-native-version-check'
@@ -13,6 +14,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
+import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
@@ -37,7 +39,7 @@ import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/s
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
-import { dynamicLink } from 'src/utils/dynamicLink'
+import { getAppStoreId } from 'src/utils/appstore'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
@@ -46,7 +48,7 @@ import { fornoSelector } from 'src/web3/selectors'
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const INVITE_FEE = '0.2'
+const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
@@ -80,19 +82,27 @@ export function getInvitationVerificationFeeInWei() {
   return new BigNumber(web3.utils.toWei(INVITE_FEE))
 }
 
-export async function generateLink(inviteCode: string, recipientName: string) {
-  const packageName = VersionCheck.getPackageName().replace(/\.debug$/g, '.integration')
-  const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName })
-  const referrerData = encodeURIComponent(`invite-code=${inviteCode}`)
-  const referrerLink = `${playStoreLink}&referrer=${referrerData}`
-  const shortUrl = await dynamicLink(referrerLink)
-  const msg = i18n.t('sendFlow7:inviteSMS', {
-    name: recipientName,
-    code: inviteCode,
-    link: shortUrl,
+export async function generateInviteLink(inviteCode: string) {
+  let bundleId = DeviceInfo.getBundleId()
+  bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
+  const encodedInvite = encodeURIComponent(`invite-code=${inviteCode}`)
+
+  // Android part
+  const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName: bundleId })
+  const playStoreUrl = `${playStoreLink}&referrer=${encodedInvite}`
+
+  // iOS part
+  const appStoreId = await getAppStoreId(bundleId)
+  const appStoreUrl = await VersionCheck.getAppStoreUrl({ appID: appStoreId })
+
+  const shortUrl = await generateShortInviteLink({
+    link: `https://celo.org/build/wallet`,
+    playStoreUrl,
+    appStoreUrl,
+    bundleId,
   })
 
-  return msg
+  return shortUrl
 }
 
 async function sendSms(toPhone: string, msg: string) {
@@ -125,7 +135,6 @@ async function sendSms(toPhone: string, msg: string) {
 }
 
 export function* sendInvite(
-  recipientName: string,
   e164Number: string,
   inviteMode: InviteBy,
   amount?: BigNumber,
@@ -137,10 +146,11 @@ export function* sendInvite(
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
-    // TODO: Improve this by not checking specifically for this
-    // display name. Requires improvements in recipient handling
-    recipientName = recipientName === i18n.t('sendFlow7:mobileNumber') ? '' : ' ' + recipientName
-    const msg = yield call(generateLink, inviteCode, recipientName)
+    const link = yield call(generateInviteLink, inviteCode)
+    const msg = i18n.t(amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS', {
+      code: inviteCode,
+      link,
+    })
 
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(temporaryAddress.toLowerCase(), e164Number))
@@ -190,15 +200,16 @@ export function* sendInvite(
 }
 
 export function* sendInviteSaga(action: SendInviteAction) {
-  const { e164Number, recipientName, inviteMode, amount, currency } = action
+  const { e164Number, inviteMode, amount, currency } = action
 
   try {
-    yield call(sendInvite, recipientName, e164Number, inviteMode, amount, currency)
+    yield call(sendInvite, e164Number, inviteMode, amount, currency)
 
     yield put(showMessage(i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number))
     yield call(navigate, Screens.WalletHome)
     yield put(sendInviteSuccess())
   } catch (e) {
+    Logger.error(TAG, 'Send invite error: ', e)
     yield put(showError(ErrorMessages.INVITE_FAILED))
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
   }

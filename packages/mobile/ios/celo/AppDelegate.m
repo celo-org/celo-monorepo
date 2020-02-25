@@ -19,6 +19,7 @@
 #import "RNFirebaseMessaging.h"
 #import "RNSplashScreen.h"
 
+#import "ReactNativeConfig.h"
 
 // Use same key as react-native-secure-key-store
 // so we don't reset already working installs
@@ -32,7 +33,10 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   // Note: react-native-secure-key-store also does that but is run too late
   // and hence can't clear Firebase credentials
   [self resetKeychainIfNecessary];
-  [FIRApp configure];
+  NSString *env = [ReactNativeConfig envFor:@"FIREBASE_ENABLED"];
+  if (env.boolValue) {
+    [FIRApp configure];
+  }
   [RNFirebaseNotifications configure];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
@@ -99,4 +103,35 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 {
   return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+  
+  // fill screen with celo green colour
+  UIView *colourView = [[UIView alloc]initWithFrame:self.window.frame];
+  colourView.backgroundColor = [UIColor colorWithRed:0.26 green:0.84 blue:0.54 alpha:1.0];;
+  colourView.tag = 1234;
+  colourView.alpha = 0;
+  [self.window addSubview:colourView];
+  [self.window bringSubviewToFront:colourView];
+  
+  // fade in the view
+  [UIView animateWithDuration:0.5 animations:^{
+    colourView.alpha = 1;
+  }];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+  
+  // grab a reference to our coloured view
+  UIView *colourView = [self.window viewWithTag:1234];
+  
+  // fade away colour view from main view
+  [UIView animateWithDuration:0.5 animations:^{
+    colourView.alpha = 0;
+  } completion:^(BOOL finished) {
+    // remove when finished fading
+    [colourView removeFromSuperview];
+  }];
+}
+
 @end

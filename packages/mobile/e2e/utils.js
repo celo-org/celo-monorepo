@@ -20,6 +20,27 @@ export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+export class TimeoutError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'TimeoutError'
+  }
+}
+
+export function timeout(asyncFunc, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new TimeoutError('Timeout after ' + ms + ' ms'))
+    }, ms)
+
+    asyncFunc()
+      .then(resolve, reject)
+      .finally(() => {
+        clearTimeout(timer)
+      })
+  })
+}
+
 export async function skipTo(nextScreen) {
   const testID = `ButtonSkipTo${nextScreen}`
   try {

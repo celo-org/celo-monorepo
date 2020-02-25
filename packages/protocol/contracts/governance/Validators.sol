@@ -10,6 +10,7 @@ import "./interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 
+import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -25,7 +26,8 @@ contract Validators is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  UsingPrecompiles
+  UsingPrecompiles,
+  CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
@@ -117,7 +119,6 @@ contract Validators is
   uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
-  event ValidatorEpochPaymentSet(uint256 value);
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -142,19 +143,14 @@ contract Validators is
     uint256 groupPayment
   );
 
-  modifier onlyVm() {
-    require(msg.sender == address(0), "Only VM can call");
-    _;
-  }
-
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
     _;
   }
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param groupRequirementValue The Locked Gold requirement amount for groups.
    * @param groupRequirementDuration The Locked Gold requirement duration for groups.
    * @param validatorRequirementValue The Locked Gold requirement amount for validators.
@@ -323,7 +319,7 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the parameters that goven how a validator's score is calculated.
+   * @notice Returns the parameters that govern how a validator's score is calculated.
    * @return The parameters that goven how a validator's score is calculated.
    */
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
@@ -354,8 +350,8 @@ contract Validators is
   /**
    * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @dev epoxh_score = uptime ** exponent
-   * @return Fixidity representation of the epoch score btween 0 and 1.
+   * @dev epoch_score = uptime ** exponent
+   * @return Fixidity representation of the epoch score between 0 and 1.
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
@@ -376,7 +372,7 @@ contract Validators is
    * @notice Calculates the aggregate score of a group for an epoch from individual uptimes.
    * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
    * @dev group_score = average(uptimes ** exponent)
-   * @return Fixidity representation of the group epoch score btween 0 and 1.
+   * @return Fixidity representation of the group epoch score between 0 and 1.
    */
   function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
     require(uptimes.length > 0, "Uptime array empty");
@@ -455,6 +451,7 @@ contract Validators is
     // The group that should be paid is the group that the validator was a member of at the
     // time it was elected.
     address group = getMembershipInLastEpoch(account);
+    require(group != address(0), "Validator not registered with a group");
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
     if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
@@ -601,6 +598,36 @@ contract Validators is
       "Error updating ECDSA public key"
     );
     emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's ECDSA and BLS keys.
+   * @param account The address under which the validator is registered.
+   * @param signer The address which the validator is using to sign consensus messages.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @return True upon success.
+   */
+  function updatePublicKeys(
+    address account,
+    address signer,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
+    require(isValidator(account), "Not a validator");
+    Validator storage validator = validators[account];
+    require(
+      _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
+    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
     return true;
   }
 

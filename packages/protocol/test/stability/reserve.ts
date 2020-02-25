@@ -35,6 +35,7 @@ contract('Reserve', (accounts: string[]) => {
   const anAddress: string = '0x00000000000000000000000000000000deadbeef'
   const nonOwner: string = accounts[1]
   const spender: string = accounts[2]
+  const exchangeAddress: string = accounts[3]
   const aTobinTaxStalenessThreshold: number = 600
   const aDailySpendingRatio: string = '1000000000000000000000000'
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
@@ -45,7 +46,14 @@ contract('Reserve', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
-    await reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+    await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
+    await reserve.initialize(
+      registry.address,
+      aTobinTaxStalenessThreshold,
+      aDailySpendingRatio,
+      0,
+      0
+    )
   })
 
   describe('#initialize()', () => {
@@ -66,7 +74,7 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not be callable again', async () => {
       await assertRevert(
-        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio, 0, 0)
       )
     })
   })
@@ -181,37 +189,86 @@ contract('Reserve', (accounts: string[]) => {
       await mockGoldToken.setBalanceOf(reserve.address, aValue)
       await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
       await reserve.addSpender(spender)
+      await reserve.addOtherReserveAddress(anAddress)
     })
 
     it('should allow a spender to call transferGold', async () => {
-      await reserve.transferGold(nonOwner, aValue, { from: spender })
+      await reserve.transferGold(anAddress, aValue, { from: spender })
     })
 
     it('should not allow a spender to transfer more than daily ratio', async () => {
       await reserve.setDailySpendingRatio(toFixed(0.2))
-      await assertRevert(reserve.transferGold(nonOwner, aValue / 2, { from: spender }))
+      await assertRevert(reserve.transferGold(anAddress, aValue / 2, { from: spender }))
     })
 
     it('daily spending accumulates', async () => {
       await reserve.setDailySpendingRatio(toFixed(0.15))
-      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
-      await assertRevert(reserve.transferGold(nonOwner, aValue * 0.1, { from: spender }))
+      await reserve.transferGold(anAddress, aValue * 0.1, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue * 0.1, { from: spender }))
     })
 
     it('daily spending limit should be reset after 24 hours', async () => {
       await reserve.setDailySpendingRatio(toFixed(0.15))
-      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await reserve.transferGold(anAddress, aValue * 0.1, { from: spender })
       await timeTravel(3600 * 24, web3)
-      await reserve.transferGold(nonOwner, aValue * 0.1, { from: spender })
+      await reserve.transferGold(anAddress, aValue * 0.1, { from: spender })
     })
 
     it('should not allow a removed spender to call transferGold', async () => {
       await reserve.removeSpender(spender)
-      await assertRevert(reserve.transferGold(nonOwner, aValue, { from: spender }))
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
     })
 
     it('should not allow other addresses to call transferGold', async () => {
-      await assertRevert(reserve.transferGold(nonOwner, aValue, { from: nonOwner }))
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: nonOwner }))
+    })
+
+    it('can only transfer gold to other reverse addresses', async () => {
+      await assertRevert(reserve.transferGold(nonOwner, aValue, { from: spender }))
+    })
+  })
+
+  describe('#transferExchangeGold()', () => {
+    const aValue = 10000
+    beforeEach(async () => {
+      await mockGoldToken.setBalanceOf(reserve.address, aValue)
+      await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
+      await reserve.addSpender(spender)
+      await reserve.addOtherReserveAddress(anAddress)
+    })
+
+    it('should allow a exchange to call transferExchangeGold', async () => {
+      await reserve.transferExchangeGold(nonOwner, aValue, { from: exchangeAddress })
+    })
+
+    it('should not allow spenders to call transferExchangeGold', async () => {
+      await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: spender }))
+    })
+
+    it('should not allow other addresses to call transferExchangeGold', async () => {
+      await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
+    })
+
+    it('should not allow freezing more gold than is available', async () => {
+      await assertRevert(reserve.setFrozenGold(aValue + 1, 1))
+    })
+
+    it('should not allow a spender to transfer more gold than is unfrozen', async () => {
+      await reserve.setFrozenGold(1, 1)
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
+    })
+
+    it('unfrozen gold should increase every 24 hours', async () => {
+      await reserve.setFrozenGold(3, 3)
+      await assertRevert(reserve.transferGold(anAddress, aValue - 2, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue - 2, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue - 1, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue - 1, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue, { from: spender })
     })
   })
 
