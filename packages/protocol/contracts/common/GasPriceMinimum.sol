@@ -2,15 +2,17 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+import "./CalledByVm.sol";
 import "./Initializable.sol";
-import "./UsingRegistry.sol";
 import "./FixidityLib.sol";
+import "./UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
  */
-contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
+contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -26,11 +28,6 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
 
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction public adjustmentSpeed;
-
-  modifier onlyVm() {
-    assert(msg.sender == address(0x0));
-    _;
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

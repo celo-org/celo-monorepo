@@ -41,6 +41,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 public spendingLimit;
   FixidityLib.Fraction private spendingRatio;
 
+  uint256 public frozenReserveGoldStartBalance;
+  uint256 public frozenReserveGoldStartDay;
+  uint256 public frozenReserveGoldDays;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
@@ -62,16 +66,21 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
+   * @param _frozenGold The balance of reserve gold that is frozen.
+   * @param _frozenDays The number of days during which the frozen gold thaws.
    */
   function initialize(
     address registryAddress,
     uint256 _tobinTaxStalenessThreshold,
-    uint256 _spendingRatio
+    uint256 _spendingRatio,
+    uint256 _frozenGold,
+    uint256 _frozenDays
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
+    setFrozenGold(_frozenGold, _frozenDays);
   }
 
   /**
@@ -100,6 +109,18 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    */
   function getDailySpendingRatio() public view returns (uint256) {
     return spendingRatio.unwrap();
+  }
+
+  /**
+   * @notice Sets the balance of reserve gold frozen from transfer.
+   * @param frozenGold The amount of cGLD frozen.
+   * @param frozenDays The number of days the frozen cGLD thaws over.
+   */
+  function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
+    require(frozenGold <= address(this).balance);
+    frozenReserveGoldStartBalance = frozenGold;
+    frozenReserveGoldStartDay = now / 1 days;
+    frozenReserveGoldDays = frozenDays;
   }
 
   /**
@@ -246,9 +267,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function _transferGold(address to, uint256 value) internal returns (bool) {
+    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
-      uint256 balance = getReserveGoldBalance();
+      uint256 balance = getUnfrozenReserveGoldBalance();
       lastSpendingDay = currentDay;
       spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
     }
@@ -316,15 +338,55 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Returns the Celo Gold amount of included in the reserve.
-   * @return The Celo Gold amount of included in the reserve.
+   * @notice Returns the amount of unfrozen Celo Gold in the reserve.
+   * @return The total unfrozen Celo Gold in the reserve.
+   */
+  function getUnfrozenBalance() public view returns (uint256) {
+    uint256 balance = address(this).balance;
+    uint256 frozenReserveGold = getFrozenReserveGoldBalance();
+    return balance > frozenReserveGold ? balance.sub(frozenReserveGold) : 0;
+  }
+
+  /**
+   * @notice Returns the amount of Celo Gold included in the reserve.
+   * @return The Celo Gold amount included in the reserve.
    */
   function getReserveGoldBalance() public view returns (uint256) {
-    uint256 reserveGoldBalance = address(this).balance;
+    return address(this).balance.add(getOtherReserveAddressesGoldBalance());
+  }
+
+  /**
+   * @notice Returns the amount of Celo Gold included in other reserve addresses.
+   * @return The Celo Gold amount included in other reserve addresses.
+   */
+  function getOtherReserveAddressesGoldBalance() public view returns (uint256) {
+    uint256 reserveGoldBalance = 0;
     for (uint256 i = 0; i < otherReserveAddresses.length; i = i.add(1)) {
       reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
     return reserveGoldBalance;
+  }
+
+  /**
+   * @notice Returns the amount of unfrozen Celo Gold included in the reserve.
+   * @return The unfrozen Celo Gold amount included in the reserve.
+   */
+  function getUnfrozenReserveGoldBalance() public view returns (uint256) {
+    return getUnfrozenBalance().add(getOtherReserveAddressesGoldBalance());
+  }
+
+  /**
+   * @notice Returns the amount of frozen Celo Gold in the reserve.
+   * @return The total frozen Celo Gold in the reserve.
+   */
+  function getFrozenReserveGoldBalance() public view returns (uint256) {
+    uint256 currentDay = now / 1 days;
+    uint256 frozenDays = currentDay.sub(frozenReserveGoldStartDay);
+    if (frozenDays >= frozenReserveGoldDays) return 0;
+    return
+      frozenReserveGoldStartBalance.sub(
+        frozenReserveGoldStartBalance.mul(frozenDays).div(frozenReserveGoldDays)
+      );
   }
 
   /**
@@ -334,7 +396,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getReserveRatio() public view returns (uint256) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = getReserveGoldBalance();
+    uint256 reserveGoldBalance = getUnfrozenReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
     FixidityLib.Fraction memory cgldWeight = FixidityLib.wrap(assetAllocationWeights["cGLD"]);
 
@@ -370,22 +432,5 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     } else {
       return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
     }
-  }
-
-  /**
-   * @notice Mint tokens.
-   * @param to The address that will receive the minted tokens.
-   * @param token The address of the token to mint.
-   * @param value The amount of tokens to mint.
-   * @return Returns true if the transaction succeeds.
-   */
-  function mintToken(address to, address token, uint256 value)
-    private
-    isStableToken(token)
-    returns (bool)
-  {
-    IStableToken stableToken = IStableToken(token);
-    stableToken.mint(to, value);
-    return true;
   }
 }
