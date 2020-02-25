@@ -32,9 +32,7 @@
     "pretruffle:migrate": "yarn build:ts",
     "truffle:migrate": "truffle migrate",
     "devchain": "ts-node scripts/devchain.ts",
-    "weekly-faucet": "./scripts/bash/weekly_faucet.sh",
-    "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "network-check": "./scripts/bash/network_check.sh"
+    "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",
