@@ -148,6 +148,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * Returns whether or not a particular account is voting on proposals.
+   * @param account The address of the account.
+   * @returns Whether or not the account is voting on proposals.
+   */
+  isVoting: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isVoting)
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<GovernanceConfig> {
@@ -575,8 +582,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the number of validators required to reach a Byzantine quorum
    */
-  byzantineQuorumValidators = proxyCall(
-    this.contract.methods.byzantineQuorumValidatorsInCurrentSet,
+  minQuorumSize = proxyCall(
+    this.contract.methods.minQuorumSizeInCurrentSet,
     undefined,
     valueToBigNumber
   )

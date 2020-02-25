@@ -7,7 +7,6 @@ import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
-import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../baklava/Freezable.sol";
@@ -19,19 +18,13 @@ import "../common/UsingRegistry.sol";
  */
 contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard, Freezable {
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
   using FixidityLib for FixidityLib.Fraction;
 
   event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
-
   event UpdateFrequencySet(uint256 updateFrequency);
-
   event MinimumReportsSet(uint256 minimumReports);
-
   event StableTokenSet(address stable);
-
   event SpreadSet(uint256 spread);
-
   event ReserveFractionSet(uint256 reserveFraction);
 
   FixidityLib.Fraction public spread;
@@ -57,8 +50,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   /**
-   * @dev Initializes the exchange, setting initial bucket sizes
-   * @param registryAddress Address of the Registry contract
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param stableToken Address of the stable token
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
@@ -128,7 +121,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       );
       IStableToken(stable).burn(sellAmount);
 
-      require(reserve.transferGold(msg.sender, buyAmount), "Transfer of buyToken failed");
+      require(reserve.transferExchangeGold(msg.sender, buyAmount), "Transfer of buyToken failed");
     }
 
     emit Exchanged(msg.sender, sellAmount, buyAmount, sellGold);
@@ -158,7 +151,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     // than maxFixedDivisor.
     // Fortunately, we expect an integer result, so integer division gives us as
     // much precision as we could hope for.
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -179,7 +172,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       .multiply(FixidityLib.fixed1().subtract(spread));
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -286,20 +279,22 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     );
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
     uint256 updatedGoldBucket = getUpdatedGoldBucket();
-    uint256 updatedStableBucket = getOracleExchangeRate().mul(updatedGoldBucket);
-
+    uint256 exchangeRateNumerator;
+    uint256 exchangeRateDenominator;
+    (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate();
+    uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedGoldBucket).div(
+      exchangeRateDenominator
+    );
     return (updatedGoldBucket, updatedStableBucket);
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
-    uint256 reserveGoldBalance = getGoldToken().balanceOf(
-      registry.getAddressForOrDie(RESERVE_REGISTRY_ID)
-    );
+    uint256 reserveGoldBalance = getReserve().getUnfrozenReserveGoldBalance();
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }
 
@@ -332,27 +327,27 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   /*
    * Checks conditions required for bucket updates.
    * @return Whether or not buckets should be updated.
-   * TODO: check the oldest report isn't expired
    */
   function shouldUpdateBuckets() private view returns (bool) {
     ISortedOracles sortedOracles = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     );
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(stable);
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
     bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
-    return timePassed && enoughReports && medianReportRecent;
+    return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
-  function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {
+  function getOracleExchangeRate() private view returns (uint256, uint256) {
     uint256 rateNumerator;
     uint256 rateDenominator;
     (rateNumerator, rateDenominator) = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     )
       .medianRate(stable);
-    return FractionUtil.Fraction(rateNumerator, rateDenominator);
+    return (rateNumerator, rateDenominator);
   }
 }
