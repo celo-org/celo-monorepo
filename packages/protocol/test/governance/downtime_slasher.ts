@@ -219,10 +219,10 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         await validators.setAccountLockedGoldRequirement(validator, slashingPenalty - 1)
       })
 
-      it('should revert', async () => {
-        await assertRevert(
-          slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
-        )
+      it('should slash the minimum of the penalty and the required locked gold', async () => {
+        await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
+        const balance = await mockLockedGold.accountTotalLockedGold(validator)
+        assert.equal(balance.toNumber(), 40001)
       })
     })
   })

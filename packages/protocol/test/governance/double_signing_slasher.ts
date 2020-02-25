@@ -166,10 +166,10 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
         await validators.setAccountLockedGoldRequirement(validator, slashingPenalty - 1)
       })
 
-      it('should revert', async () => {
-        await assertRevert(
-          slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
-        )
+      it('should slash the min of the penalty and lockedgold requirement', async () => {
+        await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
+        const balance = await mockLockedGold.accountTotalLockedGold(validator)
+        assert.equal(balance.toNumber(), 40001)
       })
     })
   })

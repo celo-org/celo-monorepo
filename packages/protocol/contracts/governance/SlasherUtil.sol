@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -64,16 +65,17 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) internal {
-    require(
-      slashingIncentives.penalty <= getValidators().getAccountLockedGoldRequirement(validator),
-      "Slash cannot exceed the locked gold requirement."
-    );
     ILockedGold lockedGold = getLockedGold();
+    // Cannot set reward as local because of solc stack too deep
+    uint256 penalty = Math.min(
+      slashingIncentives.penalty,
+      getValidators().getAccountLockedGoldRequirement(validator)
+    );
     lockedGold.slash(
       validator,
-      slashingIncentives.penalty,
+      penalty,
       recipient,
-      slashingIncentives.reward,
+      Math.min(slashingIncentives.reward, penalty),
       validatorElectionLessers,
       validatorElectionGreaters,
       validatorElectionIndices
@@ -82,9 +84,9 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     assert(group != address(0));
     lockedGold.slash(
       group,
-      slashingIncentives.penalty,
+      penalty,
       recipient,
-      slashingIncentives.reward,
+      Math.min(slashingIncentives.reward, penalty),
       groupElectionLessers,
       groupElectionGreaters,
       groupElectionIndices
@@ -93,5 +95,4 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     validators.forceDeaffiliateIfValidator(validator);
     validators.halveSlashingMultiplier(group);
   }
-
 }
