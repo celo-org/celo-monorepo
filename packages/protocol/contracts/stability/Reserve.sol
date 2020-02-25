@@ -43,12 +43,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
-  event TokenAdded(address token);
-  event TokenRemoved(address token, uint256 index);
-  event SpenderAdded(address spender);
-  event SpenderRemoved(address spender);
-  event OtherReserveAddressAdded(address otherReserveAddress);
-  event OtherReserveAddressRemoved(address otherReserveAddress, uint256 index);
+  event TokenAdded(address indexed token);
+  event TokenRemoved(address indexed token, uint256 index);
+  event SpenderAdded(address indexed spender);
+  event SpenderRemoved(address indexed spender);
+  event OtherReserveAddressAdded(address indexed otherReserveAddress);
+  event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
 
   modifier isStableToken(address token) {
@@ -59,8 +59,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function() external payable {} // solhint-disable no-empty-blocks
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    */
   function initialize(
@@ -113,15 +113,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   {
     require(symbols.length == weights.length, "Array length mismatch");
     FixidityLib.Fraction memory sum = FixidityLib.wrap(0);
-    for (uint256 i = 0; i < weights.length; i++) {
+    for (uint256 i = 0; i < weights.length; i = i.add(1)) {
       sum = sum.add(FixidityLib.wrap(weights[i]));
     }
     require(sum.equals(FixidityLib.fixed1()), "Sum of asset allocation must be 1");
-    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i = i.add(1)) {
       delete assetAllocationWeights[assetAllocationSymbols[i]];
     }
     assetAllocationSymbols = symbols;
-    for (uint256 i = 0; i < symbols.length; i++) {
+    for (uint256 i = 0; i < symbols.length; i = i.add(1)) {
       require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
@@ -130,8 +130,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Add a token that the reserve will stablize.
+   * @notice Add a token that the reserve will stabilize.
    * @param token The address of the token being stabilized.
+   * @return Returns true if the transaction succeeds.
    */
   function addToken(address token) external onlyOwner nonReentrant returns (bool) {
     require(!isToken[token], "token addr already registered");
@@ -152,6 +153,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Remove a token that the reserve will no longer stabilize.
    * @param token The address of the token no longer being stabilized.
    * @param index The index of the token in _tokens.
+   * @return Returns true if the transaction succeeds.
    */
   function removeToken(address token, uint256 index)
     external
@@ -164,9 +166,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       "index into tokens list not mapped to token"
     );
     isToken[token] = false;
-    address lastItem = _tokens[_tokens.length - 1];
+    address lastItem = _tokens[_tokens.length.sub(1)];
     _tokens[index] = lastItem;
-    _tokens.length--;
+    _tokens.length = _tokens.length.sub(1);
     emit TokenRemoved(token, index);
     return true;
   }
@@ -174,6 +176,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   /**
    * @notice Add a reserve address whose balance shall be included in the reserve ratio.
    * @param reserveAddress The reserve address to add.
+   * @return Returns true if the transaction succeeds.
    */
   function addOtherReserveAddress(address reserveAddress)
     external
@@ -192,6 +195,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Remove reserve address whose balance shall no longer be included in the reserve ratio.
    * @param reserveAddress The reserve address to remove.
    * @param index The index of the reserve address in otherReserveAddresses.
+   * @return Returns true if the transaction succeeds.
    */
   function removeOtherReserveAddress(address reserveAddress, uint256 index)
     external
@@ -204,9 +208,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       "index into reserve list not mapped to address"
     );
     isOtherReserveAddress[reserveAddress] = false;
-    address lastItem = otherReserveAddresses[otherReserveAddresses.length - 1];
+    address lastItem = otherReserveAddresses[otherReserveAddresses.length.sub(1)];
     otherReserveAddresses[index] = lastItem;
-    otherReserveAddresses.length--;
+    otherReserveAddresses.length = otherReserveAddresses.length.sub(1);
     emit OtherReserveAddressRemoved(reserveAddress, index);
     return true;
   }
@@ -233,6 +237,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Transfer gold.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
+   * @return Returns true if the transaction succeeds.
    */
   function transferGold(address to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
@@ -274,37 +279,53 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return (uint256(tobinTaxCache.numerator), FixidityLib.fixed1().unwrap());
   }
 
+  /**
+   * @notice Returns the list of stabilized token addresses.
+   * @return An array of addresses of stabilized tokens.
+   */
   function getTokens() external view returns (address[] memory) {
     return _tokens;
   }
 
+  /**
+   * @notice Returns the list other addresses included in the reserve total.
+   * @return An array of other addresses included in the reserve total.
+   */
   function getOtherReserveAddresses() external view returns (address[] memory) {
     return otherReserveAddresses;
   }
 
+  /**
+   * @notice Returns a list of token symbols that have been allocated.
+   * @return An array of token symbols that have been allocated.
+   */
   function getAssetAllocationSymbols() external view returns (bytes32[] memory) {
     return assetAllocationSymbols;
   }
 
+  /**
+   * @notice Returns a list of weights used for the allocation of reserve assets.
+   * @return An array of a list of weights used for the allocation of reserve assets.
+   */
   function getAssetAllocationWeights() external view returns (uint256[] memory) {
     uint256[] memory weights = new uint256[](assetAllocationSymbols.length);
-    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i = i.add(1)) {
       weights[i] = assetAllocationWeights[assetAllocationSymbols[i]];
     }
     return weights;
   }
 
+  /**
+   * @notice Returns the Celo Gold amount of included in the reserve.
+   * @return The Celo Gold amount of included in the reserve.
+   */
   function getReserveGoldBalance() public view returns (uint256) {
     uint256 reserveGoldBalance = address(this).balance;
-    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+    for (uint256 i = 0; i < otherReserveAddresses.length; i = i.add(1)) {
       reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
     return reserveGoldBalance;
   }
-
-  /*
-   * Internal functions
-   */
 
   /**
    * @notice Computes the ratio of current reserve balance to total stable token valuation.
@@ -317,7 +338,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     uint256 stableTokensValueInGold = 0;
     FixidityLib.Fraction memory cgldWeight = FixidityLib.wrap(assetAllocationWeights["cGLD"]);
 
-    for (uint256 i = 0; i < _tokens.length; i++) {
+    for (uint256 i = 0; i < _tokens.length; i = i.add(1)) {
       uint256 stableAmount;
       uint256 goldAmount;
       (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
@@ -332,6 +353,10 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
         .divide(FixidityLib.newFixed(stableTokensValueInGold))
         .unwrap();
   }
+
+  /*
+   * Internal functions
+   */
 
   /**
    * @notice Computes a tobin tax based on the reserve ratio.
@@ -352,6 +377,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param to The address that will receive the minted tokens.
    * @param token The address of the token to mint.
    * @param value The amount of tokens to mint.
+   * @return Returns true if the transaction succeeds.
    */
   function mintToken(address to, address token, uint256 value)
     private

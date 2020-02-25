@@ -5,6 +5,8 @@
   "localCurrencySetting": "Moneda",
   "licenses": "Licencias",
   "sendIssueReport": "Reportar un incidente",
+  "security": "Seguridad",
+  "requirePinOnAppOpen": "Requerir PIN en la aplicación abierta",
   "analytics": "Estadisticas de uso",
   "shareAnalytics": "Compartir estadisticas de uso",
   "shareAnalytics_detail": "Recopilamos datos anónimos sobre cómo utiliza Celo para ayudar a mejorar la aplicación para todos.",

@@ -12,7 +12,7 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken, Freezable {
 
   // Address of the TRANSFER precompiled contract.
   // solhint-disable state-visibility
-  address constant TRANSFER = address(0xfd);
+  address constant TRANSFER = address(0xff - 2);
   string constant NAME = "Celo Gold";
   string constant SYMBOL = "cGLD";
   uint8 constant DECIMALS = 18;
@@ -37,10 +37,10 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken, Freezable {
   }
 
   /**
-   * @notice Sets 'initialized' to true.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress Address of the Registry contract.
    */
-  function initialize(address registryAddress) external initializer {
+  function initialize() external initializer {
     totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);

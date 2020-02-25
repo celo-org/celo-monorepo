@@ -5,6 +5,7 @@ interface ISortedOracles {
   function removeOracle(address, address, uint256) external;
   function report(address, uint256, uint256, address, address) external;
   function removeExpiredReports(address, uint256) external;
+  function isOldestReportExpired(address token) external view returns (bool, address);
   function numRates(address) external view returns (uint256);
   function medianRate(address) external view returns (uint256, uint256);
   function numTimestamps(address) external view returns (uint256);
