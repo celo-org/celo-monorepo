@@ -39,6 +39,9 @@
     "minDeposit": 1,
     "concurrentProposals": 5
   },
+  "governanceApproverMultiSig": {
+    "useMultiSig": false
+  },
   "validators": {
     "commissionUpdateDelay": 3
   }
