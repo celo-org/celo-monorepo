@@ -2029,7 +2029,7 @@ contract('Validators', (accounts: string[]) => {
           })
           let membershipHistory = await validators.getMembershipHistory(validator)
           expectedMembershipHistoryGroups.push(group)
-          expectedMembershipHistoryEpochs.push(new BigNumber(epochNumber + 1))
+          expectedMembershipHistoryEpochs.push(new BigNumber(epochNumber))
           if (expectedMembershipHistoryGroups.length > membershipHistoryLength.toNumber()) {
             expectedMembershipHistoryGroups.shift()
             expectedMembershipHistoryEpochs.shift()
@@ -2063,7 +2063,7 @@ contract('Validators', (accounts: string[]) => {
             from: groups[i],
           })
           expectedMembershipHistoryGroups.push(groups[i])
-          expectedMembershipHistoryEpochs.push(new BigNumber(epochNumber + 1))
+          expectedMembershipHistoryEpochs.push(new BigNumber(epochNumber))
           if (expectedMembershipHistoryGroups.length > membershipHistoryLength.toNumber()) {
             expectedMembershipHistoryGroups.shift()
             expectedMembershipHistoryEpochs.shift()

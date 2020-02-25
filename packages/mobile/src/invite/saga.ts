@@ -84,8 +84,7 @@ export function getInvitationVerificationFeeInWei() {
 
 export async function generateInviteLink(inviteCode: string) {
   let bundleId = DeviceInfo.getBundleId()
-  bundleId = bundleId.replace(/\.debug$/g, '.integration')
-  bundleId = bundleId.replace(/\.dev$/g, '.alfajores')
+  bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
   const encodedInvite = encodeURIComponent(`invite-code=${inviteCode}`)
 
   // Android part

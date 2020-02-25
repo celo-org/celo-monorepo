@@ -529,7 +529,7 @@ contract('EpochRewards', (accounts: string[]) => {
     beforeEach(async () => {
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(registry.address, 60, toFixed(1), 0, 0)
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
@@ -664,7 +664,7 @@ contract('EpochRewards', (accounts: string[]) => {
       const totalSupply = new BigNumber(129762987346298761037469283746)
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(registry.address, 60, toFixed(1), 0, 0)
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)
       const assetAllocationSymbols = [
