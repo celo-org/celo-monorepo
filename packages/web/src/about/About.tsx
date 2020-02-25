@@ -37,12 +37,13 @@ export class About extends React.Component<Props & I18nProps> {
   static async getInitialProps({ req }) {
     let contributors
     if (req) {
-      contributors = await fetch(`http://localhost:3000/api/contributors`)
+      const getContributors = await import('src/../server/getContributors')
+      contributors = await getContributors.default()
     } else {
-      contributors = await fetch(`/api/contributors`)
+      contributors = await fetch(`/api/contributors`).then((result) => result.json())
     }
 
-    const shuffledTeam = shuffleSeed.shuffle(await contributors.json(), Math.random())
+    const shuffledTeam = shuffleSeed.shuffle(contributors, Math.random())
     return { contributors: shuffledTeam }
   }
 
