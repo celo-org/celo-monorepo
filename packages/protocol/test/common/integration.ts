@@ -2,6 +2,7 @@ import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   assertEqualBN,
   isSameAddress,
+  NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -23,6 +24,7 @@ import {
   LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
+  SortedOraclesInstance,
   StableTokenInstance,
 } from 'types'
 
@@ -366,8 +368,9 @@ contract('Integration: Exchange', (accounts: string[]) => {
   const sellAmount = new BigNumber('1000000000000000000')
   const minBuyAmount = 1
   let exchange: ExchangeInstance
-  let reserve: ReserveInstance
   let goldToken: GoldTokenInstance
+  let reserve: ReserveInstance
+  let sortedOracles: SortedOraclesInstance
   let stableToken: StableTokenInstance
   let originalStable
   let originalGold
@@ -377,10 +380,12 @@ contract('Integration: Exchange', (accounts: string[]) => {
 
   before(async () => {
     exchange = await getDeployedProxiedContract('Exchange', artifacts)
-    reserve = await getDeployedProxiedContract('Reserve', artifacts)
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
+    reserve = await getDeployedProxiedContract('Reserve', artifacts)
+    sortedOracles = await getDeployedProxiedContract('SortedOracles', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
-    await exchange.unfreeze()
+    // Set the USD/Celo Gold exchange rate to 10:1.
+    await sortedOracles.report(stableToken.address, 10, NULL_ADDRESS, NULL_ADDRESS)
   })
 
   describe('When selling gold', () => {

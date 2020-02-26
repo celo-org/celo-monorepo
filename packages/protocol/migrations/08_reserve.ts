@@ -30,13 +30,25 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
   CeloContractName.Reserve,
   initializeArgs,
   async (reserve: ReserveInstance, web3: Web3, networkName: string) => {
-    const network: any = truffle.networks[networkName]
-    console.info('Sending the reserve an initial gold balance')
-    await web3.eth.sendTransaction({
-      from: network.from,
-      to: reserve.address,
-      value: web3.utils.toWei(config.reserve.goldBalance.toString(), 'ether') as string,
+    config.reserve.spenders.forEach(async (spender) => {
+      console.info(`Marking ${spender} as a reserve spender`)
+      await reserve.addSpender(spender)
     })
+    config.reserve.otherAddresses.forEach(async (otherAddress) => {
+      console.info(`Marking ${otherAddress} as an "otherReserveAddress"`)
+      await reserve.addOtherReserveAddress(otherAddress)
+    })
+
+    if (config.reserve.initialBalance) {
+      console.info('Sending the reserve an initial gold balance')
+      const network: any = truffle.networks[networkName]
+      await web3.eth.sendTransaction({
+        from: network.from,
+        to: reserve.address,
+        value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether') as string,
+      })
+    }
+
     const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<
       ReserveSpenderMultiSigInstance
     >(CeloContractName.ReserveSpenderMultiSig, artifacts)
