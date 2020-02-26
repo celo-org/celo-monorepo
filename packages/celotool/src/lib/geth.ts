@@ -957,7 +957,6 @@ export async function startGeth(
 
   if (privateKey || ethstats) {
     gethArgs.push('--password=/dev/null', `--unlock=0`)
-    gethArgs.push('--allow-insecure-unlock')
   }
 
   if (ethstats) {
