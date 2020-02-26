@@ -27,8 +27,8 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @param newAddress The address to add.
    */
   function addAddress(address newAddress) external onlyOwner {
-    emit WhitelistedAddress(newAddress);
     whitelist.push(newAddress);
+    emit WhitelistedAddress(newAddress);
   }
 
   /**
@@ -38,10 +38,10 @@ contract TransferWhitelist is Ownable, UsingRegistry {
   function addRegisteredContract(bytes32 registryId)
     external
     onlyOwner
-    onlyRegisteredContract(registryId)
   {
-    emit WhitelistedRegistryId(registryId);
+    require(registry.getAddressFor(registryId) != address(0), "registryId does not corespond to a registered address");
     registeredContracts.push(registryId);
+    emit WhitelistedRegistryId(registryId);
   }
 
   /**
@@ -84,7 +84,7 @@ contract TransferWhitelist is Ownable, UsingRegistry {
       i = i.add(1);
     }
     for (uint256 j = 0; j < registeredContracts.length; j = j.add(1)) {
-      _whitelist[i] = registry.getAddressForOrDie(registeredContracts[j]);
+      _whitelist[i] = registry.getAddressFor(registeredContracts[j]);
       i = i.add(1);
     }
     return _whitelist;
