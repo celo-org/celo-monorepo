@@ -15,6 +15,8 @@ import * as _ from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
+  FreezerContract,
+  FreezerInstance,
   GoldTokenContract,
   GoldTokenInstance,
   LockedGoldContract,
@@ -66,14 +68,15 @@ interface ReleaseGoldConfig {
   canVote: boolean
 }
 
-const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGold')
 const Accounts: AccountsContract = artifacts.require('Accounts')
-const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
+const Freezer: FreezerContract = artifacts.require('Freezer')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
-const MockElection: MockElectionContract = artifacts.require('MockElection')
 const Registry: RegistryContract = artifacts.require('Registry')
+const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGold')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -92,15 +95,16 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   const releaseOwner = accounts[2]
   const refundAddress = accounts[3]
-  let releaseGoldInstance: ReleaseGoldInstance
   const newBeneficiary = accounts[4]
   let accountsInstance: AccountsInstance
-  let lockedGoldInstance: LockedGoldInstance
+  let freezerInstance: FreezerInstance
   let goldTokenInstance: GoldTokenInstance
+  let lockedGoldInstance: LockedGoldInstance
   let mockElection: MockElectionInstance
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
+  let releaseGoldInstance: ReleaseGoldInstance
   let proofOfWalletOwnership: Signature
 
   const releaseGoldDefaultSchedule: ReleaseGoldConfig = {
@@ -159,20 +163,23 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
-    lockedGoldInstance = await LockedGold.new()
+    freezerInstance = await Freezer.new()
     goldTokenInstance = await GoldToken.new()
+    lockedGoldInstance = await LockedGold.new()
     mockElection = await MockElection.new()
-    mockValidators = await MockValidators.new()
     mockGovernance = await MockGovernance.new()
+    mockValidators = await MockValidators.new()
 
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
-    await registry.setAddressFor(CeloContractName.LockedGold, lockedGoldInstance.address)
-    await registry.setAddressFor(CeloContractName.GoldToken, goldTokenInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.Freezer, freezerInstance.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, goldTokenInstance.address)
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, lockedGoldInstance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGoldInstance.initialize(registry.address, UNLOCKING_PERIOD)
+    await goldTokenInstance.initialize(registry.address)
     await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount({ from: beneficiary })
   })

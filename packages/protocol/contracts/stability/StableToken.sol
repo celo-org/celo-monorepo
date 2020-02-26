@@ -9,9 +9,9 @@ import "../common/interfaces/ICeloToken.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
+import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
-import "../baklava/Freezable.sol";
 
 /**
  * @title An ERC20 compliant token with adjustable supply.
@@ -106,9 +106,6 @@ contract StableToken is
 
     _transferOwnership(msg.sender);
 
-    // At network launch, stable token transfers should be frozen.
-    frozen = true;
-
     totalSupply_ = 0;
     name_ = _name;
     symbol_ = _symbol;
@@ -125,18 +122,6 @@ contract StableToken is
       _mint(initialBalanceAddresses[i], initialBalanceValues[i]);
     }
     setRegistry(registryAddress);
-  }
-
-  function _transferOwnership(address owner) internal {
-    Ownable._transferOwnership(owner);
-    _setFreezer(owner);
-  }
-
-  /**
-    * @notice This overrides Freezable's `freeze` to disable refreezing StableToken.
-    */
-  function freeze() external {
-    require(false, "StableToken is not freezable again");
   }
 
   /**

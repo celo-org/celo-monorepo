@@ -7,7 +7,6 @@ import { keccak256 } from 'ethereumjs-util'
 import {
   ProxyInstance,
   RegistryInstance,
-  ReserveInstance,
   UsingRegistryInstance,
 } from 'types'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
@@ -308,11 +307,6 @@ export function assertGteBN(
     `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
       ''}`
   )
-}
-
-export const getReserveBalance = async (web3: Web3, getContract: any): Promise<string> => {
-  const reserve: ReserveInstance = await getContract('Reserve', 'proxiedContract')
-  return (await web3.eth.getBalance(reserve.address)).toString()
 }
 
 export const isSameAddress = (minerAddress, otherAddress) => {
