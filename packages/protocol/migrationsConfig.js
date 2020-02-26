@@ -80,6 +80,13 @@ const DefaultConfig = {
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
   },
+  governanceApproverMultiSig: {
+    //Placeholder until addresses for 2/5 multsig are generated.
+    signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+    useMultiSig: true,
+  },
   lockedGold: {
     unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days divided by 24 to accelerate for Stake off
   },
@@ -96,6 +103,14 @@ const DefaultConfig = {
     goldBalance: 100000000,
     tobinTaxStalenessThreshold: 60 * 60, // 1 hour
     dailySpendingRatio: '1000000000000000000000000', // 100%
+    frozenGold: 0,
+    frozenDays: 0,
+  },
+  reserveSpenderMultiSig: {
+    //Placeholder until addresses for 2/2 multsig are generated.
+    signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
   },
   stableToken: {
     decimals: 18,
@@ -125,7 +140,8 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    maxGroupSize: '5',
+    commissionUpdateDelay: 51840, // Approximately 3 days
+    maxGroupSize: 5,
     // 30 Days divided by 24 to accelerate for Stake off
     slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24,
 

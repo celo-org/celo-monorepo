@@ -14,8 +14,7 @@ import { encryptComment } from 'src/identity/commentKey'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
@@ -123,7 +122,7 @@ function* sendPayment(
   }
 }
 
-export function* sendPaymentOrInviteSaga({
+function* sendPaymentOrInviteSaga({
   amount,
   reason,
   recipient,
@@ -150,7 +149,6 @@ export function* sendPaymentOrInviteSaga({
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,
-        recipient.displayName,
         recipient.e164PhoneNumber,
         inviteMethod || InviteBy.SMS,
         amount,
@@ -161,7 +159,7 @@ export function* sendPaymentOrInviteSaga({
     if (firebasePendingRequestUid) {
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
-    yield call(navigate, Screens.WalletHome)
+    navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))

@@ -8,9 +8,14 @@ exports[`Experience/Composition renders 1`] = `
     className="css-view-1dbjc4n"
     style={
       Object {
-        "borderBottomColor": "rgba(221,221,221,1.00)",
-        "marginBottom": "70px",
+        "MozTransitionProperty": "box-shadow",
+        "WebkitTransitionDuration": "400ms",
+        "WebkitTransitionProperty": "box-shadow",
+        "boxShadow": "0px 0px 0px 0px rgba(0,0,0,0)",
+        "marginBottom": "75px",
         "position": "fixed",
+        "transitionDuration": "400ms",
+        "transitionProperty": "box-shadow",
         "width": "100%",
         "zIndex": 10,
       }
@@ -25,8 +30,6 @@ exports[`Experience/Composition renders 1`] = `
           "WebkitBoxPack": "center",
           "WebkitJustifyContent": "center",
           "alignItems": "center",
-          "borderBottomColor": "rgba(221,221,221,1.00)",
-          "borderBottomWidth": "1px",
           "justifyContent": "center",
           "msFlexAlign": "center",
           "msFlexPack": "center",
@@ -241,7 +244,7 @@ exports[`Experience/Composition renders 1`] = `
     className="css-view-1dbjc4n"
     style={
       Object {
-        "marginTop": "70px",
+        "marginTop": "75px",
       }
     }
   />
@@ -2480,8 +2483,8 @@ exports[`Experience/Composition renders 1`] = `
           >
             <a
               href="https://github.com/celo-org"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"
@@ -2547,8 +2550,8 @@ exports[`Experience/Composition renders 1`] = `
           >
             <a
               href="https://forum.celo.org/"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"
@@ -2575,8 +2578,8 @@ exports[`Experience/Composition renders 1`] = `
           >
             <a
               href="https://discord.gg/6yWMkgM"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"
@@ -2605,8 +2608,8 @@ exports[`Experience/Composition renders 1`] = `
           >
             <a
               href="https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"

@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
@@ -65,35 +64,27 @@ const Social = React.memo(function _Social() {
           <MediumLogo color={colors.dark} height={height} />
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.gitHub}>
-            <a>
-              <Octocat color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.gitHub}>
+            <Octocat color={colors.dark} size={height} />
+          </a>
         </View>
         <View style={styles.socialIcon}>
           <TwiterLogo color={colors.dark} height={height} />
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.discourse}>
-            <a>
-              <Discourse color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.discourse}>
+            <Discourse color={colors.dark} size={height} />
+          </a>
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.discord}>
-            <a>
-              <Discord color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.discord}>
+            <Discord color={colors.dark} size={height} />
+          </a>
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.youtube}>
-            <a>
-              <YouTube color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.youtube}>
+            <YouTube color={colors.dark} size={height} />
+          </a>
         </View>
       </View>
     </Responsive>

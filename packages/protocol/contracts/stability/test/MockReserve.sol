@@ -1,7 +1,7 @@
 pragma solidity ^0.5.3;
 // solhint-disable no-unused-vars
 
-import "../../common/interfaces/IERC20Token.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title A mock Reserve for testing.
@@ -9,13 +9,13 @@ import "../../common/interfaces/IERC20Token.sol";
 contract MockReserve {
   mapping(address => bool) public tokens;
 
-  IERC20Token public goldToken;
+  IERC20 public goldToken;
 
   // solhint-disable-next-line no-empty-blocks
   function() external payable {}
 
   function setGoldToken(address goldTokenAddress) external {
-    goldToken = IERC20Token(goldTokenAddress);
+    goldToken = IERC20(goldTokenAddress);
   }
 
   function transferGold(address to, uint256 value) external returns (bool) {
@@ -39,5 +39,9 @@ contract MockReserve {
 
   function mintToken(address, address, uint256) external pure returns (bool) {
     return true;
+  }
+
+  function getUnfrozenReserveGoldBalance() external view returns (uint256) {
+    return address(this).balance;
   }
 }
