@@ -13,7 +13,6 @@ import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { GovernanceWrapper } from './wrappers/Governance'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
-import { ReleaseGoldWrapper } from './wrappers/ReleaseGold'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
@@ -37,7 +36,6 @@ const WrapperFactories = {
   // [CeloContract.MultiSig]: MultiSigWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
-  [CeloContract.ReleaseGold]: ReleaseGoldWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
@@ -65,7 +63,6 @@ interface WrapperCacheMap {
   // [CeloContract.MultiSig]?: MultiSigWrapper,
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
-  [CeloContract.ReleaseGold]?: ReleaseGoldWrapper
   [CeloContract.Reserve]?: ReserveWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
@@ -131,9 +128,6 @@ export class WrapperCache {
   // getRegistry() {
   //   return this.getWrapper(CeloContract.Registry, newRegistry)
   // }
-  getReleaseGold() {
-    return this.getContract(CeloContract.ReleaseGold)
-  }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
   }

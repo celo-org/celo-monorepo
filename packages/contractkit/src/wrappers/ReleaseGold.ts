@@ -100,7 +100,6 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @return A boolean indicating revocable releasing (true) or non-revocable(false).
    */
   async isRevokable(): Promise<boolean> {
-    // TODO(lucas): is this necessary
     const revocationInfo = await this.getRevocationInfo()
     return revocationInfo.revocable
   }
@@ -111,11 +110,23 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    */
   isRevoked: () => Promise<boolean> = proxyCall(this.contract.methods.isRevoked)
 
-  // /**
-  //  * Returns the time at which the release schedule was revoked
-  //  * @return The timestamp of the release schedule revokation
-  //  */
-  // getRevokeTime: () => Promise<string> = proxyCall(this.contract.methods.revokeTime)
+  /**
+   * Returns the time at which the release schedule was revoked
+   * @return The timestamp of the release schedule revocation
+   */
+  async getRevokeTime(): Promise<number> {
+    const revocationInfo = await this.getRevocationInfo()
+    return revocationInfo.revokeTime
+  }
+
+  /**
+   * Returns the balance of released gold when the grant was revoked
+   * @return The balance at revocation time. 0 can also indicate not revoked.
+   */
+  async getReleasedBalanceAtRevoke(): Promise<string> {
+    const revocationInfo = await this.getRevocationInfo()
+    return revocationInfo.releasedBalanceAtRevoke.toString()
+  }
 
   /**
    * Returns the total balance of the ReleaseGold instance

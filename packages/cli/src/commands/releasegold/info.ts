@@ -1,12 +1,12 @@
-import { ReleaseSchedule } from '@celo/contractkit/src/wrappers/ReleaseGold'
+import { newReleaseGold } from '@celo/contractkit/src/generated/ReleaseGold'
+import {
+  ReleaseGoldWrapper,
+  ReleaseSchedule,
+  RevocationInfo,
+} from '@celo/contractkit/src/wrappers/ReleaseGold'
 import { BaseCommand } from '../../base'
+import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-
-export interface RevokedState {
-  isRevoked: boolean
-  revokeTime?: number
-  releasedBalanceAtRevoke?: string
-}
 
 export interface BalanceState {
   totalWithdrawn: string
@@ -18,12 +18,12 @@ export interface BalanceState {
 }
 
 export interface ReleaseGoldInfo {
-  vestingInstanceAddress: string
+  releaseGoldWrapperAddress: string
   beneficiary: string
   revoker: string
-  isRevokable: boolean
-  vestingSchedule: ReleaseSchedule
-  revokedStateData: RevokedState
+  releaseSchedule: ReleaseSchedule
+  isRevoked: boolean
+  revokedStateData: RevocationInfo
   balanceStateData: BalanceState
 }
 
@@ -43,57 +43,30 @@ export default class Info extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(Info)
-    const releaseGoldContract = await this.kit.contracts.getReleaseGold()
-    const releaseGoldInstance = await releaseGoldContract.getReleaseGoldAt(flags.releaseGoldAddress)
-    console.log(releaseGoldInstance)
+
+    const releaseGoldWrapper = await new ReleaseGoldWrapper(
+      this.kit,
+      newReleaseGold(this.kit.web3, flags.releaseGoldAddress)
+    )
+    const balanceStateData: BalanceState = {
+      totalWithdrawn: (await releaseGoldWrapper.getTotalWithdrawn()).toString(),
+      totalBalance: (await releaseGoldWrapper.getTotalBalance()).toString(),
+      remainingTotalBalance: (await releaseGoldWrapper.getRemainingTotalBalance()).toString(),
+      remainingUnlockedBalance: (await releaseGoldWrapper.getRemainingUnlockedBalance()).toString(),
+      remainingLockedBalance: (await releaseGoldWrapper.getRemainingLockedBalance()).toString(),
+      currentReleasedTotalAmount: (
+        await releaseGoldWrapper.getCurrentReleasedTotalAmount()
+      ).toString(),
+    }
+    const releaseGoldInfo: ReleaseGoldInfo = {
+      releaseGoldWrapperAddress: releaseGoldWrapper.address,
+      beneficiary: await releaseGoldWrapper.getBeneficiary(),
+      revoker: await releaseGoldWrapper.getRevoker(),
+      releaseSchedule: await releaseGoldWrapper.getReleaseSchedule(),
+      isRevoked: await releaseGoldWrapper.isRevoked(),
+      revokedStateData: await releaseGoldWrapper.getRevocationInfo(),
+      balanceStateData: balanceStateData,
+    }
+    printValueMapRecursive(releaseGoldInfo)
   }
-
-  //   await newCheckBuilder(this)
-  //     .addCheck(
-  //       `No vested instance found under the given beneficiary ${flags.beneficiary}`,
-  //       () => vestingInstance.address !== NULL_ADDRESS
-  //     )
-  //     .runChecks()
-
-  //   const pausedStateData: PausedState = {
-  //     isPaused: await vestingInstance.isPaused(),
-  //   }
-
-  //   if (pausedStateData.isPaused)
-  //     pausedStateData.pauseEndTime = valueToInt(await vestingInstance.getPauseEndTime())
-
-  //   const revokedStateData: RevokedState = {
-  //     isRevoked: await vestingInstance.isRevoked(),
-  //   }
-
-  //   if (revokedStateData.isRevoked) {
-  //     revokedStateData.revokeTime = valueToInt(await vestingInstance.getRevokeTime())
-  //     revokedStateData.vestedBalanceAtRevoke = (
-  //       await vestingInstance.getVestedBalanceAtRevoke()
-  //     ).toString()
-  //   }
-
-  //   const balanceStateData: BalanceState = {
-  //     totalWithdrawn: (await vestingInstance.getTotalWithdrawn()).toString(),
-  //     totalBalance: (await vestingInstance.getTotalBalance()).toString(),
-  //     remainingTotalBalance: (await vestingInstance.getRemainingTotalBalance()).toString(),
-  //     remainingUnlockedBalance: (await vestingInstance.getRemainingUnlockedBalance()).toString(),
-  //     remainingLockedBalance: (await vestingInstance.getRemainingLockedBalance()).toString(),
-  //     initialVestingAmount: (await vestingInstance.getInitialVestingAmount()).toString(),
-  //     currentVestedTotalAmount: (await vestingInstance.getCurrentVestedTotalAmount()).toString(),
-  //   }
-
-  //   const vestingInstanceInfo: VestingInstanceInfo = {
-  //     vestingInstanceAddress: vestingInstance.address,
-  //     beneficiary: flags.beneficiary,
-  //     revoker: await vestingInstance.getRevoker(),
-  //     isRevokable: await vestingInstance.isRevokable(),
-  //     vestingSchedule: await vestingInstance.getVestingSchedule(),
-  //     maxPausePeriod: await vestingInstance.getMaxPausePeriod(),
-  //     pausedStateData: pausedStateData,
-  //     revokedStateData: revokedStateData,
-  //     balanceStateData: balanceStateData,
-  //   }
-  //   printValueMapRecursive(vestingInstanceInfo)
-  // }
 }

@@ -16,7 +16,6 @@ import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
-import { newReleaseGold } from './generated/ReleaseGold'
 import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
@@ -42,7 +41,6 @@ const ContractFactories = {
   [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
-  [CeloContract.ReleaseGold]: newReleaseGold,
   [CeloContract.Reserve]: newReserve,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
@@ -111,9 +109,6 @@ export class Web3ContractCache {
   }
   getRegistry() {
     return this.getContract(CeloContract.Registry)
-  }
-  getReleaseGold() {
-    return this.getContract(CeloContract.ReleaseGold)
   }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
