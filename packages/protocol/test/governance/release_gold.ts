@@ -311,7 +311,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should revert when setting a new beneficiary from the release owner', async () => {
-      await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: owner }))
+      await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: releaseOwner }))
     })
 
     it('should emit the BeneficiarySet event', async () => {
