@@ -1,8 +1,9 @@
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { CeloContractName } from 'lib/registry-utils'
 import { RegistryInstance, TransferWhitelistInstance } from 'types'
 
-const name = 'TransferWhitelist'
+const name = CeloContractName.TransferWhitelist
 const Contract = artifacts.require(name)
 
 module.exports = (deployer: any) => {
