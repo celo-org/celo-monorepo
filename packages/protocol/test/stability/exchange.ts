@@ -9,22 +9,29 @@ import {
 import { fixed1, fromFixed, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
+  ExchangeContract,
   ExchangeInstance,
+  FreezerContract,
+  FreezerInstance,
+  GoldTokenContract,
   GoldTokenInstance,
+  MockReserveContract,
   MockReserveInstance,
+  MockSortedOraclesContract,
   MockSortedOraclesInstance,
+  RegistryContract,
   RegistryInstance,
+  StableTokenContract,
   StableTokenInstance,
 } from 'types'
 
-const Exchange: Truffle.Contract<ExchangeInstance> = artifacts.require('Exchange')
-const GoldToken: Truffle.Contract<GoldTokenInstance> = artifacts.require('GoldToken')
-const MockSortedOracles: Truffle.Contract<MockSortedOraclesInstance> = artifacts.require(
-  'MockSortedOracles'
-)
-const MockReserve: Truffle.Contract<MockReserveInstance> = artifacts.require('MockReserve')
-const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
-const StableToken: Truffle.Contract<StableTokenInstance> = artifacts.require('StableToken')
+const Exchange: ExchangeContract = artifacts.require('Exchange')
+const Freezer: FreezerContract = artifacts.require('Freezer')
+const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
+const MockReserve: MockReserveContract = artifacts.require('MockReserve')
+const Registry: RegistryContract = artifacts.require('Registry')
+const StableToken: StableTokenContract = artifacts.require('StableToken')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN.js
@@ -38,6 +45,7 @@ GoldToken.numberFormat = 'BigNumber'
 
 contract('Exchange', (accounts: string[]) => {
   let exchange: ExchangeInstance
+  let freezer: FreezerInstance
   let registry: RegistryInstance
   let stableToken: StableTokenInstance
   let goldToken: GoldTokenInstance
@@ -86,15 +94,17 @@ contract('Exchange', (accounts: string[]) => {
   }
 
   beforeEach(async () => {
-    registry = await Registry.new()
+    freezer = await Freezer.new()
     goldToken = await GoldToken.new()
-    await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
-
     mockReserve = await MockReserve.new()
+    stableToken = await StableToken.new()
+    registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
     await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
     await mockReserve.setGoldToken(goldToken.address)
 
-    stableToken = await StableToken.new()
+    await goldToken.initialize(registry.address)
     // TODO: use MockStableToken for this
     await stableToken.initialize(
       'Celo Dollar',
@@ -107,8 +117,6 @@ contract('Exchange', (accounts: string[]) => {
       []
     )
 
-    await stableToken.unfreeze()
-
     mockSortedOracles = await MockSortedOracles.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await mockSortedOracles.setMedianRate(stableToken.address, stableAmountForRate)
@@ -120,7 +128,6 @@ contract('Exchange', (accounts: string[]) => {
     exchange = await Exchange.new()
     await exchange.initialize(
       registry.address,
-      accounts[0],
       stableToken.address,
       spread,
       reserveFraction,
@@ -140,7 +147,6 @@ contract('Exchange', (accounts: string[]) => {
       await assertRevert(
         exchange.initialize(
           registry.address,
-          accounts[0],
           stableToken.address,
           spread,
           reserveFraction,
@@ -843,7 +849,7 @@ contract('Exchange', (accounts: string[]) => {
 
     describe('when the contract is frozen', () => {
       beforeEach(async () => {
-        await exchange.freeze()
+        await freezer.freeze(exchange.address)
       })
 
       it('should revert', async () => {

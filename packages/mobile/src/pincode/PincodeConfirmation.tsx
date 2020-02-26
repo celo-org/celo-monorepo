@@ -120,6 +120,9 @@ class PincodeConfirmation extends React.Component<Props, State> {
         .unlockAccount(this.props.currentAccount, pin, UNLOCK_DURATION)
         .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
         .catch(this.onWrongPin)
+    } else {
+      // Account is not created yet, so PIN can not be verified
+      this.onCorrectPin(pin)
     }
   }
 

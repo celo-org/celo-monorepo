@@ -36,7 +36,7 @@ e2e-defaults: &e2e-defaults
   docker:
     - image: celohq/circleci:geth1.9
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: mrsmkl/gas-payment-change-m02-alt
 
 general:
   artifacts:
@@ -64,7 +64,7 @@ commands:
       - run:
           name: Extract cached node_modules (if present)
           command: |
-            if [ -e ~/.tmp/node_modules.tgz ]; then 
+            if [ -e ~/.tmp/node_modules.tgz ]; then
               tar -xf ~/.tmp/node_modules.tgz
             else
               # Dependencies have changed, create beacon file used by the install and check licenses steps
@@ -670,6 +670,7 @@ jobs:
 
   end-to-end-geth-transfer-test:
     <<: *e2e-defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -688,6 +689,7 @@ jobs:
 
   end-to-end-geth-blockchain-parameters-test:
     <<: *e2e-defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -706,8 +708,7 @@ jobs:
 
   end-to-end-geth-slashing-test:
     <<: *e2e-defaults
-    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
-    resource_class: medium+
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -726,8 +727,7 @@ jobs:
 
   end-to-end-geth-governance-test:
     <<: *e2e-defaults
-    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
-    resource_class: medium+
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -746,8 +746,7 @@ jobs:
 
   end-to-end-geth-sync-test:
     <<: *e2e-defaults
-    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
-    resource_class: medium+
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app

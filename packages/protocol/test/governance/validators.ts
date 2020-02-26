@@ -8,6 +8,7 @@ import {
   assertRevert,
   assertSameAddress,
   currentEpochNumber,
+  mineBlocks,
   mineToNextEpoch,
   NULL_ADDRESS,
   timeTravel,
@@ -58,9 +59,11 @@ const parseValidatorGroupParams = (groupParams: any) => {
   return {
     members: groupParams[0],
     commission: groupParams[1],
-    sizeHistory: groupParams[2],
-    slashingMultiplier: groupParams[3],
-    lastSlashed: groupParams[4],
+    nextCommission: groupParams[2],
+    nextCommissionBlock: groupParams[3],
+    sizeHistory: groupParams[4],
+    slashingMultiplier: groupParams[5],
+    lastSlashed: groupParams[6],
   }
 }
 
@@ -99,6 +102,7 @@ contract('Validators', (accounts: string[]) => {
   const slashingMultiplierResetPeriod = 30 * DAY
   const membershipHistoryLength = new BigNumber(5)
   const maxGroupSize = new BigNumber(5)
+  const commissionUpdateDelay = new BigNumber(3)
 
   // A random 64 byte hex string.
   const blsPublicKey = toBytes(
@@ -133,7 +137,8 @@ contract('Validators', (accounts: string[]) => {
       validatorScoreParameters.adjustmentSpeed,
       membershipHistoryLength,
       slashingMultiplierResetPeriod,
-      maxGroupSize
+      maxGroupSize,
+      commissionUpdateDelay
     )
   })
 
@@ -198,6 +203,11 @@ contract('Validators', (accounts: string[]) => {
       assertEqualBN(actualMaxGroupSize, maxGroupSize)
     })
 
+    it('should have set the commision update delay', async () => {
+      const actualCommissionUpdateDelay = await validators.getCommissionUpdateDelay()
+      assertEqualBN(actualCommissionUpdateDelay, commissionUpdateDelay)
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         validators.initialize(
@@ -210,7 +220,8 @@ contract('Validators', (accounts: string[]) => {
           validatorScoreParameters.adjustmentSpeed,
           membershipHistoryLength,
           slashingMultiplierResetPeriod,
-          maxGroupSize
+          maxGroupSize,
+          commissionUpdateDelay
         )
       )
     })
@@ -1754,7 +1765,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#updateCommission()', () => {
+  describe('#queueCommissionUpdate()', () => {
     describe('when the commission is different', () => {
       const newCommission = commission.plus(1)
       const group = accounts[0]
@@ -1764,22 +1775,29 @@ contract('Validators', (accounts: string[]) => {
 
         beforeEach(async () => {
           await registerValidatorGroup(group)
-          resp = await validators.updateCommission(newCommission)
+          resp = await validators.queueCommissionUpdate(newCommission)
         })
 
-        it('should set the validator group commission', async () => {
+        it('should NOT set the validator group commission', async () => {
           const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-          assertEqualBN(parsedGroup.commission, newCommission)
+          assertEqualBN(parsedGroup.commission, commission)
         })
 
-        it('should emit the ValidatorGroupCommissionUpdated event', async () => {
+        it('should set the validator group next commission', async () => {
+          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+          assertEqualBN(parsedGroup.nextCommission, newCommission)
+        })
+
+        it('should emit the ValidatorGroupCommissionUpdateQueued event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
+          const blockNumber = log.blockNumber
           assertContainSubset(log, {
-            event: 'ValidatorGroupCommissionUpdated',
+            event: 'ValidatorGroupCommissionUpdateQueued',
             args: {
               group,
               commission: newCommission,
+              activationBlock: commissionUpdateDelay.plus(blockNumber),
             },
           })
         })
@@ -1787,14 +1805,71 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the commission is the same', () => {
         it('should revert', async () => {
-          await assertRevert(validators.updateCommission(commission))
+          await assertRevert(validators.queueCommissionUpdate(commission))
         })
       })
 
       describe('when the commission is greater than one', () => {
         it('should revert', async () => {
-          await assertRevert(validators.updateCommission(fixed1.plus(1)))
+          await assertRevert(validators.queueCommissionUpdate(fixed1.plus(1)))
         })
+      })
+    })
+  })
+  describe('#updateCommission()', () => {
+    const group = accounts[0]
+    const newCommission = commission.plus(1)
+
+    beforeEach(async () => {
+      await registerValidatorGroup(group)
+    })
+
+    describe('when activationBlock has passed', () => {
+      let resp: any
+
+      beforeEach(async () => {
+        await validators.queueCommissionUpdate(newCommission)
+        await mineBlocks(commissionUpdateDelay.toNumber(), web3)
+        resp = await validators.updateCommission()
+      })
+
+      it('should set the validator group commission', async () => {
+        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+        assertEqualBN(parsedGroup.commission, newCommission)
+      })
+
+      it('should emit the ValidatorGroupCommissionUpdated event', async () => {
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertContainSubset(log, {
+          event: 'ValidatorGroupCommissionUpdated',
+          args: {
+            group,
+            commission: newCommission,
+          },
+        })
+      })
+    })
+
+    describe('when activationBlock has NOT passed', () => {
+      it('should revert', async () => {
+        await validators.queueCommissionUpdate(newCommission)
+        await assertRevert(validators.updateCommission())
+      })
+    })
+
+    describe('when NO Commission has been queued', () => {
+      it('should revert', async () => {
+        await assertRevert(validators.updateCommission())
+      })
+    })
+
+    describe('when try to apply an already applied Commission', () => {
+      it('should revert', async () => {
+        await validators.queueCommissionUpdate(newCommission)
+        await mineBlocks(commissionUpdateDelay.toNumber(), web3)
+        await validators.updateCommission()
+        await assertRevert(validators.updateCommission())
       })
     })
   })
