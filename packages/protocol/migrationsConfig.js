@@ -127,6 +127,7 @@ const DefaultConfig = {
   },
   stableToken: {
     decimals: 18,
+    goldPrice: 10,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
