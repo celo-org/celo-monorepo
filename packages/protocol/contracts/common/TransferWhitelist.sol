@@ -35,6 +35,14 @@ contract TransferWhitelist is Ownable, UsingRegistry {
   }
 
   /**
+   * @notice Gets the number of registered contracts
+   * @return The length of registeredContracts
+   */
+  function getRegisteredContractsLength() external view returns (uint256 length) {
+    return registeredContracts.length;
+  }
+
+  /**
    * @notice Set the whitelist of addresses.
    * @param  _whitelist The new whitelist of addresses.
    */

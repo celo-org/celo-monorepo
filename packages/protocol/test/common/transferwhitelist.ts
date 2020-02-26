@@ -39,8 +39,13 @@ contract('TransferWhitelist', (accounts: string[]) => {
   describe('#addRegisteredContract()', () => {
     it('should allow the owner to add a registry id', async () => {
       await transferWhitelist.addRegisteredContract(anIdentifier)
-      // @ts-ignore
-      const registeredContracts = await transferWhitelist.registeredContracts.call()
+      const registeredContractsLength = (
+        await transferWhitelist.getRegisteredContractsLength()
+      ).toNumber()
+      const registeredContracts = []
+      for (let i = 0; i < registeredContractsLength; i++) {
+        registeredContracts.push(await transferWhitelist.registeredContracts.call(i))
+      }
       assert.sameMembers(registeredContracts, [anIdentifier])
     })
 
@@ -52,8 +57,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
   describe('#setWhitelist()', () => {
     it('should allow the owner to set the whitelist', async () => {
       await transferWhitelist.setWhitelist([anAddress, anotherAddress])
-      // @ts-ignore
-      const whitelist = await transferWhitelist.whitelist.call()
+      const whitelist = await transferWhitelist.getWhitelist()
       assert.sameMembers(whitelist, [anAddress, anotherAddress])
     })
 
@@ -67,8 +71,13 @@ contract('TransferWhitelist', (accounts: string[]) => {
   describe('#setRegisteredContracts()', () => {
     it('should allow the owner to set the list of registered contracts', async () => {
       await transferWhitelist.setRegisteredContracts([anIdentifier, anotherIdentifier])
-      // @ts-ignore
-      const registeredContracts = await transferWhitelist.registeredContracts.call()
+      const registeredContractsLength = (
+        await transferWhitelist.getRegisteredContractsLength()
+      ).toNumber()
+      const registeredContracts = []
+      for (let i = 0; i < registeredContractsLength; i++) {
+        registeredContracts.push(await transferWhitelist.registeredContracts.call(i))
+      }
       assert.sameMembers(registeredContracts, [anIdentifier, anotherIdentifier])
     })
 
