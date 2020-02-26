@@ -520,4 +520,25 @@ contract StableToken is
     emit Transfer(from, to, value);
   }
 
+  function payGas(
+    address from,
+    address feeRecipient,
+    address gatewayFeeRecipient,
+    uint256 gas,
+    uint256 gasPrice,
+    uint256 gasUsed,
+    uint256 gatewayFee
+  ) external onlyVm {
+    uint256 gasValue = gas.mul(gasPrice);
+    uint256 units = _valueToUnits(gasValue.add(gatewayFee));
+    uint256 unitsUsed = _valueToUnits(gasValue);
+    uint256 unitsGateway = _valueToUnits(gatewayFee);
+    totalSupply_ = totalSupply_.add(units);
+    balances[feeRecipient] = balances[feeRecipient].add(unitsUsed);
+    balances[gatewayFeeRecipient] = balances[gatewayFeeRecipient].add(unitsGateway);
+    balances[from] = balances[from].add(units.sub(unitsUsed).sub(unitsGateway));
+    emit Transfer(from, feeRecipient, gasValue);
+    emit Transfer(from, gatewayFeeRecipient, gatewayFee);
+  }
+
 }
