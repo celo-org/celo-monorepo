@@ -553,8 +553,8 @@ contract StableToken is
     address communityFund,
     uint256 refund,
     uint256 tipTxFee,
-    uint256 baseTxFee,
-    uint256 gatewayFee
+    uint256 gatewayFee,
+    uint256 baseTxFee
   ) external onlyVm onlyWhenNotFrozen {
     require(feeRecipient != address(0), "coinbase cannot be zero");
     require(gatewayFeeRecipient != address(0), "gateway cannot be zero");
