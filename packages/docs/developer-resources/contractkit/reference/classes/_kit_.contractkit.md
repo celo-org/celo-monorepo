@@ -194,7 +194,7 @@ ___
 
 ▸ **getEpochNumberOfBlock**(`blockNumber`: number): *Promise‹number›*
 
-*Defined in [contractkit/src/kit.ts:309](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L309)*
+*Defined in [contractkit/src/kit.ts:316](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L316)*
 
 **Parameters:**
 
@@ -210,7 +210,7 @@ ___
 
 ▸ **getFirstBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [contractkit/src/kit.ts:295](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L295)*
+*Defined in [contractkit/src/kit.ts:294](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L294)*
 
 **Parameters:**
 
@@ -226,7 +226,7 @@ ___
 
 ▸ **getLastBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [contractkit/src/kit.ts:302](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L302)*
+*Defined in [contractkit/src/kit.ts:305](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L305)*
 
 **Parameters:**
 
@@ -346,6 +346,6 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [contractkit/src/kit.ts:316](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L316)*
+*Defined in [contractkit/src/kit.ts:328](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L328)*
 
 **Returns:** *void*

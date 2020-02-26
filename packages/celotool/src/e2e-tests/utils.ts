@@ -78,7 +78,7 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export function sleep(seconds: number, verbose: boolean = false) {
+export function sleep(seconds: number, verbose = false) {
   if (verbose) {
     console.log(`Sleeping for ${seconds} seconds. Stay tuned!`)
   }
@@ -106,11 +106,20 @@ export async function migrateContracts(
       exchange: {
         frozen: false,
       },
+      goldToken: {
+        frozen: false,
+      },
+      reserve: {
+        initialBalance: 100000000,
+      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+        oracles: validators.map(ensure0x),
+        goldPrice: 10,
+        frozen: false,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),

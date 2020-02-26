@@ -39,6 +39,8 @@ contract('Reserve', (accounts: string[]) => {
   const aTobinTaxStalenessThreshold: number = 600
   const aDailySpendingRatio: string = '1000000000000000000000000'
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
+  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+  const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
     reserve = await Reserve.new()
     registry = await Registry.new()
@@ -47,7 +49,15 @@ contract('Reserve', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
-    await reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+    await reserve.initialize(
+      registry.address,
+      aTobinTaxStalenessThreshold,
+      aDailySpendingRatio,
+      0,
+      0,
+      initialAssetAllocationSymbols,
+      initialAssetAllocationWeights
+    )
   })
 
   describe('#initialize()', () => {
@@ -68,7 +78,15 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not be callable again', async () => {
       await assertRevert(
-        reserve.initialize(registry.address, aTobinTaxStalenessThreshold, aDailySpendingRatio)
+        reserve.initialize(
+          registry.address,
+          aTobinTaxStalenessThreshold,
+          aDailySpendingRatio,
+          0,
+          0,
+          initialAssetAllocationSymbols,
+          initialAssetAllocationWeights
+        )
       )
     })
   })
@@ -228,6 +246,7 @@ contract('Reserve', (accounts: string[]) => {
       await mockGoldToken.setBalanceOf(reserve.address, aValue)
       await web3.eth.sendTransaction({ to: reserve.address, value: aValue, from: accounts[0] })
       await reserve.addSpender(spender)
+      await reserve.addOtherReserveAddress(anAddress)
     })
 
     it('should allow a exchange to call transferExchangeGold', async () => {
@@ -240,6 +259,28 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should not allow other addresses to call transferExchangeGold', async () => {
       await assertRevert(reserve.transferExchangeGold(nonOwner, aValue, { from: nonOwner }))
+    })
+
+    it('should not allow freezing more gold than is available', async () => {
+      await assertRevert(reserve.setFrozenGold(aValue + 1, 1))
+    })
+
+    it('should not allow a spender to transfer more gold than is unfrozen', async () => {
+      await reserve.setFrozenGold(1, 1)
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
+    })
+
+    it('unfrozen gold should increase every 24 hours', async () => {
+      await reserve.setFrozenGold(3, 3)
+      await assertRevert(reserve.transferGold(anAddress, aValue - 2, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue - 2, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue - 1, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue - 1, { from: spender })
+      await assertRevert(reserve.transferGold(anAddress, aValue, { from: spender }))
+      await timeTravel(3600 * 24, web3)
+      await reserve.transferGold(anAddress, aValue, { from: spender })
     })
   })
 
@@ -565,7 +606,7 @@ contract('Reserve', (accounts: string[]) => {
         reserve.setAssetAllocations(newAssetAllocationSymbols, badAssetAllocationWeights)
       )
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
-      assert.equal(assetAllocationWeights.length, 0)
+      assert.equal(assetAllocationWeights.length, initialAssetAllocationWeights.length)
     })
 
     it('should fail if the asset allocation includes multiple weights for one symbol', async () => {
@@ -575,7 +616,7 @@ contract('Reserve', (accounts: string[]) => {
         reserve.setAssetAllocations(badAssetAllocationSymbols, newAssetAllocationWeights)
       )
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
-      assert.equal(assetAllocationWeights.length, 0)
+      assert.equal(assetAllocationWeights.length, initialAssetAllocationWeights.length)
     })
 
     it("should fail if the asset allocation doesn't include cGLD", async () => {
@@ -585,7 +626,7 @@ contract('Reserve', (accounts: string[]) => {
         reserve.setAssetAllocations(badAssetAllocationSymbols, newAssetAllocationWeights)
       )
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
-      assert.equal(assetAllocationWeights.length, 0)
+      assert.equal(assetAllocationWeights.length, initialAssetAllocationWeights.length)
     })
   })
 
