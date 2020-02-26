@@ -19,7 +19,7 @@ export async function sendTransactionWithPrivateKey<T>(
   const address = privateKeyToAddress(privateKey)
 
   // Encode data and estimate gas or use default values for a transfer.
-  let encodedTxData: string|undefined
+  let encodedTxData: string | undefined
   let estimatedGas = 21000 // Gas cost of a basic transfer.
 
   if (tx !== null) {
@@ -147,21 +147,27 @@ export async function setInitialProxyImplementation<
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, ...args)
+  return Contract.at(proxy.address) as ContractInstance
+}
 
+export async function _setInitialProxyImplementation<
+  ContractInstance extends Truffle.ContractInstance
+>(web3: Web3, implementation: ContractInstance, proxy: ProxyInstance, contractName: string, ...args: any[]) {
   const initializerAbi = (implementation as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
 
+  let receipt: any
   if (initializerAbi) {
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
-    console.log(`  Setting initial ${Contract.contractName} implementation on proxy`)
-    await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+    console.log(`  Setting initial ${contractName} implementation on proxy`)
+    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
   } else {
-    await proxy._setImplementation(implementation.address)
+    receipt = await proxy._setImplementation(implementation.address)
   }
-
-  return Contract.at(proxy.address) as ContractInstance
+  return receipt.tx
 }
 
 export async function getDeployedProxiedContract<ContractInstance extends Truffle.ContractInstance>(

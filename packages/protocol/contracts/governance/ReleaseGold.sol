@@ -3,12 +3,13 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./interfaces/IReleaseGoldInstance.sol";
+import "./interfaces/IReleaseGold.sol";
 import "../common/FixidityLib.sol";
 
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
-contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInstance {
+contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -69,6 +70,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   // Public struct housing params pertaining to revocation.
   RevocationInfo public revocationInfo;
 
+  event ReleaseGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
@@ -146,13 +148,13 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @param _refundAddress Address that receives refunded funds if contract is revoked.
    *                       0x0 if contract is not revocable.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
-   * @param initialDistributionPercentage Percentage of total rewards available for distribution.
-   *                                      Expressed to 3 significant figures [0, 1000].
+   * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
+   *                                 indicating % of total balance available for distribution.
    * @param _canValidate If this schedule's gold can be used for validating.
    * @param _canVote If this schedule's gold can be used for voting.
    * @param registryAddress Address of the deployed contracts registry.
    */
-  constructor(
+  function initialize(
     uint256 releaseStartTime,
     uint256 releaseCliffTime,
     uint256 numReleasePeriods,
@@ -163,11 +165,12 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     address _releaseOwner,
     address payable _refundAddress,
     bool subjectToLiquidityProvision,
-    uint256 initialDistributionPercentage,
+    uint256 initialDistributionRatio,
     bool _canValidate,
     bool _canVote,
     address registryAddress
-  ) public {
+  ) external initializer {
+    _transferOwnership(msg.sender);
     releaseSchedule.numReleasePeriods = numReleasePeriods;
     releaseSchedule.amountReleasedPerPeriod = amountReleasedPerPeriod;
     releaseSchedule.releasePeriod = releasePeriod;
@@ -190,8 +193,13 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
         block.timestamp,
       "Release schedule end time must be in the future"
     );
+    require(
+      address(this).balance ==
+        releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
+      "Contract balance must equal the entire grant amount"
+    );
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
-    require(initialDistributionPercentage <= 1000, "Initial distribution percentage out of bounds");
+    require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     require(
       (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
@@ -203,13 +211,13 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     releaseOwner = _releaseOwner;
     refundAddress = _refundAddress;
 
-    if (initialDistributionPercentage < 1000) {
+    if (initialDistributionRatio < 1000) {
       // Cannot use `getTotalBalance()` here because the factory has not yet sent the gold.
       uint256 totalGrant = releaseSchedule.amountReleasedPerPeriod.mul(
         releaseSchedule.numReleasePeriods
       );
-      // Initial percentage is expressed to 3 significant figures: [0, 1000].
-      maxDistribution = totalGrant.mul(initialDistributionPercentage).div(1000);
+      // Initial ratio is expressed to 3 significant figures: [0, 1000].
+      maxDistribution = totalGrant.mul(initialDistributionRatio).div(1000);
     } else {
       maxDistribution = MAX_UINT;
     }
@@ -217,6 +225,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
     canValidate = _canValidate;
     canVote = _canVote;
+    emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 
   /**
@@ -237,20 +246,20 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   }
 
   /**
-   * @notice Controls the maximum distribution percentage.
-   *         Calculates `distributionPercentage` of current `totalBalance()`
+   * @notice Controls the maximum distribution ratio.
+   *         Calculates `distributionRatio`/1000 of current `totalBalance()`
    *         and sets this value as the maximum allowed gold to be currently withdrawn.
-   * @param distributionPercentage Percentage in range [0, 1000] (3 significant figures)
-   *                               indicating % of total balance available for distribution.
+   * @param distributionRatio Amount in range [0, 1000] (3 significant figures)
+   *                          indicating % of total balance available for distribution.
    */
-  function setMaxDistribution(uint256 distributionPercentage) external onlyReleaseOwner {
-    require(distributionPercentage <= 1000, "Max distribution percentage must be within bounds");
-    // If percentage is 100%, we set maxDistribution to maxUint to account for future rewards.
-    if (distributionPercentage == 1000) {
+  function setMaxDistribution(uint256 distributionRatio) external onlyReleaseOwner {
+    require(distributionRatio <= 1000, "Max distribution ratio must be within bounds");
+    // If ratio is 1000, we set maxDistribution to maxUint to account for future rewards.
+    if (distributionRatio == 1000) {
       maxDistribution = MAX_UINT;
     } else {
       uint256 totalBalance = getTotalBalance();
-      maxDistribution = totalBalance.mul(distributionPercentage).div(1000);
+      maxDistribution = totalBalance.mul(distributionRatio).div(1000);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
   }
@@ -259,7 +268,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
    * @notice Sets the beneficiary of the instance
    * @param newBeneficiary The address of the new beneficiary
    */
-  function setBeneficiary(address payable newBeneficiary) external onlyBeneficiary {
+  function setBeneficiary(address payable newBeneficiary) external onlyOwner {
     _setBeneficiary(newBeneficiary);
   }
 
