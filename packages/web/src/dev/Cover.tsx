@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import LeaderBoard from 'src/dev/LeaderBoard'
+import stakeOffLeaders from 'src/dev/stakeOffLeaderResults.json'
 import Transceive from 'src/dev/Transceive'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
@@ -9,7 +11,7 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import LeaderBoardApp from './LeaderBoardApp'
+
 const DELAY = 100
 const DURATION = 400
 
@@ -104,7 +106,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
         mobileStyle={standardStyles.blockMarginBottomMobile}
       >
         <Cell span={Spans.full}>
-          <LeaderBoardApp />
+          <LeaderBoard isLoading={false} leaders={stakeOffLeaders.data.leaderboard} />
         </Cell>
       </GridRow>
     </View>
