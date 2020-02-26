@@ -78,7 +78,7 @@ export async function killInstance(instance: GethInstanceConfig) {
   }
 }
 
-export function sleep(seconds: number, verbose: boolean = false) {
+export function sleep(seconds: number, verbose = false) {
   if (verbose) {
     console.log(`Sleeping for ${seconds} seconds. Stay tuned!`)
   }
