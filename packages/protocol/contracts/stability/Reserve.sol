@@ -54,6 +54,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   event OtherReserveAddressAdded(address indexed otherReserveAddress);
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
+  event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -270,6 +271,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   function _transferGold(address payable to, uint256 value) internal returns (bool) {
+    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
       uint256 balance = getUnfrozenReserveGoldBalance();
@@ -279,6 +281,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     require(spendingLimit >= value, "Exceeding spending limit");
     spendingLimit = spendingLimit.sub(value);
     to.transfer(value);
+    emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
 
