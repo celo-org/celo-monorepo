@@ -113,9 +113,11 @@ const styles = StyleSheet.create({
   sweepContainer: {
     width: '100%',
     height: '100vh',
+    maxHeight: '100vw',
+    maxWidth: '90vw',
   },
   mobileSweepContainer: {
-    height: '180vw',
+    height: '90vw',
     width: '100%',
   },
   lightingOff: {
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     ],
   },
   absoluteCenter: {
-    position: 'absolute', // TODO only absolute on desktop not mobile
+    position: 'absolute',
     top: 0,
     right: 0,
     left: 0,
@@ -155,7 +157,6 @@ const styles = StyleSheet.create({
 
 function getKeyframes() {
   const standardStrokeFill = {
-    // stroke: colors.screenGray,
     fill: 'transparent',
   }
   return [
@@ -183,7 +184,6 @@ function getKeyframes() {
 
 function solidFadeInFrames(color: colors, donePercent: number) {
   const standardStrokeFill = {
-    // stroke: colors.screenGray,
     fill: 'transparent',
   }
   return [{ '0%': standardStrokeFill, [donePercent]: colorFrame(color), '100%': colorFrame(color) }]
