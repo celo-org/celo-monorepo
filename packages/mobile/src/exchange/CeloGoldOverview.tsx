@@ -1,10 +1,12 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import React, { useCallback } from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { useExchangeRate } from 'src/exchange/hooks'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -14,7 +16,7 @@ import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import useSelector from 'src/redux/useSelector'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
-import { getLocalCurrencyDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
+import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 
 interface OwnProps {
   testID: string
@@ -48,7 +50,10 @@ export function CeloGoldOverview({ t, testID }: Props) {
       <Text style={styles.title}>{t('global:celoGold')}</Text>
       <Text style={styles.balance}>
         {goldBalance && (
-          <Text style={fontStyles.semiBold}>{getMoneyDisplayValue(goldBalance)}</Text>
+          <CurrencyDisplay
+            style={fontStyles.semiBold}
+            amount={{ value: goldBalance, currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code }}
+          />
         )}
       </Text>
       {!!localCurrencyCode && (

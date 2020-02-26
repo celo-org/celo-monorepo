@@ -31,13 +31,21 @@ exports[`renders correctly when not ready 1`] = `
     }
   >
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "fontFamily": "Hind-SemiBold",
-        }
+        Array [
+          Object {
+            "color": undefined,
+          },
+          Object {
+            "fontFamily": "Hind-SemiBold",
+          },
+        ]
       }
     >
-      55.00
+      
+      
+      55.000
     </Text>
   </Text>
   <Text
@@ -85,13 +93,21 @@ exports[`renders correctly when ready 1`] = `
     }
   >
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "fontFamily": "Hind-SemiBold",
-        }
+        Array [
+          Object {
+            "color": undefined,
+          },
+          Object {
+            "fontFamily": "Hind-SemiBold",
+          },
+        ]
       }
     >
-      55.00
+      
+      
+      55.000
     </Text>
   </Text>
   <Text
