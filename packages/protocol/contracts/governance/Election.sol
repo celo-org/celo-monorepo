@@ -13,6 +13,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
+import "../common/Heap.sol";
 
 contract Election is
   IElection,
@@ -881,7 +882,7 @@ contract Election is
           .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
           .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
       }
-      heapifyDown(keys, votesPerElectedMember);
+      Heap.heapifyDown(keys, votesPerElectedMember);
     }
     require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
     // Grab the top validators from each group that won seats.
@@ -899,27 +900,6 @@ contract Election is
       }
     }
     return electedValidators;
-  }
-
-  // Top element dirty, fix heap
-  function heapify(uint256[] memory keys, FixidityLib.Fraction[] memory values) internal pure {
-    uint256 i = 0;
-    while (true) {
-      uint256 left = 2 * i + 1;
-      uint256 right = 2 * i + 2;
-      uint256 largest = i;
-      if (left < keys.length && values[keys[left]].gt(values[keys[largest]])) {
-        largest = left;
-      }
-      if (right < keys.length && values[keys[right]].gt(values[keys[largest]])) {
-        largest = right;
-      }
-      if (largest == i) break;
-      uint256 tmpKey = keys[i];
-      keys[i] = keys[largest];
-      keys[largest] = tmpKey;
-      i = largest;
-    }
   }
 
   /**

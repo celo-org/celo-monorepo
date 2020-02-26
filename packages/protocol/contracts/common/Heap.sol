@@ -3,7 +3,7 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/FixidityLib.sol";
 
-contract Heap {
+library Heap {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -16,10 +16,10 @@ contract Heap {
       uint256 leftChild = i.mul(2).add(1);
       uint256 rightChild = i.mul(2).add(2);
       uint256 maxIndex = i;
-      if (left < keys.length && values[keys[leftChild]].gt(values[keys[maxIndex]])) {
+      if (leftChild < keys.length && values[keys[leftChild]].gt(values[keys[maxIndex]])) {
         maxIndex = leftChild;
       }
-      if (right < keys.length && values[keys[rightChild]].gt(values[keys[maxIndex]])) {
+      if (rightChild < keys.length && values[keys[rightChild]].gt(values[keys[maxIndex]])) {
         maxIndex = rightChild;
       }
       if (maxIndex == i) break;
