@@ -34,12 +34,6 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     })!
   })
 
-  beforeEach(async () => {
-    // Set oracle exchange rate.
-    const tx = await sortedOracles.report(CeloContract.StableToken, 10, oracleAddress)
-    await tx.sendAndWaitForReceipt()
-  })
-
   describe('#report', () => {
     const value = 16
 
@@ -175,6 +169,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
 
   describe('#numRates', () => {
     it('returns a count of rates reported for the specified token', async () => {
+      // Why 1? In packages/protocol/08_stabletoken, a single rate is reported
       expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqBigNumber(1)
     })
   })
@@ -182,6 +177,8 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   describe('#medianRate', () => {
     it('returns the key for the median', async () => {
       const returnedMedian = await sortedOracles.medianRate(CeloContract.StableToken)
+      // The value `10` comes from: packages/protocol/migrationsConfig.js:
+      //   stableToken.goldPrice
       expect(returnedMedian.rate).toEqBigNumber(10)
     })
   })
