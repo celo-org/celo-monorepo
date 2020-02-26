@@ -1,5 +1,6 @@
 pragma solidity ^0.5.8;
 
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "contracts/governance/LockedGold.sol";
 import "./GoldTokenHarness.sol";
 
@@ -47,8 +48,8 @@ contract LockedGoldHarness is LockedGold {
     return length;
   }
 
-  function getGoldToken() internal view returns (IERC20Token) {
-    return IERC20Token(goldToken);
+  function getGoldToken() internal view returns (IERC20) {
+    return IERC20(goldToken);
   }
 
   function getGoldTokenExt() public view returns (address) {
