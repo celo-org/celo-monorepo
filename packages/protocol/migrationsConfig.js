@@ -152,6 +152,7 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
+    commissionUpdateDelay: 51840, // Approximately 3 days
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 

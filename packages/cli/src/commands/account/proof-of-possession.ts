@@ -25,10 +25,7 @@ export default class ProofOfPossession extends BaseCommand {
   async run() {
     const res = this.parse(ProofOfPossession)
     const accounts = await this.kit.contracts.getAccounts()
-    const pop = await accounts.generateProofOfSigningKeyPossession(
-      res.flags.account,
-      res.flags.signer
-    )
+    const pop = await accounts.generateProofOfKeyPossession(res.flags.account, res.flags.signer)
     printValueMap({ signature: serializeSignature(pop) })
   }
 }
