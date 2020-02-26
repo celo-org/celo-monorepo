@@ -157,9 +157,9 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     res.status(204).send('ok')
   })
 
-  server.get('/announcement', async (_, res) => {
+  server.get('/announcement', async (req, res) => {
     try {
-      const annoucements = await latestAnnouncements()
+      const annoucements = await latestAnnouncements(req.ip)
       res.json(annoucements)
     } catch (e) {
       respondToError(res, e)

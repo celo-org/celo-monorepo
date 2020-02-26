@@ -26,6 +26,7 @@ export enum ErrorMessages {
   CAN_NOT_REQUEST_FROM_UNVERIFIED = 'canNotRequestFromUnverified',
   REFRESH_FAILED = 'refreshFailedUnexpectedly',
   INVITE_FAILED = 'inviteFailed',
+  INVITE_OPEN_APP_FAILED = 'inviteOpenAppFailed',
   SEND_PAYMENT_FAILED = 'sendPaymentFailed',
   PAYMENT_REQUEST_FAILED = 'paymentRequestFailed',
   ESCROW_TRANSFER_FAILED = 'escrowTransferFailed',

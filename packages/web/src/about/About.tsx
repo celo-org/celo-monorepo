@@ -1,7 +1,10 @@
+import fetch from 'cross-fetch'
 import * as React from 'react'
 import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import shuffleSeed from 'shuffle-seed'
 import AudioIcon from 'src/about/AudioIcon'
 import Backers from 'src/about/Backers'
+import { Contributor } from 'src/about/Contributor'
 import { sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
@@ -21,7 +24,7 @@ import menuItems from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
-  randomSeed: number
+  contributors: Contributor[]
 }
 
 async function pronunceCelo() {
@@ -31,12 +34,21 @@ async function pronunceCelo() {
 }
 
 export class About extends React.Component<Props & I18nProps> {
-  static getInitialProps() {
-    return { randomSeed: Math.random() }
+  static async getInitialProps({ req }) {
+    let contributors
+    if (req) {
+      const getContributors = await import('src/../server/getContributors')
+      contributors = await getContributors.default()
+    } else {
+      contributors = await fetch(`/api/contributors`).then((result) => result.json())
+    }
+
+    const shuffledTeam = shuffleSeed.shuffle(contributors, Math.random())
+    return { contributors: shuffledTeam }
   }
 
   render() {
-    const { t, randomSeed } = this.props
+    const { t, contributors } = this.props
 
     return (
       <>
@@ -124,7 +136,7 @@ export class About extends React.Component<Props & I18nProps> {
               text={t('learnMore')}
             />
           </BookLayout>
-          <Team randomSeed={randomSeed} />
+          <Team contributors={contributors} />
           <Backers />
           <PressMedia />
         </View>

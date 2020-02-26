@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -110,6 +110,7 @@
     "react-native-send-intent": "git+https://github.com/celo-org/react-native-send-intent#a0f4b00",
     "react-native-shadow": "^1.2.2",
     "react-native-share": "^2.0.0",
+    "react-native-simple-toast": "^1.0.0",
     "react-native-sms": "^1.9.0",
     "react-native-snap-carousel": "^3.8.4",
     "react-native-splash-screen": "^3.2.0",
