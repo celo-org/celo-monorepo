@@ -105,6 +105,8 @@ const DefaultConfig = {
     dailySpendingRatio: '1000000000000000000000000', // 100%
     frozenGold: 0,
     frozenDays: 0,
+    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH'], // TODO(roman)
+    assetAllocationWeights: [0.5, 0.25, 0.25], // TODO(roman)
   },
   reserveSpenderMultiSig: {
     //Placeholder until addresses for 2/2 multsig are generated.
