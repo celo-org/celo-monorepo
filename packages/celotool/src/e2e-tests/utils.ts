@@ -109,11 +109,16 @@ export async function migrateContracts(
       goldToken: {
         frozen: false,
       },
+      reserve: {
+        goldBalance: 100000000,
+      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+        oracles: validators.map(ensure0x),
+        goldPrice: 10,
         frozen: false,
       },
       validators: {
