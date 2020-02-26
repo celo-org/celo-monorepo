@@ -5,7 +5,6 @@ const name = 'TransferWhitelist'
 const Contract = artifacts.require(name)
 
 module.exports = (deployer: any) => {
-  console.info('Deploying' + name)
   deployer.deploy(Contract)
   deployer.then(async () => {
     const contract: TransferWhitelistInstance = await Contract.deployed()

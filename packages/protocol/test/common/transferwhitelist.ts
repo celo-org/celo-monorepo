@@ -13,10 +13,10 @@ contract('TransferWhitelist', (accounts: string[]) => {
   let transferWhitelist: TransferWhitelistInstance
   let registry: RegistryInstance
 
-  const anAddress = '0x000000000000000000000000000000000000ce10'
-  const anotherAddress = '0x000000000000000000000000000000000000go1D'
-  const anIdentifier: string = 'cryptokitties'
-  const anotherIdentifier: string = web3.utils.soliditySha3('cryptokitties')
+  const anAddress = accounts[2]
+  const anotherAddress = accounts[1]
+  const anIdentifier: string = web3.utils.soliditySha3('example2')
+  const anotherIdentifier: string = web3.utils.soliditySha3('example2')
 
   const nonOwner = accounts[1]
 
