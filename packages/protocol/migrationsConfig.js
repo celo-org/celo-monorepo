@@ -130,9 +130,9 @@ const DefaultConfig = {
   transferWhitelist: {
     addresses: [], // TODO(Alec): get whitelist of addresses.
     registryIds: [
-      web3.utils.soliditySha3('Governance'),
-      web3.utils.soliditySha3('LockedGold'),
-      web3.utils.soliditySha3('Reserve'),
+      web3.utils.soliditySha3(CeloContractName.Governance),
+      web3.utils.soliditySha3(CeloContractName.LockedGold),
+      web3.utils.soliditySha3(CeloContractName.Reserve),
     ],
   },
   validators: {
