@@ -10,7 +10,7 @@ attestation-service) on the compute nodes.
 
 ## Pre-built template
 
-[tempalte.json](./template.json) is a pre-built ARM template.
+[template.json](./template.json) is a pre-built ARM template.
 
 ## Build
 
