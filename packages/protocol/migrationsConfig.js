@@ -19,6 +19,7 @@ const DefaultConfig = {
     attestationExpiryBlocks: HOUR / 5, // ~1 hour,
     attestationRequestFeeInDollars: 0.05,
     selectIssuersWaitBlocks: 4,
+    maxAttestations: 100,
   },
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
