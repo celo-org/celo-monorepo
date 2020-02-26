@@ -235,7 +235,7 @@ export const handler = async (argv: StartArgv) => {
       validators.map((x) => x.address),
       gethConfig.migrateTo,
       gethConfig.migrationOverrides,
-      false
+      verbose
     )
 
     console.log('... done migrating contracts!')
