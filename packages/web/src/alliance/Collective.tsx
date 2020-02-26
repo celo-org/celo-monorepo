@@ -14,7 +14,7 @@ export default function Collective() {
   return (
     <View>
       <OpenGraph
-        title="Celo Collective"
+        title="Celo Alliance"
         description="TODO"
         path={menuItems.ALLIANCE_COLLECTIVE.link}
       />
