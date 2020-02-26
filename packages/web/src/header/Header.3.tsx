@@ -18,7 +18,6 @@ import Hoverable from 'src/shared/Hoverable'
 import Link from 'src/shared/Link'
 import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
-import Responsive from 'src/shared/Responsive'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
 const BlueBanner = dynamic(import('src/header/BlueBanner'))
@@ -156,7 +155,9 @@ export class Header extends React.PureComponent<Props, State> {
   }
 
   setHovering = () => {
-    this.setState({ isHovering: true })
+    if (this.props.screen === ScreenSizes.DESKTOP) {
+      this.setState({ isHovering: true })
+    }
   }
   unsetHovering = () => {
     this.setState({ isHovering: false })
@@ -216,8 +217,8 @@ export class Header extends React.PureComponent<Props, State> {
         />
 
         <CookieConsent />
-        <Responsive large={[styles.menuContainer, styles.largeMenuContainer]}>
-          <View style={styles.menuContainer}>
+        <Hoverable onHoverIn={this.setHovering} onHoverOut={this.unsetHovering}>
+          <View style={[styles.menuContainer, isDesktop && styles.largeMenuContainer]}>
             <Link href={'/'}>
               <View style={styles.logoLeftContainer}>
                 <View style={styles.logoContainer}>
@@ -240,53 +241,52 @@ export class Header extends React.PureComponent<Props, State> {
               </View>
             </Link>
             {isDesktop && (
-              <Hoverable onHoverIn={this.setHovering} onHoverOut={this.unsetHovering}>
-                <View
-                  style={[
-                    styles.links,
-                    styles.fadeTransition as ViewStyle,
-                    this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
-                  ]}
-                >
-                  {menuItems.map((item, index) => (
-                    <View key={index} style={styles.linkWrapper}>
-                      <Button
-                        kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                        href={item.link}
-                        text={t(item.name)}
-                      />
-                      {this.props.router.pathname === item.link && (
-                        <View style={styles.activeTab}>
-                          <OvalCoin color={colors.primary} size={10} />
-                        </View>
-                      )}
-                    </View>
-                  ))}
-                  <View style={[styles.linkWrapper]}>
+              <View
+                style={[
+                  styles.links,
+                  styles.fadeTransition as ViewStyle,
+                  this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
+                ]}
+              >
+                {menuItems.map((item, index) => (
+                  <View key={index} style={styles.linkWrapper}>
                     <Button
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                      href={'https://medium.com/CeloHQ'}
-                      text={t('blog')}
-                      target={'_blank'}
-                      iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
+                      href={item.link}
+                      text={t(item.name)}
                     />
+                    {this.props.router.pathname === item.link && (
+                      <View style={styles.activeTab}>
+                        <OvalCoin color={colors.primary} size={10} />
+                      </View>
+                    )}
                   </View>
-                  <View style={[styles.linkWrapper]}>
-                    <Button
-                      kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                      href={CeloLinks.gitHub}
-                      text={t('github')}
-                      target={'_blank'}
-                      iconRight={
-                        <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
-                      }
-                    />
-                  </View>
+                ))}
+                <View style={[styles.linkWrapper]}>
+                  <Button
+                    kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
+                    href={'https://medium.com/CeloHQ'}
+                    text={t('blog')}
+                    target={'_blank'}
+                    iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
+                  />
                 </View>
-              </Hoverable>
+                <View style={[styles.linkWrapper]}>
+                  <Button
+                    kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
+                    href={CeloLinks.gitHub}
+                    text={t('github')}
+                    target={'_blank'}
+                    iconRight={
+                      <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
+                    }
+                  />
+                </View>
+              </View>
             )}
           </View>
-        </Responsive>
+        </Hoverable>
+
         {this.state.mobileMenuActive && (
           <View style={styles.menuActive}>
             <View style={styles.mobileOpenContainer}>
