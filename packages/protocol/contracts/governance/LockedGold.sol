@@ -325,7 +325,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   ) external onlySlasher {
     uint256 actualPenalty = Math.min(penalty, getAccountTotalLockedGold(account));
     uint256 actualReward = Math.min(reward, actualPenalty);
-    // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
     _slashBalances(account, actualPenalty, reporter, actualReward, lessers, greaters, indices);
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));

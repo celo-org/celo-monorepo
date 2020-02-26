@@ -146,7 +146,6 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       startBlock = blockNumber - 50
       const epoch = (await slasher.getEpochNumberOfBlock(blockNumber)).toNumber()
       await validators.setValidator(validator)
-      await validators.setAccountLockedGoldRequirement(validator, slashingPenalty)
       await slasher.setEpochSigner(epoch, validatorIndex, validator)
       await slasher.setEpochSigner(epoch - 1, validatorIndex, validator)
       await slasher.setEpochSigner(epoch - 2, 1, validator)
@@ -214,12 +213,13 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       )
     })
 
-    describe("when the validator's lockedgold requirement is less than the penalty", () => {
+    describe("when the validator's LockedGold balance is less than the penalty", () => {
       beforeEach(async () => {
         await validators.setAccountLockedGoldRequirement(validator, slashingPenalty - 1)
+        await mockLockedGold.setAccountTotalLockedGold(validator, slashingPenalty - 1)
       })
 
-      it('should slash the minimum of the penalty and the required locked gold', async () => {
+      it("should slash the minimum of the penalty and validator's LockedGold balance", async () => {
         await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
         const balance = await mockLockedGold.accountTotalLockedGold(validator)
         assert.equal(balance.toNumber(), 40001)
