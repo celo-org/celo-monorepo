@@ -536,7 +536,8 @@ contract StableToken is
   }
 
   /**
-   * @notice Alternative function to credit balance after making payments for gas in this StableToken currency.
+   * @notice Alternative function to credit balance after making payments
+   * for gas in this StableToken currency.
    * @param from The account to debit balance from
    * @param feeRecipient Coinbase address
    * @param gatewayFeeRecipient Gateway address
