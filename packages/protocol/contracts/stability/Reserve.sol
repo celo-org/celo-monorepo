@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -11,6 +10,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Ensures price stability of StableTokens with respect to their pegs
@@ -74,13 +74,16 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     uint256 _tobinTaxStalenessThreshold,
     uint256 _spendingRatio,
     uint256 _frozenGold,
-    uint256 _frozenDays
+    uint256 _frozenDays,
+    bytes32[] calldata _assetAllocationSymbols,
+    uint256[] calldata _assetAllocationWeights
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
     setFrozenGold(_frozenGold, _frozenDays);
+    setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
   }
 
   /**
@@ -128,8 +131,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
-  function setAssetAllocations(bytes32[] calldata symbols, uint256[] calldata weights)
-    external
+  function setAssetAllocations(bytes32[] memory symbols, uint256[] memory weights)
+    public
     onlyOwner
   {
     require(symbols.length == weights.length, "Array length mismatch");
@@ -404,7 +407,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       uint256 stableAmount;
       uint256 goldAmount;
       (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
-      uint256 stableTokenSupply = IERC20Token(_tokens[i]).totalSupply();
+      uint256 stableTokenSupply = IERC20(_tokens[i]).totalSupply();
       uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
       stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
     }

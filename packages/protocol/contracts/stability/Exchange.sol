@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
@@ -9,8 +8,9 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../baklava/Freezable.sol";
+import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
@@ -63,7 +63,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    */
   function initialize(
     address registryAddress,
-    address _freezer,
     address stableToken,
     uint256 _spread,
     uint256 _reserveFraction,
@@ -71,7 +70,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     uint256 _minimumReports
   ) external initializer {
     _transferOwnership(msg.sender);
-    setFreezer(_freezer);
     setRegistry(registryAddress);
     setStableToken(stableToken);
     setSpread(_spread);
@@ -116,7 +114,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       stableBucket = stableBucket.add(sellAmount);
       goldBucket = goldBucket.sub(buyAmount);
       require(
-        IERC20Token(stable).transferFrom(msg.sender, address(this), sellAmount),
+        IERC20(stable).transferFrom(msg.sender, address(this), sellAmount),
         "Transfer of sell token failed"
       );
       IStableToken(stable).burn(sellAmount);
@@ -212,10 +210,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   function setMinimumReports(uint256 newMininumReports) public onlyOwner {
     minimumReports = newMininumReports;
     emit MinimumReportsSet(newMininumReports);
-  }
-
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
   }
 
   /**

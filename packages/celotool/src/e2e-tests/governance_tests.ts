@@ -82,7 +82,7 @@ async function newKeyRotator(
     const signerKit = newKitFromWeb3(signerWeb3)
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
     const blsPop = getBlsPoP(validator, signerPrivateKey)
-    const pop = await (await signerKit.contracts.getAccounts()).generateProofOfSigningKeyPossession(
+    const pop = await (await signerKit.contracts.getAccounts()).generateProofOfKeyPossession(
       validator,
       signer
     )
@@ -294,6 +294,7 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
+  /*
   const waitForBlock = async (blockNumber: number) => {
     // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
     let currentBlock: number
@@ -302,6 +303,7 @@ describe('governance tests', () => {
       await sleep(0.1)
     } while (currentBlock < blockNumber)
   }
+  */
 
   const waitForEpochTransition = async (epoch: number) => {
     // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
@@ -896,6 +898,7 @@ describe('governance tests', () => {
     })
   })
 
+  /*
   describe('when rewards distribution is frozen', () => {
     let epoch: number
     let blockFrozen: number
@@ -925,6 +928,7 @@ describe('governance tests', () => {
       }
     })
   })
+  */
 
   describe('after the gold token smart contract is registered', () => {
     let goldGenesisSupply = new BigNumber(0)
