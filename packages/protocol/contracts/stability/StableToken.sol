@@ -545,27 +545,28 @@ contract StableToken is
   ) external onlyVm onlyWhenNotFrozen {
     require(feeRecipient != address(0), "coinbase cannot be zero");
     require(gatewayFeeRecipient != address(0), "gateway cannot be zero");
-    uint256 gasValue = gas.mul(gasPrice);
-    uint256 units = _valueToUnits(inflationState.factor, gasValue.add(gatewayFee));
-    uint256 totalTxFee = _valueToUnits(inflationState.factor, gasUsed.mul(gasPrice));
-    uint256 unitsGateway = _valueToUnits(inflationState.factor, gatewayFee);
-    uint256 baseTxFee = _valueToUnits(inflationState.factor, gasUsed.mul(gasPriceMinimum));
-    // uint256 tipTxFee = totalTxFee.sub(baseTxFee);
-    uint256 refund = units.sub(tipTxFee).sub(unitsGateway);
+    uint256 totalTxFee = gasUsed.mul(gasPrice);
+    uint256 baseTxFee = gasUsed.mul(gasPriceMinimum);
+
+    uint256 units = _valueToUnits(inflationState.factor, gas.mul(gasPrice).add(gatewayFee));
+    totalSupply_ = totalSupply_.add(units);
 
     if (communityFund != address(0)) {
-      balances[communityFund] = balances[communityFund].add(baseTxFee);
-      refund = refund.sub(baseTxFee);
-      emit Transfer(from, communityFund, gasValue);
+      units = units.sub(_creditGas(from, communityFund, baseTxFee));
     }
 
-    totalSupply_ = totalSupply_.add(units);
-    // balances[feeRecipient] = balances[feeRecipient].add(tipTxFee);
-    balances[feeRecipient] = balances[feeRecipient].add(totalTxFee.sub(baseTxFee));
-    balances[gatewayFeeRecipient] = balances[gatewayFeeRecipient].add(unitsGateway);
-    balances[from] = balances[from].add(refund);
-    emit Transfer(from, feeRecipient, gasValue);
-    emit Transfer(from, gatewayFeeRecipient, gatewayFee);
+    units = units.sub(_creditGas(from, feeRecipient, totalTxFee.sub(baseTxFee)));
+    units = units.sub(_creditGas(from, gatewayFeeRecipient, gatewayFee));
+
+    balances[from] = balances[from].add(units);
+
+  }
+
+  function _creditGas(address from, address to, uint256 value) internal returns (uint256) {
+    uint256 units = _valueToUnits(inflationState.factor, value);
+    balances[to] = balances[to].add(units);
+    emit Transfer(from, to, value);
+    return units;
   }
 
 }
