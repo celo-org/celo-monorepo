@@ -520,23 +520,49 @@ contract StableToken is
     emit Transfer(from, to, value);
   }
 
+  /**
+   * @notice Alternative function to credit balance after making payments for gas in this StableToken currency.
+   * @param from The account to debit balance from
+   * @param feeRecipient Coinbase address
+   * @param gatewayFeeRecipient Gateway address
+   * @param communityFund Community fund address
+   * @param gas Transaction gas
+   * @param gasPrice Gas price
+   * @param gasPriceMinimum Minimum gas price
+   * @param gasUsed Used gas
+   * @param gatewayFee Gateway fee
+   */
   function payGas(
     address from,
     address feeRecipient,
     address gatewayFeeRecipient,
+    address communityFund,
     uint256 gas,
     uint256 gasPrice,
+    uint256 gasPriceMinimum,
     uint256 gasUsed,
     uint256 gatewayFee
-  ) external onlyVm {
+  ) external onlyVm onlyWhenNotFrozen {
+    require(feeRecipient != address(0), "coinbase cannot be zero");
+    require(gatewayFeeRecipient != address(0), "gateway cannot be zero");
     uint256 gasValue = gas.mul(gasPrice);
-    uint256 units = _valueToUnits(gasValue.add(gatewayFee));
-    uint256 unitsUsed = _valueToUnits(gasValue);
-    uint256 unitsGateway = _valueToUnits(gatewayFee);
+    uint256 units = _valueToUnits(inflationState.factor, gasValue.add(gatewayFee));
+    uint256 totalTxFee = _valueToUnits(inflationState.factor, gasUsed.mul(gasPrice));
+    uint256 unitsGateway = _valueToUnits(inflationState.factor, gatewayFee);
+    uint256 baseTxFee = _valueToUnits(inflationState.factor, gasUsed.mul(gasPriceMinimum));
+    uint256 tipTxFee = totalTxFee.sub(baseTxFee);
+    uint256 refund = units.sub(tipTxFee).sub(unitsGateway);
+
+    if (communityFund != address(0)) {
+      balances[communityFund] = balances[communityFund].add(baseTxFee);
+      refund = refund.sub(baseTxFee);
+      emit Transfer(from, communityFund, gasValue);
+    }
+
     totalSupply_ = totalSupply_.add(units);
-    balances[feeRecipient] = balances[feeRecipient].add(unitsUsed);
+    balances[feeRecipient] = balances[feeRecipient].add(tipTxFee);
     balances[gatewayFeeRecipient] = balances[gatewayFeeRecipient].add(unitsGateway);
-    balances[from] = balances[from].add(units.sub(unitsUsed).sub(unitsGateway));
+    balances[from] = balances[from].add(refund);
     emit Transfer(from, feeRecipient, gasValue);
     emit Transfer(from, gatewayFeeRecipient, gatewayFee);
   }
