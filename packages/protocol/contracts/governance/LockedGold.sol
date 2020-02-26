@@ -323,10 +323,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     address[] calldata greaters,
     uint256[] calldata indices
   ) external onlySlasher {
-    uint256 actualPenalty = Math.min(
-      penalty,
-      getValidators().getAccountLockedGoldRequirement(account)
-    );
+    uint256 actualPenalty = Math.min(penalty, getAccountTotalLockedGold(account));
     uint256 actualReward = Math.min(reward, actualPenalty);
     // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
     _slashBalances(account, actualPenalty, reporter, actualReward, lessers, greaters, indices);
