@@ -550,7 +550,7 @@ contract StableToken is
     uint256 totalTxFee = _valueToUnits(inflationState.factor, gasUsed.mul(gasPrice));
     uint256 unitsGateway = _valueToUnits(inflationState.factor, gatewayFee);
     uint256 baseTxFee = _valueToUnits(inflationState.factor, gasUsed.mul(gasPriceMinimum));
-    uint256 tipTxFee = totalTxFee.sub(baseTxFee);
+    // uint256 tipTxFee = totalTxFee.sub(baseTxFee);
     uint256 refund = units.sub(tipTxFee).sub(unitsGateway);
 
     if (communityFund != address(0)) {
@@ -560,7 +560,8 @@ contract StableToken is
     }
 
     totalSupply_ = totalSupply_.add(units);
-    balances[feeRecipient] = balances[feeRecipient].add(tipTxFee);
+    // balances[feeRecipient] = balances[feeRecipient].add(tipTxFee);
+    balances[feeRecipient] = balances[feeRecipient].add(totalTxFee.sub(baseTxFee));
     balances[gatewayFeeRecipient] = balances[gatewayFeeRecipient].add(unitsGateway);
     balances[from] = balances[from].add(refund);
     emit Transfer(from, feeRecipient, gasValue);
