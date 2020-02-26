@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
@@ -10,6 +9,7 @@ import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
@@ -97,6 +97,12 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
     require(
       !(identifier.length <= 0 && !(minAttestations == 0)),
       "Invalid privacy inputs: Can't require attestations if no identifier"
+    );
+
+    IAttestations attestations = IAttestations(registry.getAddressFor(ATTESTATIONS_REGISTRY_ID));
+    require(
+      minAttestations <= attestations.getMaxAttestations(),
+      "minAttestations larger than limit"
     );
 
     uint256 sentIndex = sentPaymentIds[msg.sender].push(paymentId).sub(1);
