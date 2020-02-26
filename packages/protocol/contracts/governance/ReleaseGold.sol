@@ -268,7 +268,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @notice Sets the beneficiary of the instance
    * @param newBeneficiary The address of the new beneficiary
    */
-  function setBeneficiary(address payable newBeneficiary) external onlyBeneficiary {
+  function setBeneficiary(address payable newBeneficiary) external onlyOwner {
     _setBeneficiary(newBeneficiary);
   }
 

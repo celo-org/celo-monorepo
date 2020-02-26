@@ -305,18 +305,18 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should set a new beneficiary as the old beneficiary', async () => {
-      await releaseGoldInstance.setBeneficiary(newBeneficiary, { from: beneficiary })
+      await releaseGoldInstance.setBeneficiary(newBeneficiary, { from: owner })
       const actualBeneficiary = await releaseGoldInstance.beneficiary()
       assertSameAddress(actualBeneficiary, newBeneficiary)
     })
 
     it('should revert when setting a new beneficiary from the release owner', async () => {
-      await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: releaseOwner }))
+      await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: owner }))
     })
 
     it('should emit the BeneficiarySet event', async () => {
       const setNewBeneficiaryTx = await releaseGoldInstance.setBeneficiary(newBeneficiary, {
-        from: beneficiary,
+        from: owner,
       })
       assertLogMatches(setNewBeneficiaryTx.logs[0], 'BeneficiarySet', {
         beneficiary: newBeneficiary,

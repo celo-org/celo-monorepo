@@ -1,8 +1,9 @@
 import {
-  getDeployedProxiedContract,
   _setInitialProxyImplementation,
+  getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { BigNumber } from 'bignumber.js'
+import fs = require('fs')
 import {
   GoldTokenInstance,
   RegistryInstance,
@@ -11,7 +12,6 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
-import fs = require('fs')
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
