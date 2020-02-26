@@ -551,6 +551,7 @@ contract StableToken is
     address feeRecipient,
     address gatewayFeeRecipient,
     address communityFund,
+    uint256 refund,
     uint256 tipTxFee,
     uint256 baseTxFee,
     uint256 gatewayFee
@@ -558,7 +559,10 @@ contract StableToken is
     require(feeRecipient != address(0), "coinbase cannot be zero");
     require(gatewayFeeRecipient != address(0), "gateway cannot be zero");
 
-    uint256 units = _valueToUnits(inflationState.factor, tipTxFee.add(baseTxFee).add(gatewayFee));
+    uint256 units = _valueToUnits(
+      inflationState.factor,
+      refund.add(tipTxFee).add(baseTxFee).add(gatewayFee)
+    );
 
     if (communityFund != address(0)) {
       units = units.sub(_creditGas(from, communityFund, baseTxFee));
