@@ -7,7 +7,6 @@ import { keccak256 } from 'ethereumjs-util'
 import {
   ProxyInstance,
   RegistryInstance,
-  ReserveInstance,
   UsingRegistryInstance,
 } from 'types'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
@@ -71,13 +70,28 @@ export async function mineBlocks(blocks: number, web3: Web3) {
 
 export async function currentEpochNumber(web3) {
   const blockNumber = await web3.eth.getBlockNumber()
-  return Math.floor((blockNumber - 1) / EPOCH)
+  // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+  const epochNumber = Math.floor(blockNumber / EPOCH)
+  if (blockNumber % EPOCH === 0) {
+    return epochNumber
+  } else {
+    return epochNumber + 1
+  }
+}
+
+// Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+export function getFirstBlockNumberForEpoch(epochNumber: number) {
+  if (epochNumber === 0) {
+    // No first block for epoch 0
+    return 0
+  }
+  return (epochNumber - 1) * EPOCH + 1
 }
 
 export async function mineToNextEpoch(web3) {
   const blockNumber = await web3.eth.getBlockNumber()
   const epochNumber = await currentEpochNumber(web3)
-  const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+  const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
   await mineBlocks(blocksUntilNextEpoch, web3)
 }
 
@@ -293,11 +307,6 @@ export function assertGteBN(
     `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
       ''}`
   )
-}
-
-export const getReserveBalance = async (web3: Web3, getContract: any): Promise<string> => {
-  const reserve: ReserveInstance = await getContract('Reserve', 'proxiedContract')
-  return (await web3.eth.getBalance(reserve.address)).toString()
 }
 
 export const isSameAddress = (minerAddress, otherAddress) => {

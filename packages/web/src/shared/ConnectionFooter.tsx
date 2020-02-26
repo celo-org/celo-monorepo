@@ -61,7 +61,7 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
             <EmailForm
               submitText={t('signUp')}
               route={'/contacts'}
-              whenComplete={<After t={t} />}
+              whenComplete={<After t={t} isDarkMode={false} />}
               isDarkMode={false}
             />
           </View>
@@ -90,4 +90,4 @@ const styles = StyleSheet.create({
   emailLogo: { width: 50, height: 50, marginVertical: 10 },
 })
 
-export default withNamespaces(NameSpaces.community)(ConnectionFooter)
+export default withNamespaces([NameSpaces.common, NameSpaces.community])(ConnectionFooter)

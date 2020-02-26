@@ -257,20 +257,22 @@ spec:
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+          PROXY_ALLOW_PRIVATE_IP_FLAG=""
+          [[ "$GETH_DEBUG" == "true" ]] && PROXY_ALLOW_PRIVATE_IP_FLAG="--proxy.allowprivateip"
 
           RPC_APIS="eth,net,web3,debug"
 
           {{ if .proxy }}
           VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
-          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }} --proxy.allowprivateip"
+          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }} $PROXY_ALLOW_PRIVATE_IP_FLAG"
           {{ else }}
           ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
           RPC_APIS=${RPC_APIS},txpool
           {{ end }}
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
-            --lightserv 90 \
-            --lightpeers 1000 \
+            --light.serve 90 \
+            --light.maxpeers 1000 \
             --maxpeers 1100 \
             --rpc \
             --rpcaddr 0.0.0.0 \
@@ -291,12 +293,15 @@ spec:
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --metrics \
+            --allow-insecure-unlock \
             ${PING_IP_FROM_PACKET_FLAG} \
             ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
             ${ADDITIONAL_FLAGS}
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
+        - name: GETH_DEBUG
+          value: "{{ default "false" .Values.geth.debug }}"
         - name: NETWORK_ID
           valueFrom:
             configMapKeyRef:

@@ -913,7 +913,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  signUp
+                  common:signUp
                 </a>
               </div>
               <div
@@ -2483,10 +2483,12 @@ exports[`Community renders 1`] = `
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -3120,7 +3122,7 @@ exports[`Community renders 1`] = `
               }
               target="_blog"
             >
-              readMoreFromOurBlog
+              common:readMoreFromOurBlog
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -3731,7 +3733,7 @@ exports[`Community renders 1`] = `
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
-            href="/build"
+            href="/validators"
             role="link"
             style={
               Object {
@@ -5616,10 +5618,12 @@ exports[`Community renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "cursor": "pointer",
                       "display": "inline",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                     }
                   }
                   target="_new"
@@ -5653,10 +5657,12 @@ exports[`Community renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "cursor": "pointer",
                       "display": "inline",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                     }
                   }
                   target="_new"
@@ -5873,7 +5879,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              James applied his skills as a Fixer to organize comprehensive field research for the entire C Labs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.
+              James applied his skills as a Fixer to organize comprehensive field research for the entire cLabs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.
             </div>
           </div>
         </div>
@@ -7467,6 +7473,7 @@ exports[`Community renders 1`] = `
                     role="link"
                     style={
                       Object {
+                        "WebkitTextDecorationStyle": "solid",
                         "color": "rgba(46,51,56,1.00)",
                         "cursor": "pointer",
                         "display": "inline",
@@ -7475,6 +7482,7 @@ exports[`Community renders 1`] = `
                         "lineHeight": "20px",
                         "opacity": 1,
                         "textDecoration": "underline",
+                        "textDecorationStyle": "solid",
                         "textRendering": "geometricPrecision",
                       }
                     }
@@ -7504,10 +7512,11 @@ exports[`Community renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                     data-focusable={true}
                     dir="auto"
-                    href="https://twitter.com/@celoHQ"
+                    href="https://twitter.com/@celoOrg"
                     role="link"
                     style={
                       Object {
+                        "WebkitTextDecorationStyle": "solid",
                         "color": "rgba(46,51,56,1.00)",
                         "cursor": "pointer",
                         "display": "inline",
@@ -7516,11 +7525,12 @@ exports[`Community renders 1`] = `
                         "lineHeight": "20px",
                         "opacity": 1,
                         "textDecoration": "underline",
+                        "textDecorationStyle": "solid",
                         "textRendering": "geometricPrecision",
                       }
                     }
                   >
-                    @celoHQ
+                    @celoOrg
                   </a>
                 </div>
               </div>
