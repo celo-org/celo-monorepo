@@ -212,18 +212,5 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         []
       )
     })
-
-    describe("when the validator's LockedGold balance is less than the penalty", () => {
-      beforeEach(async () => {
-        await validators.setAccountLockedGoldRequirement(validator, slashingPenalty - 1)
-        await mockLockedGold.setAccountTotalLockedGold(validator, slashingPenalty - 1)
-      })
-
-      it("should slash the minimum of the penalty and validator's LockedGold balance", async () => {
-        await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
-        const balance = await mockLockedGold.accountTotalLockedGold(validator)
-        assert.equal(balance.toNumber(), 40001)
-      })
-    })
   })
 })

@@ -159,18 +159,5 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
         slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       )
     })
-
-    describe("when the validator's LockedGold balance is less than the penalty", () => {
-      beforeEach(async () => {
-        await validators.setAccountLockedGoldRequirement(validator, slashingPenalty - 1)
-        await mockLockedGold.setAccountTotalLockedGold(validator, slashingPenalty - 1)
-      })
-
-      it("should slash the min of the penalty and the validator's LockedGold Balance", async () => {
-        await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
-        const balance = await mockLockedGold.accountTotalLockedGold(validator)
-        assert.equal(balance.toNumber(), 40001)
-      })
-    })
   })
 })
