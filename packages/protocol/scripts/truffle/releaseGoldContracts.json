@@ -1,6 +1,6 @@
 [
   {
-    "releaseStartTime": "02-24-2020",
+    "releaseStartTime": "02-25-2020",
     "releaseCliffTime": 1,
     "numReleasePeriods": 1,
     "releasePeriod": 100000000,
@@ -10,7 +10,7 @@
     "releaseOwner": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
     "refundAddress": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
     "subjectToLiquidityProvision": true,
-    "initialDistributionPercentage": 1000,
+    "initialDistributionRatio": 1000,
     "canValidate": false,
     "canVote": true
   }

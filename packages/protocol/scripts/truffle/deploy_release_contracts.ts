@@ -1,4 +1,5 @@
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import fs = require('fs')
 import {
   GoldTokenInstance,
   RegistryInstance,
@@ -7,7 +8,6 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
-import fs = require('fs')
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -30,59 +30,67 @@ module.exports = async (callback: (error?: any) => number) => {
         throw err
       }
       for (const releaseGoldConfig of JSON.parse(data)) {
-        const releaseStartTime = new Date(releaseGoldConfig.releaseStartTime)
-        const releaseCliffTime = releaseGoldConfig.releaseCliffTime
-        const numReleasePeriods = releaseGoldConfig.numReleasePeriods
-        const releasePeriod = releaseGoldConfig.releasePeriod
-        const amountReleasedPerPeriod = releaseGoldConfig.amountReleasedPerPeriod
-        const revocable = releaseGoldConfig.revocable
-        const beneficiary = releaseGoldConfig.beneficiary
-        const releaseOwner = releaseGoldConfig.releaseOwner
-        const refundAddress = releaseGoldConfig.refundAddress
-        const subjectToLiquidityProvision = releaseGoldConfig.subjectToLiquidityProvision
-        const initialDistributionPercentage = releaseGoldConfig.initialDistributionPercentage
-        const canValidate = releaseGoldConfig.canValidate
-        const canVote = releaseGoldConfig.canVote
-        const releaseGoldInstance = await ReleaseGold.new(
-          releaseStartTime.getTime() / 1000,
-          releaseCliffTime,
-          numReleasePeriods,
-          releasePeriod,
-          amountReleasedPerPeriod,
-          revocable,
-          beneficiary,
-          releaseOwner,
-          refundAddress,
-          subjectToLiquidityProvision,
-          initialDistributionPercentage,
-          canValidate,
-          canVote,
-          registry.address
-        )
+        const releaseGoldInitializeArgs = [
+          new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000,
+          releaseGoldConfig.releaseCliffTime,
+          releaseGoldConfig.numReleasePeriods,
+          releaseGoldConfig.releasePeriod,
+          releaseGoldConfig.amountReleasedPerPeriod,
+          releaseGoldConfig.revocable,
+          releaseGoldConfig.beneficiary,
+          releaseGoldConfig.releaseOwner,
+          releaseGoldConfig.refundAddress,
+          releaseGoldConfig.subjectToLiquidityProvision,
+          releaseGoldConfig.initialDistributionRatio,
+          releaseGoldConfig.canValidate,
+          releaseGoldConfig.canVote,
+          registry.address,
+        ]
+        const releaseGoldMultiSigInitializeArgs = [
+          [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
+          2,
+          2,
+        ]
+        const initializeProxyContract = async (contractInstance, proxyInstance, args) => {
+          const initializeAbi = (contractInstance as any).abi.find(
+            (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+          )
+          const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+          const reciept = await proxyInstance._setAndInitializeImplementation(
+            contractInstance.address,
+            callData as any
+          )
+          return reciept.tx
+        }
         const releaseGoldProxyInstance = await ReleaseGoldProxy.new()
+        const releaseGoldInstance = await ReleaseGold.new()
         const releaseGoldMultiSigProxyInstance = await ReleaseGoldMultiSigProxy.new()
+        const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
         await goldToken.transfer(
           releaseGoldProxyInstance.address,
-          amountReleasedPerPeriod * numReleasePeriods,
-          { from: releaseOwner }
+          releaseGoldConfig.amountReleasedPerPeriod * releaseGoldConfig.numReleasePeriods,
+          { from: releaseGoldConfig.releaseOwner }
         )
-        // const initializeAbi = (releaseGoldProxyInstance as any).abi.find(
-        //   (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-        // )
-        // const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, [])
-        // await releaseGoldProxyInstance._setAndInitializeImplementation(releaseGoldInstance.address, callData)
-        await releaseGoldProxyInstance._setImplementation(releaseGoldInstance.address)
-        const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
-        await releaseGoldMultiSigInstance.initialize([releaseOwner, beneficiary], 2)
+        const releaseTxHash = await initializeProxyContract(
+          releaseGoldMultiSigInstance,
+          releaseGoldMultiSigProxyInstance,
+          releaseGoldMultiSigInitializeArgs
+        )
+        const multiSigTxHash = await initializeProxyContract(
+          releaseGoldInstance,
+          releaseGoldProxyInstance,
+          releaseGoldInitializeArgs
+        )
+        // TODO(lucas): Is owner multisig proxy or multisig
         await releaseGoldProxyInstance._transferOwnership(releaseGoldMultiSigInstance.address)
-        await releaseGoldMultiSigProxyInstance._setImplementation(
-          releaseGoldMultiSigInstance.address
-        )
-        releases.push([
-          releaseGoldConfig.beneficiary,
-          releaseGoldProxyInstance.address,
-          releaseGoldMultiSigProxyInstance.address,
-        ])
+
+        releases.push({
+          Beneficiary: releaseGoldConfig.beneficiary,
+          ProxyAddress: releaseGoldProxyInstance.address,
+          MultiSigProxyAddress: releaseGoldMultiSigProxyInstance.address,
+          ReleaseTxHash: releaseTxHash,
+          MultiSigTxHash: multiSigTxHash,
+        })
       }
       // tslint:disable-next-line: no-console
       console.log(releases)

@@ -6,9 +6,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./interfaces/IReleaseGold.sol";
 import "../common/FixidityLib.sol";
 
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
-contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold {
+contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -164,7 +165,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold {
    * @param _canVote If this schedule's gold can be used for voting.
    * @param registryAddress Address of the deployed contracts registry.
    */
-  constructor(
+  function initialize(
     uint256 releaseStartTime,
     uint256 releaseCliffTime,
     uint256 numReleasePeriods,
@@ -179,7 +180,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold {
     bool _canValidate,
     bool _canVote,
     address registryAddress
-  ) public {
+  ) external initializer {
+    _transferOwnership(msg.sender);
     releaseSchedule.numReleasePeriods = numReleasePeriods;
     releaseSchedule.amountReleasedPerPeriod = amountReleasedPerPeriod;
     releaseSchedule.releasePeriod = releasePeriod;
@@ -201,6 +203,11 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold {
       ) >
         block.timestamp,
       "Release schedule end time must be in the future"
+    );
+    require(
+      address(this).balance ==
+        releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
+      "Contract balance must equal the entire grant amount"
     );
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");

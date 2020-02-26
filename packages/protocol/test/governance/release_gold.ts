@@ -118,7 +118,8 @@ contract('ReleaseGold', (accounts: string[]) => {
     web3: Web3
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
-    releaseGoldInstance = await ReleaseGold.new(
+    releaseGoldInstance = await ReleaseGold.new()
+    await releaseGoldInstance.initialize(
       releaseGoldSchedule.releaseStartTime,
       releaseGoldSchedule.releaseCliffTime,
       releaseGoldSchedule.numReleasePeriods,
