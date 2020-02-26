@@ -13,7 +13,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
-import "../common/Heap.sol";
+import "../common/libraries/Heap.sol";
 
 contract Election is
   IElection,
