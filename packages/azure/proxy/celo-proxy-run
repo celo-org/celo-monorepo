@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -e
+
+. /etc/default/celo
+
+SECRET_DIR=$(mktemp --directory --tmpdir=/dev/shm)
+cleanup () {
+    rm -rf ${SECRET_DIR}
+}
+trap cleanup EXIT
+
+get_secret $PROXY_KEY_VAULT 'proxyPrivateKey' > ${SECRET_DIR}/pkey
+
+set -x
+/usr/bin/docker run \
+  --name $1 \
+  --restart=always \
+  --net=host \
+  -v $DATA_DIR:$DATA_DIR \
+  -v $SECRET_DIR:$SECRET_DIR \
+  --entrypoint /bin/sh \
+  $GETH_NODE_DOCKER_IMAGE -c "\
+    geth \
+      --bootnodes=${BOOTNODES} \
+      --rpc \
+      --rpcaddr 0.0.0.0 \
+      --rpcapi=eth,net,web3 \
+      --rpccorsdomain='*' \
+      --rpcvhosts=* \
+      --ws \
+      --wsaddr 0.0.0.0 \
+      --wsorigins=* \
+      --wsapi=eth,net,web3 \
+      --nodekey=${SECRET_DIR}/pkey \
+      --networkid=${NETWORK_ID} \
+      --syncmode=full \
+      --consoleformat=json \
+      --consoleoutput=stdout \
+      --verbosity=${GETH_VERBOSITY} \
+      --ethstats=${PROXY_NAME}@${ETHSTATS_HOST} \
+      --istanbul.blockperiod=${BLOCK_TIME} \
+      --istanbul.requesttimeout=${ISTANBUL_REQUEST_TIMEOUT_MS} \
+      --maxpeers=${PROXY_MAX_PEERS} \
+      --nat=extip:${PROXY_EXTERNAL_IP_ADDRESS} \
+      --metrics \
+      --proxy.proxy \
+      --proxy.proxiedvalidatoraddress ${VALIDATOR_ACCOUNT_ADDRESS} \
+      --proxy.internalendpoint :30503 \
+"

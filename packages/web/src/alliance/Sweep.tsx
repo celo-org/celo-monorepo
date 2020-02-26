@@ -63,7 +63,6 @@ class StableCircle extends React.PureComponent {
               style={[
                 styles.justCoin,
                 {
-                  // stroke: colors.screenGray,
                   mixBlendMode: 'screen',
                   animationIterationCount: 1,
                   animationDelay: `${INTERVAL_MS + index * 30}ms`,

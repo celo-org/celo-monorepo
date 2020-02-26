@@ -42,7 +42,7 @@ class ArticlesSection extends React.PureComponent<Props> {
         >
           <Cell span={Spans.full} style={standardStyles.centered}>
             <Button
-              text={t('readMoreFromOurBlog')}
+              text={t('common:readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
               size={SIZE.normal}
               href={CeloLinks.medium}

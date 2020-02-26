@@ -111,8 +111,12 @@ function EmailForm({
   )
 }
 
-export function After({ t }) {
-  return <Text style={[fonts.h6, textStyles.invert]}>{t('stayConnectedThanks')}</Text>
+export function After({ t, isDarkMode }) {
+  return (
+    <Text style={[fonts.h6, isDarkMode && textStyles.invert]}>
+      {t('common:stayConnectedThanks')}
+    </Text>
+  )
 }
 
 const borderWidth = 1

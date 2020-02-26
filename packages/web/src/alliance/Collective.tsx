@@ -6,11 +6,13 @@ import Sweep from 'src/alliance/Sweep'
 import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
 export default function Collective() {
   const { t } = useTranslation(NameSpaces.alliance)
+  const { screen } = useScreenSize()
   return (
     <View>
       <OpenGraph
