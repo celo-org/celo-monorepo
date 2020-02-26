@@ -526,36 +526,30 @@ contract StableToken is
    * @param feeRecipient Coinbase address
    * @param gatewayFeeRecipient Gateway address
    * @param communityFund Community fund address
-   * @param gas Transaction gas
-   * @param gasPrice Gas price
-   * @param gasPriceMinimum Minimum gas price
-   * @param gasUsed Used gas
+   * @param tipTxFee Coinbase fee
+   * @param baseTxFee Community fund fee
    * @param gatewayFee Gateway fee
    */
-  function payGas(
+  function creditGasFees(
     address from,
     address feeRecipient,
     address gatewayFeeRecipient,
     address communityFund,
-    uint256 gas,
-    uint256 gasPrice,
-    uint256 gasPriceMinimum,
-    uint256 gasUsed,
+    uint256 tipTxFee,
+    uint256 baseTxFee,
     uint256 gatewayFee
   ) external onlyVm onlyWhenNotFrozen {
     require(feeRecipient != address(0), "coinbase cannot be zero");
     require(gatewayFeeRecipient != address(0), "gateway cannot be zero");
-    uint256 totalTxFee = gasUsed.mul(gasPrice);
-    uint256 baseTxFee = gasUsed.mul(gasPriceMinimum);
 
-    uint256 units = _valueToUnits(inflationState.factor, gas.mul(gasPrice).add(gatewayFee));
+    uint256 units = _valueToUnits(inflationState.factor, tipTxFee.add(baseTxFee).add(gatewayFee));
     totalSupply_ = totalSupply_.add(units);
 
     if (communityFund != address(0)) {
       units = units.sub(_creditGas(from, communityFund, baseTxFee));
     }
 
-    units = units.sub(_creditGas(from, feeRecipient, totalTxFee.sub(baseTxFee)));
+    units = units.sub(_creditGas(from, feeRecipient, tipTxFee));
     units = units.sub(_creditGas(from, gatewayFeeRecipient, gatewayFee));
 
     balances[from] = balances[from].add(units);
