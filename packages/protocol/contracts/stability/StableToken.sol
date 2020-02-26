@@ -533,6 +533,7 @@ contract StableToken is
   {
     uint256 units = _valueToUnits(inflationState.factor, value);
     balances[from] = balances[from].sub(units);
+    totalSupply_ = totalSupply_.sub(units);
   }
 
   /**
@@ -556,26 +557,19 @@ contract StableToken is
     uint256 gatewayFee,
     uint256 baseTxFee
   ) external onlyVm onlyWhenNotFrozen {
-    require(feeRecipient != address(0), "coinbase cannot be zero");
-    require(gatewayFeeRecipient != address(0), "gateway cannot be zero");
-
-    uint256 units = _valueToUnits(
-      inflationState.factor,
-      refund.add(tipTxFee).add(baseTxFee).add(gatewayFee)
-    );
-
-    if (communityFund != address(0)) {
-      units = units.sub(_creditGas(from, communityFund, baseTxFee));
-    }
-
-    units = units.sub(_creditGas(from, feeRecipient, tipTxFee));
-    units = units.sub(_creditGas(from, gatewayFeeRecipient, gatewayFee));
-
+    uint256 units = _valueToUnits(inflationState.factor, refund);
     balances[from] = balances[from].add(units);
 
+    units = units.add(_creditGas(from, communityFund, baseTxFee));
+    units = units.add(_creditGas(from, feeRecipient, tipTxFee));
+    units = units.add(_creditGas(from, gatewayFeeRecipient, gatewayFee));
+    totalSupply_ = totalSupply_.add(units);
   }
 
   function _creditGas(address from, address to, uint256 value) internal returns (uint256) {
+    if (to == address(0)) {
+      return 0;
+    }
     uint256 units = _valueToUnits(inflationState.factor, value);
     balances[to] = balances[to].add(units);
     emit Transfer(from, to, value);
