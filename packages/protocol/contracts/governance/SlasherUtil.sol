@@ -66,16 +66,11 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     uint256[] memory groupElectionIndices
   ) internal {
     ILockedGold lockedGold = getLockedGold();
-    // Cannot set reward as local because of solc stack too deep
-    uint256 penalty = Math.min(
-      slashingIncentives.penalty,
-      getValidators().getAccountLockedGoldRequirement(validator)
-    );
     lockedGold.slash(
       validator,
-      penalty,
+      slashingIncentives.penalty,
       recipient,
-      Math.min(slashingIncentives.reward, penalty),
+      slashingIncentives.reward,
       validatorElectionLessers,
       validatorElectionGreaters,
       validatorElectionIndices
@@ -84,9 +79,9 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     assert(group != address(0));
     lockedGold.slash(
       group,
-      penalty,
+      slashingIncentives.penalty,
       recipient,
-      Math.min(slashingIncentives.reward, penalty),
+      slashingIncentives.reward,
       groupElectionLessers,
       groupElectionGreaters,
       groupElectionIndices

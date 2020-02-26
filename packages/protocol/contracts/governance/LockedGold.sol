@@ -323,28 +323,41 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     address[] calldata greaters,
     uint256[] calldata indices
   ) external onlySlasher {
-    uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
-    require(maxSlash >= reward, "reward cannot exceed penalty.");
+    uint256 actualPenalty = Math.min(
+      penalty,
+      getValidators().getAccountLockedGoldRequirement(account)
+    );
+    uint256 actualReward = Math.min(reward, actualPenalty);
     // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
-    {
-      uint256 nonvotingBalance = balances[account].nonvoting;
-      uint256 difference = 0;
-      // If not enough nonvoting, revoke the difference
-      if (nonvotingBalance < maxSlash) {
-        difference = maxSlash.sub(nonvotingBalance);
-        require(
-          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
-            difference,
-          "Cannot revoke enough voting gold."
-        );
-      }
-      // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
-      _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
-      _incrementNonvotingAccountBalance(reporter, reward);
-    }
+    _slashBalances(account, actualPenalty, reporter, actualReward, lessers, greaters, indices);
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
-    communityFundPayable.transfer(maxSlash.sub(reward));
-    emit AccountSlashed(account, maxSlash, reporter, reward);
+    communityFundPayable.transfer(actualPenalty.sub(actualReward));
+    emit AccountSlashed(account, actualPenalty, reporter, actualReward);
+  }
+
+  function _slashBalances(
+    address account,
+    uint256 actualPenalty,
+    address reporter,
+    uint256 actualReward,
+    address[] memory lessers,
+    address[] memory greaters,
+    uint256[] memory indices
+  ) internal {
+    uint256 nonvotingBalance = balances[account].nonvoting;
+    uint256 difference = 0;
+    // If not enough nonvoting, revoke the difference
+    if (nonvotingBalance < actualPenalty) {
+      difference = actualPenalty.sub(nonvotingBalance);
+      require(
+        getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
+          difference,
+        "Cannot revoke enough voting gold."
+      );
+    }
+    // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
+    _decrementNonvotingAccountBalance(account, actualPenalty.sub(difference));
+    _incrementNonvotingAccountBalance(reporter, actualReward);
   }
 }
