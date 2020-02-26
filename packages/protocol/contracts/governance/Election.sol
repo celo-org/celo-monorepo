@@ -12,6 +12,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 contract Election is
@@ -851,23 +852,39 @@ contract Election is
     // Holds the number of members elected for each of the eligible validator groups.
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;
-    // Assign a number of seats to each validator group.
-    while (totalNumMembersElected < maxElectableValidators) {
-      uint256 groupIndex = 0;
-      bool memberElected = false;
-      (groupIndex, memberElected) = dHondt(
-        electionGroups,
-        numMembers,
-        totalNumMembersElected,
-        numMembersElected
-      );
 
-      if (memberElected) {
+    uint256[] memory keys = new uint256[](electionGroups.length);
+    for (uint256 i = 0; i < electionGroups.length; i++) {
+      keys[i] = i;
+    }
+    FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
+      electionGroups.length
+    );
+    for (uint256 i = 0; i < electionGroups.length; i++) {
+      votesForNextMember[i] = FixidityLib.newFixed(
+        votes.total.eligible.getValue(electionGroups[i])
+      );
+    }
+
+    // Assign a number of seats to each validator group.
+    while (totalNumMembersElected < electableValidators.max && electionGroups.length > 0) {
+      uint256 groupIndex = keys[0];
+      // All electable validators have been elected.
+      if (votesForNextMember[groupIndex].unwrap() == 0) break;
+      // All members of the group have been elected
+      if (numMembers[groupIndex] <= numMembersElected[groupIndex]) {
+        votesForNextMember[groupIndex] = FixidityLib.wrap(0);
+      } else {
+        // Elect the next member from the validator group
         numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
         totalNumMembersElected = totalNumMembersElected.add(1);
-      } else {
-        break;
+        // If there are already n elected members in a group, the votes for the next member
+        // are total votes of group divided by n+1
+        votesForNextMember[groupIndex] = FixidityLib
+          .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
+          .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
       }
+      Heap.heapifyDown(keys, votesForNextMember);
     }
     require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
     // Grab the top validators from each group that won seats.
@@ -885,43 +902,6 @@ contract Election is
       }
     }
     return electedValidators;
-  }
-
-  /**
-   * @notice Runs a round of the D'Hondt algorithm.
-   * @param electionGroups The addresses of the validator groups in the election.
-   * @param numMembers The number of members in each group.
-   * @param numMembersElected The number of members elected in each group up to this point.
-   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
-   * @return Whether or not a group elected a member, and the index of the group if so.
-   */
-  function dHondt(
-    address[] memory electionGroups,
-    uint256[] memory numMembers,
-    uint256 totalNumMembersElected,
-    uint256[] memory numMembersElected
-  ) private view returns (uint256, bool) {
-    bool memberElected = false;
-    uint256 groupIndex = 0;
-    FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
-    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-      if (i > totalNumMembersElected) {
-        break;
-      }
-      address group = electionGroups[i];
-      // Only consider groups with members left to be elected.
-      if (numMembers[i] > numMembersElected[i]) {
-        FixidityLib.Fraction memory n = FixidityLib
-          .newFixed(votes.total.eligible.getValue(group))
-          .divide(FixidityLib.newFixed(numMembersElected[i].add(1)));
-        if (n.gt(maxN)) {
-          maxN = n;
-          groupIndex = i;
-          memberElected = true;
-        }
-      }
-    }
-    return (groupIndex, memberElected);
   }
 
   /**
