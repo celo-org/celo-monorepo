@@ -48,8 +48,7 @@ export const CoreContracts = [
   'DowntimeSlasher',
   'LockedGold',
   'Validators',
-  'ReleaseGoldFactory',
-  'ReleaseGoldInstance',
+  'ReleaseGold',
 
   // identity
   'Attestations',

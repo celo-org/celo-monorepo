@@ -1,7 +1,15 @@
 pragma solidity ^0.5.3;
 
 interface IReserve {
-  function initialize(address, uint256, uint256, uint256, uint256) external;
+  function initialize(
+    address,
+    uint256,
+    uint256,
+    uint256,
+    uint256,
+    bytes32[] calldata,
+    uint256[] calldata
+  ) external;
   function setTobinTaxStalenessThreshold(uint256) external;
   function addToken(address) external returns (bool);
   function removeToken(address, uint256) external returns (bool);
