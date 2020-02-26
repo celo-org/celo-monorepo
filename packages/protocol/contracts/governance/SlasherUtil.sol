@@ -70,7 +70,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
       validator,
       slashingIncentives.penalty,
       recipient,
-      slashingIncentives.reward,
+      slashingIncentives.reward / 2,
       validatorElectionLessers,
       validatorElectionGreaters,
       validatorElectionIndices
@@ -81,7 +81,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
       group,
       slashingIncentives.penalty,
       recipient,
-      slashingIncentives.reward,
+      slashingIncentives.reward / 2,
       groupElectionLessers,
       groupElectionGreaters,
       groupElectionIndices
