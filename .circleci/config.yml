@@ -905,10 +905,6 @@ workflows:
       - certora-test:
           requires:
             - install_dependencies
-      - end-to-end-mobile-test:
-          requires:
-            - install_dependencies
-            - mobile-test-build-app
       - lint-checks:
           requires:
             - install_dependencies
