@@ -1,20 +1,20 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IRandom.sol";
-import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
-import "../common/SafeCast.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -162,7 +162,7 @@ contract Attestations is
       "Invalid attestationRequestFeeToken"
     );
     require(
-      IERC20Token(attestationRequestFeeToken).transferFrom(
+      IERC20(attestationRequestFeeToken).transferFrom(
         msg.sender,
         address(this),
         attestationRequestFees[attestationRequestFeeToken].mul(attestationsRequested)
@@ -288,7 +288,7 @@ contract Attestations is
     uint256 value = pendingWithdrawals[token][msg.sender];
     require(value > 0, "value was negative/zero");
     pendingWithdrawals[token][msg.sender] = 0;
-    require(IERC20Token(token).transfer(msg.sender, value), "token transfer failed");
+    require(IERC20(token).transfer(msg.sender, value), "token transfer failed");
     emit Withdrawal(msg.sender, token, value);
   }
 
