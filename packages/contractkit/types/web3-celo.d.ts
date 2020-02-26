@@ -1,6 +1,12 @@
 import { TransactionConfig } from 'web3-core'
+import BigNumber from 'bignumber.js'
 
 declare module 'web3-core' {
+  export interface TransactionConfig extends TransactionConfig {
+    value?: number | string | BigNumber
+    gasPrice?: number | string | BigNumber
+  }
+
   export interface Tx extends TransactionConfig {
     feeCurrency?: string
     gatewayFeeRecipient?: string
@@ -38,5 +44,5 @@ declare module 'web3-eth' {
     encodeABI(): string
   }
 
-  export type BlockType = 'latest' | 'pending' | 'genesis' | number
+  export type BlockType = string | number | BN | BigNumber | 'latest' | 'pending' | 'earliest'
 }

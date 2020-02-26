@@ -43,7 +43,9 @@
     "bip39": "^2.5.0",
     "chalk": "^2.4.2",
     "dotenv": "6.1.0",
-    "typechain": "git+https://github.com/celo-org/TypeChain.git#832e628"
+    "typechain": "1.0.5",
+    "typechain-target-web3-v1": "1.0.4",
+    "typechain-target-truffle": "1.0.2"
   },
   "files": [
     "index.ts",

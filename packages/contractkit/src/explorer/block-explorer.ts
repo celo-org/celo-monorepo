@@ -1,6 +1,6 @@
 import { Address } from '@celo/utils/lib/address'
+import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
-import { Block, Transaction } from 'web3/eth/types'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
@@ -24,7 +24,7 @@ export interface ParsedBlock {
 
 interface ContractMapping {
   details: ContractDetails
-  fnMapping: Map<string, ABIDefinition>
+  fnMapping: Map<string | undefined, ABIDefinition>
 }
 
 export async function newBlockExplorer(kit: ContractKit) {
@@ -69,9 +69,11 @@ export class BlockExplorer {
   parseBlock(block: Block): ParsedBlock {
     const parsedTx: ParsedTx[] = []
     for (const tx of block.transactions) {
-      const maybeKnownCall = this.tryParseTx(tx)
-      if (maybeKnownCall != null) {
-        parsedTx.push(maybeKnownCall)
+      if (typeof tx !== 'string') {
+        const maybeKnownCall = this.tryParseTx(tx)
+        if (maybeKnownCall != null) {
+          parsedTx.push(maybeKnownCall)
+        }
       }
     }
 
@@ -82,7 +84,7 @@ export class BlockExplorer {
   }
 
   tryParseTx(tx: Transaction): null | ParsedTx {
-    const contractMapping = this.addressMapping.get(tx.to)
+    const contractMapping = this.addressMapping.get(tx.to!)
     if (contractMapping == null) {
       return null
     }

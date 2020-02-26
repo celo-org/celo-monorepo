@@ -45,7 +45,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     const builder = new ProposalBuilder(kit)
     repoints.forEach((repoint) =>
       builder.addWeb3Tx(registry.methods.setAddressFor(...repoint), {
-        to: registry._address,
+        // TODO fix types
+        to: (registry as any)._address,
         value: '0',
       })
     )

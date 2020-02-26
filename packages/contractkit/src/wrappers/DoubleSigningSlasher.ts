@@ -52,7 +52,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidator(validatorAddress)
-    const blockNumber = await this.getBlockNumberFromHeader([headerA])
+    const blockNumber = await this.getBlockNumberFromHeader(headerA)
     return this.slash(
       findAddressIndex(validator.signer, await election.getValidatorSigners(blockNumber)),
       headerA,
@@ -72,7 +72,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const election = await this.kit.contracts.getElection()
-    const blockNumber = await this.getBlockNumberFromHeader([headerA])
+    const blockNumber = await this.getBlockNumberFromHeader(headerA)
     return this.slash(
       findAddressIndex(signerAddress, await election.getValidatorSigners(blockNumber)),
       headerA,
@@ -92,7 +92,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
-    const blockNumber = await this.getBlockNumberFromHeader([headerA])
+    const blockNumber = await this.getBlockNumberFromHeader(headerA)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const signer = await election.validatorSignerAddressFromSet(signerIndex, blockNumber)
@@ -113,8 +113,8 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
       this.contract.methods.slash(
         signer,
         signerIndex,
-        [headerA],
-        [headerB],
+        headerA,
+        headerB,
         membership.historyIndex,
         slashValidator.lessers,
         slashValidator.greaters,

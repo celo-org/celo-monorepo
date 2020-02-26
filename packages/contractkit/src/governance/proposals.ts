@@ -78,7 +78,8 @@ export class ProposalBuilder {
     if (!to || !value) {
       throw new Error("Transaction parameters 'to' and/or 'value' not provided")
     }
-    this.addWeb3Tx(tx.txo, { to, value: valueToString(value) })
+    // TODO fix type of value
+    this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
   addJsonTx = (tx: ProposalTransactionJSON) =>
@@ -93,6 +94,7 @@ export class ProposalBuilder {
       if (!txo) {
         throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
       }
-      return this.fromWeb3tx(txo, { to: contract._address, value: tx.value })
+      // TODO fix types
+      return this.fromWeb3tx(txo, { to: (contract as any)._address, value: tx.value })
     })
 }
