@@ -9,8 +9,7 @@ const CHANGE_STORY = [
   'Cambia la historia', // es
   '改变故事', // cn
   'Muda a história', // pt
-
-  // '', // ko
+  '새로운 이야기를 쓰다', // ko
 ]
 
 export default function ChangeStory() {
