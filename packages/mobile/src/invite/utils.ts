@@ -1,3 +1,4 @@
+import { trimLeading0x } from '@celo/utils/src/address'
 import { sanitizeMessageBase64 } from '@celo/utils/src/attestations'
 import URLSearchParamsReal from '@ungap/url-search-params'
 import firebase from 'react-native-firebase'
@@ -6,8 +7,7 @@ import url from 'url'
 export const createInviteCode = (privateKey: string) => {
   // TODO(Rossy) we need some scheme to encrypt this PK
   // Buffer.from doesn't expect a 0x for hex input
-  const privateKeyHex = privateKey.substring(2)
-  return Buffer.from(privateKeyHex, 'hex').toString('base64')
+  return Buffer.from(trimLeading0x(privateKey), 'hex').toString('base64')
 }
 
 // exported for testing

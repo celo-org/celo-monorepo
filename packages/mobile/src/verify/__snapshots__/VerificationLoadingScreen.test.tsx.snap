@@ -164,14 +164,15 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       <View
         style={
           Object {
-            "marginVertical": 20,
+            "paddingVertical": 20,
           }
         }
       >
         <View
           style={
             Object {
-              "height": 300,
+              "height": 330,
+              "overflow": "visible",
             }
           }
         />
@@ -526,14 +527,15 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       <View
         style={
           Object {
-            "marginVertical": 20,
+            "paddingVertical": 20,
           }
         }
       >
         <View
           style={
             Object {
-              "height": 300,
+              "height": 330,
+              "overflow": "visible",
             }
           }
         />
