@@ -51,5 +51,4 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Reserve,
   CeloContractName.SortedOracles,
   CeloContractName.StableToken,
-  CeloContractName.TransferWhitelist,
 ]
