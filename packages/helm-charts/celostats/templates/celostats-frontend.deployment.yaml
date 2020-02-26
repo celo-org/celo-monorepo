@@ -28,11 +28,11 @@ spec:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         env:
         - name: ETHSTATS_SERVICE
-          value: https://{{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}
+          value: https://{{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org
         - name: BLOCKSCOUT_URL
-          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}
+          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
         - name: GRAPHQL_BLOCKSCOUT_URL
-          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}/graphiql
+          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org/graphiql
         command:
         - /bin/sh
         - -c
