@@ -37,7 +37,7 @@ export interface AccountSlashed {
   epochNumber: number
 }
 
-interface PendingWithdrawal {
+export interface PendingWithdrawal {
   time: BigNumber
   value: BigNumber
 }

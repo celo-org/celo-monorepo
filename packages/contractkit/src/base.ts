@@ -17,6 +17,8 @@ export enum CeloContract {
   LockedGold = 'LockedGold',
   Random = 'Random',
   Registry = 'Registry',
+  // TODO(lucas): Is this necessary
+  ReleaseGold = 'ReleaseGold',
   Reserve = 'Reserve',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
