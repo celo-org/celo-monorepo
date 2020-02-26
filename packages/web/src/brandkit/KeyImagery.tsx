@@ -52,7 +52,7 @@ const Overview = React.memo(
 )
 
 function useIlloSize() {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   switch (screen) {
     case ScreenSizes.DESKTOP:
       return 340

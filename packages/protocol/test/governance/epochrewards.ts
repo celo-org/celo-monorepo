@@ -12,6 +12,8 @@ import BigNumber from 'bignumber.js'
 import {
   EpochRewardsTestContract,
   EpochRewardsTestInstance,
+  FreezerContract,
+  FreezerInstance,
   MockElectionContract,
   MockElectionInstance,
   MockGoldTokenContract,
@@ -27,6 +29,7 @@ import {
 } from 'types'
 
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
+const Freezer: FreezerContract = artifacts.require('Freezer')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
@@ -51,6 +54,7 @@ const getExpectedTargetTotalSupply = (timeDelta: BigNumber): BigNumber => {
 
 contract('EpochRewards', (accounts: string[]) => {
   let epochRewards: EpochRewardsTestInstance
+  let freezer: FreezerInstance
   let mockElection: MockElectionInstance
   let mockGoldToken: MockGoldTokenInstance
   let mockStableToken: MockStableTokenInstance
@@ -84,6 +88,8 @@ contract('EpochRewards', (accounts: string[]) => {
     const delta: number = desiredTime.minus(currentTime).toNumber()
     await timeTravel(delta, web3)
   }
+  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+  const initialAssetAllocationWeights = [toFixed(1)]
 
   beforeEach(async () => {
     epochRewards = await EpochRewards.new()
@@ -91,8 +97,10 @@ contract('EpochRewards', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
+    freezer = await Freezer.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
@@ -103,7 +111,6 @@ contract('EpochRewards', (accounts: string[]) => {
 
     await epochRewards.initialize(
       registry.address,
-      accounts[0],
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
@@ -144,7 +151,6 @@ contract('EpochRewards', (accounts: string[]) => {
       await assertRevert(
         epochRewards.initialize(
           registry.address,
-          accounts[0],
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
@@ -529,7 +535,15 @@ contract('EpochRewards', (accounts: string[]) => {
     beforeEach(async () => {
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(
+        registry.address,
+        60,
+        toFixed(1),
+        0,
+        0,
+        initialAssetAllocationSymbols,
+        initialAssetAllocationWeights
+      )
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
@@ -664,7 +678,15 @@ contract('EpochRewards', (accounts: string[]) => {
       const totalSupply = new BigNumber(129762987346298761037469283746)
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(
+        registry.address,
+        60,
+        toFixed(1),
+        0,
+        0,
+        initialAssetAllocationSymbols,
+        initialAssetAllocationWeights
+      )
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)
       const assetAllocationSymbols = [
@@ -808,18 +830,15 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('when the contract is frozen', () => {
     beforeEach(async () => {
-      await epochRewards.freeze()
+      await freezer.freeze(epochRewards.address)
     })
 
-    it('should make calculateTargetEpochRewards return zeroes', async () => {
-      const [
-        validatorPayment,
-        voterRewards,
-        communityReward,
-      ] = await epochRewards.calculateTargetEpochRewards()
-      assertEqualBN(validatorPayment, 0)
-      assertEqualBN(voterRewards, 0)
-      assertEqualBN(communityReward, 0)
+    it('should make calculateTargetEpochRewards revert', async () => {
+      await assertRevert(epochRewards.calculateTargetEpochRewards())
+    })
+
+    it('should make updateTargetVotingYield revert', async () => {
+      await assertRevert(epochRewards.updateTargetVotingYield())
     })
   })
 })

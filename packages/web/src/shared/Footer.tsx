@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
@@ -11,11 +10,12 @@ import YouTube from 'src/icons/YouTube'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
+import ChangeStory from 'src/shared/ChangeStory'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
+const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.DEVELOPERS, menu.COMMUNITY]
 
 interface Props {
   isVertical?: boolean
@@ -58,41 +58,33 @@ export class Footer extends React.PureComponent<Props & I18nProps> {
 const Social = React.memo(function _Social() {
   const height = 30
   return (
-    <Responsive medium={styles.social}>
+    <Responsive large={[styles.social, styles.socialDesktop]} medium={styles.social}>
       <View style={[styles.social, styles.socialMobile]}>
         <View style={styles.socialIcon}>
           <MediumLogo color={colors.dark} height={height} />
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.gitHub}>
-            <a>
-              <Octocat color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.gitHub}>
+            <Octocat color={colors.dark} size={height} />
+          </a>
         </View>
         <View style={styles.socialIcon}>
           <TwiterLogo color={colors.dark} height={height} />
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.discourse}>
-            <a>
-              <Discourse color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.discourse}>
+            <Discourse color={colors.dark} size={height} />
+          </a>
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.discord}>
-            <a>
-              <Discord color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.discord}>
+            <Discord color={colors.dark} size={height} />
+          </a>
         </View>
         <View style={styles.socialIcon}>
-          <Link href={CeloLinks.youtube}>
-            <a>
-              <YouTube color={colors.dark} size={height} />
-            </a>
-          </Link>
+          <a target="_blank" rel="noopener" href={CeloLinks.youtube}>
+            <YouTube color={colors.dark} size={height} />
+          </a>
         </View>
       </View>
     </Responsive>
@@ -122,8 +114,8 @@ const Navigation = React.memo(function _Navigation({
               style={[
                 styles.menuItem,
                 !isVertical && index === 0 && { marginLeft: 0 },
-                isVertical && linkIsToCurrentPage
-                  ? styles.currentMenuItem
+                isVertical
+                  ? linkIsToCurrentPage && styles.currentMenuItem
                   : styles.verticalMenuItem,
               ]}
             >
@@ -150,13 +142,7 @@ const YEAR = new Date().getFullYear()
 const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
   return (
     <View style={styles.details}>
-      <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
-        <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>
-          {t('trueGold.0')}
-          <Text style={styles.bar}>|</Text>
-          {t('trueGold.1')}
-        </Text>
-      </Responsive>
+      <ChangeStory />
       <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
         <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>{t('disclaimer')}</Text>
       </Responsive>
@@ -182,11 +168,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   socialMobile: { alignSelf: 'center', justifyContent: 'center' },
+  socialDesktop: { marginTop: 10 },
   socialIcon: {
     paddingRight: 25,
   },
   details: {
-    paddingTop: 40,
     paddingBottom: 20,
   },
   detailsText: {
@@ -212,16 +198,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginBottom: 20,
   },
   menuTablet: {
     justifyContent: 'flex-start',
     flexDirection: 'row',
+    marginBottom: 20,
   },
   menuMobile: {
     justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 20,
+    marginBottom: 30,
   },
   verticalMenu: {
     alignItems: 'center',
@@ -229,9 +218,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-around',
   },
-  verticalMenuItem: {
-    marginVertical: 30,
-  },
+  verticalMenuItem: {},
   currentMenuItem: {
     marginVertical: 30,
   },

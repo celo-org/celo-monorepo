@@ -1,16 +1,18 @@
 pragma solidity ^0.5.3;
 /* solhint-disable no-inline-assembly, no-complex-fallback, avoid-low-level-calls */
 
-import "./libraries/AddressesHelper.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 /**
  * @title A Proxy utilizing the Unstructured Storage pattern.
  */
 contract Proxy {
   // Used to store the address of the owner.
-  bytes32 private constant OWNER_POSITION = keccak256("org.celo.owner");
+  bytes32 private constant OWNER_POSITION = bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
   // Used to store the address of the implementation contract.
-  bytes32 private constant IMPLEMENTATION_POSITION = keccak256("org.celo.implementation");
+  bytes32 private constant IMPLEMENTATION_POSITION = bytes32(
+    uint256(keccak256("eip1967.proxy.implementation")) - 1
+  );
 
   event OwnerSet(address indexed owner);
   event ImplementationSet(address indexed implementation);
@@ -43,7 +45,7 @@ contract Proxy {
     // Avoid checking if address is a contract or executing delegated call when
     // implementation address is 0x0
     require(implementationAddress != address(0), "No Implementation set");
-    require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
+    require(Address.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
       // Extract the position of the transaction data (i.e. function ID and arguments).
@@ -128,7 +130,7 @@ contract Proxy {
   function _setImplementation(address implementation) public onlyOwner {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
 
-    require(AddressesHelper.isContract(implementation), "Invalid contract address");
+    require(Address.isContract(implementation), "Invalid contract address");
 
     // Store the address of the implementation contract in an explicit storage slot.
     assembly {

@@ -39,7 +39,7 @@ export default function BaseNotification({ icon, title, children, ctas, onPress 
         <View style={styles.innerContainer}>
           {icon && <View style={styles.iconArea}>{icon}</View>}
           <View style={styles.contentArea}>
-            <Text style={fontStyles.bodySmallSecondary}>{title}</Text>
+            <Text style={fontStyles.bodySmallSemiBold}>{title}</Text>
             <View style={styles.body}>
               {children}
               <View style={styles.ctas}>
@@ -60,13 +60,13 @@ export default function BaseNotification({ icon, title, children, ctas, onPress 
 const styles = StyleSheet.create({
   ctas: {
     flexDirection: 'row',
-    marginTop: 5,
+    marginTop: 12,
   },
   action: {
     paddingEnd: 15,
   },
   body: {
-    paddingTop: 8,
+    paddingTop: 2,
     minHeight: 60,
     justifyContent: 'space-between',
   },
