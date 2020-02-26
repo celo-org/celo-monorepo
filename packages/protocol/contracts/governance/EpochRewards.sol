@@ -3,9 +3,9 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "../baklava/Freezable.sol";
 import "../common/CalledByVm.sol";
 import "../common/FixidityLib.sol";
+import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
@@ -96,7 +96,6 @@ contract EpochRewards is
    */
   function initialize(
     address registryAddress,
-    address _freezer,
     uint256 targetVotingYieldInitial,
     uint256 targetVotingYieldMax,
     uint256 targetVotingYieldAdjustmentFactor,
@@ -108,7 +107,6 @@ contract EpochRewards is
     uint256 _communityRewardFraction
   ) external initializer {
     _transferOwnership(msg.sender);
-    setFreezer(_freezer);
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
     setRewardsMultiplierParameters(
@@ -143,10 +141,6 @@ contract EpochRewards is
       params.adjustmentFactors.underspend.unwrap(),
       params.adjustmentFactors.overspend.unwrap()
     );
-  }
-
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
   }
 
   /**
@@ -385,7 +379,7 @@ contract EpochRewards is
    * @notice Updates the target voting yield based on the difference between the target and current
    *   voting Gold fraction.
    */
-  function _updateTargetVotingYield() internal {
+  function _updateTargetVotingYield() internal onlyWhenNotFrozen {
     FixidityLib.Fraction memory votingGoldFraction = FixidityLib.wrap(getVotingGoldFraction());
     if (votingGoldFraction.gt(targetVotingGoldFraction)) {
       FixidityLib.Fraction memory votingGoldFractionDelta = votingGoldFraction.subtract(
@@ -451,11 +445,12 @@ contract EpochRewards is
    * @return The per validator epoch reward, the total rewards to voters, and the total community
    * reward
    */
-  function calculateTargetEpochRewards() external view returns (uint256, uint256, uint256) {
-    if (frozen) {
-      return (0, 0, 0);
-    }
-
+  function calculateTargetEpochRewards()
+    external
+    view
+    onlyWhenNotFrozen
+    returns (uint256, uint256, uint256)
+  {
     uint256 targetVoterReward = getTargetVoterRewards();
     uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);

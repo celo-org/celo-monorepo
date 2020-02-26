@@ -215,6 +215,11 @@ export default class Privacy extends React.Component {
               <TD>Site Visitor Analytics</TD>
               <TD>United States</TD>
             </TR>
+            <TR>
+              <TD>ipstack</TD>
+              <TD>IP Address Geolocation</TD>
+              <TD>Austria</TD>
+            </TR>
           </TABLE>
         </SideTitledSection>
         <SideTitledSection span={Spans.three4th} title="Legal Bases For Processing (For EEA Users)">

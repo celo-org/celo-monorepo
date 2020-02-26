@@ -1,0 +1,13 @@
+[Unit]
+Description=Docker Container %N
+Requires=docker.service
+Requires=celo-node.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/local/bin/celo-attestations-run %N
+ExecStop=/usr/bin/docker rm -f %N
+
+[Install]
+WantedBy=default.target

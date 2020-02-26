@@ -1,0 +1,76 @@
+# Security
+
+## Security Announcements
+
+Public announcements of new releases with security fixes and of disclosure of any vulnerabilities will be made in the Celo Forum's [Security Announcements](https://forum.celo.org/c/security-announcements/) channel.
+
+## Reporting a Vulnerability
+
+We’re extremely grateful for security researchers and users that report vulnerabilities to the Celo community. All reports are thoroughly investigated.
+
+**Please do not file a public ticket** mentioning any vulnerability.
+
+The Celo community asks that all suspected vulnerabilities be privately and responsibly disclosed.
+
+To make a report, submit your vulnerability to [Celo on HackerOne](https://hackerone.com/celo).
+
+You can also email the [security@celo.org](mailto:security@celo.org) list with the details of reproducing the vulnerability as well as the usual details expected for all bug reports.
+
+While the primary focus of this disclosure program is the Celo protocol and the Celo wallet, the team may be able to assist in coordinating a response to a vulnerability in the third-party apps or tools in the Celo ecosystem.
+
+You may encrypt your email to this list using this GPG key (but encryption using GPG is NOT required to make a disclosure):  
+
+```
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+ztmP6RvHPG6jYvyqofo=
+=Sy1W
+-----END PGP PUBLIC KEY BLOCK-----
+```
