@@ -14,8 +14,9 @@ contract TransferWhitelist is Ownable, UsingRegistry {
   address[] public whitelist;
   bytes32[] public registeredContracts;
 
-  constructor() public {
+  constructor(address registryAddress) public {
     _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
   }
 
   /**
@@ -30,7 +31,11 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @notice Adds the registry id of a whitelisted contract.
    * @param registryId The id of the contract to be added.
    */
-  function addRegisteredContract(bytes32 registryId) external onlyOwner {
+  function addRegisteredContract(bytes32 registryId)
+    external
+    onlyOwner
+    onlyRegisteredContract(registryId)
+  {
     registeredContracts.push(registryId);
   }
 

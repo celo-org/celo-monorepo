@@ -21,7 +21,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   beforeEach(async () => {
-    transferWhitelist = await TransferWhitelist.new()
+    transferWhitelist = await TransferWhitelist.new(registry.address)
   })
 
   describe('#addAddress()', () => {
