@@ -16,6 +16,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.validators.membershipHistoryLength,
     config.validators.slashingPenaltyResetPeriod,
     config.validators.maxGroupSize,
+    config.validators.commissionUpdateDelay,
   ]
 }
 
