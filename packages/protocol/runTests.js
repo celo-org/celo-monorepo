@@ -16,15 +16,31 @@ const migrationOverrides = {
   downtimeSlasher: {
     slashableDowntime: 60, // epoch length is 100 for unit tests
   },
+  epochRewards: {
+    frozen: false,
+  },
+  exchange: {
+    frozen: false,
+  },
+  goldToken: {
+    frozen: false,
+  },
   governanceApproverMultiSig: {
     signatories: [network.from],
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
   },
+  reserve: {
+    initialBalance: 100000000,
+  },
   reserveSpenderMultiSig: {
     signatories: [network.from],
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
+  },
+  stableToken: {
+    oracles: [network.from],
+    frozen: false,
   },
 }
 

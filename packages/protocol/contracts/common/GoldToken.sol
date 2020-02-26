@@ -4,10 +4,11 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./CalledByVm.sol";
+import "./Freezable.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 
-contract GoldToken is Initializable, CalledByVm, IERC20, ICeloToken {
+contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   using SafeMath for uint256;
 
   // Address of the TRANSFER precompiled contract.
@@ -29,9 +30,12 @@ contract GoldToken is Initializable, CalledByVm, IERC20, ICeloToken {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress Address of the Registry contract.
    */
-  function initialize() external initializer {
+  function initialize(address registryAddress) external initializer {
     totalSupply_ = 0;
+    _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
   }
 
   /**
@@ -41,7 +45,7 @@ contract GoldToken is Initializable, CalledByVm, IERC20, ICeloToken {
    * @return True if the transaction succeeds.
    */
   // solhint-disable-next-line no-simple-event-func-name
-  function transfer(address to, uint256 value) external returns (bool) {
+  function transfer(address to, uint256 value) external onlyWhenNotFrozen returns (bool) {
     return _transfer(to, value);
   }
 
@@ -54,6 +58,7 @@ contract GoldToken is Initializable, CalledByVm, IERC20, ICeloToken {
    */
   function transferWithComment(address to, uint256 value, string calldata comment)
     external
+    onlyWhenNotFrozen
     returns (bool)
   {
     bool succeeded = _transfer(to, value);
@@ -110,7 +115,11 @@ contract GoldToken is Initializable, CalledByVm, IERC20, ICeloToken {
    * @param value The amount of Celo Gold to transfer.
    * @return True if the transaction succeeds.
    */
-  function transferFrom(address from, address to, uint256 value) external returns (bool) {
+  function transferFrom(address from, address to, uint256 value)
+    external
+    onlyWhenNotFrozen
+    returns (bool)
+  {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
@@ -188,7 +197,7 @@ contract GoldToken is Initializable, CalledByVm, IERC20, ICeloToken {
    * @param value The amount of Celo Gold to transfer.
    * @return True if the transaction succeeds.
    */
-  function _transfer(address to, uint256 value) internal returns (bool) {
+  function _transfer(address to, uint256 value) internal onlyWhenNotFrozen returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 

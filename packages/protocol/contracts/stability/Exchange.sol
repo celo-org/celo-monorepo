@@ -8,7 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../baklava/Freezable.sol";
+import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
@@ -63,7 +63,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    */
   function initialize(
     address registryAddress,
-    address _freezer,
     address stableToken,
     uint256 _spread,
     uint256 _reserveFraction,
@@ -71,7 +70,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     uint256 _minimumReports
   ) external initializer {
     _transferOwnership(msg.sender);
-    setFreezer(_freezer);
     setRegistry(registryAddress);
     setStableToken(stableToken);
     setSpread(_spread);
@@ -212,10 +210,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   function setMinimumReports(uint256 newMininumReports) public onlyOwner {
     minimumReports = newMininumReports;
     emit MinimumReportsSet(newMininumReports);
-  }
-
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
   }
 
   /**
