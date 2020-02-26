@@ -226,8 +226,8 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   const ContractProxy = artifacts.require(name + 'Proxy')
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
-    deployer.deploy(ContractProxy)
-    deployer.deploy(Contract)
+    deployer.deploy(ContractProxy, {gas: 20000000})
+    deployer.deploy(Contract, {gas: 20000000})
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
       await proxy._transferOwnership(_accounts[0])
