@@ -521,6 +521,21 @@ contract StableToken is
   }
 
   /**
+   * @notice Reserve balance for making payments for gas in this StableToken currency.
+   * @param from The account to reserve balance from
+   * @param value The amount of balance to reserve
+   */
+  function debitGasFees(address from, uint256 value)
+    external
+    onlyVm
+    onlyWhenNotFrozen
+    updateInflationFactor
+  {
+    uint256 units = _valueToUnits(inflationState.factor, value);
+    balances[from] = balances[from].sub(units);
+  }
+
+  /**
    * @notice Alternative function to credit balance after making payments for gas in this StableToken currency.
    * @param from The account to debit balance from
    * @param feeRecipient Coinbase address
@@ -543,7 +558,6 @@ contract StableToken is
     require(gatewayFeeRecipient != address(0), "gateway cannot be zero");
 
     uint256 units = _valueToUnits(inflationState.factor, tipTxFee.add(baseTxFee).add(gatewayFee));
-    totalSupply_ = totalSupply_.add(units);
 
     if (communityFund != address(0)) {
       units = units.sub(_creditGas(from, communityFund, baseTxFee));
