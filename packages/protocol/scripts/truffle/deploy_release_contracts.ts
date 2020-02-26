@@ -2,6 +2,7 @@ import {
   getDeployedProxiedContract,
   _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
+import { BigNumber } from 'bignumber.js'
 import {
   GoldTokenInstance,
   RegistryInstance,
@@ -33,12 +34,37 @@ module.exports = async (callback: (error?: any) => number) => {
         throw err
       }
       for (const releaseGoldConfig of JSON.parse(data)) {
-        const releaseGoldInitializeArgs = [
+        const releaseGoldMultiSigProxyInstance = await ReleaseGoldMultiSigProxy.new()
+        const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
+        const multiSigTxHash = await _setInitialProxyImplementation(
+          web3,
+          releaseGoldMultiSigInstance,
+          releaseGoldMultiSigProxyInstance,
+          'ReleaseGoldMultiSig',
+          [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
+          2,
+          2
+        )
+        const releaseGoldProxyInstance = await ReleaseGoldProxy.new()
+        const releaseGoldInstance = await ReleaseGold.new()
+        const gold = new BigNumber(
+          web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
+        )
+        await goldToken.transfer(
+          releaseGoldProxyInstance.address,
+          gold.multipliedBy(releaseGoldConfig.numReleasePeriods),
+          { from: releaseGoldConfig.releaseOwner }
+        )
+        const releaseGoldTxHash = await _setInitialProxyImplementation(
+          web3,
+          releaseGoldInstance,
+          releaseGoldProxyInstance,
+          'ReleaseGold',
           new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000,
           releaseGoldConfig.releaseCliffTime,
           releaseGoldConfig.numReleasePeriods,
           releaseGoldConfig.releasePeriod,
-          web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod),
+          web3.utils.toHex(gold),
           releaseGoldConfig.revocable,
           releaseGoldConfig.beneficiary,
           releaseGoldConfig.releaseOwner,
@@ -47,39 +73,10 @@ module.exports = async (callback: (error?: any) => number) => {
           releaseGoldConfig.initialDistributionRatio,
           releaseGoldConfig.canValidate,
           releaseGoldConfig.canVote,
-          registry.address,
-        ]
-        const releaseGoldMultiSigInitializeArgs = [
-          [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
-          2,
-          2,
-        ]
-        const releaseGoldMultiSigProxyInstance = await ReleaseGoldMultiSigProxy.new()
-        const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
-        await _setInitialProxyImplementation(
-          web3,
-          releaseGoldMultiSigInstance,
-          releaseGoldMultiSigProxyInstance,
-          'ReleaseGoldMultiSig',
-          releaseGoldMultiSigInitializeArgs
+          registry.address
         )
-        const releaseGoldProxyInstance = await ReleaseGoldProxy.new()
-        const releaseGoldInstance = await ReleaseGold.new()
-        await goldToken.transfer(
-          releaseGoldProxyInstance.address,
-          releaseGoldConfig.amountReleasedPerPeriod * releaseGoldConfig.numReleasePeriods,
-          { from: releaseGoldConfig.releaseOwner }
-        )
-        await _setInitialProxyImplementation(
-          web3,
-          releaseGoldInstance,
-          releaseGoldProxyInstance,
-          'ReleaseGold',
-          releaseGoldInitializeArgs
-        )
-        await ReleaseGold.at(releaseGoldProxyInstance.address).transferOwnership(
-          releaseGoldMultiSigProxyInstance.address
-        )
+        const releaseGoldAtProxy = await ReleaseGold.at(releaseGoldProxyInstance.address)
+        await releaseGoldAtProxy.transferOwnership(releaseGoldMultiSigProxyInstance.address)
         await releaseGoldProxyInstance._transferOwnership(releaseGoldMultiSigProxyInstance.address)
         await releaseGoldMultiSigProxyInstance._transferOwnership(
           releaseGoldMultiSigProxyInstance.address
@@ -89,6 +86,8 @@ module.exports = async (callback: (error?: any) => number) => {
           Beneficiary: releaseGoldConfig.beneficiary,
           ProxyAddress: releaseGoldProxyInstance.address,
           MultiSigProxyAddress: releaseGoldMultiSigProxyInstance.address,
+          MultiSigTxHash: multiSigTxHash,
+          ReleaseGoldTxHash: releaseGoldTxHash,
         })
       }
       // tslint:disable-next-line: no-console
