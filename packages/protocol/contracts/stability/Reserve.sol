@@ -54,6 +54,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   event OtherReserveAddressAdded(address indexed otherReserveAddress);
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
+  event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -74,13 +75,16 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     uint256 _tobinTaxStalenessThreshold,
     uint256 _spendingRatio,
     uint256 _frozenGold,
-    uint256 _frozenDays
+    uint256 _frozenDays,
+    bytes32[] calldata _assetAllocationSymbols,
+    uint256[] calldata _assetAllocationWeights
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
     setFrozenGold(_frozenGold, _frozenDays);
+    setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
   }
 
   /**
@@ -128,8 +132,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
-  function setAssetAllocations(bytes32[] calldata symbols, uint256[] calldata weights)
-    external
+  function setAssetAllocations(bytes32[] memory symbols, uint256[] memory weights)
+    public
     onlyOwner
   {
     require(symbols.length == weights.length, "Array length mismatch");
@@ -260,13 +264,13 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param value The amount of gold to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferGold(address to, uint256 value) external returns (bool) {
+  function transferGold(address payable to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
     return _transferGold(to, value);
   }
 
-  function _transferGold(address to, uint256 value) internal returns (bool) {
+  function _transferGold(address payable to, uint256 value) internal returns (bool) {
     require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
@@ -276,11 +280,12 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     }
     require(spendingLimit >= value, "Exceeding spending limit");
     spendingLimit = spendingLimit.sub(value);
-    require(getGoldToken().transfer(to, value), "transfer of gold token failed");
+    to.transfer(value);
+    emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
 
-  function transferExchangeGold(address to, uint256 value)
+  function transferExchangeGold(address payable to, uint256 value)
     external
     onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
     returns (bool)

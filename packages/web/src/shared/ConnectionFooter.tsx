@@ -61,7 +61,7 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
             <EmailForm
               submitText={t('signUp')}
               route={'/contacts'}
-              whenComplete={<After t={t} />}
+              whenComplete={<After t={t} isDarkMode={false} />}
               isDarkMode={false}
             />
           </View>

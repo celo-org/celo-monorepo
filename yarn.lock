@@ -17255,20 +17255,6 @@ fined@^1.0.1:
     object.pick "^1.2.0"
     parse-filepath "^1.0.1"
 
-firebase-admin@^8.6.0, firebase-admin@^8.9.2:
-  version "8.9.2"
-  resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-8.9.2.tgz#248ba184dc13b4929b043870a2067787a0dd013e"
-  integrity sha512-ix4qcx+hHnr3mnc41Z8EzQa9Mr+2nhogLEv6ktkOCCpdKJ+9HxW9vikRCElSbC8ICHLD0KIH0GVOIZK80vbvqw==
-  dependencies:
-    "@firebase/database" "^0.5.17"
-    "@types/node" "^8.10.59"
-    dicer "^0.3.0"
-    jsonwebtoken "8.1.0"
-    node-forge "0.7.4"
-  optionalDependencies:
-    "@google-cloud/firestore" "^3.0.0"
-    "@google-cloud/storage" "^4.1.2"
-
 firebase-admin@^8.6.1:
   version "8.6.1"
   resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-8.6.1.tgz#b4fe5133a759a06afe06d1bf8dee6e302514a304"
@@ -17282,6 +17268,20 @@ firebase-admin@^8.6.1:
   optionalDependencies:
     "@google-cloud/firestore" "^2.0.0"
     "@google-cloud/storage" "^3.0.2"
+
+firebase-admin@^8.9.2:
+  version "8.9.2"
+  resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-8.9.2.tgz#248ba184dc13b4929b043870a2067787a0dd013e"
+  integrity sha512-ix4qcx+hHnr3mnc41Z8EzQa9Mr+2nhogLEv6ktkOCCpdKJ+9HxW9vikRCElSbC8ICHLD0KIH0GVOIZK80vbvqw==
+  dependencies:
+    "@firebase/database" "^0.5.17"
+    "@types/node" "^8.10.59"
+    dicer "^0.3.0"
+    jsonwebtoken "8.1.0"
+    node-forge "0.7.4"
+  optionalDependencies:
+    "@google-cloud/firestore" "^3.0.0"
+    "@google-cloud/storage" "^4.1.2"
 
 firebase-bolt@^0.8.4:
   version "0.8.4"

@@ -41,7 +41,7 @@ class Press extends React.PureComponent<I18nProps> {
               kind={BTN.NAKED}
               size={SIZE.normal}
               href={
-                'https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600'
+                'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project'
               }
             />
           </View>
@@ -107,8 +107,7 @@ const logos: Logo[] = [
   {
     source: coindesk,
     size: {},
-    url:
-      'https://www.coindesk.com/a16z-polychain-invest-25-million-into-crypto-payments-startup-celo',
+    url: 'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project',
   },
   {
     source: techcrunch,

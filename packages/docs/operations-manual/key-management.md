@@ -13,8 +13,8 @@ Celo has various mechanisms to reduce the impact of the loss or compromise of ke
 | Vote signer key        | This key can be used to vote in Validator elections and for on-chain governance proposals.                                                                                                                                                                                          |
 | Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |
 
-{% hint style="info" %}
-Each signer key must be unique and may not be reused. Once a signer key is authorized, the only way to deauthorize that key is to authorize a new key that has never been used before.
+{% hint style="warning" %}
+An account may have at most one authorized signer key of each type at any time. Once a signer key is authorized, the only way to deauthorize that key is to authorize a new key that has never previously been used as a signer key, either for this account or another. It follows then that a newly deauthorized key cannot be reauthorized for any account.
 {% endhint %}
 
 # Key Security
