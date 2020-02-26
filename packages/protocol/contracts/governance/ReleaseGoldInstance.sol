@@ -72,6 +72,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
+  event BeneficiarySet(address indexed beneficiary);
 
   modifier onlyReleaseOwner() {
     require(msg.sender == releaseOwner, "Sender must be the registered releaseOwner address");
@@ -197,7 +198,7 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
     );
 
     setRegistry(registryAddress);
-    beneficiary = _beneficiary;
+    _setBeneficiary(_beneficiary);
     revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
     refundAddress = _refundAddress;
@@ -252,6 +253,24 @@ contract ReleaseGoldInstance is UsingRegistry, ReentrancyGuard, IReleaseGoldInst
       maxDistribution = totalBalance.mul(distributionPercentage).div(1000);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
+  }
+
+  /**
+   * @notice Sets the beneficiary of the instance
+   * @param newBeneficiary The address of the new beneficiary
+   */
+  function setBeneficiary(address payable newBeneficiary) external onlyBeneficiary {
+    _setBeneficiary(newBeneficiary);
+  }
+
+  /**
+   * @notice Sets the beneficiary of the instance
+   * @param newBeneficiary The address of the new beneficiary
+   */
+  function _setBeneficiary(address payable newBeneficiary) private {
+    require(newBeneficiary != address(0x0), "Can't set the beneficiary to the zero address");
+    beneficiary = newBeneficiary;
+    emit BeneficiarySet(newBeneficiary);
   }
 
   /**
