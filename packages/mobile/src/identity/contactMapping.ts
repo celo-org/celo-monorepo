@@ -176,7 +176,8 @@ async function getAddresses(e164Numbers: string[], attestationsWrapper: Attestat
   for (const hash of phoneHashes) {
     if (results[hash]) {
       // TODO(Rossy) Add support for handling multiple addresses per number
-      const address = Object.keys(results[hash])[0]
+      const addressArray = Object.keys(results[hash])
+      const address = addressArray[addressArray.length - 1]
       addresses.push(address.toLowerCase())
     } else {
       addresses.push(null)

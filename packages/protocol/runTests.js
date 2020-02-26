@@ -16,6 +16,16 @@ const migrationOverrides = {
   downtimeSlasher: {
     slashableDowntime: 60, // epoch length is 100 for unit tests
   },
+  governanceApproverMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+  },
+  reserveSpenderMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+  },
 }
 
 async function startGanache() {

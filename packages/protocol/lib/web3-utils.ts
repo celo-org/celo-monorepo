@@ -200,6 +200,28 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
+  return deploymentForContract(web3, artifacts, name, args, true, then);
+}
+
+export function deploymentForProxiedContract<ContractInstance extends Truffle.ContractInstance>(
+  web3: Web3,
+  artifacts: any,
+  name: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+) {
+  return deploymentForContract(web3, artifacts, name, args, false, then);
+
+}
+
+export function deploymentForContract<ContractInstance extends Truffle.ContractInstance>(
+  web3: Web3,
+  artifacts: any,
+  name: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
+  registerAddress: boolean,
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+) {
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
   return (deployer: any, networkName: string, _accounts: string[]) => {
@@ -213,8 +235,10 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
         ContractInstance
       >(web3, artifacts, name, ...(await args(networkName)))
 
-      const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-      await registry.setAddressFor(name, proxiedContract.address)
+      if (registerAddress) {
+        const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+        await registry.setAddressFor(name, proxiedContract.address)
+      }
 
       if (then) {
         await then(proxiedContract, web3, networkName)
@@ -310,4 +334,27 @@ export async function sendEscrowedPayment(
   await contract.approve(escrow.address, value.toString())
   const expirySeconds = 60 * 60 * 24 * 5 // 5 days
   await escrow.transfer(phoneHash, contract.address, value.toString(), expirySeconds, paymentID, 0)
+}
+
+/*
+* Builds and returns mapping of function names to selectors.
+* Each function name maps to an array of selectors to account for overloading.
+*/
+export function getFunctionSelectorsForContract(contract: any, contractName: string, artifacts: Truffle.Artifacts) {
+  const selectors: { [index: string]: string[] } = {}
+  const proxy: any = artifacts.require(contractName + 'Proxy')
+  proxy.abi
+    .concat(contract.abi)
+    .filter((abiEntry: any) => abiEntry.type === 'function')
+    .forEach((func: any) => {
+      if (typeof selectors[func.name] === 'undefined') {
+        selectors[func.name] = []
+      }
+      if (typeof func.signature === 'undefined') {
+        selectors[func.name].push(web3.eth.abi.encodeFunctionSignature(func))
+      } else {
+        selectors[func.name].push(func.signature)
+      }
+    })
+  return selectors
 }

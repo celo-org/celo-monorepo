@@ -18,6 +18,7 @@ export const TEMPLATE = {
     byzantiumBlock: 0,
     constantinopleBlock: 0,
     petersburgBlock: 0,
+    istanbulBlock: undefined,
   },
   nonce: '0x0',
   timestamp: '0x5b843511',
@@ -36,6 +37,6 @@ export const TEMPLATE = {
 export const REGISTRY_ADDRESS = '000000000000000000000000000000000000ce10'
 
 export const CONTRACT_OWNER_STORAGE_LOCATION =
-  '0x34dc5a2556b2030988481969696f29fed38d45813d8003f6c70e5c16ac92ae0f'
+  '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
 export const ISTANBUL_MIX_HASH =
   '0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365'

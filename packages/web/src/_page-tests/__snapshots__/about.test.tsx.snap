@@ -1728,10 +1728,12 @@ exports[`About renders 1`] = `
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -2128,23 +2130,290 @@ exports[`About renders 1`] = `
           }
         >
           <div
-            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
-                "height": "50px",
-                "width": "50px",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxOrient": "vertical",
+                "WebkitFlexDirection": "column",
+                "flexDirection": "column",
+                "marginBottom": "50px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "maxWidth": "300px",
+                "minWidth": "250px",
+                "msFlexDirection": "column",
+                "width": "90vw",
               }
             }
           >
-            <span
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "display": "block",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                }
+              }
+            >
+              <div
+                style={
+                  Object {
+                    "display": "block",
+                    "paddingBottom": "100%",
+                    "width": "100%",
+                  }
+                }
+              />
+              <div
+                style={
+                  Object {
+                    "bottom": "0px",
+                    "height": "100%",
+                    "left": "0px",
+                    "position": "absolute",
+                    "top": "0px",
+                    "width": "100%",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "WebkitFilter": "blur(20px)",
+                      "WebkitFlexBasis": "auto",
+                      "filter": "blur(20px)",
+                      "flexBasis": "auto",
+                      "height": "100%",
+                      "msFlexPreferredSize": "auto",
+                      "opacity": 0.5,
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "100%",
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitFilter": "blur(20px)",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "backgroundImage": "url(\\"test.jpg\\")",
+                        "backgroundPosition": "center",
+                        "backgroundRepeat": "no-repeat",
+                        "backgroundSize": "cover",
+                        "bottom": "0px",
+                        "filter": "blur(20px)",
+                        "height": "100%",
+                        "left": "0px",
+                        "position": "absolute",
+                        "right": "0px",
+                        "top": "0px",
+                        "width": "100%",
+                        "zIndex": -1,
+                      }
+                    }
+                  />
+                  <img
+                    alt=""
+                    className="css-accessibilityImage-9pa8cd"
+                    draggable={false}
+                    src="test.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
                   "height": "100%",
+                  "position": "absolute",
                   "width": "100%",
                 }
               }
-            />
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "block",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                  }
+                }
+              >
+                <div
+                  style={
+                    Object {
+                      "display": "block",
+                      "paddingBottom": "100%",
+                      "width": "100%",
+                    }
+                  }
+                />
+                <div
+                  style={
+                    Object {
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "top": "0px",
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <div
+                    aria-label="Photo of Jon"
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitFlexBasis": "auto",
+                        "flexBasis": "auto",
+                        "height": "100%",
+                        "msFlexPreferredSize": "auto",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "width": "100%",
+                        "zIndex": 0,
+                      }
+                    }
+                  >
+                    <div
+                      className="css-view-1dbjc4n"
+                      style={
+                        Object {
+                          "backgroundColor": "rgba(0,0,0,0.00)",
+                          "backgroundImage": "url(\\"test.jpg\\")",
+                          "backgroundPosition": "center",
+                          "backgroundRepeat": "no-repeat",
+                          "backgroundSize": "cover",
+                          "bottom": "0px",
+                          "height": "100%",
+                          "left": "0px",
+                          "position": "absolute",
+                          "right": "0px",
+                          "top": "0px",
+                          "width": "100%",
+                          "zIndex": -1,
+                        }
+                      }
+                    />
+                    <img
+                      alt="Photo of Jon"
+                      className="css-accessibilityImage-9pa8cd"
+                      draggable={false}
+                      src="test.jpg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexDirection": "row",
+                  "flexDirection": "row",
+                  "msFlexDirection": "row",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "fontWeight": "bold",
+                    "lineHeight": "28px",
+                    "marginRight": "5px",
+                    "marginTop": "8px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                Jon
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxPack": "end",
+                    "WebkitJustifyContent": "flex-end",
+                    "justifyContent": "flex-end",
+                    "msFlexPack": "end",
+                    "paddingBottom": "1px",
+                  }
+                }
+              >
+                <a
+                  href="//www.example.com"
+                  target="_blank"
+                >
+                  <svg
+                    fill="none"
+                    height={12}
+                    style={Object {}}
+                    viewBox="0 0 14 14"
+                    width={12}
+                  >
+                    <path
+                      d="M14 0V7.17528H11.9502V3.49949L6.80322 8.64724L5.35403 7.19578L10.501 2.05008H6.82987V0H14Z"
+                      fill="#2E3338"
+                      style={Object {}}
+                    />
+                    <path
+                      d="M9.90044 9.22533H11.9502V14H0V2.05005H4.77599V4.10013H2.04978V11.9499H9.90044V9.22533Z"
+                      fill="#2E3338"
+                      style={Object {}}
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Test Collective Inc
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "26px",
+                  "fontStyle": "italic",
+                  "lineHeight": "28px",
+                  "marginTop": "8px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              To ensure rightness
+            </div>
           </div>
         </div>
       </div>
@@ -2206,7 +2475,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        
+        celoBackers
       </h3>
     </div>
     <div
@@ -3767,10 +4036,12 @@ exports[`About renders 1`] = `
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
