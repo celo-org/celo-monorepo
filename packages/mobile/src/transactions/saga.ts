@@ -14,6 +14,7 @@ import {
 } from 'src/transactions/actions'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
+import { TransactionObject } from 'web3/eth/types'
 
 const TAG = 'transactions/saga'
 
@@ -26,34 +27,30 @@ export function* waitForTransactionWithId(txId: string) {
   }
 }
 
-function* onSendAndMonitorTransactionError(txId: string) {
-  yield put(removeStandbyTransaction(txId))
-  yield put(showError(ErrorMessages.TRANSACTION_FAILED))
-}
-
 export function* sendAndMonitorTransaction(
   txId: string,
-  tx: any,
+  tx: TransactionObject<any>,
   account: string,
   currency?: CURRENCY_ENUM
 ) {
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
-    const sendTxMethod = function*() {
+    const sendTxMethod = function*(nonce: number) {
       const { transactionHash, confirmation } = yield call(
         sendTransactionPromises,
         tx,
         account,
         TAG,
-        txId
+        txId,
+        nonce
       )
       const hash = yield transactionHash
       yield put(addHashToStandbyTransaction(txId, hash))
       const result = yield confirmation
       return result
     }
-    yield call(wrapSendTransactionWithRetry, txId, sendTxMethod)
+    yield call(wrapSendTransactionWithRetry, txId, account, sendTxMethod)
 
     yield put(transactionConfirmed(txId))
 
@@ -68,10 +65,8 @@ export function* sendAndMonitorTransaction(
       yield put(fetchDollarBalance())
     }
   } catch (error) {
-    yield call(onSendAndMonitorTransactionError, txId)
-    Logger.error(
-      TAG + '@sendAndMonitorTransaction',
-      `Transaction caught: ${txId} Error: ${error.message}`
-    )
+    Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${txId}`, error)
+    yield put(removeStandbyTransaction(txId))
+    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
   }
 }
