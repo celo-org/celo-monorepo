@@ -857,11 +857,11 @@ contract Election is
     for (uint256 i = 0; i < electionGroups.length; i++) {
       keys[i] = i;
     }
-    FixidityLib.Fraction[] memory votesPerElectedMember = new FixidityLib.Fraction[](
+    FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
       electionGroups.length
     );
     for (uint256 i = 0; i < electionGroups.length; i++) {
-      votesPerElectedMember[i] = FixidityLib.newFixed(
+      votesForNextMember[i] = FixidityLib.newFixed(
         votes.total.eligible.getValue(electionGroups[i])
       );
     }
@@ -870,19 +870,21 @@ contract Election is
     while (totalNumMembersElected < electableValidators.max && electionGroups.length > 0) {
       uint256 groupIndex = keys[0];
       // All electable validators have been elected.
-      if (votesPerElectedMember[groupIndex].unwrap() == 0) break;
+      if (votesForNextMember[groupIndex].unwrap() == 0) break;
       // All members of the group have been elected
       if (numMembers[groupIndex] <= numMembersElected[groupIndex]) {
-        votesPerElectedMember[groupIndex] = FixidityLib.wrap(0);
+        votesForNextMember[groupIndex] = FixidityLib.wrap(0);
       } else {
         // Elect the next member from the validator group
         numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
         totalNumMembersElected = totalNumMembersElected.add(1);
-        votesPerElectedMember[groupIndex] = FixidityLib
+        // If there are already n elected members in a group, the votes for the next member
+        // are total votes of group divided by n+1
+        votesForNextMember[groupIndex] = FixidityLib
           .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
           .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
       }
-      Heap.heapifyDown(keys, votesPerElectedMember);
+      Heap.heapifyDown(keys, votesForNextMember);
     }
     require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
     // Grab the top validators from each group that won seats.

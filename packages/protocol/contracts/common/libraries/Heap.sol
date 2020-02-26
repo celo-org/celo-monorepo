@@ -11,7 +11,11 @@ library Heap {
   using SafeMath for uint256;
 
   /**
-   * @notice Fixes the heap invariant if top has been changed.
+   * @notice Fixes the heap invariant.
+   * @param keys Pointers to values
+   * @param values Values that are compared, only the pointers are changed by this method.
+   * @param start Node for which the invariant might have changed.
+   * @param length Size of the heap.
    */
   function siftDown(
     uint256[] memory keys,
@@ -38,6 +42,11 @@ library Heap {
     }
   }
 
+  /**
+   * @notice Fixes the heap invariant if top has been changed.
+   * @param keys Pointers to values
+   * @param values Values that are compared, only the pointers are changed by this method.
+   */
   function heapifyDown(uint256[] memory keys, FixidityLib.Fraction[] memory values) internal pure {
     siftDown(keys, values, 0, keys.length);
   }
