@@ -258,6 +258,7 @@ contract StableToken is
     require(units <= balances[msg.sender], "value exceeded balance of sender");
     totalSupply_ = totalSupply_.sub(units);
     balances[msg.sender] = balances[msg.sender].sub(units);
+    emit Transfer(msg.sender, address(0), units);
     return true;
   }
 
@@ -461,35 +462,6 @@ contract StableToken is
   }
 
   /**
-   * @notice Deduct balance for making payments for gas in this StableToken currency.
-   * @param from The account to debit balance from
-   * @param value The value of balance to debit
-   */
-  function debitFrom(address from, uint256 value)
-    external
-    onlyVm
-    updateInflationFactor
-    onlyWhenNotFrozen
-  {
-    uint256 units = _valueToUnits(inflationState.factor, value);
-    totalSupply_ = totalSupply_.sub(units);
-    balances[from] = balances[from].sub(units);
-  }
-
-  /**
-   * @notice Refund balance after making payments for gas in this StableToken currency.
-   * @param to The account to credit balance to
-   * @param value The amount of balance to credit
-   * @dev We can assume that the inflation factor is up to date as `debitFrom`
-   * will have been called in the same transaction
-   */
-  function creditTo(address to, uint256 value) external onlyVm onlyWhenNotFrozen {
-    uint256 units = _valueToUnits(inflationState.factor, value);
-    totalSupply_ = totalSupply_.add(units);
-    balances[to] = balances[to].add(units);
-  }
-
-  /**
    * @notice Transfers StableToken from one address to another
    * @param to The address to transfer StableToken to.
    * @param value The amount of StableToken to be transferred.
@@ -502,6 +474,62 @@ contract StableToken is
     balances[to] = balances[to].add(units);
     emit Transfer(msg.sender, to, value);
     return true;
+  }
+
+  /**
+   * @notice Reserve balance for making payments for gas in this StableToken currency.
+   * @param from The account to reserve balance from
+   * @param value The amount of balance to reserve
+   */
+  function debitGasFees(address from, uint256 value)
+    external
+    onlyVm
+    onlyWhenNotFrozen
+    updateInflationFactor
+  {
+    uint256 units = _valueToUnits(inflationState.factor, value);
+    balances[from] = balances[from].sub(units);
+    totalSupply_ = totalSupply_.sub(units);
+  }
+
+  /**
+   * @notice Alternative function to credit balance after making payments
+   * for gas in this StableToken currency.
+   * @param from The account to debit balance from
+   * @param feeRecipient Coinbase address
+   * @param gatewayFeeRecipient Gateway address
+   * @param communityFund Community fund address
+   * @param tipTxFee Coinbase fee
+   * @param baseTxFee Community fund fee
+   * @param gatewayFee Gateway fee
+   */
+  function creditGasFees(
+    address from,
+    address feeRecipient,
+    address gatewayFeeRecipient,
+    address communityFund,
+    uint256 refund,
+    uint256 tipTxFee,
+    uint256 gatewayFee,
+    uint256 baseTxFee
+  ) external onlyVm onlyWhenNotFrozen {
+    uint256 units = _valueToUnits(inflationState.factor, refund);
+    balances[from] = balances[from].add(units);
+
+    units = units.add(_creditGas(from, communityFund, baseTxFee));
+    units = units.add(_creditGas(from, feeRecipient, tipTxFee));
+    units = units.add(_creditGas(from, gatewayFeeRecipient, gatewayFee));
+    totalSupply_ = totalSupply_.add(units);
+  }
+
+  function _creditGas(address from, address to, uint256 value) internal returns (uint256) {
+    if (to == address(0)) {
+      return 0;
+    }
+    uint256 units = _valueToUnits(inflationState.factor, value);
+    balances[to] = balances[to].add(units);
+    emit Transfer(from, to, value);
+    return units;
   }
 
 }
