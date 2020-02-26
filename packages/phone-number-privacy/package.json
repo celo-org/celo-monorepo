@@ -1,14 +1,12 @@
 {
-  "name": "celo-moonpay-auth",
+  "name": "celo-phone-number-privacy",
   "version": "1.0.0",
-  "description": "Signs Moonpay requests with private api key",
+  "description": "Generates unique salt for phone numbers.",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
     "serve": "firebase serve --only functions",
-    "copy-env-to-firebase": "firebase functions:config:set envs.public_key=$(grep PUBLIC_KEY .env | cut -d '=' -f 2-) envs.private_key=$(grep PRIVATE_KEY .env | cut -d '=' -f 2-)",
-    "predeploy": "yarn copy-env-to-firebase",
     "deploy": "firebase deploy --only functions",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
