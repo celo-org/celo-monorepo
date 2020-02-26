@@ -29,7 +29,7 @@ export const handler = async (argv: TestnetArgv) => {
     blockscoutDBConnectionName,
   ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName)
 
-  await upgradeHelmChart(argv.celoEnv)
+  await upgradeHelmChart(argv.celoEnv, true)
 
   // Install the blockscout package
   await installHelmChart(

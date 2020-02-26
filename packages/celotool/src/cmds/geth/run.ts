@@ -147,7 +147,7 @@ export const handler = async (argv: RunArgv) => {
       `--miner.gasprice=${minerGasPrice}`,
       '--password=/dev/null',
       `--unlock=${minerAddress}`,
-      '--lightserv=90'
+      '--light.serve=90'
     )
   }
 

@@ -151,7 +151,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Gi
+          storage: 2Gi
   {{ end }}
   podManagementPolicy: Parallel
   replicas: {{ .replicas }}
@@ -271,8 +271,8 @@ spec:
           {{ end }}
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
-            --lightserv 90 \
-            --lightpeers 1000 \
+            --light.serve 90 \
+            --light.maxpeers 1000 \
             --maxpeers 1100 \
             --rpc \
             --rpcaddr 0.0.0.0 \
