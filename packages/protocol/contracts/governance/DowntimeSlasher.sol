@@ -15,8 +15,8 @@ contract DowntimeSlasher is SlasherUtil {
   event SlashableDowntimeSet(uint256 interval);
 
   /**
-   * @notice Initializer
-   * @param registryAddress Sets the registry address. Useful for testing.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _penalty Penalty for the slashed signer.
    * @param _reward Reward that the observer gets.
    * @param  _slashableDowntime Slashable downtime in blocks.
@@ -42,14 +42,6 @@ contract DowntimeSlasher is SlasherUtil {
     require(interval < getEpochSize(), "Slashable downtime must be smaller than epoch size");
     slashableDowntime = interval;
     emit SlashableDowntimeSet(interval);
-  }
-
-  function epochNumberOfBlock(uint256 blockNumber, uint256 epochSize)
-    internal
-    pure
-    returns (uint256)
-  {
-    return blockNumber.add(epochSize).sub(1) / epochSize;
   }
 
   /**

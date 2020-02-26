@@ -13,13 +13,14 @@ export enum CeloContractName {
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   GovernanceSlasher = 'GovernanceSlasher',
+  GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
   LockedGold = 'LockedGold',
   Random = 'Random',
   Reserve = 'Reserve',
+  ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
-  ReleaseGoldFactory = 'ReleaseGoldFactory',
 }
 
 // TODO(amy): Pull this list from the build artifacts instead

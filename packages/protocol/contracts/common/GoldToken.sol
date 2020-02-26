@@ -1,12 +1,13 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
+import "./CalledByVm.sol";
 import "./Initializable.sol";
-import "./interfaces/IERC20Token.sol";
 import "./interfaces/ICeloToken.sol";
 
-contract GoldToken is Initializable, IERC20Token, ICeloToken {
+contract GoldToken is Initializable, CalledByVm, IERC20, ICeloToken {
   using SafeMath for uint256;
 
   // Address of the TRANSFER precompiled contract.
@@ -27,18 +28,8 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
   /**
-   * Only VM would be able to set the caller address to 0x0 unless someone
-   * really has the private key for 0x0
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
-  modifier onlyVm() {
-    require(msg.sender == address(0), "sender was not vm (reserved 0x0 addr)");
-    _;
-  }
-
-  /**
-   * @notice Sets 'initialized' to true.
-   */
-  // solhint-disable-next-line no-empty-blocks
   function initialize() external initializer {
     totalSupply_ = 0;
   }

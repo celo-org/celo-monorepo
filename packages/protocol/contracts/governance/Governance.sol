@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -14,6 +13,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
@@ -180,7 +180,7 @@ contract Governance is
   }
 
   /**
-   * @notice Initializes critical variables.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
    * @param _concurrentProposals The number of proposals to dequeue at once.
@@ -407,7 +407,6 @@ contract Governance is
     external
     onlyOwner
   {
-    // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0), "Destination cannot be zero");
     require(
       threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap(),

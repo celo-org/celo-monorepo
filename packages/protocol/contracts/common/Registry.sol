@@ -16,6 +16,9 @@ contract Registry is IRegistry, Ownable, Initializable {
 
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address addr);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }

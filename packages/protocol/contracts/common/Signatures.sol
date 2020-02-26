@@ -1,5 +1,7 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+
 library Signatures {
   /**
   * @notice Given a signed address, returns the signer of the address.
@@ -29,10 +31,14 @@ library Signatures {
     pure
     returns (address)
   {
-    bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-    bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, messageHash));
-    address signer = ecrecover(prefixedHash, v, r, s);
-    require(signer != address(0));
-    return signer;
+    bytes memory signature = new bytes(65);
+    // Concatenate (r, s, v) into signature.
+    assembly {
+      mstore(add(signature, 32), r)
+      mstore(add(signature, 64), s)
+      mstore8(add(signature, 96), v)
+    }
+    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(messageHash);
+    return ECDSA.recover(prefixedHash, signature);
   }
 }

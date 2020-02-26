@@ -39,6 +39,12 @@ export async function timeTravel(seconds: number, web3: Web3) {
   await jsonRpcCall(web3, 'evm_mine', [])
 }
 
+export async function mineBlocks(blocks: number, web3: Web3) {
+  for (let i = 0; i < blocks; i++) {
+    await jsonRpcCall(web3, 'evm_mine', [])
+  }
+}
+
 export function evmRevert(web3: Web3, snapId: string): Promise<void> {
   return jsonRpcCall(web3, 'evm_revert', [snapId])
 }

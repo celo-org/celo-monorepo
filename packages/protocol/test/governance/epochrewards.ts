@@ -84,6 +84,8 @@ contract('EpochRewards', (accounts: string[]) => {
     const delta: number = desiredTime.minus(currentTime).toNumber()
     await timeTravel(delta, web3)
   }
+  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+  const initialAssetAllocationWeights = [toFixed(1)]
 
   beforeEach(async () => {
     epochRewards = await EpochRewards.new()
@@ -529,7 +531,15 @@ contract('EpochRewards', (accounts: string[]) => {
     beforeEach(async () => {
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(
+        registry.address,
+        60,
+        toFixed(1),
+        0,
+        0,
+        initialAssetAllocationSymbols,
+        initialAssetAllocationWeights
+      )
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
@@ -664,7 +674,15 @@ contract('EpochRewards', (accounts: string[]) => {
       const totalSupply = new BigNumber(129762987346298761037469283746)
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(
+        registry.address,
+        60,
+        toFixed(1),
+        0,
+        0,
+        initialAssetAllocationSymbols,
+        initialAssetAllocationWeights
+      )
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)
       const assetAllocationSymbols = [
