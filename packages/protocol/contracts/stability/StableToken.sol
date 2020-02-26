@@ -477,37 +477,6 @@ contract StableToken is
   }
 
   /**
-   * @notice Deduct balance for making payments for gas in this StableToken currency.
-   * @param from The account to debit balance from
-   * @param value The value of balance to debit
-   */
-  function debitFrom(address from, uint256 value)
-    external
-    onlyVm
-    updateInflationFactor
-    onlyWhenNotFrozen
-  {
-    uint256 units = _valueToUnits(inflationState.factor, value);
-    totalSupply_ = totalSupply_.sub(units);
-    balances[from] = balances[from].sub(units);
-    emit Transfer(from, address(0), value);
-  }
-
-  /**
-   * @notice Refund balance after making payments for gas in this StableToken currency.
-   * @param to The account to credit balance to
-   * @param value The amount of balance to credit
-   * @dev We can assume that the inflation factor is up to date as `debitFrom`
-   * will have been called in the same transaction
-   */
-  function creditTo(address to, uint256 value) external onlyVm onlyWhenNotFrozen {
-    uint256 units = _valueToUnits(inflationState.factor, value);
-    totalSupply_ = totalSupply_.add(units);
-    balances[to] = balances[to].add(units);
-    emit Transfer(address(0), to, value);
-  }
-
-  /**
    * @notice Transfers StableToken from one address to another
    * @param to The address to transfer StableToken to.
    * @param value The amount of StableToken to be transferred.
