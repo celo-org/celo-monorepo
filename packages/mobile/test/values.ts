@@ -91,7 +91,7 @@ export const mockNavigation = {
   openDrawer: jest.fn(),
   closeDrawer: jest.fn(),
   toggleDrawer: jest.fn(),
-  getParam: jest.fn((key) => mockRecipient),
+  getParam: jest.fn(() => mockRecipient),
   setParams: jest.fn(),
   addListener: jest.fn(),
   push: jest.fn(),

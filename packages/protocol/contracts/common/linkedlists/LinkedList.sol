@@ -24,6 +24,7 @@ library LinkedList {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param previousKey The key of the element that comes before the element to insert.
    * @param nextKey The key of the element that comes after the element to insert.
@@ -78,6 +79,7 @@ library LinkedList {
 
   /**
    * @notice Inserts an element at the tail of the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
   function push(List storage list, bytes32 key) public {
@@ -86,6 +88,7 @@ library LinkedList {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(List storage list, bytes32 key) public {
@@ -111,6 +114,7 @@ library LinkedList {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param previousKey The key of the element that comes before the updated element.
    * @param nextKey The key of the element that comes after the updated element.
@@ -126,6 +130,7 @@ library LinkedList {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -135,6 +140,7 @@ library LinkedList {
 
   /**
    * @notice Returns the keys of the N elements at the head of the list.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to return.
    * @return The keys of the N elements at the head of the list.
    * @dev Reverts if n is greater than the number of elements in the list.
@@ -143,7 +149,7 @@ library LinkedList {
     require(n <= list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     bytes32 key = list.head;
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       keys[i] = key;
       key = list.elements[key].previousKey;
     }
@@ -152,6 +158,7 @@ library LinkedList {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
   function getKeys(List storage list) public view returns (bytes32[] memory) {

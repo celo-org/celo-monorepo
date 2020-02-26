@@ -1,8 +1,9 @@
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
+import humanizeDuration from 'humanize-duration'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
+import { binaryPrompt, displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorGroupRegister extends BaseCommand {
@@ -11,6 +12,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: 'Address for the Validator Group' }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
     commission: flags.string({
       required: true,
       description:
@@ -26,6 +28,21 @@ export default class ValidatorGroupRegister extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
     const commission = new BigNumber(res.flags.commission)
+
+    if (!res.flags.yes) {
+      const requirements = await validators.getGroupLockedGoldRequirements()
+      const duration = requirements.duration.toNumber() * 1000
+      const check = await binaryPrompt(
+        `This will lock ${requirements.value.shiftedBy(-18)} cGLD for ${humanizeDuration(
+          duration
+        )}. Are you sure you want to continue?`,
+        true
+      )
+      if (!check) {
+        console.log('Cancelled')
+        return
+      }
+    }
 
     await newCheckBuilder(this, res.flags.from)
       .addCheck('Commission is in range [0,1]', () => commission.gte(0) && commission.lte(1))

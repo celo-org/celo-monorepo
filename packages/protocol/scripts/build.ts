@@ -20,10 +20,11 @@ export const ProxyContracts = [
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
+  'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
   'LockedGoldProxy',
-  'MultiSigProxy',
   'ReserveProxy',
+  'ReserveSpenderMultiSig',
   'StableTokenProxy',
   'SortedOraclesProxy',
   'RegistryProxy',
@@ -47,8 +48,7 @@ export const CoreContracts = [
   'DowntimeSlasher',
   'LockedGold',
   'Validators',
-  'ReleaseGoldFactory',
-  'ReleaseGoldInstance',
+  'ReleaseGold',
 
   // identity
   'Attestations',

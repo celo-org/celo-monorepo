@@ -25,6 +25,12 @@
 // so we don't reset already working installs
 static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
 
+@interface AppDelegate ()
+
+@property (nonatomic, weak) UIView *blurView;
+
+@end
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -103,4 +109,29 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 {
   return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+  // Prevent sensitive information from appearing in the task switcher
+  // See https://developer.apple.com/library/archive/qa/qa1838/_index.html
+  
+  if (self.blurView) {
+    // Shouldn't happen ;)
+    return;
+  }
+  
+  UIVisualEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+  UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+  blurView.frame = self.window.bounds;
+  self.blurView = blurView;
+  [self.window addSubview:blurView];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+  // Remove our blur
+  [self.blurView removeFromSuperview];
+  self.blurView = nil;
+}
+
 @end
