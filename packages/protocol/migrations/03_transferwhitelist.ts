@@ -1,6 +1,6 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { CeloContractName } from 'lib/registry-utils'
 import { RegistryInstance, TransferWhitelistInstance } from 'types'
 
 const name = CeloContractName.TransferWhitelist
