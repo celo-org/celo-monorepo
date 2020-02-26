@@ -15,6 +15,7 @@ const MINUTE = 60
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 const WEEK = 7 * DAY
+const YEAR = 365 * DAY
 
 const DefaultConfig = {
   attestations: {
@@ -69,7 +70,7 @@ const DefaultConfig = {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE, // 5 minutes
-    // TODO(asa): This is too low
+    // Should be upgraded via governance in advance of enabling the stability protocol.
     minimumReports: 1,
     frozen: true,
   },
@@ -95,7 +96,7 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
-    //Placeholder until addresses for 2/5 multsig are generated.
+    // Placeholder until addresses for 2/5 multsig are generated.
     signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
@@ -116,16 +117,16 @@ const DefaultConfig = {
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
-    // TODO(Roman): Set these appropriately.
-    frozenGold: 0,
-    frozenDays: 0,
+    frozenGold: 105000000000000000000000000, // 105M
+    frozenDays: 3 * YEAR,
     spenders: [],
+    // To be populated once addresses are generated.
     otherAddresses: [],
-    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH'], // TODO(roman)
-    assetAllocationWeights: [0.5, 0.25, 0.25], // TODO(roman)
+    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH'],
+    assetAllocationWeights: [0.5, 0.3, 0.2],
   },
   reserveSpenderMultiSig: {
-    //Placeholder until addresses for 2/2 multsig are generated.
+    // Placeholder until addresses for 2/2 multsig are generated.
     signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
@@ -136,7 +137,7 @@ const DefaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
-    inflationPeriod: 1.5 * 365 * DAY, // 1.5 years
+    inflationPeriod: 1.5 * YEAR,
     initialBalances: {
       addresses: [],
       values: [],
@@ -145,7 +146,8 @@ const DefaultConfig = {
     frozen: true,
   },
   transferWhitelist: {
-    addresses: [], // TODO(Alec): get whitelist of addresses.
+    // To be populated with addresses once generated.
+    addresses: [],
     registryIds: [
       web3.utils.soliditySha3(CeloContractName.Governance),
       web3.utils.soliditySha3(CeloContractName.LockedGold),
@@ -166,7 +168,7 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    commissionUpdateDelay: 51840, // Approximately 3 days
+    commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 
