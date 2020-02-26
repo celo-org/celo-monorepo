@@ -2,7 +2,7 @@ import {
   _setInitialProxyImplementation,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import fs = require('fs')
 import {
   GoldTokenInstance,
@@ -34,31 +34,31 @@ module.exports = async (callback: (error?: any) => number) => {
         throw err
       }
       for (const releaseGoldConfig of JSON.parse(data)) {
-        const releaseGoldMultiSigProxyInstance = await ReleaseGoldMultiSigProxy.new()
+        const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new()
         const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
         const multiSigTxHash = await _setInitialProxyImplementation(
           web3,
           releaseGoldMultiSigInstance,
-          releaseGoldMultiSigProxyInstance,
+          releaseGoldMultiSigProxy,
           'ReleaseGoldMultiSig',
           [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
           2,
           2
         )
-        const releaseGoldProxyInstance = await ReleaseGoldProxy.new()
+        await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address)
+        const releaseGoldProxy = await ReleaseGoldProxy.new()
         const releaseGoldInstance = await ReleaseGold.new()
         const gold = new BigNumber(
           web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
         )
         await goldToken.transfer(
-          releaseGoldProxyInstance.address,
-          gold.multipliedBy(releaseGoldConfig.numReleasePeriods),
-          { from: releaseGoldConfig.releaseOwner }
+          releaseGoldProxy.address,
+          gold.multipliedBy(releaseGoldConfig.numReleasePeriods)
         )
         const releaseGoldTxHash = await _setInitialProxyImplementation(
           web3,
           releaseGoldInstance,
-          releaseGoldProxyInstance,
+          releaseGoldProxy,
           'ReleaseGold',
           new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000,
           releaseGoldConfig.releaseCliffTime,
@@ -75,17 +75,14 @@ module.exports = async (callback: (error?: any) => number) => {
           releaseGoldConfig.canVote,
           registry.address
         )
-        const releaseGoldAtProxy = await ReleaseGold.at(releaseGoldProxyInstance.address)
-        await releaseGoldAtProxy.transferOwnership(releaseGoldMultiSigProxyInstance.address)
-        await releaseGoldProxyInstance._transferOwnership(releaseGoldMultiSigProxyInstance.address)
-        await releaseGoldMultiSigProxyInstance._transferOwnership(
-          releaseGoldMultiSigProxyInstance.address
-        )
+        const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
+        await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address)
+        await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address)
 
         releases.push({
           Beneficiary: releaseGoldConfig.beneficiary,
-          ProxyAddress: releaseGoldProxyInstance.address,
-          MultiSigProxyAddress: releaseGoldMultiSigProxyInstance.address,
+          ProxyAddress: releaseGoldProxy.address,
+          MultiSigProxyAddress: releaseGoldMultiSigProxy.address,
           MultiSigTxHash: multiSigTxHash,
           ReleaseGoldTxHash: releaseGoldTxHash,
         })
