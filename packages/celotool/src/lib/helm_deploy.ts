@@ -549,9 +549,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     genesisContent = generateGenesisFromEnv()
   }
 
-  console.log('useExistingGenesis?', useExistingGenesis)
-  console.log('genesisContent', genesisContent)
-
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
