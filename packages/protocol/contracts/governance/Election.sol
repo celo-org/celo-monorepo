@@ -3,7 +3,6 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
@@ -14,6 +13,7 @@ import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
 import "../common/libraries/Heap.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract Election is
   IElection,

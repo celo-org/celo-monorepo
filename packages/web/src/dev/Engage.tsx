@@ -146,7 +146,7 @@ interface EngageProps {
 }
 
 export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
@@ -193,7 +193,7 @@ export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
 }
 
 export function EngageAsValidator() {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
