@@ -481,50 +481,6 @@ contract StableToken is
    * @param from The account to reserve balance from
    * @param value The amount of balance to reserve
    */
-  function reserveGas(address from, uint256 value)
-    external
-    onlyVm
-    onlyWhenNotFrozen
-    updateInflationFactor
-  {
-    uint256 units = _valueToUnits(inflationState.factor, value);
-    totalSupply_ = totalSupply_.sub(units);
-    balances[from] = balances[from].sub(units);
-  }
-
-  /**
-   * @notice Refund balance after making payments for gas in this StableToken currency.
-   * @param to The account to credit balance to
-   * @param value The amount of balance to refund
-   * @dev We can assume that the inflation factor is up to date as `reserveGas`
-   * will have been called in the same transaction
-   */
-  function refundGas(address to, uint256 value) external onlyVm onlyWhenNotFrozen {
-    uint256 units = _valueToUnits(inflationState.factor, value);
-    totalSupply_ = totalSupply_.add(units);
-    balances[to] = balances[to].add(units);
-  }
-
-  /**
-   * @notice Credit balance after making payments for gas in this StableToken currency.
-   * @param from The account to debit balance from
-   * @param to The account to credit balance to
-   * @param value The amount of balance to credit
-   * @dev We can assume that the inflation factor is up to date as `reserveGas`
-   * will have been called in the same transaction
-   */
-  function creditGas(address from, address to, uint256 value) external onlyVm onlyWhenNotFrozen {
-    uint256 units = _valueToUnits(inflationState.factor, value);
-    totalSupply_ = totalSupply_.add(units);
-    balances[to] = balances[to].add(units);
-    emit Transfer(from, to, value);
-  }
-
-  /**
-   * @notice Reserve balance for making payments for gas in this StableToken currency.
-   * @param from The account to reserve balance from
-   * @param value The amount of balance to reserve
-   */
   function debitGasFees(address from, uint256 value)
     external
     onlyVm
