@@ -132,18 +132,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   function() external payable {} // solhint-disable no-empty-blocks
 
-  // /**
-  //  * @notice Used in addition to constructor to verify balance has been transferred before
-  //  *         transferring ownership to the proxy.
-  //  */
-  // function initialize() external initializer {
-  //   require(
-  //     address(this).balance == releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
-  //     "ReleaseGold balance must be enough to cover grant amount"
-  //   );
-  //   // _transferOwnership(msg.sender);
-  // }
-
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
    * @param releaseStartTime The time (in Unix time) at which point releasing starts.

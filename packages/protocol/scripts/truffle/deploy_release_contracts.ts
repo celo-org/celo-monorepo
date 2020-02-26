@@ -81,8 +81,11 @@ module.exports = async (callback: (error?: any) => number) => {
           releaseGoldProxyInstance,
           releaseGoldInitializeArgs
         )
-        // TODO(lucas): Is owner multisig proxy or multisig
-        await releaseGoldProxyInstance._transferOwnership(releaseGoldMultiSigInstance.address)
+        await releaseGoldInstance.transferOwnership(releaseGoldMultiSigProxyInstance.address)
+        await releaseGoldProxyInstance._transferOwnership(releaseGoldMultiSigProxyInstance.address)
+        await releaseGoldMultiSigProxyInstance._transferOwnership(
+          releaseGoldMultiSigProxyInstance.address
+        )
 
         releases.push({
           Beneficiary: releaseGoldConfig.beneficiary,
