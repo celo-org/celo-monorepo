@@ -35,11 +35,11 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @notice Adds the registry id of a whitelisted contract.
    * @param registryId The id of the contract to be added.
    */
-  function addRegisteredContract(bytes32 registryId)
-    external
-    onlyOwner
-  {
-    require(registry.getAddressFor(registryId) != address(0), "registryId does not corespond to a registered address");
+  function addRegisteredContract(bytes32 registryId) external onlyOwner {
+    require(
+      registry.getAddressFor(registryId) != address(0),
+      "registryId does not corespond to a registered address"
+    );
     registeredContracts.push(registryId);
     emit WhitelistedRegistryId(registryId);
   }
