@@ -1,6 +1,6 @@
 pragma specify 0.1
 
-/*
+/**
  * Example Usage:
  * `certoraRun.py locked_gold.conf  --path $PWD/contracts/  --cache celolockedloop3unwind --settings -patient=0,-b=3,-assumeUnwindCond`
  */
@@ -21,7 +21,7 @@ methods {
 	getGoldTokenExt() returns address envfree
 }
 
-/*
+/**
  * Account's nonvoting gold cannot exceed total locked nonvoting gold.
  */
 rule totalNonVotingGEAccountNonVoting(address a, method f) {
@@ -40,7 +40,7 @@ rule totalNonVotingGEAccountNonVoting(address a, method f) {
 	assert(sinvoke getNonvotingLockedGold() >= sinvoke getAccountNonvotingLockedGold(a));
 }
 
-/* 
+/**
  * Total here refers to the sum of address balance and locked gold (voting and nonvoting). 
  */
 rule totalPreserved(address account, method f) {
@@ -74,7 +74,7 @@ rule totalPreserved(address account, method f) {
   );
 }
 
-/*
+/**
  * An address' total gold cannot be changed by any other contract's function calls.
  */
 rule noChangeByOther(address a, address b, method f) {
@@ -106,7 +106,7 @@ rule noChangeByOther(address a, address b, method f) {
 	assert(_accountNonVoting == accountNonVoting_, "Unexpected change to account nonvoting");
 }
 
-/*
+/**
  * This rule verifies the Certora Prover is correctly modeling the behavior of GoldToken._transfer.
  */
 rule withdraw(uint256 index) {
@@ -121,20 +121,20 @@ rule withdraw(uint256 index) {
   );
 }
 
-/*
+/**
  * Verifies that withdraws do not occur before the unlocking period has passed.
  */
 rule noWithdrawBeforeUnlocking(address account, uint256 value, method f) {
-	// we must make sure the length of pending withdrawals is not MAX_UINT, since then the `push` will make the length 0.
+	// We must make sure the length of pending withdrawals is not MAX_UINT, since then the `push` will make the length 0.
 	// (this should have been checked by the solidity compiler)
-	require sinvoke pendingWithdrawalsNotFull(account);
+	require(sinvoke pendingWithdrawalsNotFull(account), "Pending withdrawals are full");
 	
-	// unlock a value and add it to pending withdrawals
+	// Unlock a value and add it to pending withdrawals
 	env _e;
 	require(_e.msg.sender == account);
 	sinvoke unlock(_e,value);
 
-	// try to run any function - adversary's goal is to succeed in unlocking before time
+	// Try to run any function - adversary's goal is to succeed in unlocking before time
 	env eF;
 	require(eF.block.timestamp > _e.block.timestamp);
 	calldataarg arg;
@@ -148,7 +148,7 @@ rule noWithdrawBeforeUnlocking(address account, uint256 value, method f) {
   );
 }
 
-/*
+/**
  * Verifies initialization value does not change.
  */
 rule only_initializer_changes_initialized_field(method f) {
@@ -167,7 +167,7 @@ rule only_initializer_changes_initialized_field(method f) {
   );
 }
 
-/*
+/**
  * Verifies `initialize` behaves correctly:
  * Reverts if already initialized,
  * Sets initialized to true if not.

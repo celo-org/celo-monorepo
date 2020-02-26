@@ -12,7 +12,7 @@ methods {
 	_getValidatorSigner(address) returns address envfree
 }
 
-/*
+/**
  * If an address x is not an account then all mapping from x should be empty
  */
 invariant account_empty_if_not_exist(env e, address x) 
@@ -23,7 +23,7 @@ invariant account_empty_if_not_exist(env e, address x)
     sinvoke _getValidatorSigner(x) == 0
 
 
-/*
+/**
  * An address d that is authorized by some account x can not become an account
  */
 invariant address_cant_be_both_account_and_signer(address x, address d) 
@@ -31,7 +31,7 @@ invariant address_cant_be_both_account_and_signer(address x, address d)
     (sinvoke isAccount(x) && !invoke isAccount(d))
 
 
-/*
+/**
  * A current signer d or account x should be authorizedby 
  */
 invariant address_signer_if_authorizedby(address x, address d) 
@@ -39,7 +39,7 @@ invariant address_signer_if_authorizedby(address x, address d)
   (sinvoke _getAttestationSigner(x) == d || sinvoke _getVoteSigner(x) == d || sinvoke _getValidatorSigner(x) == d))
     => (sinvoke isAccount(x) && sinvoke _getAuthorizedBy(d) == x)
 
-/*
+/**
  * Given  account x address d a current signer, then d can not be a current signer of account y
  */
 rule address_cant_be_both_authorizedby_of_two_address(address x, address y, address d, method f) { 
@@ -71,7 +71,7 @@ rule address_cant_be_both_authorizedby_of_two_address(address x, address y, addr
   );
 }
 
-/*
+/**
  * Account x can have two authorized addresses
  */
 rule address_can_authorize_two_address(address x, address d1, address d2, method f)
@@ -104,7 +104,7 @@ rule address_can_authorize_two_address(address x, address d1, address d2, method
   );
 }
 
-/*
+/**
  * Either the account's authorized signer doesn't change, or it gets set from nothing.
  *.
 rule authorizedBy_can_not_be_removed(method f, address signer) {

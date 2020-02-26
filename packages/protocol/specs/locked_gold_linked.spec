@@ -1,3 +1,6 @@
+/**
+ * Validators can not delegate validation while registered as validators.
+ */
 rule no_validate_delegation_when_validating {
 	env _e;
 	env eF;
@@ -9,9 +12,15 @@ rule no_validate_delegation_when_validating {
 	invoke delegateValidating(eF,arg);
 	bool succeededDelegate = !lastReverted;
 	
-	assert _isAccountValidating => !succeededDelegate, "Account successfully delegated validating even though it is already a validator";
+	assert(
+    _isAccountValidating => !succeededDelegate,
+    "Account successfully delegated validating even though it is already a validator"
+  );
 } 
 
+/**
+ * Accounts can not delegate votes if already voting.
+ */
 rule no_vote_delegation_when_voting {
 	env _e;
 	env eF;
@@ -23,9 +32,15 @@ rule no_vote_delegation_when_voting {
 	invoke delegateVoting(eF,arg);
 	bool succeededDelegate = !lastReverted;
 	
-	assert _isAccountVoting => !succeededDelegate, "Account successfully delegated voting even though it is already a voter";
+	assert(
+    _isAccountVoting => !succeededDelegate,
+    "Account successfully delegated voting even though it is already a voter"
+  );
 } 
 
+/**
+ * Accounts can not change account weight while already voting.
+ */
 rule no_weight_changing_when_voting(method f, address account) {
 	env _e;
 	uint256 _accountWeight = sinvoke _weight(_e,account);
@@ -39,5 +54,8 @@ rule no_weight_changing_when_voting(method f, address account) {
 	env e_;
 	uint256 accountWeight_ = sinvoke _weight(e_,account);
 	
-	assert isAccountVoting => _accountWeight == accountWeight_, "Method changed weight of account if voting";
+	assert(
+    isAccountVoting => _accountWeight == accountWeight_,
+    "Method changed weight of account if voting"
+  );
 }
