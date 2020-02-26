@@ -31,7 +31,6 @@ import { mockAccount, mockE164Number } from 'test/values'
 
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const mockKeyEncoded = 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ='
-const mockBalance = jest.fn()
 
 jest.mock('src/firebase/dynamicLinks', () => ({
   ...jest.requireActual('src/firebase/dynamicLinks'),
