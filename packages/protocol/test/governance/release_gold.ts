@@ -169,6 +169,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     mockElection = await MockElection.new()
     mockGovernance = await MockGovernance.new()
     mockValidators = await MockValidators.new()
+
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
