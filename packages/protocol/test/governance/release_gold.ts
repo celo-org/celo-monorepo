@@ -125,6 +125,15 @@ contract('ReleaseGold', (accounts: string[]) => {
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
     releaseGoldInstance = await ReleaseGold.new()
+    await goldTokenInstance.transfer(
+      releaseGoldInstance.address,
+      releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
+        releaseGoldSchedule.numReleasePeriods
+      ),
+      {
+        from: owner,
+      }
+    )
     await releaseGoldInstance.initialize(
       releaseGoldSchedule.releaseStartTime,
       releaseGoldSchedule.releaseCliffTime,
@@ -141,15 +150,6 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.canVote,
       registry.address,
       { from: owner }
-    )
-    await goldTokenInstance.transfer(
-      releaseGoldInstance.address,
-      releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
-        releaseGoldSchedule.numReleasePeriods
-      ),
-      {
-        from: owner,
-      }
     )
   }
 
