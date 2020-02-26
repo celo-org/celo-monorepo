@@ -111,7 +111,7 @@ const Navigation = React.memo(function _Navigation({
   currentPage = null,
 }: NavProps) {
   return (
-    <Responsive large={styles.menu} medium={styles.menuTablet}>
+    <Responsive large={styles.menu} medium={isVertical ? styles.verticalMenu : styles.menuTablet}>
       <View style={isVertical ? styles.verticalMenu : styles.menuMobile}>
         {FOOTER_MENU.map((item, index) => {
           const linkIsToCurrentPage = isVertical && currentPage === item.link
