@@ -1,5 +1,6 @@
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { TransferWhitelistInstance } from 'types'
+import { RegistryInstance, TransferWhitelistInstance } from 'types'
 
 const name = 'TransferWhitelist'
 const Contract = artifacts.require(name)
@@ -10,5 +11,7 @@ module.exports = (deployer: any) => {
     const contract: TransferWhitelistInstance = await Contract.deployed()
     await contract.setWhitelist(config.transferWhitelist.addresses)
     await contract.setRegisteredContracts(config.transferWhitelist.registryIds)
+    const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+    await registry.setAddressFor(name, contract.address)
   })
 }
