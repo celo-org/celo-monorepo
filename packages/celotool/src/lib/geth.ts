@@ -957,6 +957,7 @@ export async function startGeth(
 
   if (privateKey || ethstats) {
     gethArgs.push('--password=/dev/null', `--unlock=0`)
+    gethArgs.push('--allow-insecure-unlock')
   }
 
   if (ethstats) {
@@ -1165,11 +1166,20 @@ export async function migrateContracts(
       exchange: {
         frozen: false,
       },
+      goldToken: {
+        frozen: false,
+      },
+      reserve: {
+        goldBalance: 100000000,
+      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
+        oracles: validators.map(ensure0x),
+        goldPrice: 10,
+        frozen: false,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),
