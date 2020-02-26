@@ -5,9 +5,11 @@ import {
   assertGteBN,
   assertLogMatches,
   assertRevert,
+  assertSameAddress,
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { Signature } from '@celo/utils/src/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import {
@@ -86,9 +88,12 @@ const UNLOCKING_PERIOD = 3 * DAY
 contract('ReleaseGold', (accounts: string[]) => {
   const owner = accounts[0]
   const beneficiary = accounts[1]
+  const walletAddress = beneficiary
+
   const releaseOwner = accounts[2]
   const refundAddress = accounts[3]
   let releaseGoldInstance: ReleaseGoldInstance
+  const newBeneficiary = accounts[4]
   let accountsInstance: AccountsInstance
   let lockedGoldInstance: LockedGoldInstance
   let goldTokenInstance: GoldTokenInstance
@@ -96,6 +101,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
+  let proofOfWalletOwnership: Signature
 
   const releaseGoldDefaultSchedule: ReleaseGoldConfig = {
     releaseStartTime: null, // To be adjusted on every run
@@ -293,6 +299,31 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
   })
 
+  describe('#setBeneficiary', () => {
+    beforeEach(async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+    })
+
+    it('should set a new beneficiary as the old beneficiary', async () => {
+      await releaseGoldInstance.setBeneficiary(newBeneficiary, { from: beneficiary })
+      const actualBeneficiary = await releaseGoldInstance.beneficiary()
+      assertSameAddress(actualBeneficiary, newBeneficiary)
+    })
+
+    it('should revert when setting a new beneficiary from the release owner', async () => {
+      await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: releaseOwner }))
+    })
+
+    it('should emit the BeneficiarySet event', async () => {
+      const setNewBeneficiaryTx = await releaseGoldInstance.setBeneficiary(newBeneficiary, {
+        from: beneficiary,
+      })
+      assertLogMatches(setNewBeneficiaryTx.logs[0], 'BeneficiarySet', {
+        beneficiary: newBeneficiary,
+      })
+    })
+  })
+
   describe('#createAccount', () => {
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
@@ -331,19 +362,31 @@ contract('ReleaseGold', (accounts: string[]) => {
     const accountName = 'name'
     const dataEncryptionKey: any =
       '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
-    const walletAddress = beneficiary
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+      proofOfWalletOwnership = await getParsedSignatureOfAddress(
+        web3,
+        releaseGoldInstance.address,
+        beneficiary
+      )
     })
 
     describe('when unrevoked', () => {
       it('sets the account by beneficiary', async () => {
         let isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await releaseGoldInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
-          from: beneficiary,
-        })
+        await releaseGoldInstance.setAccount(
+          accountName,
+          dataEncryptionKey,
+          walletAddress,
+          proofOfWalletOwnership.v,
+          proofOfWalletOwnership.r,
+          proofOfWalletOwnership.s,
+          {
+            from: beneficiary,
+          }
+        )
         isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isTrue(isAccount)
       })
@@ -352,18 +395,34 @@ contract('ReleaseGold', (accounts: string[]) => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await assertRevert(
-          releaseGoldInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
-            from: accounts[2],
-          })
+          releaseGoldInstance.setAccount(
+            accountName,
+            dataEncryptionKey,
+            walletAddress,
+            proofOfWalletOwnership.v,
+            proofOfWalletOwnership.r,
+            proofOfWalletOwnership.s,
+            {
+              from: accounts[2],
+            }
+          )
         )
       })
 
       it('should set the name, dataEncryptionKey and walletAddress of the account by beneficiary', async () => {
         let isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await releaseGoldInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
-          from: beneficiary,
-        })
+        await releaseGoldInstance.setAccount(
+          accountName,
+          dataEncryptionKey,
+          walletAddress,
+          proofOfWalletOwnership.v,
+          proofOfWalletOwnership.r,
+          proofOfWalletOwnership.s,
+          {
+            from: beneficiary,
+          }
+        )
         isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isTrue(isAccount)
         const expectedWalletAddress = await accountsInstance.getWalletAddress(
@@ -383,9 +442,17 @@ contract('ReleaseGold', (accounts: string[]) => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await assertRevert(
-          releaseGoldInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
-            from: releaseOwner,
-          })
+          releaseGoldInstance.setAccount(
+            accountName,
+            dataEncryptionKey,
+            walletAddress,
+            proofOfWalletOwnership.v,
+            proofOfWalletOwnership.r,
+            proofOfWalletOwnership.s,
+            {
+              from: releaseOwner,
+            }
+          )
         )
       })
     })
@@ -399,9 +466,17 @@ contract('ReleaseGold', (accounts: string[]) => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await assertRevert(
-          releaseGoldInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
-            from: beneficiary,
-          })
+          releaseGoldInstance.setAccount(
+            accountName,
+            dataEncryptionKey,
+            walletAddress,
+            proofOfWalletOwnership.v,
+            proofOfWalletOwnership.r,
+            proofOfWalletOwnership.s,
+            {
+              from: releaseOwner,
+            }
+          )
         )
       })
 
@@ -409,9 +484,17 @@ contract('ReleaseGold', (accounts: string[]) => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await assertRevert(
-          releaseGoldInstance.setAccount(accountName, dataEncryptionKey, walletAddress, {
-            from: releaseOwner,
-          })
+          releaseGoldInstance.setAccount(
+            accountName,
+            dataEncryptionKey,
+            walletAddress,
+            proofOfWalletOwnership.v,
+            proofOfWalletOwnership.r,
+            proofOfWalletOwnership.s,
+            {
+              from: releaseOwner,
+            }
+          )
         )
       })
     })
@@ -462,16 +545,25 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#setAccountWalletAddress', () => {
-    const walletAddress = beneficiary
-
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+      proofOfWalletOwnership = await getParsedSignatureOfAddress(
+        web3,
+        releaseGoldInstance.address,
+        beneficiary
+      )
     })
 
     describe('when the releaseGold account has not been created', () => {
       it('should revert', async () => {
         await assertRevert(
-          releaseGoldInstance.setAccountWalletAddress(walletAddress, { from: beneficiary })
+          releaseGoldInstance.setAccountWalletAddress(
+            walletAddress,
+            proofOfWalletOwnership.v,
+            proofOfWalletOwnership.r,
+            proofOfWalletOwnership.s,
+            { from: beneficiary }
+          )
         )
       })
     })
@@ -483,19 +575,33 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       describe('when unrevoked', () => {
         it('beneficiary should set the walletAddress', async () => {
-          await releaseGoldInstance.setAccountWalletAddress(walletAddress, { from: beneficiary })
+          await releaseGoldInstance.setAccountWalletAddress(
+            walletAddress,
+            proofOfWalletOwnership.v,
+            proofOfWalletOwnership.r,
+            proofOfWalletOwnership.s,
+            { from: beneficiary }
+          )
           const result = await accountsInstance.getWalletAddress(releaseGoldInstance.address)
           assert.equal(result, walletAddress)
         })
 
         it('should revert if non-beneficiary attempts to set the walletAddress', async () => {
           await assertRevert(
-            releaseGoldInstance.setAccountWalletAddress(walletAddress, { from: accounts[2] })
+            releaseGoldInstance.setAccountWalletAddress(
+              walletAddress,
+              proofOfWalletOwnership.v,
+              proofOfWalletOwnership.r,
+              proofOfWalletOwnership.s,
+              { from: accounts[2] }
+            )
           )
         })
 
         it('beneficiary should set the NULL_ADDRESS', async () => {
-          await releaseGoldInstance.setAccountWalletAddress(NULL_ADDRESS, { from: beneficiary })
+          await releaseGoldInstance.setAccountWalletAddress(NULL_ADDRESS, '0x0', '0x0', '0x0', {
+            from: beneficiary,
+          })
           const result = await accountsInstance.getWalletAddress(releaseGoldInstance.address)
           assert.equal(result, NULL_ADDRESS)
         })
@@ -508,7 +614,13 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         it('should revert if anyone attempts to set the walletAddress', async () => {
           await assertRevert(
-            releaseGoldInstance.setAccountWalletAddress(walletAddress, { from: releaseOwner })
+            releaseGoldInstance.setAccountWalletAddress(
+              walletAddress,
+              proofOfWalletOwnership.v,
+              proofOfWalletOwnership.r,
+              proofOfWalletOwnership.s,
+              { from: releaseOwner }
+            )
           )
         })
       })

@@ -74,16 +74,26 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param name A string to set as the name of the account
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
    */
-  function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
-    external
-  {
+  function setAccount(
+    string calldata name,
+    bytes calldata dataEncryptionKey,
+    address walletAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external {
     if (!isAccount(msg.sender)) {
       createAccount();
     }
     setName(name);
     setAccountDataEncryptionKey(dataEncryptionKey);
-    setWalletAddress(walletAddress);
+    setWalletAddress(walletAddress, v, r, s);
   }
 
   /**
@@ -112,12 +122,21 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   /**
    * @notice Setter for the wallet address for an account
    * @param walletAddress The wallet address to set for the account
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
    * @dev Wallet address can be zero. This means that the owner of the wallet
    *  does not want to be paid directly without interaction, and instead wants users to
    * contact them, using the data encryption key, and arrange a payment.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
    */
-  function setWalletAddress(address walletAddress) public {
+  function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s) public {
     require(isAccount(msg.sender), "Unknown account");
+    if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
+      address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
+      require(signer == walletAddress, "Invalid signature");
+    }
     Account storage account = accounts[msg.sender];
     account.walletAddress = walletAddress;
     emit AccountWalletAddressSet(msg.sender, walletAddress);
