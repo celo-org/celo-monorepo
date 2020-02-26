@@ -21,6 +21,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   beforeEach(async () => {
+    registry = await Registry.new()
     transferWhitelist = await TransferWhitelist.new(registry.address)
   })
 
@@ -37,16 +38,14 @@ contract('TransferWhitelist', (accounts: string[]) => {
   })
 
   describe('#addRegisteredContract()', () => {
+    beforeEach(async () => {
+      await registry.setAddressFor(anIdentifier, anAddress)
+    })
+
     it('should allow the owner to add a registry id', async () => {
       await transferWhitelist.addRegisteredContract(anIdentifier)
-      const registeredContractsLength = (
-        await transferWhitelist.getRegisteredContractsLength()
-      ).toNumber()
-      const registeredContracts = []
-      for (let i = 0; i < registeredContractsLength; i++) {
-        registeredContracts.push(await transferWhitelist.registeredContracts.call(i))
-      }
-      assert.sameMembers(registeredContracts, [anIdentifier])
+      const whitelist = await transferWhitelist.getWhitelist()
+      assert.sameMembers(whitelist, [anAddress])
     })
 
     it('should not allow a non-owner to add a registry id', async () => {
@@ -69,16 +68,15 @@ contract('TransferWhitelist', (accounts: string[]) => {
   })
 
   describe('#setRegisteredContracts()', () => {
+    beforeEach(async () => {
+      await registry.setAddressFor(anIdentifier, anAddress)
+      await registry.setAddressFor(anotherIdentifier, anotherAddress)
+    })
+
     it('should allow the owner to set the list of registered contracts', async () => {
       await transferWhitelist.setRegisteredContracts([anIdentifier, anotherIdentifier])
-      const registeredContractsLength = (
-        await transferWhitelist.getRegisteredContractsLength()
-      ).toNumber()
-      const registeredContracts = []
-      for (let i = 0; i < registeredContractsLength; i++) {
-        registeredContracts.push(await transferWhitelist.registeredContracts.call(i))
-      }
-      assert.sameMembers(registeredContracts, [anIdentifier, anotherIdentifier])
+      const whitelist = await transferWhitelist.getWhitelist()
+      assert.sameMembers(whitelist, [anAddress, anotherAddress])
     })
 
     it('should not allow a non-owner to set the list of registered contracts', async () => {
@@ -91,9 +89,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
   })
 
   describe('#getWhitelist()', () => {
-    before('When whitelist includes both registry ids and addresses', async () => {
-      registry = await Registry.new()
-      await registry.initialize()
+    beforeEach('When whitelist includes both registry ids and addresses', async () => {
       await registry.setAddressFor(anIdentifier, anAddress)
       await transferWhitelist.addRegisteredContract(anIdentifier)
       await transferWhitelist.addAddress(anotherAddress)
@@ -101,7 +97,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
 
     it('should return the full whitelist of addresses', async () => {
       const whitelist = await transferWhitelist.getWhitelist({ from: nonOwner })
-      assert.sameMembers(whitelist, [anAddress, anotherAddress])
+      assert.sameMembers(whitelist, [anotherAddress, anAddress])
     })
   })
 })
