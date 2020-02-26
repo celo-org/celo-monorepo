@@ -1,4 +1,5 @@
 export const navigate = jest.fn()
+export const navigateHome = jest.fn()
 export const navigateBack = jest.fn()
 
 export enum NavActions {

@@ -39,7 +39,7 @@ async function copySecret(secretName: string, srcNamespace: string, destNamespac
   console.info(`Copying secret ${secretName} from namespace ${srcNamespace} to ${destNamespace}`)
   await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} -o yaml |\
   grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid |\
-  kubectl apply --namespace=${destNamespace} -f -`)
+  sed 's/default/${destNamespace}/' | kubectl apply --namespace=${destNamespace} -f -`)
 }
 
 export async function createCloudSQLInstance(celoEnv: string, instanceName: string) {

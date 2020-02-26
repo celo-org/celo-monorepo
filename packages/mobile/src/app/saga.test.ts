@@ -74,10 +74,15 @@ describe('App saga', () => {
     await expectSaga(handleNavigatePinProtected, testRoute)
       .provide([
         [select(fornoSelector), false],
-        [call(getPincode, false), '123456'],
+        [
+          call(getPincode, false, () => {
+            navigate(testRoute.routeName, testRoute.params)
+          }),
+          '123456',
+        ],
       ])
       .run()
-    expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
+    expect(navigate).toBeCalledTimes(0)
   })
 
   it('Handles Dappkit deep link', async () => {

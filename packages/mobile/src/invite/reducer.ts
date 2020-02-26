@@ -47,6 +47,8 @@ export const inviteReducer = (
         isSendingInvite: false,
       }
     case Actions.STORE_INVITEE_DATA:
+      // TODO(Rossy) refactor the invitees structure to also save invite code and
+      // decide on UI for showing users those invite codes, see #2639
       return dotProp.merge(state, 'invitees', { [action.address]: action.e164Number })
     case Actions.REDEEM_INVITE:
       return {
