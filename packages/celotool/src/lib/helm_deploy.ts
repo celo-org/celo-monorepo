@@ -542,12 +542,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       ]
     : []
 
-  let genesisContent: string
-  if (useExistingGenesis) {
-    genesisContent = await getGenesisBlockFromGoogleStorage(celoEnv)
-  } else {
-    genesisContent = generateGenesisFromEnv()
-  }
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
 
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,

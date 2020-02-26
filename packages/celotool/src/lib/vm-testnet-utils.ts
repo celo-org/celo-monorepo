@@ -274,12 +274,9 @@ function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string)
 }
 
 async function getTestnetVars(celoEnv: string, useExistingGenesis: boolean) {
-  let genesisContent: string
-  if (useExistingGenesis) {
-    genesisContent = await getGenesisBlockFromGoogleStorage(celoEnv)
-  } else {
-    genesisContent = generateGenesisFromEnv()
-  }
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
 
   const genesisBuffer = Buffer.from(genesisContent)
   const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
