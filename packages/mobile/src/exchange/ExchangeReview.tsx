@@ -5,7 +5,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -13,10 +13,11 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -172,45 +173,74 @@ export class ExchangeReview extends React.Component<Props, State> {
                     tokenName: t(`global:${this.state.inputTokenDisplayName}`),
                   })}
                 </Text>
-                <Text style={styles.currencyAmountText}>
-                  {getMoneyDisplayValue(this.state.inputAmount, this.state.inputToken, true)}
-                </Text>
+                <CurrencyDisplay
+                  style={styles.currencyAmountText}
+                  amount={{
+                    value: this.state.inputAmount.toString(),
+                    currencyCode: CURRENCIES[this.state.inputToken].code,
+                  }}
+                />
               </View>
               <HorizontalLine />
               <View style={styles.subtotalRowContainer}>
                 <Text style={styles.exchangeBodyText}>
-                  {t('subtotalAmount', {
-                    rate: getMoneyDisplayValue(exchangeRate, CURRENCY_ENUM.DOLLAR, true),
-                  })}
+                  <Trans i18nKey="subtotalAmount" ns={Namespaces.exchangeFlow9}>
+                    Subtotal @{' '}
+                    <CurrencyDisplay
+                      amount={{
+                        value: exchangeRate.toString(),
+                        currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                      }}
+                    />
+                  </Trans>
                 </Text>
-                <Text style={styles.exchangeBodyText}>
-                  {getMoneyDisplayValue(dollarAmount, CURRENCY_ENUM.DOLLAR, true)}
-                </Text>
+                <CurrencyDisplay
+                  style={styles.exchangeBodyText}
+                  amount={{
+                    value: dollarAmount.toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                />
               </View>
               <View style={styles.feeRowContainer}>
                 <View style={styles.feeTextWithIconContainer}>
                   <Text style={styles.exchangeBodyText}>{t('exchangeFee')}</Text>
                   <FeeIcon tintColor={colors.lightGray} isExchange={true} />
                 </View>
-                <Text style={styles.exchangeBodyText}>{getMoneyDisplayValue(tobinTax)}</Text>
+                <CurrencyDisplay
+                  style={styles.exchangeBodyText}
+                  amount={{
+                    value: tobinTax,
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                />
               </View>
               <View style={styles.feeRowContainer}>
                 <View style={styles.feeTextWithIconContainer}>
                   <Text style={styles.exchangeBodyText}>{t('securityFee')}</Text>
                   <FeeIcon tintColor={colors.lightGray} />
                 </View>
-                <Text style={styles.exchangeBodyText}>{getMoneyDisplayValue(fee)}</Text>
+                <CurrencyDisplay
+                  style={styles.exchangeBodyText}
+                  amount={{
+                    value: fee,
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                />
               </View>
               <HorizontalLine />
               <View style={styles.rowContainer}>
                 <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
-                <Text style={fontStyles.bodyBold}>
-                  {getMoneyDisplayValue(
-                    dollarAmount.plus(tobinTax).plus(fee),
-                    CURRENCY_ENUM.DOLLAR,
-                    true
-                  )}
-                </Text>
+                <CurrencyDisplay
+                  style={fontStyles.bodyBold}
+                  amount={{
+                    value: dollarAmount
+                      .plus(tobinTax)
+                      .plus(fee)
+                      .toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                />
               </View>
             </View>
           </ScrollView>

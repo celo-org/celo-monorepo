@@ -20,13 +20,13 @@ interface Props {
   size: number // only used for DisplayType.Big
   useColors: boolean
   hideSymbol: boolean
-  formatAmount: (amount: BigNumber.Value) => string
+  formatAmount: (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => string
   style?: StyleProp<TextStyle>
 }
 
 const SYMBOL_RATIO = 0.6
 
-function getBigSymbolStyle(fontSize: number, color: string) {
+function getBigSymbolStyle(fontSize: number, color: string | undefined) {
   const size = Math.floor(fontSize * SYMBOL_RATIO)
   return {
     fontSize: size,
@@ -67,13 +67,13 @@ export default function CurrencyDisplay({
       : CURRENCIES[currency].symbol
   const value = new BigNumber(displayAmount.value)
   const sign = value.isNegative() ? '-' : ''
-  const formattedValue = formatAmount(value.absoluteValue())
+  const formattedValue = formatAmount(value.absoluteValue(), currency)
 
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
       ? colors.celoGold
       : colors.celoGreen
-    : colors.darkSecondary
+    : StyleSheet.flatten(style)?.color
 
   if (type === DisplayType.Big) {
     // In this type the symbol is displayed as superscript
@@ -110,9 +110,10 @@ export default function CurrencyDisplay({
 CurrencyDisplay.defaultProps = {
   type: DisplayType.Default,
   size: 48,
-  useColors: true,
+  useColors: false,
   hideSymbol: false,
-  formatAmount: (amount: BigNumber.Value) => getMoneyDisplayValue(amount),
+  formatAmount: (amount: BigNumber.Value, currency: CURRENCY_ENUM) =>
+    getMoneyDisplayValue(amount, currency),
 }
 
 const styles = StyleSheet.create({

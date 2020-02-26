@@ -48,15 +48,23 @@ exports[`ExchangeReview renders correctly 1`] = `
               exchangeAmount
             </Text>
             <Text
+              numberOfLines={1}
               style={
-                Object {
-                  "color": "#42D689",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 24,
-                  "lineHeight": 39,
-                }
+                Array [
+                  Object {
+                    "color": "#42D689",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 24,
+                    "lineHeight": 39,
+                  },
+                ]
               }
             >
+              
+              
               10.000
             </Text>
           </View>
@@ -91,19 +99,43 @@ exports[`ExchangeReview renders correctly 1`] = `
                 }
               }
             >
-              subtotalAmount
+              Subtotal @
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": undefined,
+                    },
+                    undefined,
+                  ]
+                }
+              >
+                
+                $
+                12.09
+              </Text>
             </Text>
             <Text
+              numberOfLines={1}
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                  },
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 24,
+                  },
+                ]
               }
             >
-              $90.90
+              
+              $
+              120.90
             </Text>
           </View>
           <View
@@ -185,15 +217,23 @@ exports[`ExchangeReview renders correctly 1`] = `
               </View>
             </View>
             <Text
+              numberOfLines={1}
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                  },
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 24,
+                  },
+                ]
               }
             >
+              
+              $
               0.00
             </Text>
           </View>
@@ -276,15 +316,23 @@ exports[`ExchangeReview renders correctly 1`] = `
               </View>
             </View>
             <Text
+              numberOfLines={1}
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                  },
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 24,
+                  },
+                ]
               }
             >
+              
+              $
               0.00
             </Text>
           </View>
@@ -321,16 +369,24 @@ exports[`ExchangeReview renders correctly 1`] = `
               sendFlow7:total
             </Text>
             <Text
+              numberOfLines={1}
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                  },
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Bold",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  },
+                ]
               }
             >
-              $90.90
+              
+              $
+              120.90
             </Text>
           </View>
         </View>

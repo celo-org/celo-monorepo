@@ -74,11 +74,11 @@ const renderAmountSection = (props: Props) => {
           type={DisplayType.Big}
           amount={amount}
           formatAmount={formatNetworkFee}
-          useColors={false}
+          style={style.currency}
         />
       )
     default:
-      return <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
+      return <CurrencyDisplay type={DisplayType.Big} amount={amount} style={style.currency} />
   }
 }
 
@@ -126,7 +126,7 @@ const renderBottomSection = (props: Props) => {
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
+        <CurrencyDisplay type={DisplayType.Big} amount={amount} style={style.currency} />
       </View>
     )
   } else if (comment) {
@@ -175,6 +175,9 @@ const style = StyleSheet.create({
     ...fontStyles.pCurrency,
     textAlign: 'center',
     marginBottom: 5,
+  },
+  currency: {
+    color: colors.darkSecondary,
   },
 })
 

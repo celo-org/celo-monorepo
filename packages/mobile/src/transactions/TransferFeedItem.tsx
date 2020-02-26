@@ -61,6 +61,10 @@ function navigateToTransactionReview({
   })
 }
 
+function formatFee(amount: BigNumber.Value) {
+  return getNetworkFeeDisplayValue(amount)
+}
+
 // TODO(jeanregisser): ExchangeFeedItem and TransferFeedItem renders are very similar, we should use the same building blocks
 // so the parts that need to be identical stay the same as we change the code (main layout)
 export function TransferFeedItem(props: Props) {
@@ -110,9 +114,7 @@ export function TransferFeedItem(props: Props) {
             <Text style={styles.title}>{title}</Text>
             <CurrencyDisplay
               amount={amount}
-              formatAmount={
-                type === TokenTransactionType.NetworkFee ? getNetworkFeeDisplayValue : undefined
-              }
+              formatAmount={type === TokenTransactionType.NetworkFee ? formatFee : undefined}
               style={[
                 styles.amount,
                 isSent ? fontStyles.activityCurrencySent : fontStyles.activityCurrencyReceived,

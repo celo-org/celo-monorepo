@@ -7,7 +7,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -15,19 +15,26 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import {
+  convertDollarsToMaxSupportedPrecision,
+  convertLocalAmountToDollars,
+} from 'src/localCurrency/convert'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface State {
   inputToken: CURRENCY_ENUM
@@ -39,6 +46,8 @@ interface State {
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
   error: ErrorMessages | null
+  localCurrencyCode: LocalCurrencyCode
+  localCurrencyExchangeRate: string | null | undefined
 }
 
 interface NavProps {
@@ -59,6 +68,8 @@ type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslat
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
   error: errorSelector(state),
+  localCurrencyCode: getLocalCurrencyCode(state) || LocalCurrencyCode.USD,
+  localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
 })
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
@@ -73,7 +84,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     inputToken: CURRENCY_ENUM.GOLD,
     makerToken: CURRENCY_ENUM.DOLLAR,
     makerTokenAvailableBalance: '',
-    inputAmount: '',
+    inputAmount: '', // Raw amount entered, can be cGLD, cUSD or local currency
   }
 
   getMakerTokenPropertiesFromNavProps() {
@@ -93,13 +104,14 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   onChangeExchangeAmount = (amount: string) => {
-    this.setState({ inputAmount: amount })
-    this.updateError(amount)
+    this.setState({ inputAmount: amount }, () => {
+      this.updateError()
+    })
   }
 
-  updateError(inputAmount: string) {
-    const amount = parseInputAmount(inputAmount)
-    if (!this.inputAmountIsValid(amount)) {
+  updateError() {
+    const tokenAmount = this.getInputTokenAmount()
+    if (!this.inputAmountIsValid(tokenAmount)) {
       this.props.showError(
         this.isDollarToGold() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD
       )
@@ -109,7 +121,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   goToReview = () => {
-    const { inputToken, inputAmount } = this.state
+    const { inputToken } = this.state
     const inputTokenDisplayName = this.getInputTokenDisplayText()
     navigate(Screens.ExchangeReview, {
       exchangeInput: {
@@ -117,7 +129,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         makerTokenBalance: this.state.makerTokenAvailableBalance,
         inputToken,
         inputTokenDisplayName,
-        inputAmount: parseInputAmount(inputAmount),
+        inputAmount: this.getInputTokenAmount(),
       },
     })
   }
@@ -126,20 +138,20 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     return !!this.props.error
   }
 
-  inputAmountIsValid = (amount: BigNumber) => {
+  inputAmountIsValid = (tokenAmount: BigNumber) => {
     const amountInMakerToken =
       this.state.inputToken === this.state.makerToken
-        ? amount
-        : this.getOppositeInputTokenAmount(amount.toString())
+        ? tokenAmount
+        : this.getOppositeInputTokenAmount(tokenAmount)
     return amountInMakerToken.isLessThanOrEqualTo(this.state.makerTokenAvailableBalance)
   }
 
   isExchangeInvalid = () => {
-    const amount = parseInputAmount(this.state.inputAmount)
+    const tokenAmount = this.getInputTokenAmount()
 
     const amountIsInvalid =
-      !this.inputAmountIsValid(amount) ||
-      amount.isLessThan(
+      !this.inputAmountIsValid(tokenAmount) ||
+      tokenAmount.isLessThan(
         this.isDollarInput() ? DOLLAR_TRANSACTION_MIN_AMOUNT : GOLD_TRANSACTION_MIN_AMOUNT
       )
 
@@ -147,7 +159,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const exchangeRateIsInvalid = exchangeRate.isLessThanOrEqualTo(0)
     const takerToken = this.isDollarToGold() ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
     const takerAmountIsInvalid = getTakerAmount(
-      amount,
+      tokenAmount,
       exchangeRate,
       CURRENCIES[takerToken].displayDecimals
     ).isLessThanOrEqualTo(0)
@@ -171,40 +183,62 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     }
   }
 
+  // Output is either cGLD or cUSD based on input token
+  // Local amounts are converted to cUSD
+  getInputTokenAmount = () => {
+    const parsedInputAmount = parseInputAmount(this.state.inputAmount)
+    if (this.state.inputToken === CURRENCY_ENUM.GOLD) {
+      return parsedInputAmount
+    }
+
+    const { localCurrencyCode, localCurrencyExchangeRate } = this.props
+
+    let dollarsAmount
+    if (localCurrencyCode && localCurrencyCode !== LocalCurrencyCode.USD) {
+      // Amount was entered as local currency, we need to convert it to dollars
+      dollarsAmount =
+        convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
+        new BigNumber('')
+    } else {
+      dollarsAmount = parsedInputAmount
+    }
+
+    return convertDollarsToMaxSupportedPrecision(dollarsAmount)
+  }
+
   getInputTokenDisplayText = () => {
-    return this.isDollarInput() ? 'USD' : this.props.t('global:gold')
+    return this.isDollarInput() ? this.props.localCurrencyCode : this.props.t('global:gold')
   }
 
   getOppositeInputTokenDisplayText = () => {
-    return this.isDollarInput() ? this.props.t('global:gold') : 'USD'
+    return this.isDollarInput() ? this.props.t('global:gold') : this.props.localCurrencyCode
   }
 
   getOppositeInputToken = () => {
     return this.isDollarInput() ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
   }
 
-  getOppositeInputTokenAmount = (amount: string) => {
+  getOppositeInputTokenAmount = (tokenAmount: BigNumber) => {
     const exchangeRate = getRateForMakerToken(
       this.props.exchangeRatePair,
       this.state.makerToken,
       this.state.inputToken
     )
-    const oppositeInputTokenAmount = getTakerAmount(amount, exchangeRate)
+    const oppositeInputTokenAmount = getTakerAmount(tokenAmount, exchangeRate)
     return oppositeInputTokenAmount
   }
 
   switchInputToken = () => {
     this.setState({ inputToken: this.getOppositeInputToken() }, () => {
-      this.updateError(this.state.inputAmount)
+      this.updateError()
     })
   }
 
-  getSubtotalDisplayValue = () => {
-    return getMoneyDisplayValue(
-      this.getOppositeInputTokenAmount(this.state.inputAmount),
-      this.getOppositeInputToken(),
-      true
-    )
+  getSubtotalAmount = (): MoneyAmount => {
+    return {
+      value: this.getOppositeInputTokenAmount(this.getInputTokenAmount()).toString(),
+      currencyCode: CURRENCIES[this.getOppositeInputToken()].code,
+    }
   }
 
   render() {
@@ -233,7 +267,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <Text style={styles.exchangeBodyText}>
                 {t('exchangeAmount', { tokenName: this.getInputTokenDisplayText() })}
               </Text>
-              <TouchableOpacity onPress={this.switchInputToken}>
+              <TouchableOpacity onPress={this.switchInputToken} testID="ExchangeSwitchInput">
                 <Text style={[fontStyles.subSmall, { textDecorationLine: 'underline' }]}>
                   {t('switchTo', { tokenName: this.getOppositeInputTokenDisplayText() })}
                 </Text>
@@ -247,18 +281,28 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               placeholderTextColor={'#BDBDBD'}
               placeholder={'0'}
               style={styles.currencyInput}
+              testID="ExchangeInput"
             />
           </View>
           <HorizontalLine />
-          {/* <View style={styles.line} /> */}
           <View style={styles.subtotalContainer}>
             <Text style={styles.exchangeBodyText}>
-              {t('inputSubtotal', {
-                goldOrSubtotal: this.isDollarInput() ? t('global:celoGold') : t('subtotal'),
-                rate: getMoneyDisplayValue(exchangeRateDisplay, CURRENCY_ENUM.DOLLAR, true),
-              })}
+              <Trans
+                i18nKey="inputSubtotal"
+                tOptions={{ context: this.isDollarInput() ? 'gold' : null }}
+                ns={Namespaces.exchangeFlow9}
+              >
+                Subtotal (@{' '}
+                <CurrencyDisplay
+                  amount={{
+                    value: exchangeRateDisplay.toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                />
+                )
+              </Trans>
             </Text>
-            <Text style={styles.subtotal}>{this.getSubtotalDisplayValue()}</Text>
+            <CurrencyDisplay style={styles.subtotal} amount={this.getSubtotalAmount()} />
           </View>
         </KeyboardAwareScrollView>
         <View style={componentStyles.bottomContainer}>
@@ -269,6 +313,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             standard={false}
             disabled={this.isExchangeInvalid()}
             type={BtnTypes.PRIMARY}
+            testID="ExchangeReviewButton"
           />
         </View>
         <KeyboardSpacer />

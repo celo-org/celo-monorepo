@@ -81,11 +81,11 @@ export function ExchangeConfirmationCard(props: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.exchange}>
-        <CurrencyDisplay type={DisplayType.Big} amount={makerAmount} size={36} />
+        <CurrencyDisplay type={DisplayType.Big} amount={makerAmount} size={36} useColors={true} />
         <View style={styles.arrow}>
           <RoundedArrow />
         </View>
-        <CurrencyDisplay type={DisplayType.Big} amount={takerAmount} size={36} />
+        <CurrencyDisplay type={DisplayType.Big} amount={takerAmount} size={36} useColors={true} />
       </View>
 
       <View style={styles.title}>
