@@ -28,7 +28,7 @@
     "google-libphonenumber": "^3.2.4",
     "lodash": "^4.17.14",
     "numeral": "^2.0.6",
-    "web3-utils": "1.0.0-beta.37",
+    "web3-utils": "1.2.4",
     "keccak256": "^1.0.0",
     "buffer-reverse": "^1.0.1",
     "bigi": "^1.1.0"
@@ -40,8 +40,7 @@
     "@types/ethereumjs-util": "^5.2.0",
     "@types/google-libphonenumber": "^7.4.17",
     "@types/lodash": "^4.14.136",
-    "@types/node": "^10.12.18",
-    "@types/web3": "^1.0.18"
+    "@types/node": "^10.12.18"
   },
   "resolutions": {
     "elliptic/bn.js": "4.11.8",

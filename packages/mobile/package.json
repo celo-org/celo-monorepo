@@ -158,7 +158,6 @@
     "@types/react-test-renderer": "^16.9.0",
     "@types/redux-mock-store": "^1.0.0",
     "@types/utf8": "^2.1.6",
-    "@types/web3": "^1.0.18",
     "babel-core": "7.0.0-bridge.0",
     "detox": "^15.0.0",
     "enzyme": "^3.9.0",

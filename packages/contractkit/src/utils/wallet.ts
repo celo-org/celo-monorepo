@@ -5,7 +5,7 @@ import {
   trimLeading0x,
 } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
-import { Tx } from 'web3/eth/types'
+import { Tx } from 'web3-core'
 import { Address } from '../base'
 import { EncodedTransaction } from '../newtypes'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
@@ -47,7 +47,7 @@ export class DefaultWallet implements Wallet {
   }
 
   async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
-    return signTransaction(txParams, this.getPrivateKeyFor(txParams.from!))
+    return signTransaction(txParams, this.getPrivateKeyFor(txParams.from!.toString()))
   }
 
   // Original code taken from

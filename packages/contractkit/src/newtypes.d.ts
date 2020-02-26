@@ -1,9 +1,5 @@
 // This file is a temporary solution to the backwards incompatibility
 // of web3 types
-import { TransactionResult, EventLog, EncodedTransaction, Log } from '@types/web3/types'
-
-export { TransactionResult, EventLog, EncodedTransaction, Log }
-
 export interface TransactionReceipt {
   status: boolean
   transactionHash: string
@@ -21,3 +17,44 @@ export interface TransactionReceipt {
   logs?: Log[]
   logsBloom?: string
 }
+
+export interface EventLog {
+  event: string
+  address: string
+  returnValues: any
+  logIndex: number
+  transactionIndex: number
+  transactionHash: string
+  blockHash: string
+  blockNumber: number
+  raw?: { data: string; topics: string[] }
+}
+
+export interface EncodedTransaction {
+  raw: string
+  tx: {
+    nonce: string
+    gasPrice: string
+    gas: string
+    to: string
+    value: string
+    input: string
+    v: string
+    r: string
+    s: string
+    hash: string
+  }
+}
+
+export interface Log {
+  address: string
+  data: string
+  topics: string[]
+  logIndex: number
+  transactionHash: string
+  transactionIndex: number
+  blockHash: string
+  blockNumber: number
+}
+
+export type Callback<T> = (error: Error | null, result?: T) => void

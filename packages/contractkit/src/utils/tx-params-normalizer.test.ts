@@ -1,5 +1,6 @@
-import { Tx } from 'web3/eth/types'
-import { Callback, JsonRPCRequest, JsonRPCResponse } from 'web3/providers'
+import { Tx } from 'web3-core'
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { Callback } from '../newTypes'
 import { RpcCaller } from './rpc-caller'
 import { TxParamsNormalizer } from './tx-params-normalizer'
 
@@ -22,7 +23,7 @@ describe('TxParamsNormalizer class', () => {
 
   beforeEach(() => {
     mockRpcCall = jest.fn(
-      (_method: string, _params: any[]): Promise<JsonRPCResponse> => {
+      (_method: string, _params: any[]): Promise<JsonRpcResponse> => {
         return new Promise((resolve, _reject) =>
           resolve({
             jsonrpc: '2.0',
@@ -35,7 +36,7 @@ describe('TxParamsNormalizer class', () => {
     const rpcMock: RpcCaller = {
       call: mockRpcCall,
       // tslint:disable-next-line: no-empty
-      send: (_payload: JsonRPCRequest, _callback: Callback<JsonRPCResponse>): void => {},
+      send: (_payload: JsonRpcPayload, _callback: Callback<JsonRpcResponse>): void => {},
     }
     populator = new TxParamsNormalizer(rpcMock)
   })

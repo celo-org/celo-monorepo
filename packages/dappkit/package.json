@@ -9,10 +9,10 @@
     "@celo/utils": "0.1.8-dev",
     "expo": "^34.0.1",
     "expo-contacts": "6.0.0",
-    "libphonenumber-js": "^1.7.22"
+    "libphonenumber-js": "^1.7.22",
+    "web3-eth-contract": "1.2.4"
   },
   "devDependencies": {
-    "@types/web3": "^1.0.18"
   },
   "main": "./lib/index.js",
   "files": ["src/**/*", "lib/**/*"]

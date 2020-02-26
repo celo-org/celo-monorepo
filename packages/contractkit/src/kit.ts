@@ -1,7 +1,8 @@
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { TransactionObject, Tx } from 'web3/eth/types'
+import { Tx } from 'web3-core'
+import { Syncing, TransactionObject } from 'web3-eth'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
@@ -64,7 +65,7 @@ export interface NetworkConfig {
 export interface KitOptions {
   gasInflationFactor: number
   feeCurrency: Address | null
-  from?: Address
+  from: Address | null
 }
 
 interface AccountBalance {
@@ -85,12 +86,14 @@ export class ContractKit {
   private config: KitOptions
   constructor(readonly web3: Web3) {
     this.config = {
+      from: null,
       feeCurrency: null,
       gasInflationFactor: 1.3,
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider)
-      web3.setProvider(celoProviderInstance)
+      // as any because of web3 migration
+      web3.setProvider(celoProviderInstance as any)
     }
 
     this.registry = new AddressRegistry(this)
@@ -172,7 +175,7 @@ export class ContractKit {
   /**
    * Set default account for generated transactions (eg. tx.from )
    */
-  set defaultAccount(address: Address) {
+  set defaultAccount(address: Address | null) {
     this.config.from = address
     this.web3.eth.defaultAccount = address
   }
@@ -180,7 +183,7 @@ export class ContractKit {
   /**
    * Default account for generated transactions (eg. tx.from)
    */
-  get defaultAccount(): Address {
+  get defaultAccount(): Address | null {
     return this.web3.eth.defaultAccount
   }
 
@@ -212,7 +215,7 @@ export class ContractKit {
     return this.web3.eth.net.isListening()
   }
 
-  isSyncing(): Promise<boolean> {
+  isSyncing(): Promise<boolean | Syncing> {
     return this.web3.eth.isSyncing()
   }
 
@@ -264,8 +267,9 @@ export class ContractKit {
   }
 
   private fillTxDefaults(tx?: Tx): Tx {
+    const auxFrom = this.config.from ? this.config.from : undefined
     const defaultTx: Tx = {
-      from: this.config.from,
+      from: auxFrom,
       // gasPrice:0 means the node will compute gasPrice on it's own
       gasPrice: '0',
     }
