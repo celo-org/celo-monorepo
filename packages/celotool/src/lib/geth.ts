@@ -1169,7 +1169,7 @@ export async function migrateContracts(
         frozen: false,
       },
       reserve: {
-        goldBalance: 100000000,
+        initialBalance: 100000000,
       },
       stableToken: {
         initialBalances: {
