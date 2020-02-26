@@ -15,31 +15,8 @@ const INTERVAL_MS = DURATION * 2.1 // needs to be at least 4x DURATION to give t
 interface OwnProps {
   children: React.ReactNode
 }
-interface State {
-  animating: boolean
-}
-
 type Props = OwnProps & ScreenProps
-class Sweep extends React.Component<Props, State> {
-  timer: number
-  state = {
-    animating: true,
-  }
-
-  componentDidMount = () => {
-    // this.timer = setInterval(this.tick, INTERVAL_MS)
-  }
-  componentWillUnmount = () => {
-    clearInterval(this.timer)
-  }
-
-  tick = () => {
-    this.setState((state) => ({ animating: !state.animating }))
-  }
-  play = () => {
-    this.setState({ animating: true })
-  }
-
+class Sweep extends React.Component<Props> {
   render() {
     const frame = DURATION / VECTORS.length
     const isMobile = this.props.screen === ScreenSizes.MOBILE
@@ -47,7 +24,7 @@ class Sweep extends React.Component<Props, State> {
     return (
       <View style={isMobile ? styles.mobileSweepContainer : styles.sweepContainer}>
         <Svg width="100%" height="100%" viewBox="0 0 717 750" fill="none">
-          <G style={this.state.animating ? styles.lighting : styles.lightingOff}>
+          <G style={styles.lighting}>
             {VECTORS.map((path, index) => {
               const style = {
                 animationDelay: `${index * frame}ms`,
@@ -57,7 +34,7 @@ class Sweep extends React.Component<Props, State> {
                 <Path
                   key={path.slice(0, 10)}
                   d={path}
-                  style={[styles.base, this.state.animating && styles.cycle, baseCoinStyle, style]}
+                  style={[styles.base, styles.cycle, baseCoinStyle, style]}
                 />
               )
             })}
@@ -137,7 +114,6 @@ const styles = StyleSheet.create({
   sweepContainer: {
     width: '100%',
     height: '100vh',
-    transform: [{ translateY: -200 }],
   },
   mobileSweepContainer: {
     height: '180vw',
