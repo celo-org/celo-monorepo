@@ -856,26 +856,32 @@ contract Election is
     for (uint256 i = 0; i < electionGroups.length; i++) {
       keys[i] = i;
     }
-    FixidityLib.Fraction[] memory groupVotes = new FixidityLib.Fraction[](electionGroups.length);
+    FixidityLib.Fraction[] memory votesPerElectedMember = new FixidityLib.Fraction[](
+      electionGroups.length
+    );
     for (uint256 i = 0; i < electionGroups.length; i++) {
-      groupVotes[i] = FixidityLib.newFixed(votes.total.eligible.getValue(electionGroups[i]));
+      votesPerElectedMember[i] = FixidityLib.newFixed(
+        votes.total.eligible.getValue(electionGroups[i])
+      );
     }
 
     // Assign a number of seats to each validator group.
     while (totalNumMembersElected < electableValidators.max && electionGroups.length > 0) {
       uint256 groupIndex = keys[0];
-      if (groupVotes[groupIndex].unwrap() == 0) break;
+      // All electable validators have been elected.
+      if (votesPerElectedMember[groupIndex].unwrap() == 0) break;
+      // All members of the group have been elected
       if (numMembers[groupIndex] <= numMembersElected[groupIndex]) {
-        groupVotes[groupIndex] = FixidityLib.wrap(0);
-        heapify(keys, groupVotes);
+        votesPerElectedMember[groupIndex] = FixidityLib.wrap(0);
       } else {
+        // Elect the next member from the validator group
         numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
         totalNumMembersElected = totalNumMembersElected.add(1);
-        groupVotes[groupIndex] = FixidityLib
+        votesPerElectedMember[groupIndex] = FixidityLib
           .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
           .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
-        heapify(keys, groupVotes);
       }
+      heapifyDown(keys, votesPerElectedMember);
     }
     require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
     // Grab the top validators from each group that won seats.
