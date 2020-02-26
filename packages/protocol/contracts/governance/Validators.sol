@@ -58,8 +58,9 @@ contract Validators is
   struct ValidatorGroup {
     bool exists;
     LinkedList.List members;
-    // TODO(asa): Add a function that allows groups to update their commission.
     FixidityLib.Fraction commission;
+    FixidityLib.Fraction nextCommission;
+    uint256 nextCommissionBlock;
     // sizeHistory[i] contains the last time the group contained i members.
     uint256[] sizeHistory;
     SlashingInfo slashInfo;
@@ -116,9 +117,12 @@ contract Validators is
   ValidatorScoreParameters private validatorScoreParameters;
   uint256 public membershipHistoryLength;
   uint256 public maxGroupSize;
+  // The number of blocks to delay a ValidatorGroup's commission update
+  uint256 public commissionUpdateDelay;
   uint256 public slashingMultiplierResetPeriod;
 
   event MaxGroupSizeSet(uint256 size);
+  event CommissionUpdateDelaySet(uint256 delay);
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -135,6 +139,11 @@ contract Validators is
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
+  event ValidatorGroupCommissionUpdateQueued(
+    address indexed group,
+    uint256 commission,
+    uint256 activationBlock
+  );
   event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
@@ -159,6 +168,8 @@ contract Validators is
    * @param validatorScoreAdjustmentSpeed The speed at which validator scores are adjusted.
    * @param _membershipHistoryLength The max number of entries for validator membership history.
    * @param _maxGroupSize The maximum group size.
+   * @param _commissionUpdateDelay The number of blocks to delay a ValidatorGroup's commission
+   * update.
    * @dev Should be called only once.
    */
   function initialize(
@@ -171,7 +182,8 @@ contract Validators is
     uint256 validatorScoreAdjustmentSpeed,
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
-    uint256 _maxGroupSize
+    uint256 _maxGroupSize,
+    uint256 _commissionUpdateDelay
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -179,8 +191,19 @@ contract Validators is
     setValidatorLockedGoldRequirements(validatorRequirementValue, validatorRequirementDuration);
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
+    setCommissionUpdateDelay(_commissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
+  }
+
+  /**
+   * @notice Updates the block delay for a ValidatorGroup's commission udpdate
+   * @param delay Number of block to delay the update
+   */
+  function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
+    require(delay != commissionUpdateDelay, "commission update delay not changed");
+    commissionUpdateDelay = delay;
+    emit CommissionUpdateDelaySet(delay);
   }
 
   /**
@@ -243,6 +266,14 @@ contract Validators is
    */
   function getMaxGroupSize() external view returns (uint256) {
     return maxGroupSize;
+  }
+
+  /**
+   * @notice Returns the block delay for a ValidatorGroup's commission udpdate.
+   * @return The block delay for a ValidatorGroup's commission udpdate.
+   */
+  function getCommissionUpdateDelay() external view returns (uint256) {
+    return commissionUpdateDelay;
   }
 
   /**
@@ -805,20 +836,36 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator group's commission.
+   * @notice Queues an update to a validator group's commission.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members. Must be in the range [0, 1.0].
-   * @return True upon success.
    */
-  function updateCommission(uint256 commission) external returns (bool) {
+  function queueCommissionUpdate(uint256 commission) external {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     require(commission != group.commission.unwrap(), "Commission must be different");
-    group.commission = FixidityLib.wrap(commission);
-    emit ValidatorGroupCommissionUpdated(account, commission);
-    return true;
+
+    group.nextCommission = FixidityLib.wrap(commission);
+    group.nextCommissionBlock = block.number.add(commissionUpdateDelay);
+    emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
+  }
+  /**
+   * @notice Updates a validator group's commission based on the previously queued update
+   */
+  function updateCommission() external {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+
+    require(group.nextCommissionBlock != 0, "No commission update queued");
+    require(group.nextCommissionBlock <= block.number, "Can't apply commission update yet");
+
+    group.commission = group.nextCommission;
+    delete group.nextCommission;
+    delete group.nextCommissionBlock;
+    emit ValidatorGroupCommissionUpdated(account, group.commission.unwrap());
   }
 
   /**
@@ -905,13 +952,15 @@ contract Validators is
   function getValidatorGroup(address account)
     external
     view
-    returns (address[] memory, uint256, uint256[] memory, uint256, uint256)
+    returns (address[] memory, uint256, uint256, uint256, uint256[] memory, uint256, uint256)
   {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     return (
       group.members.getKeys(),
       group.commission.unwrap(),
+      group.nextCommission.unwrap(),
+      group.nextCommissionBlock,
       group.sizeHistory,
       group.slashInfo.multiplier.unwrap(),
       group.slashInfo.lastSlashed
