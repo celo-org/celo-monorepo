@@ -48,12 +48,12 @@ module.exports = async (callback: (error?: any) => number) => {
         await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address)
         const releaseGoldProxy = await ReleaseGoldProxy.new()
         const releaseGoldInstance = await ReleaseGold.new()
-        const gold = new BigNumber(
+        const weiAmountReleasedPerPeriod = new BigNumber(
           web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
         )
         await goldToken.transfer(
           releaseGoldProxy.address,
-          gold.multipliedBy(releaseGoldConfig.numReleasePeriods)
+          weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
         )
         const releaseGoldTxHash = await _setInitialProxyImplementation(
           web3,
@@ -64,7 +64,7 @@ module.exports = async (callback: (error?: any) => number) => {
           releaseGoldConfig.releaseCliffTime,
           releaseGoldConfig.numReleasePeriods,
           releaseGoldConfig.releasePeriod,
-          web3.utils.toHex(gold),
+          web3.utils.toHex(weiAmountReleasedPerPeriod),
           releaseGoldConfig.revocable,
           releaseGoldConfig.beneficiary,
           releaseGoldConfig.releaseOwner,
