@@ -77,8 +77,8 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
                 "fontSize": 14,
                 "lineHeight": 18,
               }
@@ -91,7 +91,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               Object {
                 "justifyContent": "space-between",
                 "minHeight": 60,
-                "paddingTop": 8,
+                "paddingTop": 2,
               }
             }
           >
@@ -111,7 +111,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 5,
+                  "marginTop": 12,
                 }
               }
             >
