@@ -11,9 +11,9 @@ interface IReleaseGoldInstance {
   function withdrawLockedGold(uint256) external;
   function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
   function createAccount() external;
-  function setAccount(string calldata, bytes calldata, address) external;
+  function setAccount(string calldata, bytes calldata, address, uint8, bytes32, bytes32) external;
   function setAccountName(string calldata) external;
-  function setAccountWalletAddress(address) external;
+  function setAccountWalletAddress(address, uint8, bytes32, bytes32) external;
   function setAccountDataEncryptionKey(bytes calldata) external;
   function setAccountMetadataURL(string calldata) external;
   function revokeActive(address, uint256, address, address, uint256) external;
