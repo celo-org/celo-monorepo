@@ -14,6 +14,9 @@ contract TransferWhitelist is Ownable, UsingRegistry {
   address[] public whitelist;
   bytes32[] public registeredContracts;
 
+  event WhitelistedAddress(address addr);
+  event WhitelistedRegistryId(bytes32 registryId);
+
   constructor(address registryAddress) public {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -24,6 +27,7 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @param newAddress The address to add.
    */
   function addAddress(address newAddress) external onlyOwner {
+    emit WhitelistedAddress(newAddress);
     whitelist.push(newAddress);
   }
 
@@ -36,6 +40,7 @@ contract TransferWhitelist is Ownable, UsingRegistry {
     onlyOwner
     onlyRegisteredContract(registryId)
   {
+    emit WhitelistedRegistryId(registryId);
     registeredContracts.push(registryId);
   }
 
@@ -79,7 +84,7 @@ contract TransferWhitelist is Ownable, UsingRegistry {
       i = i.add(1);
     }
     for (uint256 j = 0; j < registeredContracts.length; j = j.add(1)) {
-      _whitelist[i] = registry.getAddressFor(registeredContracts[j]);
+      _whitelist[i] = registry.getAddressForOrDie(registeredContracts[j]);
       i = i.add(1);
     }
     return _whitelist;
