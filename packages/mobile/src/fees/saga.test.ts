@@ -13,9 +13,19 @@ import { mockAccount } from 'test/values'
 
 const GAS_AMOUNT = 500000
 
+jest.mock('@celo/walletkit', () => ({
+  ContractUtils: {
+    getGasPrice: jest.fn(() => 10000),
+  },
+}))
+
 describe(estimateFeeSaga, () => {
   beforeAll(() => {
     jest.useRealTimers()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('updates the default invite fee', async () => {

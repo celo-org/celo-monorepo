@@ -1,26 +1,19 @@
 import BigNumber from 'bignumber.js'
 
-const txo = {
-  send: jest.fn(),
-  sendAndWaitForReceipt: jest.fn(),
-}
-
 export const newKitFromWeb3 = () => ({
   contracts: {
     getGasPriceMinimum: async () => ({
       getGasPriceMinimum: jest.fn(async (address: string) => new BigNumber(10000)),
     }),
-    getStableToken: jest.fn(async () => ({
-      balanceOf: jest.fn(async () => {
-        return new BigNumber(10000000000)
-      }),
+    getStableToken: async () => ({
+      balanceOf: jest.fn(async () => new BigNumber(10000000000)),
       decimals: jest.fn(async () => '10'),
-      transferWithComment: jest.fn(async () => ({ txo })),
-    })),
+      transferWithComment: jest.fn(async () => null),
+    }),
     getGoldToken: async () => ({
       balanceOf: jest.fn(async () => new BigNumber(10000000000)),
       decimals: jest.fn(async () => '10'),
-      transferWithComment: jest.fn(async () => ({ txo })),
+      transferWithComment: jest.fn(async () => null),
     }),
   },
   registry: {

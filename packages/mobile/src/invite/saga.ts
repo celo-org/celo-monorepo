@@ -1,6 +1,6 @@
-import { CeloTransactionObject } from '@celo/contractkit'
 import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -41,7 +41,7 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, contractKit, web3 } from 'src/web3/contracts'
+import { addLocalAccount, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 
@@ -52,25 +52,25 @@ const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
-  currency: CURRENCY_ENUM,
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
   amount: string,
   comment: string
 ) {
-  const escrowContract = await contractKit.contracts.getEscrow()
-  return getSendTxGas(account, currency, {
+  const escrowContract = await getEscrowContract(web3)
+  return getSendTxGas(account, contractGetter, {
     amount,
     comment,
-    recipientAddress: escrowContract.address,
+    recipientAddress: escrowContract._address,
   })
 }
 
 export async function getInviteFee(
   account: string,
-  currency: CURRENCY_ENUM,
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, currency, amount, comment)
+  const gas = await getInviteTxGas(account, contractGetter, amount, comment)
   return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
 }
 
@@ -351,7 +351,7 @@ export function* withdrawFundsFromTempAccount(
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx: CeloTransactionObject<boolean> = yield call(createTransaction, CURRENCY_ENUM.DOLLAR, {
+  const tx = yield call(createTransaction, getStableTokenContract, {
     recipientAddress: newAccount,
     comment: SENTINEL_INVITE_COMMENT,
     // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
@@ -359,7 +359,7 @@ export function* withdrawFundsFromTempAccount(
   })
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  yield call(sendTransaction, tx.txo, tempAccount, TAG, 'Transfer from temp wallet')
+  yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 
