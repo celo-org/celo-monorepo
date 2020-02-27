@@ -9,7 +9,9 @@ const web3 = require('web3')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
-BigNumber.config({ EXPONENTIAL_AT: 1e9 })
+BigNumber.config({
+  EXPONENTIAL_AT: 1e9,
+})
 
 const MINUTE = 60
 const HOUR = 60 * MINUTE
@@ -39,7 +41,8 @@ const DefaultConfig = {
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
     penalty: '100000000000000000000', // 100 cGLD
-    slashableDowntime: (12 * HOUR) / 5, // ~12 hours
+    // slashableDowntime: (12 * HOUR) / 5, // ~12 hours
+    slashableDowntime: (12 * MINUTE) / 5, // ~12 hours
   },
   election: {
     minElectableValidators: '50',
