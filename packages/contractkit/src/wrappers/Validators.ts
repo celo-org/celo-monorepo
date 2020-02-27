@@ -1,6 +1,6 @@
 import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
-import { range, zip } from '@celo/utils/lib/collections'
+import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3/types'
