@@ -4,7 +4,7 @@ import { UpgradeArgv } from '../../deploy/upgrade'
 import { handler as contractsHandler } from '../initial/contracts'
 import { handler as attestationServiceHandler } from './attestation-service'
 import { handler as blockscoutHandler } from './blockscout'
-import { handler as ethstatsHandler } from './ethstats'
+import { handler as celostatsHandler } from './celostats'
 import { handler as testnetHandler } from './testnet'
 
 export const command = 'all'
@@ -26,8 +26,8 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: TestnetArgv) => {
   console.info('Deploy the testnet')
   await testnetHandler(argv)
-  console.info('Deploy ethstats')
-  await ethstatsHandler(argv)
+  console.info('Deploy celostats')
+  await celostatsHandler(argv)
   console.info('Deploy blockscout')
   await blockscoutHandler(argv)
 
