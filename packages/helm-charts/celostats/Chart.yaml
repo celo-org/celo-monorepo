@@ -1,0 +1,9 @@
+name: celostats
+version: 0.1.0
+description: Chart which is used to deploy an celostats setup for a celo testnet
+keywords:
+- ethereum
+- blockchain
+- celostats
+- ethstats
+appVersion: ""

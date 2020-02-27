@@ -8,6 +8,18 @@
   "exchange": {
     "frozen": false
   },
+  "governance": {
+    "dequeueFrequency": 30,
+    "queueExpiry": 1000,
+    "approvalStageDuration": 100,
+    "referendumStageDuration": 100,
+    "executionStageDuration": 100,
+    "minDeposit": 1,
+    "concurrentProposals": 5
+  },
+  "reserve": {
+    "initialBalance": 100000000
+  },
   "stableToken": {
     "initialBalances": {
       "addresses": [
@@ -28,7 +40,8 @@
       "0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84",
       "0x06cEf8E666768cC40Cc78CF93d9611019dDcB628",
       "0x7457d5E02197480Db681D3fdF256c7acA21bDc12"
-    ]
+    ],
+    "frozen": false
   },
   "governance": {
     "dequeueFrequency": 30,
@@ -41,5 +54,8 @@
   },
   "governanceApproverMultiSig": {
     "useMultiSig": false
+  },
+  "validators": {
+    "commissionUpdateDelay": 3
   }
 }

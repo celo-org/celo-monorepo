@@ -1065,7 +1065,523 @@ exports[`BuildPage renders 1`] = `
             "width": "100%",
           }
         }
-      />
+      >
+        <div
+          className="css-view-1dbjc4n"
+          id="leaderboard"
+        >
+          <h3
+            aria-level="3"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(255,255,255,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            ranking
+          </h3>
+          <h2
+            aria-level="2"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(255,255,255,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "28px",
+                "lineHeight": "32px",
+                "marginBottom": "20px",
+                "marginTop": "20px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            leaderboardTitle
+          </h2>
+          <div
+            className="css-view-1dbjc4n"
+          >
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="lazyload-placeholder"
+              style={
+                Object {
+                  "height": 65,
+                }
+              }
+            />
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitBoxPack": "justify",
+                  "WebkitFlexDirection": "row",
+                  "WebkitJustifyContent": "space-between",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginBottom": "20px",
+                  "marginTop": "20px",
+                  "msFlexDirection": "row",
+                  "msFlexPack": "justify",
+                }
+              }
+            >
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  0
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  195900
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  391800
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  587700
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  783600
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  979500
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  1175400
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  1371300
+                </div>
+              </div>
+              <div
+                className="react-reveal"
+                style={
+                  Object {
+                    "opacity": undefined,
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                    }
+                  }
+                >
+                  1567200
+                </div>
+              </div>
+            </div>
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(255,255,255,1.00)",
+                  }
+                }
+              >
+                unitOfMeasure
+              </div>
+            </div>
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "marginTop": "20px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderRelease={[Function]}
+                >
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(53,208,127,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "minWidth": "150px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "paddingBottom": "10px",
+                        "paddingLeft": "20px",
+                        "paddingRight": "20px",
+                        "paddingTop": "10px",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
+                      }
+                    }
+                  >
+                    expandLeaderboard
+                    <div
+                      className="css-view-1dbjc4n"
+                      style={
+                        Object {
+                          "display": "inline-flex",
+                          "paddingLeft": "8px",
+                        }
+                      }
+                    >
+                      <svg
+                        fill="none"
+                        height={12}
+                        style={Object {}}
+                        transform="rotate(90)"
+                        viewBox="0 0 8 12"
+                        width={12}
+                      >
+                        <path
+                          clipRule="evenodd"
+                          d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                          fill="#35D07F"
+                          fillRule="evenodd"
+                          opacity={1}
+                          style={Object {}}
+                        />
+                      </svg>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxPack": "center",
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "marginBottom": "40px",
+                  "marginTop": "20px",
+                  "msFlexAlign": "center",
+                  "msFlexPack": "center",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(255,255,255,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "maxWidth": "450px",
+                    "textAlign": "center",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderRelease={[Function]}
+                  style={
+                    Object {
+                      "display": "inline",
+                    }
+                  }
+                >
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+                    data-focusable={true}
+                    dir="auto"
+                    href="/stake-off/terms"
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitTextDecorationStyle": "solid",
+                        "color": "rgba(255,255,255,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline",
+                        "opacity": 1,
+                        "textDecoration": "underline",
+                        "textDecorationStyle": "solid",
+                      }
+                    }
+                  >
+                    Terms and Conditions
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div

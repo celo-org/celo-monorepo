@@ -5,7 +5,15 @@ import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Clipboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -172,9 +180,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   sendLogsToSupport = async () => {
-    if (this.props.e164PhoneNumber) {
-      await Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
-    }
+    await Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
   }
 
   onPressAddress = () => {
@@ -242,9 +248,9 @@ export class Account extends React.Component<Props, State> {
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
           <View style={style.accountProfile}>
-            <TouchableOpacity onPress={this.onPressAvatar}>
+            <TouchableWithoutFeedback onPress={this.onPressAvatar}>
               <AvatarSelf />
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
             <View>
               <TouchableOpacity onPress={this.onPressAddress}>
                 <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>
