@@ -403,6 +403,10 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     const feeCurrency = feeCurrencyContract._address
     Logger.debug(tag, `Fee currency: ${feeCurrency}`)
 
+    // Note(Rossy): I'm not 100% sure why we need this currentNonceMap. I assume Ashish added it
+    // in case this send util got called from multiple places which weren't coordinating on latest nonce.
+    // Somewhat unecessary now that txs from the wallet all come through SendTransactionPromises
+    // But keeping it anyway for now.
     if (currentNonce.has(account) && nonce < currentNonce.get(account)!) {
       Logger.error(
         'contract-utils@sendTransactionAsync',
@@ -410,7 +414,6 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       )
       throw new Error('Tx nonce too low')
     }
-    // Increment and store nonce for the next call to sendTransaction.
     currentNonce.set(account, nonce)
     Logger.debug(tag, `nonce is ${nonce} for account ${account}`)
 
@@ -421,7 +424,6 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
       // the suggested price in the selected feeCurrency.
       gasPrice: '0',
-      nonce,
     }
 
     if (estimatedGas === undefined) {
@@ -436,15 +438,6 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     const gatewayFee = '0x' + defaultGatewayFee.toString(16)
     Logger.debug(tag, `Gateway fee is ${gatewayFee} paid to ${gatewayFeeRecipient}`)
     const gasPrice = await getGasPrice(web3, feeCurrency)
-    Logger.debug(tag, `Gas price is ${gasPrice}`)
-
-    const celoTx = {
-      ...txParams,
-      gas: estimatedGas,
-      gatewayFeeRecipient,
-      gatewayFee,
-      gasPrice,
-    }
 
     let recievedTxHash: string | null = null
     let alreadyInformedResolversAboutConfirmation = false
@@ -463,10 +456,19 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       }
     }
 
+    const celoTx = {
+      ...txParams,
+      nonce,
+      gas: estimatedGas,
+      gatewayFeeRecipient,
+      gatewayFee,
+      gasPrice,
+    }
+
     try {
       await tx.send(celoTx)
     } catch (e) {
-      Logger.debug(tag, `Ignoring error with message: ${e.message}`)
+      Logger.debug(tag, `Ignoring error with message: ${JSON.stringify(e)}`)
       // Ideally, I want to only ignore error whose messsage contains
       // "Failed to subscribe to new newBlockHeaders" but seems like another wrapped
       // error (listed below) gets thrown and there is no way to catch that.
@@ -490,7 +492,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         // Ignore this error
         Logger.warn(tag, `Expected error ignored: ${JSON.stringify(e)}`)
       } else {
-        Logger.debug(tag, `Unexpected error ignored: ${e.message}`)
+        Logger.debug(tag, `Unexpected error ignored: ${JSON.stringify(e)}`)
       }
       // @ts-ignore Web3's types are wrong in many places
       const signedTxn = await web3.eth.signTransaction(celoTx)
