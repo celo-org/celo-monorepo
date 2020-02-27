@@ -18,7 +18,7 @@ Contract for handling reserve for stable currencies
 
 * [escrowedPayments](_wrappers_escrow_.escrowwrapper.md#escrowedpayments)
 * [getReceivedPaymentIds](_wrappers_escrow_.escrowwrapper.md#getreceivedpaymentids)
-* [getSentPaymentIds](_wrappers_escrow_.escrowwrapper.md#getsentpaymentids)
+* [getSentPaymentId](_wrappers_escrow_.escrowwrapper.md#getsentpaymentid)
 * [receivedPaymentIds](_wrappers_escrow_.escrowwrapper.md#receivedpaymentids)
 * [revoke](_wrappers_escrow_.escrowwrapper.md#revoke)
 * [sentPaymentIds](_wrappers_escrow_.escrowwrapper.md#sentpaymentids)
@@ -70,7 +70,7 @@ ___
 
 ###  getReceivedPaymentIds
 
-• **getReceivedPaymentIds**: *function* = proxyCall(this.contract.methods.getReceivedPaymentIds)
+• **getReceivedPaymentIds**: *function* = proxyCall(this.contract.methods.sentPaymentIds)
 
 *Defined in [contractkit/src/wrappers/Escrow.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Escrow.ts#L14)*
 
@@ -86,9 +86,9 @@ Name | Type |
 
 ___
 
-###  getSentPaymentIds
+###  getSentPaymentId
 
-• **getSentPaymentIds**: *function* = proxyCall(this.contract.methods.getSentPaymentIds)
+• **getSentPaymentId**: *function* = proxyCall(this.contract.methods.sentPaymentIds)
 
 *Defined in [contractkit/src/wrappers/Escrow.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Escrow.ts#L16)*
 

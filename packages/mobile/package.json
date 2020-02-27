@@ -172,7 +172,6 @@
     "postinstall-prepare": "^1.0.1",
     "react-devtools": "^3.6.0",
     "react-dom": "16.9.0",
-    "react-native-bundle-visualizer": "^2.1.1",
     "react-native-debugger-open": "^0.3.17",
     "react-native-kill-packager": "^1.0.0",
     "react-native-svg-mock": "^2.0.0",

@@ -1,8 +1,8 @@
 import { CURRENCY_ENUM } from '@celo/utils'
+import { ContractUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { getCurrencyAddress } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
-import { contractKit } from 'src/web3/contracts'
+import { web3 } from 'src/web3/contracts'
 
 const TAG = 'web3/gas'
 const GAS_PRICE_STALE_AFTER = 150000 // 15 seconds
@@ -30,9 +30,7 @@ export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
 }
 
 async function fetchGasPrice(currency: CURRENCY_ENUM) {
-  const gasPriceMinimum = await contractKit.contracts.getGasPriceMinimum()
-  const address = await getCurrencyAddress(currency)
-  const latestGasPrice = gasPriceMinimum.getGasPriceMinimum(address)
+  const latestGasPrice = new BigNumber(await ContractUtils.getGasPrice(web3, currency))
   Logger.debug(
     TAG,
     'fetchGasPrice',
