@@ -118,7 +118,7 @@ ___
 
 ▸ **tryParseTx**(`tx`: Transaction): *null | [ParsedTx](../interfaces/_explorer_block_explorer_.parsedtx.md)*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L84)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L86)*
 
 **Parameters:**
 
