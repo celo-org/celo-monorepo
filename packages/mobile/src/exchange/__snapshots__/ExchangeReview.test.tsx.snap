@@ -481,7 +481,24 @@ exports[`ExchangeReview renders correctly 1`] = `
               ]
             }
           >
-            buyOrSellGoldAmount
+            Buy or sell
+             
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "color": undefined,
+                  },
+                  undefined,
+                ]
+              }
+            >
+              
+              
+              10.000
+            </Text>
+            Gold
           </Text>
         </View>
       </View>

@@ -26,7 +26,6 @@ import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
@@ -249,16 +248,25 @@ export class ExchangeReview extends React.Component<Props, State> {
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.onPressConfirm}
-            text={t('buyOrSellGoldAmount', {
-              buyOrSell: this.state.makerToken === CURRENCY_ENUM.DOLLAR ? t('buy') : t('sell'),
-              total: getMoneyDisplayValue(
-                this.getInputAmountInToken(CURRENCY_ENUM.GOLD),
-                CURRENCY_ENUM.GOLD,
-                false,
-                3
-              ),
-              gold: t(`global:gold`),
-            })}
+            text={
+              <Trans
+                i18nKey={
+                  this.state.makerToken === CURRENCY_ENUM.DOLLAR
+                    ? 'buyGoldAmount'
+                    : 'sellGoldAmount'
+                }
+                ns={Namespaces.exchangeFlow9}
+              >
+                Buy or sell{' '}
+                <CurrencyDisplay
+                  amount={{
+                    value: this.getInputAmountInToken(CURRENCY_ENUM.GOLD).toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
+                  }}
+                />
+                Gold
+              </Trans>
+            }
             standard={false}
             disabled={!appConnected || exchangeRate.isZero()}
             type={BtnTypes.PRIMARY}
