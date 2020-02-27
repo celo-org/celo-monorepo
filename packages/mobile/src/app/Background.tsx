@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    backgroundColor: Platform.OS === 'android' ? colors.white : colors.celoGreen,
+    backgroundColor: colors.white,
   },
 })
 
