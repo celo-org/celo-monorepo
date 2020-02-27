@@ -19,9 +19,11 @@ import { getLatestNonce } from 'src/web3/utils'
 import { TransactionObject } from 'web3/eth/types'
 
 const TAG = 'transactions/send'
-const TX_NUM_RETRIES = 3 // Try txs up to 3 times
+//TODO
+const TX_NUM_RETRIES = 1 // Try txs up to 3 times
 const TX_RETRY_DELAY = 1000 // 1s
-const TX_TIMEOUT = 20000 // 20s
+//TODO
+const TX_TIMEOUT = 40000 // 20s
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
 const KNOWN_TX_ERROR = 'known transaction'
@@ -178,6 +180,8 @@ export function* wrapSendTransactionWithRetry(
       if (!shouldTxFailureRetry(err)) {
         return
       }
+
+      //TODO analytics
 
       if (i + 1 <= TX_NUM_RETRIES) {
         yield delay(TX_RETRY_DELAY)

@@ -233,12 +233,6 @@ async function getGasPrice(
   return String(parseInt(gasPrice, 10) * 10)
 }
 
-// Maps account address to current nonce. This ensures that transactions
-// being sent too close to each other do not end up having the
-// same nonce. This does not have to be persisted across app restarts since
-// nonce calculation will be correct over the order of seconds (restart time).
-const currentNonce = new Map<string, number>()
-
 /**
  * sendTransactionAsync mainly abstracts the sending of a transaction in a promise like
  * interface. Use the higher-order sendTransactionFactory as a consumer to configure
@@ -401,21 +395,10 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
   try {
     logger(Started)
     const feeCurrency = feeCurrencyContract._address
-    Logger.debug(tag, `Fee currency: ${feeCurrency}`)
-
-    // Note(Rossy): I'm not 100% sure why we need this currentNonceMap. I assume Ashish added it
-    // in case this send util got called from multiple places which weren't coordinating on latest nonce.
-    // Somewhat unecessary now that txs from the wallet all come through SendTransactionPromises
-    // But keeping it anyway for now.
-    if (currentNonce.has(account) && nonce < currentNonce.get(account)!) {
-      Logger.error(
-        'contract-utils@sendTransactionAsync',
-        `nonce is ${nonce} which is less than existing known nonce (${currentNonce.get(account)})`
-      )
-      throw new Error('Tx nonce too low')
-    }
-    currentNonce.set(account, nonce)
-    Logger.debug(tag, `nonce is ${nonce} for account ${account}`)
+    Logger.debug(
+      tag,
+      `Using nonce is ${nonce} for account ${account} and fee currency ${feeCurrency}`
+    )
 
     const txParams: Tx = {
       from: account,
