@@ -67,10 +67,10 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    await this.checkInviteCode()
+    await this.checkForInviteCode()
   }
 
-  checkInviteCode = async () => {
+  checkForInviteCode = async () => {
     // Check deeplink
     const validCode = await getValidInviteCodeFromReferrerData()
     if (validCode) {
