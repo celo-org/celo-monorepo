@@ -41,7 +41,9 @@ class Sweep extends React.Component<Props> {
           </G>
           <StableCircle />
         </Svg>
-        <View style={isMobile ? standardStyles.centered : styles.absoluteCenter}>
+        <View
+          style={isMobile ? [standardStyles.centered, { paddingTop: 40 }] : styles.absoluteCenter}
+        >
           {this.props.children}
         </View>
       </View>
@@ -117,8 +119,8 @@ const styles = StyleSheet.create({
     maxWidth: '90vw',
   },
   mobileSweepContainer: {
-    height: '90vw',
-    width: '100%',
+    height: '100vh',
+    width: '95vw',
   },
   lightingOff: {
     opacity: 0,

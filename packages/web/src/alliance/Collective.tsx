@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
+import Fade from 'react-reveal/Fade'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'
 import SignupForm from 'src/alliance/SignupForm'
@@ -86,11 +87,15 @@ export default function Collective() {
         </View>
         <GridRow
           desktopStyle={standardStyles.sectionMarginBottom}
+          tabletStyle={standardStyles.sectionMarginBottomTablet}
+          mobileStyle={standardStyles.sectionMarginBottomMobile}
           allStyle={standardStyles.centered}
         >
           <Cell span={Spans.half}>
-            <CollectiveMission />
-            <SignupForm />
+            <Fade>
+              <CollectiveMission />
+              <SignupForm />
+            </Fade>
           </Cell>
         </GridRow>
       </View>
@@ -114,7 +119,7 @@ const styles = StyleSheet.create({
   sweepContainerMobile: {
     transform: [
       {
-        translateY: -100,
+        translateY: -200,
       } as any,
     ],
   },

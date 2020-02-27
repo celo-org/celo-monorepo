@@ -7,7 +7,7 @@ import { standardStyles, textStyles } from 'src/styles'
 export default function CollectiveMission() {
   const { t } = useTranslation(NameSpaces.alliance)
   return (
-    <View style={standardStyles.centered}>
+    <View style={[standardStyles.centered, standardStyles.blockMarginBottomMobile]}>
       <ColLogo />
       <H1 style={[textStyles.invert, textStyles.center, standardStyles.elementalMargin]}>
         {t('title')}
