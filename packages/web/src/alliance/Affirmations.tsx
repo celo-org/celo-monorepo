@@ -1,17 +1,20 @@
 import * as React from 'react'
-import { ImageSourcePropType, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Image, ImageSourcePropType, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import {
   clabs,
   clabsPreview,
   laboratoria,
   laboratoriaPreview,
-  wwf,
-  wwfPreview,
+  wfp,
+  wfpPreview,
 } from 'src/alliance/images/index'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, Trans, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import cLabsLogo from 'src/logos/cLabs-logo.png'
+import laboratoriaLogo from 'src/logos/laboratoria-dark.png'
+import wfpLogo from 'src/logos/wfp-logo.png'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Photo from 'src/shared/Photo'
 import { fonts, standardStyles, textStyles } from 'src/styles'
@@ -35,16 +38,18 @@ export default function Affirmations() {
         copy={t('affirmations.laboratoriaCopy')}
         image={laboratoria}
         preview={laboratoriaPreview}
-        logo={<View />}
+        logo={
+          <Image resizeMode="contain" source={laboratoriaLogo} style={{ width: 200, height: 70 }} />
+        }
         contentStyle={styles.laborStyle}
       />
       <Exemplar
-        belief={<TransItalic i18nKey="affirmations.wwfBelief" />}
-        copy={t('affirmations.wwfCopy')}
-        image={wwf}
-        preview={wwfPreview}
-        logo={<View />}
-        button={{ text: t('affirmations.wwfButton'), href: '/TODO' }}
+        belief={<TransItalic i18nKey="affirmations.wfpBelief" />}
+        copy={t('affirmations.wfpCopy')}
+        image={wfp}
+        preview={wfpPreview}
+        logo={<Image resizeMode="contain" source={wfpLogo} style={{ width: 182, height: 80 }} />}
+        button={{ text: t('affirmations.wfpButton'), href: '/TODO' }}
         contentStyle={styles.cLabStyle}
       />
       <Exemplar
@@ -53,8 +58,8 @@ export default function Affirmations() {
         image={clabs}
         preview={clabsPreview}
         button={{ text: t('affirmations.cLabsButton'), href: '/TODO' }}
-        logo={<View />}
-        contentStyle={styles.wwfStyle}
+        logo={<Image resizeMode="contain" source={cLabsLogo} style={{ width: 140, height: 50 }} />}
+        contentStyle={styles.wfpStyle}
       />
     </View>
   )
@@ -114,5 +119,5 @@ const styles = StyleSheet.create({
   photoContainer: { paddingHorizontal: 20 },
   laborStyle: { maxWidth: 440 },
   cLabStyle: { maxWidth: 475 },
-  wwfStyle: { maxWidth: 400 },
+  wfpStyle: { maxWidth: 400 },
 })
