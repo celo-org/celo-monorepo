@@ -11,6 +11,7 @@ import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
@@ -102,6 +103,7 @@ export default function Main() {
       </View>
       <Affirmations />
       <Benefits />
+      <ConnectionFooter includeDividerLine={false} />
     </View>
   )
 }

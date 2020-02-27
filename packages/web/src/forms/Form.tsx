@@ -9,7 +9,7 @@ interface State {
 
 type FormField = string
 
-type FormState = Record<FormField, string | boolean>
+type FormState = Record<FormField, string>
 
 interface ChildArguments {
   onSubmit: (any?: any) => Promise<void>

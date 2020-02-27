@@ -14,7 +14,7 @@ const BLANK_FORM = {
   name: '',
   email: '',
   contribution: '',
-  subscribe: false,
+  subscribe: '',
 }
 
 export default function SignupForm() {
