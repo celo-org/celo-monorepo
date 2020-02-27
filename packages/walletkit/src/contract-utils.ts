@@ -395,10 +395,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
   try {
     logger(Started)
     const feeCurrency = feeCurrencyContract._address
-    Logger.debug(
-      tag,
-      `Using nonce is ${nonce} for account ${account} and fee currency ${feeCurrency}`
-    )
+    Logger.debug(tag, `Using nonce ${nonce} for account ${account} and fee currency ${feeCurrency}`)
 
     const txParams: Tx = {
       from: account,
@@ -443,9 +440,9 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       ...txParams,
       nonce,
       gas: estimatedGas,
+      gasPrice,
       gatewayFeeRecipient,
       gatewayFee,
-      gasPrice,
     }
 
     try {
