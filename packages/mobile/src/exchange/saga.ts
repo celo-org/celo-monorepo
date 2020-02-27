@@ -1,6 +1,12 @@
-import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
-import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import {
+  ContractUtils,
+  getExchangeContract,
+  getGoldTokenContract,
+  getStableTokenContract,
+} from '@celo/walletkit'
+import { Exchange as ExchangeType } from '@celo/walletkit/types/Exchange'
+import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -28,7 +34,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { contractKit } from 'src/web3/contracts'
+import { contractKit, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as util from 'util'
 
@@ -103,10 +109,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
         ? makerAmountInWei
         : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
 
-    const exchange: ExchangeWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getExchange,
-    ])
+    const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
 
     const [dollarMakerExchangeRate, goldMakerExchangeRate]: [BigNumber, BigNumber] = yield all([
       call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
@@ -157,18 +160,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     txId = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
 
-    const goldTokenContract: GoldTokenWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getGoldToken,
-    ])
-    const stableTokenContract: StableTokenWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getStableToken,
-    ])
-    const exchangeContract: ExchangeWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getExchange,
-    ])
+    const goldTokenContract: GoldTokenType = yield call(getGoldTokenContract, web3)
+    const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
+    const exchangeContract: ExchangeType = yield call(getExchangeContract, web3)
 
     const convertedMakerAmount: BigNumber = roundDown(
       yield call(convertToContractDecimals, makerAmount, makerToken),
@@ -178,9 +172,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const updatedExchangeRate: BigNumber = yield call(
       // Updating with actual makerAmount, rather than conservative estimate displayed
-      [exchangeContract, exchangeContract.getExchangeRate],
-      convertedMakerAmount,
-      sellGold
+      ContractUtils.getExchangeRate,
+      web3,
+      makerToken,
+      convertedMakerAmount
     )
 
     const exceedsExpectedSize =
@@ -225,23 +220,23 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     let approveTx
     if (makerToken === CURRENCY_ENUM.GOLD) {
-      approveTx = goldTokenContract.approve(
-        exchangeContract.address,
+      approveTx = goldTokenContract.methods.approve(
+        exchangeContract._address,
         convertedMakerAmount.toString()
       )
     } else if (makerToken === CURRENCY_ENUM.DOLLAR) {
-      approveTx = stableTokenContract.approve(
-        exchangeContract.address,
+      approveTx = stableTokenContract.methods.approve(
+        exchangeContract._address,
         convertedMakerAmount.toString()
       )
     } else {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
-    yield call(sendTransaction, approveTx.txo, account, TAG, 'approval')
-    Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
+    yield call(sendTransaction, approveTx, account, TAG, 'approval')
+    Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.arguments)}`)
 
-    const tx = exchangeContract.exchange(
+    const tx = exchangeContract.methods.exchange(
       convertedMakerAmount.toString(),
       convertedTakerAmount.toString(),
       sellGold

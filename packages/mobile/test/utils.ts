@@ -22,7 +22,6 @@ export const mockContractKitBalance = jest.fn(() => new BigNumber(10))
 export const mockContractKitContract = {
   balanceOf: mockContractKitBalance,
   decimals: jest.fn(async () => '10'),
-  transferWithComment: jest.fn(async () => '10'),
 }
 
 interface MockContract {

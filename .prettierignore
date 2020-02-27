@@ -32,5 +32,3 @@ packages/docs/celo-codebase/protocol/proof-of-stake/epoch-rewards.md
 
 packages/mobile/android/app/build
 packages/verifier/android/app/build
-
-**/*.yaml

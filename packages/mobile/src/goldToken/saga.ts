@@ -1,3 +1,4 @@
+import { getGoldTokenContract } from '@celo/walletkit'
 import { spawn } from 'redux-saga/effects'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, fetchGoldBalance, setBalance } from 'src/goldToken/actions'
@@ -14,6 +15,7 @@ export const goldFetch = tokenFetchFactory({
 
 export const goldTransfer = tokenTransferFactory({
   actionName: Actions.TRANSFER,
+  contractGetter: getGoldTokenContract,
   tag,
   currency: CURRENCY_ENUM.GOLD,
   fetchAction: fetchGoldBalance,
