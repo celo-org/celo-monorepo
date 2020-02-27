@@ -1,6 +1,5 @@
 import { Tx } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
-import { Callback } from '../newTypes'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { RpcCaller } from './rpc-caller'
 import { TxParamsNormalizer } from './tx-params-normalizer'
 

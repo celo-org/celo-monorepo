@@ -1,10 +1,9 @@
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
-import { Tx } from 'web3-core'
+import { EncodedTransaction, Tx } from 'web3-core'
 // @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
-import { EncodedTransaction } from '../newtypes'
 
 const debug = debugFactory('kit:tx:sign')
 

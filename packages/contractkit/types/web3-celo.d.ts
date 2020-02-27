@@ -12,6 +12,22 @@ declare module 'web3-core' {
     gatewayFeeRecipient?: string
     gatewayFee?: string
   }
+
+  export interface EncodedTransaction {
+    raw: string
+    tx: {
+      nonce: string
+      gasPrice: string
+      gas: string
+      to: string
+      value: string
+      input: string
+      v: string
+      r: string
+      s: string
+      hash: string
+    }
+  }
 }
 
 declare module 'web3-eth' {
@@ -32,4 +48,8 @@ declare module 'web3-eth' {
   }
 
   export type BlockType = string | number | BN | BigNumber | 'latest' | 'pending' | 'earliest'
+}
+
+declare module 'web3-core-helpers' {
+  export type Callback<T> = (error: Error | null, result?: T) => void
 }

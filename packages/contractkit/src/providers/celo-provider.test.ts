@@ -1,7 +1,6 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { provider, Tx } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
-import { Callback } from '../newTypes'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { CeloProvider } from '../providers/celo-provider'
 
 // Random private keys

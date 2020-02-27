@@ -1,7 +1,6 @@
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
-import { Callback } from '../newTypes'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'

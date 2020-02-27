@@ -1,6 +1,5 @@
 import { provider } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
-import { Callback } from '../newTypes'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from './rpc-caller'
 
 const mockProvider: provider = {

@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events'
-import { TransactionReceipt } from 'src/newtypes'
-import { PromiEvent } from 'web3-core'
+import { PromiEvent, TransactionReceipt } from 'web3-core'
 
 interface PromiEventStub<T> extends PromiEvent<T> {
   emitter: EventEmitter

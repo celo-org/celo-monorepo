@@ -1,6 +1,6 @@
 import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'src/newtypes'
+import { EventLog } from 'web3-core'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
