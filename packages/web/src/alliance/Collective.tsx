@@ -2,10 +2,12 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'
+import SignupForm from 'src/alliance/SignupForm'
 import Sweep from 'src/alliance/Sweep'
 import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
@@ -20,7 +22,7 @@ export default function Collective() {
         description="TODO"
         path={menuItems.ALLIANCE_COLLECTIVE.link}
       />
-      <View style={[standardStyles.darkBackground]}>
+      <View style={standardStyles.darkBackground}>
         <View
           style={[
             standardStyles.centered,
@@ -82,7 +84,15 @@ export default function Collective() {
             </View>
           </Sweep>
         </View>
-        <CollectiveMission />
+        <GridRow
+          desktopStyle={standardStyles.sectionMarginBottom}
+          allStyle={standardStyles.centered}
+        >
+          <Cell span={Spans.half}>
+            <CollectiveMission />
+            <SignupForm />
+          </Cell>
+        </GridRow>
       </View>
       <Benefits />
     </View>
@@ -97,14 +107,14 @@ const styles = StyleSheet.create({
   sweepContainer: {
     transform: [
       {
-        translateY: -225,
+        translateY: -100,
       } as any,
     ],
   },
   sweepContainerMobile: {
     transform: [
       {
-        translateY: -150,
+        translateY: -100,
       } as any,
     ],
   },

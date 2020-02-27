@@ -1,13 +1,13 @@
 {
-  "title": "Celo Collective",
+  "title": "Alliance for Prosperity",
   "thematicStatement": "Money can be beautiful",
-  "mission": "Join mission-aligned organizations to create a more prosperous world",
+  "mission": "Join mission-aligned organizations \n to create a more prosperous world",
   "form": {
     "name": "Name",
     "email": "Email",
-    "info": "How might you contribute ot the Collective?",
+    "contribution": "How might you contribute to the Alliance?",
     "subscribe": "Join the Celo Newsletter",
-    "mainAction": "Apply"
+    "btn": "Apply"
   },
   "benefits": {
     "headline": "Benefits of collaborating on a mission-driven blockchain",

@@ -171,9 +171,18 @@ interface LabelProps {
   value: string
   label: string
   onInput: (x?: unknown) => void
+  isDarkMode: boolean
 }
 
-export function LabeledInput({ name, multiline, hasError, value, onInput, label }: LabelProps) {
+export function LabeledInput({
+  name,
+  multiline,
+  hasError,
+  value,
+  onInput,
+  label,
+  isDarkMode,
+}: LabelProps) {
   return (
     <>
       <View style={styles.labelBox}>
@@ -189,9 +198,10 @@ export function LabeledInput({ name, multiline, hasError, value, onInput, label 
           fonts.p,
           styles.input,
           standardStyles.elementalMarginBottom,
+          isDarkMode && standardStyles.inputDarkMode,
           hasError && styles.errorBorder,
         ]}
-        focusStyle={standardStyles.inputFocused}
+        focusStyle={isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused}
         name={name}
         value={value}
         onChange={onInput}

@@ -9,7 +9,9 @@ export default function CollectiveMission() {
   return (
     <View style={standardStyles.centered}>
       <ColLogo />
-      <H1 style={[textStyles.invert, textStyles.center]}>{t('title')}</H1>
+      <H1 style={[textStyles.invert, textStyles.center, standardStyles.elementalMargin]}>
+        {t('title')}
+      </H1>
       <H4 style={[textStyles.invert, textStyles.center]}>{t('mission')}</H4>
     </View>
   )
