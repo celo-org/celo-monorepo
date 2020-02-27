@@ -329,11 +329,4 @@ export class ContractKit {
     assertIsCeloProvider(this.web3.currentProvider)
     this.web3.currentProvider.stop()
   }
-
-  async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    const epochSize = await validators.getEpochSize()
-    // Follows protocol/contracts getEpochNumberOfBlock()
-    return Math.floor((blockNumber - 1) / epochSize.toNumber())
-  }
 }
