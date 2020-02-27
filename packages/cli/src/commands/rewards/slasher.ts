@@ -93,7 +93,7 @@ export default class Slasher extends BaseCommand {
         console.info(`New block: ${blockNumber}`)
 
         const istanbulExtra = parseBlockExtraData(block.extraData)
-        const seal = istanbulExtra.aggregatedSeal
+        const seal = istanbulExtra.parentAggregatedSeal
 
         for (let i = 0; i < validatorSet.length; i++) {
           const validatorUp = bitIsSet(seal.bitmap, i)
