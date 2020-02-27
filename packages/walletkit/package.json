@@ -33,7 +33,8 @@
     "web3": "1.2.4",
     "web3-eth": "1.2.4",
     "web3-utils": "1.2.4",
-    "web3-core": "1.2.4"
+    "web3-core": "1.2.4",
+    "web3-core-helpers": "1.2.4"
   },
   "devDependencies": {
     "@types/bignumber.js": "^5.0.0",
