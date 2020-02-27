@@ -13,7 +13,7 @@ import { DEFAULT_FORNO_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject } from 'web3-eth'
 
 const TAG = 'transactions/send'
 

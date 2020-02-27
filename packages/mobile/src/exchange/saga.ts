@@ -221,12 +221,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     let approveTx
     if (makerToken === CURRENCY_ENUM.GOLD) {
       approveTx = goldTokenContract.methods.approve(
-        exchangeContract._address,
+        // TODO fix types
+        (exchangeContract as any)._address,
         convertedMakerAmount.toString()
       )
     } else if (makerToken === CURRENCY_ENUM.DOLLAR) {
       approveTx = stableTokenContract.methods.approve(
-        exchangeContract._address,
+        // TODO fix types
+        (exchangeContract as any)._address,
         convertedMakerAmount.toString()
       )
     } else {

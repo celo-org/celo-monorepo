@@ -1,5 +1,5 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3.d.ts" />
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
@@ -8,7 +8,7 @@ import { eqAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3/types'
+import { TransactionReceipt } from 'web3-core'
 import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
@@ -30,7 +30,7 @@ class InflationManager {
   }
 
   now = async (): Promise<number> => {
-    return (await this.kit.web3.eth.getBlock('pending')).timestamp
+    return Number((await this.kit.web3.eth.getBlock('pending')).timestamp)
   }
 
   getNextUpdateRate = async (): Promise<number> => {
@@ -260,7 +260,7 @@ describe('Transfer tests', function(this: any) {
     await waitToFinishInstanceSyncing(currentGethInstance)
 
     // Reset contracts to send RPCs through transferring node.
-    kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
+    kit.web3.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
 
     // Give the node time to sync the latest block.
     const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')

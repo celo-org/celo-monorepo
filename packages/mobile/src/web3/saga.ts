@@ -44,7 +44,7 @@ import {
   currentAccountSelector,
   fornoSelector,
 } from 'src/web3/selectors'
-import { Block } from 'web3/eth/types'
+import { Block } from 'web3-eth'
 const ETH_PRIVATE_KEY_LENGTH = 64
 const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 

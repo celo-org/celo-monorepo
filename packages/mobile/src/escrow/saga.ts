@@ -58,8 +58,14 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
 
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
-    const transferTxId = generateStandbyTransactionId(escrow._address)
-    yield call(registerStandbyTransaction, transferTxId, amount.toString(), escrow._address)
+    // TODO fix types
+    const transferTxId = generateStandbyTransactionId((escrow as any)._address)
+    yield call(
+      registerStandbyTransaction,
+      transferTxId,
+      amount.toString(),
+      (escrow as any)._address
+    )
 
     const transferTx = escrow.methods.transfer(
       phoneHash,
@@ -175,7 +181,8 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
-    feeCurrency: (await getStableTokenContract(web3))._address,
+    // TODO fix types
+    feeCurrency: ((await getStableTokenContract(web3)) as any)._address,
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
