@@ -16,19 +16,6 @@ declare module 'web3-core' {
 
 declare module 'web3-eth' {
   import { Tx } from 'web3-core'
-  // export interface Tx {
-  //   from?: string;
-  //   to?: string;
-  //   value?: string | number;
-  //   gas?: string | number;
-  //   gasPrice?: string | number;
-  //   data?: string;
-  //   nonce?: string | number;
-  //   chainId?: string | number;
-  //   feeCurrency?: string
-  //   gatewayFeeRecipient?: string
-  //   gatewayFee?: string
-  // }
 
   export interface Transaction {
     feeCurrency?: string

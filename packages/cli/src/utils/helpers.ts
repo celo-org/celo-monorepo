@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import { Block } from 'web3/eth/types'
+import { Block } from 'web3-eth'
 import { failWith } from './cli'
 
 export async function nodeIsSynced(web3: Web3): Promise<boolean> {
@@ -18,7 +18,7 @@ export async function nodeIsSynced(web3: Web3): Promise<boolean> {
         // To catch the case in which syncing has happened in the past,
         // has stopped, and hasn't started again, check for an old timestamp
         // on the latest block
-        const ageOfBlock = Date.now() / 1000 - latestBlock.timestamp
+        const ageOfBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
         if (ageOfBlock > 120) {
           console.log(
             `Latest block is ${ageOfBlock} seconds old, and syncing is not currently in progress`
