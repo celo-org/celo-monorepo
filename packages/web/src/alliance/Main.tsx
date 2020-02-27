@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import Affirmations from 'src/alliance/Affirmations'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'
 import SignupForm from 'src/alliance/SignupForm'
@@ -13,7 +14,7 @@ import { useScreenSize } from 'src/layout/ScreenSize'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
-export default function Collective() {
+export default function Main() {
   const { t } = useTranslation(NameSpaces.alliance)
   const { isDesktop } = useScreenSize()
   return (
@@ -99,6 +100,7 @@ export default function Collective() {
           </Cell>
         </GridRow>
       </View>
+      <Affirmations />
       <Benefits />
     </View>
   )

@@ -1,2 +1,2 @@
-import Collective from 'src/alliance/Collective'
-export default Collective
+import Alliance from 'src/alliance/Main'
+export default Alliance
