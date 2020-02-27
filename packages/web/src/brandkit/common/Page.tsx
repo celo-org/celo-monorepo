@@ -218,6 +218,9 @@ class Page extends React.Component<Props & ScreenProps, State> {
       this.setLineVisibilityViaScroll()
     }
     window.addEventListener('hashchange', this.onChangeHash, false)
+    this.props.router.events.on('routeChangeStart', (url) => {
+      console.log('changing lanes')
+    })
   }
 
   setLineVisibilityViaScroll = () => {
@@ -242,6 +245,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
   render() {
     const { screen, sections, router, path, metaDescription, title } = this.props
     const isMobile = screen === ScreenSizes.MOBILE
+
     return (
       <>
         <OpenGraph
