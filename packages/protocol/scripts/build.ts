@@ -136,8 +136,9 @@ function generateFilesForContractKit() {
 function writeContractFactoryFile(outputDir: string, contractName: string, abi: any[]) {
   const contents = [
     "import Web3 from 'web3'",
+    "import { AbiItem } from 'web3-utils'",
     `import { ${contractName} } from './types/${contractName}'`,
-    `export const ABI = ${JSON.stringify(abi)}`,
+    `export const ABI: AbiItem[] = ${JSON.stringify(abi)}`,
     ``,
     `export function new${contractName}(web3: Web3, address: string): ${contractName} {`,
     ' return new web3.eth.Contract(ABI, address) as any',

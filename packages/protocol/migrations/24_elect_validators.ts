@@ -12,8 +12,8 @@ import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 
-import Web3 = require('web3')
-import { TransactionObject } from 'web3/eth/types'
+import Web3 from 'web3'
+import { TransactionObject } from 'web3-eth'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 const bip39 = require('bip39')

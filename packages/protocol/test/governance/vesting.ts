@@ -28,7 +28,7 @@ import {
   VestingFactoryInstance,
   VestingInstanceContract,
 } from 'types'
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
 

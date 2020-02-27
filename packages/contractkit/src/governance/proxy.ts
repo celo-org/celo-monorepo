@@ -1,6 +1,7 @@
 import Web3 from 'web3'
+import { AbiItem } from 'web3-utils'
 
-const PROXY_ABI = [
+const PROXY_ABI: AbiItem[] = [
   {
     constant: true,
     inputs: [],

@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -33,7 +33,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
     await web3.eth.sendTransaction({
       from: network.from,
       to: reserve.address,
-      value: web3.utils.toWei(config.reserve.goldBalance.toString(), 'ether') as string,
+      value: web3.utils.toWei(config.reserve.goldBalance.toString(), 'ether').toString(),
     })
     console.info(`Marking ${network.from} as a reserve spender`)
     await reserve.addSpender(network.from)

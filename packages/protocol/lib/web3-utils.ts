@@ -6,9 +6,9 @@ import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject } from 'web3-eth'
 
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
