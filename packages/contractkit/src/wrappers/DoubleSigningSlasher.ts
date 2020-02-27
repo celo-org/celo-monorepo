@@ -49,14 +49,12 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     headerA: string,
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidator(validatorAddress)
     const blockNumber = await this.getBlockNumberFromHeader([headerA])
     return this.slash(
-      findAddressIndex(
-        validator.signer,
-        await validators.getValidatorSignerAddressSet(blockNumber)
-      ),
+      findAddressIndex(validator.signer, await election.getValidatorSigners(blockNumber)),
       headerA,
       headerB
     )
@@ -73,10 +71,10 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     headerA: string,
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
-    const validators = await this.kit.contracts.getValidators()
+    const election = await this.kit.contracts.getElection()
     const blockNumber = await this.getBlockNumberFromHeader([headerA])
     return this.slash(
-      findAddressIndex(signerAddress, await validators.getValidatorSignerAddressSet(blockNumber)),
+      findAddressIndex(signerAddress, await election.getValidatorSigners(blockNumber)),
       headerA,
       headerB
     )
@@ -88,20 +86,18 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
    * @param headerA First double signed block header.
    * @param headerB Second double signed block header.
    */
-  async slash(
+  private async slash(
     signerIndex: number,
     headerA: string,
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
     const blockNumber = await this.getBlockNumberFromHeader([headerA])
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const signer = await validators.validatorSignerAddressFromSet(signerIndex, blockNumber)
+    const signer = await election.validatorSignerAddressFromSet(signerIndex, blockNumber)
     const validator = await validators.getValidatorFromSigner(signer)
-    const membership = await validators.getValidatorMembershipHistoryIndex(
-      validator.address,
-      blockNumber
-    )
+    const membership = await validators.getValidatorMembershipHistoryIndex(validator, blockNumber)
     const lockedGold = await this.kit.contracts.getLockedGold()
     const slashValidator = await lockedGold.computeInitialParametersForSlashing(
       validator.address,

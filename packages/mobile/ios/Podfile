@@ -1,4 +1,5 @@
-# File contents of "ios/Podfile"
+source 'https://cdn.cocoapods.org/'
+
 platform :ios, "9.0"
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
@@ -43,6 +44,7 @@ target "celo" do
   pod "Firebase/Storage"
   pod "Firebase/Messaging"
   pod "Firebase/Database"
+  pod "Firebase/DynamicLinks"
   pod "GoogleUtilities", "~> 5.3.7"
 
   # Using a custom fork so we can have a specific bug fix (crash when firebase already initialized)

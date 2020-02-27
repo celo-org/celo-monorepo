@@ -10,6 +10,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { Validator } from './Validators'
 
 /**
  * Contract handling slashing for Validator downtime
@@ -40,35 +41,36 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    * @param startSignerIndex Validator index at the first block.
    * @param endSignerIndex Validator index at the last block.
    */
-  async isDown(
-    startBlock: number,
-    startSignerIndex: number,
-    endSignerIndex: number
-  ): Promise<boolean> {
-    const period = await this.slashableDowntime()
-    return (
-      this.contract.methods
-        .isDown(startBlock, startSignerIndex, endSignerIndex)
-        // @ts-ignore: Expected 0-1 arguments, but got 2
-        .call({}, startBlock + period + 1)
-    )
-  }
+  isDown = proxyCall(this.contract.methods.isDown)
 
   /**
    * Slash a Validator for downtime.
    * @param validator Validator to slash for downtime.
-   * @param startBlock First block of the downtime.
+   * @param startBlock First block of the downtime, undefined if using endBlock.
+   * @param endBlock Last block of the downtime.
    */
   async slashValidator(
     validatorAddress: Address,
-    startBlock: number
+    startBlock?: number,
+    endBlock?: number
   ): Promise<CeloTransactionObject<void>> {
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const validator = await validators.getValidator(validatorAddress)
-    return this.slashStartSignerIndex(
-      startBlock,
-      findAddressIndex(validator.signer, await validators.getValidatorSignerAddressSet(startBlock))
-    )
+    if (endBlock) {
+      const validator = await validators.getValidator(validatorAddress, endBlock)
+      return this.slashEndSignerIndex(
+        endBlock,
+        findAddressIndex(validator.signer, await election.getValidatorSigners(endBlock))
+      )
+    } else if (startBlock) {
+      const validator = await validators.getValidator(validatorAddress, startBlock)
+      return this.slashStartSignerIndex(
+        startBlock,
+        findAddressIndex(validator.signer, await election.getValidatorSigners(startBlock))
+      )
+    } else {
+      throw new Error(`No block specified`)
+    }
   }
 
   /**
@@ -80,8 +82,9 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     startBlock: number,
     startSignerIndex: number
   ): Promise<CeloTransactionObject<void>> {
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const signer = await validators.validatorSignerAddressFromSet(startSignerIndex, startBlock)
+    const signer = await election.validatorSignerAddressFromSet(startSignerIndex, startBlock)
     const startEpoch = await this.kit.getEpochNumberOfBlock(startBlock)
     // Follows DowntimeSlasher.getEndBlock()
     const endBlock = startBlock + (await this.slashableDowntime()) - 1
@@ -89,9 +92,9 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const endSignerIndex =
       startEpoch === endEpoch
         ? startSignerIndex
-        : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(endBlock))
+        : findAddressIndex(signer, await election.getValidatorSigners(endBlock))
     const validator = await validators.getValidatorFromSigner(signer)
-    return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
+    return this.slash(validator, startBlock, startSignerIndex, endSignerIndex)
   }
 
   /**
@@ -103,8 +106,9 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     endBlock: number,
     endSignerIndex: number
   ): Promise<CeloTransactionObject<void>> {
+    const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-    const signer = await validators.validatorSignerAddressFromSet(endSignerIndex, endBlock)
+    const signer = await election.validatorSignerAddressFromSet(endSignerIndex, endBlock)
     const endEpoch = await this.kit.getEpochNumberOfBlock(endBlock)
     // Reverses DowntimeSlasher.getEndBlock()
     const startBlock = endBlock - (await this.slashableDowntime()) + 1
@@ -112,9 +116,9 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const startSignerIndex =
       startEpoch === endEpoch
         ? endSignerIndex
-        : findAddressIndex(signer, await validators.getValidatorSignerAddressSet(startBlock))
+        : findAddressIndex(signer, await election.getValidatorSigners(startBlock))
     const validator = await validators.getValidatorFromSigner(signer)
-    return this.slash(validator.address, startBlock, startSignerIndex, endSignerIndex)
+    return this.slash(validator, startBlock, startSignerIndex, endSignerIndex)
   }
 
   /**
@@ -124,8 +128,8 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    * @param startSignerIndex Validator index at the first block.
    * @param endSignerIndex Validator index at the last block.
    */
-  async slash(
-    validator: Address,
+  private async slash(
+    validator: Validator,
     startBlock: number,
     startSignerIndex: number,
     endSignerIndex: number
@@ -135,7 +139,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const membership = await validators.getValidatorMembershipHistoryIndex(validator, startBlock)
     const lockedGold = await this.kit.contracts.getLockedGold()
     const slashValidator = await lockedGold.computeInitialParametersForSlashing(
-      validator,
+      validator.address,
       incentives.penalty
     )
     const slashGroup = await lockedGold.computeParametersForSlashing(

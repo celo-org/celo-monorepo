@@ -91,7 +91,7 @@ export const mockNavigation = {
   openDrawer: jest.fn(),
   closeDrawer: jest.fn(),
   toggleDrawer: jest.fn(),
-  getParam: jest.fn((key) => mockRecipient),
+  getParam: jest.fn(() => mockRecipient),
   setParams: jest.fn(),
   addListener: jest.fn(),
   push: jest.fn(),
@@ -141,7 +141,6 @@ export const mockContactList = [mockContactWithPhone2, mockContactWithPhone]
 export const mockEscrowedPayment: EscrowedPayment = {
   senderAddress: mockAccount2,
   recipientPhone: mockE164Number,
-  recipientContact: mockRecipient,
   paymentID: mockAccount,
   currency: SHORT_CURRENCIES.DOLLAR,
   amount: new BigNumber(10),

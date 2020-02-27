@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { range, zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -15,6 +15,7 @@ import {
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
+  valueToFixidityString,
   valueToInt,
 } from './BaseWrapper'
 
@@ -32,8 +33,11 @@ export interface ValidatorGroup {
   name: string
   address: Address
   members: Address[]
+  membersUpdated: number
   affiliates: Address[]
   commission: BigNumber
+  nextCommission: BigNumber
+  nextCommissionBlock: BigNumber
 }
 
 export interface ValidatorReward {
@@ -53,6 +57,7 @@ export interface ValidatorsConfig {
   groupLockedGoldRequirements: LockedGoldRequirements
   validatorLockedGoldRequirements: LockedGoldRequirements
   maxGroupSize: BigNumber
+  membershipHistoryLength: BigNumber
 }
 
 export interface GroupMembership {
@@ -60,17 +65,36 @@ export interface GroupMembership {
   group: Address
 }
 
+export interface MembershipHistoryExtraData {
+  lastRemovedFromGroupTimestamp: number
+  tail: number
+}
+
 /**
  * Contract for voting for validators and managing validator groups.
  */
 // TODO(asa): Support validator signers
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
-  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.updateCommission(toFixed(commission).toFixed())
-    )
-  }
+  /**
+   * Queues an update to a validator group's commission.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members. Must be in the range [0, 1.0].
+   */
+  queueCommissionUpdate: (commission: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.queueCommissionUpdate,
+    tupleParser(valueToFixidityString)
+  )
+
+  /**
+   * Updates a validator group's commission based on the previously queued update
+   */
+
+  updateCommission: () => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.updateCommission
+  )
+
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -113,11 +137,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidatorLockedGoldRequirements(),
       this.getGroupLockedGoldRequirements(),
       this.contract.methods.maxGroupSize().call(),
+      this.contract.methods.membershipHistoryLength().call(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
       maxGroupSize: valueToBigNumber(res[2]),
+      membershipHistoryLength: valueToBigNumber(res[3]),
     }
   }
 
@@ -236,7 +262,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     if (getAffiliates) {
       const validators = await this.getRegisteredValidators(blockNumber)
       affiliates = validators
-        .filter((v) => v.affiliation === address)
+        .filter((v) => v.affiliation && eqAddress(v.affiliation, address))
         .filter((v) => !res[0].includes(v.address))
     }
     return {
@@ -244,6 +270,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       address,
       members: res[0],
       commission: fromFixed(new BigNumber(res[1])),
+      nextCommission: fromFixed(new BigNumber(res[2])),
+      nextCommissionBlock: new BigNumber(res[3]),
+      membersUpdated: res[4].reduce(
+        (a: number, b: BigNumber.Value) => Math.max(a, new BigNumber(b).toNumber()),
+        0
+      ),
       affiliates: affiliates.map((v) => v.address),
     }
   }
@@ -258,6 +290,19 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     undefined,
     (res) =>
       zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
+  )
+
+  /**
+   * Returns extra data from the Validator's group membership history
+   * @param validator The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
+  getValidatorMembershipHistoryExtraData: (
+    validator: Address
+  ) => Promise<MembershipHistoryExtraData> = proxyCall(
+    this.contract.methods.getMembershipHistory,
+    undefined,
+    (res) => ({ lastRemovedFromGroupTimestamp: valueToInt(res[2]), tail: valueToInt(res[3]) })
   )
 
   /** Get the size (amount of members) of a ValidatorGroup */
@@ -425,9 +470,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
     }
 
-    const currentIdx = group.members.indexOf(validator)
+    const currentIdx = group.members.map(normalizeAddress).indexOf(normalizeAddress(validator))
     if (currentIdx < 0) {
-      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+      throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
       throw new Error(`Validator is already in position ${newIndex}`)
     }
@@ -461,51 +506,36 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidator(e.returnValues.validator, blockNumber)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, true, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
         epochNumber,
         validator: validator[index],
-        validatorPayment: e.returnValues.validatorPayment,
+        validatorPayment: valueToBigNumber(e.returnValues.validatorPayment),
         group: validatorGroup[index],
-        groupPayment: e.returnValues.groupPayment,
+        groupPayment: valueToBigNumber(e.returnValues.groupPayment),
       })
     )
   }
 
   /**
-   * Gets the size of the validator set that must sign the given block number.
-   * @param blockNumber Block number to retrieve the validator set from.
-   * @return Size of the validator set.
+   * Returns the current set of validator signer addresses
    */
-  numberValidatorsInSet: (blockNumber: number) => Promise<number> = proxyCall(
-    this.contract.methods.numberValidatorsInSet,
-    undefined,
-    valueToInt
-  )
-
-  /**
-   * Gets a validator address from the validator set at the given block number.
-   * @param index Index of requested validator in the validator set.
-   * @param blockNumber Block number to retrieve the validator set from.
-   * @return Address of validator at the requested index.
-   */
-  validatorSignerAddressFromSet: (
-    signerIndex: number,
-    blockNumber: number
-  ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
-
-  /**
-   * Returns the signers for block `blockNumber`.
-   * @param blockNumber Block number to retrieve signers for.
-   * @return Address of each signer in the validator set.
-   */
-  async getValidatorSignerAddressSet(blockNumber: number): Promise<Address[]> {
-    const numValidators = await this.numberValidatorsInSet(blockNumber)
-    return concurrentMap(10, range(0, numValidators, 1), (i) =>
-      this.validatorSignerAddressFromSet(i, blockNumber)
+  async currentSignerSet(): Promise<Address[]> {
+    const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
+    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+      this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
     )
+  }
+
+  /**
+   * Returns the current set of validator signer and account addresses
+   */
+  async currentValidatorAccountsSet() {
+    const signerAddresses = await this.currentSignerSet()
+    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
+    return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
   }
 
   /**
@@ -515,13 +545,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @return Group and membership history index for `validator`.
    */
   async getValidatorMembershipHistoryIndex(
-    validator: Address,
+    validator: Validator,
     blockNumber?: number
   ): Promise<{ group: Address; historyIndex: number }> {
     const blockEpoch = await this.kit.getEpochNumberOfBlock(
       blockNumber || (await this.kit.web3.eth.getBlockNumber())
     )
-    const membershipHistory = await this.getValidatorMembershipHistory(validator)
+    const account = await this.validatorSignerToAccount(validator.signer)
+    const membershipHistory = await this.getValidatorMembershipHistory(account)
     const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
     const group = membershipHistory[historyIndex].group
     return { group, historyIndex }

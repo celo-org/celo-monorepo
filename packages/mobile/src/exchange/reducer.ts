@@ -16,6 +16,7 @@ export interface ExchangeRate {
 
 export interface State {
   exchangeRatePair: ExchangeRatePair | null
+  tobinTax: string | null
   history: {
     celoGoldExchangeRates: ExchangeRate[]
     lastTimeUpdated: number
@@ -24,6 +25,7 @@ export interface State {
 
 const initialState = {
   exchangeRatePair: null,
+  tobinTax: null,
   history: {
     celoGoldExchangeRates: [],
     lastTimeUpdated: 0,
@@ -70,6 +72,11 @@ export const reducer = (
       return {
         ...state,
         exchangeRatePair: action.exchangeRatePair,
+      }
+    case Actions.SET_TOBIN_TAX:
+      return {
+        ...state,
+        tobinTax: action.tobinTax,
       }
     case Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY:
       return {

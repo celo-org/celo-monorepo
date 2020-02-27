@@ -44,6 +44,7 @@
     "@babel/runtime": "^7.6.2",
     "@types/jest": "^24.0.18",
     "babel-jest": "^24.9.0",
+    "codecov": "^3.6.5",
     "husky": "^3.0.0",
     "jest": "^24.9.0",
     "jest-junit": "^8.0.0",
@@ -62,15 +63,12 @@
     "typescript": "^3.7.3",
     "typescript-tslint-plugin": "^0.5.4"
   },
-  "dependencies": {
-    "codecov": "^3.1.0"
-  },
+  "dependencies": {},
   "resolutions": {
     "node-gyp": "5.0.1",
     "tar": "4.4.10",
     "lodash": "4.17.15",
     "react-native-ntp-client": "^1.0.0",
-    "**/codecov/**/js-yaml": "^3.13.1",
     "**/deep-extend": "^0.5.1",
     "**/extend": "^3.0.2",
     "**/cross-fetch": "^3.0.2",

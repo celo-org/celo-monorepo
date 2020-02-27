@@ -11,6 +11,39 @@ const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * s
 // As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
 const isCI = process.env.CI === 'true'
 
+// Migration overrides specifically for unit tests
+const migrationOverrides = {
+  downtimeSlasher: {
+    slashableDowntime: 60, // epoch length is 100 for unit tests
+  },
+  epochRewards: {
+    frozen: false,
+  },
+  exchange: {
+    frozen: false,
+  },
+  goldToken: {
+    frozen: false,
+  },
+  governanceApproverMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+  },
+  reserve: {
+    initialBalance: 100000000,
+  },
+  reserveSpenderMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+  },
+  stableToken: {
+    oracles: [network.from],
+    frozen: false,
+  },
+}
+
 async function startGanache() {
   const server = ganache.server({
     default_balance_ether: network.defaultBalance,
@@ -65,16 +98,21 @@ async function test() {
     if (argv.gas) {
       testArgs = testArgs.concat(['--color', '--gas'])
     }
-    if (argv._.length > 0) {
-      const testGlob = argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
-      const testFiles = glob.readdirSync(testGlob)
-      if (testFiles.length === 0) {
-        // tslint:disable-next-line: no-console
-        console.error(`No test files matched with ${testGlob}`)
-        process.exit(1)
-      }
-      testArgs = testArgs.concat(testFiles)
+    // Add test specific migration overrides
+    testArgs = testArgs.concat(['--migration_override', JSON.stringify(migrationOverrides)])
+
+    const testGlob =
+      argv._.length > 0
+        ? argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
+        : `test/\*\*/*.ts`
+    const testFiles = glob.readdirSync(testGlob)
+    if (testFiles.length === 0) {
+      // tslint:disable-next-line: no-console
+      console.error(`No test files matched with ${testGlob}`)
+      process.exit(1)
     }
+    testArgs = testArgs.concat(testFiles)
+
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {

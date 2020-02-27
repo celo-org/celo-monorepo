@@ -8,11 +8,29 @@ You can run the local version by first ensuring you have installed the latest de
 
 `yarn`
 
+then by decrypted the secrets file, this requires being authenticated on gcloud
+
+`brew cask install google-cloud-sdk` && `gcloud auth login` 
+
+from root of monorepo run `yarn run keys:decrypt` 
+
+
+
 and then running
 
 `yarn run dev`
 
 which will start a server accessible at [http://localhost:3000](http://localhost:3000)
+
+## Testing
+
+run tests with `yarn test`
+
+tools: `jest`, `@testing-library/react`
+
+#### Testing Strategy
+
+Each page should have a snapshot test found in `src/_page-tests` more interactive components should have an additional tests for various states/ interactions.
 
 ## Architecture
 
@@ -22,9 +40,11 @@ The website uses [React.js](https://reactjs.org/), [Next.js](https://nextjs.org/
 
 The website is hosted on [Google App Engine](https://cloud.google.com/appengine/). In order to deploy it, you first need the [gcloud SDK](https://cloud.google.com/sdk/gcloud/).
 
-`brew install gcloud`
+`brew cask install google-cloud-sdk`
 
 You may need to log in and be granted additional permissions.
+
+`gcloud auth login`
 
 Make sure your dependencies are up to date. in this directory, run:
 
@@ -35,7 +55,3 @@ Now you can run
 `yarn run deploy:dev`
 
 to deploy to the `dev` environment, with similar commands for `staging` and `prod`
-
-## Add your picture
-
-Take a look at the files in [this folder](https://github.com/celo-org/celo-monorepo/tree/master/packages/web/src/about/team) and see if you can figure out how to add your picture to the `/about` page :)

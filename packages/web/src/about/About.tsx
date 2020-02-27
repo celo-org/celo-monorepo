@@ -1,12 +1,16 @@
+import fetch from 'cross-fetch'
 import * as React from 'react'
 import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import shuffleSeed from 'shuffle-seed'
 import AudioIcon from 'src/about/AudioIcon'
 import Backers from 'src/about/Backers'
+import { Contributor } from 'src/about/Contributor'
 import { sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
 import CeloValues from 'src/about/Values'
 import VideoCover from 'src/about/VideoCover'
+import analytics from 'src/analytics/analytics'
 import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
@@ -20,21 +24,31 @@ import menuItems from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
-  randomSeed: number
+  contributors: Contributor[]
 }
 
 async function pronunceCelo() {
   const audio = document.getElementById('pronunce') as HTMLAudioElement
   await audio.play()
+  await analytics.track('pronounced celo')
 }
 
 export class About extends React.Component<Props & I18nProps> {
-  static getInitialProps() {
-    return { randomSeed: Math.random() }
+  static async getInitialProps({ req }) {
+    let contributors
+    if (req) {
+      const getContributors = await import('src/../server/getContributors')
+      contributors = await getContributors.default()
+    } else {
+      contributors = await fetch(`/api/contributors`).then((result) => result.json())
+    }
+
+    const shuffledTeam = shuffleSeed.shuffle(contributors, Math.random())
+    return { contributors: shuffledTeam }
   }
 
   render() {
-    const { t, randomSeed } = this.props
+    const { t, contributors } = this.props
 
     return (
       <>
@@ -122,7 +136,7 @@ export class About extends React.Component<Props & I18nProps> {
               text={t('learnMore')}
             />
           </BookLayout>
-          <Team randomSeed={randomSeed} />
+          <Team contributors={contributors} />
           <Backers />
           <PressMedia />
         </View>

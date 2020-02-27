@@ -27,7 +27,7 @@ const CHART_MIN_VERTICAL_RANGE = 0.1
 const CHART_DOMAIN_PADDING = { y: [30, 30], x: [5, 5] }
 
 interface OwnProps {
-  testID: string
+  testID?: string
 }
 
 type Props = WithTranslation & OwnProps
@@ -158,7 +158,7 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
   ])
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const dollarsToLocal = useCallback(
-    (amount) => convertDollarsToLocalAmount(amount, localExchangeRate),
+    (amount) => convertDollarsToLocalAmount(amount, localCurrencyCode ? localExchangeRate : 1),
     [localExchangeRate]
   )
   const [range] = useState(30 * 24 * 60 * 60 * 1000) // 30 days

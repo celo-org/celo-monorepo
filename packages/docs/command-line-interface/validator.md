@@ -104,6 +104,7 @@ OPTIONS
   --blsSignature=0x                                  (required) BLS Proof-of-Possession
   --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
+  --yes                                              Answer yes to prompt
 
 EXAMPLE
   register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey
@@ -146,6 +147,29 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_
+
+### Signed-blocks
+
+Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block.
+
+```
+USAGE
+  $ celocli validator:signed-blocks
+
+OPTIONS
+  --at-block=at-block                                  latest block to examine for sginer activity
+  --lookback=lookback                                  [default: 120] how many blocks to look back for signer activity
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check for signatures
+  --width=width                                        [default: 40] line width for printing marks
+
+EXAMPLES
+  heartbeat --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  heartbeat --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  heartbeat --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  heartbeat --lookback 50 --width 10 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+```
+
+_See code: [packages/cli/src/commands/validator/signed-blocks.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/signed-blocks.ts)_
 
 ### Status
 

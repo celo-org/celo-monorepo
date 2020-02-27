@@ -913,7 +913,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  signUp
+                  common:signUp
                 </a>
               </div>
               <div
@@ -2483,15 +2483,12 @@ exports[`Community renders 1`] = `
             role="link"
             style={
               Object {
-                "color": "rgba(46,51,56,1.00)",
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
                 "opacity": 1,
                 "textDecoration": "underline",
-                "textRendering": "geometricPrecision",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -2586,6 +2583,7 @@ exports[`Community renders 1`] = `
               }
             >
               <div
+                aria-label="loading"
                 className="css-view-1dbjc4n"
                 style={
                   Object {
@@ -2873,6 +2871,7 @@ exports[`Community renders 1`] = `
           }
         >
           <div
+            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
@@ -2931,6 +2930,7 @@ exports[`Community renders 1`] = `
           }
         >
           <div
+            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
@@ -2989,6 +2989,7 @@ exports[`Community renders 1`] = `
           }
         >
           <div
+            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
@@ -3121,7 +3122,7 @@ exports[`Community renders 1`] = `
               }
               target="_blog"
             >
-              readMoreFromOurBlog
+              common:readMoreFromOurBlog
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -3732,7 +3733,7 @@ exports[`Community renders 1`] = `
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
-            href="/build"
+            href="/validators"
             role="link"
             style={
               Object {
@@ -5617,15 +5618,12 @@ exports[`Community renders 1`] = `
                   role="link"
                   style={
                     Object {
-                      "color": "rgba(46,51,56,1.00)",
+                      "WebkitTextDecorationStyle": "solid",
                       "cursor": "pointer",
                       "display": "inline",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
                       "opacity": 1,
                       "textDecoration": "underline",
-                      "textRendering": "geometricPrecision",
+                      "textDecorationStyle": "solid",
                     }
                   }
                   target="_new"
@@ -5659,15 +5657,12 @@ exports[`Community renders 1`] = `
                   role="link"
                   style={
                     Object {
-                      "color": "rgba(46,51,56,1.00)",
+                      "WebkitTextDecorationStyle": "solid",
                       "cursor": "pointer",
                       "display": "inline",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
                       "opacity": 1,
                       "textDecoration": "underline",
-                      "textRendering": "geometricPrecision",
+                      "textDecorationStyle": "solid",
                     }
                   }
                   target="_new"
@@ -5884,7 +5879,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              James applied his skills as a Fixer to organize comprehensive field research for the entire C Labs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.
+              James applied his skills as a Fixer to organize comprehensive field research for the entire cLabs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.
             </div>
           </div>
         </div>
@@ -7140,6 +7135,202 @@ exports[`Community renders 1`] = `
             }
           }
         >
+          experienceLabel
+        </h3>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxFlex": 0,
+            "WebkitFlexGrow": 0,
+            "WebkitFlexShrink": 0,
+            "flexGrow": 0,
+            "flexShrink": 0,
+            "msFlexNegative": 0,
+            "msFlexPositive": 0,
+            "paddingBottom": "10px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "10px",
+            "width": "100%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxLines": "multiple",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "WebkitFlexWrap": "wrap",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "msFlexDirection": "row",
+              "msFlexWrap": "wrap",
+            }
+          }
+        >
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "60px",
+                  "marginRight": "60px",
+                  "width": "180px",
+                }
+              }
+            >
+              <a
+                href="/experience/brand"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "marginBottom": "10px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitFlexBasis": "auto",
+                        "flexBasis": "auto",
+                        "height": "45px",
+                        "msFlexPreferredSize": "auto",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "width": "45px",
+                        "zIndex": 0,
+                      }
+                    }
+                  >
+                    <div
+                      className="css-view-1dbjc4n"
+                      style={
+                        Object {
+                          "backgroundColor": "rgba(0,0,0,0.00)",
+                          "backgroundPosition": "center",
+                          "backgroundRepeat": "no-repeat",
+                          "backgroundSize": "contain",
+                          "bottom": "0px",
+                          "height": "100%",
+                          "left": "0px",
+                          "position": "absolute",
+                          "right": "0px",
+                          "top": "0px",
+                          "width": "100%",
+                          "zIndex": -1,
+                        }
+                      }
+                    />
+                  </div>
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "marginBottom": "15px",
+                      "marginTop": "15px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  channels.brand.name
+                </div>
+              </a>
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                channels.brand.text
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignSelf": "center",
+          "WebkitBoxDirection": "normal",
+          "WebkitBoxOrient": "vertical",
+          "WebkitFlexDirection": "column",
+          "alignSelf": "center",
+          "flexDirection": "column",
+          "maxWidth": "100vw",
+          "msFlexDirection": "column",
+          "msFlexItemAlign": "center",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxFlex": 0,
+            "WebkitFlexGrow": 0,
+            "WebkitFlexShrink": 0,
+            "flexGrow": 0,
+            "flexShrink": 0,
+            "msFlexNegative": 0,
+            "msFlexPositive": 0,
+            "paddingBottom": "10px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "10px",
+            "width": "100%",
+          }
+        }
+      >
+        <h3
+          aria-level="3"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "24px",
+              "lineHeight": "32px",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
           socialLabel
         </h3>
       </div>
@@ -7282,6 +7473,7 @@ exports[`Community renders 1`] = `
                     role="link"
                     style={
                       Object {
+                        "WebkitTextDecorationStyle": "solid",
                         "color": "rgba(46,51,56,1.00)",
                         "cursor": "pointer",
                         "display": "inline",
@@ -7290,6 +7482,7 @@ exports[`Community renders 1`] = `
                         "lineHeight": "20px",
                         "opacity": 1,
                         "textDecoration": "underline",
+                        "textDecorationStyle": "solid",
                         "textRendering": "geometricPrecision",
                       }
                     }
@@ -7319,10 +7512,11 @@ exports[`Community renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                     data-focusable={true}
                     dir="auto"
-                    href="https://twitter.com/@celoHQ"
+                    href="https://twitter.com/@celoOrg"
                     role="link"
                     style={
                       Object {
+                        "WebkitTextDecorationStyle": "solid",
                         "color": "rgba(46,51,56,1.00)",
                         "cursor": "pointer",
                         "display": "inline",
@@ -7331,11 +7525,12 @@ exports[`Community renders 1`] = `
                         "lineHeight": "20px",
                         "opacity": 1,
                         "textDecoration": "underline",
+                        "textDecorationStyle": "solid",
                         "textRendering": "geometricPrecision",
                       }
                     }
                   >
-                    @celoHQ
+                    @celoOrg
                   </a>
                 </div>
               </div>
@@ -7403,7 +7598,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  GitHub
+                  channels.github.name
                 </div>
               </a>
               <div
@@ -7419,7 +7614,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                Contribute to the codebase
+                channels.github.text
               </div>
             </div>
           </div>
@@ -7485,7 +7680,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  Discord
+                  channels.discord.name
                 </div>
               </a>
               <div
@@ -7501,8 +7696,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                Collaborate and get
-developer support
+                channels.discord.text
               </div>
             </div>
           </div>
@@ -7566,7 +7760,7 @@ developer support
                     }
                   }
                 >
-                  Forum
+                  channels.forum.name
                 </div>
               </a>
               <div
@@ -7582,7 +7776,7 @@ developer support
                   }
                 }
               >
-                Ask technical questions
+                channels.forum.text
               </div>
             </div>
           </div>
@@ -7667,7 +7861,7 @@ developer support
                     }
                   }
                 >
-                  Events
+                  channels.events.name
                 </div>
               </a>
               <div
@@ -7683,7 +7877,7 @@ developer support
                   }
                 }
               >
-                Connect in Person
+                channels.events.text
               </div>
             </div>
           </div>

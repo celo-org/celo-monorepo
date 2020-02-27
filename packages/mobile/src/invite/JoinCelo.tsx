@@ -9,7 +9,7 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { setName, setPhoneNumber } from 'src/account/actions'
+import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -33,6 +33,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
+  setPromptForno: typeof setPromptForno
   showError: typeof showError
   hideAlert: typeof hideAlert
   setPhoneNumber: typeof setPhoneNumber
@@ -49,6 +50,7 @@ interface State {
 }
 
 const mapDispatchToProps = {
+  setPromptForno,
   setPhoneNumber,
   setName,
   showError,
@@ -136,6 +138,7 @@ export class JoinCelo extends React.Component<Props, State> {
       return
     }
 
+    this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
     this.props.setPhoneNumber(e164Number, countryCode)
     this.props.setName(name)
     this.goToNextScreen()

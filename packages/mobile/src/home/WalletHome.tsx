@@ -20,16 +20,16 @@ import {
 import SafeAreaView from 'react-native-safe-area-view'
 import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
-import { hideAlert, showMessage } from 'src/alert/actions'
+import { showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
 import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
-import TransactionsList from 'src/home/TransactionsList'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -41,6 +41,7 @@ import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/actions'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
+import TransactionsList from 'src/transactions/TransactionsList'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
@@ -63,7 +64,6 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
   setLoading: typeof setLoading
   showMessage: typeof showMessage
-  hideAlert: typeof hideAlert
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -75,7 +75,6 @@ const mapDispatchToProps = {
   exitBackupFlow,
   setLoading,
   showMessage,
-  hideAlert,
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -193,7 +192,9 @@ export class WalletHome extends React.Component<Props> {
     sections.push({
       title: t('activity'),
       data: [{}],
-      renderItem: () => <TransactionsList key={'TransactionList'} />,
+      renderItem: () => (
+        <TransactionsList key={'TransactionList'} currency={CURRENCY_ENUM.DOLLAR} />
+      ),
     })
 
     return (

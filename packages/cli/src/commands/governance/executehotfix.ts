@@ -1,10 +1,14 @@
-import { hotfixToHash } from '@celo/contractkit/lib/governance/proposals'
+import {
+  hotfixToHash,
+  ProposalBuilder,
+  ProposalTransactionJSON,
+} from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
+import { readFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { buildProposalFromJsonFile } from '../../utils/governance'
 
 export default class ExecuteHotfix extends BaseCommand {
   static description = 'Execute a governance hotfix prepared for the current epoch'
@@ -16,12 +20,20 @@ export default class ExecuteHotfix extends BaseCommand {
     salt: flags.string({ required: true, description: 'Secret salt associated with hotfix' }),
   }
 
-  static examples = []
+  static examples = [
+    'executehotfix --jsonTransactions ./transactions.json --salt 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+  ]
 
   async run() {
     const res = this.parse(ExecuteHotfix)
     const account = res.flags.from
-    const hotfix = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
+
+    const jsonString = readFileSync(res.flags.jsonTransactions).toString()
+    const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
+
+    const builder = new ProposalBuilder(this.kit)
+    jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
+    const hotfix = await builder.build()
     const saltBuff = Buffer.from(res.flags.salt, 'hex')
     const hash = hotfixToHash(this.kit, hotfix, saltBuff)
 
@@ -39,6 +51,11 @@ export default class ExecuteHotfix extends BaseCommand {
       .addCheck(`Hotfix ${hash} is approved`, () => record.approved)
       .runChecks()
 
-    await displaySendTx('executeHotfixTx', governance.executeHotfix(hotfix, saltBuff))
+    await displaySendTx(
+      'executeHotfixTx',
+      governance.executeHotfix(hotfix, saltBuff),
+      {},
+      'HotfixExecuted'
+    )
   }
 }

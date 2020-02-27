@@ -16,7 +16,7 @@ export class Backers extends React.Component<I18nProps & ScreenProps> {
     return (
       <>
         <BookLayout startBlock={true} label={t('celoBackers')} nativeID={hashNav.about.backers}>
-          <Text style={fonts.p}>{t('celoBackersText')}</Text>
+          <Text style={fonts.p}>{t('celoBackersText', { count: 80 })}</Text>
         </BookLayout>
         <GridRow
           allStyle={standardStyles.blockMarginTopTablet}

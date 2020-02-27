@@ -48,7 +48,7 @@ spec:
 {{ include "common.init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command:
           - bash
           - "-c"
@@ -136,22 +136,26 @@ spec:
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command: ["/bin/sh"]
         args:
         - "-c"
         - |-
           set -euo pipefail
-          # Delete the private key as it is no longer needed
-          rm /root/.celo/pkey
+          if [[ "$GETH_DEBUG" != "true" ]]; then
+            rm /root/.celo/pkey || true
+          fi
 
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
 
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
 
+          PROXY_ALLOW_PRIVATE_IP_FLAG=""
+          [[ "$GETH_DEBUG" == "true" ]] && PROXY_ALLOW_PRIVATE_IP_FLAG="--proxy.allowprivateip"
+
           PROXIED_FLAGS=""
-          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` --nodiscover"
+          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` --nodiscover $PROXY_ALLOW_PRIVATE_IP_FLAG --proxy.allowprivateip"
 
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
@@ -186,6 +190,7 @@ spec:
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --metrics \
+            --allow-insecure-unlock \
             ${PING_IP_FROM_PACKET_FLAG} \
             ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
             ${PROXIED_FLAGS}
@@ -195,6 +200,8 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.podIP
+        - name: GETH_DEBUG
+          value: "{{ default "false" .Values.geth.debug }}"
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
         - name: NETWORK_ID

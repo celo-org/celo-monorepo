@@ -19,10 +19,17 @@
 #import "RNFirebaseMessaging.h"
 #import "RNSplashScreen.h"
 
+#import "ReactNativeConfig.h"
 
 // Use same key as react-native-secure-key-store
 // so we don't reset already working installs
 static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
+
+@interface AppDelegate ()
+
+@property (nonatomic, weak) UIView *blurView;
+
+@end
 
 @implementation AppDelegate
 
@@ -32,7 +39,10 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   // Note: react-native-secure-key-store also does that but is run too late
   // and hence can't clear Firebase credentials
   [self resetKeychainIfNecessary];
-  [FIRApp configure];
+  NSString *env = [ReactNativeConfig envFor:@"FIREBASE_ENABLED"];
+  if (env.boolValue) {
+    [FIRApp configure];
+  }
   [RNFirebaseNotifications configure];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
@@ -99,4 +109,29 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 {
   return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
 }
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+  // Prevent sensitive information from appearing in the task switcher
+  // See https://developer.apple.com/library/archive/qa/qa1838/_index.html
+  
+  if (self.blurView) {
+    // Shouldn't happen ;)
+    return;
+  }
+  
+  UIVisualEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+  UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+  blurView.frame = self.window.bounds;
+  self.blurView = blurView;
+  [self.window addSubview:blurView];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+  // Remove our blur
+  [self.blurView removeFromSuperview];
+  self.blurView = nil;
+}
+
 @end
