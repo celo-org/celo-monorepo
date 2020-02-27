@@ -1,4 +1,6 @@
-/* tslint:disable: no-console */
+// tslint:disable:no-console
+// tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
