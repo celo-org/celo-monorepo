@@ -66,10 +66,36 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   getBeneficiary: () => Promise<Address> = proxyCall(this.contract.methods.beneficiary)
 
   /**
-   * Returns the revoker address of the ReleaseGold contract
-   * @return The address of the revoker.
+   * Returns the releaseOwner address of the ReleaseGold contract
+   * @return The address of the releaseOwner.
    */
-  getRevoker: () => Promise<Address> = proxyCall(this.contract.methods.releaseOwner)
+  getReleaseOwner: () => Promise<Address> = proxyCall(this.contract.methods.releaseOwner)
+
+  /**
+   * Returns the refund address of the ReleaseGold contract
+   * @return The refundAddress.
+   */
+  getRefundAddress: () => Promise<Address> = proxyCall(this.contract.methods.refundAddress)
+
+  /**
+   * Returns true if the liquidity provision has been met for this contract
+   * @return If the liquidity provision is met.
+   */
+  getLiquidityProvisionMet: () => Promise<boolean> = proxyCall(
+    this.contract.methods.liquidityProvisionMet
+  )
+
+  /**
+   * Returns true if the contract can validate
+   * @return If the contract can validate
+   */
+  getCanValidate: () => Promise<boolean> = proxyCall(this.contract.methods.canValidate)
+
+  /**
+   * Returns true if the contract can vote
+   * @return If the contract can vote
+   */
+  getCanVote: () => Promise<boolean> = proxyCall(this.contract.methods.canVote)
 
   /**
    * Returns the total withdrawn amount from the ReleaseGold contract
@@ -77,6 +103,17 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    */
   getTotalWithdrawn: () => Promise<BigNumber> = proxyCall(
     this.contract.methods.totalWithdrawn,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
+   * Returns the maximum amount of gold (regardless of release schedule)
+   * currently allowed for release.
+   * @return The max amount of gold currently withdrawable.
+   */
+  getMaxDistribution: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.maxDistribution,
     undefined,
     valueToBigNumber
   )
@@ -336,6 +373,11 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     this.kit,
     this.contract.methods.setAccountDataEncryptionKey
   )
+
+  /**
+   * Sets the contracts' liquidity provision to true
+   */
+  setLiquidityProvision = proxySend(this.kit, this.contract.methods.setLiquidityProvision)
 
   /**
    * Authorizes an address to sign votes on behalf of the account.

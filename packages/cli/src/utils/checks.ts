@@ -3,6 +3,7 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
+import { ReleaseGoldWrapper } from '@celo/contractkit/src/wrappers/ReleaseGold'
 import { eqAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
@@ -340,6 +341,10 @@ class CheckBuilder {
         return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now()
       })
     )
+  }
+
+  isNotRevoked = (contract: ReleaseGoldWrapper) => {
+    return this.addCheck('Contract is not revoked', async () => negate(contract.isRevoked()))
   }
 
   hasACommissionUpdateQueued = () =>
