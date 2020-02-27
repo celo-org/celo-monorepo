@@ -1,9 +1,8 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
@@ -12,7 +11,6 @@ import ExchangeRate from 'src/exchange/ExchangeRate'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import RoundedArrow from 'src/shared/RoundedArrow'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 export interface ExchangeConfirmationCardProps {
   makerAmount: MoneyAmount
@@ -20,8 +18,6 @@ export interface ExchangeConfirmationCardProps {
   fee?: string
   tobinTax?: string
   exchangeRate?: BigNumber
-  newDollarBalance?: BigNumber
-  newGoldBalance?: BigNumber
 }
 
 type Props = ExchangeConfirmationCardProps & WithTranslation
@@ -37,39 +33,8 @@ const getExchangeRate = (props: Props) => {
   return new BigNumber(makerAmount.value).dividedBy(takerAmount.value)
 }
 
-const renderNewBalances = (
-  props: Props,
-  newDollarBalance: BigNumber,
-  newGoldBalance: BigNumber
-) => {
-  const { t } = props
-
-  return (
-    <View style={styles.newBalanceContainer}>
-      <View style={styles.line} />
-
-      <View style={styles.titleContainer}>
-        <Text style={[fontStyles.pCurrency, styles.title]}>{t('newBalance')}</Text>
-      </View>
-      <View style={styles.tabular}>
-        <Text style={fontStyles.bodySecondary}>{t('global:celoDollars')}</Text>
-        <Text numberOfLines={1} style={[fontStyles.body, styles.dollar]}>
-          {getMoneyDisplayValue(newDollarBalance, CURRENCY_ENUM.DOLLAR, true)}
-        </Text>
-      </View>
-
-      <View style={styles.tabular}>
-        <Text style={fontStyles.bodySecondary}>{t('global:celoGold')}</Text>
-        <Text numberOfLines={1} style={[fontStyles.body, styles.gold]}>
-          {getMoneyDisplayValue(newGoldBalance, CURRENCY_ENUM.GOLD, true)}
-        </Text>
-      </View>
-    </View>
-  )
-}
-
 export function ExchangeConfirmationCard(props: Props) {
-  const { t, newDollarBalance, newGoldBalance, makerAmount, takerAmount, fee, tobinTax } = props
+  const { t, makerAmount, takerAmount, fee, tobinTax } = props
 
   // TODO: improve this with a generic helper
   const makerToken =
@@ -106,10 +71,6 @@ export function ExchangeConfirmationCard(props: Props) {
           titleIcon={<FeeIcon isExchange={true} />}
         />
       </View>
-
-      {newDollarBalance &&
-        newGoldBalance &&
-        renderNewBalances(props, newDollarBalance, newGoldBalance)}
     </View>
   )
 }
