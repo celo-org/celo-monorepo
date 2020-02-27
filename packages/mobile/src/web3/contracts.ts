@@ -1,5 +1,4 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { DEFAULT_FORNO_URL } from 'src/config'
@@ -101,5 +100,6 @@ export function addLocalAccount(web3Instance: Web3, privateKey: string) {
   if (!privateKey) {
     throw new Error(`privateKey is ${privateKey}`)
   }
-  web3utilsAddLocalAccount(web3Instance, privateKey)
+  contractKit.addAccount(privateKey)
+  contractKit.defaultAccount = privateKey
 }
