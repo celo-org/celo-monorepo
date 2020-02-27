@@ -24,30 +24,13 @@ import {
 } from 'src/invite/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
+import { contractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
-import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
+import { createMockStore, mockContractKitBalance } from 'test/utils'
 import { mockAccount, mockE164Number } from 'test/values'
 
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const mockKeyEncoded = 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ='
-const mockBalance = jest.fn()
-
-jest.mock('@celo/walletkit', () => {
-  const { createMockContract } = require('test/utils')
-  return {
-    ...jest.requireActual('@celo/walletkit'),
-    getAttestationsContract: async () =>
-      createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
-    getStableTokenContract: jest.fn(async () =>
-      createMockContract({
-        balanceOf: mockBalance,
-        transfer: () => null,
-        transferWithComment: () => null,
-        decimals: () => '10',
-      })
-    ),
-  }
-})
 
 jest.mock('src/firebase/dynamicLinks', () => ({
   ...jest.requireActual('src/firebase/dynamicLinks'),
@@ -67,36 +50,35 @@ jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
 
-jest.mock('src/web3/contracts', () => ({
-  web3: {
-    eth: {
-      accounts: {
-        privateKeyToAccount: () => mockAccount,
-        wallet: {
-          add: () => null,
+jest.mock('src/web3/contracts', () => {
+  const ck = require('@celo/contractkit').newKitFromWeb3
+  return {
+    contractKit: ck(),
+    web3: {
+      eth: {
+        accounts: {
+          privateKeyToAccount: () => mockAccount,
+          wallet: {
+            add: () => null,
+          },
+          create: () => ({
+            address: mockAccount,
+            privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+          }),
         },
-        create: () => ({
-          address: mockAccount,
-          privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-        }),
+        personal: {
+          importRawKey: () => mockAccount,
+          unlockAccount: async () => true,
+        },
       },
-      personal: {
-        importRawKey: () => mockAccount,
-        unlockAccount: async () => true,
+      utils: {
+        fromWei: (x: any) => x / 1e18,
+        sha3: () => `a sha3 hash`,
       },
     },
-    utils: {
-      fromWei: (x: any) => x / 1e18,
-      sha3: () => `a sha3 hash`,
-    },
-  },
-  contractKit: {
-    contracts: {
-      getStableToken: () => mockContractKitContract,
-    },
-  },
-  isFornoMode: () => false,
-}))
+    isFornoMode: () => false,
+  }
+})
 
 SendIntentAndroid.sendSms = jest.fn()
 
@@ -148,10 +130,6 @@ describe(watchRedeemInvite, () => {
   })
 
   it('works with a valid private key and enough money on it', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
@@ -165,10 +143,6 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but unsuccessful transfer', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-      .mockReturnValueOnce(new BigNumber(0)) // new account
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
@@ -183,9 +157,16 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but no money on key', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(0)) // temp account
-      .mockReturnValueOnce(new BigNumber(0)) // current account
+    // @ts-ignore
+    contractKit.contracts.getStableToken.mockImplementation(async () => ({
+      balanceOf: async () => {
+        return new BigNumber(0)
+      },
+      decimals: async () => '10',
+      transferWithComment: async () => ({
+        txo: {},
+      }),
+    }))
 
     await expectSaga(watchRedeemInvite)
       .provide([
@@ -200,7 +181,16 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with error creating account', async () => {
-    mockContractKitBalance.mockReturnValueOnce(new BigNumber(10)) // temp account
+    // @ts-ignore
+    contractKit.contracts.getStableToken.mockImplementation(async () => ({
+      balanceOf: async () => {
+        return new BigNumber(10)
+      },
+      decimals: async () => '10',
+      transferWithComment: async () => ({
+        txo: {},
+      }),
+    }))
 
     await expectSaga(watchRedeemInvite)
       .provide([

@@ -1,3 +1,5 @@
+import { CeloTransactionObject } from '@celo/contractkit'
+import { TxPromises } from '@celo/walletkit'
 import { call, put, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -31,26 +33,20 @@ function* onSendAndMonitorTransactionError(txId: string) {
   yield put(showError(ErrorMessages.TRANSACTION_FAILED))
 }
 
-export function* sendAndMonitorTransaction(
+export function* sendAndMonitorTransaction<T>(
   txId: string,
-  tx: any,
+  tx: CeloTransactionObject<T>,
   account: string,
   currency?: CURRENCY_ENUM
 ) {
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
-    const { transactionHash, confirmation } = yield call(
-      sendTransactionPromises,
-      tx,
-      account,
-      TAG,
-      txId
-    )
-    const hash = yield transactionHash
+    const txPromises: TxPromises = yield call(sendTransactionPromises, tx.txo, account, TAG, txId)
+    const hash = yield txPromises.transactionHash
     yield put(addHashToStandbyTransaction(txId, hash))
 
-    yield confirmation
+    yield txPromises.confirmation
     yield put(transactionConfirmed(txId))
 
     if (currency === CURRENCY_ENUM.GOLD) {

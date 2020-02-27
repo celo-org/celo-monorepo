@@ -1,7 +1,6 @@
+import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { ensureLeading0x } from '@celo/utils/src/address'
-import { getEscrowContract, getStableTokenContract } from '@celo/walletkit'
-import { Escrow } from '@celo/walletkit/lib/types/Escrow'
-import { StableToken } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -31,12 +30,13 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import { getCurrencyAddress } from 'src/tokens/saga'
 import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, web3 } from 'src/web3/contracts'
+import { addLocalAccount, contractKit, web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 
@@ -46,24 +46,31 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
   Logger.debug(TAG + '@transferToEscrow', 'Begin transfer to escrow')
   try {
     const { phoneHash, amount, tempWalletAddress } = action
-    const escrow: Escrow = yield call(getEscrowContract, web3)
-    const stableToken: StableToken = yield call(getStableTokenContract, web3)
     const account: string = yield call(getConnectedUnlockedAccount)
+
+    const stableToken: StableTokenWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getStableToken,
+    ])
+    const escrow: EscrowWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getEscrow,
+    ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
     const convertedAmount = web3.utils.toWei(amount.toString())
-    const approvalTx = stableToken.methods.approve(escrow.options.address, convertedAmount)
+    const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
-    yield call(sendTransaction, approvalTx, account, TAG, 'approval')
+    yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
 
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
-    const transferTxId = generateStandbyTransactionId(escrow._address)
-    yield call(registerStandbyTransaction, transferTxId, amount.toString(), escrow._address)
+    const transferTxId = generateStandbyTransactionId(escrow.address)
+    yield call(registerStandbyTransaction, transferTxId, amount.toString(), escrow.address)
 
-    const transferTx = escrow.methods.transfer(
+    const transferTx = escrow.transfer(
       phoneHash,
-      stableToken.options.address,
+      stableToken.address,
       convertedAmount,
       ESCROW_PAYMENT_EXPIRY_SECONDS,
       tempWalletAddress,
@@ -101,7 +108,10 @@ function* withdrawFromEscrow() {
   try {
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
-    const escrow: Escrow = yield call(getEscrowContract, web3)
+    const escrow: EscrowWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getEscrow,
+    ])
     const account: string = yield call(getConnectedUnlockedAccount)
     const tmpWalletPrivateKey: string = yield select(
       (state: RootState) => state.invite.redeemedInviteCode
@@ -148,10 +158,10 @@ function* withdrawFromEscrow() {
     const s = `0x${signature.slice(64, 128)}`
     const v = web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
 
-    const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
+    const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
 
-    yield call(sendTransaction, withdrawTx, account, TAG, txID)
+    yield call(sendTransaction, withdrawTx.txo, account, TAG, txID)
 
     yield put(fetchDollarBalance())
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
@@ -166,8 +176,8 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const escrow = await getEscrowContract(web3)
-  return escrow.methods.revoke(paymentID)
+  const escrow = await contractKit.contracts.getEscrow()
+  return escrow.revoke(paymentID).txo
 }
 
 export async function getReclaimEscrowGas(account: string, paymentID: string) {
@@ -175,7 +185,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
-    feeCurrency: (await getStableTokenContract(web3))._address,
+    feeCurrency: await getCurrencyAddress(CURRENCY_ENUM.DOLLAR),
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
@@ -213,11 +223,11 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
   }
 }
 
-async function getEscrowedPayment(escrow: Escrow, paymentID: string) {
+async function getEscrowedPayment(escrow: EscrowWrapper, paymentID: string) {
   Logger.debug(TAG + '@getEscrowedPayment', 'Fetching escrowed payment')
 
   try {
-    const payment = await escrow.methods.escrowedPayments(paymentID).call()
+    const payment = await escrow.escrowedPayments(paymentID)
     return payment
   } catch (e) {
     Logger.error(TAG + '@getEscrowedPayment', 'Error fetching escrowed payment', e)
@@ -229,10 +239,13 @@ function* doFetchSentPayments() {
   Logger.debug(TAG + '@doFetchSentPayments', 'Fetching valid sent escrowed payments')
 
   try {
-    const escrow: Escrow = yield call(getEscrowContract, web3)
+    const escrow: EscrowWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getEscrow,
+    ])
     const account: string = yield call(getConnectedAccount)
 
-    const sentPaymentIDs: string[] = yield call(escrow.methods.getSentPaymentIds(account).call) // Note: payment ids are currently temp wallet addresses
+    const sentPaymentIDs: string[] = yield call(escrow.getSentPaymentIds, account) // Note: payment ids are currently temp wallet addresses
     if (!sentPaymentIDs || !sentPaymentIDs.length) {
       Logger.debug(TAG + '@doFetchSentPayments', 'No payments ids found, clearing stored payments')
       yield put(storeSentEscrowPayments([]))
