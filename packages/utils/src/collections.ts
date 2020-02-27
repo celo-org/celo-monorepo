@@ -97,11 +97,3 @@ export function linkedListChanges(
   }
   return { lessers, greaters, list }
 }
-
-export function range(from: number, to: number, step: number) {
-  const res: number[] = []
-  for (let i = from; i < to; i += step) {
-    res.push(i)
-  }
-  return res
-}
