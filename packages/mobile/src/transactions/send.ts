@@ -5,7 +5,6 @@ import {
   SendTransactionLogEvent,
   SendTransactionLogEventType,
 } from '@celo/walletkit'
-import { StableToken } from '@celo/walletkit/types/StableToken'
 import { call, delay, race, select, take } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -19,11 +18,9 @@ import { getLatestNonce } from 'src/web3/utils'
 import { TransactionObject } from 'web3/eth/types'
 
 const TAG = 'transactions/send'
-//TODO
-const TX_NUM_RETRIES = 1 // Try txs up to 3 times
+const TX_NUM_RETRIES = 3 // Try txs up to 3 times
 const TX_RETRY_DELAY = 1000 // 1s
-//TODO
-const TX_TIMEOUT = 40000 // 20s
+const TX_TIMEOUT = 20000 // 20s
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
 const KNOWN_TX_ERROR = 'known transaction'
@@ -78,7 +75,7 @@ export function* sendTransactionPromises(
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
   // Use stabletoken to pay for gas by default
-  const stableToken: StableToken = yield call(getStableTokenContract, web3)
+  const stableToken = yield call(getStableTokenContract, web3)
   const fornoMode: boolean = yield select(fornoSelector)
 
   Logger.debug(
@@ -180,8 +177,6 @@ export function* wrapSendTransactionWithRetry(
       if (!shouldTxFailureRetry(err)) {
         return
       }
-
-      //TODO analytics
 
       if (i + 1 <= TX_NUM_RETRIES) {
         yield delay(TX_RETRY_DELAY)

@@ -271,7 +271,7 @@ export function* unlockAccount(account: string) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
         Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in forno mode`)
-        const privateKey: string = yield call(readPrivateKeyFromLocalDisk, account, pincode)
+        const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
         addLocalAccount(web3, privateKey)
         accountAlreadyAddedInFornoMode = true
       }

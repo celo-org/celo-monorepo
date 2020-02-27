@@ -35,5 +35,5 @@ export async function getLatestNonce(address: string) {
 }
 
 export function getAccountAddressFromPrivateKey(privateKey: string): string {
-  return web3.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey.toLowerCase())).address
+  return web3.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey)).address
 }
