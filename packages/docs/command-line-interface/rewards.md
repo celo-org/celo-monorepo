@@ -24,17 +24,3 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/rewards/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/rewards/show.ts)_
-
-### Slasher
-
-Mines for slashable downtime
-
-```
-USAGE
-  $ celocli rewards:slasher
-
-EXAMPLE
-  slasher
-```
-
-_See code: [packages/cli/src/commands/rewards/slasher.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/rewards/slasher.ts)_
