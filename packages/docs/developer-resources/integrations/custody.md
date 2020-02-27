@@ -4,31 +4,28 @@ Custody in this section refers to the holding of Celo assets such as Celo Dollar
 
 ## Balance model
 
-As a fork of Ethereum, Celo retains the account model to keep track of users' balances. Celo Dollar and Celo Gold are [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) contracts. Thus it is easy and common for smart contracts to have balances on the token contracts in another account's association. An example is the [`LockedGold`](celo-codebase/protocol/proof-of-stake/locked-gold) smart contract that holds the "locked portion of a user's `cGLD` balance". Another one is the [`ReleasingGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGoldInstance.sol) smart contract that holds `cGLD` that is being released over time to some schedule.
+As a fork of Ethereum, Celo retains the account model to keep track of users' balances. Celo Dollar and Celo Gold are [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) contracts. It is common for smart contracts to hold balances on behalf of other addresses. One example is the [`LockedGold`](celo-codebase/protocol/proof-of-stake/locked-gold) smart contract that holds the "locked portion of a user's `cGLD` balance". Another one is the [`ReleasingGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGoldInstance.sol) smart contract that holds `cGLD` that is being released to a beneficiary address over time according to some schedule.
 
-It is up you to decide how you would like to represent a user's "balance" in your service.
+Applications that display balances may need to be written to be aware of this possibility.
 
 ## Transfers
 
-Since all Celo assets are implementing an ERC-20 like interface, transfers can be done simply with the `transfer` function. Celo Gold is special as the native currency of the network, and can thus be transfered (in addition to the ERC20 interface) by specifying the `value` field of the transaction, similarly to `ETH` in Ethereum. Transfers to smart contracts can often be accomplished via the `approve/transferFrom` method, or via `value` in the case of contracts such as `LockedGold`.
+Celo Gold and Celo Dollars implement the ERC20 interface, as will any future core stable Celo currencies. Celo Gold, as the native currency of the network, can also be transferred by specifying the value field of a transaction, in the same way that ETH can be transferred in Ethereum.
 
 ## LockedGold
 
-The `LockedGold` contract is part of Celo's [Proof of Stake system] to allow users to vote in validator elections, receive rewards for doing so and participate in on-chain governance. `Celo Gold` can be transferred to the `LockedGold` contract and be voted with (after [creating an account](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L89) on the `Accounts` smart contract). There are two ways through which you can support your users' voting in the validator elections:
+The `LockedGold` contract is part of Celo's [Proof of Stake system]. Users can lock Celo Gold by creating an account in the [Accounts smart contract](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L89) and sending it to LockedGold. This allows users to vote in validator elections, receive epoch rewards, and participate in on-chain governance.
 
-**Direct voting**:
-In your service, you can list eligible validator groups and then have users vote directly in your UI by submitting the relevant transactions (such as voting/activating/revoking) from your side.
+There are two ways in which users can vote:
+- Directly, by sending voting transactions with the same key used to lock up Celo Gold
+- Via an authorized validator signer, which can submit voting transactions on behalf of the account with locked Celo Gold
 
-**Voting key delegation**:
-Any account on the [Accounts smart contract](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L13) can designate an authorized vote signer which can submit the voting transactions on behalf of the account. In this scenario, your service would only have to expose the authorizing of the voting key to the user, and then the user would be responsible for submitting the voting transactions themselves.
 
-Voting on governance proposals is similar.
+## ReleaseGold
 
-## ReleasingGold
+A common problem in more recent PoS projects is the fact that early token holders have their balances release over time to ensure long-term alignment, yet wanting to have those balances participate in the PoS system to increase the security of the network. For that purpose, many early token balances are released via the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) contract. Beneficiaries of these contracts can participate in the PoS system by locking/unlocking already-released/to-be-released Celo Gold and authoring voting/validating keys to act on behalf of the beneficiary.
 
-A common problem in more recent PoS projects is the fact that early token holders have their balances release over time to ensure long-term alignment, yet wanting to have those balances participate in the PoS system to increase the security of the network. For that purpose, many early token balances are released via the `ReleasingGold` contract. Beneficiaries of these contracts can participate in the PoS system by locking/unlocking already-released/to-be-released Celo Gold and authoring voting/validating keys to act on behalf of the beneficiary.
-
-Custodians of benefiaries will want to support this functionality to increase the security of the network.
+Many users are likely to prefer custodians that support this functionality so that they can maximize their epoch rewards and participate in governance of the network.
 
 
 
