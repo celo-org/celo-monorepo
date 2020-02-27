@@ -171,7 +171,7 @@ interface LabelProps {
   value: string
   label: string
   onInput: (x?: unknown) => void
-  isDarkMode?: boolean
+  isDarkMode: boolean
 }
 
 export function LabeledInput({
