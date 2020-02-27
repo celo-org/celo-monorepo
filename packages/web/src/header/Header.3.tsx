@@ -12,7 +12,7 @@ import Octocat from 'src/icons/Octocat'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
-import Footer from 'src/shared/Footer.3'
+import Footer from 'src/shared/Footer'
 import Link from 'src/shared/Link'
 import menu, { CeloLinks } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
@@ -23,11 +23,13 @@ const CookieConsent = dynamic(
   (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
 )
 
-const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
+const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.DEVELOPERS, menu.COMMUNITY]
 const DARK_PAGES = new Set([
   menu.HOME.link,
   menu.COMMUNITY.link,
   menu.BUILD.link,
+  menu.SDK_DEVELOPERS.link,
+  menu.VALIDATORS_LIST.link,
   CeloLinks.walletApp,
 ])
 

@@ -74,6 +74,7 @@
   "quitApp": "Quit",
   "loading": "Loading…",
   "inviteFailed": "Failure sending invite",
+  "inviteOpenAppFailed": "Could not open messaging app, invite code copied to clipboard",
   "importContactsFailed": "Failed to import contacts",
   "sendPaymentFailed": "Failure sending payment",
   "paymentRequestFailed": "Payment Request did not send",
@@ -87,7 +88,7 @@
   },
   "networkConnectionFailed":
     "Could not connect with the network, please check your data connection",
-  "firebaseFailed": "Couldn't connect to notification service",
+  "firebaseFailed": "Could not connect to Firebase",
   "gasPriceUpdateFailed": "Could not update fee",
   "appHasToBeUpdated": "App has to be updated",
   "thisVersionIsInsecure": "This version is insecure",

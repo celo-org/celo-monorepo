@@ -41,35 +41,44 @@ class CheckBuilder {
 
   constructor(private cmd: BaseCommand, private signer?: Address) {}
 
+  get web3() {
+    return this.cmd.web3
+  }
+
   get kit() {
     return this.cmd.kit
   }
 
   withValidators<A>(
-    f: (validators: ValidatorsWrapper, signer: Address, account: Address) => A
+    f: (validators: ValidatorsWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
   ): () => Promise<Resolve<A>> {
     return async () => {
       const validators = await this.kit.contracts.getValidators()
       if (this.signer) {
         const account = await validators.signerToAccount(this.signer)
-        return f(validators, this.signer, account) as Resolve<A>
+        return f(validators, this.signer, account, this) as Resolve<A>
       } else {
-        return f(validators, '', '') as Resolve<A>
+        return f(validators, '', '', this) as Resolve<A>
       }
     }
   }
 
   withLockedGold<A>(
-    f: (lockedGold: LockedGoldWrapper, signer: Address, account: Address) => A
+    f: (
+      lockedGold: LockedGoldWrapper,
+      signer: Address,
+      account: Address,
+      validators: ValidatorsWrapper
+    ) => A
   ): () => Promise<Resolve<A>> {
     return async () => {
       const lockedGold = await this.kit.contracts.getLockedGold()
       const validators = await this.kit.contracts.getValidators()
       if (this.signer) {
         const account = await validators.signerToAccount(this.signer)
-        return f(lockedGold, this.signer, account) as Resolve<A>
+        return f(lockedGold, this.signer, account, validators) as Resolve<A>
       } else {
-        return f(lockedGold, '', '') as Resolve<A>
+        return f(lockedGold, '', '', validators) as Resolve<A>
       }
     }
   }
@@ -112,7 +121,7 @@ class CheckBuilder {
         const match = (await g.getProposalStage(proposalID)) === stage
         if (!match) {
           const waitTimes = await g.timeUntilStages(proposalID)
-          printValueMap(waitTimes)
+          printValueMap({ waitTimes })
         }
         return match
       })
@@ -183,6 +192,18 @@ class CheckBuilder {
       this.withValidators((v) => v.isValidatorGroup(account))
     )
 
+  isNotValidator = () =>
+    this.addCheck(
+      `${this.signer!} is not a registered Validator`,
+      this.withValidators((v, _signer, account) => negate(v.isValidator(account)))
+    )
+
+  isNotValidatorGroup = () =>
+    this.addCheck(
+      `${this.signer!} is not a registered ValidatorGroup`,
+      this.withValidators((v, _signer, account) => negate(v.isValidatorGroup(account)))
+    )
+
   signerMeetsValidatorBalanceRequirements = () =>
     this.addCheck(
       `Signer's account has enough locked gold for registration`,
@@ -242,9 +263,16 @@ class CheckBuilder {
       `${address} is not registered as an account. Try running account:register`
     )
 
+  isNotVoting = (address: Address) =>
+    this.addCheck(
+      `${address} is not currently voting on a governance proposal`,
+      this.withGovernance((gov) => negate(gov.isVoting(address))),
+      `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
+    )
+
   hasEnoughGold = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} cGold`, () =>
+    return this.addCheck(`Account has at least ${valueInEth} cGLD`, () =>
       this.kit.contracts
         .getGoldToken()
         .then((gt) => gt.balanceOf(account))
@@ -277,6 +305,61 @@ class CheckBuilder {
       )
     )
   }
+
+  hasEnoughLockedGoldToUnlock = (value: BigNumber) => {
+    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(
+      `Account has at least ${valueInEth} non-voting Locked Gold over requirement`,
+      this.withLockedGold(async (l, _signer, account, v) =>
+        value
+          .plus(await v.getAccountLockedGoldRequirement(account))
+          .isLessThanOrEqualTo(await l.getAccountNonvotingLockedGold(account))
+      )
+    )
+  }
+
+  isNotValidatorGroupMember = () => {
+    return this.addCheck(
+      `Account isn't a member of a validator group`,
+      this.withValidators(async (v, _signer, account) => {
+        const { affiliation } = await v.getValidator(account)
+        const { members } = await v.getValidatorGroup(affiliation!)
+        return !members.includes(account)
+      })
+    )
+  }
+
+  validatorDeregisterDurationPassed = () => {
+    return this.addCheck(
+      `Enough time has passed since the account was removed from a validator group`,
+      this.withValidators(async (v, _signer, account) => {
+        const { lastRemovedFromGroupTimestamp } = await v.getValidatorMembershipHistoryExtraData(
+          account
+        )
+        const { duration } = await v.getValidatorLockedGoldRequirements()
+        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now()
+      })
+    )
+  }
+
+  hasACommissionUpdateQueued = () =>
+    this.addCheck(
+      "There's a commision update queued",
+      this.withValidators(async (v, _signer, account) => {
+        const vg = await v.getValidatorGroup(account)
+        return !vg.nextCommissionBlock.eq(0)
+      })
+    )
+
+  hasCommissionUpdateDelayPassed = () =>
+    this.addCheck(
+      'The Commission update delay has already passed',
+      this.withValidators(async (v, _signer, account, ctx) => {
+        const blockNumber = await ctx.web3.eth.getBlockNumber()
+        const vg = await v.getValidatorGroup(account)
+        return vg.nextCommissionBlock.lte(blockNumber)
+      })
+    )
 
   async runChecks() {
     console.log(`Running Checks:`)

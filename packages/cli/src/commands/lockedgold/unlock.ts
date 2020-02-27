@@ -28,7 +28,8 @@ export default class Unlock extends BaseCommand {
 
     await newCheckBuilder(this, res.flags.from)
       .isAccount(res.flags.from)
-      .hasEnoughNonvotingLockedGold(value)
+      .isNotVoting(res.flags.from)
+      .hasEnoughLockedGoldToUnlock(value)
       .runChecks()
 
     await displaySendTx('unlock', lockedgold.unlock(value))

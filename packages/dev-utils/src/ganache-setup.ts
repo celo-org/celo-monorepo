@@ -1,5 +1,8 @@
 // @ts-ignore
 import * as ganache from '@celo/ganache-cli'
+import * as fs from 'fs-extra'
+import * as path from 'path'
+import * as targz from 'targz'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 export const ACCOUNT_PRIVATE_KEYS = [
@@ -27,13 +30,34 @@ export const ACCOUNT_ADDRESSES = [
   '0x91c987bf62D25945dB517BDAa840A6c661374402',
 ]
 
-export async function startGanache(datadir: string, opts: { verbose?: boolean } = {}) {
+export async function startGanache(
+  filePath: string,
+  datafile: string,
+  opts: { verbose?: boolean; from_targz?: boolean } = {}
+) {
   const logFn = opts.verbose
     ? // tslint:disable-next-line: no-console
       (...args: any[]) => console.log(...args)
     : () => {
         /*nothing*/
       }
+  const chainCopy: string = path.resolve(path.join(filePath, 'tmp/copychain'))
+  console.log(filePath, datafile)
+  const filenameWithPath: string = path.resolve(path.join(filePath, datafile))
+
+  // erases tmp chain
+  if (fs.existsSync(chainCopy)) {
+    console.log(`Removing old chain tmp folder: ${chainCopy}`)
+    fs.removeSync(chainCopy)
+  }
+  console.log(`Creating chain tmp folder: ${chainCopy}`)
+  fs.mkdirsSync(chainCopy)
+
+  if (opts.from_targz) {
+    await decompressChain(filenameWithPath, chainCopy)
+  } else {
+    fs.copySync(filenameWithPath, chainCopy)
+  }
 
   const server = ganache.server({
     default_balance_ether: 1000000,
@@ -41,7 +65,7 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
       log: logFn,
     },
     network_id: 1101,
-    db_path: datadir,
+    db_path: chainCopy,
     mnemonic: MNEMONIC,
     gasLimit: 20000000,
     allowUnlimitedContractSize: true,
@@ -69,8 +93,27 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
     })
 }
 
-export default function setup(dataDir: string) {
-  return startGanache(dataDir)
+function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
+  console.log('Decompressing chain')
+  return new Promise((resolve, reject) => {
+    targz.decompress({ src: tarPath, dest: copyChainPath }, (err) => {
+      if (err) {
+        console.error(err)
+        reject(err)
+      } else {
+        console.log('Chain decompressed')
+        resolve()
+      }
+    })
+  })
+}
+
+export default function setup(
+  filePath: string,
+  datafile: string,
+  opts: { verbose?: boolean; from_targz?: boolean } = {}
+) {
+  return startGanache(filePath, datafile, opts)
     .then((stopGanache) => {
       ;(global as any).stopGanache = stopGanache
     })

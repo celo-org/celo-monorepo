@@ -48,19 +48,21 @@ export interface ProposalMetadata {
   deposit: BigNumber
   timestamp: BigNumber
   transactionCount: number
+  descriptionURL: string
 }
 
 export type ProposalParams = Parameters<Governance['methods']['propose']>
 export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
-export const proposalToParams = (proposal: Proposal): ProposalParams => {
+export const proposalToParams = (proposal: Proposal, descriptionURL: string): ProposalParams => {
   const data = proposal.map((tx) => stringToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
     proposal.map((tx) => tx.to),
     bufferToBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
+    descriptionURL,
   ]
 }
 
@@ -92,7 +94,7 @@ export interface Votes {
 
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
 export const hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams => {
-  const p = proposalToParams(proposal)
+  const p = proposalToParams(proposal, '') // no description URL for hotfixes
   return [p[0], p[1], p[2], p[3], bufferToString(salt)]
 }
 
@@ -146,6 +148,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * Returns whether or not a particular account is voting on proposals.
+   * @param account The address of the account.
+   * @returns Whether or not the account is voting on proposals.
+   */
+  isVoting: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isVoting)
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<GovernanceConfig> {
@@ -177,6 +186,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       deposit: valueToBigNumber(res[1]),
       timestamp: valueToBigNumber(res[2]),
       transactionCount: valueToInt(res[3]),
+      descriptionURL: res[4],
     })
   )
 
@@ -204,6 +214,24 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isApproved: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
     this.contract.methods.isApproved,
+    tupleParser(valueToString)
+  )
+
+  /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isDequeuedProposalExpired: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
+    this.contract.methods.isDequeuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+  /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isQueuedProposalExpired = proxyCall(
+    this.contract.methods.isQueuedProposalExpired,
     tupleParser(valueToString)
   )
 
@@ -272,6 +300,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Submits a new governance proposal.
    * @param proposal Governance proposal
+   * @param descriptionURL A URL where further information about the proposal can be viewed
    */
   propose = proxySend(this.kit, this.contract.methods.propose, proposalToParams)
 
@@ -342,11 +371,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
-   * Returns the proposal dequeue as list of proposal IDs.
+   * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  getDequeue = proxyCall(this.contract.methods.getDequeue, undefined, (arrayObject) =>
-    arrayObject.map(valueToBigNumber)
-  )
+  async getDequeue(filterZeroes = false) {
+    const dequeue = await this.contract.methods.getDequeue().call()
+    // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
+    const dequeueIds = dequeue.map(valueToBigNumber)
+    return filterZeroes ? dequeueIds.filter((id) => !id.isZero()) : dequeueIds
+  }
 
   /**
    * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
@@ -430,9 +462,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   private async lesserAndGreaterAfterUpvote(upvoter: Address, proposalID: BigNumber.Value) {
     const upvoteRecord = await this.getUpvoteRecord(upvoter)
-    const queue = upvoteRecord.proposalID.isZero()
-      ? await this.getQueue()
-      : (await this.withUpvoteRevoked(upvoter)).queue
+    const recordQueued = await this.isQueued(upvoteRecord.proposalID)
+    // if existing upvote exists in queue, revoke it before applying new upvote
+    const queue = recordQueued
+      ? (await this.withUpvoteRevoked(upvoter)).queue
+      : await this.getQueue()
     const upvoteQueue = await this.withUpvoteApplied(upvoter, proposalID, queue)
     return this.lesserAndGreater(proposalID, upvoteQueue)
   }
@@ -468,6 +502,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   /**
    * Approves given proposal, allowing it to later move to `referendum`.
+   * This will be deprecated in favor of the multiSig implementation for approver.
    * @param proposalID Governance proposal UUID
    * @notice Only the `approver` address will succeed in sending this transaction
    */
@@ -548,8 +583,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the number of validators required to reach a Byzantine quorum
    */
-  byzantineQuorumValidators = proxyCall(
-    this.contract.methods.byzantineQuorumValidatorsInCurrentSet,
+  minQuorumSize = proxyCall(
+    this.contract.methods.minQuorumSizeInCurrentSet,
     undefined,
     valueToBigNumber
   )

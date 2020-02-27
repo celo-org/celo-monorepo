@@ -37,7 +37,7 @@ A database maintained by a distributed set of computers that do not share a trus
 
 A form of consensus algorithm in which up to a third of participants can be faulty or malicious.
 
-## C Labs, Celo Labs
+## cLabs, Celo Labs
 
 The team currently leading the development of the Celo protocol and Celo Wallet application.
 
@@ -140,6 +140,10 @@ See [Block](#block).
 ## HSM
 
 Hardware Security Module. A hardware device that hosts one or more private keys and signs data without passing the key off the device.
+
+## Key Rotation
+
+The creation of a new cryptographic key to replace an existing key in active use.
 
 ## [Community Fund](../celo-codebase/protocol/proof-of-stake/community-fund.md)
 

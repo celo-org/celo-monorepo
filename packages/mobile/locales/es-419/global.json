@@ -72,6 +72,7 @@
   "quitApp": "Dejar",
   "loading": "Cargando…",
   "inviteFailed": "Falló el envío de la invitación",
+  "inviteOpenAppFailed": "No se pudo abrir la aplicación de mensajería, el código de invitación se copió al portapapeles",
   "importContactsFailed": "Error al importar contactos",
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
@@ -84,7 +85,7 @@
     "1": "algunas funciones no disponible"
   },
   "networkConnectionFailed": "No se pudo conectar a la red, por favor verifica tu conexión",
-  "firebaseFailed": "No se pudo conectar al servicio de notificaciones",
+  "firebaseFailed": "No se pudo conectar al Firebase",
   "gasPriceUpdateFailed": "No se pudo actualizar la comisión",
   "appHasToBeUpdated": "La aplicación tiene que ser actualizada",
   "thisVersionIsInsecure": "Esta versión es insegura.",

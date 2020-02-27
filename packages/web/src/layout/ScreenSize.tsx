@@ -16,7 +16,7 @@ interface State {
 
 const defaultContext = { screen: null }
 
-export const ScreenSizeContext = React.createContext(defaultContext)
+export const ScreenSizeContext = React.createContext<State>(defaultContext)
 
 export class ScreenSizeProvider extends React.PureComponent<{}, State> {
   state = defaultContext
@@ -77,6 +77,16 @@ export function withScreenSize<T>(
         }}
       </ScreenSizeContext.Consumer>
     )
+  }
+}
+
+export function useScreenSize() {
+  const { screen } = React.useContext(ScreenSizeContext)
+  return {
+    screen,
+    isMobile: screen === ScreenSizes.MOBILE,
+    isDesktop: screen === ScreenSizes.DESKTOP,
+    isTablet: screen === ScreenSizes.TABLET,
   }
 }
 

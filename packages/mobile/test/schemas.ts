@@ -1,4 +1,5 @@
 import { PincodeType } from 'src/account/reducer'
+import { AppState } from 'src/app/actions'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
@@ -9,19 +10,26 @@ export const vNeg1Schema = {
     numberVerified: false,
     error: null,
     dismissErrorAfter: null,
-    language: 'es-AR',
+    language: 'es-419',
     doingBackupFlow: false,
     message: null,
     dismissMessageAfter: null,
     analyticsEnabled: true,
+    doingPinVerification: false,
+    lockWithPinEnabled: false,
+    appState: AppState.Active,
+    locked: false,
   },
   networkInfo: {
     connected: true,
   },
   send: {
     isSending: false,
-    suggestedFee: '',
-    recentPhoneNumbers: [],
+    recentPhoneNumbers: undefined,
+    recipientCache: undefined,
+    recentRecipients: [],
+  },
+  recipients: {
     recipientCache: {},
   },
   goldToken: {
@@ -45,24 +53,22 @@ export const vNeg1Schema = {
     standbyTransactions: [],
   },
   web3: {
-    isReady: false,
-    syncProgress: 0,
-    syncProgressData: {
+    syncProgress: {
+      startingBlock: 0,
       currentBlock: 100,
       highestBlock: 100,
-      startBlock: 0,
     },
     latestBlockNumber: 0,
     account: '0x0000000000000000000000000000000000007E57',
     accountInWeb3Keystore: '0x0000000000000000000000000000000000007E57',
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
-    zeroSyncMode: false,
-    gethStartedThisSession: true,
+    fornoMode: false,
   },
   geth: {
     initialized: 'INITIALIZED',
     connected: true,
+    gethStartedThisSession: false,
   },
   identity: {
     attestationCodes: [],
@@ -70,122 +76,9 @@ export const vNeg1Schema = {
     verificationFailed: false,
     addressToE164Number: {},
     e164NumberToAddress: {},
-  },
-  account: {
-    name: 'John Doe',
-    e164PhoneNumber: '+14155556666',
-    defaultCountryCode: '+1',
-    contactDetails: {
-      contactId: 'contactId',
-      thumbnailPath: null,
-    },
-    devModeActive: false,
-    devModeClickCount: 0,
-    photosNUXClicked: false,
-    pincodeSet: false,
-    accountCreationTime: 99999999999999,
-    paymentRequests: [],
-    showFakeData: false,
-    backupCompleted: false,
-    socialBackupCompleted: false,
-    backupDelayedTime: 0,
-    dismissedEarnRewards: false,
-    dismissedInviteFriends: false,
-  },
-  invite: {
-    isSendingInvite: false,
-    invitees: {},
-    redeemedInviteCode: '',
-  },
-  escrow: {
-    isReclaiming: false,
-    sentEscrowedPayments: [],
-    suggestedFee: null,
-  },
-}
-
-export const v0Schema = {
-  ...vNeg1Schema,
-  identity: {
-    ...vNeg1Schema.identity,
     startedVerification: false,
     askedContactsPermission: false,
     isLoadingImportContacts: false,
-  },
-  invite: {
-    ...vNeg1Schema.invite,
-    redeemComplete: false,
-  },
-  send: {
-    isSending: false,
-    recentPhoneNumbers: undefined,
-    recipientCache: undefined,
-    recentRecipients: [],
-  },
-  recipients: {
-    recipientCache: {},
-  },
-  web3: {
-    ...vNeg1Schema.web3,
-    syncProgress: {
-      startingBlock: 0,
-      currentBlock: 100,
-      highestBlock: 100,
-    },
-  },
-  localCurrency: {
-    isLoading: false,
-    symbol: 'MXN',
-    exchangeRate: 1.33,
-  },
-}
-
-export const v1Schema = {
-  ...v0Schema,
-  app: {
-    ...v0Schema.app,
-    language: 'es-419',
-  },
-}
-
-export const v2Schema = {
-  ...v1Schema,
-  account: {
-    ...v1Schema.account,
-    pincodeType: PincodeType.Unset,
-    isSettingPin: false,
-  },
-  invite: {
-    ...v1Schema.invite,
-    isRedeemingInvite: false,
-  },
-}
-
-export const v3Schema = {
-  ...v2Schema,
-  app: {
-    ...v2Schema.app,
-    doingPinVerification: false,
-  },
-  localCurrency: {
-    ...v2Schema.localCurrency,
-    preferredCurrencyCode: 'MXN',
-    fetchedCurrencyCode: 'MXN',
-    symbol: undefined,
-  },
-  imports: {
-    isImportingWallet: false,
-  },
-}
-
-export const v4Schema = {
-  ...v3Schema,
-  invite: {
-    ...v3Schema.invite,
-    isSkippingInvite: false,
-  },
-  identity: {
-    ...v3Schema.identity,
     acceptedAttestationCodes: [],
     verificationStatus: 0,
     hasSeenVerificationNux: false,
@@ -206,18 +99,40 @@ export const v4Schema = {
     devModeClickCount: 0,
     photosNUXClicked: false,
     pincodeSet: false,
+    pincodeType: PincodeType.Unset,
+    isSettingPin: false,
     accountCreationTime: 99999999999999,
+    backupCompleted: false,
+    backupDelayedTime: 0,
+    socialBackupCompleted: false,
     incomingPaymentRequests: [],
     outgoingPaymentRequests: [],
-    showFakeData: false,
-    backupCompleted: false,
-    socialBackupCompleted: false,
-    backupDelayedTime: 0,
     dismissedGetVerified: false,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
-    pincodeType: PincodeType.Unset,
-    isSettingPin: false,
+    promptFornoIfNeeded: false,
+  },
+  invite: {
+    isSendingInvite: false,
+    isRedeemingInvite: false,
+    isSkippingInvite: false,
+    invitees: {},
+    redeemedInviteCode: '',
+    redeemComplete: false,
+  },
+  escrow: {
+    isReclaiming: false,
+    sentEscrowedPayments: [],
+    suggestedFee: null,
+  },
+  localCurrency: {
+    isLoading: false,
+    exchangeRate: '1.33',
+    preferredCurrencyCode: 'MXN',
+    fetchedCurrencyCode: 'MXN',
+  },
+  imports: {
+    isImportingWallet: false,
   },
   exchange: {
     exchangeRatePair: null,
@@ -230,14 +145,6 @@ export const v4Schema = {
   },
 }
 
-export const v5Schema = {
-  ...v4Schema,
-  localCurrency: {
-    ...v4Schema.localCurrency,
-    exchangeRate: '1.33',
-  },
-}
-
 export function getLatestSchema(): Partial<RootState> {
-  return v5Schema as Partial<RootState>
+  return vNeg1Schema as Partial<RootState>
 }
