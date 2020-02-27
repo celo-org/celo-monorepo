@@ -78,6 +78,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   getRefundAddress: () => Promise<Address> = proxyCall(this.contract.methods.refundAddress)
 
   /**
+   * Returns the owner's address of the ReleaseGold contract
+   * @return The owner's address.
+   */
+  getOwner: () => Promise<Address> = proxyCall(this.contract.methods.owner)
+
+  /**
    * Returns true if the liquidity provision has been met for this contract
    * @return If the liquidity provision is met.
    */
@@ -383,6 +389,11 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * Sets the contract's max distribution
    */
   setMaxDistribution = proxySend(this.kit, this.contract.methods.setMaxDistribution)
+
+  /**
+   * Sets the contract's beneficiary
+   */
+  setBeneficiary = proxySend(this.kit, this.contract.methods.setBeneficiary)
 
   /**
    * Authorizes an address to sign votes on behalf of the account.

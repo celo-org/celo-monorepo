@@ -37,13 +37,13 @@ export default class Info extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({
+    contract: Flags.address({
       required: true,
       description: 'Address of the ReleaseGold Contract',
     }),
   }
 
-  static examples = ['info --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
+  static examples = ['info --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
 
   async run() {
     // tslint:disable-next-line
@@ -51,7 +51,7 @@ export default class Info extends BaseCommand {
 
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       this.kit,
-      newReleaseGold(this.kit.web3, flags.from)
+      newReleaseGold(this.kit.web3, flags.contract)
     )
     const balanceStateData: BalanceState = {
       totalWithdrawn: (await releaseGoldWrapper.getTotalWithdrawn()).toString(),

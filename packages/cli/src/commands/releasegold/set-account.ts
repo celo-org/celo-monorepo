@@ -12,7 +12,7 @@ export default class SetAccount extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
     property: flags.string({
       char: 'p',
       options: ['name', 'dataencyptionkey', 'walletaddress', 'metaurl'],
@@ -30,13 +30,13 @@ export default class SetAccount extends BaseCommand {
 
   // TODO(lucas): examples for each function, and test walletaddress
   static examples = [
-    'set-account --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --property name --value mywallet',
+    'set-account --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --property name --value mywallet',
   ]
 
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(SetAccount)
-    const contractAddress = flags.from
+    const contractAddress = flags.contract
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       this.kit,
       newReleaseGold(this.kit.web3, contractAddress)
@@ -45,7 +45,7 @@ export default class SetAccount extends BaseCommand {
 
     await newCheckBuilder(this)
       .isAccount(releaseGoldWrapper.address)
-      .isNotRevoked(releaseGoldWrapper)
+      .addCheck('Contract is not revoked', () => !isRevoked)
       .runChecks()
 
     let tx: any
@@ -62,7 +62,6 @@ export default class SetAccount extends BaseCommand {
     }
 
     this.kit.defaultAccount = await releaseGoldWrapper.getBeneficiary()
-
-    await displaySendTx('setAccountTx', tx, { from: this.kit.defaultAccount })
+    await displaySendTx('setAccount', tx)
   }
 }

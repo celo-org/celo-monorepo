@@ -12,7 +12,7 @@ export default class SetMaxDistribution extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
     distributionRatio: flags.string({
       required: true,
       description:
@@ -23,13 +23,13 @@ export default class SetMaxDistribution extends BaseCommand {
   static args = []
 
   static examples = [
-    'set-max-distribution --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --distributionRatio 1000',
+    'set-max-distribution --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --distributionRatio 1000',
   ]
 
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(SetMaxDistribution)
-    const contractAddress = flags.from
+    const contractAddress = flags.contract
     const distributionRatio = valueToInt(flags.distributionRatio)
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       this.kit,
@@ -44,7 +44,9 @@ export default class SetMaxDistribution extends BaseCommand {
       .runChecks()
 
     this.kit.defaultAccount = await releaseGoldWrapper.getReleaseOwner()
-    const tx = await releaseGoldWrapper.setMaxDistribution(distributionRatio)
-    await displaySendTx('authorizeVoterTx', tx, { from: this.kit.defaultAccount })
+    await displaySendTx(
+      'setMaxDistribution',
+      await releaseGoldWrapper.setMaxDistribution(distributionRatio)
+    )
   }
 }

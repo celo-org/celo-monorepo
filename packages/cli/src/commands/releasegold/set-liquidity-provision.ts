@@ -11,17 +11,19 @@ export default class SetLiquidityProvision extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
   }
 
   static args = []
 
-  static examples = ['set-liquidity-provision --from 0x5409ED021D9299bf6814279A6A1411A7e866A631']
+  static examples = [
+    'set-liquidity-provision --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+  ]
 
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(SetLiquidityProvision)
-    const contractAddress = flags.from
+    const contractAddress = flags.contract
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       this.kit,
       newReleaseGold(this.kit.web3, contractAddress)
@@ -35,7 +37,6 @@ export default class SetLiquidityProvision extends BaseCommand {
       .runChecks()
 
     this.kit.defaultAccount = await releaseGoldWrapper.getReleaseOwner()
-    const tx = await releaseGoldWrapper.setLiquidityProvision()
-    await displaySendTx('authorizeVoterTx', tx, { from: this.kit.defaultAccount })
+    await displaySendTx('setLiquidityProvision', await releaseGoldWrapper.setLiquidityProvision())
   }
 }

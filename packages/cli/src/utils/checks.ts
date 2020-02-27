@@ -343,10 +343,6 @@ class CheckBuilder {
     )
   }
 
-  isNotRevoked = (contract: ReleaseGoldWrapper) => {
-    return this.addCheck('Contract is not revoked', async () => negate(contract.isRevoked()))
-  }
-
   hasACommissionUpdateQueued = () =>
     this.addCheck(
       "There's a commision update queued",
