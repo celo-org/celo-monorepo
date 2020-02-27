@@ -375,9 +375,14 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   )
 
   /**
-   * Sets the contracts' liquidity provision to true
+   * Sets the contract's liquidity provision to true
    */
   setLiquidityProvision = proxySend(this.kit, this.contract.methods.setLiquidityProvision)
+
+  /**
+   * Sets the contract's max distribution
+   */
+  setMaxDistribution = proxySend(this.kit, this.contract.methods.setMaxDistribution)
 
   /**
    * Authorizes an address to sign votes on behalf of the account.
