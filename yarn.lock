@@ -10788,6 +10788,29 @@ block-stream@0.0.9:
   dependencies:
     inherits "~2.0.0"
 
+"bls12377js-blind@https://github.com/celo-org/bls12377js-blind#4a2b67da441fca3fab254b6d787800f465a8dcee":
+  version "0.1.0"
+  resolved "https://github.com/celo-org/bls12377js-blind#4a2b67da441fca3fab254b6d787800f465a8dcee"
+  dependencies:
+    "@types/node" "^12.11.7"
+    bls12377js celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49
+    chai "^4.2.0"
+    mocha "^6.2.2"
+    ts-node "^8.4.1"
+    typescript "^3.6.4"
+
+bls12377js@celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49:
+  version "0.1.0"
+  resolved "https://codeload.github.com/celo-org/bls12377js/tar.gz/566137fd6b9568ef105a3aeaf8e36ff03da91d49"
+  dependencies:
+    "@stablelib/blake2xs" "0.10.4"
+    "@types/node" "^12.11.7"
+    big-integer "^1.6.44"
+    chai "^4.2.0"
+    mocha "^6.2.2"
+    ts-node "^8.4.1"
+    typescript "^3.6.4"
+
 "bls12377js@https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c":
   version "0.1.0"
   resolved "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"

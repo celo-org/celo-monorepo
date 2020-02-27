@@ -10,14 +10,21 @@
     "deploy": "firebase deploy --only functions",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
-    "lint": "tslint --project ."
+    "lint": "tslint --project .",
+    "test": "jest --runInBand",
+    "copy-env-to-firebase": "firebase functions:config:set envs.private_key=$(grep PRIVATE_KEY .env | cut -d '=' -f 2-)"
   },
   "dependencies": {
+    "bls12377js-blind": "https://github.com/celo-org/bls12377js-blind#4a2b67da441fca3fab254b6d787800f465a8dcee",
+    "dotenv": "8.0.0",
     "firebase-admin": "^8.9.2",
     "firebase-functions": "^3.3.0"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.1.6"
+    "firebase-functions-test": "^0.1.6",
+    "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
+    "chai": "^4.1.2"
+
   },
   "engines": {
     "node": "10"
