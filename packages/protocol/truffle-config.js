@@ -39,6 +39,7 @@ const networks = {
     ...defaultConfig,
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
+    gasLimit: 20000000,
     defaultBalance: 200000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
