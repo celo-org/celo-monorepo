@@ -1,17 +1,27 @@
+const { toFixed } = require('@celo/utils/lib/fixidity')
+const { CeloContractName } = require('@celo/protocol/lib/registry-utils')
+
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')
 const lodash = require('lodash')
+const web3 = require('web3')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
+const MINUTE = 60
+const HOUR = 60 * MINUTE
+const DAY = 24 * HOUR
+const WEEK = 7 * DAY
+
 const DefaultConfig = {
   attestations: {
-    attestationExpiryBlocks: (60 * 60) / 5, // 1 hour,
+    attestationExpiryBlocks: HOUR / 5, // ~1 hour,
     attestationRequestFeeInDollars: 0.05,
     selectIssuersWaitBlocks: 4,
+    maxAttestations: 100,
   },
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
@@ -23,18 +33,18 @@ const DefaultConfig = {
     blockGasLimit: 20000000,
   },
   doubleSigningSlasher: {
-    reward: '20000000000000000000', // 20 cGLD
-    penalty: '100000000000000000000', // 100 cGLD
+    reward: '1000000000000000000000', // 1000 cGLD
+    penalty: '5000000000000000000000', // 5000 cGLD
   },
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
-    penalty: '20000000000000000000', // 20 cGLD
-    slashableDowntime: 480,
+    penalty: '100000000000000000000', // 100 cGLD
+    slashableDowntime: (12 * HOUR) / 5, // ~12 hours
   },
   election: {
-    minElectableValidators: '22',
+    minElectableValidators: '50',
     maxElectableValidators: '100',
-    maxVotesPerAccount: 3,
+    maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
   },
   epochRewards: {
@@ -53,28 +63,32 @@ const DefaultConfig = {
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
-    frozen: false,
+    frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
-    updateFrequency: 5 * 60, // 5 minutes
+    updateFrequency: 5 * MINUTE, // 5 minutes
+    // TODO(asa): This is too low
     minimumReports: 1,
-    frozen: false,
+    frozen: true,
   },
   gasPriceMinimum: {
     minimumFloor: 1000000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
   },
+  goldToken: {
+    frozen: true,
+  },
   governance: {
-    approvalStageDuration: 15 * 60, // 15 minutes
+    queueExpiry: 4 * WEEK,
+    dequeueFrequency: WEEK,
     concurrentProposals: 10,
-    dequeueFrequency: 15 * 60, // 15 minutes
-    executionStageDuration: 2 * 24 * 60 * 60, // 2 days
-    minDeposit: 1, // 1 cGLD
-    queueExpiry: 7 * 24 * 60 * 60, // 1 week
-    referendumStageDuration: 15 * 60, // 15 minutes
+    approvalStageDuration: 3 * DAY,
+    referendumStageDuration: WEEK,
+    executionStageDuration: WEEK,
+    minDeposit: 100, // 100 cGLD
     participationBaseline: 8 / 10,
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
@@ -88,23 +102,27 @@ const DefaultConfig = {
     useMultiSig: true,
   },
   lockedGold: {
-    unlockingPeriod: (60 * 60 * 24 * 3) / 24, // 3 days divided by 24 to accelerate for Stake off
+    unlockingPeriod: 3 * DAY,
   },
   oracles: {
-    reportExpiry: 10 * 60, // 10 minutes
+    reportExpiry: 10 * MINUTE,
   },
   random: {
-    randomnessBlockRetentionWindow: (60 * 60) / 5, // 1 hour to match attestationExpiryBlocks
+    randomnessBlockRetentionWindow: HOUR / 5, // 1 hour to match attestationExpiryBlocks
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    goldBalance: 100000000,
-    tobinTaxStalenessThreshold: 60 * 60, // 1 hour
-    dailySpendingRatio: '1000000000000000000000000', // 100%
+    tobinTaxStalenessThreshold: HOUR, // 1 hour
+    dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
+    // TODO(Roman): Set these appropriately.
     frozenGold: 0,
     frozenDays: 0,
+    spenders: [],
+    otherAddresses: [],
+    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH'], // TODO(roman)
+    assetAllocationWeights: [0.5, 0.25, 0.25], // TODO(roman)
   },
   reserveSpenderMultiSig: {
     //Placeholder until addresses for 2/2 multsig are generated.
@@ -118,31 +136,39 @@ const DefaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
-    inflationPeriod: 1.5 * 365 * 24 * 60 * 60, // 1.5 years
+    inflationPeriod: 1.5 * 365 * DAY, // 1.5 years
     initialBalances: {
       addresses: [],
       values: [],
     },
     oracles: [],
-    unfreezeImmediately: true,
+    frozen: true,
+  },
+  transferWhitelist: {
+    addresses: [], // TODO(Alec): get whitelist of addresses.
+    registryIds: [
+      web3.utils.soliditySha3(CeloContractName.Governance),
+      web3.utils.soliditySha3(CeloContractName.LockedGold),
+      web3.utils.soliditySha3(CeloContractName.Reserve),
+    ],
   },
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold per validator
-      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
+      duration: 180 * DAY,
     },
     validatorLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold
-      duration: (60 * 24 * 60 * 60) / 24, // 60 days divided by 24 to accelerate for Stake off
+      duration: 60 * DAY,
     },
     validatorScoreParameters: {
       exponent: 10,
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
+    commissionUpdateDelay: 51840, // Approximately 3 days
     maxGroupSize: 5,
-    // 30 Days divided by 24 to accelerate for Stake off
-    slashingPenaltyResetPeriod: (60 * 60 * 24 * 30) / 24,
+    slashingPenaltyResetPeriod: 30 * DAY,
 
     // We register a number of C-Labs groups to contain an initial set of validators to run the network.
     validatorKeys: [],

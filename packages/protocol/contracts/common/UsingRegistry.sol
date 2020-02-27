@@ -3,9 +3,10 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-import "./interfaces/IRegistry.sol";
 import "./interfaces/IAccounts.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
+import "./interfaces/IFreezer.sol";
+import "./interfaces/IRegistry.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
@@ -40,6 +41,7 @@ contract UsingRegistry is Ownable {
   bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
   );
+  bytes32 constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
   bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
@@ -93,6 +95,10 @@ contract UsingRegistry is Ownable {
 
   function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
     return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
+  }
+
+  function getFreezer() internal view returns (IFreezer) {
+    return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
   }
 
   function getGoldToken() internal view returns (IERC20) {

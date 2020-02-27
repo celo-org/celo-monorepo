@@ -99,6 +99,12 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
       "Invalid privacy inputs: Can't require attestations if no identifier"
     );
 
+    IAttestations attestations = IAttestations(registry.getAddressFor(ATTESTATIONS_REGISTRY_ID));
+    require(
+      minAttestations <= attestations.getMaxAttestations(),
+      "minAttestations larger than limit"
+    );
+
     uint256 sentIndex = sentPaymentIds[msg.sender].push(paymentId).sub(1);
     uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
 

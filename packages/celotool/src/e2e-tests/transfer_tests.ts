@@ -4,6 +4,7 @@
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import { eqAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -83,7 +84,7 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-const stableTokenTransferGasCost = 20525
+const stableTokenTransferGasCost = 29391
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -338,6 +339,31 @@ describe('Transfer tests', function(this: any) {
     ok: boolean
     fees: Fees
     gas: GasUsage
+    events: any[]
+  }
+
+  const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+
+  function truncateTopic(hex: string) {
+    return '0x' + hex.substr(26)
+  }
+
+  function parseEvents(receipt: TransactionReceipt | undefined) {
+    if (!receipt) {
+      return []
+    }
+    if (receipt.events && receipt.events.Transfer) {
+      let events: any = receipt.events.Transfer
+      if (!(events instanceof Array)) {
+        events = [events]
+      }
+      return events.map((a: any) => ({ to: a.returnValues.to, from: a.returnValues.from }))
+    }
+    if (receipt.logs) {
+      return receipt.logs
+        .filter((a) => a.topics[0] === TRANSFER_TOPIC)
+        .map((a) => ({ to: truncateTopic(a.topics[2]), from: truncateTopic(a.topics[1]) }))
+    }
   }
 
   const runTestTransaction = async (
@@ -356,6 +382,8 @@ describe('Transfer tests', function(this: any) {
     } catch (err) {
       ok = false
     }
+
+    const events = parseEvents(receipt)
 
     if (receipt != null && receipt.gasUsed !== expectedGasUsed) {
       // tslint:disable-next-line: no-console
@@ -383,7 +411,7 @@ describe('Transfer tests', function(this: any) {
       used: receipt && receipt.gasUsed,
       expected: expectedGasUsed,
     }
-    return { ok, fees, gas }
+    return { ok, fees, gas, events }
   }
 
   function testTransferToken({
@@ -449,6 +477,16 @@ describe('Transfer tests', function(this: any) {
 
       it(`should increment the receiver's ${transferToken} balance by the transfer amount`, () =>
         assertEqualBN(balances.delta(ToAddress, transferToken), TransferAmount))
+
+      if (feeToken === CeloContract.StableToken) {
+        it('should have emitted transfer events for the fee token', () => {
+          assert(
+            txRes.events.find(
+              (a) => eqAddress(a.to, governanceAddress) && eqAddress(a.from, FromAddress)
+            )
+          )
+        })
+      }
 
       if (transferToken === feeToken) {
         it(`should decrement the sender's ${transferToken} balance by the transfer amount plus fees`, () => {
