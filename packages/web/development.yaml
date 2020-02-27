@@ -11,7 +11,7 @@ handlers:
     static_dir: .next/static
 
   - url: /static
-    static_dir: static
+    static_dir: public/static
 
   - url: /public
     static_dir: public

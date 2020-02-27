@@ -21,11 +21,10 @@
     "web3-core-helpers": "1.2.4",
     "tmp": "^0.1.0",
     "targz": "^1.0.1",
-    "ncp": "^2.0.0"
+    "fs-extra": "^8.1.0"
   },
   "devDependencies": {
-    "@types/ncp": "^2.0.3",
-    "@types/tmp": "^0.1.0"
+    "@types/fs-extra": "^8.1.0"
   },
   "engines": {
     "node": ">=8.13.0"

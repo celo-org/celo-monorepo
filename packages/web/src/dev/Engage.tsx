@@ -127,7 +127,7 @@ export function Contribute() {
         />
       </Cell>
       <Cell span={Spans.half} style={standardStyles.centered}>
-        <AspectRatio ratio={309 / 360} style={styles.feastImage}>
+        <AspectRatio ratio={309 / 360} style={[styles.feastImage, standardStyles.image]}>
           <Image
             source={require('src/dev/Feast.png')}
             style={styles.graphic}
@@ -146,7 +146,7 @@ interface EngageProps {
 }
 
 export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
@@ -193,7 +193,7 @@ export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
 }
 
 export function EngageAsValidator() {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
@@ -264,7 +264,6 @@ const styles = StyleSheet.create({
   },
   feastImage: {
     maxWidth: 309,
-    ...standardStyles.image,
   },
   asideGraphic: { width: 60 },
   asideFrame: { flexBasis: 80 },

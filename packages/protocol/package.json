@@ -32,9 +32,7 @@
     "pretruffle:migrate": "yarn build:ts",
     "truffle:migrate": "truffle migrate",
     "devchain": "ts-node scripts/devchain.ts",
-    "weekly-faucet": "./scripts/bash/weekly_faucet.sh",
-    "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "network-check": "./scripts/bash/network_check.sh"
+    "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",
@@ -59,7 +57,7 @@
     "mathjs": "^5.0.4",
     "mocha": "^5.1.1",
     "node-fetch": "^2.3.0",
-    "openzeppelin-solidity": "^2.2.0",
+    "openzeppelin-solidity": "^2.5.0",
     "prompts": "^2.0.1",
     "solhint": "^2.0.0",
     "solidity-bytes-utils": "0.0.7",

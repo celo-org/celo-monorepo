@@ -1,4 +1,4 @@
 export default {
-  getPackageName: () => 'org.celo.mobile',
-  getPlayStoreUrl: () => 'http://play.google.com',
+  getPlayStoreUrl: jest.fn(async () => 'https://play.store.link'),
+  getAppStoreUrl: jest.fn(async () => 'https://app.store.link'),
 }

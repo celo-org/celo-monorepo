@@ -1,3 +1,4 @@
+import { trimLeading0x } from '@celo/utils/src/address'
 import { sanitizeMessageBase64 } from '@celo/utils/src/attestations'
 import URLSearchParamsReal from '@ungap/url-search-params'
 import { Platform } from 'react-native'
@@ -7,8 +8,7 @@ import Logger from 'src/utils/Logger'
 export const createInviteCode = (privateKey: string) => {
   // TODO(Rossy) we need some scheme to encrypt this PK
   // Buffer.from doesn't expect a 0x for hex input
-  const privateKeyHex = privateKey.substring(2)
-  return Buffer.from(privateKeyHex, 'hex').toString('base64')
+  return Buffer.from(trimLeading0x(privateKey), 'hex').toString('base64')
 }
 
 // exported for testing
@@ -53,6 +53,12 @@ interface ReferrerDataError {
   message: string
 }
 
+export function decodeInvite(encodedInvite: string) {
+  const params = new URLSearchParamsReal(decodeURIComponent(encodedInvite))
+  const code: string = params.get('invite-code')
+  return { code }
+}
+
 export const getValidInviteCodeFromReferrerData = async () => {
   if (Platform.OS === 'android') {
     const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
@@ -61,12 +67,9 @@ export const getValidInviteCodeFromReferrerData = async () => {
       'Referrer Data: ' + JSON.stringify(referrerData)
     )
     if (referrerData && referrerData.hasOwnProperty('installReferrer')) {
-      const params = new URLSearchParamsReal(
-        decodeURIComponent((referrerData as ReferrerData).installReferrer)
-      )
-      const inviteCode = params.get('invite-code')
-      if (inviteCode) {
-        const sanitizedCode = inviteCode.replace(' ', '+')
+      const { code } = decodeInvite((referrerData as ReferrerData).installReferrer)
+      if (code) {
+        const sanitizedCode = code.replace(' ', '+')
         // Accept invite codes which are either base64 encoded or direct hex keys
         if (isValidPrivateKey(sanitizedCode)) {
           return sanitizedCode

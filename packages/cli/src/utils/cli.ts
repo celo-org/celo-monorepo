@@ -76,7 +76,10 @@ export function failWith(msg: string): never {
   throw new CLIError(msg)
 }
 
-export async function binaryPrompt(promptMessage: string) {
-  const resp = await cli.prompt(promptMessage + ' [y/yes, n/no]')
-  return ['y', 'yes'].includes(resp)
+export async function binaryPrompt(promptMessage: string, defaultToNo?: boolean) {
+  const resp: string = await cli.prompt(
+    promptMessage + ` [y/yes, n/no${defaultToNo ? ' (default)' : ''}]`,
+    { required: !defaultToNo }
+  )
+  return ['y', 'yes'].includes(resp.toLowerCase())
 }
