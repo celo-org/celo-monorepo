@@ -24,7 +24,6 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 

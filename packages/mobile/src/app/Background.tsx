@@ -1,6 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import React, { useCallback, useEffect } from 'react'
-import { Platform, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps, StackActions } from 'react-navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppState, lock, unlock } from 'src/app/actions'
