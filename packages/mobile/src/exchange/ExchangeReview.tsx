@@ -19,6 +19,7 @@ import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/a
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -29,6 +30,7 @@ import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
+  localCurrencyExchangeRate: string | null | undefined
   tobinTax: string
   fee: string
   appConnected: boolean
@@ -61,6 +63,7 @@ type Props = StateProps & WithTranslation & DispatchProps & NavigationInjectedPr
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
+  localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
   tobinTax: state.exchange.tobinTax || '0',
   fee: '0',
   appConnected: isAppConnected(state),
@@ -151,7 +154,14 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   render() {
-    const { exchangeRatePair, fee, t, appConnected, tobinTax } = this.props
+    const {
+      exchangeRatePair,
+      localCurrencyExchangeRate,
+      fee,
+      t,
+      appConnected,
+      tobinTax,
+    } = this.props
 
     const exchangeRate = getRateForMakerToken(
       exchangeRatePair,
@@ -159,6 +169,14 @@ export class ExchangeReview extends React.Component<Props, State> {
       CURRENCY_ENUM.DOLLAR
     )
     const dollarAmount = this.getInputAmountInToken(CURRENCY_ENUM.DOLLAR)
+
+    const totalAmount = {
+      value: dollarAmount
+        .plus(tobinTax)
+        .plus(fee)
+        .toString(),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
 
     return (
       <SafeAreaView style={styles.container}>
@@ -228,19 +246,33 @@ export class ExchangeReview extends React.Component<Props, State> {
                 />
               </View>
               <HorizontalLine />
-              <View style={styles.rowContainer}>
+              <View style={styles.totalContainer}>
                 <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
-                <CurrencyDisplay
-                  style={fontStyles.bodyBold}
-                  amount={{
-                    value: dollarAmount
-                      .plus(tobinTax)
-                      .plus(fee)
-                      .toString(),
-                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                  }}
-                />
+                <CurrencyDisplay style={fontStyles.bodyBold} amount={totalAmount} />
               </View>
+              {!!localCurrencyExchangeRate && (
+                <View style={styles.totalDollarsContainer}>
+                  <Text style={styles.dollarsText}>
+                    <Trans i18nKey="totalInDollars" ns={Namespaces.exchangeFlow9}>
+                      Celo Dollars (@{' '}
+                      <CurrencyDisplay
+                        amount={{
+                          value: new BigNumber(localCurrencyExchangeRate).pow(-1).toString(),
+                          currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                        }}
+                        showLocalAmount={false}
+                      />
+                      )
+                    </Trans>
+                  </Text>
+                  <CurrencyDisplay
+                    style={styles.dollarsText}
+                    amount={totalAmount}
+                    hideSymbol={true}
+                    showLocalAmount={false}
+                  />
+                </View>
+              )}
             </View>
           </ScrollView>
         </View>
@@ -291,11 +323,16 @@ const styles = StyleSheet.create({
   headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
   exchangeBodyText: { ...fontStyles.body, fontSize: 15 },
   currencyAmountText: { ...fontStyles.body, fontSize: 24, lineHeight: 39, color: colors.celoGreen },
+  dollarsText: { ...fontStyles.body, fontSize: 15, color: colors.darkSecondary },
   feeTextWithIconContainer: { flexDirection: 'row', alignItems: 'center' },
-  rowContainer: {
+  totalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+  },
+  totalDollarsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   subtotalRowContainer: {
     flexDirection: 'row',

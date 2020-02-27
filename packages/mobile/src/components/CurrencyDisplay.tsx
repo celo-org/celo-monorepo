@@ -20,6 +20,7 @@ interface Props {
   size: number // only used for DisplayType.Big
   useColors: boolean
   hideSymbol: boolean
+  showLocalAmount: boolean
   formatAmount: (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => string
   style?: StyleProp<TextStyle>
 }
@@ -42,6 +43,7 @@ export default function CurrencyDisplay({
   size,
   useColors,
   hideSymbol,
+  showLocalAmount,
   amount,
   formatAmount,
   style,
@@ -57,7 +59,7 @@ export default function CurrencyDisplay({
 
   // For now only show the local amount when original currency is dollars
   const localAmount =
-    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode
+    showLocalAmount && currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode
       ? amount.localAmount ?? { value: localValue, currencyCode: localCurrencyCode }
       : null
   const displayAmount = localAmount ?? amount
@@ -112,6 +114,7 @@ CurrencyDisplay.defaultProps = {
   size: 48,
   useColors: false,
   hideSymbol: false,
+  showLocalAmount: true,
   formatAmount: (amount: BigNumber.Value, currency: CURRENCY_ENUM) =>
     getMoneyDisplayValue(amount, currency),
 }

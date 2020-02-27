@@ -389,6 +389,63 @@ exports[`ExchangeReview renders correctly 1`] = `
               120.90
             </Text>
           </View>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              Celo Dollars (@
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": undefined,
+                    },
+                    undefined,
+                  ]
+                }
+              >
+                
+                $
+                0.75
+              </Text>
+              )
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                  },
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 24,
+                  },
+                ]
+              }
+            >
+              
+              90.90
+            </Text>
+          </View>
         </View>
       </View>
     </RCTScrollView>
