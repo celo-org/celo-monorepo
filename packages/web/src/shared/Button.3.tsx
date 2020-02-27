@@ -117,7 +117,8 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
   }
 
   render() {
-    const { text, href, align, iconRight, iconLeft } = this.props
+    const { text, align, iconRight, iconLeft } = this.props
+
     const ButtonComponent = this.getButtonComponent()
     const renderedButton = (
       <ButtonComponent status={this.getStatus()} {...this.props}>
@@ -137,12 +138,21 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
         <View
           style={[{ alignItems: align }, this.props.kind === BTN.INLINE && inlineStyle.container]}
         >
-          {href ? <Link href={href}>{renderedButton}</Link> : renderedButton}
+          {renderedButton}
         </View>
       </Hoverable>
     )
   }
 }
+
+// function isExternalLink(url: string) {
+//   try {
+//     const uri = new URL(url)
+//     return !!uri
+//   } catch {
+//     return false
+//   }
+// }
 
 enum BTNStates {
   normal = 'normal',
@@ -165,26 +175,28 @@ interface Props {
 function ButtonPrimary(props: Props) {
   const { children, status, size, style, href, target, onDarkBackground } = props
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[
-        baseStyles.base,
-        baseStyles.verticallyAlign,
-        fonts.navigation,
-        sizeStyle(size),
-        primaryStyles[status],
-        textStyles.medium,
-        status === BTNStates.disabled && onDarkBackground
-          ? primaryStyles.darkText
-          : primaryStyles.text,
-        style,
-        status === BTNStates.disabled && baseStyles.notAllowed,
-      ]}
-    >
-      {children}
-    </Text>
+    <Link href={href}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[
+          baseStyles.base,
+          baseStyles.verticallyAlign,
+          fonts.navigation,
+          sizeStyle(size),
+          primaryStyles[status],
+          textStyles.medium,
+          status === BTNStates.disabled && onDarkBackground
+            ? primaryStyles.darkText
+            : primaryStyles.text,
+          style,
+          status === BTNStates.disabled && baseStyles.notAllowed,
+        ]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
 }
 
@@ -193,24 +205,26 @@ function ButtonSecondary(props: Props) {
 
   return (
     <View style={secondaryStyles[status]}>
-      <Text
-        href={href}
-        target={target}
-        accessibilityRole="link"
-        style={[
-          baseStyles.base,
-          sizeStyle(size),
-          baseStyles.verticallyAlign,
-          fonts.navigation,
-          sizeStyle(size),
-          verticalSize(size),
-          textStyles.medium,
-          commonTextStyles[status],
-          style,
-        ]}
-      >
-        {children}
-      </Text>
+      <Link href={href}>
+        <Text
+          href={href}
+          target={target}
+          accessibilityRole="link"
+          style={[
+            baseStyles.base,
+            sizeStyle(size),
+            baseStyles.verticallyAlign,
+            fonts.navigation,
+            sizeStyle(size),
+            verticalSize(size),
+            textStyles.medium,
+            commonTextStyles[status],
+            style,
+          ]}
+        >
+          {children}
+        </Text>
+      </Link>
     </View>
   )
 }
@@ -218,24 +232,26 @@ function ButtonSecondary(props: Props) {
 function ButtonTertiary(props: Props) {
   const { children, status, size, style, href, target } = props
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[
-        baseStyles.base,
-        baseStyles.verticallyAlign,
-        sizeStyle(size),
-        baseStyles.floating,
-        fonts.navigation,
-        sizeStyle(size),
-        textStyles.medium,
-        commonTextStyles[status],
-        style,
-      ]}
-    >
-      {children}
-    </Text>
+    <Link href={href}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[
+          baseStyles.base,
+          baseStyles.verticallyAlign,
+          sizeStyle(size),
+          baseStyles.floating,
+          fonts.navigation,
+          sizeStyle(size),
+          textStyles.medium,
+          commonTextStyles[status],
+          style,
+        ]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
 }
 
@@ -266,25 +282,27 @@ function ButtonNaked(props: Props) {
   const fontSize = nakedSize(size)
   return (
     <View style={[baseStyles.base, baseStyles.floating, nakedStyles.container]}>
-      <Text
-        accessibilityRole="link"
-        href={href}
-        target={target}
-        style={[
-          fonts.navigation,
-          baseStyles.verticallyAlign,
-          textStyle,
-          { fontSize },
-          textStyles.medium,
-          style,
-        ]}
-      >
-        {children}
+      <Link href={href}>
+        <Text
+          accessibilityRole="link"
+          href={href}
+          target={target}
+          style={[
+            fonts.navigation,
+            baseStyles.verticallyAlign,
+            textStyle,
+            { fontSize },
+            textStyles.medium,
+            style,
+          ]}
+        >
+          {children}
 
-        <View style={nakedStyles.chevron}>
-          <Chevron color={color} opacity={opacity} size={'0.75em'} />
-        </View>
-      </Text>
+          <View style={nakedStyles.chevron}>
+            <Chevron color={color} opacity={opacity} size={'0.75em'} />
+          </View>
+        </Text>
+      </Link>
     </View>
   )
 }
@@ -301,40 +319,44 @@ const nakedStyles = StyleSheet.create({
   },
 })
 
-function ButtonNav(props: Props) {
-  const { children, status, kind, style, href, target } = props
+const ButtonNav = React.forwardRef(function _ButtonNav(props: Props) {
+  const { children, status, kind, style, target, href } = props
   const color = kind === BTN.DARKNAV ? colors.white : colors.dark
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[
-        baseStyles.base,
-        baseStyles.verticallyAlign,
-        baseStyles.floating,
-        fonts.navigation,
-        { color },
-        opacityStyle[status],
-        style,
-      ]}
-    >
-      {children}
-    </Text>
+    <Link href={href}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[
+          baseStyles.base,
+          baseStyles.verticallyAlign,
+          baseStyles.floating,
+          fonts.navigation,
+          { color },
+          opacityStyle[status],
+          style,
+        ]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
-}
+})
 
 function ButtonInline(props: Props) {
   const { children, status, style, href, target } = props
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
-    >
-      {children}
-    </Text>
+    <Link href={href}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
 }
 
