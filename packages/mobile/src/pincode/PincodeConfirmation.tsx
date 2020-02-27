@@ -25,7 +25,7 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
 import { RootState } from 'src/redux/reducers'
 import { web3 } from 'src/web3/contracts'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
 interface State {
   pin: string
@@ -33,6 +33,7 @@ interface State {
 
 interface StateProps {
   currentAccount: string | null
+  fornoMode: boolean
 }
 
 interface DispatchProps {
@@ -115,13 +116,15 @@ class PincodeConfirmation extends React.Component<Props, State> {
 
   onPressConfirm = () => {
     const { pin } = this.state
-    if (this.props.currentAccount) {
+    const fornoMode = this.props
+    if (this.props.currentAccount && !fornoMode) {
       web3.eth.personal
         .unlockAccount(this.props.currentAccount, pin, UNLOCK_DURATION)
         .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
         .catch(this.onWrongPin)
     } else {
-      // Account is not created yet, so PIN can not be verified
+      // Account is not created yet or fornoMode is ON, so
+      // PIN can not be verified
       this.onCorrectPin(pin)
     }
   }
@@ -188,6 +191,7 @@ const style = StyleSheet.create({
 
 const mapStateToProps = (state: RootState): StateProps => ({
   currentAccount: currentAccountSelector(state),
+  fornoMode: fornoSelector(state),
 })
 
 export default connect(mapStateToProps, { showError })(

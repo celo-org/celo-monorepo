@@ -913,7 +913,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  signUp
+                  common:signUp
                 </a>
               </div>
               <div
@@ -3122,7 +3122,7 @@ exports[`Community renders 1`] = `
               }
               target="_blog"
             >
-              readMoreFromOurBlog
+              common:readMoreFromOurBlog
               <div
                 className="css-view-1dbjc4n"
                 style={
