@@ -120,7 +120,7 @@ function generateFilesForContractKit() {
 
   const globPattern = `${BUILD_DIR}/contracts/@(${CoreContracts.join('|')}).json`
   exec(
-    `yarn run --silent typechain --target="Web3-v1" --outDir "${relativePath}/types" "${globPattern}" `
+    `yarn run --silent typechain --target="web3-v1" --outDir "${relativePath}/types" "${globPattern}" `
   )
 
   console.log('contractkit: Generating Contract Factories')
