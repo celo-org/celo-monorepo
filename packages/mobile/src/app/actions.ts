@@ -15,6 +15,7 @@ export enum AppState {
 }
 
 export enum Actions {
+  SET_REQUESTING_ANDROID_PERMISSION = 'APP/SET_REQUESTING_ANDROID_PERMISSION',
   SET_APP_STATE = 'APP/SET_APP_STATE',
   SET_LOGGED_IN = 'APP/SET_LOGGED_IN',
   SET_NUMBER_VERIFIED = 'APP/SET_NUMBER_VERIFIED',
@@ -28,6 +29,11 @@ export enum Actions {
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
+}
+
+export interface SetRequestingAndroidPermission {
+  type: Actions.SET_REQUESTING_ANDROID_PERMISSION
+  value: boolean
 }
 
 export interface SetAppState {
@@ -86,6 +92,7 @@ export interface Unlock {
 }
 
 export type ActionTypes =
+  | SetRequestingAndroidPermission
   | SetAppState
   | SetLoggedIn
   | SetNumberVerifiedAction
@@ -98,6 +105,11 @@ export type ActionTypes =
   | SetLockWithPinEnabled
   | Lock
   | Unlock
+
+export const setRequestingAndroidPermission = (value: boolean) => ({
+  type: Actions.SET_REQUESTING_ANDROID_PERMISSION,
+  value,
+})
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,

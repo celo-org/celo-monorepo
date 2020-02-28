@@ -1,4 +1,4 @@
-import { AppState, Linking } from 'react-native'
+import { AppState, Linking, Platform } from 'react-native'
 import { NavigationParams } from 'react-navigation'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
@@ -180,8 +180,17 @@ function* watchAppState() {
 
 function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
+  // When requesting Android Permissions app state
+  // would background, so we do not want to lock
+  // the in this case
+  const requestingAndroidPermission = yield select((state) => state.app.requestingAndroidPermission)
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (lockWithPinEnabled && action.state === 'background' && !appLocked) {
+  if (
+    lockWithPinEnabled &&
+    action.state === 'background' &&
+    !appLocked &&
+    (Platform.OS !== 'android' || !requestingAndroidPermission)
+  ) {
     lockCurrentScreen()
   }
 }

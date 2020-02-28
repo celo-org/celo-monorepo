@@ -123,7 +123,6 @@ class BackupIntroduction extends React.Component<Props> {
             </>
           )}
         </ScrollView>
-        )}
         <View>
           {!backupCompleted && (
             <>

@@ -1,4 +1,6 @@
 import { Permission, PermissionsAndroid } from 'react-native'
+import { setRequestingAndroidPermission } from 'src/app/actions'
+import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
 // TODO(Rossy) i18n in this file
@@ -26,7 +28,9 @@ export async function checkContactsPermission() {
 }
 
 async function requestPermission(permission: Permission, title?: string, message?: string) {
+  const { dispatch } = store
   try {
+    dispatch(setRequestingAndroidPermission(true))
     const granted = await PermissionsAndroid.request(
       permission,
       title && message
@@ -48,5 +52,7 @@ async function requestPermission(permission: Permission, title?: string, message
   } catch (err) {
     Logger.showError('Error requesting permisison: ' + permission)
     return false
+  } finally {
+    dispatch(setRequestingAndroidPermission(false))
   }
 }

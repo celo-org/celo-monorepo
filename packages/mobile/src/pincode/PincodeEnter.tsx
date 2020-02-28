@@ -14,6 +14,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import RNExitApp from 'react-native-exit-app'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -68,7 +69,7 @@ class PincodeEnter extends React.Component<Props, State> {
   componentDidMount() {
     if (this.props.navigation.getParam('disableGoingBack')) {
       this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-        BackHandler.exitApp()
+        RNExitApp.exitApp()
         return true
       })
     }

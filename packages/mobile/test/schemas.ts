@@ -18,6 +18,7 @@ export const vNeg1Schema = {
     lockWithPinEnabled: false,
     appState: AppState.Active,
     locked: false,
+    requestingAndroidPermission: false,
   },
   networkInfo: {
     connected: true,

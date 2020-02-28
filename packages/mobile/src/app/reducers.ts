@@ -11,6 +11,7 @@ export interface State {
   lockWithPinEnabled: boolean
   appState: AppState
   locked: boolean
+  requestingAndroidPermission: boolean
 }
 
 const initialState = {
@@ -23,6 +24,7 @@ const initialState = {
   lockWithPinEnabled: false,
   appState: AppState.Active,
   locked: false,
+  requestingAndroidPermission: false,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -41,6 +43,11 @@ export const appReducer = (
         locked: initialState.locked,
       }
     }
+    case Actions.SET_REQUESTING_ANDROID_PERMISSION:
+      return {
+        ...state,
+        requestingAndroidPermission: action.value,
+      }
     case Actions.SET_APP_STATE:
       let appState = state.appState
       switch (action.state) {

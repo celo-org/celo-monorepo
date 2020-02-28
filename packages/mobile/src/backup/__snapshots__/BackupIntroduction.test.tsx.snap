@@ -117,7 +117,6 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
       </Text>
     </View>
   </RCTScrollView>
-  )}
   <View>
     <View
       style={
@@ -391,7 +390,6 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
       </Text>
     </View>
   </RCTScrollView>
-  )}
   <View>
     <View
       style={
@@ -651,7 +649,6 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
       </Text>
     </View>
   </RCTScrollView>
-  )}
   <View>
     <View
       style={
@@ -826,7 +823,6 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
       </Text>
     </View>
   </RCTScrollView>
-  )}
   <View>
     <View
       style={
@@ -1001,182 +997,6 @@ exports[`BackupIntroduction renders correctly when neither backup nor social bac
       </Text>
     </View>
   </RCTScrollView>
-  )}
-  <View>
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "borderRadius": 3,
-            "flexDirection": "row",
-          },
-          null,
-          null,
-          undefined,
-          Object {
-            "backgroundColor": "#42D689",
-          },
-        ]
-      }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        isTVSelectable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            },
-            Object {
-              "backgroundColor": "#42D689",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderWidth": 0,
-            },
-          ]
-        }
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-            }
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
-                },
-              ]
-            }
-          >
-            getYourKey
-          </Text>
-        </View>
-      </View>
-    </View>
-  </View>
-</SafeAreaView>
-`;
-
-exports[`BackupIntroduction renders correctly when pin verification is in-progress 1`] = `
-<SafeAreaView
-  style={
-    Object {
-      "backgroundColor": "#FFFFFF",
-      "flex": 1,
-      "justifyContent": "space-between",
-    }
-  }
->
-  <RCTScrollView
-    contentContainerStyle={
-      Object {
-        "flex": 1,
-        "justifyContent": "center",
-        "paddingBottom": 20,
-        "paddingHorizontal": 30,
-      }
-    }
-  >
-    <View>
-      <Image
-        source={
-          Object {
-            "testUri": "../../../packages/mobile/src/images/backup-icon.png",
-          }
-        }
-        style={
-          Object {
-            "alignSelf": "center",
-            "height": 75,
-            "width": 75,
-          }
-        }
-      />
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 22,
-            "marginTop": 15,
-            "paddingBottom": 20,
-            "textAlign": "center",
-          }
-        }
-      >
-        backupAndRecovery
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-            "paddingBottom": 15,
-            "textAlign": "center",
-          }
-        }
-      >
-        backupKeyIntro.0
-      </Text>
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-              "paddingBottom": 15,
-              "textAlign": "center",
-            },
-            Object {
-              "fontFamily": "Hind-Bold",
-            },
-          ]
-        }
-      >
-        backupKeyIntro.1
-      </Text>
-    </View>
-  </RCTScrollView>
-  )}
   <View>
     <View
       style={
