@@ -26,7 +26,7 @@ interface Props {
   size: number // only used for DisplayType.Big
   useColors: boolean
   hideSymbol: boolean
-  showLocalAmount: boolean
+  showLocalAmount?: boolean
   formatAmount: (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => string
   style?: StyleProp<TextStyle>
 }
@@ -45,15 +45,11 @@ function getBigSymbolStyle(fontSize: number, color: string | undefined) {
 
 function getLocalAmount(
   amount: MoneyAmount,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   dollarToLocalRate: BigNumber.Value | null | undefined,
   goldToDollarRate: BigNumber
 ) {
-  if (!localCurrencyCode) {
-    return null
-  }
-
-  if (amount.localAmount?.currencyCode === localCurrencyCode) {
+  if (amount.localAmount) {
     return amount.localAmount
   }
 
@@ -98,17 +94,25 @@ export default function CurrencyDisplay({
       ? CURRENCY_ENUM.GOLD
       : CURRENCY_ENUM.DOLLAR
 
-  const localAmount = showLocalAmount
+  // Show local amount only if explicitly set to true when currency is gold
+  const shouldShowLocalAmount = showLocalAmount ?? currency !== CURRENCY_ENUM.GOLD
+  const displayAmount = shouldShowLocalAmount
     ? getLocalAmount(amount, localCurrencyCode, dollarToLocalRate, goldToDollarRate)
+    : amount
+  const displayCurrency = displayAmount
+    ? displayAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      ? CURRENCY_ENUM.GOLD
+      : CURRENCY_ENUM.DOLLAR
     : null
-  const displayAmount = localAmount ?? amount
-  const currencySymbol =
-    displayAmount === localAmount
+  const currencySymbol = displayAmount
+    ? shouldShowLocalAmount
       ? LocalCurrencySymbol[displayAmount.currencyCode as LocalCurrencyCode]
       : CURRENCIES[currency].symbol
-  const value = new BigNumber(displayAmount.value)
-  const sign = value.isNegative() ? '-' : ''
-  const formattedValue = formatAmount(value.absoluteValue(), currency)
+    : null
+  const value = displayAmount ? new BigNumber(displayAmount.value) : null
+  const sign = value?.isNegative() ? '-' : ''
+  const formattedValue =
+    value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
 
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
@@ -153,7 +157,6 @@ CurrencyDisplay.defaultProps = {
   size: 48,
   useColors: false,
   hideSymbol: false,
-  showLocalAmount: true,
   formatAmount: (amount: BigNumber.Value, currency: CURRENCY_ENUM) =>
     getMoneyDisplayValue(amount, currency),
 }

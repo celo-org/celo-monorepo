@@ -68,7 +68,7 @@ type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslat
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
   error: errorSelector(state),
-  localCurrencyCode: getLocalCurrencyCode(state) || LocalCurrencyCode.USD,
+  localCurrencyCode: getLocalCurrencyCode(state),
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
 })
 

@@ -29,17 +29,13 @@ export function CeloGoldOverview({ t, testID }: Props) {
       <Text style={styles.title}>{t('global:celoGold')}</Text>
       <Text style={styles.balance}>
         {goldBalanceAmount && (
-          <CurrencyDisplay
-            style={fontStyles.semiBold}
-            amount={goldBalanceAmount}
-            showLocalAmount={false}
-          />
+          <CurrencyDisplay style={fontStyles.semiBold} amount={goldBalanceAmount} />
         )}
       </Text>
       <Text style={styles.localBalance}>
         {goldBalanceAmount ? (
           <Trans i18nKey="equalToAmount" ns={Namespaces.exchangeFlow9}>
-            Equal to <CurrencyDisplay amount={goldBalanceAmount} />
+            Equal to <CurrencyDisplay amount={goldBalanceAmount} showLocalAmount={true} />
           </Trans>
         ) : (
           t('loadingExchangeRate')

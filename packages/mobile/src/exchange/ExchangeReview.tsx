@@ -19,7 +19,8 @@ import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/a
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -30,6 +31,7 @@ import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
+  localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
   tobinTax: string
   fee: string
@@ -63,6 +65,7 @@ type Props = StateProps & WithTranslation & DispatchProps & NavigationInjectedPr
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
+  localCurrencyCode: getLocalCurrencyCode(state),
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
   tobinTax: state.exchange.tobinTax || '0',
   fee: '0',
@@ -156,6 +159,7 @@ export class ExchangeReview extends React.Component<Props, State> {
   render() {
     const {
       exchangeRatePair,
+      localCurrencyCode,
       localCurrencyExchangeRate,
       fee,
       t,
@@ -250,7 +254,7 @@ export class ExchangeReview extends React.Component<Props, State> {
                 <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
                 <CurrencyDisplay style={fontStyles.bodyBold} amount={totalAmount} />
               </View>
-              {!!localCurrencyExchangeRate && (
+              {localCurrencyCode !== LocalCurrencyCode.USD && !!localCurrencyExchangeRate && (
                 <View style={styles.totalDollarsContainer}>
                   <Text style={styles.dollarsText}>
                     <Trans i18nKey="totalInDollars" ns={Namespaces.exchangeFlow9}>

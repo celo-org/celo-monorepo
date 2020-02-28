@@ -86,7 +86,7 @@ interface StateProps {
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
   feeType: FeeType | null
-  localCurrencyCode: LocalCurrencyCode | null
+  localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
 }
 
@@ -178,7 +178,7 @@ export class SendAmount extends React.Component<Props, State> {
     const { localCurrencyCode, localCurrencyExchangeRate } = this.props
 
     let dollarsAmount
-    if (localCurrencyCode) {
+    if (localCurrencyCode !== LocalCurrencyCode.USD) {
       dollarsAmount =
         convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
         new BigNumber('')

@@ -57,7 +57,21 @@ exports[`renders correctly when not ready 1`] = `
       }
     }
   >
-    loadingExchangeRate
+    Equal to 
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": undefined,
+          },
+          undefined,
+        ]
+      }
+    >
+      
+      -
+    </Text>
   </Text>
 </View>
 `;
@@ -119,7 +133,22 @@ exports[`renders correctly when ready 1`] = `
       }
     }
   >
-    equalToAmount
+    Equal to 
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": undefined,
+          },
+          undefined,
+        ]
+      }
+    >
+      
+      $
+      731.50
+    </Text>
   </Text>
 </View>
 `;
