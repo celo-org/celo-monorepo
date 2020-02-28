@@ -9,9 +9,13 @@ interface Props {
 }
 
 export default ({ href, children, passHref, prefetch = false }: Props) => {
-  return (
-    <Link prefetch={prefetch} href={href} passHref={passHref}>
-      {children}
-    </Link>
-  )
+  if (href) {
+    return (
+      <Link prefetch={prefetch} href={href} passHref={passHref}>
+        {children}
+      </Link>
+    )
+  } else {
+    return <>{children}</>
+  }
 }

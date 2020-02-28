@@ -270,7 +270,7 @@ function ButtonNaked(props: Props) {
   const fontSize = nakedSize(size)
   return (
     <View style={[baseStyles.base, baseStyles.floating, nakedStyles.container]}>
-      <Link href={href} passHref={true}>
+      <Link href={href}>
         <Text
           accessibilityRole="link"
           href={href}
