@@ -1,6 +1,5 @@
 import FunctionsTest from 'firebase-functions-test'
 import { BLINDBLS } from 'bls12377js-blind'
-import * as chai from 'chai'
 
 const functionsTest = FunctionsTest()
 functionsTest.mockConfig({
@@ -11,7 +10,6 @@ functionsTest.mockConfig({
 
 process.env.SECRET_KEY = 'fakeSecretKey'
 const celoFunctions = require('../src/index')
-const assert = chai.assert
 
 describe(`POST /getSalt endpoint`, () => {
   it('provides blinded salt', () => {
@@ -76,9 +74,8 @@ describe(`POST /getSalt endpoint`, () => {
 
     const res = {
       json: (body: any) => {
-        assert.equal(body.success, true)
-        assert.equal(
-          JSON.stringify(BLINDBLS.unblindMessage(body.salt, blindingFactor)),
+        expect(body.success).toEqual(true)
+        expect(JSON.stringify(BLINDBLS.unblindMessage(body.salt, blindingFactor))).toEqual(
           JSON.stringify(expected)
         )
       },

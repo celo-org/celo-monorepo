@@ -15,7 +15,6 @@ files=(
   "packages/mobile/android/sentry.properties"
   "packages/mobile/ios/GoogleService-Info.plist"
   "packages/mobile/ios/sentry.properties"
-  "packages/phone-number-privacy/.env"
   "packages/verifier/android/app/google-services.json"
   "packages/verifier/android/app/src/staging/google-services.json"
   "packages/verifier/android/app/src/integration/google-services.json"
