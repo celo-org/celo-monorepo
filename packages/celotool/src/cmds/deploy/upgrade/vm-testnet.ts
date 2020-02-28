@@ -10,6 +10,7 @@ export const describe = 'upgrade a testnet on a VM'
 type VmTestnetArgv = UpgradeArgv & {
   reset: boolean
   skipSecretGeneration: boolean
+  useExistingGenesis: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -25,6 +26,11 @@ export const builder = (argv: yargs.Argv) => {
       default: false,
       type: 'boolean',
     })
+    .option('useExistingGenesis', {
+      type: 'boolean',
+      description: 'Instead of generating a new genesis, use an existing genesis in GCS',
+      default: false,
+    })
 }
 
 export const handler = async (argv: VmTestnetArgv) => {
@@ -35,7 +41,7 @@ export const handler = async (argv: VmTestnetArgv) => {
     onDeployFailed = () => untaintTestnet(argv.celoEnv)
     await taintTestnet(argv.celoEnv)
   }
-  await deploy(argv.celoEnv, !argv.skipSecretGeneration, onDeployFailed)
+  await deploy(argv.celoEnv, !argv.skipSecretGeneration, argv.useExistingGenesis, onDeployFailed)
 
   // upgrade prom to sd statefulset
   await upgradeHelmChart(argv.celoEnv)
