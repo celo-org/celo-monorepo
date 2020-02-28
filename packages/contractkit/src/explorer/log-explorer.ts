@@ -6,7 +6,7 @@ import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 interface ContractMapping {
   details: ContractDetails
-  logMapping: Map<string | undefined, ABIDefinition>
+  logMapping: Map<string, ABIDefinition>
 }
 
 export async function newLogExplorer(kit: ContractKit) {
@@ -35,7 +35,7 @@ export class LogExplorer {
       const fnMapping: Map<string, ABIDefinition> = new Map()
       for (const abiDef of cd.jsonInterface as ABIDefinition[]) {
         if (abiDef.type === 'event') {
-          fnMapping.set(abiDef.signature!, abiDef)
+          fnMapping.set(abiDef.signature, abiDef)
         }
       }
 

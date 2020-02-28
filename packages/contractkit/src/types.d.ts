@@ -1,10 +1,10 @@
+import {} from 'web3-eth-abi'
+import { AbiItem } from 'web3-utils'
 declare module 'web3-eth-abi' {
-  import { AbiItem } from 'web3-utils'
-
   export interface ABIDefinition extends AbiItem {
     inputs?: ABIInputParameter[]
     outputs?: ABIOutputParameter[]
-    signature?: string
+    signature: string
   }
 
   export type ABIType = 'uint256' | 'boolean' | 'string' | 'bytes' | string // TODO complete list

@@ -16,7 +16,7 @@ export async function obtainKitContractDetails(kit: ContractKit): Promise<Contra
     return {
       name: celoContract,
       address: contract.options.address,
-      jsonInterface: contract.options.jsonInterface,
+      jsonInterface: contract.options.jsonInterface as any, // TODO fix types
     }
   })
 }

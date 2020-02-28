@@ -24,7 +24,7 @@ export interface ParsedBlock {
 
 interface ContractMapping {
   details: ContractDetails
-  fnMapping: Map<string | undefined, ABIDefinition>
+  fnMapping: Map<string, ABIDefinition>
 }
 
 export async function newBlockExplorer(kit: ContractKit) {

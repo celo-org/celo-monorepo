@@ -2,7 +2,7 @@
 /// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { NULL_ADDRESS } from '@celo/utils/lib/address'
+import { ensureLeading0x, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
@@ -36,7 +36,7 @@ function headerArray(web3: Web3, block: any) {
 }
 
 function headerFromBlock(web3: Web3, block: any) {
-  return rlp.encode(headerArray(web3, block))
+  return ensureLeading0x(rlp.encode(headerArray(web3, block)).toString('hex'))
 }
 
 describe('slashing tests', function(this: any) {
@@ -96,7 +96,7 @@ describe('slashing tests', function(this: any) {
 
   const hooks: any = getHooks(gethConfig)
   const hooksDown: any = getHooks(gethConfigDown)
-  let web3: any
+  let web3: Web3
   let kit: ContractKit
 
   before(async function(this: any) {
@@ -147,10 +147,8 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const rlpEncodedBlock = rlp.encode(headerArray(kit.web3, block))
-      const blockNumber = await contract.methods
-        .getBlockNumberFromHeader(rlpEncodedBlock.toString())
-        .call()
+      const header = headerFromBlock(kit.web3, block)
+      const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
       assert.equal(blockNumber, current.toString())
     })
 
@@ -165,8 +163,8 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const rlpEncodedBlock = rlp.encode(headerArray(kit.web3, block))
-      const blockHash = await contract.methods.hashHeader(rlpEncodedBlock.toString()).call()
+      const header = headerFromBlock(kit.web3, block)
+      const blockHash = await contract.methods.hashHeader(header).call()
       assert.equal(blockHash, block.hash)
     })
   })
@@ -233,15 +231,13 @@ describe('slashing tests', function(this: any) {
 
       const other = headerFromBlock(web3, doubleSigningBlock)
 
-      const num = await slasher.methods.getBlockNumberFromHeader(other.toString()).call()
+      const num = await slasher.methods.getBlockNumberFromHeader(other).call()
 
       const header = headerFromBlock(web3, await web3.eth.getBlock(num))
 
       // Find a validator that double signed. Both blocks will have signatures from exactly 2F+1 validators.
-      const bitmap1 = await slasher.methods
-        .getVerifiedSealBitmapFromHeader(header.toString())
-        .call()
-      const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other.toString()).call()
+      const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
+      const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
 
       let bmNum1 = new BigNumber(bitmap1).toNumber()
       let bmNum2 = new BigNumber(bitmap2).toNumber()
@@ -270,8 +266,8 @@ describe('slashing tests', function(this: any) {
         .slash(
           signer,
           signerIdx,
-          header.toString(),
-          other.toString(),
+          header,
+          other,
           historyIndex,
           [],
           [],
