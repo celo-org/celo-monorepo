@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PincodeConfirmation renders correctly 1`] = `
+exports[`PincodeEnter renders correctly 1`] = `
 <SafeAreaView
   style={
     Object {

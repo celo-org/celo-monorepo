@@ -54,8 +54,8 @@ import TabNavigator from 'src/navigator/TabNavigator'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
@@ -97,7 +97,7 @@ export const headerArea: CreateNavigatorConfig<
 }
 
 export const commonScreens = {
-  [Screens.PincodeConfirmation]: { screen: PincodeConfirmation },
+  [Screens.PincodeEnter]: { screen: PincodeEnter },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
   [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },

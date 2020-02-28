@@ -52,7 +52,7 @@ export enum Screens {
   PhotosNUX = 'PhotosNUX',
   PincodeEducation = 'PincodeEducation',
   PincodeSet = 'SetPincode',
-  PincodeConfirmation = 'PincodeConfirmation',
+  PincodeEnter = 'PincodeEnter',
   Profile = 'Profile',
   QRCode = 'QRCode',
   QRScanner = 'QRScanner',

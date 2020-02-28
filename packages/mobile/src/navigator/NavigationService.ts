@@ -59,7 +59,7 @@ export async function ensurePincode(disableGoingBack: boolean): Promise<boolean>
     let pin
     try {
       pin = await new Promise((resolve) => {
-        navigate(Screens.PincodeConfirmation, {
+        navigate(Screens.PincodeEnter, {
           onSuccess: resolve,
           withVerification: true,
           disableGoingBack,

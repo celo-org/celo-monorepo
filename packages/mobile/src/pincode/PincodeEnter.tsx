@@ -47,7 +47,7 @@ interface NavProps {
 
 type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
-class PincodeConfirmation extends React.Component<Props, State> {
+class PincodeEnter extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     let options
     if (navigation.getParam('disableGoingBack')) {
@@ -195,5 +195,5 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export default connect(mapStateToProps, { showError })(
-  withTranslation(Namespaces.nuxNamePin1)(PincodeConfirmation)
+  withTranslation(Namespaces.nuxNamePin1)(PincodeEnter)
 )
