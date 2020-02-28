@@ -8,7 +8,7 @@ import { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer'
-import Progressive from 'src/shared/Progessive'
+import Progress from 'src/shared/Progress'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
@@ -54,7 +54,7 @@ class MyApp extends App {
     const { Component, pageProps } = this.props
     return (
       <ScreenSizeProvider>
-        <Progressive />
+        <Progress />
         {this.skipHeader() || <Header />}
         <Component {...pageProps} />
         {this.skipHeader() || (

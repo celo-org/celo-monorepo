@@ -28,7 +28,6 @@ export function usePageTurner() {
     })
     router.events.on(RouterEvents.routeChangeError, (error, url) => {
       if (error.cancelled) {
-        // TODO a way to show rerouting
         setRoute(url)
       }
       setError(true)
@@ -38,7 +37,7 @@ export function usePageTurner() {
   return { isPageTurning, hasError, route }
 }
 
-export default function Progressive() {
+export default function Progress() {
   const { isPageTurning, hasError, route } = usePageTurner()
 
   if (isPageTurning) {
