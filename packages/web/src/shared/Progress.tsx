@@ -65,19 +65,19 @@ const styles = StyleSheet.create({
     right: 0,
   },
   [EffectiveTypes['slow-2g']]: {
-    animationDuration: `35s`,
+    animationDuration: `30s`,
   },
   [EffectiveTypes['2g']]: {
     animationDuration: `20s`,
   },
   [EffectiveTypes.unknown]: {
-    animationDuration: `15s`,
+    animationDuration: `12s`,
   },
   [EffectiveTypes['3g']]: {
     animationDuration: `15s`,
   },
   [EffectiveTypes['4g']]: {
-    animationDuration: `8s`,
+    animationDuration: `5s`,
   },
   good: {
     backgroundColor: colors.primary,
