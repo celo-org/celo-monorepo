@@ -13,14 +13,21 @@ export const describe = 'upgrades a typical deploy'
 
 type TestnetArgv = UpgradeArgv & {
   reset: boolean
+  useExistingGenesis: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
-  return argv.option('reset', {
-    describe: 'indicates a reset',
-    default: false,
-    type: 'boolean',
-  })
+  return argv
+    .option('reset', {
+      describe: 'indicates a reset',
+      default: false,
+      type: 'boolean',
+    })
+    .option('useExistingGenesis', {
+      type: 'boolean',
+      description: 'Instead of generating a new genesis, use an existing genesis in GCS',
+      default: false,
+    })
 }
 
 export const handler = async (argv: TestnetArgv) => {

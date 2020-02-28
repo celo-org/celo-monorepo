@@ -151,7 +151,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Gi
+          storage: 2Gi
   {{ end }}
   podManagementPolicy: Parallel
   replicas: {{ .replicas }}

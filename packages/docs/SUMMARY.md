@@ -102,6 +102,9 @@
       - [Usage](developer-resources/dappkit/usage.md)
     <!-- - [Guide to Asset Custody]() -->
   - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+  - [Integrations](developer-resources/integrations/integrations.md)
+    - [General](developer-resources/integrations/general.md)
+    - [Custody](developer-resources/integrations/custody.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
