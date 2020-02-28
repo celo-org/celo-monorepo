@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native-web'
+import { StyleSheet, View, ViewStyle } from 'react-native-web'
 import VECTORS from 'src/community/connect/RingOfCoinVectors'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { G, Path } from 'src/shared/svg'
@@ -13,16 +13,17 @@ const DURATION = 1100
 const INTERVAL_MS = DURATION * 2.1 // needs to be at least 4x DURATION to give the complete animation a chance to finish
 
 interface OwnProps {
-  children: React.ReactNode
+  children?: React.ReactNode
+  mobileContainerStyle: ViewStyle | ViewStyle[]
 }
 type Props = OwnProps & ScreenProps
-class Sweep extends React.Component<Props> {
+class PinWheel extends React.Component<Props> {
   render() {
     const frame = DURATION / VECTORS.length
     const isMobile = this.props.screen === ScreenSizes.MOBILE
 
     return (
-      <View style={isMobile ? styles.mobileSweepContainer : styles.sweepContainer}>
+      <View style={isMobile ? this.props.mobileContainerStyle : styles.sweepContainer}>
         <Svg width="100%" height="100%" viewBox="0 0 717 750" fill="none">
           <G style={styles.lighting}>
             {VECTORS.map((path, index) => {
@@ -41,17 +42,17 @@ class Sweep extends React.Component<Props> {
           </G>
           <StableCircle />
         </Svg>
-        <View
-          style={isMobile ? [standardStyles.centered, { paddingTop: 40 }] : styles.absoluteCenter}
-        >
-          {this.props.children}
-        </View>
+        {this.props.children && (
+          <View style={isMobile ? standardStyles.centered : styles.absoluteCenter}>
+            {this.props.children}
+          </View>
+        )}
       </View>
     )
   }
 }
 
-export default withScreenSize(Sweep)
+export default withScreenSize(PinWheel)
 
 class StableCircle extends React.PureComponent {
   render() {
@@ -117,10 +118,6 @@ const styles = StyleSheet.create({
     height: '100vh',
     maxHeight: '100vw',
     maxWidth: '90vw',
-  },
-  mobileSweepContainer: {
-    height: '100vh',
-    width: '95vw',
   },
   lightingOff: {
     opacity: 0,

@@ -4,8 +4,9 @@ import Fade from 'react-reveal/Fade'
 import Affirmations from 'src/alliance/Affirmations'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'
+import PinWheel from 'src/alliance/PinWheel'
+import WheelWithForm from 'src/alliance/RisingPinWheelForm'
 import SignupForm from 'src/alliance/SignupForm'
-import Sweep from 'src/alliance/Sweep'
 import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
@@ -32,7 +33,7 @@ export default function Main() {
             isDesktop ? styles.sweepContainer : styles.sweepContainerMobile,
           ]}
         >
-          <Sweep>
+          <PinWheel mobileContainerStyle={styles.mobileSweepInner}>
             <View
               style={{
                 // @ts-ignore
@@ -85,7 +86,7 @@ export default function Main() {
                 {t('thematicStatement')}
               </H4>
             </View>
-          </Sweep>
+          </PinWheel>
         </View>
         <GridRow
           desktopStyle={standardStyles.sectionMarginBottom}
@@ -103,6 +104,7 @@ export default function Main() {
       </View>
       <Affirmations />
       <Benefits />
+      <WheelWithForm />
       <ConnectionFooter includeDividerLine={false} />
     </View>
   )
@@ -126,5 +128,10 @@ const styles = StyleSheet.create({
         translateY: -200,
       } as any,
     ],
+  },
+  mobileSweepInner: {
+    height: '100vh',
+    width: '95vw',
+    justifyContent: 'space-evenly',
   },
 })
