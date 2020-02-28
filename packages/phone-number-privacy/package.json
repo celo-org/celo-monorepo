@@ -22,9 +22,7 @@
   },
   "devDependencies": {
     "firebase-functions-test": "^0.1.6",
-    "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
     "chai": "^4.1.2"
-
   },
   "engines": {
     "node": "10"

@@ -76,7 +76,6 @@ describe(`POST /getSalt endpoint`, () => {
 
     const res = {
       json: (body: any) => {
-        console.log(body)
         assert.equal(body.success, true)
         assert.equal(
           JSON.stringify(BLINDBLS.unblindMessage(body.salt, blindingFactor)),
