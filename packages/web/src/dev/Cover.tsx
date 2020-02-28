@@ -7,7 +7,7 @@ import Transceive from 'src/dev/Transceive'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import Button, { BTN } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -80,12 +80,6 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
             {t('challengeText')}
           </Text>
-          <Button
-            size={SIZE.normal}
-            kind={BTN.PRIMARY}
-            text={t('challengeBtnText')}
-            href="https://forum.celo.org/t/the-great-celo-stake-off-the-details/136"
-          />
         </Cell>
       </GridRow>
       <GridRow
