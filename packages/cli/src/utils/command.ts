@@ -50,14 +50,6 @@ const parseWei: ParseFn<BigNumber> = (input) => {
   }
 }
 
-const parseBlockNumber: ParseFn<number> = (input) => {
-  try {
-    return parseInt(input, 10)
-  } catch (_err) {
-    throw new CLIError(`${input} is not a valid block number`)
-  }
-}
-
 const parsePath: ParseFn<string> = (input) => {
   if (pathExistsSync(input)) {
     return input
@@ -128,11 +120,6 @@ export const Flags = {
     parse: parseWei,
     description: 'Token value without decimals',
     helpValue: '10000000000000000000000',
-  }),
-  block: flags.build({
-    parse: parseBlockNumber,
-    description: 'Block number',
-    helpValue: '10402',
   }),
 }
 
