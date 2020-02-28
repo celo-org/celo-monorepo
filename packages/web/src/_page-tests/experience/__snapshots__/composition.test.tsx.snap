@@ -172,6 +172,8 @@ exports[`Experience/Composition renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://github.com/celo-org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             rel=" noopener noreferrer"
             role="link"
             style={
@@ -337,6 +339,8 @@ exports[`Experience/Composition renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -430,6 +434,8 @@ exports[`Experience/Composition renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/logo"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -540,6 +546,8 @@ exports[`Experience/Composition renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/color"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -650,6 +658,8 @@ exports[`Experience/Composition renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/typography"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -760,6 +770,8 @@ exports[`Experience/Composition renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/composition"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -870,6 +882,8 @@ exports[`Experience/Composition renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/icons"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -963,6 +977,8 @@ exports[`Experience/Composition renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/key-imagery"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -2704,6 +2720,8 @@ exports[`Experience/Composition renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2777,6 +2795,8 @@ exports[`Experience/Composition renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/about"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2850,6 +2870,8 @@ exports[`Experience/Composition renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/jobs"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2923,6 +2945,8 @@ exports[`Experience/Composition renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/validators"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2996,6 +3020,8 @@ exports[`Experience/Composition renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3069,6 +3095,8 @@ exports[`Experience/Composition renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/community"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3306,6 +3334,8 @@ exports[`Experience/Composition renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/terms"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {

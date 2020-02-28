@@ -5331,6 +5331,8 @@ exports[`Error renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="/"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
