@@ -3019,7 +3019,7 @@ exports[`Experience/Typography renders 1`] = `
             }
           >
             <a
-              href="https://twitter.com/CeloHQ"
+              href="https://twitter.com/CeloOrg"
               rel="noopener"
               style={
                 Object {
