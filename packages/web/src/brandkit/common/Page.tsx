@@ -219,7 +219,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
     }
     window.addEventListener('hashchange', this.onChangeHash, false)
     this.props.router.events.on('routeChangeStart', (url) => {
-      console.log('changing lanes')
+      console.log('changing lanes', url)
     })
   }
 
