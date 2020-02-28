@@ -15,10 +15,12 @@ export function usePageTurner() {
   const router = useRouter()
   const [isPageTurning, setPageTurning] = React.useState(false)
   const [hasError, setError] = React.useState(false)
+  const [route, setRoute] = React.useState('')
   React.useEffect(() => {
-    router.events.on(RouterEvents.routeChangeStart, () => {
+    router.events.on(RouterEvents.routeChangeStart, (url) => {
       setPageTurning(true)
       setError(false)
+      setRoute(url)
     })
     router.events.on(RouterEvents.routeChangeComplete, () => {
       setPageTurning(false)
@@ -27,24 +29,24 @@ export function usePageTurner() {
     router.events.on(RouterEvents.routeChangeError, (error, url) => {
       if (error.cancelled) {
         // TODO a way to show rerouting
-        console.log('rerouting', url)
+        setRoute(url)
       }
       setError(true)
     })
   }, [])
 
-  return [isPageTurning, hasError]
+  return { isPageTurning, hasError, route }
 }
 
 export default function Progressive() {
-  const [isPageTurning, error] = usePageTurner()
+  const { isPageTurning, hasError, route } = usePageTurner()
 
   if (isPageTurning) {
     const speed = getEffectiveConnection(navigator)
     const animationSpeed = styles[speed]
     return (
-      <View style={styles.container}>
-        <View style={[styles.bar, animationSpeed, error ? styles.bad : styles.good]} />
+      <View style={styles.container} key={route}>
+        <View style={[styles.bar, animationSpeed, hasError ? styles.bad : styles.good]} />
       </View>
     )
   }
