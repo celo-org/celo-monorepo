@@ -39,7 +39,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
   }
 }
 
-export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
+export function* getPincode(withVerification = true) {
   const pincodeType = yield select(pincodeTypeSelector)
 
   if (pincodeType === PincodeType.Unset) {
@@ -47,6 +47,8 @@ export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
     throw Error('Pin has never been set')
   }
 
+  // This method is deprecated and will be removed soon
+  // `withVerification` is ignored here (it will NOT verify PIN)
   if (pincodeType === PincodeType.PhoneAuth) {
     Logger.debug(TAG + '@getPincode', 'Getting pin from keystore')
     const pin = yield call(getPinFromKeystore)
@@ -58,32 +60,25 @@ export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
 
   if (pincodeType === PincodeType.CustomPin) {
     Logger.debug(TAG + '@getPincode', 'Getting custom pin')
-    if (useCache) {
-      const cachedPin = getCachedPincode()
-      if (cachedPin) {
-        return cachedPin
-      }
+    const cachedPin = getCachedPincode()
+    if (cachedPin) {
+      return cachedPin
     }
 
-    const pincodeEntered = new Promise((resolve) => {
+    const pin = yield new Promise((resolve, reject) => {
       navigate(Screens.PincodeConfirmation, {
-        onValidPin: (code: string) => {
-          if (onValidCustomPin) {
-            onValidCustomPin()
-          } else {
-            navigateBack()
-          }
-          resolve(code)
-        },
+        onSuccess: resolve,
+        onFail: reject,
+        withVerification,
       })
     })
-    const pin = yield pincodeEntered
+
+    navigateBack()
+
     if (!pin) {
       throw new Error('Pincode confirmation returned empty pin')
     }
-    if (useCache) {
-      setCachedPincode(pin)
-    }
+    setCachedPincode(pin)
     return pin
   }
 }

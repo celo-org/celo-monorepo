@@ -1,17 +1,15 @@
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
-import { call, select } from 'redux-saga/effects'
-import { getPincode } from 'src/account/saga'
+import { call } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { openDeepLink } from 'src/app/actions'
-import { handleDeepLink, handleNavigatePinProtected, navigateToProperScreen } from 'src/app/saga'
+import { handleDeepLink, navigateToProperScreen } from 'src/app/saga'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
-import { fornoSelector } from 'src/web3/selectors'
 
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
@@ -59,30 +57,6 @@ describe('App saga', () => {
       .provide([[call(isAppVersionDeprecated), true]])
       .run()
     expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
-  })
-
-  it('Navigates after verifying PIN - Forno', async () => {
-    const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(handleNavigatePinProtected, testRoute)
-      .provide([[select(fornoSelector), true]])
-      .run()
-    expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
-  })
-
-  it('Navigates after verifying PIN - Light node', async () => {
-    const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(handleNavigatePinProtected, testRoute)
-      .provide([
-        [select(fornoSelector), false],
-        [
-          call(getPincode, false, () => {
-            navigate(testRoute.routeName, testRoute.params)
-          }),
-          '123456',
-        ],
-      ])
-      .run()
-    expect(navigate).toBeCalledTimes(0)
   })
 
   it('Handles Dappkit deep link', async () => {

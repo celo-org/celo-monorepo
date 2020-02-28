@@ -7,7 +7,6 @@ export interface State {
   numberVerified: boolean
   language: string | null
   doingBackupFlow: boolean
-  doingPinVerification: boolean
   analyticsEnabled: boolean
   lockWithPinEnabled: boolean
   appState: AppState
@@ -20,7 +19,6 @@ const initialState = {
   numberVerified: false,
   language: null,
   doingBackupFlow: false,
-  doingPinVerification: false,
   analyticsEnabled: true,
   lockWithPinEnabled: false,
   appState: AppState.Active,
@@ -39,7 +37,6 @@ export const appReducer = (
       return {
         ...state,
         ...getRehydratePayload(action, 'app'),
-        doingPinVerification: initialState.doingPinVerification,
         appState: initialState.appState,
         locked: initialState.locked,
       }

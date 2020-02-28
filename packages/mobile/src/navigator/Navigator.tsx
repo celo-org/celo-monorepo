@@ -25,7 +25,6 @@ import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import Security from 'src/account/Security'
 import AppLoading from 'src/app/AppLoading'
-import Background from 'src/app/Background'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -106,7 +105,6 @@ export const commonScreens = {
   [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
   [Screens.Debug]: { screen: Debug },
   [Screens.DataSaver]: { screen: DataSaver },
-  [Screens.Background]: { screen: Background },
 }
 
 const verificationScreens = {

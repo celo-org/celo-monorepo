@@ -19,7 +19,6 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { UNLOCK_DURATION } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
@@ -41,8 +40,9 @@ interface DispatchProps {
 }
 
 interface NavProps {
-  onValidPin: (pin: string) => void
-  hideBackButton: null | boolean
+  onSuccess: (pin: string) => void
+  disableGoingBack: null | boolean
+  withVerification: boolean
 }
 
 type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
@@ -50,7 +50,7 @@ type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedPr
 class PincodeConfirmation extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     let options
-    if (navigation.getParam('hideBackButton')) {
+    if (navigation.getParam('disableGoingBack')) {
       options = {
         headerLeft: null,
       }
@@ -66,7 +66,7 @@ class PincodeConfirmation extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    if (this.props.navigation.getParam('hideBackButton')) {
+    if (this.props.navigation.getParam('disableGoingBack')) {
       this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
         BackHandler.exitApp()
         return true
@@ -103,9 +103,9 @@ class PincodeConfirmation extends React.Component<Props, State> {
   }
 
   onCorrectPin = (pin: string) => {
-    const onValidPin = this.props.navigation.getParam('onValidPin')
-    if (onValidPin) {
-      onValidPin(pin)
+    const onSuccess = this.props.navigation.getParam('onSuccess')
+    if (onSuccess) {
+      onSuccess(pin)
     }
   }
 
@@ -115,16 +115,16 @@ class PincodeConfirmation extends React.Component<Props, State> {
   }
 
   onPressConfirm = () => {
+    const { fornoMode, navigation, currentAccount } = this.props
     const { pin } = this.state
-    const fornoMode = this.props
-    if (this.props.currentAccount && !fornoMode) {
+    const withVerification = navigation.getParam('withVerification')
+    // TODO: Implement PIN verification for forno mode
+    if (withVerification && currentAccount && !fornoMode) {
       web3.eth.personal
-        .unlockAccount(this.props.currentAccount, pin, UNLOCK_DURATION)
+        .unlockAccount(currentAccount, pin, 1)
         .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
         .catch(this.onWrongPin)
     } else {
-      // Account is not created yet or fornoMode is ON, so
-      // PIN can not be verified
       this.onCorrectPin(pin)
     }
   }

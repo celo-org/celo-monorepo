@@ -1,11 +1,12 @@
-import { expectSaga, testSaga } from 'redux-saga-test-plan'
+import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { setPincodeFailure, setPincodeSuccess } from 'src/account/actions'
 import { PincodeType, pincodeTypeSelector } from 'src/account/reducer'
 import { getPincode, setPincode } from 'src/account/saga'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { setCachedPincode } from 'src/pincode/PincodeCache'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { getCachedPincode, setCachedPincode } from 'src/pincode/PincodeCache'
 import { setPinInKeystore } from 'src/pincode/PincodeUtils'
 
 const mockPin = '123456'
@@ -36,6 +37,8 @@ describe('@setPincode', () => {
 })
 
 describe('@getPincode', () => {
+  const mockedNavigate = navigate as jest.Mock
+  const mockedGetCachedPincode = getCachedPincode as jest.Mock
   it('returns PIN from phone keystore', async () => {
     await expectSaga(getPincode)
       .provide([[select(pincodeTypeSelector), PincodeType.PhoneAuth]])
@@ -50,6 +53,36 @@ describe('@getPincode', () => {
       .run()
   })
 
+  it('returns custom PIN without cache', async () => {
+    mockedGetCachedPincode.mockReturnValueOnce(null)
+    mockedNavigate.mockImplementationOnce((_, params) => {
+      expect(params.withVerification).toBe(true)
+      params.onSuccess(mockPin)
+    })
+    await expectSaga(getPincode)
+      .provide([[select(pincodeTypeSelector), PincodeType.CustomPin]])
+      .returns(mockPin)
+      .run()
+    expect(navigate).toHaveBeenCalled()
+    expect(navigateBack).toHaveBeenCalled()
+    expect(setCachedPincode).toHaveBeenCalledWith(mockPin)
+  })
+
+  it('returns custom PIN without cache and verification', async () => {
+    mockedGetCachedPincode.mockReturnValueOnce(null)
+    mockedNavigate.mockImplementationOnce((_, params) => {
+      expect(params.withVerification).toBe(false)
+      params.onSuccess(mockPin)
+    })
+    await expectSaga(getPincode, false)
+      .provide([[select(pincodeTypeSelector), PincodeType.CustomPin]])
+      .returns(mockPin)
+      .run()
+    expect(navigate).toHaveBeenCalled()
+    expect(navigateBack).toHaveBeenCalled()
+    expect(setCachedPincode).toHaveBeenCalledWith(mockPin)
+  })
+
   it('throws error for unset pin', async () => {
     try {
       await expectSaga(getPincode)
@@ -58,13 +91,5 @@ describe('@getPincode', () => {
     } catch (error) {
       expect(error.message).toBe('Pin has never been set')
     }
-  })
-
-  it('does not touch cache', async () => {
-    await testSaga(getPincode, false)
-      .next()
-      .next(PincodeType.CustomPin)
-      .next(mockPin)
-      .returns(mockPin)
   })
 })

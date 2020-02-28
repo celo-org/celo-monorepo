@@ -22,19 +22,14 @@ import { PincodeType, pincodeTypeSelector } from 'src/account/reducer'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import {
-  navigatePinProtected,
-  resetAppOpenedState,
-  setAnalyticsEnabled,
-  setNumberVerified,
-} from 'src/app/actions'
+import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src/app/actions'
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
@@ -48,7 +43,6 @@ interface DispatchProps {
   setAnalyticsEnabled: typeof setAnalyticsEnabled
   resetBackupState: typeof resetBackupState
   devModeTriggerClicked: typeof devModeTriggerClicked
-  navigatePinProtected: typeof navigatePinProtected
 }
 
 interface StateProps {
@@ -86,7 +80,6 @@ const mapDispatchToProps = {
   setAnalyticsEnabled,
   resetBackupState,
   devModeTriggerClicked,
-  navigatePinProtected,
 }
 
 export class Account extends React.Component<Props, State> {
@@ -130,7 +123,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToSecurity = () => {
-    this.props.navigatePinProtected(Screens.Security, { nextScreen: Screens.Account })
+    navigateProtected(Screens.Security, { nextScreen: Screens.Account })
   }
 
   goToAnalytics() {

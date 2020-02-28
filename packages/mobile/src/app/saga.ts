@@ -1,32 +1,22 @@
 import { AppState, Linking } from 'react-native'
+import { NavigationParams } from 'react-navigation'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
-import { getPincode } from 'src/account/saga'
-import { showError } from 'src/alert/actions'
-import {
-  Actions,
-  NavigatePinProtected,
-  OpenDeepLink,
-  SetAppState,
-  setAppState,
-  setLanguage,
-} from 'src/app/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { Actions, OpenDeepLink, SetAppState, setAppState, setLanguage } from 'src/app/actions'
 import { getAppLocked, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import {
+  lockCurrentScreen,
   NavActions,
   navigate,
-  navigateAfterPinEntered,
-  navigateBack,
+  navigateProtected,
 } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
-import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
@@ -118,7 +108,10 @@ export function* navigateToProperScreen() {
     return
   }
 
-  const appLockedAwareNavigate = account && lockWithPinEnabled ? navigateAfterPinEntered : navigate
+  const appLockedAwareNavigate =
+    account && lockWithPinEnabled
+      ? (routeName: string, params?: NavigationParams) => navigateProtected(routeName, params, true)
+      : navigate
 
   if (!language) {
     appLockedAwareNavigate(Stacks.NuxStack)
@@ -150,27 +143,6 @@ export function* handleDeepLink(action: OpenDeepLink) {
       handleDappkitDeepLink(deepLink)
     }
   }
-}
-
-export function* handleNavigatePinProtected(action: NavigatePinProtected) {
-  const fornoMode = yield select(fornoSelector)
-  try {
-    // TODO: Implement PIN protection for forno mode
-    if (!fornoMode) {
-      yield call(getPincode, false, () => {
-        navigate(action.routeName, action.params)
-      })
-    } else {
-      navigate(action.routeName, action.params)
-    }
-  } catch (error) {
-    Logger.error(TAG + '@showBackupAndRecovery', 'Incorrect pincode', error)
-    yield put(showError(ErrorMessages.INCORRECT_PIN))
-  }
-}
-
-export function* watchNavigatePinProtected() {
-  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, handleNavigatePinProtected)
 }
 
 export function* watchDeepLinks() {
@@ -208,21 +180,15 @@ function* watchAppState() {
 
 function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
-  const cachedPin = getCachedPincode()
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (lockWithPinEnabled && action.state === 'background' && !appLocked && !cachedPin) {
-    navigate(Screens.Background, {
-      onUnlock() {
-        navigateBack({ immediate: true })
-      },
-    })
+  if (lockWithPinEnabled && action.state === 'background' && !appLocked) {
+    lockCurrentScreen()
   }
 }
 
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
-  yield spawn(watchNavigatePinProtected)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)

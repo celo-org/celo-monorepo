@@ -117,6 +117,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
       </Text>
     </View>
   </RCTScrollView>
+  )}
   <View>
     <View
       style={
@@ -390,6 +391,7 @@ exports[`BackupIntroduction renders correctly when backup completed and social b
       </Text>
     </View>
   </RCTScrollView>
+  )}
   <View>
     <View
       style={
@@ -649,6 +651,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
       </Text>
     </View>
   </RCTScrollView>
+  )}
   <View>
     <View
       style={
@@ -823,6 +826,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
       </Text>
     </View>
   </RCTScrollView>
+  )}
   <View>
     <View
       style={
@@ -997,6 +1001,7 @@ exports[`BackupIntroduction renders correctly when neither backup nor social bac
       </Text>
     </View>
   </RCTScrollView>
+  )}
   <View>
     <View
       style={
@@ -1171,17 +1176,7 @@ exports[`BackupIntroduction renders correctly when pin verification is in-progre
       </Text>
     </View>
   </RCTScrollView>
-  <ActivityIndicator
-    animating={true}
-    color="#42D689"
-    hidesWhenStopped={true}
-    size="large"
-    style={
-      Object {
-        "marginBottom": 20,
-      }
-    }
-  />
+  )}
   <View>
     <View
       style={

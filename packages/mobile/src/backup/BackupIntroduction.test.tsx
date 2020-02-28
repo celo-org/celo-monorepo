@@ -70,11 +70,7 @@ describe('BackupIntroduction', () => {
   })
   it('renders correctly when pin verification is in-progress', () => {
     const tree = renderer.create(
-      <Provider
-        store={createMockStore({
-          app: { doingPinVerification: true },
-        })}
-      >
+      <Provider store={createMockStore()}>
         <BackupIntroduction />
       </Provider>
     )

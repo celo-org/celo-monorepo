@@ -10,7 +10,7 @@ describe('BackupSocialIntro', () => {
     const navigation = createMockNavigationProp(false)
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <BackupSocialIntro navigation={navigation} doingPinVerification={false} />
+        <BackupSocialIntro navigation={navigation} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
