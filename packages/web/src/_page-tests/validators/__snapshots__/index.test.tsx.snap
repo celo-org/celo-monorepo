@@ -866,71 +866,6 @@ exports[`BuildPage renders 1`] = `
         >
           challengeText
         </div>
-        <div
-          className="css-view-1dbjc4n"
-          onClick={[Function]}
-          onMouseDown={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
-        >
-          <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-            data-focusable={true}
-            dir="auto"
-            href="https://forum.celo.org/t/the-great-celo-stake-off-the-details/136"
-            role="link"
-            style={
-              Object {
-                "WebkitAlignItems": "center",
-                "WebkitBoxAlign": "center",
-                "WebkitBoxFlex": 0,
-                "WebkitBoxPack": "center",
-                "WebkitFlexGrow": 0,
-                "WebkitJustifyContent": "center",
-                "alignItems": "center",
-                "backgroundColor": "rgba(53,208,127,1.00)",
-                "borderBottomColor": "rgba(53,208,127,1.00)",
-                "borderBottomLeftRadius": "3px",
-                "borderBottomRightRadius": "3px",
-                "borderBottomWidth": "1px",
-                "borderLeftColor": "rgba(53,208,127,1.00)",
-                "borderLeftWidth": "1px",
-                "borderRightColor": "rgba(53,208,127,1.00)",
-                "borderRightWidth": "1px",
-                "borderTopColor": "rgba(53,208,127,1.00)",
-                "borderTopLeftRadius": "3px",
-                "borderTopRightRadius": "3px",
-                "borderTopWidth": "1px",
-                "color": "rgba(255,255,255,1.00)",
-                "cursor": "pointer",
-                "display": "inline-flex",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "fontWeight": "500",
-                "justifyContent": "center",
-                "lineHeight": "16px",
-                "minWidth": "150px",
-                "msFlexAlign": "center",
-                "msFlexPack": "center",
-                "msFlexPositive": 0,
-                "opacity": 1,
-                "paddingBottom": "10px",
-                "paddingLeft": "20px",
-                "paddingRight": "20px",
-                "paddingTop": "10px",
-                "textAlign": "center",
-                "textRendering": "geometricPrecision",
-                "width": "fit-content",
-              }
-            }
-          >
-            challengeBtnText
-          </a>
-        </div>
       </div>
     </div>
     <div
@@ -1230,7 +1165,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  195900
+                  362600
                 </div>
               </div>
               <div
@@ -1250,7 +1185,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  391800
+                  725200
                 </div>
               </div>
               <div
@@ -1270,7 +1205,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  587700
+                  1087800
                 </div>
               </div>
               <div
@@ -1290,7 +1225,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  783600
+                  1450400
                 </div>
               </div>
               <div
@@ -1310,7 +1245,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  979500
+                  1813000
                 </div>
               </div>
               <div
@@ -1330,7 +1265,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  1175400
+                  2175600
                 </div>
               </div>
               <div
@@ -1350,7 +1285,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  1371300
+                  2538200
                 </div>
               </div>
               <div
@@ -1370,7 +1305,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  1567200
+                  2900800
                 </div>
               </div>
             </div>
