@@ -96,7 +96,7 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
     }
 
     try {
-      formatters.inputCallFormatter(tx)
+      tx = formatters.inputCallFormatter(tx)
 
       const transaction = tx
       transaction.to = tx.to || '0x'

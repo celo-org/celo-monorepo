@@ -2,11 +2,7 @@
   "extends": "../typescript/tsconfig.library.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib",
-    "baseUrl": ".",
-    "paths": {
-      "web3": ["../../node_modules/@types/web3"]
-    }
+    "outDir": "lib"
   },
   "include": ["src", "types/"],
   "references": [{ "path": "../utils" }]
