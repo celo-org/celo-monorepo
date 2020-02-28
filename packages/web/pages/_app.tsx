@@ -15,28 +15,11 @@ import { appWithTranslation } from '../src/i18n'
 
 config({ ssrReveal: true })
 
-interface State {
-  isPageTurning: number
-}
-
-class MyApp extends App<{}, State> {
-  state: State = { isPageTurning: 0 }
+class MyApp extends App {
   async componentDidMount() {
     if (window.location.hash) {
       hashScroller(window.location.hash)
     }
-
-    this.props.router.events.on('routeChangeStart', () => {
-      this.setState({ isPageTurning: true })
-    })
-
-    this.props.router.events.on('routeChangeComplete', () => {
-      this.setState({ isPageTurning: false })
-    })
-
-    this.props.router.events.on('routeChangeError', () => {
-      this.setState({ isPageTurning: false })
-    })
 
     window.addEventListener('hashchange', () => hashScroller(window.location.hash))
 
@@ -71,7 +54,7 @@ class MyApp extends App<{}, State> {
     const { Component, pageProps } = this.props
     return (
       <ScreenSizeProvider>
-        {this.state.isPageTurning && <Progressive />}
+        <Progressive />
         {this.skipHeader() || <Header />}
         <Component {...pageProps} />
         {this.skipHeader() || (

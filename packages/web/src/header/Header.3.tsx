@@ -113,9 +113,6 @@ export class Header extends React.PureComponent<Props, State> {
     window.addEventListener('scroll', this.handleScroll)
 
     this.props.router.events.on('routeChangeComplete', this.closeMenu)
-    this.props.router.events.on('routeChangeStart', (url) => {
-      console.log('chaning to ', url)
-    })
   }
 
   componentWillUnmount() {
