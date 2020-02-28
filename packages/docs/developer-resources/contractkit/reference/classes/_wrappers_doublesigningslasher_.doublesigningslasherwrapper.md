@@ -16,7 +16,6 @@ Contract handling slashing for Validator double-signing
 
 ### Properties
 
-* [getBlockNumberFromHeader](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#getblocknumberfromheader)
 * [slashingIncentives](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#slashingincentives)
 
 ### Accessors
@@ -25,6 +24,7 @@ Contract handling slashing for Validator double-signing
 
 ### Methods
 
+* [getBlockNumberFromHeader](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#getblocknumberfromheader)
 * [slashSigner](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#slashsigner)
 * [slashValidator](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#slashvalidator)
 
@@ -48,34 +48,6 @@ Name | Type |
 **Returns:** *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
 
 ## Properties
-
-###  getBlockNumberFromHeader
-
-• **getBlockNumberFromHeader**: *function* = proxyCall(
-    this.contract.methods.getBlockNumberFromHeader,
-    undefined,
-    valueToInt
-  )
-
-*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L36)*
-
-Parses block number out of header.
-
-**`param`** RLP encoded header
-
-**`returns`** Block number.
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *Promise‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
 
 ###  slashingIncentives
 
@@ -119,11 +91,31 @@ Contract address
 
 ## Methods
 
+###  getBlockNumberFromHeader
+
+▸ **getBlockNumberFromHeader**(`header`: string): *Promise‹number›*
+
+*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L36)*
+
+Parses block number out of header.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`header` | string | RLP encoded header |
+
+**Returns:** *Promise‹number›*
+
+Block number.
+
+___
+
 ###  slashSigner
 
 ▸ **slashSigner**(`signerAddress`: [Address](../modules/_base_.md#address), `headerA`: string, `headerB`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L70)*
+*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L69)*
 
 Slash a Validator for double-signing.
 
@@ -143,7 +135,7 @@ ___
 
 ▸ **slashValidator**(`validatorAddress`: [Address](../modules/_base_.md#address), `headerA`: string, `headerB`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L48)*
+*Defined in [contractkit/src/wrappers/DoubleSigningSlasher.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DoubleSigningSlasher.ts#L47)*
 
 Slash a Validator for double-signing.
 

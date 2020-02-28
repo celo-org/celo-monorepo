@@ -338,9 +338,8 @@ describe('slashing tests', function(this: any) {
       const election = await kit.contracts.getElection()
       await waitUntilBlock(doubleSigningBlock.number)
 
-      const slasherContract = await kit._web3Contracts.getDoubleSigningSlasher()
       const other = headerFromBlock(web3, doubleSigningBlock)
-      const num = await slasherContract.methods.getBlockNumberFromHeader(other).call()
+      const num = await slasher.getBlockNumberFromHeader(bufferToString(other))
       const header = headerFromBlock(web3, await web3.eth.getBlock(num))
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await election.validatorSignerAddressFromSet(signerIdx, num)

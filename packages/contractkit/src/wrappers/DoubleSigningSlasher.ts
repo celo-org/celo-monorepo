@@ -33,11 +33,10 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
    * @param header RLP encoded header
    * @return Block number.
    */
-  getBlockNumberFromHeader = proxyCall(
-    this.contract.methods.getBlockNumberFromHeader,
-    undefined,
-    valueToInt
-  )
+  async getBlockNumberFromHeader(header: string): Promise<number> {
+    const res = await this.contract.methods.getBlockNumberFromHeader(stringToBytes(header)).call()
+    return valueToInt(res)
+  }
 
   /**
    * Slash a Validator for double-signing.
@@ -53,7 +52,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidator(validatorAddress)
-    const blockNumber = await this.getBlockNumberFromHeader(stringToBytes(headerA))
+    const blockNumber = await this.getBlockNumberFromHeader(headerA)
     return this.slash(
       findAddressIndex(validator.signer, await election.getValidatorSigners(blockNumber)),
       headerA,
@@ -73,7 +72,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const election = await this.kit.contracts.getElection()
-    const blockNumber = await this.getBlockNumberFromHeader(stringToBytes(headerA))
+    const blockNumber = await this.getBlockNumberFromHeader(headerA)
     return this.slash(
       findAddressIndex(signerAddress, await election.getValidatorSigners(blockNumber)),
       headerA,
@@ -93,7 +92,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
-    const blockNumber = await this.getBlockNumberFromHeader(stringToBytes(headerA))
+    const blockNumber = await this.getBlockNumberFromHeader(headerA)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const signer = await election.validatorSignerAddressFromSet(signerIndex, blockNumber)
