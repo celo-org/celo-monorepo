@@ -34,6 +34,10 @@ class MyApp extends App<{}, State> {
       this.setState({ isPageTurning: false })
     })
 
+    this.props.router.events.on('routeChangeError', () => {
+      this.setState({ isPageTurning: false })
+    })
+
     window.addEventListener('hashchange', () => hashScroller(window.location.hash))
 
     if (getConfig().publicRuntimeConfig.FLAGS.ENV === 'development') {
