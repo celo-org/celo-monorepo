@@ -1,6 +1,6 @@
 {
   "learnMore": "Learn More",
-  "equalToAmount": "Equal to {{amount}}",
+  "equalToAmount": "Equal to <1></1>",
   "whatIsGold": "Gold is where you can choose to store {{CeloDollars}} you have",
   "manageCelo": "Manage {{CeloDollars}}",
   "activity": "Activity",

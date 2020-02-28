@@ -1,6 +1,6 @@
 {
   "learnMore": "Saber más",
-  "equalToAmount": "Igual a {{amount}}",
+  "equalToAmount": "Igual a <1></1>",
   "whatIsGold": "Puede elegir guardar sus {{CeloDollars}} en Celo Oro",
   "manageCelo": "Administrar {{CeloDollars}}",
   "activity": "Actividad",

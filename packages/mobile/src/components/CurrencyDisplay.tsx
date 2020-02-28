@@ -4,9 +4,15 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
+import { useExchangeRate as useGoldToDollarRate } from 'src/exchange/hooks'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
-import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import {
+  useExchangeRate as useDollarToLocalRate,
+  useLocalCurrencyCode,
+} from 'src/localCurrency/hooks'
+import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 export enum DisplayType {
@@ -37,6 +43,41 @@ function getBigSymbolStyle(fontSize: number, color: string | undefined) {
   }
 }
 
+function getLocalAmount(
+  amount: MoneyAmount,
+  localCurrencyCode: LocalCurrencyCode | null,
+  dollarToLocalRate: BigNumber.Value | null | undefined,
+  goldToDollarRate: BigNumber
+) {
+  if (!localCurrencyCode) {
+    return null
+  }
+
+  if (amount.localAmount?.currencyCode === localCurrencyCode) {
+    return amount.localAmount
+  }
+
+  let dollarValue = null
+  if (amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code) {
+    dollarValue = goldToDollarAmount(amount.value, goldToDollarRate)
+  } else if (amount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code) {
+    dollarValue = amount.value
+  } else {
+    // Can't convert other currencies for now
+    return null
+  }
+
+  const localValue = convertDollarsToLocalAmount(dollarValue, dollarToLocalRate)
+  if (!localValue) {
+    return null
+  }
+
+  return {
+    value: localValue,
+    currencyCode: localCurrencyCode as string,
+  }
+}
+
 // TODO(Rossy) This is mostly duped by MoneyAmount, converge the two
 export default function CurrencyDisplay({
   type,
@@ -49,19 +90,17 @@ export default function CurrencyDisplay({
   style,
 }: Props) {
   const localCurrencyCode = useLocalCurrencyCode()
-  // tslint:disable-next-line: react-hooks-nesting
-  const localValue = useDollarsToLocalAmount(amount.value) || 0
+  const dollarToLocalRate = useDollarToLocalRate()
+  const goldToDollarRate = useGoldToDollarRate()
 
   const currency =
     amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
       ? CURRENCY_ENUM.GOLD
       : CURRENCY_ENUM.DOLLAR
 
-  // For now only show the local amount when original currency is dollars
-  const localAmount =
-    showLocalAmount && currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode
-      ? amount.localAmount ?? { value: localValue, currencyCode: localCurrencyCode }
-      : null
+  const localAmount = showLocalAmount
+    ? getLocalAmount(amount, localCurrencyCode, dollarToLocalRate, goldToDollarRate)
+    : null
   const displayAmount = localAmount ?? amount
   const currencySymbol =
     displayAmount === localAmount
