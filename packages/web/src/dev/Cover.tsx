@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import LeaderBoard from 'src/dev/LeaderBoard'
-import stakeOffLeaders from 'src/dev/stakeOffLeaderResults.json'
+import stakeOffLeaders from 'src/dev/tgsco-final.json'
 import Transceive from 'src/dev/Transceive'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
@@ -106,7 +106,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
         mobileStyle={standardStyles.blockMarginBottomMobile}
       >
         <Cell span={Spans.full}>
-          <LeaderBoard isLoading={false} leaders={stakeOffLeaders.data.leaderboard} />
+          <LeaderBoard isLoading={false} leaders={stakeOffLeaders} />
         </Cell>
       </GridRow>
     </View>
