@@ -14,11 +14,25 @@ import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
 
 config({ ssrReveal: true })
-class MyApp extends App {
+
+interface State {
+  isPageTurning: number
+}
+
+class MyApp extends App<{}, State> {
+  state: State = { isPageTurning: 0 }
   async componentDidMount() {
     if (window.location.hash) {
       hashScroller(window.location.hash)
     }
+
+    this.props.router.events.on('routeChangeStart', () => {
+      this.setState({ isPageTurning: true })
+    })
+
+    this.props.router.events.on('routeChangeComplete', () => {
+      this.setState({ isPageTurning: false })
+    })
 
     window.addEventListener('hashchange', () => hashScroller(window.location.hash))
 
@@ -53,7 +67,7 @@ class MyApp extends App {
     const { Component, pageProps } = this.props
     return (
       <ScreenSizeProvider>
-        <Progressive />
+        {this.state.isPageTurning && <Progressive />}
         {this.skipHeader() || <Header />}
         <Component {...pageProps} />
         {this.skipHeader() || (

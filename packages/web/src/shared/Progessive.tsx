@@ -12,7 +12,6 @@ export default function Progressive() {
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: colors.white,
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 1000,
@@ -25,17 +24,20 @@ const styles = StyleSheet.create({
   },
   bar: {
     height: '100%',
+    width: '100%',
+    transformOrigin: 'left',
     animationFillMode: 'both',
     backgroundColor: colors.primary,
-    animationDuration: `10s`,
+    animationTimingFunction: 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
+    animationDuration: `7s`,
     animationKeyframes: [
       {
-        from: {
-          width: '10%',
+        '0%': {
+          transform: [{ scaleX: 0 }],
         },
 
         to: {
-          width: '50%',
+          transform: [{ scaleX: 1 }],
         },
       },
     ],
