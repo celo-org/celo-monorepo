@@ -1,4 +1,3 @@
-import { valueToInt } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import { newReleaseGold } from '@celo/contractkit/src/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/src/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
@@ -30,7 +29,7 @@ export default class SetMaxDistribution extends BaseCommand {
     // tslint:disable-next-line
     const { flags } = this.parse(SetMaxDistribution)
     const contractAddress = flags.contract
-    const distributionRatio = valueToInt(flags.distributionRatio)
+    const distributionRatio = Number(flags.distributionRatio)
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       this.kit,
       newReleaseGold(this.kit.web3, contractAddress)

@@ -26,9 +26,10 @@ export default class CreateAccount extends BaseCommand {
       newReleaseGold(this.kit.web3, contractAddress)
     )
 
+    const isRevoked = await releaseGoldWrapper.isRevoked()
     await newCheckBuilder(this)
       .isNotAccount(releaseGoldWrapper.address)
-      .isNotRevoked(releaseGoldWrapper)
+      .addCheck('Contract is not revoked', () => !isRevoked)
       .runChecks()
 
     this.kit.defaultAccount = await releaseGoldWrapper.getBeneficiary()

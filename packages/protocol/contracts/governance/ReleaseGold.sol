@@ -1,10 +1,10 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IReleaseGold.sol";
 import "../common/FixidityLib.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
