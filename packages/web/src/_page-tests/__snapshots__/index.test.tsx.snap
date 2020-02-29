@@ -1066,7 +1066,7 @@ exports[`HomePage renders 1`] = `
           </div>
         </a>
         <a
-          href="https://www.coindesk.com/a16z-polychain-invest-25-million-into-crypto-payments-startup-celo"
+          href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
           rel="noopener"
           target="_blank"
         >
@@ -1212,7 +1212,7 @@ exports[`HomePage renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600"
+              href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
               role="link"
               style={
                 Object {

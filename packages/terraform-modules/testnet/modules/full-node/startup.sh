@@ -209,8 +209,8 @@ docker run \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
-      --lightserv 90 \
-      --lightpeers 1000 \
+      --light.serve 90 \
+      --light.maxpeers 1000 \
       --maxpeers=${max_peers} \
       --rpc \
       --rpcaddr 0.0.0.0 \

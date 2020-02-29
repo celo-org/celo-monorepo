@@ -1,10 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-ingress
+  name: {{ .Release.Namespace }}-ethstats-ingress
   labels:
-    app: ethstats
-    chart: ethstats
+    app: celostats
+    chart: celostats
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: ethstats
@@ -17,13 +17,13 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Release.Name }}.{{ .Values.domain.name }}.org
-    secretName: {{ .Release.Name }}-tls
+    - {{ .Release.Namespace }}-ethstats.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Namespace }}-ethstats-tls
   rules:
-  - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Namespace }}-ethstats.{{ .Values.domain.name }}.org
     http:
       paths:
       - path: /
         backend:
-          serviceName: {{ .Release.Name }}
+          serviceName: {{ .Release.Namespace }}-celostats-server
           servicePort: 80
