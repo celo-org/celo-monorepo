@@ -78,7 +78,7 @@ export enum CeloLinks {
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
   twitter = 'https://twitter.com/CeloOrg',
-  mediumOrg = 'https://medium.com/@celo.org',
+  mediumUser = 'https://medium.com/@celo.org',
   mediumPublication = 'https://medium.com/celoOrg',
   fundingRequest = 'https://c-labs.typeform.com/to/gj9aUp',
   linkedIn = 'https://www.linkedin.com/company/celoOrg/',
