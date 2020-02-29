@@ -6,7 +6,6 @@ import { ensureLeading0x, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
-import { Buffer } from 'safe-buffer'
 import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep } from './utils'
@@ -15,8 +14,6 @@ const headerHex =
   '0xf901f9a07285abd5b24742f184ad676e31f6054663b3529bc35ea2fcad8a3e0f642a46f7a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347948888f1f195afa192cfee860698584c030f4c9db1a0ecc60e00b3fe5ce9f6e1a10e5469764daf51f1fe93c22ec3f9a7583a80357217a0d35d334d87c0cc0a202e3756bf81fae08b1575f286c7ee7a3f8df4f0f3afc55da056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008302000001832fefd8825208845c47775c80a00000000000000000000000000000000000000000000000000000000000000000880000000000000000'
 
 const TMP_PATH = '/tmp/e2e'
-
-const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
 function headerArray(web3: Web3, block: any) {
   return [
@@ -45,8 +42,8 @@ function headerFromBlock(web3: Web3, block: any) {
 // Find a validator that double signed. Both blocks will have signatures from exactly 2F+1 validators.
 async function findDoubleSignerIndex(
   kit: ContractKit,
-  header: Buffer,
-  other: Buffer
+  header: string,
+  other: string
 ): Promise<number> {
   const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
   const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
@@ -339,7 +336,7 @@ describe('slashing tests', function(this: any) {
       await waitUntilBlock(doubleSigningBlock.number)
 
       const other = headerFromBlock(web3, doubleSigningBlock)
-      const num = await slasher.getBlockNumberFromHeader(bufferToString(other))
+      const num = await slasher.getBlockNumberFromHeader(other)
       const header = headerFromBlock(web3, await web3.eth.getBlock(num))
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await election.validatorSignerAddressFromSet(signerIdx, num)
@@ -347,7 +344,7 @@ describe('slashing tests', function(this: any) {
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
 
-      const tx = await slasher.slashSigner(signer, bufferToString(header), bufferToString(other))
+      const tx = await slasher.slashSigner(signer, header, other)
       const txResult = await tx.send({ from: validator, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)
