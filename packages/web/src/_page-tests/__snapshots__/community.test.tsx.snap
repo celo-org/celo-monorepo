@@ -3306,7 +3306,7 @@ exports[`Community renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://medium.com/celohq/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
+                href="https://medium.com/celoOrg/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
                 role="link"
                 style={
                   Object {

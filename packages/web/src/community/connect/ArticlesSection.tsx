@@ -8,7 +8,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import menuItems, { hashNav } from 'src/shared/menu-items'
+import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
 interface OwnProps {
@@ -45,7 +45,7 @@ class ArticlesSection extends React.PureComponent<Props> {
               text={t('common:readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
               size={SIZE.normal}
-              href={menuItems.MEDIUM.link}
+              href={CeloLinks.mediumOrg}
               target={'_blog'}
               iconRight={<MediumLogo height={16} color={colors.dark} wrapWithLink={false} />}
             />

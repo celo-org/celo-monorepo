@@ -1184,7 +1184,7 @@ exports[`Experience/Typography renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                     data-focusable={true}
                     dir="auto"
-                    href="https://medium.com/celohq/the-why-of-the-celo-coin-part-1-of-3-5e5701805847"
+                    href="https://medium.com/celoOrg/the-why-of-the-celo-coin-part-1-of-3-5e5701805847"
                     role="link"
                     style={
                       Object {
