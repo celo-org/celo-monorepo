@@ -565,6 +565,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @return Index for epoch or -1.
    */
   findValidatorMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
-    return history.reverse().findIndex((x) => x.epoch <= epoch)
+    const revIndex = history
+      .slice()
+      .reverse()
+      .findIndex((x) => x.epoch <= epoch)
+    return revIndex < 0 ? -1 : history.length - revIndex - 1
   }
 }

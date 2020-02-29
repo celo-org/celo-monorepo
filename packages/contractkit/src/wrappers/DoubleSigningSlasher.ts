@@ -32,11 +32,10 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
    * @param header RLP encoded header
    * @return Block number.
    */
-  getBlockNumberFromHeader = proxyCall(
-    this.contract.methods.getBlockNumberFromHeader,
-    undefined,
-    valueToInt
-  )
+  async getBlockNumberFromHeader(header: string): Promise<number> {
+    const res = await this.contract.methods.getBlockNumberFromHeader(header).call()
+    return valueToInt(res)
+  }
 
   /**
    * Slash a Validator for double-signing.
@@ -99,13 +98,14 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     const validator = await validators.getValidatorFromSigner(signer)
     const membership = await validators.getValidatorMembershipHistoryIndex(validator, blockNumber)
     const lockedGold = await this.kit.contracts.getLockedGold()
-    const slashValidator = await lockedGold.computeParametersForSlashing(
+    const slashValidator = await lockedGold.computeInitialParametersForSlashing(
       validator.address,
       incentives.penalty
     )
     const slashGroup = await lockedGold.computeParametersForSlashing(
       membership.group,
-      incentives.penalty
+      incentives.penalty,
+      slashValidator.list
     )
 
     return toTransactionObject(

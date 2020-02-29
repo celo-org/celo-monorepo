@@ -29,6 +29,7 @@ Contract for handling deposits needed for voting.
 
 ### Methods
 
+* [computeInitialParametersForSlashing](_wrappers_lockedgold_.lockedgoldwrapper.md#computeinitialparametersforslashing)
 * [computeParametersForSlashing](_wrappers_lockedgold_.lockedgoldwrapper.md#computeparametersforslashing)
 * [getAccountSummary](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountsummary)
 * [getAccountsSlashed](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountsslashed)
@@ -229,9 +230,9 @@ Contract address
 
 ## Methods
 
-###  computeParametersForSlashing
+###  computeInitialParametersForSlashing
 
-▸ **computeParametersForSlashing**(`account`: string, `penalty`: BigNumber): *Promise‹object›*
+▸ **computeInitialParametersForSlashing**(`account`: string, `penalty`: BigNumber): *Promise‹object›*
 
 *Defined in [contractkit/src/wrappers/LockedGold.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L226)*
 
@@ -247,6 +248,24 @@ Name | Type | Description |
 **Returns:** *Promise‹object›*
 
 List of (group, voting gold) to decrement from `account`.
+
+___
+
+###  computeParametersForSlashing
+
+▸ **computeParametersForSlashing**(`account`: string, `penalty`: BigNumber, `groups`: AddressListItem[]): *Promise‹object›*
+
+*Defined in [contractkit/src/wrappers/LockedGold.ts:233](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L233)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`account` | string |
+`penalty` | BigNumber |
+`groups` | AddressListItem[] |
+
+**Returns:** *Promise‹object›*
 
 ___
 

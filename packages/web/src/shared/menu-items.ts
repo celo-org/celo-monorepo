@@ -58,10 +58,6 @@ export const menuItems = {
     name: 'Terms',
     link: '/terms',
   },
-  TWITTER: {
-    name: 'Twitter',
-    link: 'https://twitter.com/CeloHQ',
-  },
   CODE_OF_CONDUCT: {
     name: 'Code of Conduct',
     link: '/code-of-conduct',
@@ -86,6 +82,7 @@ export enum CeloLinks {
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
+  twitter = 'https://twitter.com/CeloOrg',
   fundingRequest = 'https://c-labs.typeform.com/to/gj9aUp',
   linkedIn = 'https://www.linkedin.com/company/celohq/',
   monorepo = 'https://github.com/celo-org/celo-monorepo',

@@ -2,12 +2,12 @@ import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import LeaderBoard from 'src/dev/LeaderBoard'
-import stakeOffLeaders from 'src/dev/stakeOffLeaderResults.json'
+import stakeOffLeaders from 'src/dev/tgsco-final.json'
 import Transceive from 'src/dev/Transceive'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import Button, { BTN } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -80,12 +80,6 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
             {t('challengeText')}
           </Text>
-          <Button
-            size={SIZE.normal}
-            kind={BTN.PRIMARY}
-            text={t('challengeBtnText')}
-            href="https://forum.celo.org/t/the-great-celo-stake-off-the-details/136"
-          />
         </Cell>
       </GridRow>
       <GridRow
@@ -106,7 +100,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
         mobileStyle={standardStyles.blockMarginBottomMobile}
       >
         <Cell span={Spans.full}>
-          <LeaderBoard isLoading={false} leaders={stakeOffLeaders.data.leaderboard} />
+          <LeaderBoard isLoading={false} leaders={stakeOffLeaders} />
         </Cell>
       </GridRow>
     </View>
