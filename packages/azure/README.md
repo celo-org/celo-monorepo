@@ -52,10 +52,8 @@ az group deployment create \
    proxyPublicKey=... \
    proxyPrivateKey=... \
    validatorPrivateKey=... \
-   validatorGethAccountSecret=... \
    attesterAccountAddress=... \
    attesterPrivateKey=... \
-   attesterGethAccountSecret=... \
    attesterTwilioAccountSID=... \
    attesterTwilioAuthToken=... \
    attesterTwilioMessageServiceSID=... \
@@ -84,10 +82,8 @@ az group delete --name $GROUP
 | `proxyPublicKey` | string | Proxy enode public key |
 | `proxyPrivateKey` | secureString | Proxy etherbase account private key |
 | `validatorPrivateKey` | secureString | Authorized validator signer etherbase account private key |
-| `validatorGethAccountSecret` | secureString | Password to secure validatorPrivateKey |
 | `attesterAccountAddress` | string | Attester account address |
 | `attesterPrivateKey` | secureString | Attester account private key |
-| `attesterGethAccountSecret` | secureString | Password to secure attesterPrivateKey |
 | `attesterTwilioAccountSID` | string | Attester Twilio account SID |
 | `attesterTwilioAuthToken` | secureString | Attester Twilio authentication token |
 | `attesterTwilioMessageServiceSID` | string | Attester Twilio message service SID |
