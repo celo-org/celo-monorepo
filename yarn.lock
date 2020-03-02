@@ -23599,11 +23599,6 @@ lodash.isequal@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
   integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
 
-lodash.isfunction@^3.0.9:
-  version "3.0.9"
-  resolved "https://registry.yarnpkg.com/lodash.isfunction/-/lodash.isfunction-3.0.9.tgz#06de25df4db327ac931981d1bdb067e5af68d051"
-  integrity sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==
-
 lodash.isinteger@^4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz#619c0af3d03f8b04c31f5882840b77b11cd68343"
@@ -23613,11 +23608,6 @@ lodash.ismatch@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.ismatch/-/lodash.ismatch-4.4.0.tgz#756cb5150ca3ba6f11085a78849645f188f85f37"
   integrity sha1-dWy1FQyjum8RCFp4hJZF8Yj4Xzc=
-
-lodash.isnil@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/lodash.isnil/-/lodash.isnil-4.0.0.tgz#49e28cd559013458c814c5479d3c663a21bfaa6c"
-  integrity sha1-SeKM1VkBNFjIFMVHnTxmOiG/qmw=
 
 lodash.isnumber@^3.0.3:
   version "3.0.3"
@@ -23709,7 +23699,7 @@ lodash.padstart@^4.1.0:
   resolved "https://registry.yarnpkg.com/lodash.padstart/-/lodash.padstart-4.6.1.tgz#d2e3eebff0d9d39ad50f5cbd1b52a7bce6bb611b"
   integrity sha1-0uPuv/DZ05rVD1y9G1KnvOa7YRs=
 
-lodash.pick@^4.2.1, lodash.pick@^4.4.0:
+lodash.pick@^4.2.1:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.pick/-/lodash.pick-4.4.0.tgz#52f05610fff9ded422611441ed1fc123a03001b3"
   integrity sha1-UvBWEP/53tQiYRRB7R/BI6AwAbM=
@@ -29873,10 +29863,6 @@ react-native-gesture-handler@^1.5.2:
   version "0.1.0-development"
   resolved "https://github.com/celo-org/react-native-geth#6f993d958645cbe85db4d070d31947f52e6d5f89"
 
-"react-native-install-referrer@git://github.com/celo-org/react-native-install-referrer#343bf3d":
-  version "2.0.0"
-  resolved "git://github.com/celo-org/react-native-install-referrer#343bf3d1c3af6f72b8e16622826c2f8092ef45eb"
-
 react-native-iphone-x-helper@^1.0.3:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.2.1.tgz#645e2ffbbb49e80844bb4cbbe34a126fda1e6772"
@@ -30119,16 +30105,6 @@ react-native-testing-library@^1.12.0:
     inherits "^2.0.1"
     ip-regex "^1.0.3"
     util "^0.10.3"
-
-react-native-version-check@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/react-native-version-check/-/react-native-version-check-3.3.0.tgz#b2c5c4d0e490c3cee83e99377f42dbeddff47fd8"
-  integrity sha512-hFy3YydVv+szvT08+fkWigdAlQ8K/IL507NZgxXMjhutwhCT3Nif/HnZXUN3de/yplfdY7ab9gfSjuvJIWPlQA==
-  dependencies:
-    lodash.isfunction "^3.0.9"
-    lodash.isnil "^4.0.0"
-    lodash.pick "^4.4.0"
-    semver "^6.1.1"
 
 react-native-version@^3.1.0:
   version "3.1.0"

@@ -82,7 +82,7 @@ function parseXML(xmlData: string): JSONRSSItem[] {
 }
 
 async function fetchMediumArticles(): Promise<string> {
-  const response = (await abortableFetch('https://medium.com/feed/celohq')) as Response
+  const response = (await abortableFetch('https://medium.com/feed/celoOrg')) as Response
   return response.text()
 }
 

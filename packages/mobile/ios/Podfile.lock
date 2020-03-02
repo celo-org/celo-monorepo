@@ -335,8 +335,6 @@ PODS:
     - React
   - react-native-udp (2.6.1):
     - React
-  - react-native-version-check (3.3.0):
-    - React
   - react-native-webview (7.4.1):
     - React
   - React-RCTActionSheet (0.61.2):
@@ -474,7 +472,6 @@ DEPENDENCIES:
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
   - react-native-tcp (from `../../../node_modules/react-native-tcp`)
   - react-native-udp (from `../../../node_modules/react-native-udp`)
-  - react-native-version-check (from `../../../node_modules/react-native-version-check`)
   - react-native-webview (from `../../../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -596,8 +593,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-tcp"
   react-native-udp:
     :path: "../../../node_modules/react-native-udp"
-  react-native-version-check:
-    :path: "../../../node_modules/react-native-version-check"
   react-native-webview:
     :path: "../../../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -718,7 +713,6 @@ SPEC CHECKSUMS:
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
-  react-native-version-check: 7d578f3405cd9d673bbfd1225f727c87991e9ef9
   react-native-webview: e800df5dd1a0f3555fd543ebf7d881a9014851f2
   React-RCTActionSheet: 89b037c0fb7d2671607cb645760164e7e0c013f6
   React-RCTAnimation: e3cefa93c38c004c318f7ec04b883eb14b8b8235
