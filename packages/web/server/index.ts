@@ -20,6 +20,7 @@ import { submitFellowApp } from './FellowshipApp'
 import getContributors from './getContributors'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
+import respondToError from './respondToError'
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
@@ -224,7 +225,3 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   // tslint:disable-next-line
   console.log(`> Ready on http://localhost:${port}`)
 })()
-
-function respondToError(res: express.Response, error: { message: string; statusCode: number }) {
-  res.status(error.statusCode || 500).json({ message: error.message || 'unknownError' })
-}
