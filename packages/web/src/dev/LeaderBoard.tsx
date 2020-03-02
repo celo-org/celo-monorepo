@@ -7,10 +7,9 @@ import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
 
 interface BoardProps {
   leaders: Competitor[]
@@ -98,7 +97,7 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
     const showExpandButton = leaders.length >= INITIAL_MAX + 1
 
     const leadersWithBTUs = leaders.map((leader) => ({
-      points: leader.points / Math.pow(10, 18),
+      points: leader.points,
       identity: leader.identity === 'Unknown account' ? leader.address : leader.identity,
     }))
 
