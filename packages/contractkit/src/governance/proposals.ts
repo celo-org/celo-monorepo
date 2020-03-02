@@ -1,6 +1,8 @@
 import { concurrentMap } from '@celo/base/lib/async'
 import { keccak256 } from 'ethereumjs-util'
+import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'
+import { ABIDefinition } from 'web3-eth-abi'
 import { Contract } from 'web3-eth-contract'
 import { CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
@@ -132,26 +134,90 @@ export class ProposalBuilder {
     this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
-  /**
-   * Adds a JSON encoded proposal transaction to the builder list.
-   * @param tx A JSON encoded proposal transaction.
-   */
-  addJsonTx = (tx: ProposalTransactionJSON) =>
-    this.builders.push(async () => {
-      const contract = await this.kit._web3Contracts.getContract(tx.contract)
-      const methodName = tx.function
-      const method = (contract.methods as Contract['methods'])[methodName]
-      if (!method) {
-        throw new Error(`Method ${methodName} not found on ${tx.contract}`)
+  fromJsonTx = async (tx: ProposalTransactionJSON) => {
+    const contract = await this.kit._web3Contracts.getContract(tx.contract)
+    const methodName = tx.function
+    const method = (contract.methods as Contract['methods'])[methodName]
+    if (!method) {
+      throw new Error(`Method ${methodName} not found on ${tx.contract}`)
+    }
+    const txo = method(...tx.args)
+    if (!txo) {
+      throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
+    }
+    const address = await this.kit.registry.addressFor(tx.contract)
+    return this.fromWeb3tx(txo, { to: address, value: tx.value })
+  }
+
+  addJsonTx = (tx: ProposalTransactionJSON) => this.builders.push(async () => this.fromJsonTx(tx))
+}
+
+export class InteractiveProposalBuilder {
+  constructor(private readonly builder: ProposalBuilder) {}
+
+  async outputTransactions() {
+    const transactionList = this.builder.build()
+    console.log(JSON.stringify(transactionList, null, 2))
+  }
+
+  async promptTransactions(num: number) {
+    let transactions: ProposalTransactionJSON[] = []
+    while (transactions.length < num) {
+      console.log(`Transaction #${transactions.length + 1}:`)
+      const contractPromptName = 'Celo Contract'
+      const contractAnswer = await inquirer.prompt({
+        name: contractPromptName,
+        type: 'list',
+        choices: Object.keys(CeloContract),
+      })
+      const contractName = contractAnswer[contractPromptName] as CeloContract
+      const contractABI = require('@celo/contractkit/lib/generated/' + contractName)
+        .ABI as ABIDefinition[]
+      const methodNames = contractABI.map((def) => def.name!)
+
+      const functionPromptName = contractName + ' Function'
+      const functionAnswer = await inquirer.prompt({
+        name: functionPromptName,
+        type: 'list',
+        choices: methodNames,
+      })
+      const functionName = functionAnswer[functionPromptName] as string
+      const idx = methodNames.findIndex((m) => m === functionName)
+      const args = []
+      for (const functionInput of contractABI[idx].inputs!) {
+        const inputAnswer = await inquirer.prompt({
+          name: functionInput.name,
+          type: 'input',
+          validate: () => {
+            // TODO: switch on user input and functionInput.type
+            return true
+          },
+        })
+        args.push(inputAnswer[functionInput.name])
       }
-      const txo = method(...tx.args)
-      if (!txo) {
-        throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
+
+      const valuePromptName = 'Value'
+      const valueAnswer = await inquirer.prompt({
+        name: valuePromptName,
+        type: 'input',
+      })
+
+      const tx: ProposalTransactionJSON = {
+        contract: contractName,
+        function: functionName,
+        args,
+        value: valueAnswer[valuePromptName],
       }
-      if (tx.value === undefined) {
-        tx.value = '0'
+
+      try {
+        await this.builder.fromJsonTx(tx)
+        transactions.push(tx)
+      } catch (error) {
+        console.error(error)
+        console.error('Please retry forming this transaction')
       }
-      // TODO fix types
-      return this.fromWeb3tx(txo, { to: (contract as any)._address, value: tx.value })
-    })
+    }
+
+    return transactions
+  }
 }
