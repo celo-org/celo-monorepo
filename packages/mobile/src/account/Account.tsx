@@ -1,7 +1,7 @@
 import Link from '@celo/react-components/components/Link'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -129,6 +129,10 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Licenses)
   }
 
+  goToSupport() {
+    navigate(Screens.Support)
+  }
+
   goToSecurity = () => {
     this.props.navigatePinProtected(Screens.Security, { nextScreen: Screens.Account })
   }
@@ -177,10 +181,6 @@ export class Account extends React.Component<Props, State> {
 
   showDebugScreen = async () => {
     navigate(Screens.Debug)
-  }
-
-  sendLogsToSupport = async () => {
-    await Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
   }
 
   onPressAddress = () => {
@@ -287,7 +287,7 @@ export class Account extends React.Component<Props, State> {
               onPress={this.goToLocalCurrencySetting}
             />
             <SettingsItem title={t('licenses')} onPress={this.goToLicenses} />
-            <SettingsItem title={t('sendIssueReport')} onPress={this.sendLogsToSupport} />
+            <SettingsItem title={t('support')} onPress={this.goToSupport} />
           </View>
           {this.getDevSettingsComp()}
 

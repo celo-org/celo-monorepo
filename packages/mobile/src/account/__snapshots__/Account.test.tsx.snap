@@ -937,7 +937,7 @@ exports[`Account renders correctly 1`] = `
                   }
                 }
               >
-                sendIssueReport
+                support
               </Text>
             </View>
             <View
@@ -2027,7 +2027,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   }
                 }
               >
-                sendIssueReport
+                support
               </Text>
             </View>
             <View
