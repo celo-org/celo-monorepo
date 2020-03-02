@@ -55,7 +55,7 @@ jest.mock('src/firebase/dynamicLinks', () => ({
 }))
 
 jest.mock('src/utils/appstore', () => ({
-  getAppStoreId: jest.fn(async () => 1482389446),
+  getAppStoreId: jest.fn(async () => '1482389446'),
 }))
 
 jest.mock('src/account/actions', () => ({
@@ -225,9 +225,8 @@ describe(generateInviteLink, () => {
     expect(result).toBe('http://celo.page.link/PARAMS')
     expect(generateShortInviteLink).toBeCalledTimes(1)
     expect(generateShortInviteLink).toHaveBeenCalledWith({
-      link: `https://celo.org/build/wallet`,
-      playStoreUrl: `https://play.store.link&referrer=invite-code%3D${mockKey}`,
-      appStoreUrl: 'https://app.store.link',
+      link: `https://celo.org/build/wallet?invite-code=${mockKey}`,
+      appStoreId: '1482389446',
       bundleId: 'org.celo.mobile.alfajores',
     })
   })
