@@ -55,8 +55,8 @@ export default class RevokeVotes extends BaseCommand {
     )
     await checkBuilder
       .addCheck('Vote value is valid', async () => {
-        // tslint:disable-next-line
-        const relevantVotes = votesForGroup[flags.type]
+        let relevantVotes = votesForGroup.pending
+        if (flags.type === 'active') relevantVotes = votesForGroup.active
         return votes.gt(0) && relevantVotes.gte(votes)
       })
       .runChecks()
