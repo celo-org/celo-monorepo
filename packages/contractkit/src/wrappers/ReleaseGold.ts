@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { newReleaseGold } from '../generated/ReleaseGold'
 import { ReleaseGold } from '../generated/types/ReleaseGold'
-import { PendingWithdrawal } from '../wrappers/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -142,7 +141,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * Indicates if the release grant is revocable or not
    * @return A boolean indicating revocable releasing (true) or non-revocable(false).
    */
-  async isRevokable(): Promise<boolean> {
+  async isRevocable(): Promise<boolean> {
     const revocationInfo = await this.getRevocationInfo()
     return revocationInfo.revocable
   }
@@ -258,63 +257,11 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   )
 
   /**
-   * Get the total value of `account`s pending withdrawals.
-   * @param account Account to query
-   */
-  async getPendingWithdrawalsTotalValue(account: Address) {
-    const lockedGoldContract = await this.kit.contracts.getLockedGold()
-    const pendingWithdrawals = await lockedGoldContract.getPendingWithdrawals(account)
-    // Ensure there are enough pending withdrawals to relock.
-    const values = pendingWithdrawals.map((pw: PendingWithdrawal) => pw.value)
-    const reducer = (total: BigNumber, pw: BigNumber) => pw.plus(total)
-    return values.reduce(reducer, new BigNumber(0))
-  }
-
-  /**
-   * Relocks gold in the ReleaseGold instance that has been unlocked but not withdrawn.
-   * @param value The total value to relock
-   */
-  async relockGold(value: BigNumber.Value): Promise<Array<CeloTransactionObject<void>>> {
-    const lockedGoldContract = await this.kit.contracts.getLockedGold()
-    const pendingWithdrawals = await lockedGoldContract.getPendingWithdrawals(
-      this.contract._address
-    )
-    // Ensure there are enough pending withdrawals to relock.
-    const totalValue = await this.getPendingWithdrawalsTotalValue(this.contract._address)
-    if (totalValue.isLessThan(value)) {
-      throw new Error(`Not enough pending withdrawals to relock ${value}`)
-    }
-    // Assert pending withdrawals are sorted by time (increasing), so that we can re-lock starting
-    // with those furthest away from being available (at the end).
-    const throwIfNotSorted = (pw: PendingWithdrawal, i: number) => {
-      if (i > 0 && !pw.time.isGreaterThanOrEqualTo(pendingWithdrawals[i - 1].time)) {
-        throw new Error('Pending withdrawals not sorted by timestamp')
-      }
-    }
-    pendingWithdrawals.forEach(throwIfNotSorted)
-
-    let remainingToRelock = new BigNumber(value)
-    const relockPw = (
-      acc: Array<CeloTransactionObject<void>>,
-      pw: PendingWithdrawal,
-      i: number
-    ) => {
-      const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
-      if (!valueToRelock.isZero()) {
-        remainingToRelock = remainingToRelock.minus(valueToRelock)
-        acc.push(this._relock(i, valueToRelock))
-      }
-      return acc
-    }
-    return pendingWithdrawals.reduceRight(relockPw, []) as Array<CeloTransactionObject<void>>
-  }
-
-  /**
    * Relocks gold in the ReleaseGold instance that has been unlocked but not withdrawn.
    * @param index The index of the pending withdrawal to relock from.
    * @param value The value to relock from the specified pending withdrawal.
    */
-  _relock: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+  relockGold: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.relockGold,
     tupleParser(valueToString, valueToString)
