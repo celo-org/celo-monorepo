@@ -197,17 +197,10 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       return parsedInputAmount
     }
 
-    const { localCurrencyCode, localCurrencyExchangeRate } = this.props
+    const { localCurrencyExchangeRate } = this.props
 
-    let dollarsAmount
-    if (localCurrencyCode && localCurrencyCode !== LocalCurrencyCode.USD) {
-      // Amount was entered as local currency, we need to convert it to dollars
-      dollarsAmount =
-        convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
-        new BigNumber('')
-    } else {
-      dollarsAmount = parsedInputAmount
-    }
+    const dollarsAmount =
+      convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) || new BigNumber('')
 
     return convertDollarsToMaxSupportedPrecision(dollarsAmount)
   }
