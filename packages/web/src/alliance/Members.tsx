@@ -1,4 +1,5 @@
 import * as React from 'react'
+import LazyFade from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Ally from 'src/alliance/AllianceMember'
 import { H2, H4 } from 'src/fonts/Fonts'
@@ -24,7 +25,7 @@ export default function Members() {
   }, [])
 
   return (
-    <View>
+    <View nativeID={'members'}>
       <GridRow
         desktopStyle={[{ justifyContent: 'flex-end' }, standardStyles.sectionMargin]}
         tabletStyle={standardStyles.sectionMarginTablet}
@@ -46,7 +47,6 @@ export default function Members() {
           ))}
         </Cell>
       </GridRow>
-      {t}
     </View>
   )
 }
@@ -65,23 +65,39 @@ function Category({ name, members }: CategoryProps) {
       <Text style={fonts.p}>{t(`members.categoryText.${name}`)}</Text>
       <View style={styles.categoryContainer}>
         {members.map(({ name: memberName, logo, url }) => (
-          <Member key={name} name={memberName} logo={logo} url={url} />
+          <Member key={memberName} name={memberName} logo={logo} url={url} />
         ))}
       </View>
     </View>
   )
 }
 
-function Member({ logo, name }: Ally) {
+const Member = React.memo(function _Member({ logo, name }: Ally) {
   return (
     <View style={styles.member}>
-      <Image
-        resizeMode="contain"
-        source={{ uri: logo }}
-        accessibilityLabel={name}
-        style={styles.logo}
-      />
-      <Text style={{ position: 'absolute' }}>{name}</Text>
+      {logo ? (
+        <LazyFade>
+          {(onLoad: () => void) => (
+            <Image
+              resizeMode="contain"
+              onLoad={onLoad}
+              source={{ uri: logo }}
+              accessibilityLabel={name}
+              style={styles.logo}
+            />
+          )}
+        </LazyFade>
+      ) : (
+        <PlaceHolder text={name} />
+      )}
+    </View>
+  )
+})
+
+function PlaceHolder({ text }) {
+  return (
+    <View style={standardStyles.centered}>
+      <Text style={[fonts.legal, textStyles.center]}>{text}</Text>
     </View>
   )
 }
@@ -100,12 +116,17 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
   member: {
+    alignItems: 'center',
+    justifyContent: 'center',
     marginHorizontal: 20,
     marginVertical: 20,
+    width: 170,
+    height: 50,
   },
   logo: {
+    backgroundColor: colors.white,
+    marginHorizontal: 10,
     width: 150,
     height: 50,
-    marginHorizontal: 10,
   },
 })

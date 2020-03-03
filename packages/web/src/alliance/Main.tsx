@@ -4,6 +4,7 @@ import Fade from 'react-reveal/Fade'
 import Affirmations from 'src/alliance/Affirmations'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'
+import { allianceOG } from 'src/alliance/images/index'
 import Members from 'src/alliance/Members'
 import PinWheel from 'src/alliance/PinWheel'
 import WheelWithForm from 'src/alliance/RisingPinWheelForm'
@@ -23,8 +24,9 @@ export default function Main() {
   return (
     <View>
       <OpenGraph
+        image={allianceOG}
         title="Celo Alliance"
-        description="TODO"
+        description="The Alliance for Prosperity is an ecosystem of mission-aligned organizations including nonprofits, merchants, and payment processors fostering social impact and financial inclusion through the use of blockchain technology."
         path={menuItems.ALLIANCE_COLLECTIVE.link}
       />
       <View style={standardStyles.darkBackground}>
