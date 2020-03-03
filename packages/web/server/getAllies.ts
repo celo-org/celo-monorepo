@@ -1,9 +1,8 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
+import Ally from 'src/alliance/AllianceMember'
 import airtableInit, { getImageURI, ImageSizes } from './airtable'
 import { cache } from './cache'
-
-interface AllianceMember {}
 
 enum Category {
   'Send' = 'Send',
@@ -50,7 +49,7 @@ async function fetchAllies(category: Category) {
     })
     .all()
     .then((records) => {
-      return { category, records: records.map((r) => normalize(r.fields)) }
+      return { name: category, records: records.map((r) => normalize(r.fields)) }
     })
 }
 
@@ -60,11 +59,11 @@ function getAirtable(sheet: string) {
 
 const IS_APROVED = 'Approved=1'
 
-function normalize(asset: Fields): AllianceMember {
+function normalize(asset: Fields): Ally {
   return {
     name: asset.Name,
     logo: getImageURI(asset['Logo Upload'], ImageSizes.large),
     url: asset[URL_FIELD],
-    categories: asset[CATEGORY_FIELD],
+    // categories: asset[CATEGORY_FIELD],
   }
 }

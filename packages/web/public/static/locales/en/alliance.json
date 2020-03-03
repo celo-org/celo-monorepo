@@ -21,6 +21,36 @@
     "cLabsCopy": "Exploring how to bring more Filipino merchants & consumers  into the formal economy.",
     "cLabsButton": "Phillippines Pilot Report"
   },
+  "members": {
+    "title": "Meet the Alliance",
+    "subtitle": "Member contributions, <0>in no particular order</0>",
+    "categoryTitle": {
+      "send": "Send",
+      "lend": "Lend",
+      "earn": "Earn",
+      "pay": "Pay",
+      "save": "Save",
+      "give": "Give",
+      "educate": "Educate",
+      "validate": "Validate",
+      "invest": "Invest",
+      "secure": "Secure",
+      "build": "Build"
+    },
+    "categoryText": {
+      "send": "Send money almost everywhere for as little as $0.01",
+      "lend": "Lend Celo Dollars to accelerate speed of delivery and reduce costs",
+      "earn": "Earn a stable, digital asset for lending your talents for various tasks",
+      "pay": "Pay for mobile top ups, utilities, and shopping online with Celo Dollars",
+      "save": "Save Celo Dollars (pegged to USD) to help overcome inflation and build for your future",
+      "give": "Give Celo Dollars to increase transparency, reduce fraud, and increase portability",
+      "educate": "Educate",
+      "validate": "Validate",
+      "invest": "Invest",
+      "secure": "Secure",
+      "build": "Build on Celo or use the open source wallet to deliver innovative customer solutions"
+    }
+  },
   "benefits": {
     "headline": "Benefits of collaborating on a mission-driven blockchain",
     "title": "What the Alliance offers",
