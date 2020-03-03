@@ -1,7 +1,9 @@
+import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { displayMetadata } from '../../utils/identity'
 
 export default class RegisterMetadata extends BaseCommand {
   static description =
@@ -31,7 +33,17 @@ export default class RegisterMetadata extends BaseCommand {
       .isAccount(flags.from)
       .runChecks()
 
-    const accounts = await this.kit.contracts.getAccounts()
-    await displaySendTx('registerMetadata', accounts.setMetadataURL(flags.url))
+    const metadataURL = flags.url
+
+    try {
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+      console.info('Metadata contains the following claims: \n')
+      await displayMetadata(metadata, this.kit)
+      const accounts = await this.kit.contracts.getAccounts()
+      console.info()
+      await displaySendTx('registerMetadata', accounts.setMetadataURL(metadataURL))
+    } catch (error) {
+      console.error(`Bad metadata URL ${metadataURL}: ${error.toString()}`)
+    }
   }
 }
