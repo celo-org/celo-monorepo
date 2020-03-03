@@ -5,6 +5,7 @@ import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
+import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
@@ -39,7 +40,7 @@ async function copySecret(secretName: string, srcNamespace: string, destNamespac
   console.info(`Copying secret ${secretName} from namespace ${srcNamespace} to ${destNamespace}`)
   await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} -o yaml |\
   grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid |\
-  kubectl apply --namespace=${destNamespace} -f -`)
+  sed 's/default/${destNamespace}/' | kubectl apply --namespace=${destNamespace} -f -`)
 }
 
 export async function createCloudSQLInstance(celoEnv: string, instanceName: string) {
@@ -532,7 +533,7 @@ async function helmIPParameters(celoEnv: string) {
   return ipAddressParameters
 }
 
-async function helmParameters(celoEnv: string) {
+async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   const bucketName = isProduction() ? 'contract_artifacts_production' : 'contract_artifacts'
   const productionTagOverrides = isProduction()
     ? [
@@ -541,12 +542,16 @@ async function helmParameters(celoEnv: string) {
       ]
     : []
 
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.node.cpu_request=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
     `--set geth.node.memory_request=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
-    `--set geth.genesisFile=${Buffer.from(generateGenesisFromEnv()).toString('base64')}`,
+    `--set geth.genesisFile=${Buffer.from(genesisContent).toString('base64')}`,
     `--set geth.genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.image.repository=${fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
@@ -575,7 +580,6 @@ async function helmParameters(celoEnv: string) {
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
-    `--set geth.debug=${fetchEnvOrFallback('GETH_DEBUG', 'false')}`,
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
       'IN_MEMORY_DISCOVERY_TABLE',
@@ -644,25 +648,25 @@ export async function removeGenericHelmChart(releaseName: string) {
   }
 }
 
-export async function installHelmChart(celoEnv: string) {
+export async function installHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
   await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   return installGenericHelmChart(
     celoEnv,
     celoEnv,
     '../helm-charts/testnet',
-    await helmParameters(celoEnv)
+    await helmParameters(celoEnv, useExistingGenesis)
   )
 }
 
-export async function upgradeHelmChart(celoEnv: string) {
+export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   console.info(`Upgrading helm release ${celoEnv}`)
-  const parameters = await helmParameters(celoEnv)
+  const parameters = await helmParameters(celoEnv, useExistingGenesis)
   await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
   console.info(`Helm release ${celoEnv} upgrade successful`)
 }
 
-export async function resetAndUpgradeHelmChart(celoEnv: string) {
+export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
   const bootnodeName = `${celoEnv}-bootnode`
@@ -678,7 +682,7 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   await deletePersistentVolumeClaims(celoEnv)
   await sleep(10000)
 
-  await upgradeHelmChart(celoEnv)
+  await upgradeHelmChart(celoEnv, useExistingGenesis)
   await sleep(10000)
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)

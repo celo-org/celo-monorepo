@@ -6,6 +6,7 @@ import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
 import { GridRow } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
+import menuItems from 'src/shared/menu-items'
 import {
   BrandChannel,
   DiscordChannel,
@@ -32,7 +33,7 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
       </GridRow>
       <BookLayout label={t('conductLabel')}>
         <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('conductText')}</Text>
-        <Button kind={BTN.PRIMARY} text={t('conductBtn')} />
+        <Button kind={BTN.PRIMARY} text={t('conductBtn')} href={menuItems.CODE_OF_CONDUCT.link} />
       </BookLayout>
       <BookLayout label={t('experienceLabel')} isWide={true}>
         <View style={styles.engageArea}>
@@ -61,7 +62,7 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
             <EmailForm
               submitText={t('signUp')}
               route={'/contacts'}
-              whenComplete={<After t={t} />}
+              whenComplete={<After t={t} isDarkMode={false} />}
               isDarkMode={false}
             />
           </View>

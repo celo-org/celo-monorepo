@@ -913,7 +913,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  signUp
+                  common:signUp
                 </a>
               </div>
               <div
@@ -3122,7 +3122,7 @@ exports[`Community renders 1`] = `
               }
               target="_blog"
             >
-              readMoreFromOurBlog
+              common:readMoreFromOurBlog
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -3306,7 +3306,7 @@ exports[`Community renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://medium.com/celohq/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
+                href="https://medium.com/celoOrg/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
                 role="link"
                 style={
                   Object {
@@ -7028,6 +7028,7 @@ exports[`Community renders 1`] = `
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
+            href="/code-of-conduct"
             role="link"
             style={
               Object {
@@ -7512,7 +7513,7 @@ exports[`Community renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                     data-focusable={true}
                     dir="auto"
-                    href="https://twitter.com/@celoOrg"
+                    href="https://twitter.com/CeloOrg"
                     role="link"
                     style={
                       Object {
