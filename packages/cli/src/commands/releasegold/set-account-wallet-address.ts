@@ -39,20 +39,22 @@ export default class SetAccountWalletAddress extends BaseCommand {
     )
     const isRevoked = await releaseGoldWrapper.isRevoked()
 
-    await newCheckBuilder(this)
+    const checkBuilder = await newCheckBuilder(this)
       .isAccount(releaseGoldWrapper.address)
       .addCheck('Contract is not revoked', () => !isRevoked)
-      .runChecks()
 
     let sig: any
     if (flags.walletAddress !== '0x0000000000000000000000000000000000000000') {
       const accounts = await this.kit.contracts.getAccounts()
-      sig = accounts.parseSignatureOfAddress(
-        releaseGoldWrapper.address,
-        flags.walletAddress,
-        flags.pop
+      checkBuilder.addCheck(
+        'Wallet address is provided and PoP is provided',
+        () => flags.pop !== undefined
       )
+      await checkBuilder.runChecks()
+      const pop = String(flags.pop)
+      sig = accounts.parseSignatureOfAddress(releaseGoldWrapper.address, flags.walletAddress, pop)
     } else {
+      await checkBuilder.runChecks()
       sig = {}
       sig.v = '0'
       sig.r = '0x0'
