@@ -13,10 +13,12 @@ import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
+import { newGovernanceApproverMultiSig } from './generated/GovernanceApproverMultiSig'
 import { newLockedGold } from './generated/LockedGold'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
+import { newReserveSpenderMultiSig } from './generated/ReserveSpenderMultiSig'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
 import { newValidators } from './generated/Validators'
@@ -38,10 +40,12 @@ const ContractFactories = {
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.GovernanceApproverMultiSig]: newGovernanceApproverMultiSig,
   [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
+  [CeloContract.ReserveSpenderMultiSig]: newReserveSpenderMultiSig,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.Validators]: newValidators,
@@ -101,6 +105,9 @@ export class Web3ContractCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
+  getGovernanceApproverMultiSig() {
+    return this.getContract(CeloContract.GovernanceApproverMultiSig)
+  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
@@ -112,6 +119,9 @@ export class Web3ContractCache {
   }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
+  }
+  getReserveSpenderMultiSig() {
+    return this.getContract(CeloContract.ReserveSpenderMultiSig)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)

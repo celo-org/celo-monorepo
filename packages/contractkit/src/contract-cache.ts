@@ -13,7 +13,9 @@ import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { GovernanceWrapper } from './wrappers/Governance'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
+import { GovernanceApproverMultiSigWrapper } from './wrappers/GovernanceApproverMultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
+import { ReserveSpenderMultiSigWrapper } from './wrappers/ReserveSpenderMultiSig'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
@@ -32,11 +34,12 @@ const WrapperFactories = {
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.Governance]: GovernanceWrapper,
+  [CeloContract.GovernanceApproverMultiSig]: GovernanceApproverMultiSigWrapper,
   [CeloContract.LockedGold]: LockedGoldWrapper,
-  // [CeloContract.MultiSig]: MultiSigWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
+  [CeloContract.ReserveSpenderMultiSig]: ReserveSpenderMultiSigWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
@@ -59,11 +62,12 @@ interface WrapperCacheMap {
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
+  [CeloContract.GovernanceApproverMultiSig]?: GovernanceApproverMultiSigWrapper
   [CeloContract.LockedGold]?: LockedGoldWrapper
-  // [CeloContract.MultiSig]?: MultiSigWrapper,
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
   [CeloContract.Reserve]?: ReserveWrapper
+  [CeloContract.ReserveSpenderMultiSig]?: ReserveSpenderMultiSigWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
@@ -119,17 +123,20 @@ export class WrapperCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
+  getGovernanceApproverMultiSig() {
+    return this.getContract(CeloContract.GovernanceApproverMultiSig)
+  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
-  // getMultiSig() {
-  //   return this.getWrapper(CeloContract.MultiSig, newMultiSig)
-  // }
   // getRegistry() {
   //   return this.getWrapper(CeloContract.Registry, newRegistry)
   // }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
+  }
+  getReserveSpenderMultiSig() {
+    return this.getContract(CeloContract.ReserveSpenderMultiSig)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)

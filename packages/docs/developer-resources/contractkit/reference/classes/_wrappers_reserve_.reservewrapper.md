@@ -16,9 +16,7 @@ Contract for handling reserve for stable currencies
 
 ### Properties
 
-* [isSpender](_wrappers_reserve_.reservewrapper.md#isspender)
 * [tobinTaxStalenessThreshold](_wrappers_reserve_.reservewrapper.md#tobintaxstalenessthreshold)
-* [transferGold](_wrappers_reserve_.reservewrapper.md#transfergold)
 
 ### Accessors
 
@@ -27,6 +25,8 @@ Contract for handling reserve for stable currencies
 ### Methods
 
 * [getConfig](_wrappers_reserve_.reservewrapper.md#getconfig)
+* [isSpender](_wrappers_reserve_.reservewrapper.md#isspender)
+* [transferGold](_wrappers_reserve_.reservewrapper.md#transfergold)
 
 ## Constructors
 
@@ -49,24 +49,6 @@ Name | Type |
 
 ## Properties
 
-###  isSpender
-
-• **isSpender**: *function* = proxyCall(this.contract.methods.isSpender)
-
-*Defined in [contractkit/src/wrappers/Reserve.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L22)*
-
-#### Type declaration:
-
-▸ (`account`: string): *Promise‹boolean›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`account` | string |
-
-___
-
 ###  tobinTaxStalenessThreshold
 
 • **tobinTaxStalenessThreshold**: *function* = proxyCall(
@@ -75,7 +57,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L17)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L24)*
 
 Query Tobin tax staleness threshold parameter.
 
@@ -84,24 +66,6 @@ Query Tobin tax staleness threshold parameter.
 #### Type declaration:
 
 ▸ (...`args`: InputArgs): *Promise‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
-
-###  transferGold
-
-• **transferGold**: *function* = proxySend(this.kit, this.contract.methods.transferGold)
-
-*Defined in [contractkit/src/wrappers/Reserve.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L23)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
 
 **Parameters:**
 
@@ -129,8 +93,45 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L28)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L53)*
 
 Returns current configuration parameters.
 
 **Returns:** *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
+
+___
+
+###  isSpender
+
+▸ **isSpender**(`account`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L36)*
+
+Check is spender is a signatory of the multiSig spender address
+TODO @amyslawson update this if we decide to continue to support other
+non-multisig spenders
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`account` | [Address](../modules/_base_.md#address) |   |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
+###  transferGold
+
+▸ **transferGold**(`to`: [Address](../modules/_base_.md#address), `value`: BigNumber.Value): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L41)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`to` | [Address](../modules/_base_.md#address) |
+`value` | BigNumber.Value |
+
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*

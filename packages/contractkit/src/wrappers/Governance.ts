@@ -502,15 +502,19 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   /**
    * Approves given proposal, allowing it to later move to `referendum`.
-   * This will be deprecated in favor of the multiSig implementation for approver.
+   * Approval leverages multisig.
    * @param proposalID Governance proposal UUID
    * @notice Only the `approver` address will succeed in sending this transaction
    */
   async approve(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
+    const multisig = await this.kit.contracts.getGovernanceApproverMultiSig()
+    const txData = this.contract.methods
+      .approve(valueToString(proposalID), proposalIndex)
+      .encodeABI()
     return toTransactionObject(
       this.kit,
-      this.contract.methods.approve(valueToString(proposalID), proposalIndex)
+      multisig.submitTransaction(this.contract._address, txData).txo
     )
   }
 

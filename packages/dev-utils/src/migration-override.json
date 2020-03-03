@@ -18,7 +18,9 @@
     "concurrentProposals": 5
   },
   "reserve": {
-    "initialBalance": 100000000
+    "initialBalance": 100000000,
+    "otherAddresses": ["0x91c987bf62D25945dB517BDAa840A6c661374402"]
+
   },
   "stableToken": {
     "initialBalances": {
@@ -51,9 +53,6 @@
     "executionStageDuration": 100,
     "minDeposit": 1,
     "concurrentProposals": 5
-  },
-  "governanceApproverMultiSig": {
-    "useMultiSig": false
   },
   "validators": {
     "commissionUpdateDelay": 3

@@ -32,6 +32,7 @@ const migrationOverrides = {
   },
   reserve: {
     initialBalance: 100000000,
+    otherAddresses: [network.from],
   },
   reserveSpenderMultiSig: {
     signatories: [network.from],

@@ -24,7 +24,7 @@ export const ProxyContracts = [
   'GovernanceProxy',
   'LockedGoldProxy',
   'ReserveProxy',
-  'ReserveSpenderMultiSig',
+  'ReserveSpenderMultiSigProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
   'RegistryProxy',
@@ -43,6 +43,7 @@ export const CoreContracts = [
   'Election',
   'EpochRewards',
   'Governance',
+  'GovernanceApproverMultiSig',
   'BlockchainParameters',
   'DoubleSigningSlasher',
   'DowntimeSlasher',
@@ -58,6 +59,7 @@ export const CoreContracts = [
   // stability
   'Exchange',
   'Reserve',
+  'ReserveSpenderMultiSig',
   'StableToken',
   'SortedOracles',
 ]
