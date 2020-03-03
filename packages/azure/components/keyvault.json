@@ -242,17 +242,6 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
-      "name":
-        "[concat(variables('validatorKeyVaultName'), '/', variables('validatorGethAccountSecretName'))]",
-      "apiVersion": "2018-02-14",
-      "location": "[parameters('location')]",
-      "dependsOn": ["[variables('validatorKeyVaultName')]"],
-      "properties": {
-        "value": "[parameters('validatorGethAccountSecret')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(variables('attesterKeyVaultName'), '/attesterPostgreSQLPassword')]",
       "apiVersion": "2018-02-14",
       "location": "[parameters('location')]",
@@ -270,17 +259,6 @@
       "dependsOn": ["[variables('attesterKeyVaultName')]"],
       "properties": {
         "value": "[parameters('attesterPrivateKey')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name":
-        "[concat(variables('attesterKeyVaultName'), '/', variables('attesterGethAccountSecretName'))]",
-      "apiVersion": "2018-02-14",
-      "location": "[parameters('location')]",
-      "dependsOn": ["[variables('attesterKeyVaultName')]"],
-      "properties": {
-        "value": "[parameters('attesterGethAccountSecret')]"
       }
     },
     {
