@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    minHeight: 50,
+    minHeight: 90,
   },
   member: {
     alignItems: 'center',

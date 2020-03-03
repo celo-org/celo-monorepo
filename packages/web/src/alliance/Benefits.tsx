@@ -1,12 +1,24 @@
 import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
-import eductateImg from 'src/dev/devEvents.png'
 import { H2 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import {
+  buildWithCeloOnLight,
+  coinTalkOnLight,
+  connectPeopleOnLight,
+  educateOnLight,
+  expandReachOnLight,
+} from 'src/icons'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
-const OFFERINGS = [eductateImg, eductateImg, eductateImg, eductateImg, eductateImg]
+const OFFERINGS = [
+  connectPeopleOnLight,
+  buildWithCeloOnLight,
+  coinTalkOnLight,
+  educateOnLight,
+  expandReachOnLight,
+]
 
 export default React.memo(function Benefits() {
   const { t } = useTranslation(NameSpaces.alliance)
@@ -19,7 +31,13 @@ export default React.memo(function Benefits() {
       <Cell span={Spans.full}>
         <Text style={fonts.h3Mobile}>{t('benefits.headline')}</Text>
         <H2 style={standardStyles.elementalMargin}>{t('benefits.title')}</H2>
-        <View style={[styles.offeringsArea, standardStyles.centered]}>
+        <View
+          style={[
+            styles.offeringsArea,
+            standardStyles.centered,
+            standardStyles.blockMarginTopTablet,
+          ]}
+        >
           {OFFERINGS.map((img, index) => (
             <Offering key={index} text={t(`benefits.offerings.${index}`)} icon={img} />
           ))}

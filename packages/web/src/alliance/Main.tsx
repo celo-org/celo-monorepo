@@ -9,6 +9,7 @@ import Members from 'src/alliance/Members'
 import PinWheel from 'src/alliance/PinWheel'
 import WheelWithForm from 'src/alliance/RisingPinWheelForm'
 import SignupForm from 'src/alliance/SignupForm'
+import ArticleData from 'src/community/connect/ArticleData'
 import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
@@ -69,6 +70,7 @@ export default function Main() {
       </View>
       <Affirmations />
       <Members />
+      <ArticleData title={t('mediumArticlesTitle')} />
       <Benefits />
       <WheelWithForm />
       <ConnectionFooter includeDividerLine={false} />
