@@ -104,7 +104,6 @@ class VerificationLoadingScreen extends React.Component<Props> {
         </View>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
-          <View style={styles.spacer} />
           <View style={styles.statusContainer}>
             <LoadingSpinner />
             <Text style={styles.textPhoneNumber}>
@@ -112,9 +111,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
             </Text>
             <Text style={styles.textOpenTip}>{t('loading.keepOpen')}</Text>
           </View>
-          <View style={styles.spacer} />
           <Carousel containerStyle={styles.carouselContainer} items={items} />
-          <View style={styles.spacer} />
         </ScrollView>
         <VerificationFailedModal
           verificationStatus={verificationStatus}
@@ -132,11 +129,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundDarker,
   },
   scrollContainer: {
-    // flex: 1,
     flexGrow: 1,
     paddingTop: 20,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   buttonCancelContainer: {
     left: 5,
@@ -156,9 +152,6 @@ const styles = StyleSheet.create({
   },
   carouselContainer: {
     paddingVertical: 20,
-  },
-  spacer: {
-    flex: 1,
   },
 })
 
