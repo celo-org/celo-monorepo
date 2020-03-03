@@ -17,12 +17,6 @@
          "bladeTitle": "Cluster settings",
          "elements": [
            {
-             "name": "userObjectId",
-             "type": "Microsoft.Common.TextBox",
-             "label": "userObjectId",
-             "visible": true
-           },
-           {
              "name": "adminUsername",
              "type": "Microsoft.Common.TextBox",
              "label": "adminUsername",
@@ -167,7 +161,6 @@
        }
      ],
      "outputs": {
-       "userObjectId": "[steps('allSettings').userObjectId]",
        "proxyName": "[steps('allSettings').proxyName]",
        "validatorName": "[steps('allSettings').validatorName]",
        "adminUsername": "[steps('allSettings').adminUsername]",
