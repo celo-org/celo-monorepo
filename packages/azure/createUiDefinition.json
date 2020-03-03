@@ -59,9 +59,14 @@
            },
            {
              "name": "validatorPrivateKey",
-             "type": "Microsoft.Common.TextBox",
-             "label": "validatorPrivateKey",
-             "visible": true
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "Validator private key"
+             },
+             "visible": true,
+             "options": {
+               "hideConfirmation": true
+             }
            }
          ]
        },
@@ -88,9 +93,14 @@
            },
            {
              "name": "proxyPrivateKey",
-             "type": "Microsoft.Common.TextBox",
-             "label": "proxyPrivateKey",
-             "visible": true
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "Proxy private key"
+             },
+             "visible": true,
+             "options": {
+               "hideConfirmation": true
+             }
            }
          ]
        },
@@ -106,13 +116,16 @@
            {
              "name": "attesterPostgreSQLUsername",
              "type": "Microsoft.Common.TextBox",
-             "label": "attesterPostgreSQLUsername",
+             "label": "DB admin username",
              "visible": true
            },
            {
              "name": "attesterPostgreSQLPassword",
-             "type": "Microsoft.Common.TextBox",
-             "label": "attesterPostgreSQLPassword",
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "DB admin password",
+               "confirmPassword": "Confirm DB admin password"
+             },
              "visible": true
            },
            {
@@ -123,9 +136,14 @@
            },
            {
              "name": "attesterPrivateKey",
-             "type": "Microsoft.Common.TextBox",
-             "label": "attesterPrivateKey",
-             "visible": true
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "Attester private key"
+             },
+             "visible": true,
+             "options": {
+               "hideConfirmation": true
+             }
            },
            {
              "name": "attesterTwilioAccountSID",
