@@ -1,4 +1,5 @@
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -19,6 +20,7 @@ export default class RegisterMetadata extends BaseCommand {
       required: true,
       description: 'The url to the metadata you want to register',
     }),
+    force: flags.boolean({ description: 'Ignore checks' }),
   }
 
   static examples = [
@@ -26,24 +28,26 @@ export default class RegisterMetadata extends BaseCommand {
   ]
 
   async run() {
-    const { flags } = this.parse(RegisterMetadata)
-    this.kit.defaultAccount = flags.from
+    const res = this.parse(RegisterMetadata)
+    this.kit.defaultAccount = res.flags.from
 
     await newCheckBuilder(this)
-      .isAccount(flags.from)
+      .isAccount(res.flags.from)
       .runChecks()
 
-    const metadataURL = flags.url
+    const metadataURL = res.flags.url
 
     try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
-      console.info('Metadata contains the following claims: \n')
-      await displayMetadata(metadata, this.kit)
+      if (!res.flags.force) {
+        const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+        console.info('Metadata contains the following claims: \n')
+        await displayMetadata(metadata, this.kit)
+        console.info()
+      }
       const accounts = await this.kit.contracts.getAccounts()
-      console.info()
       await displaySendTx('registerMetadata', accounts.setMetadataURL(metadataURL))
     } catch (error) {
-      console.error(`Bad metadata URL ${metadataURL}: ${error.toString()}`)
+      console.error(`Cannot set metadata URL ${metadataURL}: ${error.toString()}`)
     }
   }
 }
