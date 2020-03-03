@@ -1,16 +1,14 @@
+import { Articles as ArticleProps } from 'fullstack/ArticleProps'
 import * as React from 'react'
 import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Articles from 'src/community/Articles'
-
-import { Articles as ArticleProps } from 'fullstack/ArticleProps'
-
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import menuItems, { hashNav } from 'src/shared/menu-items'
+import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
 interface OwnProps {
@@ -44,10 +42,10 @@ class ArticlesSection extends React.PureComponent<Props> {
         >
           <Cell span={Spans.full} style={standardStyles.centered}>
             <Button
-              text={t('readMoreFromOurBlog')}
+              text={t('common:readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
               size={SIZE.normal}
-              href={menuItems.MEDIUM.link}
+              href={CeloLinks.mediumUser}
               target={'_blog'}
               iconRight={<MediumLogo height={16} color={colors.dark} wrapWithLink={false} />}
             />

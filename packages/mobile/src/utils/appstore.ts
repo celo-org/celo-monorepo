@@ -12,5 +12,5 @@ export async function getAppStoreId(bundleId: string) {
   if (appInfo.resultCount !== 1) {
     throw new Error('Can not determine AppStore ID: multiple or none results')
   }
-  return appInfo.results[0].trackId
+  return appInfo.results[0].trackId.toString()
 }

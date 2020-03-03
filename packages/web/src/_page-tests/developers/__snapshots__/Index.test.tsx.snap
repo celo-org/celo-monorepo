@@ -5864,6 +5864,7 @@ exports[`DevelopersPage renders 1`] = `
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
+          href="/code-of-conduct"
           role="link"
           style={
             Object {
@@ -6348,7 +6349,7 @@ exports[`DevelopersPage renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
                   dir="auto"
-                  href="https://twitter.com/@celoOrg"
+                  href="https://twitter.com/CeloOrg"
                   role="link"
                   style={
                     Object {

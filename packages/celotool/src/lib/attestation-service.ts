@@ -36,8 +36,8 @@ export async function upgradeHelmChart(celoEnv: string) {
 async function helmParameters(celoEnv: string) {
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
-  const genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
-  const genesisFileJsonB64 = Buffer.from(JSON.stringify(genesis)).toString('base64')
+  const genesisContents = await getGenesisBlockFromGoogleStorage(celoEnv)
+  const genesisFileJsonB64 = Buffer.from(genesisContents).toString('base64')
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set celotool.image.repository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,
