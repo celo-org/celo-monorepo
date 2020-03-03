@@ -13,11 +13,17 @@ import {
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 
 export enum DisplayType {
   Default,
   Big, // symbol displayed as superscript
+}
+
+export enum FormatType {
+  Default,
+  NetworkFee,
+  NetworkFeePrecise,
 }
 
 interface Props {
@@ -27,7 +33,7 @@ interface Props {
   useColors: boolean
   hideSymbol: boolean
   showLocalAmount?: boolean
-  formatAmount: (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => string
+  formatType: FormatType
   style?: StyleProp<TextStyle>
 }
 
@@ -74,6 +80,21 @@ function getLocalAmount(
   }
 }
 
+type FormatFunction = (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => string
+
+function getFormatFunction(formatType: FormatType): FormatFunction {
+  switch (formatType) {
+    case FormatType.Default:
+      return getMoneyDisplayValue
+    case FormatType.NetworkFee:
+      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+        getNetworkFeeDisplayValue(amount)
+    case FormatType.NetworkFeePrecise:
+      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+        getNetworkFeeDisplayValue(amount, true)
+  }
+}
+
 // TODO(Rossy) This is mostly duped by MoneyAmount, converge the two
 export default function CurrencyDisplay({
   type,
@@ -82,7 +103,7 @@ export default function CurrencyDisplay({
   hideSymbol,
   showLocalAmount,
   amount,
-  formatAmount,
+  formatType,
   style,
 }: Props) {
   const localCurrencyCode = useLocalCurrencyCode()
@@ -111,6 +132,7 @@ export default function CurrencyDisplay({
     : null
   const value = displayAmount ? new BigNumber(displayAmount.value) : null
   const sign = value?.isNegative() ? '-' : ''
+  const formatAmount = getFormatFunction(formatType)
   const formattedValue =
     value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
 
@@ -157,8 +179,7 @@ CurrencyDisplay.defaultProps = {
   size: 48,
   useColors: false,
   hideSymbol: false,
-  formatAmount: (amount: BigNumber.Value, currency: CURRENCY_ENUM) =>
-    getMoneyDisplayValue(amount, currency),
+  formatType: FormatType.Default,
 }
 
 const styles = StyleSheet.create({

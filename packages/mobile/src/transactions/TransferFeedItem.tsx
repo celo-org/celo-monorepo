@@ -8,7 +8,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
@@ -17,7 +17,6 @@ import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
-import { getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = TransferItemFragment & {
@@ -59,10 +58,6 @@ function navigateToTransactionReview({
     type,
     // fee TODO: add fee here.
   })
-}
-
-function formatFee(amount: BigNumber.Value) {
-  return getNetworkFeeDisplayValue(amount)
 }
 
 // TODO(jeanregisser): ExchangeFeedItem and TransferFeedItem renders are very similar, we should use the same building blocks
@@ -114,7 +109,9 @@ export function TransferFeedItem(props: Props) {
             <Text style={styles.title}>{title}</Text>
             <CurrencyDisplay
               amount={amount}
-              formatAmount={type === TokenTransactionType.NetworkFee ? formatFee : undefined}
+              formatType={
+                type === TokenTransactionType.NetworkFee ? FormatType.NetworkFee : undefined
+              }
               style={[
                 styles.amount,
                 isSent ? fontStyles.activityCurrencySent : fontStyles.activityCurrencyReceived,
