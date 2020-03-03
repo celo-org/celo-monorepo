@@ -15,7 +15,7 @@
     "Follow these instructions to build the Wallet from source, pointed at the Alfajores Testnet.",
   "buildLocallyLink": "Read the Wallet Tutorial",
   "youCanUse":
-    "You can access an existing account from the Celo Wallet by pressing 'Import It' on the first screen and entering your seed phrase.",
+    "You can access an existing account from the Celo Wallet by pressing 'Restore Existing Wallet' on the Invite Code screen and entering your seed phrase.",
   "viewAccountInfo": "View account information. ",
   "checkYourBalance": "Check your balance and transaction history",
   "celoWallet": "Celo Wallet",

@@ -2,10 +2,11 @@
 /// <reference path="../../../contractkit/types/web3.d.ts" />
 
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { NULL_ADDRESS } from '@celo/utils/lib/address'
+import { ensureLeading0x, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
+import { Buffer } from 'safe-buffer'
 import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep } from './utils'
@@ -14,6 +15,8 @@ const headerHex =
   '0xf901f9a07285abd5b24742f184ad676e31f6054663b3529bc35ea2fcad8a3e0f642a46f7a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347948888f1f195afa192cfee860698584c030f4c9db1a0ecc60e00b3fe5ce9f6e1a10e5469764daf51f1fe93c22ec3f9a7583a80357217a0d35d334d87c0cc0a202e3756bf81fae08b1575f286c7ee7a3f8df4f0f3afc55da056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008302000001832fefd8825208845c47775c80a00000000000000000000000000000000000000000000000000000000000000000880000000000000000'
 
 const TMP_PATH = '/tmp/e2e'
+
+const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
 function headerArray(web3: Web3, block: any) {
   return [
@@ -37,6 +40,32 @@ function headerArray(web3: Web3, block: any) {
 
 function headerFromBlock(web3: Web3, block: any) {
   return rlp.encode(headerArray(web3, block))
+}
+
+// Find a validator that double signed. Both blocks will have signatures from exactly 2F+1 validators.
+async function findDoubleSignerIndex(
+  kit: ContractKit,
+  header: Buffer,
+  other: Buffer
+): Promise<number> {
+  const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
+  const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
+  const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
+
+  let bmNum1 = new BigNumber(bitmap1).toNumber()
+  let bmNum2 = new BigNumber(bitmap2).toNumber()
+  bmNum1 = bmNum1 >> 1
+  bmNum2 = bmNum2 >> 1
+  let signerIdx = 1
+  for (let i = 1; i < 5; i++) {
+    if ((bmNum1 & 1) === 1 && (bmNum2 & 1) === 1) {
+      break
+    }
+    signerIdx++
+    bmNum1 = bmNum1 >> 1
+    bmNum2 = bmNum2 >> 1
+  }
+  return signerIdx
 }
 
 describe('slashing tests', function(this: any) {
@@ -101,6 +130,7 @@ describe('slashing tests', function(this: any) {
 
   before(async function(this: any) {
     this.timeout(0)
+    // Comment out the following line after a test run for a quick rerun.
     await hooks.before()
   })
 
@@ -212,8 +242,37 @@ describe('slashing tests', function(this: any) {
         .send({ from: validator, gas: 5000000 })
 
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      // Penalty is defined to be 20 cGLD in migrations, locked gold is 10000 cGLD for a validator
-      assert.equal(balance.toString(10), '9980000000000000000000')
+      // Penalty is defined to be 100 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      assert.equal(balance.toString(10), '9900000000000000000000')
+    })
+  })
+
+  describe('test slashing for downtime with contractkit', () => {
+    before(async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      await restartWithDowntime()
+    })
+
+    it('slash for downtime with contractkit', async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      const slasher = await kit.contracts.getDowntimeSlasher()
+      const blockNumber = await web3.eth.getBlockNumber()
+      await waitUntilBlock(blockNumber + 20)
+
+      const validator = (await kit.web3.eth.getAccounts())[0]
+      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+
+      const tx = await slasher.slashEndSignerIndex(blockNumber + 12, 4)
+      const txResult = await tx.send({ from: validator, gas: 5000000 })
+      const txRcpt = await txResult.waitReceipt()
+      assert.equal(txRcpt.status, true)
+
+      const election = await kit.contracts.getElection()
+      const signer = await election.validatorSignerAddressFromSet(4, blockNumber + 12)
+      const lockedGold = await kit.contracts.getLockedGold()
+      const balance = await lockedGold.getAccountTotalLockedGold(signer)
+      // Penalty is defined to be 100 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      assert.equal(balance.toString(10), '9900000000000000000000')
     })
   })
 
@@ -235,24 +294,7 @@ describe('slashing tests', function(this: any) {
 
       const header = headerFromBlock(web3, await web3.eth.getBlock(num))
 
-      // Find a validator that double signed. Both blocks will have signatures from exactly 2F+1 validators.
-      const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
-      const bitmap2 = await slasher.methods.getVerifiedSealBitmapFromHeader(other).call()
-
-      let bmNum1 = new BigNumber(bitmap1).toNumber()
-      let bmNum2 = new BigNumber(bitmap2).toNumber()
-      bmNum1 = bmNum1 >> 1
-      bmNum2 = bmNum2 >> 1
-      let signerIdx = 1
-      for (let i = 1; i < 5; i++) {
-        if ((bmNum1 & 1) === 1 && (bmNum2 & 1) === 1) {
-          break
-        }
-        signerIdx++
-        bmNum1 = bmNum1 >> 1
-        bmNum2 = bmNum2 >> 1
-      }
-
+      const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
@@ -278,9 +320,42 @@ describe('slashing tests', function(this: any) {
         )
         .send({ from: validator, gas: 5000000 })
 
-      // Penalty is defined to be 100 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      // Penalty is defined to be 5000 cGLD in migrations, locked gold is 10000 cGLD for a validator
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      assert.equal(balance.toString(10), '9900000000000000000000')
+      assert.equal(balance.toString(10), '5000000000000000000000')
+    })
+  })
+
+  describe('test slashing for double signing with contractkit', () => {
+    before(async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      await restart()
+    })
+
+    it('slash for double signing with contractkit', async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      const slasher = await kit.contracts.getDoubleSigningSlasher()
+      const election = await kit.contracts.getElection()
+      await waitUntilBlock(doubleSigningBlock.number)
+
+      const other = headerFromBlock(web3, doubleSigningBlock)
+      const num = await slasher.getBlockNumberFromHeader(bufferToString(other))
+      const header = headerFromBlock(web3, await web3.eth.getBlock(num))
+      const signerIdx = await findDoubleSignerIndex(kit, header, other)
+      const signer = await election.validatorSignerAddressFromSet(signerIdx, num)
+
+      const validator = (await kit.web3.eth.getAccounts())[0]
+      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+
+      const tx = await slasher.slashSigner(signer, bufferToString(header), bufferToString(other))
+      const txResult = await tx.send({ from: validator, gas: 5000000 })
+      const txRcpt = await txResult.waitReceipt()
+      assert.equal(txRcpt.status, true)
+
+      // Penalty is defined to be 5000 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      const lockedGold = await kit.contracts.getLockedGold()
+      const balance = await lockedGold.getAccountTotalLockedGold(signer)
+      assert.equal(balance.toString(10), '5000000000000000000000')
     })
   })
 })

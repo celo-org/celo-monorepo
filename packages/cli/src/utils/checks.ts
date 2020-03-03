@@ -41,20 +41,24 @@ class CheckBuilder {
 
   constructor(private cmd: BaseCommand, private signer?: Address) {}
 
+  get web3() {
+    return this.cmd.web3
+  }
+
   get kit() {
     return this.cmd.kit
   }
 
   withValidators<A>(
-    f: (validators: ValidatorsWrapper, signer: Address, account: Address) => A
+    f: (validators: ValidatorsWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
   ): () => Promise<Resolve<A>> {
     return async () => {
       const validators = await this.kit.contracts.getValidators()
       if (this.signer) {
         const account = await validators.signerToAccount(this.signer)
-        return f(validators, this.signer, account) as Resolve<A>
+        return f(validators, this.signer, account, this) as Resolve<A>
       } else {
-        return f(validators, '', '') as Resolve<A>
+        return f(validators, '', '', this) as Resolve<A>
       }
     }
   }
@@ -259,9 +263,16 @@ class CheckBuilder {
       `${address} is not registered as an account. Try running account:register`
     )
 
+  isNotVoting = (address: Address) =>
+    this.addCheck(
+      `${address} is not currently voting on a governance proposal`,
+      this.withGovernance((gov) => negate(gov.isVoting(address))),
+      `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
+    )
+
   hasEnoughGold = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} cGold`, () =>
+    return this.addCheck(`Account has at least ${valueInEth} cGLD`, () =>
       this.kit.contracts
         .getGoldToken()
         .then((gt) => gt.balanceOf(account))
@@ -330,6 +341,25 @@ class CheckBuilder {
       })
     )
   }
+
+  hasACommissionUpdateQueued = () =>
+    this.addCheck(
+      "There's a commision update queued",
+      this.withValidators(async (v, _signer, account) => {
+        const vg = await v.getValidatorGroup(account)
+        return !vg.nextCommissionBlock.eq(0)
+      })
+    )
+
+  hasCommissionUpdateDelayPassed = () =>
+    this.addCheck(
+      'The Commission update delay has already passed',
+      this.withValidators(async (v, _signer, account, ctx) => {
+        const blockNumber = await ctx.web3.eth.getBlockNumber()
+        const vg = await v.getValidatorGroup(account)
+        return vg.nextCommissionBlock.lte(blockNumber)
+      })
+    )
 
   async runChecks() {
     console.log(`Running Checks:`)

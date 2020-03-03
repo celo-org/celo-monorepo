@@ -11,7 +11,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import { hideAlert, showError } from 'src/alert/actions'
+import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -25,7 +25,6 @@ import PincodeTextbox from 'src/pincode/PincodeTextbox'
 
 interface DispatchProps {
   showError: typeof showError
-  hideAlert: typeof hideAlert
   setPincode: typeof setPincode
 }
 
@@ -39,7 +38,6 @@ type Props = DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   showError,
-  hideAlert,
   setPincode,
 }
 

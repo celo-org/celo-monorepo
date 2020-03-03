@@ -890,6 +890,8 @@ export async function startGeth(
     '--consoleformat=term',
     '--nat',
     'extip:127.0.0.1',
+    '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
+    '--gcmode=archive', // Needed to retrieve historical state
   ]
 
   if (rpcport) {
@@ -917,7 +919,10 @@ export async function startGeth(
   }
 
   if (lightserv) {
-    gethArgs.push('--lightserv=90')
+    gethArgs.push('--light.serve=90')
+    gethArgs.push('--light.maxpeers=10')
+  } else if (syncmode === 'full' || syncmode === 'fast') {
+    gethArgs.push('--light.serve=0')
   }
 
   if (validating) {

@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   carouselContainer: {
-    marginVertical: 20,
+    paddingVertical: 20,
   },
 })
 

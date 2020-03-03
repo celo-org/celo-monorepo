@@ -1,4 +1,4 @@
-import { Actions, ActionTypes } from 'src/app/actions'
+import { Actions, ActionTypes, AppState } from 'src/app/actions'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
@@ -9,6 +9,9 @@ export interface State {
   doingBackupFlow: boolean
   doingPinVerification: boolean
   analyticsEnabled: boolean
+  lockWithPinEnabled: boolean
+  appState: AppState
+  locked: boolean
 }
 
 const initialState = {
@@ -19,6 +22,9 @@ const initialState = {
   doingBackupFlow: false,
   doingPinVerification: false,
   analyticsEnabled: true,
+  lockWithPinEnabled: false,
+  appState: AppState.Active,
+  locked: false,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -33,9 +39,28 @@ export const appReducer = (
       return {
         ...state,
         ...getRehydratePayload(action, 'app'),
-        doingPinVerification: false,
+        doingPinVerification: initialState.doingPinVerification,
+        appState: initialState.appState,
+        locked: initialState.locked,
       }
     }
+    case Actions.SET_APP_STATE:
+      let appState = state.appState
+      switch (action.state) {
+        case 'background':
+          appState = AppState.Background
+          break
+        case 'inactive':
+          appState = AppState.Inactive
+          break
+        case 'active':
+          appState = AppState.Active
+          break
+      }
+      return {
+        ...state,
+        appState,
+      }
     case Actions.SET_LOGGED_IN:
       return {
         ...state,
@@ -73,15 +98,20 @@ export const appReducer = (
         ...state,
         analyticsEnabled: action.enabled,
       }
-    case Actions.START_PIN_VERIFICATION:
+    case Actions.SET_LOCK_WITH_PIN_ENABLED:
       return {
         ...state,
-        doingPinVerification: true,
+        lockWithPinEnabled: action.enabled,
       }
-    case Actions.FINISH_PIN_VERIFICATION:
+    case Actions.LOCK:
       return {
         ...state,
-        doingPinVerification: false,
+        locked: true,
+      }
+    case Actions.UNLOCK:
+      return {
+        ...state,
+        locked: false,
       }
     default:
       return state

@@ -80,6 +80,7 @@ contract('Attestations', (accounts: string[]) => {
   const attestationsRequested = 3
   const attestationExpiryBlocks = (60 * 60) / 5
   const selectIssuersWaitBlocks = 4
+  const maxAttestations = 20
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
   async function getVerificationCodeSignature(
@@ -92,7 +93,7 @@ contract('Attestations', (accounts: string[]) => {
   }
 
   async function setAccountWalletAddress() {
-    return accountsInstance.setWalletAddress(caller)
+    return accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0')
   }
 
   const getNonIssuer = async () => {
@@ -137,6 +138,7 @@ contract('Attestations', (accounts: string[]) => {
     const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
+    await random.initialize(256)
     await random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
@@ -173,6 +175,7 @@ contract('Attestations', (accounts: string[]) => {
       registry.address,
       attestationExpiryBlocks,
       selectIssuersWaitBlocks,
+      maxAttestations,
       [mockStableToken.address, otherMockStableToken.address],
       [attestationFee, attestationFee]
     )
@@ -203,6 +206,7 @@ contract('Attestations', (accounts: string[]) => {
           registry.address,
           attestationExpiryBlocks,
           selectIssuersWaitBlocks,
+          maxAttestations,
           [mockStableToken.address],
           [attestationFee]
         )
@@ -298,6 +302,33 @@ contract('Attestations', (accounts: string[]) => {
     it('should revert when set by a non-owner', async () => {
       await assertRevert(
         attestations.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks, {
+          from: accounts[1],
+        })
+      )
+    })
+  })
+
+  describe('#setMaxAttestations()', () => {
+    const newMaxAttestations = maxAttestations + 1
+
+    it('should set maxAttestations', async () => {
+      await attestations.setMaxAttestations(newMaxAttestations)
+      assert.equal(await attestations.maxAttestations.call(this), newMaxAttestations)
+    })
+
+    it('should emit the MaxAttestationsSet event', async () => {
+      const response = await attestations.setMaxAttestations(newMaxAttestations)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'MaxAttestationsSet',
+        args: { value: new BigNumber(newMaxAttestations) },
+      })
+    })
+
+    it('should revert when set by a non-owner', async () => {
+      await assertRevert(
+        attestations.setMaxAttestations(newMaxAttestations, {
           from: accounts[1],
         })
       )
@@ -521,6 +552,20 @@ contract('Attestations', (accounts: string[]) => {
                 attestationRequestFeeToken: mockStableToken.address,
               },
             })
+          })
+        })
+
+        describe('when more attestations were requested', () => {
+          beforeEach(async () => {
+            await attestations.selectIssuers(phoneHash)
+            await attestations.request(phoneHash, 8, mockStableToken.address)
+            expectedRequestBlockNumber = await web3.eth.getBlockNumber()
+            const requestBlockNumber = await web3.eth.getBlockNumber()
+            await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
+          })
+
+          it('should revert if too many issuers attempted', async () => {
+            await assertRevert(attestations.selectIssuers(phoneHash))
           })
         })
 
@@ -847,7 +892,7 @@ contract('Attestations', (accounts: string[]) => {
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
             const [v, r, s] = await getVerificationCodeSignature(other, issuer)
             await attestations.complete(phoneHash, v, r, s, { from: other })
-            await accountsInstance.setWalletAddress(other, { from: other })
+            await accountsInstance.setWalletAddress(other, '0x0', '0x0', '0x0', { from: other })
           })
 
           it('should return multiple attested accounts', async () => {

@@ -1,7 +1,6 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -10,6 +9,7 @@ import "./interfaces/ILockedGold.sol";
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;
@@ -66,17 +66,22 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 reward
   );
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   * @param _unlockingPeriod The unlocking period in seconds.
+   */
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    unlockingPeriod = _unlockingPeriod;
+    setUnlockingPeriod(_unlockingPeriod);
   }
 
   /**
    * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
    * @param value The unlocking period in seconds.
    */
-  function setUnlockingPeriod(uint256 value) external onlyOwner {
+  function setUnlockingPeriod(uint256 value) public onlyOwner {
     require(value != unlockingPeriod, "Unlocking period not changed");
     unlockingPeriod = value;
     emit UnlockingPeriodSet(value);
@@ -192,7 +197,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
-    require(getGoldToken().transfer(msg.sender, value), "Transfer failed");
+    msg.sender.transfer(value);
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -246,7 +251,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = 0; i < length; i++) {
+    for (uint256 i = 0; i < length; i = i.add(1)) {
       PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;

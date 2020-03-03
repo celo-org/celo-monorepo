@@ -1,3 +1,5 @@
+import DevelopersPage from 'pages/developers'
+
 export const menuItems = {
   HOME: {
     name: 'Home',
@@ -12,24 +14,32 @@ export const menuItems = {
     link: '/about',
   },
   BUILD: {
-    name: 'Build',
-    link: '/build',
+    name: 'Validators',
+    link: '/validators',
+  },
+  VALIDATORS_LIST: {
+    name: 'Validators List',
+    link: '/validators/explore',
   },
   BRAND: {
     name: 'Experience - Brand Kit',
     link: '/experience/brand',
   },
   COMMUNITY: {
-    name: 'Connect',
+    name: 'Community',
     link: '/community',
+  },
+  DEVELOPERS: {
+    name: 'Developers',
+    link: '/developers',
+  },
+  SDK_DEVELOPERS: {
+    name: DevelopersPage,
+    link: '/developers',
   },
   JOBS: {
     name: 'Join',
     link: '/jobs',
-  },
-  MEDIUM: {
-    name: 'Medium',
-    link: 'https://medium.com/@celo.org',
   },
   PRIVACY: {
     name: 'Privacy Policy',
@@ -43,33 +53,35 @@ export const menuItems = {
     name: 'Terms',
     link: '/terms',
   },
-  TWITTER: {
-    name: 'Twitter',
-    link: 'https://twitter.com/CeloHQ',
-  },
   CODE_OF_CONDUCT: {
     name: 'Code of Conduct',
     link: '/code-of-conduct',
   },
 }
 
+// TODO: Temporary link to the master branch documentation for 'sdkDocs' and 'sdkTutorial'
 export enum CeloLinks {
   agreement = '/user-agreement',
   faq = '/faq',
-  faucet = '/build/faucet',
+  faucet = '/developers/faucet',
   iconsLicense = 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',
   discord = 'https://discord.gg/6yWMkgM',
   discourse = 'https://forum.celo.org/',
-  walletApp = '/build/wallet',
+  walletApp = '/developers/wallet',
   blockscout = 'http://alfajores-blockscout.celo-testnet.org/',
   disclaimer = 'https://docs.celo.org/important-information/alfajores-testnet-disclaimer',
   docs = 'https://docs.celo.org/',
   docsOverview = 'https://docs.celo.org/overview',
-  sdkDocs = 'https://docs.celo.org/celo-sdk/introduction',
+  sdkDocs = 'https://docs.celo.org/v/master/developer-guide/overview/introduction',
+  sdkTutorial = 'https://docs.celo.org/v/master/developer-guide/start',
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
-  linkedIn = 'https://www.linkedin.com/company/celohq/',
+  twitter = 'https://twitter.com/CeloOrg',
+  mediumUser = 'https://medium.com/@celo.org',
+  mediumPublication = 'https://medium.com/celoOrg',
+  fundingRequest = 'https://c-labs.typeform.com/to/gj9aUp',
+  linkedIn = 'https://www.linkedin.com/company/celoOrg/',
   monorepo = 'https://github.com/celo-org/celo-monorepo',
   blockChainRepo = 'https://github.com/celo-org/celo-blockchain',
   playStoreWallet = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores',

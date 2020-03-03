@@ -5,15 +5,29 @@ import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Clipboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
+import { PincodeType, pincodeTypeSelector } from 'src/account/reducer'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src/app/actions'
+import {
+  navigatePinProtected,
+  resetAppOpenedState,
+  setAnalyticsEnabled,
+  setNumberVerified,
+} from 'src/app/actions'
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
@@ -25,6 +39,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
+import { fornoSelector } from 'src/web3/selectors'
 
 interface DispatchProps {
   revokeVerification: typeof revokeVerification
@@ -33,6 +48,7 @@ interface DispatchProps {
   setAnalyticsEnabled: typeof setAnalyticsEnabled
   resetBackupState: typeof resetBackupState
   devModeTriggerClicked: typeof devModeTriggerClicked
+  navigatePinProtected: typeof navigatePinProtected
 }
 
 interface StateProps {
@@ -41,6 +57,8 @@ interface StateProps {
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
+  pincodeType: PincodeType
+  fornoMode: boolean
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -56,6 +74,8 @@ const mapStateToProps = (state: RootState): StateProps => {
     e164PhoneNumber: state.account.e164PhoneNumber,
     analyticsEnabled: state.app.analyticsEnabled,
     numberVerified: state.app.numberVerified,
+    pincodeType: pincodeTypeSelector(state),
+    fornoMode: fornoSelector(state),
   }
 }
 
@@ -66,6 +86,7 @@ const mapDispatchToProps = {
   setAnalyticsEnabled,
   resetBackupState,
   devModeTriggerClicked,
+  navigatePinProtected,
 }
 
 export class Account extends React.Component<Props, State> {
@@ -106,6 +127,10 @@ export class Account extends React.Component<Props, State> {
 
   goToLicenses() {
     navigate(Screens.Licenses)
+  }
+
+  goToSecurity = () => {
+    this.props.navigatePinProtected(Screens.Security, { nextScreen: Screens.Account })
   }
 
   goToAnalytics() {
@@ -155,9 +180,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   sendLogsToSupport = async () => {
-    if (this.props.e164PhoneNumber) {
-      await Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
-    }
+    await Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
   }
 
   onPressAddress = () => {
@@ -218,15 +241,16 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account, numberVerified } = this.props
+    const { t, account, numberVerified, fornoMode, pincodeType } = this.props
+    const showSecurity = !fornoMode && pincodeType === PincodeType.CustomPin
 
     return (
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
           <View style={style.accountProfile}>
-            <TouchableOpacity onPress={this.onPressAvatar}>
+            <TouchableWithoutFeedback onPress={this.onPressAvatar}>
               <AvatarSelf />
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
             <View>
               <TouchableOpacity onPress={this.onPressAddress}>
                 <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>
@@ -254,6 +278,7 @@ export class Account extends React.Component<Props, State> {
             {features.SHOW_SHOW_REWARDS_APP_LINK && (
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
+            {showSecurity && <SettingsItem title={t('security')} onPress={this.goToSecurity} />}
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
             <SettingsItem title={t('dataSaver')} onPress={this.goToDataSaver} />
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
