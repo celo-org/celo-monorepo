@@ -1,25 +1,25 @@
+import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/celostats'
 import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
-import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/ethstats'
 import yargs from 'yargs'
-import { UpgradeArgv } from '../../deploy/upgrade'
+import { UpgradeArgv } from '../upgrade'
 
-export const command = 'ethstats'
+export const command = 'celostats'
 
-export const describe = 'upgrade the ethstats package'
+export const describe = 'upgrade the celostats package'
 
-type EthstatsArgv = UpgradeArgv & {
+type CelostatsArgv = UpgradeArgv & {
   reset: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
   return argv.option('reset', {
-    description: 'Destroy & redeploy the ethstats package',
+    description: 'Destroy & redeploy the celostats package',
     default: false,
     type: 'boolean',
   })
 }
 
-export const handler = async (argv: EthstatsArgv) => {
+export const handler = async (argv: CelostatsArgv) => {
   await createClusterIfNotExists()
   await switchToClusterFromEnv()
 

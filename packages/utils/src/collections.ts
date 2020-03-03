@@ -87,13 +87,13 @@ export function linkedListChanges(
   sortedList: AddressListItem[],
   changeList: AddressListItem[]
 ): { lessers: string[]; greaters: string[]; list: AddressListItem[] } {
-  const list = sortedList.concat()
+  const listClone = [...sortedList]
   const lessers: string[] = []
   const greaters: string[] = []
   for (const it of changeList) {
-    const { lesser, greater } = _linkedListChange(sortedList, it)
+    const { lesser, greater } = _linkedListChange(listClone, it)
     lessers.push(lesser)
     greaters.push(greater)
   }
-  return { lessers, greaters, list }
+  return { lessers, greaters, list: listClone }
 }

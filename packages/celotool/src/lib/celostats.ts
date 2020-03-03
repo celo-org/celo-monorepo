@@ -4,7 +4,7 @@ import { getBlockscoutUrl } from './endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { AccountType, getAddressesFor } from './generate_utils'
 
-const helmChartPath = '../helm-charts/ethstats'
+const helmChartPath = '../helm-charts/celostats'
 
 export async function installHelmChart(celoEnv: string) {
   return installGenericHelmChart(
@@ -36,26 +36,31 @@ export async function upgradeHelmChart(celoEnv: string) {
 function helmParameters(celoEnv: string) {
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
-    `--set ethstats.image.repository=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_REPOSITORY)}`,
-    `--set ethstats.image.tag=${fetchEnv(envVar.ETHSTATS_DOCKER_IMAGE_TAG)}`,
-    `--set ethstats.trusted_addresses='${String(generateAuthorizedAddresses()).replace(
+    `--set celostats.image.server.repository=${fetchEnv(
+      envVar.CELOSTATS_SERVER_DOCKER_IMAGE_REPOSITORY
+    )}`,
+    `--set celostats.image.server.tag=${fetchEnv(envVar.CELOSTATS_SERVER_DOCKER_IMAGE_TAG)}`,
+    `--set celostats.image.frontend.repository=${fetchEnv(
+      envVar.CELOSTATS_FRONTEND_DOCKER_IMAGE_REPOSITORY
+    )}`,
+    `--set celostats.image.frontend.tag=${fetchEnv(envVar.CELOSTATS_FRONTEND_DOCKER_IMAGE_TAG)}`,
+    `--set celostats.trusted_addresses='${String(generateAuthorizedAddresses()).replace(
       /,/g,
       '\\,'
     )}'`,
-    `--set ethstats.banned_addresses='${String(fetchEnv(envVar.ETHSTATS_BANNED_ADDRESSES)).replace(
-      /,/g,
-      '\\,'
-    )}'`,
-    `--set ethstats.reserved_addresses='${String(
-      fetchEnv(envVar.ETHSTATS_RESERVED_ADDRESSES)
+    `--set celostats.banned_addresses='${String(
+      fetchEnv(envVar.CELOSTATS_BANNED_ADDRESSES)
     ).replace(/,/g, '\\,')}'`,
-    `--set ethstats.network_name='Celo ${celoEnv}'`,
-    `--set ethstats.blockscout_url='${getBlockscoutUrl(celoEnv)}'`,
+    `--set celostats.reserved_addresses='${String(
+      fetchEnv(envVar.CELOSTATS_RESERVED_ADDRESSES)
+    ).replace(/,/g, '\\,')}'`,
+    `--set celostats.network_name='Celo ${celoEnv}'`,
+    `--set celostats.blockscout_url='${getBlockscoutUrl(celoEnv)}'`,
   ]
 }
 
 function releaseName(celoEnv: string) {
-  return `${celoEnv}-ethstats`
+  return `${celoEnv}-celostats`
 }
 
 function generateAuthorizedAddresses() {
@@ -67,6 +72,6 @@ function generateAuthorizedAddresses() {
   publicKeys.push(getAddressesFor(AccountType.TX_NODE, mnemonic, txNodes))
   publicKeys.push(getAddressesFor(AccountType.VALIDATOR, mnemonic, validatorNodes))
 
-  publicKeys.push(fetchEnvOrFallback(envVar.ETHSTATS_TRUSTED_ADDRESSES, '').split(','))
+  publicKeys.push(fetchEnvOrFallback(envVar.CELOSTATS_TRUSTED_ADDRESSES, '').split(','))
   return publicKeys.reduce((accumulator, value) => accumulator.concat(value), []).filter((_) => !!_)
 }

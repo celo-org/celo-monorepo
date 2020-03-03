@@ -1,11 +1,11 @@
+import { installHelmChart } from 'src/lib/celostats'
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
-import { installHelmChart } from 'src/lib/ethstats'
 import yargs from 'yargs'
-import { InitialArgv } from '../../deploy/initial'
+import { InitialArgv } from '../initial'
 
-export const command = 'ethstats'
+export const command = 'celostats'
 
-export const describe = 'deploy the ethstats package'
+export const describe = 'deploy the celostats package'
 
 export const builder = (argv: yargs.Argv) => {
   return argv.option('skipClusterSetup', {
@@ -15,11 +15,11 @@ export const builder = (argv: yargs.Argv) => {
   })
 }
 
-type EthstatsInitialArgv = InitialArgv & {
+type CelostatsInitialArgv = InitialArgv & {
   skipClusterSetup: boolean
 }
 
-export const handler = async (argv: EthstatsInitialArgv) => {
+export const handler = async (argv: CelostatsInitialArgv) => {
   const createdCluster = await createClusterIfNotExists()
   await switchToClusterFromEnv()
 
