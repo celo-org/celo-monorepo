@@ -69,12 +69,6 @@
         "description": "Authorized validator signer etherbase account private key"
       }
     },
-    "validatorGethAccountSecret": {
-      "type": "secureString",
-      "metadata": {
-        "description": "Password to secure validatorPrivateKey"
-      }
-    },
     "attesterAccountAddress": {
       "type": "string",
       "metadata": {
@@ -85,12 +79,6 @@
       "type": "secureString",
       "metadata": {
         "description": "Attester account private key"
-      }
-    },
-    "attesterGethAccountSecret": {
-      "type": "secureString",
-      "metadata": {
-        "description": "Password to secure attesterPrivateKey"
       }
     },
     "attesterTwilioAccountSID": {
@@ -322,7 +310,6 @@
     "subnetId": "[concat(variables('virtualNetworkId'), '/subnets/default')]",
     "validatorKeyVaultName": "[concat('validator-', celo.globalName('keyvault'))]",
     "validatorPrivateKeyName": "validatorPrivateKey",
-    "validatorGethAccountSecretName": "validatorGethAccountSecret",
     "validatorDataDiskName": "validatorDataDisk",
     "validatorVirtualMachineName": "validatorVirtualMachine",
     "validatorNetworkInterfaceName": "validatorNetworkInterface",
@@ -340,7 +327,6 @@
     "attesterKeyVaultName": "[concat('attester-', celo.globalName('keyvault'))]",
     "attesterPrivateKeyName": "attesterPrivateKey",
     "attesterTwilioAuthTokenName": "attesterTwilioAuthToken",
-    "attesterGethAccountSecretName": "attesterGethAccountSecret",
     "attesterPublicIpAddressName": "attesterPublicIpAddress",
     "attesterNetworkSecurityGroupName": "attesterNetworkSecurityGroup",
     "attesterVirtualMachineName": "attesterVirtualMachine",
