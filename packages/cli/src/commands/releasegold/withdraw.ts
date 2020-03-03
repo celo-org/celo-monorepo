@@ -50,6 +50,6 @@ export default class Withdraw extends BaseCommand {
       .runChecks()
 
     this.kit.defaultAccount = await releaseGoldWrapper.getBeneficiary()
-    await displaySendTx('withdrawTx', await releaseGoldWrapper.withdraw(value.toNumber()))
+    await displaySendTx('withdrawTx', releaseGoldWrapper.withdraw(value.toNumber()))
   }
 }

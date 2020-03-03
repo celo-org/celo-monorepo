@@ -37,6 +37,6 @@ export default class SetLiquidityProvision extends BaseCommand {
       .runChecks()
 
     this.kit.defaultAccount = await releaseGoldWrapper.getReleaseOwner()
-    await displaySendTx('setLiquidityProvision', await releaseGoldWrapper.setLiquidityProvision())
+    await displaySendTx('setLiquidityProvision', releaseGoldWrapper.setLiquidityProvision())
   }
 }

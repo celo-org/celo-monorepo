@@ -35,13 +35,15 @@ export default class SetBeneficiary extends BaseCommand {
       newReleaseGold(this.kit.web3, contractAddress)
     )
 
-    // Verify owner is real owner
     await newCheckBuilder(this)
-      .addCheck('Sender is owner', async () => owner === (await releaseGoldWrapper.getOwner()))
+      .addCheck(
+        'Owner argument is contract owner',
+        async () => owner === (await releaseGoldWrapper.getOwner())
+      )
       .runChecks()
 
     this.kit.defaultAccount = owner
-    const tx = await releaseGoldWrapper.setBeneficiary(newBeneficiary)
+    const tx = releaseGoldWrapper.setBeneficiary(newBeneficiary)
     await displaySendTx('setBeneficiary', tx)
   }
 }

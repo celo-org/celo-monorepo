@@ -45,7 +45,7 @@ export default class SetMaxDistribution extends BaseCommand {
     this.kit.defaultAccount = await releaseGoldWrapper.getReleaseOwner()
     await displaySendTx(
       'setMaxDistribution',
-      await releaseGoldWrapper.setMaxDistribution(distributionRatio)
+      releaseGoldWrapper.setMaxDistribution(distributionRatio)
     )
   }
 }

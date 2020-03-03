@@ -33,6 +33,6 @@ export default class CreateAccount extends BaseCommand {
       .runChecks()
 
     this.kit.defaultAccount = await releaseGoldWrapper.getBeneficiary()
-    await displaySendTx('createAccount', await releaseGoldWrapper.createAccount())
+    await displaySendTx('createAccount', releaseGoldWrapper.createAccount())
   }
 }

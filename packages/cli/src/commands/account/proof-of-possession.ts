@@ -14,7 +14,7 @@ export default class ProofOfPossession extends BaseCommand {
     }),
     account: Flags.address({
       required: true,
-      description: 'Address of the account that needs to proove possession of the signer key.',
+      description: 'Address of the account that needs to prove possession of the signer key.',
     }),
   }
 

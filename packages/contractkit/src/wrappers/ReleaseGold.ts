@@ -364,6 +364,47 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   }
 
   /**
+   * Authorizes an address to sign validation messages on behalf of the account.
+   * @param signer The address of the validator signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
+   * @return A CeloTransactionObject
+   */
+  async authorizeValidatorSigner(
+    signer: Address,
+    proofOfSigningKeyPossession: Signature
+  ): Promise<CeloTransactionObject<void>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeValidatorSigner(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
+      )
+    )
+  }
+  /**
+   * Authorizes an address to sign attestation messages on behalf of the account.
+   * @param signer The address of the attestation signing key to authorize.
+   * @param proofOfSigningKeyPossession The account address signed by the signer address.
+   * @return A CeloTransactionObject
+   */
+  async authorizeAttestationSigner(
+    signer: Address,
+    proofOfSigningKeyPossession: Signature
+  ): Promise<CeloTransactionObject<void>> {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeAttestationSigner(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s
+      )
+    )
+  }
+
+  /**
    * Revokes pending votes
    * @param account The account to revoke from.
    * @param validatorGroup The group to revoke the vote for.

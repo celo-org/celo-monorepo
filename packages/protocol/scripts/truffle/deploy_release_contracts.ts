@@ -1,9 +1,8 @@
 import {
-  _setInitialProxyImplementation,
   getDeployedProxiedContract,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
-import fs = require('fs')
 import {
   GoldTokenInstance,
   RegistryInstance,
@@ -12,11 +11,12 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['network', 'grants'],
+      string: ['network', 'grants', 'start_gold'],
     })
     const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
     const goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
@@ -29,6 +29,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGold')
     const ReleaseGoldProxy: ReleaseGoldProxyContract = artifacts.require('ReleaseGoldProxy')
     const releases = []
+    const startGold = web3.utils.toWei(argv.start_gold)
     const handleJSONFile = async (err, data) => {
       if (err) {
         throw err
@@ -78,6 +79,8 @@ module.exports = async (callback: (error?: any) => number) => {
         const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
         await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address)
         await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address)
+        // Send starting gold amount to the beneficiary so they can perform transactions.
+        await goldToken.transfer(releaseGoldConfig.beneficiary, startGold)
 
         releases.push({
           Beneficiary: releaseGoldConfig.beneficiary,

@@ -32,8 +32,8 @@ export interface ReleaseGoldInfo {
   balanceStateData: BalanceState
 }
 
-export default class Info extends BaseCommand {
-  static description = 'Get info on a ReleaseGold instance contract.'
+export default class Show extends BaseCommand {
+  static description = 'Show info on a ReleaseGold instance contract.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -43,11 +43,11 @@ export default class Info extends BaseCommand {
     }),
   }
 
-  static examples = ['info --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
+  static examples = ['show --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
 
   async run() {
     // tslint:disable-next-line
-    const { flags } = this.parse(Info)
+    const { flags } = this.parse(Show)
 
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       this.kit,
