@@ -134,6 +134,7 @@ export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, acco
   Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Checking account balance', account)
   const tokenContract = await getTokenContract(token)
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
+  // TODO consider having retry logic for ALL contract calls and txs. ContractKit should have this logic.
   const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
   Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Account balance', balanceInWei.toString())
   return balanceInWei
