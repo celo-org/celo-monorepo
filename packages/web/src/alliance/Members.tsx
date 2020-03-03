@@ -13,8 +13,8 @@ import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 async function gatherAllies(persistFunc: (data: []) => void) {
   const response = await fetch('api/alliance')
-  const allies = await response.json()
-  persistFunc(allies)
+  const alliesByCategory = await response.json()
+  persistFunc(alliesByCategory)
 }
 
 function buildDropDownProps(t: TFunction, currentFilter: string): ListItem[] {
@@ -40,7 +40,7 @@ const ALL = 'all'
 
 export default function Members() {
   const { t } = useTranslation(NameSpaces.alliance)
-  const [allies, setAllies] = React.useState(initialState())
+  const [alliesByCategory, setAllies] = React.useState(initialState())
   const [selectedFilter, setFilter] = React.useState(ALL)
 
   React.useEffect(() => {
@@ -53,8 +53,11 @@ export default function Members() {
   const onClear = React.useCallback(() => setFilter(ALL), [])
 
   const displayedCategories = React.useMemo(
-    () => (selectedFilter === ALL ? allies : allies.filter(({ name }) => name === selectedFilter)),
-    [allies, selectedFilter]
+    () =>
+      selectedFilter === ALL
+        ? alliesByCategory
+        : alliesByCategory.filter(({ name }) => name === selectedFilter),
+    [alliesByCategory, selectedFilter]
   )
 
   return (
