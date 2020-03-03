@@ -3,3 +3,8 @@ export default interface AllianceMember {
   logo: string
   url: string
 }
+
+export interface Grouping {
+  name: string
+  records: AllianceMember[]
+}

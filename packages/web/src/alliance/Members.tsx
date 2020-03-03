@@ -1,3 +1,4 @@
+import { TFunction } from 'next-i18next'
 import * as React from 'react'
 import LazyFade from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
@@ -16,7 +17,7 @@ async function gatherAllies(persistFunc: (data: []) => void) {
   persistFunc(allies)
 }
 
-function buildDropDownProps(t, currentFilter): ListItem[] {
+function buildDropDownProps(t: TFunction, currentFilter: string): ListItem[] {
   return Object.keys(CategoryEnum).map((key) => {
     return {
       id: key,
@@ -26,11 +27,20 @@ function buildDropDownProps(t, currentFilter): ListItem[] {
   })
 }
 
+function initialState() {
+  return Object.keys(CategoryEnum).map((key: CategoryEnum) => {
+    return {
+      name: key,
+      records: [],
+    }
+  })
+}
+
 const ALL = 'all'
 
 export default function Members() {
   const { t } = useTranslation(NameSpaces.alliance)
-  const [allies, setAllies] = React.useState([])
+  const [allies, setAllies] = React.useState(initialState())
   const [selectedFilter, setFilter] = React.useState(ALL)
 
   React.useEffect(() => {
@@ -41,6 +51,11 @@ export default function Members() {
   }, [])
 
   const onClear = React.useCallback(() => setFilter(ALL), [])
+
+  const displayedCategories = React.useMemo(
+    () => (selectedFilter === ALL ? allies : allies.filter(({ name }) => name === selectedFilter)),
+    [allies, selectedFilter]
+  )
 
   return (
     <View nativeID={'members'}>
@@ -60,6 +75,7 @@ export default function Members() {
         </Cell>
       </GridRow>
       <GridRow
+        allStyle={{ minHeight: 600 }}
         desktopStyle={standardStyles.sectionMarginBottom}
         tabletStyle={standardStyles.sectionMarginBottomTablet}
         mobileStyle={standardStyles.sectionMarginBottomMobile}
@@ -71,7 +87,10 @@ export default function Members() {
               data={[
                 {
                   name: t(`members.categoryTitle.all`),
-                  list: buildDropDownProps(t, selectedFilter),
+                  list: React.useMemo(() => buildDropDownProps(t, selectedFilter), [
+                    t,
+                    selectedFilter,
+                  ]),
                   onSelect: setFilter,
                   onClear,
                 },
@@ -80,7 +99,7 @@ export default function Members() {
           </View>
         </Cell>
         <Cell span={Spans.three4th}>
-          {allies.map((category) => (
+          {displayedCategories.map((category) => (
             <Category
               key={category.name}
               name={category.name.toLowerCase()}
