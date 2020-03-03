@@ -1,4 +1,4 @@
-import { Address } from '@celo/contractkit'
+import { Address, NULL_ADDRESS } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
@@ -312,7 +312,9 @@ class CheckBuilder {
       `Account isn't a member of a validator group`,
       this.withValidators(async (v, _signer, account) => {
         const { affiliation } = await v.getValidator(account)
-        console.log('affiliation', affiliation)
+        if (eqAddress(affiliation!, NULL_ADDRESS)) {
+          return true
+        }
         const { members } = await v.getValidatorGroup(affiliation!)
         return !members.includes(account)
       })
@@ -323,7 +325,6 @@ class CheckBuilder {
     return this.addCheck(
       `Enough time has passed since the account was removed from a validator group`,
       this.withValidators(async (v, _signer, account) => {
-        console.log('getting extra data')
         const { lastRemovedFromGroupTimestamp } = await v.getValidatorMembershipHistoryExtraData(
           account
         )

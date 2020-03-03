@@ -237,17 +237,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     getAffiliates: boolean = true,
     blockNumber?: number
   ): Promise<ValidatorGroup> {
-    console.log('what???')
     // @ts-ignore: Expected 0-1 arguments, but got 2
     const res = await this.contract.methods.getValidatorGroup(address).call({}, blockNumber)
-    console.log(res)
     const accounts = await this.kit.contracts.getAccounts()
     const name = (await accounts.getName(address, blockNumber)) || ''
-    console.log('name', name)
     let affiliates: Validator[] = []
     if (getAffiliates) {
       const validators = await this.getRegisteredValidators(blockNumber)
-      console.log('affiliates')
       affiliates = validators
         .filter((v) => v.affiliation === address)
         .filter((v) => !res[0].includes(v.address))
