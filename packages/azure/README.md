@@ -10,13 +10,13 @@ attestation-service) on the compute nodes.
 
 ## Pre-built template
 
-[template.json](./template.json) is a pre-built ARM template.
+[mainTemplate.json](./mainTemplate.json) is a pre-built ARM template.
 
 ## Build
 
 The JSON files in [components/](components/) define resources for the
 validator network. You must merge them into a single JSON
-`template.json` file before deploying:
+`mainTemplate.json` file before deploying:
 
 ```
 npm run build
@@ -33,15 +33,14 @@ az group create \
    --name $GROUP --location $LOCATION
 ```
 
-Deploy `template.json`, specifying all the required parameters:
+Deploy `mainTemplate.json`, specifying all the required parameters:
 
 ```
 az group deployment create \
    --resource-group $GROUP \
    --name ${GROUP}-deployment \
-   --template-file=template.json \
+   --template-file=mainTemplate.json \
    --parameters \
-   userObjectId=... \
    proxyName=... \
    validatorName=... \
    adminUsername=... \
@@ -59,8 +58,6 @@ az group deployment create \
    attesterTwilioMessageServiceSID=... \
 ```
 
-You can get the value of your `userObjectId` via the Portal or `az ad user list`.
-
 You can delete all the services you created with:
 
 ```
@@ -71,7 +68,6 @@ az group delete --name $GROUP
 
 | Parameter | Type | Description |
 | --------- | -----| ----------- |
-| `userObjectId` | string | The object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. |
 | `proxyName` | string | The proxy name for ethstats |
 | `validatorName` | string | The validator name for ethstats |
 | `adminUsername` | string | Admin username for SSH access |
