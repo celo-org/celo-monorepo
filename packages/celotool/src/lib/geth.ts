@@ -1151,7 +1151,7 @@ export async function migrateContracts(
   overrides: any = {},
   verbose: boolean = true
 ) {
-  const migrationOverrides = _.merge(
+  const migrationOverrides = merge(
     {
       downtimeSlasher: {
         slashableDowntime: 6,
