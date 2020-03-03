@@ -1,22 +1,9 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
 import Ally from 'src/alliance/AllianceMember'
+import { Category } from 'src/alliance/CategoryEnum'
 import airtableInit, { getImageURI, ImageSizes } from './airtable'
 import { cache } from './cache'
-
-enum Category {
-  'Send' = 'Send',
-  'Lend' = 'Lend',
-  'Earn' = 'Earn',
-  'Pay' = 'Pay',
-  'Save' = 'Save',
-  'Give' = 'Give',
-  'Educate' = 'Educate',
-  'Validate' = 'Validate',
-  'Invest' = 'Invest',
-  'Build' = 'Build',
-  'Secure' = 'Secure',
-}
 
 const CATEGORY_FIELD = 'Web Category*'
 const LOGO_FIELD = 'Logo Upload'

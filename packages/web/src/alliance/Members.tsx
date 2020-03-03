@@ -2,9 +2,12 @@ import * as React from 'react'
 import LazyFade from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Ally from 'src/alliance/AllianceMember'
+import { Category as CategoryEnum } from 'src/alliance/CategoryEnum'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, Trans, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ListItem } from 'src/shared/DropDown'
+import DropDownGroup from 'src/shared/DropDownGroup'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 async function gatherAllies(persistFunc: (data: []) => void) {
@@ -13,9 +16,22 @@ async function gatherAllies(persistFunc: (data: []) => void) {
   persistFunc(allies)
 }
 
+function buildDropDownProps(t, currentFilter): ListItem[] {
+  return Object.keys(CategoryEnum).map((key) => {
+    return {
+      id: key,
+      selected: key === currentFilter,
+      label: t(`members.categoryTitle.${key.toLocaleLowerCase()}`),
+    }
+  })
+}
+
+const ALL = 'all'
+
 export default function Members() {
   const { t } = useTranslation(NameSpaces.alliance)
   const [allies, setAllies] = React.useState([])
+  const [selectedFilter, setFilter] = React.useState(ALL)
 
   React.useEffect(() => {
     // sometimes it is nessessary to break a rule
@@ -24,20 +40,46 @@ export default function Members() {
     gatherAllies(setAllies)
   }, [])
 
+  const onClear = React.useCallback(() => setFilter(ALL), [])
+
   return (
     <View nativeID={'members'}>
       <GridRow
-        desktopStyle={[{ justifyContent: 'flex-end' }, standardStyles.sectionMargin]}
-        tabletStyle={standardStyles.sectionMarginTablet}
-        mobileStyle={standardStyles.sectionMarginMobile}
+        allStyle={standardStyles.centered}
+        desktopStyle={standardStyles.sectionMarginTop}
+        tabletStyle={standardStyles.sectionMarginTopTablet}
+        mobileStyle={standardStyles.sectionMarginTopMobile}
       >
-        <Cell span={Spans.three4th}>
-          <H2 style={{ marginBottom: 5 }}>{t('members.title')}</H2>
+        <Cell span={Spans.half}>
+          <H2 style={[{ marginBottom: 5 }, textStyles.center]}>{t('members.title')}</H2>
           <H4 style={standardStyles.blockMarginBottomMobile}>
             <Trans i18nKey={'members.subtitle'} ns={NameSpaces.alliance}>
               <Text style={textStyles.italic}>{}</Text>
             </Trans>
           </H4>
+        </Cell>
+      </GridRow>
+      <GridRow
+        desktopStyle={standardStyles.sectionMarginBottom}
+        tabletStyle={standardStyles.sectionMarginBottomTablet}
+        mobileStyle={standardStyles.sectionMarginBottomMobile}
+      >
+        <Cell span={Spans.fourth}>
+          <View style={{ maxWidth: 220 }}>
+            <Text style={[fonts.h6, styles.filterLabel]}>{t('filterLabel')}</Text>
+            <DropDownGroup
+              data={[
+                {
+                  name: t(`members.categoryTitle.all`),
+                  list: buildDropDownProps(t, selectedFilter),
+                  onSelect: setFilter,
+                  onClear,
+                },
+              ]}
+            />
+          </View>
+        </Cell>
+        <Cell span={Spans.three4th}>
           {allies.map((category) => (
             <Category
               key={category.name}
@@ -128,5 +170,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     width: 150,
     height: 50,
+  },
+  filterLabel: {
+    marginBottom: 5,
   },
 })

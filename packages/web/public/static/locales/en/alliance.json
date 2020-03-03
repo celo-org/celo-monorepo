@@ -2,6 +2,7 @@
   "title": "Alliance for Prosperity",
   "thematicStatement": "Money can be beautiful",
   "mission": "Create a more prosperous world with mission-aligned organiztions",
+  "filterLabel": "Refine By",
   "form": {
     "name": "Name",
     "email": "Email",
@@ -25,6 +26,7 @@
     "title": "Meet the Alliance",
     "subtitle": "Member contributions, <0>in no particular order</0>",
     "categoryTitle": {
+      "all": "Show All",
       "send": "Send",
       "lend": "Lend",
       "earn": "Earn",
