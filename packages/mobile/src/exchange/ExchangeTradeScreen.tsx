@@ -76,11 +76,21 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     inputAmount: '',
   }
 
-  getMakerTokenPropertiesFromNavProps() {
+  componentDidMount() {
+    this.getMakerTokenPropertiesFromNavProps()
+  }
+
+  getMakerTokenPropertiesFromNavProps = () => {
     const { makerToken, makerTokenBalance } = this.props.navigation.getParam('makerTokenDisplay')
-    if (!makerToken || !makerTokenBalance) {
-      throw new Error('Maker token or maker token balance missing from nav props')
+
+    if (!makerToken) {
+      throw new Error('Maker token missing from nav props')
     }
+
+    if (!makerTokenBalance) {
+      throw new Error('Maker token balance missing from nav props')
+    }
+
     this.setState({
       makerToken,
       makerTokenAvailableBalance: makerTokenBalance,
@@ -88,16 +98,12 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     this.props.fetchExchangeRate(makerToken, makerTokenBalance)
   }
 
-  componentDidMount() {
-    this.getMakerTokenPropertiesFromNavProps()
-  }
-
   onChangeExchangeAmount = (amount: string) => {
     this.setState({ inputAmount: amount })
     this.updateError(amount)
   }
 
-  updateError(inputAmount: string) {
+  updateError = (inputAmount: string) => {
     const amount = parseInputAmount(inputAmount)
     if (!this.inputAmountIsValid(amount)) {
       this.props.showError(

@@ -48,7 +48,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
     navigate(Stacks.ExchangeStack, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.DOLLAR,
-        makerTokenBalance: this.props.dollarBalance,
+        makerTokenBalance: this.props.dollarBalance || '0',
       },
     })
   }
@@ -57,7 +57,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
     navigate(Stacks.ExchangeStack, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.GOLD,
-        makerTokenBalance: this.props.goldBalance,
+        makerTokenBalance: this.props.goldBalance || '0',
       },
     })
   }

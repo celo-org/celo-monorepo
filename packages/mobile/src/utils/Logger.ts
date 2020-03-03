@@ -1,4 +1,5 @@
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
+import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import Mailer from 'react-native-mail'
@@ -10,7 +11,8 @@ class Logger extends ReactNativeLogger {
   }
 
   getCombinedLogsFilePath = () => {
-    return RNFS.ExternalDirectoryPath + '/celo_logs.txt'
+    const path = Platform.OS === 'ios' ? RNFS.TemporaryDirectoryPath : RNFS.ExternalDirectoryPath
+    return `${path}/celo_logs.txt`
   }
 
   /**
@@ -74,7 +76,7 @@ class Logger extends ReactNativeLogger {
     const deviceInfo = {
       version: DeviceInfo.getVersion(),
       buildNumber: DeviceInfo.getBuildNumber(),
-      apiLevel: DeviceInfo.getApiLevel(),
+      apiLevel: DeviceInfo.getApiLevelSync(),
       deviceId: DeviceInfo.getDeviceId(),
     }
 
@@ -87,7 +89,7 @@ class Logger extends ReactNativeLogger {
         isHTML: true,
         attachment: {
           path: combinedLogsPath, // The absolute path of the file from which to read data.
-          type: 'txt', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+          type: 'text', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
           name: '', // Optional: Custom filename for attachment
         },
       },
