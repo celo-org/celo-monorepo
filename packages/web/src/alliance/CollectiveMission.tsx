@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { View } from 'react-native'
 import ColLogo from 'src/alliance/ColLogo'
 import { H1, H4 } from 'src/fonts/Fonts'

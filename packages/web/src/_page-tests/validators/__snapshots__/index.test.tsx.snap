@@ -754,6 +754,8 @@ exports[`BuildPage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/stake-off/terms"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -881,6 +883,8 @@ exports[`BuildPage renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://forum.celo.org/t/the-great-celo-stake-off-the-details/136"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1433,6 +1437,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1536,6 +1542,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1763,6 +1771,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1866,6 +1876,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2093,6 +2105,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2196,6 +2210,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2310,6 +2326,8 @@ exports[`BuildPage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://github.com/celo-org"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -3845,6 +3863,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4124,6 +4144,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4379,6 +4401,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4674,6 +4698,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celohq/announcing-the-great-celo-stake-off-12eb15dd5eb0"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4953,6 +4979,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/getting-started/running-a-validator"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5208,6 +5236,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celohq/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5361,6 +5391,8 @@ exports[`BuildPage renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://c-labs.typeform.com/to/gj9aUp"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -5640,6 +5672,9 @@ exports[`BuildPage renders 1`] = `
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
+          href="/code-of-conduct"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -6082,6 +6117,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoDevs"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6125,6 +6162,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoOrg"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6519,6 +6558,7 @@ exports[`BuildPage renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"image.png\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "contain",
@@ -6532,6 +6572,12 @@ exports[`BuildPage renders 1`] = `
                 "zIndex": -1,
               }
             }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="image.png"
           />
         </div>
         <div
@@ -6661,6 +6707,8 @@ exports[`BuildPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
