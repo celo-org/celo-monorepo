@@ -20,7 +20,7 @@ export default class RegisterMetadata extends BaseCommand {
       required: true,
       description: 'The url to the metadata you want to register',
     }),
-    force: flags.boolean({ description: 'Ignore checks' }),
+    force: flags.boolean({ description: 'Ignore metadata validity checks' }),
   }
 
   static examples = [
