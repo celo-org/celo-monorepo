@@ -61,8 +61,7 @@
       "A friendly reminder you're using the {{testnet}} network build - the balances are not real"
   },
   "dismiss": "Dismiss",
-  "localCurrencyEqual": "Equal to <2>{{localValue}} {{localCurrencyCode}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
+  "dollarBalance": "<0></0> $t(global:celoDollars)",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemNetworkFeeTitle": "Celo",

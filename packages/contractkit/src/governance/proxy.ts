@@ -1,7 +1,7 @@
 import Web3 from 'web3'
-import { AbiItem } from 'web3-utils'
+import { ABIDefinition } from 'web3-eth-abi'
 
-const PROXY_ABI: AbiItem[] = [
+export const PROXY_ABI: ABIDefinition[] = [
   {
     constant: true,
     inputs: [],
@@ -15,6 +15,7 @@ const PROXY_ABI: AbiItem[] = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
+    signature: '0x42404e07',
   },
   {
     constant: false,
@@ -29,6 +30,7 @@ const PROXY_ABI: AbiItem[] = [
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
+    signature: '0xbb913f41',
   },
 ]
 
