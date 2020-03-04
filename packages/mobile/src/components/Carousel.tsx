@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     marginTop: 0,
+    paddingVertical: 0,
   },
 })
 

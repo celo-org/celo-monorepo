@@ -1,6 +1,7 @@
 import { Address } from '@celo/utils/lib/address'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { Block, Transaction } from 'web3/eth/types'
+import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
@@ -41,7 +42,7 @@ export class BlockExplorer {
         {
           details: cd,
           fnMapping: mapFromPairs(
-            (cd.jsonInterface as ABIDefinition[])
+            (cd.jsonInterface.concat(PROXY_ABI) as ABIDefinition[])
               .filter((ad) => ad.type === 'function')
               .map((ad) => [ad.signature, ad])
           ),
