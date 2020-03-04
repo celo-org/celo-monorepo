@@ -854,15 +854,13 @@ export async function startGeth(
     isProxied,
     proxyport,
     ethstats,
+    setNodeKey,
+    maxPeers,
   } = instance
 
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
-  // Allow maxPeers to be zero
-  const maxPeers = instance.maxPeers !== undefined ? instance.maxPeers : gethConfig.instances.length
-  // Default to true
-  const setNodeKey = instance.setNodeKey !== undefined ? instance.setNodeKey : true
   const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
   let blocktime: number = 1
 
@@ -890,7 +888,6 @@ export async function startGeth(
     '--consoleformat=term',
     '--nat',
     'extip:127.0.0.1',
-    `--maxpeers=${maxPeers}`,
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
   ]
@@ -926,7 +923,7 @@ export async function startGeth(
     gethArgs.push('--light.serve=0')
   }
 
-  if (setNodeKey) {
+  if (isProxy || setNodeKey) {
     gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
@@ -970,6 +967,10 @@ export async function startGeth(
 
   if (ethstats) {
     gethArgs.push(`--ethstats=${instance.name}@${ethstats}`, '--etherbase=0')
+  }
+
+  if (maxPeers != null) {
+    gethArgs.push(`--maxpeers=${maxPeers}`)
   }
 
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
@@ -1149,7 +1150,7 @@ export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   await connectPeers(
     instances.filter(
       ({ wsport, rpcport, validating, isProxy, isProxied }) =>
-        isProxy || (validating && !isProxied && (wsport || rpcport))
+        (isProxy || (validating && !isProxied)) && (wsport || rpcport)
     )
   )
 }

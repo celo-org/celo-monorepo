@@ -1,14 +1,15 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
+import {
+  ProxyInstance,
+  RegistryInstance,
+  UsingRegistryInstance,
+} from '@celo/protocol/types'
+import { Address } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import * as chai from 'chai'
 import * as chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
-import {
-  ProxyInstance,
-  RegistryInstance,
-  UsingRegistryInstance,
-} from 'types'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 // tslint:disable-next-line: ordered-imports
@@ -44,14 +45,14 @@ export async function jsonRpc(web3: Web3, method: string, params: any[] = []): P
         params,
         // salt id generation, milliseconds might not be
         // enough to generate unique ids
-        id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
+        id: (new Date().getTime() * 100) + Math.floor(Math.random() * 100),
       },
       // @ts-ignore
       (err: any, result: any) => {
         if (err) {
           return reject(err)
         }
-        return resolve(result)
+        return resolve(result.result)
       }
     )
   })
@@ -68,7 +69,7 @@ export async function mineBlocks(blocks: number, web3: Web3) {
   }
 }
 
-export async function currentEpochNumber(web3) {
+export async function currentEpochNumber(web3: Web3) {
   const blockNumber = await web3.eth.getBlockNumber()
   // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
   const epochNumber = Math.floor(blockNumber / EPOCH)
@@ -88,7 +89,7 @@ export function getFirstBlockNumberForEpoch(epochNumber: number) {
   return (epochNumber - 1) * EPOCH + 1
 }
 
-export async function mineToNextEpoch(web3) {
+export async function mineToNextEpoch(web3: Web3) {
   const blockNumber = await web3.eth.getBlockNumber()
   const epochNumber = await currentEpochNumber(web3)
   const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
@@ -294,7 +295,7 @@ export function assertEqualDpBN(
 
 export function assertEqualBNArray(value: number[] | BN[] | BigNumber[], expected: number[] | BN[] | BigNumber[], msg?: string) {
   assert.equal(value.length, expected.length, msg)
-  value.forEach((x, i) => assertEqualBN(x, expected[i]))
+  value.forEach((x: number | BN | BigNumber, i: number) => assertEqualBN(x, expected[i]))
 }
 
 export function assertGteBN(
@@ -309,7 +310,7 @@ export function assertGteBN(
   )
 }
 
-export const isSameAddress = (minerAddress, otherAddress) => {
+export const isSameAddress = (minerAddress: Address, otherAddress: Address) => {
   return minerAddress.toLowerCase() === otherAddress.toLowerCase()
 }
 

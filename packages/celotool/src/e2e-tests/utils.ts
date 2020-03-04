@@ -30,7 +30,7 @@ import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
-const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+const monorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
 const mnemonic =
   'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
@@ -134,7 +134,7 @@ export async function migrateContracts(
 
   const args = [
     '--cwd',
-    `${MonorepoRoot}/packages/protocol`,
+    `${monorepoRoot}/packages/protocol`,
     'init-network',
     '-n',
     'testing',
@@ -220,7 +220,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
     }
 
-    configureInstances(gethConfig, bootnodeEnode)
+    setProxyConfigurations(gethConfig, bootnodeEnode)
 
     // Start all the instances
     for (const instance of gethConfig.instances) {
@@ -295,10 +295,8 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 }
 
 // Modifies gethConfig to properly configure proxies and proxied instances
-export function configureInstances(gethConfig: GethRunConfig, bootnodeEnode?: string) {
-  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
-
-  const numValidators = validatorInstances.length
+export function setProxyConfigurations(gethConfig: GethRunConfig, bootnodeEnode?: string) {
+  const numValidators = gethConfig.instances.filter((x: any) => x.validating).length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
 
   const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
@@ -360,28 +358,6 @@ export function configureInstances(gethConfig: GethRunConfig, bootnodeEnode?: st
   }
 }
 
-export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
-  return new Promise((resolve, reject) => {
-    web3.currentProvider.send(
-      {
-        jsonrpc: '2.0',
-        method,
-        params,
-        // salt id generation, milliseconds might not be
-        // enough to generate unique ids
-        id: new Date().getTime() + Math.floor(Math.random() * (1 + 100 - 1)),
-      },
-      // @ts-ignore
-      (err: any, result: any) => {
-        if (err) {
-          return reject(err)
-        }
-        return resolve(result)
-      }
-    )
-  })
-}
-
 export async function restartInstance(
   gethConfig: GethRunConfig,
   instance: GethInstanceConfig,
@@ -389,6 +365,10 @@ export async function restartInstance(
   verbose: boolean = false
 ) {
   await killInstance(instance)
+  // Wait for the process to be killed before restoring the datadir
+  while (instance.pid && (await spawnCmd('kill', ['-0', instance.pid.toString()])) === 0) {
+    await sleep(0.25)
+  }
   await restoreDatadir(gethConfig.runPath, instance)
 
   // Geth creates a "nodekey" file with a generated key when the nodekey is not set

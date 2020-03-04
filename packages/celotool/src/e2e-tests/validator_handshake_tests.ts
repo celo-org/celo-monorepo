@@ -1,12 +1,12 @@
+import { jsonRpc } from '@celo/protocol/lib/test-utils'
 import { eqAddress } from '@celo/utils/lib/address'
 import { assert } from 'chai'
 import _ from 'lodash'
-import sleep from 'sleep-promise'
 import Web3 from 'web3'
 import { Admin } from 'web3-eth-admin'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
-import { configureInstances, getContext, jsonRpc, killInstance, restartInstance } from './utils'
+import { getContext, killInstance, restartInstance, setProxyConfigurations, sleep } from './utils'
 
 const VALIDATORS = 3
 const PROXIED_VALIDATORS = 1
@@ -35,10 +35,12 @@ describe('Validator handshake tests', () => {
   after(context.hooks.after)
 
   describe('Validator handshake', () => {
-    before(async function() {
-      // reset the instances for each test
+    beforeEach(async function() {
+      // Because these tests are modifying the gethConfig (like the proxy
+      // configuration, or maxpeers), we reset the instances and the proxy
+      // configurations for each test
       gethConfig.instances = getInstances()
-      configureInstances(gethConfig)
+      setProxyConfigurations(gethConfig)
       this.timeout(0)
       await context.hooks.restart()
     })
@@ -49,15 +51,18 @@ describe('Validator handshake tests', () => {
       // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
       this.retries(2)
 
-      const val0Provider = `http://localhost:${gethConfig.instances[0].rpcport}`
+      const val0Provider = getProvider(gethConfig.instances, 'validator0')
+      assert(val0Provider, 'Could not find validator 0 provider')
       const val0Web3 = new Web3(val0Provider)
       const val0Admin = new Admin(val0Provider)
       const val0InfoBefore = await val0Admin.getNodeInfo()
       const val0EnodeBefore = val0InfoBefore.enode
 
-      const val1Provider = `http://localhost:${gethConfig.instances[1].rpcport}`
+      const val1Provider = getProvider(gethConfig.instances, 'validator1')
+      assert(val1Provider, 'Could not find validator 1 provider')
       const val1Web3 = new Web3(val1Provider)
       const val1Admin = new Admin(val1Provider)
+      const val1Address = await val1Web3.eth.getCoinbase()
 
       // restart instance 1 with maxPeers as 0
       gethConfig.instances[1].maxPeers = 0
@@ -72,6 +77,22 @@ describe('Validator handshake tests', () => {
       assert(
         !_.isEqual(val0EnodeBefore, val0EnodeAfter),
         'Restarting instance 0 with a new nodekey did not result in a new enode'
+      )
+
+      // Ensure that the restarted validator 0 still has its valEnodeTable and
+      // has the correct entry for validator 1
+      const val1Info = await val1Admin.getNodeInfo()
+      const val1EnodeNoPort = getEnodeNoPort(val1Info.enode)
+      const val0ValEnodeTable = await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])
+      const val1EntryInVal0ValEnodeTable = getValEnodeTableEntry(val0ValEnodeTable, val1Address)
+      assert(
+        val1EntryInVal0ValEnodeTable,
+        `Did not find an entry for validator 1's address ${val1Address}`
+      )
+      assert(
+        // @ts-ignore enode is not in the type definition
+        getEnodeNoPort(val1EntryInVal0ValEnodeTable.enode) === val1EnodeNoPort,
+        "Enode for validator 1 in validator 0's valEnodeTable is incorrect"
       )
 
       // validator 0 still has its valEnodeTable, so it will try to connect to
@@ -90,14 +111,14 @@ describe('Validator handshake tests', () => {
       assert(val0Peer, "Could not find validator 0 in validator 1's peers")
       assert(val0Peer.network.inbound, 'Validator 0 peer to validator 1 is not inbound')
 
-      const val1ValEnodeTable = (await jsonRpc(val1Web3, 'istanbul_getValEnodeTable', [])).result
+      const val1ValEnodeTable = await jsonRpc(val1Web3, 'istanbul_getValEnodeTable', [])
       const val0Address = await val0Web3.eth.getCoinbase()
 
       const entry = getValEnodeTableEntry(val1ValEnodeTable, val0Address)
       assert(entry, `Did not find an entry for validator 0's address ${val0Address}`)
       assert(
         // @ts-ignore enode is not in the type definition
-        entry.enode === val0EnodeAfter,
+        getEnodeNoPort(entry.enode) === val0EnodeNoPort,
         "Enode for validator 0 in validator 1's valEnodeTable is incorrect"
       )
     })
@@ -109,15 +130,18 @@ describe('Validator handshake tests', () => {
       this.retries(2)
 
       const proxiedValIndex = VALIDATORS - PROXIED_VALIDATORS
-      const proxiedValProvider = `http://localhost:${gethConfig.instances[proxiedValIndex].rpcport}`
+      const proxiedValProvider = getProvider(gethConfig.instances, `validator${proxiedValIndex}`)
+      assert(proxiedValProvider, 'Could not find proxied validator provider')
       const proxiedValWeb3 = new Web3(proxiedValProvider)
       const proxiedValAddress = await proxiedValWeb3.eth.getCoinbase()
 
       const proxyIndex = VALIDATORS - PROXIED_VALIDATORS + 1
-      const proxyProvider = `http://localhost:${gethConfig.instances[proxyIndex].rpcport}`
+      const proxyProvider = getProvider(gethConfig.instances, `proxy${proxiedValIndex}`)
+      assert(proxyProvider, 'Could not find proxy provider')
       const proxyAdmin = new Admin(proxyProvider)
 
-      const val0Provider = `http://localhost:${gethConfig.instances[0].rpcport}`
+      const val0Provider = getProvider(gethConfig.instances, `validator0`)
+      assert(val0Provider, 'Could not find validator 0 provider')
       const val0Admin = new Admin(val0Provider)
       const val0Web3 = new Web3(val0Provider)
 
@@ -125,7 +149,7 @@ describe('Validator handshake tests', () => {
       gethConfig.instances[proxyIndex].privateKey =
         '26ad9dc2a8adcacdf3427e185ea358ba80aa3f205c8b7766acb16cd2beb1492a'
       gethConfig.instances[0].maxPeers = 0
-      configureInstances(gethConfig)
+      setProxyConfigurations(gethConfig)
 
       // Stop validator 1 so it cannot share the new proxy enode via the normal announce protocol.
       // This leaves us with only validator 0, the proxied validator, and the proxy
@@ -135,7 +159,7 @@ describe('Validator handshake tests', () => {
       // It will still have its valEnodeTable, which will still have the old entry
       // for the proxied validator
       await restartInstance(gethConfig, gethConfig.instances[0])
-      let val0ValEnodeTable = (await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])).result
+      let val0ValEnodeTable = await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])
       let val0ProxiedValEntry = getValEnodeTableEntry(val0ValEnodeTable, proxiedValAddress)
       assert(val0ProxiedValEntry, 'No entry in restarted validator 0 for old proxied validator')
 
@@ -144,7 +168,7 @@ describe('Validator handshake tests', () => {
       // incorrect enode, so at this point the proxy does not have any proof
       // it is on behalf of the proxied validator.
       await restartInstance(gethConfig, gethConfig.instances[proxyIndex])
-      val0ValEnodeTable = (await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])).result
+      val0ValEnodeTable = await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])
       let val0ProxiedValEntryOld = val0ProxiedValEntry
       val0ProxiedValEntry = getValEnodeTableEntry(val0ValEnodeTable, proxiedValAddress)
       assert(
@@ -166,7 +190,7 @@ describe('Validator handshake tests', () => {
       // tried to connect to validator 0 at start up, but been rejected because
       // the proxy was not connected to its proxied validator. This 30 seconds
       // waits for the proxy to retry connecting to proxy 0.
-      await sleep(30000)
+      await sleep(30)
 
       const val0Peers = await val0Admin.getPeers()
       const proxyEnodeNoPort = getEnodeNoPort((await proxyAdmin.getNodeInfo()).enode)
@@ -191,9 +215,8 @@ function getInstances() {
     port: 30303 + 3 * i,
     rpcport: 8545 + 2 * i,
     lightserv: false,
-    setNodeKey: false,
   }))
-
+  // Create the last PROXIED_VALIDATORS validators with their own proxies
   for (let i = VALIDATORS - PROXIED_VALIDATORS; i < VALIDATORS; i++) {
     instances.push({
       name: `validator${i}`,
@@ -204,7 +227,6 @@ function getInstances() {
       lightserv: false,
       proxy: `proxy${i}`,
       isProxied: true,
-      setNodeKey: false,
     })
     instances.push({
       name: `proxy${i}`,
@@ -215,10 +237,18 @@ function getInstances() {
       rpcport: 8545 + 2 * i + 1,
       lightserv: false,
       isProxy: true,
-      setNodeKey: true,
     })
   }
   return instances
+}
+
+function getProvider(instances: GethInstanceConfig[], targetName: string) {
+  for (const instance of instances) {
+    if (instance.name === targetName && instance.rpcport) {
+      return `http://localhost:${instance.rpcport}`
+    }
+  }
+  return ''
 }
 
 function getEnodeNoPort(fullEnode: string) {
