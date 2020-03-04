@@ -31,7 +31,7 @@ async function fetchAllies(category: Category) {
   return getAirtable(SHEET)
     .select({
       filterByFormula: `AND(${IS_APROVED},SEARCH("${category}", {${CATEGORY_FIELD}}))`,
-      fields: ['Name', 'Approved', CATEGORY_FIELD, LOGO_FIELD],
+      fields: ['Name', 'Approved', CATEGORY_FIELD, LOGO_FIELD, URL_FIELD],
       view: 'Alliance Web',
     })
     .all()
