@@ -9,6 +9,7 @@ import { NameSpaces, Trans, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
+import Outbound from 'src/shared/Outbound'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 async function gatherAllies(persistFunc: (data: []) => void) {
@@ -136,7 +137,7 @@ function Category({ name, members }: CategoryProps) {
   )
 }
 
-const Member = React.memo(function _Member({ logo, name }: Ally) {
+const Member = React.memo(function _Member({ logo, name, url }: Ally) {
   return (
     <View style={styles.member}>
       {logo ? (
@@ -152,16 +153,19 @@ const Member = React.memo(function _Member({ logo, name }: Ally) {
           )}
         </LazyFade>
       ) : (
-        <PlaceHolder text={name} />
+        <PlaceHolder text={name} url={url} />
       )}
+      {url && <Outbound url={url} />}
     </View>
   )
 })
 
-function PlaceHolder({ text }) {
+function PlaceHolder({ text, url }) {
   return (
-    <View style={standardStyles.centered}>
-      <Text style={[fonts.legal, textStyles.center]}>{text}</Text>
+    <View style={[standardStyles.centered, styles.logo]}>
+      <Text href={url} style={[fonts.legal, textStyles.center]}>
+        {text}
+      </Text>
     </View>
   )
 }
