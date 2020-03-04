@@ -8,23 +8,23 @@
 
 ### Properties
 
-* [feeCurrency](_kit_.kitoptions.md#feecurrency)
-* [from](_kit_.kitoptions.md#from)
+* [feeCurrency](_kit_.kitoptions.md#optional-feecurrency)
+* [from](_kit_.kitoptions.md#optional-from)
 * [gasInflationFactor](_kit_.kitoptions.md#gasinflationfactor)
 
 ## Properties
 
-###  feeCurrency
+### `Optional` feeCurrency
 
-• **feeCurrency**: *[Address](../modules/_base_.md#address) | null*
+• **feeCurrency**? : *[Address](../modules/_base_.md#address)*
 
 *Defined in [contractkit/src/kit.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L67)*
 
 ___
 
-###  from
+### `Optional` from
 
-• **from**: *[Address](../modules/_base_.md#address) | null*
+• **from**? : *[Address](../modules/_base_.md#address)*
 
 *Defined in [contractkit/src/kit.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L68)*
 
