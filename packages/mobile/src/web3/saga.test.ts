@@ -5,8 +5,6 @@ import { navigateToError } from 'src/navigator/NavigationService'
 import { completeWeb3Sync, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
   checkWeb3SyncProgress,
-  getDecryptedData,
-  getEncryptedData,
   getOrCreateAccount,
   SYNC_TIMEOUT,
   waitForWeb3Sync,
@@ -97,17 +95,5 @@ describe(checkWeb3SyncProgress, () => {
       .put(completeWeb3Sync(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)
       .run()
-  })
-})
-
-describe(getEncryptedData, () => {
-  it('encrypts and decrypts correctly', () => {
-    const data = 'testing data'
-    const password = 'a random password'
-    const encryptedBuffer: Buffer = getEncryptedData(data, password)
-    console.debug(`Encrypted data is ${encryptedBuffer.toString('hex')}`)
-    const decryptedData: string = getDecryptedData(encryptedBuffer, password)
-    console.debug(`Decrypted data is \"${decryptedData}\"`)
-    expect(decryptedData).toBe(data)
   })
 })

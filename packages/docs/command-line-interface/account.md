@@ -268,6 +268,7 @@ USAGE
   $ celocli account:register-metadata
 
 OPTIONS
+  --force                                            Ignore metadata validity checks
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
   --url=https://www.celo.org                         (required) The url to the metadata you want to register
 

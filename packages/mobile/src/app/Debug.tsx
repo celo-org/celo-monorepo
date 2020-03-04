@@ -9,8 +9,8 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import { getLatestBlock } from 'src/web3/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { getLatestBlock } from 'src/web3/utils'
 
 interface State {
   reactNativeLogs: string
