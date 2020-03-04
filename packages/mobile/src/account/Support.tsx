@@ -3,27 +3,20 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Linking, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import SettingsItem from 'src/account/SettingsItem'
+import { FAQ_LINK, FORUM_LINK } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import Logger from 'src/utils/Logger'
+import { navigateToURI } from 'src/utils/linking'
 
-const openExternalLink = (link: string) => {
-  return async () => {
-    try {
-      await Linking.openURL(link)
-    } catch (e) {
-      Logger.error('Support/openExternalLink', '', e)
-    }
-  }
-}
+const openExternalLink = (link: string) => () => navigateToURI(link)
 
 const onPressContact = () => {
-  navigate(Screens.Contact)
+  navigate(Screens.SupportContact)
 }
 
 const Support = () => {
@@ -31,15 +24,20 @@ const Support = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.containerList}>
-        <SettingsItem title={t('webFaq')} onPress={openExternalLink('https://celo.org/faq')} />
         <SettingsItem
+          testID="WebFAQLink"
+          title={t('webFaq')}
+          onPress={openExternalLink(FAQ_LINK)}
+        />
+        <SettingsItem
+          testID="ForumLink"
           title={t('forum')}
-          onPress={openExternalLink('https://forum.celo.org/c/support')}
+          onPress={openExternalLink(FORUM_LINK)}
         />
       </View>
       <View style={styles.contactUs}>
-        <Text style={fontStyles.body}>{t('contactText')}</Text>
-        <Link onPress={onPressContact} style={styles.contactLink}>
+        <Text style={fontStyles.body}>{t('contactText')} </Text>
+        <Link onPress={onPressContact} testID="SupportContactLink" style={styles.contactLink}>
           {t('contactUs')}
         </Link>
       </View>
@@ -64,12 +62,10 @@ const styles = StyleSheet.create({
   },
   contactUs: {
     marginTop: 30,
-    alignItems: 'center',
+    paddingLeft: 30,
   },
   contactLink: {
-    ...fontStyles.bodyBold,
-    color: colors.celoGreen,
-    textDecorationLine: 'none',
+    ...fontStyles.body,
   },
 })
 

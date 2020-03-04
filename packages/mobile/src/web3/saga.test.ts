@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, delay, select } from 'redux-saga/effects'
-import { pincodeTypeSelector } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/selectors'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { completeWeb3Sync, updateWeb3SyncProgress } from 'src/web3/actions'
 import {

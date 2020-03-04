@@ -47,7 +47,7 @@ export enum Screens {
   Language = 'Language',
   Licenses = 'Licenses',
   Support = 'Support',
-  Contact = 'Contact',
+  SupportContact = 'SupportContact',
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
   OutgoingPaymentRequestListScreen = 'OutgoingPaymentRequestListScreen',
   EscrowedPaymentListScreen = 'EscrowedPaymentListScreen',

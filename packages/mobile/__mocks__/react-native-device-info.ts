@@ -23,7 +23,7 @@ export default {
   getTimezone: jest.fn(),
   getUniqueID: jest.fn(),
   getUserAgent: jest.fn(),
-  getVersion: jest.fn(),
+  getVersion: jest.fn(() => 'appVersion'),
   hasNotch: () => true,
   is24Hour: () => false,
   isEmulator: () => true,

@@ -55,7 +55,7 @@ export class Debug extends React.Component<RootState, State> {
   }
 
   onClickEmailLogs = async () => {
-    navigate(Screens.Contact)
+    navigate(Screens.SupportContact)
   }
 
   render() {

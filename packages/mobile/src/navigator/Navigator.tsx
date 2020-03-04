@@ -13,7 +13,6 @@ import {
 } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
-import Contact from 'src/account/Contact'
 import DataSaver from 'src/account/DataSaver'
 import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
@@ -26,6 +25,7 @@ import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import Security from 'src/account/Security'
 import Support from 'src/account/Support'
+import SupportContact from 'src/account/SupportContact'
 import AppLoading from 'src/app/AppLoading'
 import Background from 'src/app/Background'
 import Debug from 'src/app/Debug'
@@ -269,7 +269,7 @@ const SettingsStack = createStackNavigator(
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
     [Screens.Support]: { screen: Support },
-    [Screens.Contact]: { screen: Contact },
+    [Screens.SupportContact]: { screen: SupportContact },
     [Screens.FiatExchange]: { screen: FiatExchange },
     ...verificationScreens,
   },

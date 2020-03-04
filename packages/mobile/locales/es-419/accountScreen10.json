@@ -41,12 +41,12 @@
   "version": "Versión:",
   "addressCopied": "Dirección copiada al portapapeles",
   "support": "Apoyo",
-  "contact": "Contact",
-  "webFaq": "Web FAQ",
+  "contact": "Contacto",
+  "webFaq": "FAQ la web",
   "forum": "Forum",
-  "contactText": "Can’t find what you’re looking for?",
-  "contactUs": "Contact Us",
-  "tellUsMore": "Tell us more",
-  "attachLogs": "Attach logs",
-  "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with Celo Support."
+  "contactText": "¿No puede encontrar lo que está buscando?",
+  "contactUs": "Contáctenos",
+  "tellUsMore": "Cuéntanos más",
+  "attachLogs": "Adjuntar registros",
+  "supportLegalCheckbox": "Al enviar, acepto compartir la información anterior y cualquier dato de registro de la aplicación adjunta con Celo Support."
 }

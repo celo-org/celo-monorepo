@@ -7,12 +7,12 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import Mailer from 'react-native-mail'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useSelector } from 'react-redux'
-import { getE164PhoneNumber } from 'src/account/selectors'
+import { e164NumberSelector } from 'src/account/selectors'
 import { CELO_SUPPORT_EMAIL_ADDRESS } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -34,9 +34,11 @@ const Support = () => {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [message, setMessage] = useState('')
   const [attachLogs, setAttachLogs] = useState(true)
-  const e164PhoneNumber = useSelector(getE164PhoneNumber)
+  const [inProgress, setInProgress] = useState(false)
+  const e164PhoneNumber = useSelector(e164NumberSelector)
 
   const sendEmail = useCallback(async () => {
+    setInProgress(true)
     const deviceInfo = {
       version: DeviceInfo.getVersion(),
       buildNumber: DeviceInfo.getBuildNumber(),
@@ -59,13 +61,15 @@ const Support = () => {
           type: 'text', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
           name: '', // Optional: Custom filename for attachment
         }
-        email.body += '<br/><br/><b>Support logs are attached...</b>'
+        email.body += (email.body ? '<br/><br/>' : '') + '<b>Support logs are attached...</b>'
       }
     }
+    setInProgress(false)
     Mailer.mail(email, (error: any, event: any) => {
       Logger.showError(error + ' ' + event)
     })
   }, [message, attachLogs, e164PhoneNumber])
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.innerContainer}>
@@ -74,7 +78,7 @@ const Support = () => {
           onChangeText={setMessage}
           value={message}
           multiline={true}
-          style={styles.nameInputField}
+          style={styles.messageTextInput}
           placeholderTextColor={colors.inactive}
           underlineColorAndroid="transparent"
           numberOfLines={10}
@@ -84,21 +88,32 @@ const Support = () => {
         />
         <View style={styles.spacer}>
           <View style={styles.attachLogs}>
-            <Switch style={styles.logsSwitch} value={attachLogs} onValueChange={setAttachLogs} />
+            <Switch
+              testID="SwitchLogs"
+              style={styles.logsSwitch}
+              value={attachLogs}
+              onValueChange={setAttachLogs}
+            />
             <Text style={fontStyles.body}>{t('attachLogs')}</Text>
           </View>
         </View>
+        {inProgress && (
+          <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
+            <ActivityIndicator size="large" color={colors.celoGreen} />
+          </View>
+        )}
+
         <View>
           <Text style={fontStyles.body}>{t('supportLegalCheckbox')}</Text>
         </View>
       </ScrollView>
       <Button
-        disabled={false}
+        disabled={!message || inProgress}
         onPress={sendEmail}
         text={t('global:submit')}
         standard={false}
         type={BtnTypes.PRIMARY}
-        testID="ImportWalletSocialButton"
+        testID="SubmitContactForm"
       />
       <KeyboardSpacer />
     </SafeAreaView>
@@ -150,7 +165,7 @@ const styles = StyleSheet.create({
     color: colors.celoGreen,
     textDecorationLine: 'none',
   },
-  nameInputField: {
+  messageTextInput: {
     marginTop: 10,
     alignItems: 'flex-start',
     borderColor: colors.inputBorder,
@@ -164,6 +179,9 @@ const styles = StyleSheet.create({
   headerText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
+  },
+  loadingSpinnerContainer: {
+    marginVertical: 20,
   },
 })
 

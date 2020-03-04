@@ -8,7 +8,7 @@ import {
   SignTxResponseSuccess,
 } from '@celo/utils/src/dappkit'
 import { call, select, takeLeading } from 'redux-saga/effects'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
