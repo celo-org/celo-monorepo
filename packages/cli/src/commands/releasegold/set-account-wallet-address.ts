@@ -39,7 +39,7 @@ export default class SetAccountWalletAddress extends BaseCommand {
     )
     const isRevoked = await releaseGoldWrapper.isRevoked()
 
-    const checkBuilder = await newCheckBuilder(this)
+    const checkBuilder = newCheckBuilder(this)
       .isAccount(releaseGoldWrapper.address)
       .addCheck('Contract is not revoked', () => !isRevoked)
 
