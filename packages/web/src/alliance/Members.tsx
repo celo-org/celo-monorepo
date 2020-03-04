@@ -145,8 +145,9 @@ const Member = React.memo(function _Member({ logo, name, url }: Ally) {
           {(onLoad: () => void) => (
             <Image
               resizeMode="contain"
+              resizeMethod="resize"
               onLoad={onLoad}
-              source={{ uri: logo }}
+              source={{ uri: logo.uri }}
               accessibilityLabel={name}
               style={styles.logo}
             />
@@ -184,7 +185,9 @@ const styles = StyleSheet.create({
     minHeight: 90,
   },
   member: {
+    flexDirection: 'row',
     alignItems: 'center',
+    alignContent: 'center',
     justifyContent: 'center',
     marginHorizontal: 20,
     marginVertical: 20,
@@ -194,6 +197,7 @@ const styles = StyleSheet.create({
   logo: {
     backgroundColor: colors.white,
     marginHorizontal: 10,
+    padding: 5,
     width: 150,
     height: 50,
   },

@@ -36,11 +36,15 @@ export enum ImageSizes {
 }
 
 export function getImageURI(previewField: Attachment[], size: ImageSizes) {
-  return (
-    (previewField &&
-      previewField[0] &&
-      previewField[0].thumbnails &&
-      previewField[0].thumbnails[size].url) ||
-    ''
-  )
+  const thumb = getThumbnail(previewField, size)
+  return thumb ? thumb.url : ''
+}
+
+export function getImageRatio(imageField: Attachment[]) {
+  const thumb = getThumbnail(imageField, ImageSizes.large)
+  return thumb ? thumb.width / thumb.height : 1
+}
+
+function getThumbnail(imageField: Attachment[], size: ImageSizes) {
+  return imageField && imageField[0] && imageField[0].thumbnails && imageField[0].thumbnails[size]
 }

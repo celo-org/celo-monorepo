@@ -2,7 +2,7 @@ import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
 import Ally from 'src/alliance/AllianceMember'
 import { Category } from 'src/alliance/CategoryEnum'
-import airtableInit, { getImageURI, ImageSizes } from './airtable'
+import airtableInit, { getImageRatio, getImageURI, ImageSizes } from './airtable'
 import { cache } from './cache'
 
 const CATEGORY_FIELD = 'Web Category*'
@@ -49,8 +49,10 @@ const IS_APROVED = 'Approved=1'
 function normalize(asset: Fields): Ally {
   return {
     name: asset.Name,
-    logo: getImageURI(asset['Logo Upload'], ImageSizes.large),
+    logo: {
+      uri: getImageURI(asset['Logo Upload'], ImageSizes.large),
+      ratio: getImageRatio(asset['Logo Upload']),
+    },
     url: asset[URL_FIELD],
-    // categories: asset[CATEGORY_FIELD],
   }
 }
