@@ -1284,7 +1284,7 @@ exports[`Experience/Brandkit renders 1`] = `
             }
           >
             <a
-              href="https://medium.com/CeloHQ"
+              href="https://medium.com/celoOrg"
               rel="noopener"
               style={
                 Object {
