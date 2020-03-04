@@ -4,7 +4,6 @@ import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-
 export default class CreateAccount extends BaseCommand {
   static description = 'Creates a new account for the ReleaseGold instance'
 

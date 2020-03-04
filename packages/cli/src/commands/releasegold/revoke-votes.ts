@@ -1,5 +1,5 @@
-import { newReleaseGold } from '@celo/contractkit/src/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/src/wrappers/ReleaseGold'
+import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
+import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'

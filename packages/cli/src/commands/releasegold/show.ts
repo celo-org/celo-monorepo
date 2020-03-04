@@ -1,9 +1,9 @@
-import { newReleaseGold } from '@celo/contractkit/src/generated/ReleaseGold'
+import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import {
   ReleaseGoldWrapper,
   ReleaseSchedule,
   RevocationInfo,
-} from '@celo/contractkit/src/wrappers/ReleaseGold'
+} from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'

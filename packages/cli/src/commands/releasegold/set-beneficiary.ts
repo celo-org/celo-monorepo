@@ -1,5 +1,5 @@
-import { newReleaseGold } from '@celo/contractkit/src/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/src/wrappers/ReleaseGold'
+import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
+import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
