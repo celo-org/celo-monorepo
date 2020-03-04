@@ -62,11 +62,21 @@ export function ExchangeFeedItem(props: Props) {
             />
           </View>
           <View style={styles.exchangeContainer}>
-            <CurrencyDisplay amount={makerAmount} hideSymbol={true} style={exchangeStyle} />
+            <CurrencyDisplay
+              amount={makerAmount}
+              useColors={true}
+              hideSymbol={true}
+              style={exchangeStyle}
+            />
             <View style={styles.arrow}>
               <ExchangeArrow />
             </View>
-            <CurrencyDisplay amount={takerAmount} hideSymbol={true} style={exchangeStyle} />
+            <CurrencyDisplay
+              amount={takerAmount}
+              useColors={true}
+              hideSymbol={true}
+              style={exchangeStyle}
+            />
           </View>
           <View style={styles.statusContainer}>
             {isPending && (
