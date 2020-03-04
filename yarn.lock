@@ -3169,24 +3169,6 @@
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
-"@celo/contractkit@0.2.14":
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.14.tgz#69242b40b575fdc68547ea2dd376532934dfd819"
-  integrity sha512-/EVfyieXwsWdDqHEJ/cYC58N300IGg9o1I1n17xEgB6C3uQEJxvTBTAJxwZezfrXa5eqv67f5/O5m68wN70p6g==
-  dependencies:
-    "@celo/utils" "0.1.7"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^7.2.0"
-    cross-fetch "3.0.4"
-    debug "^4.1.1"
-    eth-lib "^0.2.8"
-    fp-ts "2.1.1"
-    io-ts "2.0.1"
-    web3 "1.0.0-beta.37"
-    web3-core-helpers "1.0.0-beta.37"
-    web3-eth-abi "1.0.0-beta.37"
-    web3-utils "1.0.0-beta.37"
-
 "@celo/contractkit@0.2.9":
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.9.tgz#98c61e2f6a7f5d47dab43d1cf6b04c48d05acc13"
@@ -3301,28 +3283,6 @@
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.6.tgz#a3d30ba7f2a8556669f7517791f75b0767d13122"
   integrity sha512-uQqFEyYBTNioS5OZpjZwJHxoSETZrsrOa8EPcRDPRdwHDn+aN2dlVxYiNdDYy4oOxMVU7vuoollB0dXCKjmYag==
-  dependencies:
-    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
-    bigi "^1.1.0"
-    bignumber.js "^7.2.0"
-    bls12377js "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
-    bn.js "4.11.8"
-    buffer-reverse "^1.0.1"
-    country-data "^0.0.31"
-    crypto-js "^3.1.9-1"
-    elliptic "^6.4.1"
-    ethereumjs-util "^5.2.0"
-    futoin-hkdf "^1.0.3"
-    google-libphonenumber "^3.2.4"
-    keccak256 "^1.0.0"
-    lodash "^4.17.14"
-    numeral "^2.0.6"
-    web3-utils "1.0.0-beta.37"
-
-"@celo/utils@0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.7.tgz#f3c133d1a09ab88e6cfe38f451378c9933a8c661"
-  integrity sha512-gzyYSxDo7tMWIpBQJglNGv9r/unqlZDDFoWJOuyDu2PRX+wYJiM682xxEsPcDGddzlVUqqV8ZfYN/MCJvMYK3w==
   dependencies:
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"

@@ -278,15 +278,14 @@ export class ContractKit {
   }
 
   private fillTxDefaults(tx?: Tx): Tx {
-    const auxFrom = this.config.from ? this.config.from : undefined
+    const from = this.config.from ? this.config.from : undefined
+    const feeCurrency = this.config.feeCurrency ? this.config.feeCurrency : undefined
+
     const defaultTx: Tx = {
-      from: auxFrom,
+      from,
+      feeCurrency,
       // gasPrice:0 means the node will compute gasPrice on it's own
       gasPrice: '0',
-    }
-
-    if (this.config.feeCurrency) {
-      defaultTx.feeCurrency = this.config.feeCurrency
     }
 
     return {
