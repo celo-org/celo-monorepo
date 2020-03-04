@@ -4,7 +4,7 @@ import Fade from 'react-reveal/Fade'
 import Affirmations from 'src/alliance/Affirmations'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'
-import { allianceOG } from 'src/alliance/images/index'
+import { aguaComunidad, allianceOG, fences } from 'src/alliance/images'
 import Members from 'src/alliance/Members'
 import PinWheel from 'src/alliance/PinWheel'
 import WheelWithForm from 'src/alliance/RisingPinWheelForm'
@@ -70,9 +70,19 @@ export default function Main() {
         </GridRow>
       </View>
       <Affirmations />
-      <BeautifulQuote />
+      <BeautifulQuote
+        color={colors.white}
+        imgSource={aguaComunidad}
+        quote={'"Viva La Local"'}
+        citation={'who said it'}
+      />
       <Members />
-      <BeautifulQuote />
+      <BeautifulQuote
+        color={colors.dark}
+        imgSource={fences}
+        quote={'"Just Do It"'}
+        citation={'Nike'}
+      />
       <ArticleData title={t('mediumArticlesTitle')} />
       <Benefits />
       <WheelWithForm />

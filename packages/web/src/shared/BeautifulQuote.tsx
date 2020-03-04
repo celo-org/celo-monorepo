@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { ImageBackground, ImageSourcePropType, StyleSheet, Text } from 'react-native'
 import { useScreenSize } from 'src/layout/ScreenSize'
-import { fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
   imgSource: ImageSourcePropType
   quote: React.ReactNode
   citation: React.ReactNode
+  color?: colors
 }
 
 export default React.memo(function BeautifulQuote(props: Props) {
@@ -23,6 +24,7 @@ export default React.memo(function BeautifulQuote(props: Props) {
           isMobile ? styles.quoteMobile : styles.quote,
           textStyles.invert,
           textStyles.center,
+          props.color && { color: props.color },
         ]}
       >
         {props.quote}
@@ -33,6 +35,7 @@ export default React.memo(function BeautifulQuote(props: Props) {
           textStyles.invert,
           textStyles.center,
           standardStyles.blockMarginTopTablet,
+          props.color && { color: props.color },
         ]}
       >
         {props.citation}
