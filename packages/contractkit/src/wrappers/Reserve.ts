@@ -4,9 +4,9 @@ import { Reserve } from '../generated/types/Reserve'
 import {
   BaseWrapper,
   proxyCall,
+  toTransactionObject,
   valueToBigNumber,
   valueToString,
-  toTransactionObject,
 } from './BaseWrapper'
 
 export interface ReserveConfig {

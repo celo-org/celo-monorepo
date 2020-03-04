@@ -11,7 +11,7 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-//TODO @amyslawson has to register address for contractKit -- see if this is necessary
+// TODO @amyslawson has to register address for contractKit -- see if this is necessary
 module.exports = deploymentForCoreContract<ReserveSpenderMultiSigInstance>(
   web3,
   artifacts,

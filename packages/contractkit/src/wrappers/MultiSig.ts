@@ -1,6 +1,6 @@
-import { BaseWrapper, proxySend, stringToBytes, proxyCall } from './BaseWrapper'
 import { Address } from '../base'
 import { MultiSig } from '../generated/types/MultiSig'
+import { BaseWrapper, proxyCall, proxySend, stringToBytes } from './BaseWrapper'
 
 export type SubmitTransactionsParams = Parameters<MultiSig['methods']['submitTransaction']>
 export const submitTransactionsParams = (

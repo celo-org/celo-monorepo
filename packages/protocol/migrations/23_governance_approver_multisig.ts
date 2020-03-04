@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { transferOwnershipOfProxy, deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
+import { deploymentForCoreContract, transferOwnershipOfProxy } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { GovernanceApproverMultiSigInstance } from 'types'
 
@@ -11,7 +11,7 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-//TODO @amyslawson has to register address for contractKit -- see if this is necessary
+// TODO @amyslawson has to register address for contractKit -- see if this is necessary
 module.exports = deploymentForCoreContract<GovernanceApproverMultiSigInstance>(
   web3,
   artifacts,
