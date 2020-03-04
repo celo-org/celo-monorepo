@@ -317,7 +317,7 @@ ___
 
 ###  getPendingWithdrawals
 
-▸ **getPendingWithdrawals**(`account`: string): *Promise‹PendingWithdrawal[]›*
+▸ **getPendingWithdrawals**(`account`: string): *Promise‹[PendingWithdrawal](../interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)[]›*
 
 *Defined in [contractkit/src/wrappers/LockedGold.ts:188](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L188)*
 
@@ -329,7 +329,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `account` | string | The address of the account. |
 
-**Returns:** *Promise‹PendingWithdrawal[]›*
+**Returns:** *Promise‹[PendingWithdrawal](../interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)[]›*
 
 The value and timestamp for each pending withdrawal.
 
