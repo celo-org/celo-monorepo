@@ -323,7 +323,7 @@ class CheckBuilder {
       `Account isn't a member of a validator group`,
       this.withValidators(async (v, _signer, account) => {
         const { affiliation } = await v.getValidator(account)
-        if (eqAddress(affiliation!, NULL_ADDRESS)) {
+        if (!affiliation || eqAddress(affiliation, NULL_ADDRESS)) {
           return true
         }
         const { members } = await v.getValidatorGroup(affiliation!)
