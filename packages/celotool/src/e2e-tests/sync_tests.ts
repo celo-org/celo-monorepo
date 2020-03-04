@@ -1,9 +1,9 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { connectPeers, initAndStartGeth } from '../lib/geth'
+import { connectPeers, initAndStartGeth, tailLogFile } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+import { getHooks, killInstance, waitForBlock, waitToFinishInstanceSyncing } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -62,7 +62,7 @@ describe('sync tests', function(this: any) {
 
   before(async () => {
     // Start validator nodes and migrate contracts.
-    await hooks.before()
+    // await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
 
@@ -88,9 +88,25 @@ describe('sync tests', function(this: any) {
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'lightest',
         }
-        await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncNode, verbose)
-        await connectPeers([fullNode, syncNode], verbose)
-        await waitToFinishInstanceSyncing(syncNode)
+        const retries = 3
+        for (let i = 1; i <= retries; i++) {
+          try {
+            await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncNode, verbose)
+            await connectPeers([fullNode, syncNode], verbose)
+            await waitToFinishInstanceSyncing(syncNode)
+            break
+          } catch (error) {
+            console.info(`Syncmode ${syncmode} error: ${error}`)
+            console.info(await tailLogFile(gethConfig.runPath, syncNode, 50))
+            if (i == retries) {
+              console.info(`Retrying ${i}/${retries} ...`)
+              killInstance(syncNode)
+              continue
+            } else {
+              throw error
+            }
+          }
+        }
       })
 
       afterEach(() => killInstance(syncNode))
@@ -98,12 +114,13 @@ describe('sync tests', function(this: any) {
       it('should sync the latest block', async () => {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
         const validatingFirstBlock = await validatingWeb3.eth.getBlockNumber()
-        // Give the validators time to create more blocks.
-        await sleep(20, true)
+        await waitForBlock(validatingWeb3, validatingFirstBlock + 1)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
-        await sleep(20, true)
+
         const syncWeb3 = new Web3(`http://localhost:8555`)
+        await waitForBlock(syncWeb3, validatingFirstBlock + 1)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
+
         assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.
         assert.isAbove(validatingLatestBlock, validatingFirstBlock)
@@ -129,11 +146,12 @@ describe('sync tests', function(this: any) {
       await initAndStartGeth(gethConfig, hooks.gethBinaryPath, additionalInstance, verbose)
       await connectPeers([gethConfig.instances[0], additionalInstance], verbose)
       await waitToFinishInstanceSyncing(additionalInstance)
-      await sleep(180, true) // wait for round change / resync
+
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
-      for (let i = 0; i < gethConfig.instances.length; i++) {
-        if ((await web3.eth.getBlock(currentBlock.number - i)).miner === address) {
+      for (let i = 1; i < 500; i++) {
+        await waitForBlock(web3, currentBlock.number + i)
+        if ((await web3.eth.getBlock(currentBlock.number + i)).miner === address) {
           return // A block proposed by validator who lost randomness was found, hence randomness was recovered
         }
       }

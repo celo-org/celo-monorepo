@@ -43,6 +43,24 @@ export async function waitToFinishSyncing(web3: any) {
   }
 }
 
+export async function waitForBlock(web3: Web3, blockNumber: number) {
+  // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
+  let currentBlock: number
+  do {
+    currentBlock = await web3.eth.getBlockNumber()
+    await sleep(0.1)
+  } while (currentBlock < blockNumber)
+}
+
+export async function waitForEpochTransition(web3: Web3, epoch: number) {
+  // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
+  let blockNumber: number
+  do {
+    blockNumber = await web3.eth.getBlockNumber()
+    await sleep(0.1)
+  } while (blockNumber % epoch !== 1)
+}
+
 export function assertAlmostEqual(
   actual: BigNumber,
   expected: BigNumber,
@@ -64,12 +82,27 @@ export function assertAlmostEqual(
 
 export async function killBootnode() {
   console.info(`Killing the bootnode`)
-  await spawnCmd('pkill', ['-SIGINT', 'bootnode'], { silent: true })
+  await shutdownOrKill('bootnode')
 }
 
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
-  await spawnCmd('pkill', ['-SIGINT', 'geth'], { silent: true })
+  await shutdownOrKill('geth')
+}
+
+export async function shutdownOrKill(processName: string) {
+  await spawnCmd('pkill', ['-SIGINT', processName], { silent: true })
+
+  let processRemaining = true
+  for (let i = 0; i < 15 && processRemaining; i++) {
+    await sleep(2)
+    const pgrepResult = await spawnCmd('pgrep', [processName], { silent: true })
+    processRemaining = pgrepResult === 0
+  }
+
+  if (processRemaining) {
+    await spawnCmd('pkill', ['-SIGKILL', processName], { silent: true })
+  }
 }
 
 export async function killInstance(instance: GethInstanceConfig) {
@@ -299,7 +332,6 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     }
 
     await killGeth()
-    await sleep(2)
 
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.

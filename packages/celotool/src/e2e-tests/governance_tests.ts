@@ -14,7 +14,13 @@ import Web3 from 'web3'
 import { connectPeers, connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { assertAlmostEqual, getHooks, sleep, waitToFinishInstanceSyncing } from './utils'
+import {
+  assertAlmostEqual,
+  getHooks,
+  sleep,
+  waitForEpochTransition,
+  waitToFinishInstanceSyncing,
+} from './utils'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -294,26 +300,6 @@ describe('governance tests', () => {
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
   }
 
-  /*
-  const waitForBlock = async (blockNumber: number) => {
-    // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-    let currentBlock: number
-    do {
-      currentBlock = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (currentBlock < blockNumber)
-  }
-  */
-
-  const waitForEpochTransition = async (epoch: number) => {
-    // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-    let blockNumber: number
-    do {
-      blockNumber = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (blockNumber % epoch !== 1)
-  }
-
   const assertTargetVotingYieldChanged = async (blockNumber: number, expected: BigNumber) => {
     const currentTarget = new BigNumber(
       (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
@@ -439,10 +425,10 @@ describe('governance tests', () => {
       assert.equal(epoch, 10)
 
       // Wait for an epoch transition so we can activate our vote.
-      await waitForEpochTransition(epoch)
+      await waitForEpochTransition(web3, epoch)
       await sleep(5.5)
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
-      await waitForEpochTransition(epoch)
+      await waitForEpochTransition(web3, epoch)
 
       const groupWeb3Url = 'ws://localhost:8555'
 
