@@ -14,8 +14,37 @@ class Text extends RNText {
   }
 }
 
+export interface CeloGroup {
+  elected: number
+  online: number
+  total: number
+  uptime: number
+  attestation: number
+  name: string
+  address: string
+  usd: number
+  gold: number
+  receivableVotes: string
+  votes: string
+  votesAbsolute: string
+  commission: number
+  rewards: number
+  rewardsStyle: any
+  numMembers: number
+  validators: Array<{
+    name: string
+    address: string
+    usd: number
+    gold: number
+    elected: boolean
+    online: boolean
+    uptime: number
+    attestation: number
+  }>
+}
+
 interface Props {
-  group: any
+  group: CeloGroup
   expanded: boolean
 }
 
@@ -53,10 +82,12 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
             <Text style={[styles.numberBlock]}>{group.numMembers}</Text>
           </Text>
           <Text style={[styles.tableCell, styles.sizeXL, styles.tableCellBars]}>
-            <Text style={[styles.tableCellBarsValue]}>{formatNumber(group.votesAbsolute, 1)}%</Text>
+            <Text style={[styles.tableCellBarsValue]}>
+              {formatNumber(+group.votesAbsolute, 1)}%
+            </Text>
             <Text style={[styles.tableCellBarsRows]}>
               <Text style={[styles.tableCellBarsRowValues]}>
-                {formatNumber(group.votes, 1)}% of {formatNumber(group.receivableVotes, 1)}%
+                {formatNumber(+group.votes, 1)}% of {formatNumber(+group.receivableVotes, 1)}%
               </Text>
               <ProgressCutBar
                 bars={Math.floor(+group.receivableVotes * 2) || 1}

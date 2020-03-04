@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js'
 import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
-import ValidatorsListRow from 'src/dev/ValidatorsListRow'
+import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -43,8 +43,42 @@ const HeaderCell = React.memo(function HeaderCellFn({
   )
 })
 
+interface CeloValidatorGroup {
+  account: {
+    address: string
+    lockedGold: string
+    name: string
+    usd: string
+  }
+  accumulatedActive: string
+  accumulatedRewards: string
+  affiliates: {
+    edges: Array<{
+      node: {
+        address: string
+        attestationsFulfilled: number
+        attestationsRequested: number
+        lastElected: number
+        lastOnline: number
+        lockedGold: string
+        name: string
+        score: string
+        usd: string
+      }
+    }>
+  }
+  commission: string
+  numMembers: number
+  receivableVotes: string
+  rewardsRatio: string
+  votes: string
+}
+
 interface ValidatorsListProps {
-  data: any
+  data: {
+    celoValidatorGroups: CeloValidatorGroup[]
+    latestBlock: number
+  }
   isLoading: boolean
 }
 
@@ -81,7 +115,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     attestation: (_) => _.attestation,
   }
   private defaultOrderAccessor = 'name'
-  private cachedCleanData
+  private cachedCleanData: CeloGroup[]
 
   expand(expanded: number) {
     if (this.state.expanded === expanded) {
@@ -99,7 +133,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     this.setState({ orderBy, orderAsc })
   }
 
-  cleanData({ celoValidatorGroups, latestBlock }: any) {
+  cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']) {
     if (this.cachedCleanData) {
       return this.cachedCleanData
     }
@@ -107,11 +141,11 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
       .map(({ receivableVotes }) => new BigNumber(receivableVotes))
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
-    this.cachedCleanData = celoValidatorGroups
+    const cleanData = celoValidatorGroups
       .map(
         ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
           const group = account
-          const rewards = rewardsRatio === null ? null : Math.round(rewardsRatio * 100 * 10) / 10
+          const rewards = rewardsRatio === null ? null : Math.round(+rewardsRatio * 100 * 10) / 10
           const rewardsStyle =
             rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
           const receivableVotesPer = new BigNumber(receivableVotes)
@@ -122,8 +156,8 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
           return {
             name: group.name,
             address: group.address,
-            usd: weiToDecimal(group.usd),
-            gold: weiToDecimal(group.lockedGold),
+            usd: weiToDecimal(+group.usd),
+            gold: weiToDecimal(+group.lockedGold),
             receivableVotes: receivableVotesPer.toString(),
             votes: votesPer.toString(),
             votesAbsolute: votesAbsolutePer.toString(),
@@ -146,8 +180,8 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
               return {
                 name,
                 address,
-                usd: weiToDecimal(usd),
-                gold: weiToDecimal(lockedGold),
+                usd: weiToDecimal(+usd),
+                gold: weiToDecimal(+lockedGold),
                 elected: lastElected >= latestBlock,
                 online: lastOnline >= latestBlock,
                 uptime: (+score * 100) / 10 ** 24,
@@ -176,16 +210,17 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
           ...data,
         }
       })
-    return this.cachedCleanData
+    this.cachedCleanData = cleanData
+    return cleanData
   }
 
-  sortData(data: any[]) {
+  sortData<T>(data: T[]): T[] {
     const { orderBy, orderAsc } = this.state
     const accessor = this.orderAccessors[orderBy]
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
-    return data
+    return (data || [])
       .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
       .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
   }
@@ -193,7 +228,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
   render() {
     const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
-    const validatorGroups = this.sortData(data ? this.cleanData(data) : [])
+    const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
     return (
       <View style={[styles.cover, styles.pStatic]}>
         <View style={[styles.pStatic]}>
