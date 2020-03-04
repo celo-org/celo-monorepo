@@ -37,17 +37,19 @@ export default class RegisterMetadata extends BaseCommand {
 
     const metadataURL = res.flags.url
 
-   if (!res.flags.force) {
-     try {
+    if (!res.flags.force) {
+      try {
         const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
         console.info('Metadata contains the following claims: \n')
         await displayMetadata(metadata, this.kit)
         console.info() // Print a newline.
       } catch (error) {
         console.error(`Metadata could not be retrieved from ${metadataURL}: ${error.toString()}`)
+        console.info('Exiting without performing changes...')
+        process.exit(-1)
       }
     }
-   
+
     const accounts = await this.kit.contracts.getAccounts()
     await displaySendTx('registerMetadata', accounts.setMetadataURL(metadataURL))
   }
