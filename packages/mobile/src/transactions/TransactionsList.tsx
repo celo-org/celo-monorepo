@@ -37,7 +37,7 @@ interface OwnProps {
 interface StateProps {
   address?: string | null
   standbyTransactions: StandbyTransaction[]
-  localCurrencyCode: LocalCurrencyCode | null
+  localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
 }
 
@@ -76,7 +76,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 function resolveAmount(
   moneyAmount: Pick<MoneyAmount, 'value' | 'currencyCode'>,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   exchangeRate: string | null | undefined
 ) {
   if (!localCurrencyCode || !exchangeRate) {
@@ -96,7 +96,7 @@ function resolveAmount(
 function mapExchangeStandbyToFeedItem(
   standbyTx: ExchangeStandby,
   currency: CURRENCY_ENUM,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   localCurrencyExchangeRate: string | null | undefined
 ): FeedItem {
   const { type, hash, status, timestamp, inValue, inSymbol, outValue, outSymbol } = standbyTx
@@ -158,7 +158,7 @@ function mapExchangeStandbyToFeedItem(
 
 function mapTransferStandbyToFeedItem(
   standbyTx: TransferStandby,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   localCurrencyExchangeRate: string | null | undefined
 ): FeedItem {
   const { type, hash, status, timestamp, value, symbol, address, comment } = standbyTx
@@ -186,7 +186,7 @@ function mapTransferStandbyToFeedItem(
 
 function mapStandbyTransactionToFeedItem(
   currency: CURRENCY_ENUM,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   localCurrencyExchangeRate: string | null | undefined
 ) {
   return (standbyTx: StandbyTransaction): FeedItem => {
