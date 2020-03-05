@@ -110,7 +110,6 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
   }
 }
 
-// TODO(Rossy) This is mostly duped by MoneyAmount, converge the two
 export default function CurrencyDisplay({
   type,
   size,
