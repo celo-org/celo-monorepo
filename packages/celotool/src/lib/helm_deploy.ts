@@ -278,13 +278,17 @@ export async function grantRoles(serviceAccountName: string, role: string) {
   return
 }
 
-export async function retrieveCloudSQLConnectionInfo(celoEnv: string, instanceName: string) {
+export async function retrieveCloudSQLConnectionInfo(
+  celoEnv: string,
+  instanceName: string,
+  dbSuffix: string
+) {
   await validateExistingCloudSQLInstance(instanceName)
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${celoEnv}-blockscout${dbSuffix} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${celoEnv}-blockscout${dbSuffix} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -583,6 +587,10 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
       'IN_MEMORY_DISCOVERY_TABLE',
+      'false'
+    )}`,
+    `--set geth.clean_validator_rountstate_folder=${fetchEnvOrFallback(
+      'CLEAN_VALIDATOR_ROUNTSTATE_FOLDER',
       'false'
     )}`,
     `--set geth.proxiedValidators=${fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')}`,

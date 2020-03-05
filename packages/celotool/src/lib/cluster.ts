@@ -45,6 +45,7 @@ export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction 
       `gcloud container clusters get-credentials ${kubernetesClusterName} --project ${projectName} --zone ${kubernetesClusterZone}`
     )
   }
+  await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
 }
 
 export async function createClusterIfNotExists() {
