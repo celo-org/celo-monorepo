@@ -17,7 +17,8 @@ export const builder = {}
 export const handler = async (argv: TestnetArgv) => {
   await switchToClusterFromEnv()
 
-  const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
+  const dbSuffix = fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')
+  const instanceName = `${argv.celoEnv}${dbSuffix}`
   const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
     'BLOCKSCOUT_DB_SUFFIX',
     ''
@@ -27,7 +28,7 @@ export const handler = async (argv: TestnetArgv) => {
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName,
-  ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName)
+  ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName, dbSuffix)
 
   // Install the blockscout package
   await installHelmChart(

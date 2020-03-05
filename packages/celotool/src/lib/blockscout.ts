@@ -68,6 +68,7 @@ async function helmParameters(
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
+    `--set blockscout.db.drop=${fetchEnvOrFallback('BLOCKSCOUT_DROP_DB', 'false')}`,
     `--set blockscout.replicas=${fetchEnv('BLOCKSCOUT_WEB_REPLICAS')}`,
     `--set blockscout.subnetwork="${fetchEnvOrFallback('BLOCKSCOUT_SUBNETWORK_NAME', celoEnv)}"`,
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,

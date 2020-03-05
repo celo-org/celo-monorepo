@@ -28,7 +28,8 @@ type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
 export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
 
-  const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
+  const dbSuffix = fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')
+  const instanceName = `${argv.celoEnv}${dbSuffix}`
   const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
     'BLOCKSCOUT_DB_SUFFIX',
     ''
@@ -38,7 +39,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName,
-  ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName)
+  ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName, dbSuffix)
 
   if (argv.reset === true) {
     console.info(
@@ -54,7 +55,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     console.info(`Delete blockscout-migration`)
     try {
       await execCmdWithExitOnFailure(
-        `kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`
+        `kubectl delete job ${argv.celoEnv}-blockscout${dbSuffix}-migration -n ${argv.celoEnv}`
       )
     } catch (error) {
       console.error(error)
