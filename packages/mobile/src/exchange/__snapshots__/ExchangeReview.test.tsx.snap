@@ -53,12 +53,12 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#42D689",
-                  },
-                  Object {
-                    "color": "#42D689",
                     "fontFamily": "Hind-Regular",
                     "fontSize": 24,
                     "lineHeight": 39,
+                  },
+                  Object {
+                    "color": "#42D689",
                   },
                 ]
               }
@@ -105,10 +105,10 @@ exports[`ExchangeReview renders correctly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
+                    undefined,
                     Object {
                       "color": undefined,
                     },
-                    undefined,
                   ]
                 }
               >
@@ -123,12 +123,12 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                  },
-                  Object {
-                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
                     "fontSize": 15,
                     "lineHeight": 24,
+                  },
+                  Object {
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -222,12 +222,12 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                  },
-                  Object {
-                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
                     "fontSize": 15,
                     "lineHeight": 24,
+                  },
+                  Object {
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -321,12 +321,12 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                  },
-                  Object {
-                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
                     "fontSize": 15,
                     "lineHeight": 24,
+                  },
+                  Object {
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -374,12 +374,12 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                  },
-                  Object {
-                    "color": "#2E3338",
                     "fontFamily": "Hind-Bold",
                     "fontSize": 16,
                     "lineHeight": 24,
+                  },
+                  Object {
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -413,10 +413,10 @@ exports[`ExchangeReview renders correctly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
+                    undefined,
                     Object {
                       "color": undefined,
                     },
-                    undefined,
                   ]
                 }
               >
@@ -432,12 +432,12 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#81868B",
-                  },
-                  Object {
-                    "color": "#81868B",
                     "fontFamily": "Hind-Regular",
                     "fontSize": 15,
                     "lineHeight": 24,
+                  },
+                  Object {
+                    "color": "#81868B",
                   },
                 ]
               }
@@ -544,10 +544,10 @@ exports[`ExchangeReview renders correctly 1`] = `
               numberOfLines={1}
               style={
                 Array [
+                  undefined,
                   Object {
                     "color": undefined,
                   },
-                  undefined,
                 ]
               }
             >

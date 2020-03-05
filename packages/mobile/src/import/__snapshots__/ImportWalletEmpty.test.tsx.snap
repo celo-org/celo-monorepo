@@ -43,13 +43,13 @@ exports[`ImportWalletEmpty renders correctly 1`] = `
         Array [
           Object {
             "color": "#2E3338",
-          },
-          Object {
-            "color": "#2E3338",
             "fontFamily": "Hind-Light",
             "fontSize": 22,
             "paddingBottom": 20,
             "textAlign": "center",
+          },
+          Object {
+            "color": "#2E3338",
           },
         ]
       }

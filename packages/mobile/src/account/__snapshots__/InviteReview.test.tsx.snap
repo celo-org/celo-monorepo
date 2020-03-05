@@ -210,27 +210,64 @@ exports[`InviteReview renders correctly 1`] = `
             </View>
             <View
               style={
-                Object {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "marginHorizontal": 25,
-                  "marginTop": 15,
-                }
+                Array [
+                  Object {
+                    "alignItems": "flex-start",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "marginTop": 5,
+                  },
+                  Object {
+                    "color": "#81868B",
+                    "marginTop": 15,
+                  },
+                ]
               }
             >
               <Text
-                ellipsizeMode="tail"
                 numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 48,
-                      "lineHeight": 64,
                     },
                     Object {
                       "color": "#81868B",
+                      "fontSize": 34,
+                    },
+                  ]
+                }
+              >
+                
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-Regular",
+                    },
+                    Object {
+                      "color": "#81868B",
+                      "fontSize": 24,
+                    },
+                  ]
+                }
+              >
+                $
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-Regular",
+                      "paddingHorizontal": 3,
+                    },
+                    Object {
+                      "color": "#81868B",
+                      "fontSize": 48,
+                      "lineHeight": 64,
                     },
                   ]
                 }
@@ -238,15 +275,20 @@ exports[`InviteReview renders correctly 1`] = `
                 0.33
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "alignSelf": "flex-end",
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 64,
-                    "marginLeft": 7,
-                  }
+                  Array [
+                    Object {
+                      "alignSelf": "flex-end",
+                      "fontFamily": "Hind-Regular",
+                      "marginLeft": 7,
+                    },
+                    Object {
+                      "color": "#81868B",
+                      "fontSize": 16,
+                      "lineHeight": 64,
+                    },
+                  ]
                 }
               >
                 MXN
@@ -322,7 +364,20 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
-                    0.25
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      0.25
+                    </Text>
                   </Text>
                 </View>
                 <Text
@@ -336,7 +391,23 @@ exports[`InviteReview renders correctly 1`] = `
                     }
                   }
                 >
-                  localValueHint
+                  @
+                   
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    $
+                    0.75
+                  </Text>
                 </Text>
                 <View
                   style={
@@ -378,7 +449,20 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
-                    0.25
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      0.25
+                    </Text>
                   </Text>
                 </View>
                 <View
@@ -469,7 +553,20 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
-                    0.001
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      -
+                      0.25
+                    </Text>
                   </Text>
                 </View>
                 <View
@@ -512,7 +609,20 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
-                    0.25
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      0.25
+                    </Text>
                   </Text>
                 </View>
               </View>

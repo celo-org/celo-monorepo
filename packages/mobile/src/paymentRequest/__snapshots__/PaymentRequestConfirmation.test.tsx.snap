@@ -213,23 +213,30 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
             </View>
             <View
               style={
-                Object {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "marginHorizontal": 25,
-                  "marginTop": 15,
-                }
+                Array [
+                  Object {
+                    "alignItems": "flex-start",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "marginTop": 5,
+                  },
+                  Object {
+                    "color": "#81868B",
+                    "marginTop": 15,
+                  },
+                ]
               }
             >
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
                     },
                     Object {
                       "color": "#81868B",
+                      "fontSize": 34,
                     },
                   ]
                 }
@@ -237,18 +244,17 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 +
               </Text>
               <Text
-                ellipsizeMode="tail"
                 numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 48,
-                      "lineHeight": 64,
+                      "paddingHorizontal": 3,
                     },
                     Object {
                       "color": "#81868B",
+                      "fontSize": 48,
+                      "lineHeight": 64,
                     },
                   ]
                 }
@@ -256,15 +262,20 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 13.30
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "alignSelf": "flex-end",
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 64,
-                    "marginLeft": 7,
-                  }
+                  Array [
+                    Object {
+                      "alignSelf": "flex-end",
+                      "fontFamily": "Hind-Regular",
+                      "marginLeft": 7,
+                    },
+                    Object {
+                      "color": "#81868B",
+                      "fontSize": 16,
+                      "lineHeight": 64,
+                    },
+                  ]
                 }
               >
                 MXN
@@ -358,7 +369,20 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       }
                     }
                   >
-                    10.00
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      10.00
+                    </Text>
                   </Text>
                 </View>
                 <Text
@@ -372,7 +396,23 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     }
                   }
                 >
-                  localValueHint
+                  @
+                   
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    $
+                    0.75
+                  </Text>
                 </Text>
                 <View
                   style={
@@ -414,7 +454,20 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       }
                     }
                   >
-                    10.00
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      10.00
+                    </Text>
                   </Text>
                 </View>
               </View>

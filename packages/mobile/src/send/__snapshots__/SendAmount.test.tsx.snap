@@ -430,7 +430,21 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-            0.001
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              0.001
+            </Text>
           </Text>
         </View>
         <View
@@ -457,23 +471,28 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             newAccountBalance
           </Text>
           <Text
+            numberOfLines={1}
             style={
               Array [
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "fontFamily": "Hind-SemiBold",
+                  },
+                ],
                 Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                },
-                Object {
-                  "color": "#FD785B",
+                  "color": "#42D689",
                 },
               ]
             }
           >
+            -
+            $
             0.00
           </Text>
         </View>

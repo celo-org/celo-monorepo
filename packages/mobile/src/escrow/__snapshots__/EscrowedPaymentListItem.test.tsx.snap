@@ -84,7 +84,24 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               }
             }
           >
-            escrowPaymentNotificationTitle
+            Invited (
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              0
+            </Text>
+            ) 
+            +14155550000
           </Text>
           <View
             style={

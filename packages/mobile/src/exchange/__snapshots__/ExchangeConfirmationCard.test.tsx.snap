@@ -43,13 +43,23 @@ exports[`renders correctly with giant numbers 1`] = `
             },
             Object {
               "color": "#42D689",
-              "fontSize": 21,
-              "lineHeight": 29,
-              "transform": Array [
-                Object {
-                  "translateY": 2,
-                },
-              ],
+              "fontSize": 26,
+            },
+          ]
+        }
+      >
+        
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#42D689",
+              "fontSize": 18,
             },
           ]
         }
@@ -62,14 +72,12 @@ exports[`renders correctly with giant numbers 1`] = `
           Array [
             Object {
               "fontFamily": "Hind-Regular",
-            },
-            Object {
               "paddingHorizontal": 3,
             },
             Object {
               "color": "#42D689",
               "fontSize": 36,
-              "lineHeight": 47,
+              "lineHeight": 48,
             },
           ]
         }
@@ -125,13 +133,7 @@ exports[`renders correctly with giant numbers 1`] = `
             },
             Object {
               "color": "#FBCC5C",
-              "fontSize": 21,
-              "lineHeight": 29,
-              "transform": Array [
-                Object {
-                  "translateY": 2,
-                },
-              ],
+              "fontSize": 26,
             },
           ]
         }
@@ -146,12 +148,26 @@ exports[`renders correctly with giant numbers 1`] = `
               "fontFamily": "Hind-Regular",
             },
             Object {
+              "color": "#FBCC5C",
+              "fontSize": 18,
+            },
+          ]
+        }
+      >
+        
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
               "paddingHorizontal": 3,
             },
             Object {
               "color": "#FBCC5C",
               "fontSize": 36,
-              "lineHeight": 47,
+              "lineHeight": 48,
             },
           ]
         }
@@ -300,7 +316,21 @@ exports[`renders correctly with giant numbers 1`] = `
           }
         }
       >
-        0.01
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              undefined,
+              Object {
+                "color": undefined,
+              },
+            ]
+          }
+        >
+          
+          
+          0.01
+        </Text>
       </Text>
     </View>
     <View
@@ -381,6 +411,32 @@ exports[`renders correctly with giant numbers 1`] = `
           />
         </View>
       </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 20,
+          }
+        }
+      >
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              undefined,
+              Object {
+                "color": undefined,
+              },
+            ]
+          }
+        >
+          
+          
+          0.001
+        </Text>
+      </Text>
     </View>
   </View>
 </View>
@@ -429,13 +485,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             },
             Object {
               "color": "#FBCC5C",
-              "fontSize": 21,
-              "lineHeight": 29,
-              "transform": Array [
-                Object {
-                  "translateY": 2,
-                },
-              ],
+              "fontSize": 26,
             },
           ]
         }
@@ -450,12 +500,26 @@ exports[`renders correctly with no exchange rate 1`] = `
               "fontFamily": "Hind-Regular",
             },
             Object {
+              "color": "#FBCC5C",
+              "fontSize": 18,
+            },
+          ]
+        }
+      >
+        
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
               "paddingHorizontal": 3,
             },
             Object {
               "color": "#FBCC5C",
               "fontSize": 36,
-              "lineHeight": 47,
+              "lineHeight": 48,
             },
           ]
         }
@@ -511,13 +575,23 @@ exports[`renders correctly with no exchange rate 1`] = `
             },
             Object {
               "color": "#42D689",
-              "fontSize": 21,
-              "lineHeight": 29,
-              "transform": Array [
-                Object {
-                  "translateY": 2,
-                },
-              ],
+              "fontSize": 26,
+            },
+          ]
+        }
+      >
+        
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#42D689",
+              "fontSize": 18,
             },
           ]
         }
@@ -530,14 +604,12 @@ exports[`renders correctly with no exchange rate 1`] = `
           Array [
             Object {
               "fontFamily": "Hind-Regular",
-            },
-            Object {
               "paddingHorizontal": 3,
             },
             Object {
               "color": "#42D689",
               "fontSize": 36,
-              "lineHeight": 47,
+              "lineHeight": 48,
             },
           ]
         }
@@ -686,7 +758,21 @@ exports[`renders correctly with no exchange rate 1`] = `
           }
         }
       >
-        0.01
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              undefined,
+              Object {
+                "color": undefined,
+              },
+            ]
+          }
+        >
+          
+          $
+          0.0133
+        </Text>
       </Text>
     </View>
     <View
@@ -767,6 +853,32 @@ exports[`renders correctly with no exchange rate 1`] = `
           />
         </View>
       </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 20,
+          }
+        }
+      >
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              undefined,
+              Object {
+                "color": undefined,
+              },
+            ]
+          }
+        >
+          
+          $
+          0.001
+        </Text>
+      </Text>
     </View>
   </View>
 </View>

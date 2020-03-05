@@ -300,7 +300,24 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 }
               }
             >
-              escrowPaymentNotificationTitle
+              Invited (
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                9.31
+              </Text>
+              ) 
+              +491522345678
             </Text>
             <View
               style={

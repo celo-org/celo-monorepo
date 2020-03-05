@@ -57,13 +57,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
           },
           Object {
             "color": "#81868B",
-            "fontSize": 28,
-            "lineHeight": 39,
-            "transform": Array [
-              Object {
-                "translateY": 3,
-              },
-            ],
+            "fontSize": 24,
           },
         ]
       }
@@ -76,14 +70,12 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
         Array [
           Object {
             "fontFamily": "Hind-Regular",
-          },
-          Object {
             "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
             "fontSize": 48,
-            "lineHeight": 62,
+            "lineHeight": 64,
           },
         ]
       }
@@ -102,10 +94,23 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
       }
     }
   >
-    receiveFlow8:receivedAmountFromCelo.0
-    $
-    100.00
-    receiveFlow8:receivedAmountFromCelo.1
+    You received 
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      $
+      133.00
+    </Text>
+     from Celo!
   </Text>
 </View>
 `;
@@ -281,13 +286,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
           },
           Object {
             "color": "#81868B",
-            "fontSize": 28,
-            "lineHeight": 39,
-            "transform": Array [
-              Object {
-                "translateY": 3,
-              },
-            ],
+            "fontSize": 24,
           },
         ]
       }
@@ -300,14 +299,12 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
         Array [
           Object {
             "fontFamily": "Hind-Regular",
-          },
-          Object {
             "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
             "fontSize": 48,
-            "lineHeight": 62,
+            "lineHeight": 64,
           },
         ]
       }
@@ -489,13 +486,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           },
           Object {
             "color": "#81868B",
-            "fontSize": 28,
-            "lineHeight": 39,
-            "transform": Array [
-              Object {
-                "translateY": 3,
-              },
-            ],
+            "fontSize": 24,
           },
         ]
       }
@@ -508,14 +499,12 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         Array [
           Object {
             "fontFamily": "Hind-Regular",
-          },
-          Object {
             "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
             "fontSize": 48,
-            "lineHeight": 62,
+            "lineHeight": 64,
           },
         ]
       }
@@ -697,13 +686,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           },
           Object {
             "color": "#81868B",
-            "fontSize": 28,
-            "lineHeight": 39,
-            "transform": Array [
-              Object {
-                "translateY": 3,
-              },
-            ],
+            "fontSize": 24,
           },
         ]
       }
@@ -716,14 +699,12 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
         Array [
           Object {
             "fontFamily": "Hind-Regular",
-          },
-          Object {
             "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
             "fontSize": 48,
-            "lineHeight": 62,
+            "lineHeight": 64,
           },
         ]
       }
@@ -923,13 +904,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           },
           Object {
             "color": "#81868B",
-            "fontSize": 28,
-            "lineHeight": 39,
-            "transform": Array [
-              Object {
-                "translateY": 3,
-              },
-            ],
+            "fontSize": 24,
           },
         ]
       }
@@ -942,14 +917,12 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         Array [
           Object {
             "fontFamily": "Hind-Regular",
-          },
-          Object {
             "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
             "fontSize": 48,
-            "lineHeight": 62,
+            "lineHeight": 64,
           },
         ]
       }
@@ -1035,13 +1008,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
           },
           Object {
             "color": "#81868B",
-            "fontSize": 28,
-            "lineHeight": 39,
-            "transform": Array [
-              Object {
-                "translateY": 3,
-              },
-            ],
+            "fontSize": 24,
           },
         ]
       }
@@ -1054,14 +1021,12 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
         Array [
           Object {
             "fontFamily": "Hind-Regular",
-          },
-          Object {
             "paddingHorizontal": 3,
           },
           Object {
             "color": "#81868B",
             "fontSize": 48,
-            "lineHeight": 62,
+            "lineHeight": 64,
           },
         ]
       }

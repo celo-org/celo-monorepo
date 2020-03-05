@@ -113,23 +113,27 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             </View>
             <View
               style={
-                Object {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "marginHorizontal": 25,
-                  "marginTop": 15,
-                }
+                Array [
+                  Object {
+                    "alignItems": "flex-start",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "marginTop": 5,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 34,
                     },
                   ]
                 }
@@ -137,16 +141,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 +
               </Text>
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 24,
-                      "textAlignVertical": "top",
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 24,
                     },
                   ]
                 }
@@ -154,23 +157,41 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 $
               </Text>
               <Text
-                ellipsizeMode="tail"
                 numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 48,
-                      "lineHeight": 64,
+                      "paddingHorizontal": 3,
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 48,
+                      "lineHeight": 64,
                     },
                   ]
                 }
               >
-                10.00
+                13.30
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "alignSelf": "flex-end",
+                      "fontFamily": "Hind-Regular",
+                      "marginLeft": 7,
+                    },
+                    Object {
+                      "color": "#42D689",
+                      "fontSize": 16,
+                      "lineHeight": 64,
+                    },
+                  ]
+                }
+              >
+                MXN
               </Text>
             </View>
             <View
@@ -274,7 +295,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       }
                     }
                   >
-                    totalSent
+                    totalSentInCeloDollars
                   </Text>
                 </View>
                 <Text
@@ -287,9 +308,51 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     }
                   }
                 >
-                  10
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    10.00
+                  </Text>
                 </Text>
               </View>
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 20,
+                    "marginBottom": 3,
+                  }
+                }
+              >
+                @
+                 
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  $
+                  0.75
+                </Text>
+              </Text>
               <View
                 style={
                   Object {
@@ -427,7 +490,20 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     }
                   }
                 >
-                  10.00
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    10.00
+                  </Text>
                 </Text>
               </View>
             </View>
@@ -740,23 +816,27 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             </View>
             <View
               style={
-                Object {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "marginHorizontal": 25,
-                  "marginTop": 15,
-                }
+                Array [
+                  Object {
+                    "alignItems": "flex-start",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "marginTop": 5,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 34,
                     },
                   ]
                 }
@@ -764,16 +844,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 +
               </Text>
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 24,
-                      "textAlignVertical": "top",
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 24,
                     },
                   ]
                 }
@@ -781,23 +860,41 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 $
               </Text>
               <Text
-                ellipsizeMode="tail"
                 numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 48,
-                      "lineHeight": 64,
+                      "paddingHorizontal": 3,
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 48,
+                      "lineHeight": 64,
                     },
                   ]
                 }
               >
-                10.00
+                13.30
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "alignSelf": "flex-end",
+                      "fontFamily": "Hind-Regular",
+                      "marginLeft": 7,
+                    },
+                    Object {
+                      "color": "#42D689",
+                      "fontSize": 16,
+                      "lineHeight": 64,
+                    },
+                  ]
+                }
+              >
+                MXN
               </Text>
             </View>
             <View
@@ -901,7 +998,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       }
                     }
                   >
-                    totalSent
+                    totalSentInCeloDollars
                   </Text>
                 </View>
                 <Text
@@ -914,9 +1011,51 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  10
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    10.00
+                  </Text>
                 </Text>
               </View>
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 20,
+                    "marginBottom": 3,
+                  }
+                }
+              >
+                @
+                 
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  $
+                  0.75
+                </Text>
+              </Text>
               <View
                 style={
                   Object {
@@ -1054,7 +1193,20 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  10.00
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    10.00
+                  </Text>
                 </Text>
               </View>
             </View>
@@ -1367,23 +1519,27 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             </View>
             <View
               style={
-                Object {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "marginHorizontal": 25,
-                  "marginTop": 15,
-                }
+                Array [
+                  Object {
+                    "alignItems": "flex-start",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "marginTop": 5,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 34,
                     },
                   ]
                 }
@@ -1391,16 +1547,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 +
               </Text>
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 24,
-                      "textAlignVertical": "top",
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 24,
                     },
                   ]
                 }
@@ -1408,23 +1563,41 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 $
               </Text>
               <Text
-                ellipsizeMode="tail"
                 numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 48,
-                      "lineHeight": 64,
+                      "paddingHorizontal": 3,
                     },
                     Object {
                       "color": "#42D689",
+                      "fontSize": 48,
+                      "lineHeight": 64,
                     },
                   ]
                 }
               >
-                10.00
+                13.30
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "alignSelf": "flex-end",
+                      "fontFamily": "Hind-Regular",
+                      "marginLeft": 7,
+                    },
+                    Object {
+                      "color": "#42D689",
+                      "fontSize": 16,
+                      "lineHeight": 64,
+                    },
+                  ]
+                }
+              >
+                MXN
               </Text>
             </View>
             <View
@@ -1528,7 +1701,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       }
                     }
                   >
-                    totalSent
+                    totalSentInCeloDollars
                   </Text>
                 </View>
                 <Text
@@ -1541,9 +1714,51 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  10
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    10.00
+                  </Text>
                 </Text>
               </View>
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 20,
+                    "marginBottom": 3,
+                  }
+                }
+              >
+                @
+                 
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  $
+                  0.75
+                </Text>
+              </Text>
               <View
                 style={
                   Object {
@@ -1675,7 +1890,20 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  10.00
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        undefined,
+                        Object {
+                          "color": undefined,
+                        },
+                      ]
+                    }
+                  >
+                    
+                    10.00
+                  </Text>
                 </Text>
               </View>
             </View>
