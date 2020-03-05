@@ -14,6 +14,7 @@ import {
 } from 'src/localCurrency/hooks'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import {
+  getCentAwareMoneyDisplay,
   getFeeDisplayValue,
   getMoneyDisplayValue,
   getNetworkFeeDisplayValue,
@@ -26,6 +27,7 @@ export enum DisplayType {
 
 export enum FormatType {
   Default,
+  CentAware,
   Fee,
   NetworkFee,
   NetworkFeePrecise,
@@ -95,6 +97,8 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
   switch (formatType) {
     case FormatType.Default:
       return getMoneyDisplayValue
+    case FormatType.CentAware:
+      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => getCentAwareMoneyDisplay(amount)
     case FormatType.Fee:
       return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => getFeeDisplayValue(amount)
     case FormatType.NetworkFee:

@@ -11,7 +11,7 @@ const { contentPadding } = variables
 
 interface Props {
   icon?: React.ReactNode
-  title: string
+  title: string | React.ReactNode
   children: React.ReactNode
   ctas: CTA[]
   onPress?: () => unknown
