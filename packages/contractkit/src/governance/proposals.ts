@@ -173,7 +173,9 @@ export class InteractiveProposalBuilder {
       const contractName = contractAnswer[contractPromptName] as CeloContract
       const contractABI = require('@celo/contractkit/lib/generated/' + contractName)
         .ABI as ABIDefinition[]
-      const methodNames = contractABI.map((def) => def.name!)
+      const methodNames = contractABI
+        .filter((def) => def.type === 'function' && def.stateMutability !== 'view')
+        .map((def) => def.name!)
 
       const functionPromptName = contractName + ' Function'
       const functionAnswer = await inquirer.prompt({
@@ -189,7 +191,7 @@ export class InteractiveProposalBuilder {
           name: functionInput.name,
           type: 'input',
           validate: () => {
-            // TODO: switch on user input and functionInput.type
+            // TODO(yorke): switch on user input and functionInput.type
             return true
           },
         })
@@ -210,6 +212,7 @@ export class InteractiveProposalBuilder {
       }
 
       try {
+        // use fromJsonTx as well-formed tx validation
         await this.builder.fromJsonTx(tx)
         transactions.push(tx)
       } catch (error) {
