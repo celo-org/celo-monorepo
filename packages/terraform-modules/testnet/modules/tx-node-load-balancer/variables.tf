@@ -18,11 +18,6 @@ variable forno_host {
   description = "The host name to use for the tx node forno setup"
 }
 
-variable gcloud_credentials_path {
-  type        = string
-  description = "Path to the file containing the Google Cloud credentials to use"
-}
-
 variable gcloud_project {
   type        = string
   description = "Name of the Google Cloud project to use"
