@@ -197,6 +197,7 @@ export const textStyles = StyleSheet.create({
   left: {
     textAlign: 'left',
   },
+  lean: { fontWeight: '300' },
   medium: {
     fontWeight: '500',
   },
@@ -359,4 +360,9 @@ export const standardStyles = StyleSheet.create({
 export const baseCoinStyle = {
   stroke: colors.screenGray,
   mixBlendMode: 'screen',
+}
+
+export const baseCoinStyleLight = {
+  stroke: colors.gray,
+  mixBlendMode: 'multiply',
 }

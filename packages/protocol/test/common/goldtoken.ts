@@ -1,3 +1,4 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertBalance,
   assertEqualBN,
@@ -6,23 +7,38 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
-import { GoldTokenInstance } from 'types'
+import {
+  FreezerContract,
+  FreezerInstance,
+  GoldTokenContract,
+  GoldTokenInstance,
+  RegistryContract,
+  RegistryInstance,
+} from 'types'
 
-const GoldToken: Truffle.Contract<GoldTokenInstance> = artifacts.require('GoldToken')
+const Freezer: FreezerContract = artifacts.require('Freezer')
+const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
 GoldToken.numberFormat = 'BigNumber'
 
 contract('GoldToken', (accounts: string[]) => {
+  let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
+  let registry: RegistryInstance
   const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
   const TWO_GOLDTOKEN = new BigNumber('2000000000000000000')
   const sender = accounts[0]
   const receiver = accounts[1]
 
   beforeEach(async () => {
+    freezer = await Freezer.new()
     goldToken = await GoldToken.new()
+    registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
+    await goldToken.initialize(registry.address)
   })
 
   describe('#name()', () => {

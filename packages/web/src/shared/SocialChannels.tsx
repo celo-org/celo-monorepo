@@ -1,8 +1,10 @@
-import { memo } from 'react'
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import { NameSpaces, useTranslation } from 'src/i18n'
 import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
+import DrawCoin from 'src/icons/DrawCoin'
 import LinkedIn from 'src/icons/LinkedIn'
 import Octocat from 'src/icons/Octocat'
 import { TweetLogo as TwitterLogo } from 'src/icons/TwitterLogo'
@@ -24,7 +26,7 @@ interface ExternalChannelProps {
   alignCenter?: boolean
 }
 
-export const Channel = memo(function _Channel(props: ChannelProps & ExternalChannelProps) {
+export const Channel = React.memo(function _Channel(props: ChannelProps & ExternalChannelProps) {
   const openExternalLinkInNewTab = props.link.includes('//') ? '_blank' : undefined
   return (
     <Fade bottom={true} distance="20px" delay={200}>
@@ -93,9 +95,9 @@ export function TwitterChannel({ alignCenter, isDarkMode }: ExternalChannelProps
           &{' '}
           <Button
             style={[fonts.legal, isDarkMode && textStyles.invert]}
-            text={'@celoHQ'}
+            text={'@celoOrg'}
             kind={BTN.INLINE}
-            href="https://twitter.com/@celoHQ"
+            href={CeloLinks.twitter}
           />
         </>
       }
@@ -103,82 +105,107 @@ export function TwitterChannel({ alignCenter, isDarkMode }: ExternalChannelProps
   )
 }
 
-export const GitHubChannel = memo(function _GitHubChannel({
+export const GitHubChannel = React.memo(function _GitHubChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {
+  const { t } = useTranslation(NameSpaces.common)
   return (
     <Channel
       isDarkMode={isDarkMode}
       alignCenter={alignCenter}
-      title={'GitHub'}
+      title={t('channels.github.name')}
       link={CeloLinks.gitHub}
       icon={<Octocat size={41} color={isDarkMode ? colors.white : colors.dark} />}
-      text={'Contribute to the codebase'}
+      text={t('channels.github.text')}
     />
   )
 })
 
-export const DiscordChannel = memo(function _DiscordChannel({
+export const BrandChannel = React.memo(function _BrandChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {
+  const { t } = useTranslation(NameSpaces.common)
   return (
     <Channel
       isDarkMode={isDarkMode}
       alignCenter={alignCenter}
-      title={'Discord'}
+      title={t('channels.brand.name')}
+      link={menuItems.BRAND.link}
+      icon={<DrawCoin size={45} />}
+      text={t('channels.brand.text')}
+    />
+  )
+})
+
+export const DiscordChannel = React.memo(function _DiscordChannel({
+  alignCenter,
+  isDarkMode,
+}: ExternalChannelProps) {
+  const { t } = useTranslation(NameSpaces.common)
+  return (
+    <Channel
+      isDarkMode={isDarkMode}
+      alignCenter={alignCenter}
+      title={t('channels.discord.name')}
       link={CeloLinks.discord}
       icon={<Discord size={40} color={isDarkMode ? colors.white : colors.dark} />}
-      text={'Collaborate and get\ndeveloper support'}
+      text={t('channels.discord.text')}
     />
   )
 })
 
-export const LinkedInChannel = memo(function _LinkedInChannel({
+export const LinkedInChannel = React.memo(function _LinkedInChannel({
   isDarkMode,
   alignCenter,
 }: ExternalChannelProps) {
+  const { t } = useTranslation(NameSpaces.common)
+
   return (
     <Channel
       isDarkMode={isDarkMode}
       alignCenter={alignCenter}
-      title={'LinkedIn'}
+      title={t('channels.linkedin.name')}
       link={CeloLinks.linkedIn}
       icon={<LinkedIn size={40} color={isDarkMode ? colors.white : colors.dark} />}
-      text={'Find Professional Opportunities '}
+      text={t('channels.linkedin.text')}
     />
   )
 })
 
-export const ForumChannel = memo(function _ForumChannel({
+export const ForumChannel = React.memo(function _ForumChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {
+  const { t } = useTranslation(NameSpaces.common)
+
   return (
     <Channel
       isDarkMode={isDarkMode}
       alignCenter={alignCenter}
-      title={'Forum'}
+      title={t('channels.forum.name')}
       link={CeloLinks.discourse}
       icon={<Discourse size={40} color={isDarkMode ? colors.white : colors.dark} />}
-      text={'Ask technical questions'}
+      text={t('channels.forum.text')}
     />
   )
 })
 
-export const EventsChannel = memo(function _EventsChannel({
+export const EventsChannel = React.memo(function _EventsChannel({
   alignCenter,
   isDarkMode,
 }: ExternalChannelProps) {
+  const { t } = useTranslation(NameSpaces.common)
+
   return (
     <Channel
       isDarkMode={isDarkMode}
       alignCenter={alignCenter}
-      title={'Events'}
+      title={t('channels.events.name')}
       link={menuItems.COMMUNITY.link}
       icon={<Image resizeMode="contain" source={eventsImg} style={styles.image} />}
-      text={'Connect in Person'}
+      text={t('channels.events.text')}
     />
   )
 })

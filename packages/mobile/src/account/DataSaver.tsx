@@ -6,36 +6,77 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
-import { toggleZeroSyncMode } from 'src/web3/actions'
+import { toggleFornoMode } from 'src/web3/actions'
 
 interface StateProps {
-  zeroSyncEnabled: boolean
+  fornoEnabled: boolean
   gethStartedThisSession: boolean
 }
 
 interface DispatchProps {
-  toggleZeroSyncMode: typeof toggleZeroSyncMode
+  toggleFornoMode: typeof toggleFornoMode
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 const mapDispatchToProps = {
-  toggleZeroSyncMode,
+  toggleFornoMode,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    zeroSyncEnabled: state.web3.zeroSyncMode,
-    gethStartedThisSession: state.web3.gethStartedThisSession,
+    fornoEnabled: state.web3.fornoMode,
+    gethStartedThisSession: state.geth.gethStartedThisSession,
   }
 }
 
 interface State {
-  modalVisible: boolean
+  switchOffModalVisible: boolean
+  switchOnModalVisible: boolean
+  promptModalVisible: boolean
+}
+
+interface ModalProps {
+  isVisible: boolean
+  header: string
+  body: string
+  continueTitle: string
+  cancelTitle: string
+  onCancel: () => void
+  onContinue: () => void
+}
+
+function WarningModal({
+  isVisible,
+  header,
+  body,
+  continueTitle,
+  cancelTitle,
+  onCancel,
+  onContinue,
+}: ModalProps) {
+  return (
+    <Modal isVisible={isVisible}>
+      <View style={styles.modalContainer}>
+        <Text style={styles.modalHeader}>{header}</Text>
+        <Text style={fontStyles.body}>{body}</Text>
+        <View style={styles.modalButtonsContainer}>
+          <TextButton onPress={onCancel} style={styles.modalCancelText}>
+            {cancelTitle}
+          </TextButton>
+          <TextButton onPress={onContinue} style={styles.modalSkipText}>
+            {continueTitle}
+          </TextButton>
+        </View>
+      </View>
+    </Modal>
+  )
 }
 
 export class DataSaver extends React.Component<Props, State> {
@@ -45,57 +86,110 @@ export class DataSaver extends React.Component<Props, State> {
   })
 
   state = {
-    modalVisible: false,
+    switchOffModalVisible: false,
+    switchOnModalVisible: false,
+    promptModalVisible: false,
   }
 
-  showModal = () => {
-    this.setState({ modalVisible: true })
+  componentDidMount() {
+    const promptModalVisible = this.props.navigation.getParam('promptModalVisible')
+    if (promptModalVisible) {
+      this.setState({
+        promptModalVisible,
+      })
+    }
   }
 
-  hideModal = () => {
-    this.setState({ modalVisible: false })
+  showSwitchOffModal = () => {
+    this.setState({ switchOffModalVisible: true })
   }
 
-  onPressToggleWithRestartModal = () => {
-    this.props.toggleZeroSyncMode(false)
-    this.hideModal()
+  hideSwitchOffModal = () => {
+    this.setState({ switchOffModalVisible: false })
   }
 
-  handleZeroSyncToggle = (zeroSyncMode: boolean) => {
-    if (!zeroSyncMode && this.props.gethStartedThisSession) {
-      // Starting geth a second time this app session which will
-      // require an app restart, so show restart modal
-      this.showModal()
+  onPressToggleWithSwitchOffModal = () => {
+    this.props.toggleFornoMode(false)
+    this.hideSwitchOffModal()
+  }
+
+  showSwitchOnModal = () => {
+    this.setState({ switchOnModalVisible: true })
+  }
+
+  hideSwitchOnModal = () => {
+    this.setState({ switchOnModalVisible: false })
+  }
+
+  onPressToggleWithSwitchOnModal = () => {
+    this.props.toggleFornoMode(true)
+    this.hideSwitchOnModal()
+  }
+
+  onPressPromptModal = () => {
+    this.props.toggleFornoMode(true)
+    navigateBack()
+  }
+
+  hidePromptModal = () => {
+    this.props.toggleFornoMode(false)
+    navigateBack()
+  }
+
+  handleFornoToggle = (fornoMode: boolean) => {
+    if (!fornoMode) {
+      if (this.props.gethStartedThisSession) {
+        // Starting geth a second time this app session which will
+        // require an app restart, so show restart modal
+        this.showSwitchOffModal()
+      } else {
+        this.props.toggleFornoMode(false)
+      }
     } else {
-      this.props.toggleZeroSyncMode(zeroSyncMode)
+      // If move to forno was not successful we will need
+      // to rollback starting geth a second time
+      this.showSwitchOnModal()
     }
   }
 
   render() {
-    const { zeroSyncEnabled, t } = this.props
+    const { fornoEnabled, t } = this.props
     return (
       <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
         <SettingsSwitchItem
-          switchValue={zeroSyncEnabled}
-          onSwitchChange={this.handleZeroSyncToggle}
+          switchValue={fornoEnabled}
+          onSwitchChange={this.handleFornoToggle}
           details={t('dataSaverDetail')}
         >
           <Text style={fontStyles.body}>{t('enableDataSaver')}</Text>
         </SettingsSwitchItem>
-        <Modal isVisible={this.state.modalVisible}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('restartModal.header')}</Text>
-            <Text style={fontStyles.body}>{t('restartModal.body')}</Text>
-            <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.hideModal} style={styles.modalCancelText}>
-                {t('global:cancel')}
-              </TextButton>
-              <TextButton onPress={this.onPressToggleWithRestartModal} style={styles.modalSkipText}>
-                {t('restartModal.restart')}
-              </TextButton>
-            </View>
-          </View>
-        </Modal>
+        <WarningModal
+          isVisible={this.state.promptModalVisible}
+          header={t('promptFornoModal.header')}
+          body={t('promptFornoModal.body')}
+          continueTitle={t('promptFornoModal.switchToDataSaver')}
+          cancelTitle={t('global:goBack')}
+          onCancel={this.hidePromptModal}
+          onContinue={this.onPressPromptModal}
+        />
+        <WarningModal
+          isVisible={this.state.switchOffModalVisible}
+          header={t('restartModalSwitchOff.header')}
+          body={t('restartModalSwitchOff.body')}
+          continueTitle={t('restartModalSwitchOff.restart')}
+          cancelTitle={t('global:cancel')}
+          onCancel={this.hideSwitchOffModal}
+          onContinue={this.onPressToggleWithSwitchOffModal}
+        />
+        <WarningModal
+          isVisible={this.state.switchOnModalVisible}
+          header={t('restartModalSwitchOn.header')}
+          body={t('restartModalSwitchOn.body')}
+          continueTitle={t('restartModalSwitchOn.understand')}
+          cancelTitle={t('global:cancel')}
+          onCancel={this.hideSwitchOnModal}
+          onContinue={this.onPressToggleWithSwitchOnModal}
+        />
       </ScrollView>
     )
   }

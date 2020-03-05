@@ -3,8 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -16,7 +15,6 @@ import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
 import { importContacts } from 'src/identity/actions'
-import { E164NumberToAddressType } from 'src/identity/reducer'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -69,7 +67,6 @@ interface StateProps {
   e164PhoneNumber: string
   numberVerified: boolean
   devModeActive: boolean
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
   recentRecipients: Recipient[]
   allRecipients: Recipient[]
 }
@@ -89,7 +86,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumber: state.account.e164PhoneNumber,
   numberVerified: state.app.numberVerified,
   devModeActive: state.account.devModeActive || false,
-  e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
   recentRecipients: state.account.devModeActive
     ? [CeloDefaultRecipient, ...state.send.recentRecipients]
     : state.send.recentRecipients,
@@ -255,16 +251,15 @@ class Send extends React.Component<Props, State> {
             onPressCta={this.onPressStartVerification}
           />
         )}
-        {numberVerified &&
-          !hasGivenContactPermission && (
-            <SendCallToAction
-              icon={<ContactPermission />}
-              header={t('importContactsCta.header')}
-              body={t('importContactsCta.body')}
-              cta={t('importContactsCta.cta')}
-              onPressCta={this.onPressContactsSettings}
-            />
-          )}
+        {numberVerified && !hasGivenContactPermission && (
+          <SendCallToAction
+            icon={<ContactPermission />}
+            header={t('importContactsCta.header')}
+            body={t('importContactsCta.body')}
+            cta={t('importContactsCta.cta')}
+            onPressCta={this.onPressContactsSettings}
+          />
+        )}
         <ContactSyncBanner />
       </>
     )
@@ -275,7 +270,9 @@ class Send extends React.Component<Props, State> {
     const { searchQuery } = this.state
 
     return (
-      <SafeAreaView style={style.body}>
+      // Intentionally not using SafeAreaView here as RecipientPicker
+      // needs fullscreen rendering
+      <View style={style.body}>
         <DisconnectBanner />
         <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
         <RecipientPicker
@@ -286,7 +283,7 @@ class Send extends React.Component<Props, State> {
           listHeaderComponent={this.renderListHeader}
           onSelectRecipient={this.onSelectRecipient}
         />
-      </SafeAreaView>
+      </View>
     )
   }
 }

@@ -1,17 +1,21 @@
-import { AppState, NativeEventEmitter, NativeModules } from 'react-native'
+import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
-import { call, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
+import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
+import { setPromptForno } from 'src/account/actions'
+import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
   getGeth,
 } from 'src/geth/geth'
-import { InitializationState, isGethConnectedSelector } from 'src/geth/reducer'
-import { navigateToError } from 'src/navigator/NavigationService'
+import { InitializationState } from 'src/geth/reducer'
+import { isGethConnectedSelector } from 'src/geth/selectors'
+import { navigate, navigateToError } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { zeroSyncSelector } from 'src/web3/selectors'
+import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -42,10 +46,6 @@ export function* waitForGethConnectivity() {
 }
 
 function* waitForGethInstance() {
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
-    return GethInitOutcomes.SUCCESS
-  }
   try {
     const gethInstance = yield call(getGeth)
     if (gethInstance == null) {
@@ -120,7 +120,13 @@ export function* initGethSaga() {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
     deleteChainDataAndRestartApp()
   } else {
-    navigateToError('networkConnectionFailed')
+    // Suggest switch to forno for network-related errors
+    if (yield select(promptFornoIfNeededSelector)) {
+      yield put(setPromptForno(false))
+      navigate(Screens.DataSaver, { promptModalVisible: true })
+    } else {
+      navigateToError('networkConnectionFailed')
+    }
   }
 }
 
@@ -134,13 +140,6 @@ function createNewBlockChannel() {
 function* monitorGeth() {
   const newBlockChannel = yield createNewBlockChannel()
 
-  const zeroSyncMode = yield select(zeroSyncSelector)
-  if (zeroSyncMode) {
-    yield put(setGethConnected(true))
-    yield delay(GETH_MONITOR_DELAY)
-    return
-  }
-
   while (true) {
     try {
       const { newBlock } = yield race({
@@ -152,52 +151,25 @@ function* monitorGeth() {
         yield put(setGethConnected(true))
         yield delay(GETH_MONITOR_DELAY)
       } else {
-        // Check whether reason for no new blocks is switch to zeroSync mode
-        const switchedToZeroSync = yield select(zeroSyncSelector)
-        if (switchedToZeroSync) {
-          yield put(setGethConnected(true))
-          return
-        } else {
-          Logger.error(
-            `${TAG}@monitorGeth`,
-            `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
-          )
-          yield put(setGethConnected(false))
-        }
+        Logger.error(
+          `${TAG}@monitorGeth`,
+          `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
+        )
+        yield put(setGethConnected(false))
       }
     } catch (error) {
       Logger.error(`${TAG}@monitorGeth`, error)
     } finally {
       if (yield cancelled()) {
-        newBlockChannel.close()
-      }
-    }
-  }
-}
-
-function createAppStateChannel() {
-  return eventChannel((emit: any) => {
-    AppState.addEventListener('change', emit)
-
-    const removeEventListener = () => {
-      AppState.removeEventListener('change', emit)
-    }
-    return removeEventListener
-  })
-}
-
-function* monitorAppState() {
-  Logger.debug(`${TAG}@monitorAppState`, 'Starting monitor app state saga')
-  const appStateChannel = yield createAppStateChannel()
-  while (true) {
-    try {
-      const newState = yield take(appStateChannel)
-      Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
-    } catch (error) {
-      Logger.error(`${TAG}@monitorAppState`, error)
-    } finally {
-      if (yield cancelled()) {
-        appStateChannel.close()
+        try {
+          newBlockChannel.close()
+        } catch (error) {
+          Logger.debug(
+            `${TAG}@monitorGeth`,
+            'Could not close newBlockChannel. May already be closed.',
+            error
+          )
+        }
       }
     }
   }
@@ -205,6 +177,14 @@ function* monitorAppState() {
 
 export function* gethSaga() {
   yield call(initGethSaga)
-  yield fork(monitorAppState)
-  yield fork(monitorGeth)
+  const gethRelatedSagas = yield fork(monitorGeth)
+  yield take(Actions.CANCEL_GETH_SAGA)
+  yield cancel(gethRelatedSagas)
+  yield put(setGethConnected(true))
+}
+
+export function* gethSagaIfNecessary() {
+  if (!(yield select(fornoSelector))) {
+    yield call(gethSaga)
+  }
 }

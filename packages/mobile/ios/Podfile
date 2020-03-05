@@ -1,4 +1,5 @@
-# File contents of "ios/Podfile"
+source 'https://cdn.cocoapods.org/'
+
 platform :ios, "9.0"
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
@@ -43,12 +44,13 @@ target "celo" do
   pod "Firebase/Storage"
   pod "Firebase/Messaging"
   pod "Firebase/Database"
+  pod "Firebase/DynamicLinks"
   pod "GoogleUtilities", "~> 5.3.7"
 
-  # Using a custom fork so we can have a specific bug fix (crash when firebase already initialized) 
+  # Using a custom fork so we can have a specific bug fix (crash when firebase already initialized)
   # without upgrading to firebase 6
   # TODO: remove this once we upgrade to Firebase >= 6
-  pod 'Segment-Firebase', :git => 'https://github.com/celo-org/analytics-ios-integration-firebase.git', :commit => 'e849d040239a7e56e02df96aabc0851e56a4cb19'
+  pod "Segment-Firebase", :git => "https://github.com/celo-org/analytics-ios-integration-firebase.git", :commit => "e849d040239a7e56e02df96aabc0851e56a4cb19"
 
   target "celoTests" do
     inherit! :search_paths

@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Feature from 'src/dev/Feature'
@@ -19,7 +19,7 @@ const evmImg = require('src/dev/features/evm.png')
 type Props = I18nProps
 
 export default withNamespaces('dev')(
-  memo(function Features({ t }: Props) {
+  React.memo(function Features({ t }: Props) {
     return (
       <View style={styles.darkBackground}>
         <Fade bottom={true} distance={'40px'}>
@@ -33,55 +33,55 @@ export default withNamespaces('dev')(
                 <H3 style={textStyles.invert}>{t('featureTitle')}</H3>
               </Cell>
             </GridRow>
-            <GridRow mobileStyle={styles.featuresMobile}>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+            <GridRow
+              allStyle={styles.featuresContainer}
+              desktopStyle={standardStyles.sectionMarginBottom}
+              tabletStyle={standardStyles.sectionMarginBottomTablet}
+              mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.featuresMobile]}
+            >
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.stableValueCurrencies')}
                   graphic={stableImg}
                   text={t('feat.stableText')}
                 />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature title={t('feat.phonePKI')} graphic={pkiImg} text={t('feat.pkiText')} />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature title={t('feat.onChainGov')} graphic={govImg} text={t('feat.govText')} />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
-                <Feature
-                  title={t('feat.proofOfStake')}
-                  graphic={stakeImg}
-                  text={t('feat.stakeText')}
-                />
-              </Cell>
-            </GridRow>
-            <GridRow
-              desktopStyle={standardStyles.sectionMarginBottom}
-              tabletStyle={standardStyles.sectionMarginBottomTablet}
-              mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.featuresMobile]}
-            >
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.selfCustody')}
                   graphic={custodyImg}
                   text={t('feat.custodyText')}
                 />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
+                <Feature
+                  title={t('feat.proofOfStake')}
+                  graphic={stakeImg}
+                  text={t('feat.stakeText')}
+                />
+              </Cell>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.fastUltraLight')}
                   graphic={ultraImg}
                   text={t('feat.ultraText')}
                 />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.gasMultiCurrency')}
                   graphic={gasImg}
                   text={t('feat.gasText')}
                 />
               </Cell>
-              <Cell span={Spans.fourth} mobileSpan={Spans.half}>
+              <Cell span={Spans.third} tabletSpan={Spans.half} mobileSpan={Spans.full}>
                 <Feature
                   title={t('feat.programmable')}
                   graphic={evmImg}
@@ -104,4 +104,5 @@ const styles = StyleSheet.create({
   darkBackground: {
     backgroundColor: colors.dark,
   },
+  featuresContainer: { flexWrap: 'wrap' },
 })

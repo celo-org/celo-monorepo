@@ -9,7 +9,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
-import { defaultCountryCodeSelector } from 'src/account/reducer'
+import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
@@ -40,7 +40,7 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
     return t('walletAddress')
   }
   // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
-  return t('unknown')
+  return t('global:unknown')
 }
 
 function getE164Number(e164Number?: string, recipient?: Recipient) {

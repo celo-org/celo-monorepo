@@ -12,6 +12,7 @@ export interface Props {
   mode: Mode
   onLoaded: () => void
   onFinished: () => void
+  onError: () => void
 }
 export enum Mode {
   'wait',
@@ -24,20 +25,25 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   video: any
   started = false
 
-  videoLoaded = () => {
+  startVideo = async () => {
     if (this.video) {
       if (!this.started) {
-        this.props.onLoaded()
-        this.video.play()
+        try {
+          this.started = true
+          await this.video.play()
+
+          this.props.onLoaded()
+        } catch {
+          this.props.onError()
+        }
       }
-      this.started = true
     }
   }
 
   videoRef = (ref) => {
     this.video = ref
     if (this.video) {
-      this.video.oncanplaythrough = () => this.videoLoaded()
+      this.video.oncanplaythrough = () => this.startVideo()
       this.video.load()
       this.video.onended = () => this.restartVideo()
     }
@@ -45,11 +51,12 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
 
   restartVideo = () => {
     this.props.onFinished()
-    setTimeout(() => {
+
+    setTimeout(async () => {
       if (this.video) {
         this.video.currentTime = 0
         this.started = false
-        this.videoLoaded()
+        await this.startVideo()
       }
     }, 200)
   }
@@ -89,6 +96,7 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
           style={styles.videoSmall}
           preload={'auto'}
           muted={true}
+          autoPlay={true}
           playsInline={true}
         >
           <Source src={this.source()} type="video/mp4" />
@@ -117,7 +125,7 @@ export const styles = StyleSheet.create({
     ],
   },
   still: {
-    height: 'calc(100% - 250px)',
+    height: '70vh',
     justifyContent: 'center',
   },
   stillMobile: {

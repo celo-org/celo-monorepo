@@ -108,6 +108,7 @@ Execute the following (and make sure the lines are in your `~/.bash_profile`):
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
+export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
@@ -248,7 +249,7 @@ export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
 Run the emulator with:
 
 ```bash
-emulator -avd Nexus_5X_API_28
+emulator -avd Nexus_5X_API_28_x86
 ```
 
 #### Optional: Install Genymotion Emulator Manager

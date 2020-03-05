@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
@@ -5,7 +6,9 @@ import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
 import { GridRow } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
+import menuItems from 'src/shared/menu-items'
 import {
+  BrandChannel,
   DiscordChannel,
   EventsChannel,
   ForumChannel,
@@ -30,9 +33,14 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
       </GridRow>
       <BookLayout label={t('conductLabel')}>
         <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('conductText')}</Text>
-        <Button kind={BTN.PRIMARY} text={t('conductBtn')} />
+        <Button kind={BTN.PRIMARY} text={t('conductBtn')} href={menuItems.CODE_OF_CONDUCT.link} />
       </BookLayout>
-      <BookLayout label={t('socialLabel')} isWide={true}>
+      <BookLayout label={t('experienceLabel')} isWide={true}>
+        <View style={styles.engageArea}>
+          <BrandChannel isDarkMode={false} />
+        </View>
+      </BookLayout>
+      <BookLayout label={t('socialLabel')} isWide={true} tightTop={true}>
         <View style={styles.engageArea}>
           <TwitterChannel isDarkMode={false} />
           <GitHubChannel isDarkMode={false} />
@@ -54,7 +62,7 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
             <EmailForm
               submitText={t('signUp')}
               route={'/contacts'}
-              whenComplete={<After t={t} />}
+              whenComplete={<After t={t} isDarkMode={false} />}
               isDarkMode={false}
             />
           </View>
@@ -83,4 +91,4 @@ const styles = StyleSheet.create({
   emailLogo: { width: 50, height: 50, marginVertical: 10 },
 })
 
-export default withNamespaces(NameSpaces.community)(ConnectionFooter)
+export default withNamespaces([NameSpaces.common, NameSpaces.community])(ConnectionFooter)

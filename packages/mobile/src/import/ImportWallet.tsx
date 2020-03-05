@@ -59,12 +59,13 @@ export class ImportWallet extends React.Component<Props, State> {
     backupPhrase: '',
   }
 
-  checkCleanBackupPhrase() {
-    if (this.props.navigation.getParam('clean')) {
+  checkCleanBackupPhrase = () => {
+    const { navigation } = this.props
+    if (navigation && navigation.getParam('clean')) {
       this.setState({
         backupPhrase: '',
       })
-      this.props.navigation.setParams({ clean: false })
+      navigation.setParams({ clean: false })
     }
   }
 
@@ -175,10 +176,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, any, RootState>(
-  mapStateToProps,
-  {
-    importBackupPhrase,
-    hideAlert,
-  }
-)(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWallet))
+export default connect<StateProps, DispatchProps, any, RootState>(mapStateToProps, {
+  importBackupPhrase,
+  hideAlert,
+})(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWallet))

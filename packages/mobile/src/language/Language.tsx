@@ -67,8 +67,7 @@ export class Language extends React.Component<Props, State> {
 }
 
 export default componentWithAnalytics(
-  connect<any, DispatchProps, {}, RootState>(
-    null,
-    { setLanguage }
-  )(withTranslation(Namespaces.accountScreen10)(Language))
+  connect<any, DispatchProps, {}, RootState>(null, { setLanguage })(
+    withTranslation(Namespaces.accountScreen10)(Language)
+  )
 )

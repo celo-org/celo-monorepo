@@ -1,4 +1,5 @@
 import NetworkSpeed from 'network-speed'
+import { Clipboard } from 'react-native'
 
 export function randomIntegerInRange(min: number, max: number) {
   return Math.round(Math.random() * (max - min + 1)) + min
@@ -22,12 +23,16 @@ interface Speeds {
 }
 
 export async function getNetworkDownloadSpeed() {
-  const testNetworkSpeed = new NetworkSpeed()
-  const fileSize = 5000000
-  const baseUrl = `http://eu.httpbin.org/stream-bytes/${fileSize}`
+  try {
+    const testNetworkSpeed = new NetworkSpeed()
+    const byteSize = 2000
+    const baseUrl = `https://eu.httpbin.org/stream-byteSize/${byteSize}`
 
-  const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, fileSize)
-  return speed
+    const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, byteSize)
+    return speed
+  } catch (e) {
+    return { mbps: '0', kbps: '0', bps: '0' }
+  }
 }
 
 const MIN_MB_FOR_FAST = 5
@@ -71,12 +76,15 @@ async function multiPartCheck() {
     getNetworkDownloadSpeed(),
     getNetworkDownloadSpeed(),
   ])
-  const averageSped =
-    multiPart.map((speeds) => speeds.mbps).reduce((previous, current) => {
-      return Number(previous) + Number(current)
-    }, 0) / 3
 
-  return isFast(averageSped)
+  const averageSpeed =
+    multiPart
+      .map((speeds) => speeds.mbps)
+      .reduce((previous, current) => {
+        return Number(previous) + Number(current)
+      }, 0) / 3
+
+  return isFast(averageSpeed)
 }
 
 const MAX_TIME_MS = 1000
@@ -94,4 +102,26 @@ type MemoryGB = 0.25 | 0.5 | 1 | 2 | 4 | 8
 export function getDeviceMemory(): MemoryGB {
   // only available on chrome / android browser assume 4 if we dont know
   return (navigator.deviceMemory as MemoryGB) || 4
+}
+
+export function isBrowser() {
+  return process.browser
+}
+
+export function cutAddress(address: string) {
+  return address.toUpperCase().replace(/^0x([a-f0-9]{4}).+([a-f0-9]{4})$/i, '0x$1...$2')
+}
+
+export function formatNumber(n: number, decimals: number = 2) {
+  return isNaN(+n)
+    ? (0).toFixed(decimals)
+    : (+n).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+export function copyToClipboad(text: string) {
+  Clipboard.setString(text)
+}
+
+export function weiToDecimal(number: number) {
+  return number / 10 ** 18
 }

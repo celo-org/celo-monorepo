@@ -1,16 +1,23 @@
+import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   assertEqualBN,
   isSameAddress,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import {
+  getDeployedProxiedContract,
+  getFunctionSelectorsForContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { linkedListChanges, zip } from '@celo/utils/lib/collections'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  AccountsInstance,
+  ElectionInstance,
   ExchangeInstance,
   GoldTokenInstance,
+  GovernanceApproverMultiSigInstance,
   GovernanceInstance,
   GovernanceSlasherInstance,
   LockedGoldInstance,
@@ -26,27 +33,85 @@ enum VoteValue {
   Yes,
 }
 
+async function getGroups(election: ElectionInstance) {
+  const [lst1, lst2] = await election.getTotalVotesForEligibleValidatorGroups()
+  return zip(
+    (address, value) => {
+      return { address, value }
+    },
+    lst1,
+    lst2
+  )
+}
+
+// Returns how much voting gold will be decremented from the groups voted by an account
+async function slashingOfGroups(
+  account: string,
+  penalty: BigNumber,
+  lockedGold: LockedGoldInstance,
+  election: ElectionInstance
+) {
+  // first check how much voting gold has to be slashed
+  const nonVoting = await lockedGold.getAccountNonvotingLockedGold(account)
+  if (penalty.isLessThan(nonVoting)) {
+    return []
+  }
+  let difference = penalty.minus(nonVoting)
+  // find voted groups
+  const groups = await election.getGroupsVotedForByAccount(account)
+  const res = []
+  //
+  for (let i = groups.length - 1; i >= 0; i--) {
+    const group = groups[i]
+    const totalVotes = await election.getTotalVotesForGroup(group)
+    const votes = await election.getTotalVotesForGroupByAccount(group, account)
+    const slashedVotes = votes.lt(difference) ? votes : difference
+    res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })
+    difference = difference.minus(slashedVotes)
+    if (difference.eq(new BigNumber(0))) {
+      break
+    }
+  }
+  return res
+}
+
+async function findLessersAndGreaters(
+  account: string,
+  penalty: BigNumber,
+  lockedGold: LockedGoldInstance,
+  election: ElectionInstance
+) {
+  const groups = await getGroups(election)
+  const changed = await slashingOfGroups(account, penalty, lockedGold, election)
+  const changes = linkedListChanges(groups, changed)
+  return { ...changes, indices: changed.map((a) => a.index) }
+}
+
 contract('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
-  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
+  let election: ElectionInstance
+  let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let governanceSlasher: GovernanceSlasherInstance
   let proposalTransactions: any
-  const value = new BigNumber('1000000000000000000')
+  let value: BigNumber
+  let valueOfSlashed: BigNumber
+  const penalty = new BigNumber('100')
+  const slashedAccount = accounts[9]
 
   before(async () => {
-    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
+    election = await getDeployedProxiedContract('Election', artifacts)
+    // @ts-ignore
+    await lockedGold.lock({ value: '10000000000000000000000000' })
+
+    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
-    await accountsInstance.createAccount()
-    await accountsInstance.createAccount({ from: accounts[1] })
-    // @ts-ignore
-    await lockedGold.lock({ value })
-    // @ts-ignore
-    await lockedGold.lock({ value, from: accounts[1] })
+    value = await lockedGold.getAccountTotalLockedGold(accounts[0])
+
     proposalTransactions = [
       {
         value: 0,
@@ -54,7 +119,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         data: Buffer.from(
           stripHexEncoding(
             // @ts-ignore
-            governanceSlasher.contract.methods.approveSlashing(accounts[1], 100).encodeABI()
+            governanceSlasher.contract.methods.approveSlashing(slashedAccount, 100).encodeABI()
           ),
           'hex'
         ),
@@ -70,6 +135,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         // @ts-ignore
         Buffer.concat(proposalTransactions.map((x: any) => x.data)),
         proposalTransactions.map((x: any) => x.data.length),
+        'URL',
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
       )
@@ -93,7 +159,11 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
-      await governance.approve(proposalId, dequeuedIndex)
+      // @ts-ignore
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      await multiSig.submitTransaction(governance.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should set the proposal to approved', async () => {
@@ -120,22 +190,32 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
 
     it('should execute the proposal', async () => {
-      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 100)
+      assertEqualBN(await governanceSlasher.getApprovedSlashing(slashedAccount), penalty)
     })
   })
 
   describe('When performing slashing', () => {
     before(async () => {
       await timeTravel(config.governance.referendumStageDuration, web3)
-      await governanceSlasher.slash(accounts[1], [], [], [])
+      valueOfSlashed = await lockedGold.getAccountTotalLockedGold(slashedAccount)
+      const { lessers, greaters, indices } = await findLessersAndGreaters(
+        slashedAccount,
+        penalty,
+        lockedGold,
+        election
+      )
+      await governanceSlasher.slash(slashedAccount, lessers, greaters, indices)
     })
 
     it('should set approved slashing to zero', async () => {
-      assert.equal((await governanceSlasher.getApprovedSlashing(accounts[1])).toNumber(), 0)
+      assert.equal((await governanceSlasher.getApprovedSlashing(slashedAccount)).toNumber(), 0)
     })
 
     it('should slash the account', async () => {
-      // slashing not yet implemented in LockedGold
+      assertEqualBN(
+        await lockedGold.getAccountTotalLockedGold(slashedAccount),
+        valueOfSlashed.minus(penalty)
+      )
     })
   })
 })
@@ -143,21 +223,21 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
-  let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
+  let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
-  const value = new BigNumber('1000000000000000000')
+  let value: BigNumber
 
   before(async () => {
-    accountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
     lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
+    // @ts-ignore
+    await lockedGold.lock({ value: '10000000000000000000000000' })
+    value = await lockedGold.getAccountTotalLockedGold(accounts[0])
+    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    await accountsInstance.createAccount()
-    // @ts-ignore
-    await lockedGold.lock({ value })
     proposalTransactions = [
       {
         value: 0,
@@ -184,6 +264,35 @@ contract('Integration: Governance', (accounts: string[]) => {
     ]
   })
 
+  describe('Checking governance thresholds', () => {
+    for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
+      it('should have correct thresholds for ' + contractName, async () => {
+        const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifacts
+        )
+
+        const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+        selectors.default = ['0x00000000']
+
+        const thresholds = { ...constitution.proxy, ...constitution[contractName] }
+        await Promise.all(
+          Object.keys(thresholds).map((func) =>
+            Promise.all(
+              selectors[func].map(async (selector) => {
+                assertEqualBN(
+                  await governance.getConstitution(contract.address, selector),
+                  toFixed(thresholds[func]),
+                  'Threshold set incorrectly for function ' + func
+                )
+              })
+            )
+          )
+        )
+      })
+    }
+  })
+
   describe('When making a governance proposal', () => {
     before(async () => {
       await governance.propose(
@@ -192,6 +301,7 @@ contract('Integration: Governance', (accounts: string[]) => {
         // @ts-ignore
         Buffer.concat(proposalTransactions.map((x: any) => x.data)),
         proposalTransactions.map((x: any) => x.data.length),
+        'URL',
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
       )
@@ -215,7 +325,11 @@ contract('Integration: Governance', (accounts: string[]) => {
   describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
-      await governance.approve(proposalId, dequeuedIndex)
+      // @ts-ignore
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      await multiSig.submitTransaction(governance.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should set the proposal to approved', async () => {

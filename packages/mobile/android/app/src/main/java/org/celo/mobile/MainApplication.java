@@ -1,8 +1,8 @@
 package org.celo.mobile;
 
-import android.app.Application;
 import android.content.Context;
 import android.util.Log;
+import androidx.multidex.MultiDexApplication;
 import cl.json.ShareApplication;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -13,6 +13,7 @@ import com.facebook.soloader.SoLoader;
 import com.reactnativegeth.RNGethPackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import io.invertase.firebase.links.RNFirebaseLinksPackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.invertase.firebase.storage.RNFirebaseStoragePackage;
@@ -26,7 +27,9 @@ import ru.ivanarh.jndcrash.NDCrash;
 import ru.ivanarh.jndcrash.NDCrashError;
 import ru.ivanarh.jndcrash.NDCrashUnwinder;
 
-public class MainApplication extends Application implements ShareApplication, ReactApplication {
+public class MainApplication
+  extends MultiDexApplication
+  implements ShareApplication, ReactApplication {
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 
     @Override
@@ -50,6 +53,7 @@ public class MainApplication extends Application implements ShareApplication, Re
       packages.add(new RNFirebaseStoragePackage());
       packages.add(new RNFirebaseMessagingPackage());
       packages.add(new RNFirebaseNotificationsPackage());
+      packages.add(new RNFirebaseLinksPackage());
       return packages;
     }
 

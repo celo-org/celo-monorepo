@@ -3,6 +3,7 @@ import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/ge
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
+import * as path from 'path'
 import sleep from 'sleep-promise'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
@@ -19,8 +20,13 @@ const envBucketName = 'env_config_files'
 const bootnodesBucketName = 'env_bootnodes'
 
 // uploads genesis block, static nodes, env file, and bootnode to GCS
-export async function uploadTestnetInfoToGoogleStorage(networkName: string) {
-  await uploadGenesisBlockToGoogleStorage(networkName)
+export async function uploadTestnetInfoToGoogleStorage(
+  networkName: string,
+  uploadGenesis: boolean
+) {
+  if (uploadGenesis) {
+    await uploadGenesisBlockToGoogleStorage(networkName)
+  }
   await uploadStaticNodesToGoogleStorage(networkName)
   await uploadBootnodeToGoogleStorage(networkName)
   await uploadEnvFileToGoogleStorage(networkName)
@@ -41,22 +47,23 @@ export async function uploadGenesisBlockToGoogleStorage(networkName: string) {
 
 export async function getGenesisBlockFromGoogleStorage(networkName: string) {
   const resp = await fetch(getGenesisGoogleStorageUrl(networkName))
-  return resp.json()
+  return JSON.stringify(await resp.json())
 }
 
 // This will throw an error if it fails to upload
 export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
-  const nodesJsonData: string[] | null = await retryCmd(() =>
+  const nodesData: string[] | null = await retryCmd(() =>
     getEnodesWithExternalIPAddresses(networkName)
   )
-  if (nodesJsonData === null) {
+  if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  console.debug('Static nodes are ' + nodesJsonData + '\n')
+  const nodesJson = JSON.stringify(nodesData)
+  console.debug('Static nodes are ' + nodesJson + '\n')
   await uploadDataToGoogleStorage(
-    nodesJsonData,
+    nodesJson,
     staticNodesBucketName,
     networkName,
     true,
@@ -161,6 +168,10 @@ export function uploadDataToGoogleStorage(
   contentType: string
 ) {
   const localTmpFilePath = `/tmp/${googleStorageBucketName}-${googleStorageFileName}`
+  // @ts-ignore The expected type of this is not accurate
+  fs.mkdirSync(path.dirname(localTmpFilePath), {
+    recursive: true,
+  })
   fs.writeFileSync(localTmpFilePath, data)
   return uploadFileToGoogleStorage(
     localTmpFilePath,

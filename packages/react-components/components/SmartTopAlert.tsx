@@ -34,34 +34,31 @@ function SmartTopAlert(props: Props) {
     containerRef.current = node && node.getNode()
   }, [])
 
-  const alertState = useMemo(
-    () => {
-      // tslint bug?
-      // tslint:disable-next-line: no-shadowed-variable
-      const { type, title, text, buttonMessage, dismissAfter, onPress } = props
-      if (title || text) {
-        return {
-          type,
-          title,
-          text,
-          buttonMessage,
-          dismissAfter,
-          onPress,
-        }
-      } else {
-        return null
+  const alertState = useMemo(() => {
+    // tslint bug?
+    // tslint:disable-next-line: no-shadowed-variable
+    const { type, title, text, buttonMessage, dismissAfter, onPress } = props
+    if (title || text) {
+      return {
+        type,
+        title,
+        text,
+        buttonMessage,
+        dismissAfter,
+        onPress,
       }
-    },
-    [
-      props.timestamp,
-      props.type,
-      props.title,
-      props.text,
-      props.buttonMessage,
-      props.dismissAfter,
-      props.onPress,
-    ]
-  )
+    } else {
+      return null
+    }
+  }, [
+    props.timestamp,
+    props.type,
+    props.title,
+    props.text,
+    props.buttonMessage,
+    props.dismissAfter,
+    props.onPress,
+  ])
 
   function hide() {
     if (!containerRef.current) {
@@ -81,59 +78,53 @@ function SmartTopAlert(props: Props) {
     })
   }
 
-  useEffect(
-    () => {
-      if (alertState) {
-        // show
-        setVisibleAlertState(alertState)
-      } else {
-        // hide
-        hide()
-      }
-    },
-    [alertState]
-  )
+  useEffect(() => {
+    if (alertState) {
+      // show
+      setVisibleAlertState(alertState)
+    } else {
+      // hide
+      hide()
+    }
+  }, [alertState])
 
-  useEffect(
-    () => {
-      let rafHandle: number
-      let timeoutHandle: number
+  useEffect(() => {
+    let rafHandle: number
+    let timeoutHandle: number
 
-      if (!visibleAlertState) {
+    if (!visibleAlertState) {
+      return
+    }
+
+    rafHandle = requestAnimationFrame(() => {
+      if (!containerRef.current) {
         return
       }
 
-      rafHandle = requestAnimationFrame(() => {
-        if (!containerRef.current) {
-          return
+      containerRef.current.measure((l, t, w, height) => {
+        Animated.timing(yOffset.current, {
+          // @ts-ignore, react-native type defs are missing this one!
+          fromValue: -height,
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start()
+
+        if (visibleAlertState.dismissAfter) {
+          timeoutHandle = window.setTimeout(hide, visibleAlertState.dismissAfter)
         }
-
-        containerRef.current.measure((l, t, w, height) => {
-          Animated.timing(yOffset.current, {
-            // @ts-ignore, react-native type defs are missing this one!
-            fromValue: -height,
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }).start()
-
-          if (visibleAlertState.dismissAfter) {
-            timeoutHandle = window.setTimeout(hide, visibleAlertState.dismissAfter)
-          }
-        })
       })
+    })
 
-      return () => {
-        if (rafHandle) {
-          cancelAnimationFrame(rafHandle)
-        }
-        if (timeoutHandle) {
-          window.clearTimeout(timeoutHandle)
-        }
+    return () => {
+      if (rafHandle) {
+        cancelAnimationFrame(rafHandle)
       }
-    },
-    [visibleAlertState]
-  )
+      if (timeoutHandle) {
+        window.clearTimeout(timeoutHandle)
+      }
+    }
+  }, [visibleAlertState])
 
   if (!visibleAlertState) {
     return null
@@ -208,7 +199,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorIcon: {
-    marginHorizontal: 5,
+    marginLeft: 5,
+    marginRight: 8,
   },
   button: {
     marginTop: 8,

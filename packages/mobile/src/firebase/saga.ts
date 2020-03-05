@@ -20,14 +20,20 @@ import {
 } from 'src/account/actions'
 import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
+import { updateCeloGoldExchangeRateHistory } from 'src/exchange/actions'
+import { exchangeHistorySelector, ExchangeRate, MAX_HISTORY_RETENTION } from 'src/exchange/reducer'
 import {
   Actions,
+  CancelPaymentRequestAction,
+  CompletePaymentRequestAction,
+  DeclinePaymentRequestAction,
   firebaseAuthorized,
   UpdatePaymentRequestNotifiedAction,
-  UpdatePaymentRequestStatusAction,
 } from 'src/firebase/actions'
 import {
   initializeAuth,
@@ -41,6 +47,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'firebase/saga'
 const REQUEST_DB = 'pendingRequests'
+const EXCHANGE_RATES = 'exchangeRates'
 const REQUESTEE_ADDRESS = 'requesteeAddress'
 const REQUESTER_ADDRESS = 'requesterAddress'
 const VALUE = 'value'
@@ -70,9 +77,7 @@ function* initializeFirebase() {
     const app = firebase.app()
     Logger.info(
       TAG,
-      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${
-        app.options.databaseURL
-      }`
+      `Initializing Firebase for app ${app.name}, appId ${app.options.appId}, db url ${app.options.databaseURL}`
     )
     yield call(initializeAuth, firebase, address)
     yield put(firebaseAuthorized())
@@ -161,7 +166,21 @@ function* subscribeToOutgoingPaymentRequests() {
   yield subscribeToPaymentRequests(REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
 }
 
-function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusAction) {
+function* updatePaymentRequestStatus({
+  id,
+  status,
+}: (DeclinePaymentRequestAction | CompletePaymentRequestAction) | CancelPaymentRequestAction) {
+  switch (status) {
+    case PaymentRequestStatus.DECLINED:
+      CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
+      break
+    case PaymentRequestStatus.COMPLETED:
+      CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
+      break
+    case PaymentRequestStatus.CANCELLED:
+      CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
+      break
+  }
   try {
     Logger.debug(TAG, 'Updating payment request', id, `status: ${status}`)
     yield call(() =>
@@ -219,11 +238,72 @@ export function* watchWritePaymentRequest() {
   yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, paymentRequestWriter)
 }
 
+function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
+
+  const now = Date.now()
+
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: DataSnapshot) => {
+      const result: ExchangeRate[] = []
+      snapshot.forEach((childSnapshot) => {
+        result.push(childSnapshot.val())
+        return false
+      })
+      emit(result)
+    }
+
+    // timestamp + 1 cause .startAt is inclusive
+    const startAt = latestExchangeRate
+      ? latestExchangeRate.timestamp + 1
+      : now - MAX_HISTORY_RETENTION
+
+    const cancel = () => {
+      firebase
+        .database()
+        .ref(`${EXCHANGE_RATES}/cGLD/cUSD`)
+        .orderByChild('timestamp')
+        .startAt(startAt)
+        .off(VALUE, emitter)
+    }
+
+    firebase
+      .database()
+      .ref(`${EXCHANGE_RATES}/cGLD/cUSD`)
+      .orderByChild('timestamp')
+      .startAt(startAt)
+      .on(VALUE, emitter, errorCallback)
+    return cancel
+  })
+}
+
+export function* subscribeToCeloGoldExchangeRateHistory() {
+  yield call(waitForFirebaseAuth)
+  const history = yield select(exchangeHistorySelector)
+  const latestExchangeRate = history.celoGoldExchangeRates[history.celoGoldExchangeRates.length - 1]
+  const chan = yield call(celoGoldExchangeRateHistoryChannel, latestExchangeRate)
+  try {
+    while (true) {
+      const exchangeRates = yield take(chan)
+      yield put(updateCeloGoldExchangeRateHistory(exchangeRates))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@subscribeToCeloGoldExchangeRateHistory`, error)
+  } finally {
+    if (yield cancelled()) {
+      chan.close()
+    }
+  }
+}
+
 export function* firebaseSaga() {
   yield spawn(initializeFirebase)
   yield spawn(watchLanguage)
   yield spawn(subscribeToIncomingPaymentRequests)
   yield spawn(subscribeToOutgoingPaymentRequests)
+  yield spawn(subscribeToCeloGoldExchangeRateHistory)
   yield spawn(watchPaymentRequestStatusUpdates)
   yield spawn(watchPaymentRequestNotifiedUpdates)
   yield spawn(watchWritePaymentRequest)

@@ -5,11 +5,9 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
-import { getReclaimableEscrowPayments } from 'src/escrow/saga'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
+import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
@@ -22,19 +20,16 @@ import { RootState } from 'src/redux/reducers'
 interface StateProps {
   dollarBalance: string | null
   sentEscrowedPayments: EscrowedPayment[]
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
   recipientCache: NumberToRecipient
 }
 
 interface DispatchProps {
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
-  sentEscrowedPayments: getReclaimableEscrowPayments(state.escrow.sentEscrowedPayments),
-  e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
+  sentEscrowedPayments: getReclaimableEscrowPayments(state),
   recipientCache: recipientCacheSelector(state),
 })
 
@@ -64,10 +59,6 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
   i18n.t('walletFlow5:escrowedPaymentReminder')
 )
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    updatePaymentRequestStatus,
-    fetchPhoneAddresses,
-  }
-)(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  fetchPhoneAddresses,
+})(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))

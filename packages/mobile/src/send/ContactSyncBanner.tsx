@@ -20,18 +20,15 @@ export function ContactSyncBanner() {
   const isSynced = current && total && current >= total
 
   // Hide banner after 3 seconds when sync is done
-  React.useEffect(
-    () => {
-      if (!isSynced) {
-        return
-      }
-      const timer = setTimeout(() => {
-        setHasSynced(true)
-      }, 3000)
-      return () => clearTimeout(timer)
-    },
-    [isSynced]
-  )
+  React.useEffect(() => {
+    if (!isSynced) {
+      return
+    }
+    const timer = setTimeout(() => {
+      setHasSynced(true)
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [isSynced])
 
   if (!isLoadingContacts && (hasSynced || !total)) {
     return null

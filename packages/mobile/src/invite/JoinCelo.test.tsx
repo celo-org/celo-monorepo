@@ -37,6 +37,7 @@ describe('JoinCeloScreen', () => {
         <JoinCeloClass
           showError={showErrorMock}
           hideAlert={jest.fn()}
+          setPromptForno={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
           language={'en-us'}
@@ -59,6 +60,7 @@ describe('JoinCeloScreen', () => {
         <JoinCeloClass
           showError={jest.fn()}
           hideAlert={jest.fn()}
+          setPromptForno={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
           language={'en-us'}
@@ -82,6 +84,7 @@ describe('JoinCeloScreen', () => {
           showError={error}
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}
+          setPromptForno={jest.fn()}
           setName={jest.fn()}
           language={'en-us'}
           cachedName={''}

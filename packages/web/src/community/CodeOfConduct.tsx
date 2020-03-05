@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import defaultContent from 'src/../static/locales/en/codeofconduct.json'
+import defaultContent from 'src/../public/static/locales/en/codeofconduct.json'
 import { IntegratingAnimation } from 'src/community/connect/CodeOfConduct'
 import { H1, Li, Ul } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
@@ -113,13 +113,15 @@ export class CodeOfConduct extends React.Component<I18nProps> {
                   text="Geek Feminism Anti-Harassment Policy"
                   kind={BTN.INLINE}
                   target={'_new'}
-                />, and the{' '}
+                />
+                , and the{' '}
                 <Button
                   href={'https://www.contributor-covenant.org/version/1/4/code-of-conduct.html'}
                   text="Contributor Covenant"
                   kind={BTN.INLINE}
                   target={'_new'}
-                />.
+                />
+                .
               </Trans>
             }
           />

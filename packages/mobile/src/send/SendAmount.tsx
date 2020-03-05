@@ -24,6 +24,7 @@ import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
 import {
@@ -58,7 +59,6 @@ import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { getBalanceColor, getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
@@ -86,8 +86,8 @@ interface StateProps {
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
   feeType: FeeType | null
-  localCurrencyCode: LocalCurrencyCode | null
-  localCurrencyExchangeRate: number | null | undefined
+  localCurrencyCode: LocalCurrencyCode
+  localCurrencyExchangeRate: string | null | undefined
 }
 
 interface DispatchProps {
@@ -161,10 +161,6 @@ export class SendAmount extends React.Component<Props, State> {
     this.fetchLatestPhoneAddress()
   }
 
-  componentWillUnmount() {
-    this.props.hideAlert()
-  }
-
   fetchLatestPhoneAddress = () => {
     const recipient = this.getRecipient()
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
@@ -179,16 +175,10 @@ export class SendAmount extends React.Component<Props, State> {
 
   getDollarsAmount = () => {
     const parsedInputAmount = parseInputAmount(this.state.amount)
-    const { localCurrencyCode, localCurrencyExchangeRate } = this.props
+    const { localCurrencyExchangeRate } = this.props
 
-    let dollarsAmount
-    if (localCurrencyCode) {
-      dollarsAmount =
-        convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
-        new BigNumber('')
-    } else {
-      dollarsAmount = parsedInputAmount
-    }
+    const dollarsAmount =
+      convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) || new BigNumber('')
 
     return convertDollarsToMaxSupportedPrecision(dollarsAmount)
   }
@@ -218,7 +208,7 @@ export class SendAmount extends React.Component<Props, State> {
     return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
   }
 
-  getConfirmationInput = (type: TransactionTypes) => {
+  getConfirmationInput = (type: TokenTransactionType) => {
     const amount = this.getDollarsAmount()
     const recipient = this.getRecipient()
     // TODO (Rossy) Remove address field from some recipient types.
@@ -255,12 +245,12 @@ export class SendAmount extends React.Component<Props, State> {
     let confirmationInput: ConfirmationInput
 
     if (verificationStatus === RecipientVerificationStatus.VERIFIED) {
-      confirmationInput = this.getConfirmationInput(TransactionTypes.SENT)
+      confirmationInput = this.getConfirmationInput(TokenTransactionType.Sent)
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
       })
     } else {
-      confirmationInput = this.getConfirmationInput(TransactionTypes.INVITE_SENT)
+      confirmationInput = this.getConfirmationInput(TokenTransactionType.InviteSent)
       CeloAnalytics.track(CustomEventNames.send_invite_details)
     }
 
@@ -271,7 +261,7 @@ export class SendAmount extends React.Component<Props, State> {
 
   onRequest = () => {
     CeloAnalytics.track(CustomEventNames.request_payment_continue)
-    const confirmationInput = this.getConfirmationInput(TransactionTypes.PAY_REQUEST)
+    const confirmationInput = this.getConfirmationInput(TokenTransactionType.PayRequest)
     navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
   }
 
@@ -505,14 +495,11 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
-    mapStateToProps,
-    {
-      fetchDollarBalance,
-      showError,
-      hideAlert,
-      showMessage,
-      fetchPhoneAddresses,
-    }
-  )(withTranslation(Namespaces.sendFlow7)(SendAmount))
+  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+    fetchDollarBalance,
+    showError,
+    hideAlert,
+    showMessage,
+    fetchPhoneAddresses,
+  })(withTranslation(Namespaces.sendFlow7)(SendAmount))
 )

@@ -3,15 +3,17 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IElection.sol";
 import "./interfaces/IValidators.sol";
+import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/Heap.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract Election is
   IElection,
@@ -19,7 +21,8 @@ contract Election is
   ReentrancyGuard,
   Initializable,
   UsingRegistry,
-  UsingPrecompiles
+  UsingPrecompiles,
+  CalledByVm
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -114,10 +117,10 @@ contract Election is
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param minElectableValidators The minimum number of validators that can be elected.
-   * @param _maxNumGroupsVotedFor The maximum number of groups that an acconut can vote for at once.
+   * @param _maxNumGroupsVotedFor The maximum number of groups that an account can vote for at once.
    * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
    *   be elected.
    * @dev Should be called only once.
@@ -340,6 +343,53 @@ contract Election is
   }
 
   /**
+   * @notice Decrements `value` pending or active votes for `group` from `account`.
+   *         First revokes all pending votes and then, if `value` votes haven't
+   *         been revoked yet, revokes additional active votes.
+   *         Fundamentally calls `revokePending` and `revokeActive` but only resorts groups once.
+   * @param account The account whose votes to `group` should be decremented.
+   * @param group The validator group to decrement votes from.
+   * @param maxValue The maxinum number of votes to decrement and revoke.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *               or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *                or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @return uint256 Number of votes successfully decremented and revoked, with a max of `value`.
+   */
+  function _decrementVotes(
+    address account,
+    address group,
+    uint256 maxValue,
+    address lesser,
+    address greater,
+    uint256 index
+  ) internal returns (uint256) {
+    uint256 remainingValue = maxValue;
+    uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
+    if (pendingVotes > 0) {
+      uint256 decrementValue = Math.min(remainingValue, pendingVotes);
+      decrementPendingVotes(group, account, decrementValue);
+      remainingValue = remainingValue.sub(decrementValue);
+    }
+    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
+    if (activeVotes > 0 && remainingValue > 0) {
+      uint256 decrementValue = Math.min(remainingValue, activeVotes);
+      decrementActiveVotes(group, account, decrementValue);
+      remainingValue = remainingValue.sub(decrementValue);
+    }
+    uint256 decrementedValue = maxValue.sub(remainingValue);
+    if (decrementedValue > 0) {
+      decrementTotalVotes(group, decrementedValue, lesser, greater);
+      emit ValidatorGroupVoteRevoked(account, group, decrementedValue);
+      if (getTotalVotesForGroupByAccount(group, account) == 0) {
+        deleteElement(votes.groupsVotedFor[account], group, index);
+      }
+    }
+    return decrementedValue;
+  }
+
+  /**
    * @notice Returns the total number of votes cast by an account.
    * @param account The address of the account.
    * @return The total number of votes cast by an account.
@@ -478,8 +528,8 @@ contract Election is
    */
   function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
     external
+    onlyVm
   {
-    require(msg.sender == address(0), "Only VM can call");
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -632,11 +682,19 @@ contract Election is
     ActiveVotes storage active = votes.active;
     active.total = active.total.sub(value);
 
-    uint256 unitsDelta = getActiveVotesUnitsDelta(group, value);
-
+    // Rounding may cause getActiveVotesUnitsDelta to return 0 for value != 0, preventing users
+    // from revoking the last of their votes. The case where value == activeVotes is special cased
+    // to prevent this.
+    uint256 unitsDelta = 0;
+    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
     GroupActiveVotes storage groupActive = active.forGroup[group];
-    groupActive.total = groupActive.total.sub(value);
+    if (activeVotes == value) {
+      unitsDelta = groupActive.unitsByAccount[account];
+    } else {
+      unitsDelta = getActiveVotesUnitsDelta(group, value);
+    }
 
+    groupActive.total = groupActive.total.sub(value);
     groupActive.totalUnits = groupActive.totalUnits.sub(unitsDelta);
     groupActive.unitsByAccount[account] = groupActive.unitsByAccount[account].sub(unitsDelta);
   }
@@ -762,9 +820,22 @@ contract Election is
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
    * @return The list of elected validators.
-   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
   function electValidatorSigners() external view returns (address[] memory) {
+    return electNValidatorSigners(electableValidators.min, electableValidators.max);
+  }
+
+  /**
+   * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
+   *   method.
+   * @return The list of elected validators.
+   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
+   */
+  function electNValidatorSigners(uint256 minElectableValidators, uint256 maxElectableValidators)
+    public
+    view
+    returns (address[] memory)
+  {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
     uint256 requiredVotes = electabilityThreshold
@@ -774,27 +845,48 @@ contract Election is
     // max number of electable validators.
     uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(
       requiredVotes,
-      electableValidators.max
+      maxElectableValidators
     );
     address[] memory electionGroups = votes.total.eligible.headN(numElectionGroups);
     uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;
-    // Assign a number of seats to each validator group.
-    while (totalNumMembersElected < electableValidators.max) {
-      uint256 groupIndex = 0;
-      bool memberElected = false;
-      (groupIndex, memberElected) = dHondt(electionGroups, numMembers, numMembersElected);
 
-      if (memberElected) {
+    uint256[] memory keys = new uint256[](electionGroups.length);
+    for (uint256 i = 0; i < electionGroups.length; i++) {
+      keys[i] = i;
+    }
+    FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
+      electionGroups.length
+    );
+    for (uint256 i = 0; i < electionGroups.length; i++) {
+      votesForNextMember[i] = FixidityLib.newFixed(
+        votes.total.eligible.getValue(electionGroups[i])
+      );
+    }
+
+    // Assign a number of seats to each validator group.
+    while (totalNumMembersElected < electableValidators.max && electionGroups.length > 0) {
+      uint256 groupIndex = keys[0];
+      // All electable validators have been elected.
+      if (votesForNextMember[groupIndex].unwrap() == 0) break;
+      // All members of the group have been elected
+      if (numMembers[groupIndex] <= numMembersElected[groupIndex]) {
+        votesForNextMember[groupIndex] = FixidityLib.wrap(0);
+      } else {
+        // Elect the next member from the validator group
         numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
         totalNumMembersElected = totalNumMembersElected.add(1);
-      } else {
-        break;
+        // If there are already n elected members in a group, the votes for the next member
+        // are total votes of group divided by n+1
+        votesForNextMember[groupIndex] = FixidityLib
+          .newFixed(votes.total.eligible.getValue(electionGroups[groupIndex]))
+          .divide(FixidityLib.newFixed(numMembersElected[groupIndex].add(1)));
       }
+      Heap.heapifyDown(keys, votesForNextMember);
     }
-    require(totalNumMembersElected >= electableValidators.min, "Not enough elected groups");
+    require(totalNumMembersElected >= minElectableValidators, "Not enough elected validators");
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
@@ -813,48 +905,70 @@ contract Election is
   }
 
   /**
-   * @notice Runs a round of the D'Hondt algorithm.
-   * @param electionGroups The addresses of the validator groups in the election.
-   * @param numMembers The number of members in each group.
-   * @param numMembersElected The number of members elected in each group up to this point.
-   * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
-   * @return Whether or not a group elected a member, and the index of the group if so.
-   */
-  function dHondt(
-    address[] memory electionGroups,
-    uint256[] memory numMembers,
-    uint256[] memory numMembersElected
-  ) private view returns (uint256, bool) {
-    bool memberElected = false;
-    uint256 groupIndex = 0;
-    FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
-    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-      address group = electionGroups[i];
-      // Only consider groups with members left to be elected.
-      if (numMembers[i] > numMembersElected[i]) {
-        FixidityLib.Fraction memory n = FixidityLib
-          .newFixed(votes.total.eligible.getValue(group))
-          .divide(FixidityLib.newFixed(numMembersElected[i].add(1)));
-        if (n.gt(maxN)) {
-          maxN = n;
-          groupIndex = i;
-          memberElected = true;
-        }
-      }
-    }
-    return (groupIndex, memberElected);
-  }
-
-  /**
    * @notice Returns get current validator signers using the precompiles.
    * @return List of current validator signers.
    */
   function getCurrentValidatorSigners() public view returns (address[] memory) {
     uint256 n = numberValidatorsInCurrentSet();
     address[] memory res = new address[](n);
-    for (uint256 idx = 0; idx < n; idx++) {
-      res[idx] = validatorSignerAddressFromCurrentSet(idx);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      res[i] = validatorSignerAddressFromCurrentSet(i);
     }
     return res;
+  }
+
+  // Struct to hold local variables for `forceDecrementVotes`.
+  // Needed to prevent solc error of "stack too deep" from too many local vars.
+  struct DecrementVotesInfo {
+    address[] groups;
+    uint256 remainingValue;
+  }
+
+  /**
+   * @notice Reduces the total amount of `account`'s voting gold by `value` by
+   *         iterating over all groups voted for by account.
+   * @param account Address to revoke votes from.
+   * @param value Maximum amount of votes to revoke.
+   * @param lessers The groups receiving fewer votes than the i'th `group`, or 0 if
+   *                the i'th `group` has the fewest votes of any validator group.
+   * @param greaters The groups receivier more votes than the i'th `group`, or 0 if
+   *                the i'th `group` has the most votes of any validator group.
+   * @param indices The indices of the i'th group in the account's voting list.
+   * @return Number of votes successfully decremented.
+   */
+  function forceDecrementVotes(
+    address account,
+    uint256 value,
+    address[] calldata lessers,
+    address[] calldata greaters,
+    uint256[] calldata indices
+  ) external nonReentrant onlyRegisteredContract(LOCKED_GOLD_REGISTRY_ID) returns (uint256) {
+    require(value > 0, "Decrement value must be greater than 0.");
+    DecrementVotesInfo memory info = DecrementVotesInfo(votes.groupsVotedFor[account], value);
+    require(
+      lessers.length <= info.groups.length &&
+        lessers.length == greaters.length &&
+        greaters.length == indices.length,
+      "Input lengths must be correspond."
+    );
+    // Iterate in reverse order to hopefully optimize removing pending votes before active votes
+    // And to attempt to preserve `account`'s earliest votes (assuming earliest = prefered)
+    for (uint256 i = info.groups.length; i > 0; i = i.sub(1)) {
+      info.remainingValue = info.remainingValue.sub(
+        _decrementVotes(
+          account,
+          info.groups[i.sub(1)],
+          info.remainingValue,
+          lessers[i.sub(1)],
+          greaters[i.sub(1)],
+          indices[i.sub(1)]
+        )
+      );
+      if (info.remainingValue == 0) {
+        break;
+      }
+    }
+    require(info.remainingValue == 0, "Failure to decrement all votes.");
+    return value.sub(info.remainingValue);
   }
 }

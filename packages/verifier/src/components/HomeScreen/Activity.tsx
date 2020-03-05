@@ -246,9 +246,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.profile)(
-  connect(
-    null,
-    mapDispatchToProps
-  )(Activity)
-)
+export default withTranslation(Namespaces.profile)(connect(null, mapDispatchToProps)(Activity))

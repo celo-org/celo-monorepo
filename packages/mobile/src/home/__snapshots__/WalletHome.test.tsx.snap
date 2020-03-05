@@ -560,68 +560,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
               "paddingVertical": 20,
             }
           }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontSize": 44,
-                "height": 48,
-                "lineHeight": 62,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              $
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              0.00
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontSize": 22,
-                }
-              }
-            >
-               
-              
-            </Text>
-          </Text>
-          <Text
-            style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Light",
-                },
-                Object {
-                  "color": "#B0B5B9",
-                  "fontSize": 18,
-                },
-              ]
-            }
-          >
-            <Text>
-              0.00
-               
-            </Text>
-            <Text>
-              global:celoDollars
-            </Text>
-          </Text>
-        </View>
+        />
       </View>
       <View
         onLayout={[Function]}
@@ -1252,68 +1191,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
               "paddingVertical": 20,
             }
           }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontSize": 44,
-                "height": 48,
-                "lineHeight": 62,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              $
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              0.00
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontSize": 22,
-                }
-              }
-            >
-               
-              
-            </Text>
-          </Text>
-          <Text
-            style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Light",
-                },
-                Object {
-                  "color": "#B0B5B9",
-                  "fontSize": 18,
-                },
-              ]
-            }
-          >
-            <Text>
-              0.00
-               
-            </Text>
-            <Text>
-              global:celoDollars
-            </Text>
-          </Text>
-        </View>
+        />
       </View>
       <View
         onLayout={[Function]}
@@ -1925,68 +1803,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
               "paddingVertical": 20,
             }
           }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontSize": 44,
-                "height": 48,
-                "lineHeight": 62,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              $
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              0.00
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontSize": 22,
-                }
-              }
-            >
-               
-              
-            </Text>
-          </Text>
-          <Text
-            style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Light",
-                },
-                Object {
-                  "color": "#B0B5B9",
-                  "fontSize": 18,
-                },
-              ]
-            }
-          >
-            <Text>
-              0.00
-               
-            </Text>
-            <Text>
-              global:celoDollars
-            </Text>
-          </Text>
-        </View>
+        />
       </View>
       <View
         onLayout={[Function]}

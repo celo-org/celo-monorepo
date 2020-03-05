@@ -5,10 +5,11 @@ import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { contractKit, web3 } from 'src/web3/contracts'
@@ -133,6 +134,7 @@ export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, acco
   Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Checking account balance', account)
   const tokenContract = await getTokenContract(token)
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
+  // TODO consider having retry logic for ALL contract calls and txs. ContractKit should have this logic.
   const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
   Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Account balance', balanceInWei.toString())
   return balanceInWei
@@ -155,7 +157,7 @@ export function tokenTransferFactory({
       yield put(
         addStandbyTransaction({
           id: txId,
-          type: TransactionTypes.SENT,
+          type: TokenTransactionType.Sent,
           comment,
           status: TransactionStatus.Pending,
           value: amount.toString(),

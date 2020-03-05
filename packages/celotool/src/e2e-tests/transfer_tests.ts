@@ -4,18 +4,18 @@
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import { eqAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import {
-  GethInstanceConfig,
-  getHooks,
-  GethTestConfig,
-  initAndStartGeth,
-  killInstance,
-  sleep,
-} from './utils'
+import { connectPeers, initAndStartGeth } from '../lib/geth'
+import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+
+const TMP_PATH = '/tmp/e2e'
+const verbose = false
 
 /**
  * Helper Class to change StableToken Inflation in tests
@@ -84,14 +84,21 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
+const stableTokenTransferGasCost = 29391
+
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
   update(): Promise<void>
+
   delta(address: string, token: CeloToken): BigNumber
+
   current(address: string, token: CeloToken): BigNumber
+
   initial(address: string, token: CeloToken): BigNumber
+
   debugPrint(address: string, token: CeloToken): void
 }
+
 async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<BalanceWatcher> {
   const stableToken = await kit.contracts.getStableToken()
   const goldToken = await kit.contracts.getGoldToken()
@@ -162,16 +169,40 @@ describe('Transfer tests', function(this: any) {
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
-  const syncModes = ['full', 'fast', 'light', 'ultralight']
-  const gethConfig: GethTestConfig = {
-    migrateTo: 18,
+  const syncModes = ['full', 'fast', 'light', 'lightest']
+  const gethConfig: GethRunConfig = {
+    migrateTo: 20,
+    networkId: 1101,
+    network: 'local',
+    runPath: TMP_PATH,
     instances: [
-      { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
+      {
+        name: 'validator',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
     ],
   }
+
   const hooks = getHooks(gethConfig)
+
   after(hooks.after)
   before(hooks.before)
+
+  // Spin up a node that we can sync with.
+  const fullInstance: GethInstanceConfig = {
+    name: 'txFull',
+    validating: false,
+    syncmode: 'full',
+    lightserv: true,
+    port: 30305,
+    rpcport: 8547,
+    // We need to set an etherbase here so that the full node will accept transactions from
+    // light clients.
+    etherbase: FeeRecipientAddress,
+  }
 
   const restartWithCleanNodes = async () => {
     await hooks.restart()
@@ -184,20 +215,9 @@ describe('Transfer tests', function(this: any) {
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
-    // Spin up a node that we can sync with.
-    const fullInstance = {
-      name: 'txFull',
-      validating: false,
-      syncmode: 'full',
-      lightserv: true,
-      port: 30305,
-      rpcport: 8547,
-      // We need to set an etherbase here so that the full node will accept transactions from
-      // light clients.
-      etherbase: FeeRecipientAddress,
-      peers: [8545],
-    }
-    await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
+    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
+    await connectPeers([...gethConfig.instances, fullInstance], verbose)
+    await waitToFinishInstanceSyncing(fullInstance)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -218,16 +238,26 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
-    // Spin up the node to run transfers as.
-    currentGethInstance = await initAndStartGeth(hooks.gethBinaryPath, {
+    const instance: GethInstanceConfig = {
       name: syncmode,
       validating: false,
       syncmode,
       port: 30307,
       rpcport: 8549,
+      lightserv: syncmode !== 'light' && syncmode !== 'lightest',
       privateKey: DEF_FROM_PK,
-      peers: [8547],
-    })
+    }
+
+    // Spin up the node to run transfers as.
+    currentGethInstance = await initAndStartGeth(
+      gethConfig,
+      hooks.gethBinaryPath,
+      instance,
+      verbose
+    )
+
+    await connectPeers([fullInstance, currentGethInstance])
+    await waitToFinishInstanceSyncing(currentGethInstance)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
@@ -309,6 +339,31 @@ describe('Transfer tests', function(this: any) {
     ok: boolean
     fees: Fees
     gas: GasUsage
+    events: any[]
+  }
+
+  const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+
+  function truncateTopic(hex: string) {
+    return '0x' + hex.substr(26)
+  }
+
+  function parseEvents(receipt: TransactionReceipt | undefined) {
+    if (!receipt) {
+      return []
+    }
+    if (receipt.events && receipt.events.Transfer) {
+      let events: any = receipt.events.Transfer
+      if (!(events instanceof Array)) {
+        events = [events]
+      }
+      return events.map((a: any) => ({ to: a.returnValues.to, from: a.returnValues.from }))
+    }
+    if (receipt.logs) {
+      return receipt.logs
+        .filter((a) => a.topics[0] === TRANSFER_TOPIC)
+        .map((a) => ({ to: truncateTopic(a.topics[2]), from: truncateTopic(a.topics[1]) }))
+    }
   }
 
   const runTestTransaction = async (
@@ -327,6 +382,8 @@ describe('Transfer tests', function(this: any) {
     } catch (err) {
       ok = false
     }
+
+    const events = parseEvents(receipt)
 
     if (receipt != null && receipt.gasUsed !== expectedGasUsed) {
       // tslint:disable-next-line: no-console
@@ -354,7 +411,7 @@ describe('Transfer tests', function(this: any) {
       used: receipt && receipt.gasUsed,
       expected: expectedGasUsed,
     }
-    return { ok, fees, gas }
+    return { ok, fees, gas, events }
   }
 
   function testTransferToken({
@@ -421,6 +478,16 @@ describe('Transfer tests', function(this: any) {
       it(`should increment the receiver's ${transferToken} balance by the transfer amount`, () =>
         assertEqualBN(balances.delta(ToAddress, transferToken), TransferAmount))
 
+      if (feeToken === CeloContract.StableToken) {
+        it('should have emitted transfer events for the fee token', () => {
+          assert(
+            txRes.events.find(
+              (a) => eqAddress(a.to, governanceAddress) && eqAddress(a.from, FromAddress)
+            )
+          )
+        })
+      }
+
       if (transferToken === feeToken) {
         it(`should decrement the sender's ${transferToken} balance by the transfer amount plus fees`, () => {
           const expectedBalanceChange = txRes.fees.total.plus(TransferAmount)
@@ -479,8 +546,8 @@ describe('Transfer tests', function(this: any) {
 
         describe('Transfer CeloGold >', () => {
           describe('with feeCurrency = CeloGold >', () => {
-            if (syncMode === 'light' || syncMode === 'ultralight') {
-              describe('when running in light/ultralight sync mode', () => {
+            if (syncMode === 'light' || syncMode === 'lightest') {
+              describe('when running in light/lightest sync mode', () => {
                 const recipient = (choice: string) => {
                   switch (choice) {
                     case 'peer':
@@ -584,10 +651,12 @@ describe('Transfer tests', function(this: any) {
         })
 
         describe('Transfer CeloDollars', () => {
-          const evmGasCost = 20325
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: evmGasCost + INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
+              expectedGas:
+                stableTokenTransferGasCost +
+                INTRINSIC_TX_GAS_COST +
+                ADDITIONAL_INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
             })
@@ -595,7 +664,7 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: evmGasCost + INTRINSIC_TX_GAS_COST,
+              expectedGas: stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
@@ -660,7 +729,10 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloDollars', () => {
           describe('feeCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: 75325,
+              expectedGas:
+                stableTokenTransferGasCost +
+                changedIntrinsicGasForAlternativeFeeCurrency +
+                INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
             })

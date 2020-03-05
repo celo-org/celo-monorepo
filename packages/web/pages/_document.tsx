@@ -1,12 +1,9 @@
 import Document, { DocumentContext, Head, Main, NextScript } from 'next/document'
 import * as React from 'react'
 import { AppRegistry, I18nManager } from 'react-native-web'
-import analytics from 'src/analytics/analytics'
 import { setDimensionsForScreen } from 'src/layout/ScreenSize'
-import Sentry from '../fullstack/sentry'
+import { getSentry } from 'src/utils/sentry'
 import { isLocaleRTL } from '../server/i18nSetup'
-// @ts-ignore
-const a = analytics
 
 interface NextReq {
   locale: string
@@ -40,6 +37,7 @@ export default class MyDocument extends Document<Props> {
     ])
 
     if (context.err) {
+      const Sentry = await getSentry()
       Sentry.captureException(context.err)
     }
 
@@ -52,7 +50,7 @@ export default class MyDocument extends Document<Props> {
       <html lang={locale} style={{ height: '100%', width: '100%' }}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <link rel="stylesheet" href={'/static/normalize.css'} />
+          <link rel="stylesheet" href={'/normalize.css'} />
 
           <link
             rel="stylesheet"
@@ -64,7 +62,7 @@ export default class MyDocument extends Document<Props> {
             rel="stylesheet"
           />
 
-          <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
+          <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         </Head>
         <body>
           <Main />

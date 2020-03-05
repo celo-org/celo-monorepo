@@ -10,6 +10,9 @@ const CONTRACTKIT_GEN_DIR = path.normalize(path.join(ROOT_DIR, '../contractkit/s
 export const ProxyContracts = [
   'AccountsProxy',
   'AttestationsProxy',
+  'BlockchainParametersProxy',
+  'DoubleSigningSlasherProxy',
+  'DowntimeSlasherProxy',
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
@@ -17,12 +20,13 @@ export const ProxyContracts = [
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
+  'GovernanceApproverMultiSigProxy',
+  'GovernanceProxy',
   'LockedGoldProxy',
-  'MultiSigProxy',
   'ReserveProxy',
+  'ReserveSpenderMultiSig',
   'StableTokenProxy',
   'SortedOraclesProxy',
-  'GovernanceProxy',
   'RegistryProxy',
   'BlockchainParametersProxy',
 ]
@@ -40,8 +44,11 @@ export const CoreContracts = [
   'EpochRewards',
   'Governance',
   'BlockchainParameters',
+  'DoubleSigningSlasher',
+  'DowntimeSlasher',
   'LockedGold',
   'Validators',
+  'ReleaseGold',
 
   // identity
   'Attestations',

@@ -288,7 +288,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             }
           }
         >
-          0.20
+          0.25
         </Text>
       </View>
       <View
