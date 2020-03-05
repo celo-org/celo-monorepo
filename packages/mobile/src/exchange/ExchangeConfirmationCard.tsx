@@ -4,7 +4,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
-import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
+import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import ExchangeRate from 'src/exchange/ExchangeRate'
@@ -59,16 +59,24 @@ export function ExchangeConfirmationCard(props: Props) {
 
       <View style={styles.feeContainer}>
         <LineItemRow
-          currencySymbol={takerToken}
-          amount={fee || '0.00'}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
+          amount={
+            <CurrencyDisplay
+              amount={{ value: fee || '0', currencyCode: CURRENCIES[takerToken].code }}
+              formatType={FormatType.Fee}
+            />
+          }
         />
         <LineItemRow
-          currencySymbol={takerToken}
-          amount={tobinTax}
           title={t('exchangeFee')}
           titleIcon={<FeeIcon isExchange={true} />}
+          amount={
+            <CurrencyDisplay
+              amount={{ value: tobinTax || '0', currencyCode: CURRENCIES[takerToken].code }}
+              formatType={FormatType.Fee}
+            />
+          }
         />
       </View>
     </View>
