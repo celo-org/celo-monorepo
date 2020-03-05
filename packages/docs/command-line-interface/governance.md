@@ -213,7 +213,10 @@ OPTIONS
   --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
                                                      'auto' which uses whatever feeCurrency is available)
 
-  --jsonTransactions=jsonTransactions                (required) Path to json transactions
+  --interactive                                      Form proposal using an interactive prompt for Celo registry
+                                                     contracts and functions
+
+  --jsonTransactions=jsonTransactions                Path to json transactions
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -224,6 +227,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --number=number                                    [default: 1] Number of transactions to prompt for in interactive
+                                                     mode
 
   --useLedger                                        Set it to use a ledger wallet
 
