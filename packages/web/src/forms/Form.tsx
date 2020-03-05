@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { NativeSyntheticEvent, TextInputChangeEventData } from 'react-native'
 interface State {
   isComplete: boolean
   isLoading: boolean
@@ -11,10 +11,15 @@ type FormField = string
 
 type FormState = Record<FormField, string>
 
+interface NativeEvent {
+  target: { name: string; value: string | boolean }
+}
+
 interface ChildArguments {
   onSubmit: (any?: any) => Promise<void>
   onAltSubmit: () => boolean
-  onInput: (any: any) => void
+  onInput: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void
+  onCheck: (event: { nativeEvent: NativeEvent }) => void
   onSelect: (key: string) => (event) => void
   formState: State
 }
@@ -110,6 +115,11 @@ export default class Form extends React.Component<Props, State> {
     this.updateForm(name, value)
   }
 
+  onCheck = ({ nativeEvent }) => {
+    const field = nativeEvent.target.name || nativeEvent.target.htmlFor
+    this.updateForm(field, !this.state.form[field])
+  }
+
   clearError = (field: string) => {
     this.setState((state) => {
       return { ...state, errors: state.errors.filter((error) => error !== field) }
@@ -133,6 +143,7 @@ export default class Form extends React.Component<Props, State> {
       onSubmit: this.submit,
       onAltSubmit: this.altSubmit,
       onInput: this.onInput,
+      onCheck: this.onCheck,
       onSelect: this.onSelect,
       formState: { ...this.state },
     })

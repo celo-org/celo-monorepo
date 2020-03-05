@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import FormContainer from 'src/forms/Form'
-import {
-  // ErrorMessage,
-  Form,
-  LabeledInput,
-} from 'src/forms/FormComponents'
+import { CheckboxWithLabel, Form, LabeledInput } from 'src/forms/FormComponents'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import Button, { BTN } from 'src/shared/Button.3'
 import { standardStyles } from 'src/styles'
@@ -21,7 +17,7 @@ export default function SignupForm() {
   const { t } = useTranslation(NameSpaces.alliance)
   return (
     <FormContainer route="/" blankForm={BLANK_FORM}>
-      {({ formState, onInput, onAltSubmit }) => (
+      {({ formState, onInput, onCheck, onAltSubmit }) => (
         <Form>
           <View style={{ margin: 20 }}>
             <View style={standardStyles.row}>
@@ -54,6 +50,14 @@ export default function SignupForm() {
                 hasError={formState.errors.includes('contribution')}
                 name="contribution"
                 value={formState.form.contribution as string}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <CheckboxWithLabel
+                name={'subscribe'}
+                checked={!!formState.form.subscribe}
+                onPress={onCheck}
+                label={t('form.subscribe')}
               />
             </View>
           </View>

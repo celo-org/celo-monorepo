@@ -1610,8 +1610,7 @@ exports[`About renders 1`] = `
         }
       }
     >
-      – 
-      beautifulLifeSource
+      – beautifulLifeSource
     </div>
   </div>
   <div
