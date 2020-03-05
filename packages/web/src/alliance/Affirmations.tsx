@@ -47,7 +47,11 @@ export default function Affirmations() {
         image={wfp}
         preview={wfpPreview}
         logo={<Image resizeMode="contain" source={wfpLogo} style={styles.wfpLogo} />}
-        button={{ text: t('affirmations.wfpButton'), href: '/TODO' }}
+        button={{
+          text: t('affirmations.wfpButton'),
+          href:
+            'https://medium.com/celoorg/how-to-design-for-all-stories-from-tanzania-refugees-8b34594d64ae',
+        }}
         contentStyle={styles.cLabStyle}
       />
       <Exemplar
@@ -55,7 +59,10 @@ export default function Affirmations() {
         copy={t('affirmations.cLabsCopy')}
         image={clabs}
         preview={clabsPreview}
-        button={{ text: t('affirmations.cLabsButton'), href: '/TODO' }}
+        button={{
+          text: t('affirmations.cLabsButton'),
+          href: 'https://medium.com/celohq/a-cryptocurrency-for-every-juan-144144e62d5',
+        }}
         logo={<Image resizeMode="contain" source={cLabsLogo} style={styles.cLabsLogo} />}
         contentStyle={styles.wfpStyle}
       />
