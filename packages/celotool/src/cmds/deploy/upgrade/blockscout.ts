@@ -30,10 +30,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
 
   const dbSuffix = fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')
   const instanceName = `${argv.celoEnv}${dbSuffix}`
-  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
-    'BLOCKSCOUT_DB_SUFFIX',
-    ''
-  )}`
+  const helmReleaseName = `${argv.celoEnv}-blockscout${dbSuffix}`
 
   const [
     blockscoutDBUsername,

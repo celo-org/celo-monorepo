@@ -41,11 +41,9 @@ export const handler = async (argv: BlockscoutInitialArgv) => {
 
   await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName)
 
-  const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
-  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
-    'BLOCKSCOUT_DB_SUFFIX',
-    ''
-  )}`
+  const dbSuffix = fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')
+  const instanceName = `${argv.celoEnv}${dbSuffix}`
+  const helmReleaseName = `${argv.celoEnv}-blockscout${dbSuffix}`
 
   const [
     blockscoutDBUsername,
