@@ -60,6 +60,7 @@ import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import { getBalanceColor } from 'src/utils/formatting'
 
 const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
   ValidatedTextInput
@@ -425,12 +426,15 @@ export class SendAmount extends React.Component<Props, State> {
             <View style={style.balanceContainer}>
               <Text style={fontStyles.bodySmall}>{t('newAccountBalance')}</Text>
               <CurrencyDisplay
-                style={[fontStyles.bodySmall, fontStyles.semiBold]}
+                style={[
+                  fontStyles.bodySmall,
+                  fontStyles.semiBold,
+                  { color: getBalanceColor(newAccountBalance) },
+                ]}
                 amount={{
                   value: newAccountBalance.toString(),
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
-                useColors={true}
               />
             </View>
           </View>

@@ -484,9 +484,12 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                   Object {
                     "fontFamily": "Hind-SemiBold",
                   },
+                  Object {
+                    "color": "#FD785B",
+                  },
                 ],
                 Object {
-                  "color": "#42D689",
+                  "color": "#FD785B",
                 },
               ]
             }
