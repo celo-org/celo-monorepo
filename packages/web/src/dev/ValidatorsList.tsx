@@ -116,6 +116,15 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
   }
   private defaultOrderAccessor = 'name'
   private cachedCleanData: CeloGroup[]
+  private orderByFn: { [by: string]: any } = {}
+
+  constructor(...args) {
+    super(args[0], args[1])
+
+    Object.keys(this.orderAccessors).forEach(
+      (orderType: any) => (this.orderByFn[orderType] = () => this.orderBy(orderType))
+    )
+  }
 
   expand(expanded: number) {
     if (this.state.expanded === expanded) {
@@ -238,49 +247,49 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
           <View style={[styles.table, styles.pStatic]}>
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'name')}
+                onClick={this.orderByFn.name}
                 style={[styles.tableHeaderCellPadding]}
                 name="Name"
                 order={orderBy === 'name' ? orderAsc : null}
               />
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'total')}
+                onClick={this.orderByFn.total}
                 style={[styles.sizeM]}
                 name="Elected/ Total"
                 order={orderBy === 'total' ? orderAsc : null}
               />
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'votes')}
+                onClick={this.orderByFn.votes}
                 style={[styles.sizeXL]}
                 name="Votes Available"
                 order={orderBy === 'votes' ? orderAsc : null}
               />
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'gold')}
+                onClick={this.orderByFn.gold}
                 style={[styles.sizeM]}
                 name="Locked CGLD"
                 order={orderBy === 'gold' ? orderAsc : null}
               />
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'commision')}
+                onClick={this.orderByFn.commision}
                 style={[styles.sizeM]}
                 name="Group Share"
                 order={orderBy === 'commision' ? orderAsc : null}
               />
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'rewards')}
+                onClick={this.orderByFn.rewards}
                 style={[styles.sizeM]}
                 name="Voter Rewards"
                 order={orderBy === 'rewards' ? orderAsc : null}
               />
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'uptime')}
+                onClick={this.orderByFn.uptime}
                 style={[styles.sizeS]}
                 name="Uptime"
                 order={orderBy === 'uptime' ? orderAsc : null}
               />
               <HeaderCell
-                onClick={this.orderBy.bind(this, 'attestation')}
+                onClick={this.orderByFn.attestation}
                 style={[styles.sizeS]}
                 name="Attestation"
                 order={orderBy === 'attestation' ? orderAsc : null}
