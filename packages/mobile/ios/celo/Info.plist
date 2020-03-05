@@ -25,6 +25,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>celo</string>
@@ -33,6 +35,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>17</string>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://l.celo.org</string>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -50,10 +56,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Celo Wallet needs camera access to scan QR codes.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Celo Wallet needs access to save your QR code to your photos.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Celo Wallet can import your contacts so you can transact with them.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Celo Wallet needs access to save your QR code to your photos.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>

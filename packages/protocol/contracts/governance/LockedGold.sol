@@ -197,7 +197,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
-    require(getGoldToken().transfer(msg.sender, value), "Transfer failed");
+    msg.sender.transfer(value);
     emit GoldWithdrawn(msg.sender, value);
   }
 

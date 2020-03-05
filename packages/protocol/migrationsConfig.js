@@ -1,9 +1,11 @@
 const { toFixed } = require('@celo/utils/lib/fixidity')
+const { CeloContractName } = require('@celo/protocol/lib/registry-utils')
 
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')
 const lodash = require('lodash')
+const web3 = require('web3')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
@@ -19,6 +21,7 @@ const DefaultConfig = {
     attestationExpiryBlocks: HOUR / 5, // ~1 hour,
     attestationRequestFeeInDollars: 0.05,
     selectIssuersWaitBlocks: 4,
+    maxAttestations: 100,
   },
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
@@ -140,6 +143,14 @@ const DefaultConfig = {
     },
     oracles: [],
     frozen: true,
+  },
+  transferWhitelist: {
+    addresses: [], // TODO(Alec): get whitelist of addresses.
+    registryIds: [
+      web3.utils.soliditySha3(CeloContractName.Governance),
+      web3.utils.soliditySha3(CeloContractName.LockedGold),
+      web3.utils.soliditySha3(CeloContractName.Reserve),
+    ],
   },
   validators: {
     groupLockedGoldRequirements: {

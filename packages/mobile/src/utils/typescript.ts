@@ -24,3 +24,8 @@ export type InferProps<T extends React.ComponentType<any>> = T extends React.Com
 export function isPresent<T>(t: T | undefined | null | void): t is T {
   return t !== undefined && t !== null
 }
+
+// As per https://www.typescriptlang.org/docs/handbook/advanced-types.html#exhaustiveness-checking
+export function assertNever(x: never): never {
+  throw new Error('Unexpected object: ' + x)
+}

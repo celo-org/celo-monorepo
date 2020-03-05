@@ -1,0 +1,706 @@
+{
+  "data": {
+    "leaderboard": [
+      {
+        "address": "0x775A5C899FD4A7CDD54E9F41738087748CFCB953",
+        "identity": "Chainlayer1",
+        "points": 1.424680194632599e+24
+      },
+      {
+        "address": "0x91F5F037EFDB97D0C7A840276837D4226B91A258",
+        "identity": "census0",
+        "points": 1.3714476978782098e+24
+      },
+      {
+        "address": "0xF5B15312E6407988372D9280D064DAA0248181BE",
+        "identity": "wotrust1",
+        "points": 1.3557993182799077e+24
+      },
+      {
+        "address": "0x694FB0E26FC592984C8A310EB4FE9BCC3037CA48",
+        "identity": "celvaly0",
+        "points": 1.2305533734191845e+24
+      },
+      {
+        "address": "0x43C8CC9884D8E2EA870C33BDC25F495C25F269DF",
+        "identity": "dsrv labs - WellDoneStake.com",
+        "points": 1.0578393398704731e+24
+      },
+      {
+        "address": "0x92FB67ACE261E016678CD221972F21F5C03D781A",
+        "identity": "syncnode",
+        "points": 1.0300702374289402e+24
+      },
+      {
+        "address": "0xEC4E104BD412AAEA47C4AE753A8B3A194E9939AC",
+        "identity": "YYYYYYYYYYYYY",
+        "points": 1.0220965947283513e+24
+      },
+      {
+        "address": "0xBCD25468E4D433AC442B87F32B37B39678BF7077",
+        "identity": "Qoor.io",
+        "points": 1.0044943713090097e+24
+      },
+      {
+        "address": "0xE193D7CCB6D5644BFF9C9BF41FF1E62765B382E8",
+        "identity": "usopp",
+        "points": 9.556115419667058e+23
+      },
+      {
+        "address": "0x2EE2A7FD94A31CF1E6DB3875F4FD3D961B15DE17",
+        "identity": "stella",
+        "points": 9.304727436749021e+23
+      },
+      {
+        "address": "0x0C561CFE5616E01467BA9792F0BC320314C7B1C6",
+        "identity": "tessellated-geometry",
+        "points": 9.241218797932883e+23
+      },
+      {
+        "address": "0xB84FA68DB82AF1BFCBB4B876E017657AFB1DD615",
+        "identity": "steakvalley01",
+        "points": 8.782707924960094e+23
+      },
+      {
+        "address": "0x2FBAAF12676191EAB6BF9D92E84EABF11F303D7F",
+        "identity": "Alive29",
+        "points": 8.500150359659538e+23
+      },
+      {
+        "address": "0xD6F05649C5350C20030DE1DC57ED31510141F487",
+        "identity": "MoonletV",
+        "points": 8.410096496492368e+23
+      },
+      {
+        "address": "0xEA6A71634F7228798EC8AC6395525A632EC4945E",
+        "identity": "AGx1",
+        "points": 8.223475111610611e+23
+      },
+      {
+        "address": "0xE2B8269E836C0F2EDE96802405410203FB0DE3A6",
+        "identity": "happycelo",
+        "points": 7.921885559855452e+23
+      },
+      {
+        "address": "0xB060351F01492A56287F0D9E07DA18116C93728F",
+        "identity": "Celory",
+        "points": 7.675920559599252e+23
+      },
+      {
+        "address": "0xDBC52F9E934145E2E3172AEAD59303328BBAD2D1",
+        "identity": "Bison Trails",
+        "points": 7.56314388058134e+23
+      },
+      {
+        "address": "0x61D7E2D39B924744FEBC65D141F30E9F644BD286",
+        "identity": "Figment Networks",
+        "points": 7.482140632896879e+23
+      },
+      {
+        "address": "0xEE9D99071E541E19EAE7F1063539EF5B39199BD6",
+        "identity": "DY",
+        "points": 7.370351810943519e+23
+      },
+      {
+        "address": "0xD0604078265249629759F6F342CC5D19461B2C8B",
+        "identity": "euclid0",
+        "points": 7.232617674103838e+23
+      },
+      {
+        "address": "0xEDF3DACB0FDA9A955956CFC7F833EA4DBE26C4F2",
+        "identity": "sharpcelo",
+        "points": 6.835170220069158e+23
+      },
+      {
+        "address": "0x1569C74093B9393BA5D5A684013458B1F3000185",
+        "identity": "chainvibes",
+        "points": 6.667899401522042e+23
+      },
+      {
+        "address": "0xE4DC20758DF2B3DAB5DBBFD3239CCDC0B9682206",
+        "identity": "gunray01",
+        "points": 6.491776063053036e+23
+      },
+      {
+        "address": "0xC9D9A8DBBC238CE17134DC9C12447DCC137630A7",
+        "identity": "TDlabs",
+        "points": 6.369641795037865e+23
+      },
+      {
+        "address": "0xC3A0AC447E6E2BA795CBDD8A3648CB2779203EA4",
+        "identity": "nonce - validator1",
+        "points": 6.261975787783178e+23
+      },
+      {
+        "address": "0x0BCDF73C45D99F33D1D8354980D7CA73C4CF72DB",
+        "identity": "projecttent-ceres",
+        "points": 6.030549250365057e+23
+      },
+      {
+        "address": "0x7BF109E20BAE23C8A68C3A975C9E3D7BEA941658",
+        "identity": "zoro",
+        "points": 5.98494019701169e+23
+      },
+      {
+        "address": "0x4500B26A6F52836510BFD013241DF203F03456F8",
+        "identity": "pretoria",
+        "points": 5.9326204143994785e+23
+      },
+      {
+        "address": "0xB7B3C854B00D65208E410A5D16EB54F58DBEBBC7",
+        "identity": "StakesStone",
+        "points": 5.6125378381094684e+23
+      },
+      {
+        "address": "0xCF08368E0AA6D6017A2FEDE771EA72ABB555F266",
+        "identity": "Chainflow-Validator",
+        "points": 5.607592262500763e+23
+      },
+      {
+        "address": "0x9F85BAEFB7942F8B6D03C28AF32D09756830C1E8",
+        "identity": "NGA_validator",
+        "points": 5.4754974258199e+23
+      },
+      {
+        "address": "0x9880279FA2A2170B9F3D89181249A34A291E6547",
+        "identity": "moonlime",
+        "points": 5.4268309756909864e+23
+      },
+      {
+        "address": "0xE49515934D5EB7E8A2DF1F6B00A819DE9938F2C6",
+        "identity": "SlavaMo",
+        "points": 5.423733714792421e+23
+      },
+      {
+        "address": "0x9913E776ED11E9247EF89B4E8B2B7C062FAA5281",
+        "identity": "Staking Fund",
+        "points": 5.374774430008712e+23
+      },
+      {
+        "address": "0x48CEDC58B10AF13D688631BC3CB78A05B8A6E56A",
+        "identity": "Zanshin",
+        "points": 5.36796141319395e+23
+      },
+      {
+        "address": "0xB1BEB7832F72B27D045A9078D8ADB0A3E42B3F99",
+        "identity": "Inotel",
+        "points": 5.365389028289286e+23
+      },
+      {
+        "address": "0xCBEBE96DD4811243E23B1F7B43D7C3266C59AF2F",
+        "identity": "bitcat",
+        "points": 5.356126300216914e+23
+      },
+      {
+        "address": "0x362F0DD270E96A8AB333C4283541FB15DC817126",
+        "identity": "GRom81",
+        "points": 5.345610974639469e+23
+      },
+      {
+        "address": "0xA866EFED4E0AF66A1FBF2C0CBC3E39197CBC5B01",
+        "identity": "happy-new-year",
+        "points": 5.3007421801802894e+23
+      },
+      {
+        "address": "0x575240F049AEA7BC783F60BEBD7FCB5584A54B4A",
+        "identity": "chorusone",
+        "points": 5.2683690267417976e+23
+      },
+      {
+        "address": "0x4F9F7FA5DB4A44A469F95115E0525F548605C7FD",
+        "identity": "UbikCapital",
+        "points": 5.258045137937604e+23
+      },
+      {
+        "address": "0x255F0DE37B99D52AD4189D06AB4F63A748B2D235",
+        "identity": "TheLoop",
+        "points": 5.0308342378050794e+23
+      },
+      {
+        "address": "0x3DF5F6EF8095ED76338F8FF94203A5B42FCAD62F",
+        "identity": "a16z-0",
+        "points": 5.0224593737669824e+23
+      },
+      {
+        "address": "0x65C5BF635E57D6791A5A81FD64C186FC6B43F459",
+        "identity": "maugli",
+        "points": 4.7629979613212506e+23
+      },
+      {
+        "address": "0x060B52F506579625AD73B99F1BE8D6B06259953D",
+        "identity": "stablenode-0",
+        "points": 4.6496810753955126e+23
+      },
+      {
+        "address": "0xF3EE14DFBBBB7F0EF1EF787BE39BF4814741E300",
+        "identity": "Simply Staking",
+        "points": 4.598411590144534e+23
+      },
+      {
+        "address": "0xE81ECE7F8F962BD1076F1134D1FD523D64E43702",
+        "identity": "onenode",
+        "points": 4.5889407217034764e+23
+      },
+      {
+        "address": "0x30FD0740B4A6DFA31924982D377EE634B86D7A95",
+        "identity": "zbx001",
+        "points": 4.504108088033228e+23
+      },
+      {
+        "address": "0x4A36B1EEB0178C9948CFFB183A2333E98EBB888D",
+        "identity": "huglester00",
+        "points": 4.2917198570021634e+23
+      },
+      {
+        "address": "0xA250B8D79653DE86CF7431FF0719DC77FE08CCFB",
+        "identity": "bmass",
+        "points": 4.257604222560732e+23
+      },
+      {
+        "address": "0xE32C4FC7E75091197E7CE24F0B1257EA858C6A0D",
+        "identity": "sparkpool-v1",
+        "points": 4.2532739376739326e+23
+      },
+      {
+        "address": "0x9A4B4F0469E5A871A27CC9451CE69A6CF769D757",
+        "identity": "cnstnt.xyz",
+        "points": 4.248370818683233e+23
+      },
+      {
+        "address": "0xC2D5C2AC49FB7511584E567A48EF96917110AD9D",
+        "identity": "hashquark",
+        "points": 4.175738947878929e+23
+      },
+      {
+        "address": "0x81A9CC4103E2C66A652B2C17BAAF134FDAEAFCA9",
+        "identity": "ryabina-1",
+        "points": 4.142007538435338e+23
+      },
+      {
+        "address": "0x0E5F835AF9F0C32BD48B6540207844DD08BCA3E9",
+        "identity": "Anna ❄️",
+        "points": 4.137944076934989e+23
+      },
+      {
+        "address": "0x453F92064CD11CFC185B058757FD5AB23F98B978",
+        "identity": "Nodeasy",
+        "points": 4.061281675907115e+23
+      },
+      {
+        "address": "0x6A2998527CD699982364C9399D17B63C6CA22A41",
+        "identity": "NeNa",
+        "points": 4.044003934665777e+23
+      },
+      {
+        "address": "0xF4691164B53141BD4082592C0E979689A0486500",
+        "identity": "Masternode24",
+        "points": 4.0015236522812396e+23
+      },
+      {
+        "address": "0xF823E8A4BA6ADDDB02E97B5B8886D18E41B2723E",
+        "identity": "Bi23",
+        "points": 3.9722967277373924e+23
+      },
+      {
+        "address": "0xC6034975EE23BB19685BFFD3C4E818E964E0D7C7",
+        "identity": "stakery",
+        "points": 3.876218152185723e+23
+      },
+      {
+        "address": "0x1985B61750657AC41656A67565950B6B48BAC809",
+        "identity": "Bambarello",
+        "points": 3.836076990834306e+23
+      },
+      {
+        "address": "0xB584F6A8E1196B27592E3EC69446BED1B76D52D9",
+        "identity": "Newroad",
+        "points": 3.764860816073488e+23
+      },
+      {
+        "address": "0xE820238DC7B75B7602DAFC7FFCCD35C9EF5E2FDF",
+        "identity": "kytzu",
+        "points": 3.725332575431249e+23
+      },
+      {
+        "address": "0x5EEE762A960560CB6A625F280E53F92D93EC9B78",
+        "identity": "EZ_Group",
+        "points": 3.4101007334146886e+23
+      },
+      {
+        "address": "0xC8C8E28DBE45A95B70D3F19B9A225B3531642A79",
+        "identity": "mariposa",
+        "points": 3.3196787270940203e+23
+      },
+      {
+        "address": "0xF327386EF9D6BE057D1C720FEF633938743660F3",
+        "identity": "daithi-blockdaemon",
+        "points": 3.2093970152061756e+23
+      },
+      {
+        "address": "0x87F394E0DEABB94D844AE62FF2AEA730F75BD33D",
+        "identity": "war-validator",
+        "points": 3.1153675788092623e+23
+      },
+      {
+        "address": "0x5582268E275FC3407F92FA80DD3F0D05904A723A",
+        "identity": "CypherCore",
+        "points": 2.9866744173374292e+23
+      },
+      {
+        "address": "0x75BDA3AC305484C50DF6C66014B11EFF13216F26",
+        "identity": "stake.fish",
+        "points": 2.9021072167244145e+23
+      },
+      {
+        "address": "0x4BB62DFD16FBD3D267E3F2D6F37F3B41401C6E27",
+        "identity": "POS Bakerz",
+        "points": 2.7429511965289825e+23
+      },
+      {
+        "address": "0x0B3654A18513C76EEE3A576241F328A3514F26E8",
+        "identity": "cryptiumlabs",
+        "points": 2.4465528781896873e+23
+      },
+      {
+        "address": "0x6A2BEEA75F32F2E7B264E9F25AC970C5210E9230",
+        "identity": "DokiaCapital",
+        "points": 1.8356381876597984e+23
+      },
+      {
+        "address": "0xB1782C590339BCCE5677960CEEA1B5F5B5FBE566",
+        "identity": "Wanderer",
+        "points": 1.819661636127279e+23
+      },
+      {
+        "address": "0x556B94105721E92331EF09E5689A72481A590DC1",
+        "identity": "ztake.org",
+        "points": 1.7155921706166354e+23
+      },
+      {
+        "address": "0xB57BC132A8BD43CDB57F8D46F7F4C7AE18620E46",
+        "identity": "Endor",
+        "points": 1.6200999669841658e+23
+      },
+      {
+        "address": "0xD8115F550490958D6F897D75904650842FA696FA",
+        "identity": "Staking_Hub",
+        "points": 1.3310634811306128e+23
+      },
+      {
+        "address": "0xFB92C612BE9C9758D7111DAA07954EB0455D224B",
+        "identity": "yourcodesucks",
+        "points": 1.1490907947693158e+23
+      },
+      {
+        "address": "0x8FB800B94D2B1258236E598FCD5E65EAF45CA671",
+        "identity": "celo_xigua",
+        "points": 1.0751709142316883e+23
+      },
+      {
+        "address": "0x608FE2DBE23917F523E157FE7D8044243417A1E8",
+        "identity": "CeloGreen",
+        "points": 9.505729688692032e+22
+      },
+      {
+        "address": "0xB1CB7EA2D15EF69D01AAF8185EDBEF0076D83454",
+        "identity": "P2P-Validator",
+        "points": 9.45590661027307e+22
+      },
+      {
+        "address": "0x940F7E5E603377F58FFA019EA2AD7200C88C5086",
+        "identity": "staked",
+        "points": 8.809346825454345e+22
+      },
+      {
+        "address": "0x2C8A412026454D1E56B9687DD88D4A6080C10E87",
+        "identity": "ChainodeTech",
+        "points": 6.84759662930762e+22
+      },
+      {
+        "address": "0x0AB74005A6017533D2F38F74BD029D18426BDA0B",
+        "identity": "Cyberili",
+        "points": 5.2716571675664795e+22
+      },
+      {
+        "address": "0xCF5D9C9514E7217A19CD975CECC0257C9B69DB1B",
+        "identity": "bantham",
+        "points": 5.1476291750209606e+22
+      },
+      {
+        "address": "0xE33722565FADDE6225A26586F48D8625C50147C4",
+        "identity": "251A-VALIDATOR",
+        "points": 5.042353310164666e+22
+      },
+      {
+        "address": "0x4A47F329F9429EE621E6B359E46FF3B5AC79E5E7",
+        "identity": "Convoluted",
+        "points": 4.791642492862297e+22
+      },
+      {
+        "address": "0xF7084F320F3779DD2A92A2F58D23ABB35F8A9C15",
+        "identity": "IntegralOps",
+        "points": 4.7663820764653426e+22
+      },
+      {
+        "address": "0x66D4902810A03F45015998A8E92BE8E2FA49C05A",
+        "identity": "YJQ-VAD01",
+        "points": 4.685778817599185e+22
+      },
+      {
+        "address": "0x19F79EAA92D20E0A2E7BF24E32FFFC5A1239BC8C",
+        "identity": "celo_tudou",
+        "points": 4.682916791284398e+22
+      },
+      {
+        "address": "0xAF8911392621C7881F4EF1A83021C651E0656F2A",
+        "identity": "witval",
+        "points": 4.405153780289675e+22
+      },
+      {
+        "address": "0x6835CD60ECCBF73437E3A62CD460A52E1E9755FA",
+        "identity": "ConsensusNetworks",
+        "points": 4.291769576241885e+22
+      },
+      {
+        "address": "0x89A2BB2F22E84AEDF0C4152B9EF80CC2F015DF51",
+        "identity": "celoisitmeyourelookingfor",
+        "points": 4.053153833769552e+22
+      },
+      {
+        "address": "0x673EC125D05F8AA71F735407A87A14836D775512",
+        "identity": "chuiyun01",
+        "points": 3.94890967236449e+22
+      },
+      {
+        "address": "0xF5E4574972B165C499DEBEE15926205398BC2CD7",
+        "identity": "dmval",
+        "points": 3.6422180277192766e+22
+      },
+      {
+        "address": "0x633C83D129EAC4B8336226F19773C1FD0A4F7FDE",
+        "identity": "turbo",
+        "points": 3.4222501881599215e+22
+      },
+      {
+        "address": "0x0474FE22B801E5684AC54F65C2C5C34352C1E479",
+        "identity": "forbole",
+        "points": 3.365332778944065e+22
+      },
+      {
+        "address": "0x5CE23CDF3D8477B7BE52C69156034C7F391CA4FC",
+        "identity": "djam",
+        "points": 3.187301228130622e+22
+      },
+      {
+        "address": "0x0537D935B50124B3BB9277D0356CE45400579C57",
+        "identity": "Wetez",
+        "points": 3.0038672904829218e+22
+      },
+      {
+        "address": "0x0328B30DD55BAA5A5FC1BE23C4575A7FB779DC25",
+        "identity": "sikka-0",
+        "points": 2.7167273133129175e+22
+      },
+      {
+        "address": "0x4DA496AF48238FEFEA8B4FFE6183310750CCA6EA",
+        "identity": "andreyvelde-validator",
+        "points": 2.4527759817639914e+22
+      },
+      {
+        "address": "0x60E8DD93413A473A7BF354E292057688F179E8C0",
+        "identity": "eosnairobi",
+        "points": 2.197527553984711e+22
+      },
+      {
+        "address": "0x4D2F9739E6D82663BBD1FC3FD3CEE041D631AF7D",
+        "identity": "ou812",
+        "points": 2.0808012476307512e+22
+      },
+      {
+        "address": "0xD1D4C8B640CE83FAF89C60BF47E7319F0FFE57F0",
+        "identity": "apt4e",
+        "points": 1.955621644144585e+22
+      },
+      {
+        "address": "0x1674E1F2C0B6D6F1B569F95795F623B76919BB91",
+        "identity": "Unknown account",
+        "points": 1.3999980392355002e+22
+      },
+      {
+        "address": "0xDD30983C073D20116477FF672543E3EEC3F491AF",
+        "identity": "matmeth-validator",
+        "points": 1.2481522352220986e+22
+      },
+      {
+        "address": "0x1A7A7AF9E78A690979963F1641F9694853226D0A",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x13B3E17F8CF507D8FEE3532C3826D1B9D84D8BB2",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xEF621AF83C70695DAAC497D7959D2848C8A2ACEA",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x10E7E7616304773BB6A6584AD7B7E9AE17CC8352",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xAE3AAFFA0F2B5D8490BFA212C39A032852FB20DE",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x0B3B9A58056D786E42A024225A507F26A6CD698C",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x0BD061B698161D943DECD91590F0E43C54BB4AD4",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xAEAC20CDB7F9CDDA85AD09AC0920047E41BF0BCC",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xA6DB023DFB73785F3321CD409622E6B7DF69E9B2",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xB0C9FA734E0FAC63D9051554E869C33EBCFCEC6D",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xA5317A01D642FA1979056E886504513B28E31F05",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xA5247FB4678574FE6663253135CDF479A06BEF9B",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x9B6828D728EC0AEDD7E8FE1DA93979D66F70968B",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x99100ADA9E90A4B1E8E7754FE6B4F3FB1D049113",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x91D44695A988BF5AC192C8F1F0493D48724D15AD",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x8B4A3ADEB377D478708AEE2F0DACDAAF889845BC",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x8482688F494A359D9EFE5C37C5E16071F97890BD",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xC37021CC0EC286891A203D19901B0572B7BEAD1D",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x6BB1E8C0ECC1BDB3D6CE3B3359F2FFAA3CFB6F28",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xC50FBD7054E3EEF480FB8C61A6A5798B3A8BCBBB",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xC8575778154215A9ED1949FF7C18863ACF7116DE",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xCAD07EBF3C922BFE1292D4FBFCE015A934E520B9",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x62F959F22DBE968D1A41D426AE9DAD5596B93236",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xD660EB4C3D84BEAFE836E351D6C65F9CF62BD51F",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x5D206C2898034D4DF75E075D0BF834397791191F",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xDF917121EFDC92E1EA4414731AD3FD5D07BDE322",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x43DDA21951E06E5C70BD9196A49B2D2EB47018D8",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x2DC4051191C05C00821168256084455A5EB1BA1E",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xE556D76384334A7138CA85E5EB4281C909628AE1",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x22031B9BA9C5FE20BEDCF559E7D1966E2FF03173",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0xF901E39FB6C2B7CCE470B2EEDB46DC541D093B7E",
+        "identity": "Unknown account",
+        "points": 1.2e+22
+      },
+      {
+        "address": "0x44E11B8EB591A5B8B0CF4DB6B02AD60E6ED89A62",
+        "identity": "centralized-minotaur-group",
+        "points": 1.199999482339e+22
+      },
+      {
+        "address": "0xE01886C1C29F5E1CA8F6DE0C02108967712AE216",
+        "identity": "Appeal2Heaven",
+        "points": 1.1999992393425e+22
+      },
+      {
+        "address": "0xEA4FDA0CAC8B4D978CD8773778FA8232AA22AD2F",
+        "identity": "Unknown account",
+        "points": 1.6628455249287305e+21
+      }
+    ]
+  }
+}
