@@ -262,7 +262,7 @@ export class Header extends React.PureComponent<Props, State> {
                     )}
                   </View>
                 ))}
-                <View style={[styles.linkWrapper]}>
+                <View style={styles.linkWrapper}>
                   <Button
                     kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
                     href={'https://medium.com/CeloHQ'}
@@ -271,7 +271,7 @@ export class Header extends React.PureComponent<Props, State> {
                     iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
                   />
                 </View>
-                <View style={[styles.linkWrapper]}>
+                <View style={[styles.linkWrapper, styles.lastLink]}>
                   <Button
                     kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
                     href={CeloLinks.gitHub}
@@ -405,7 +405,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
-    marginRight: 50,
+    marginHorizontal: 20,
+  },
+  lastLink: {
+    marginRight: 10,
   },
   hamburger: {
     position: 'fixed',
