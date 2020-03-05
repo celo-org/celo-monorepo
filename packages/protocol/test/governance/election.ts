@@ -953,62 +953,6 @@ contract('Election', (accounts: string[]) => {
       })
     })
 
-    describe.only('when there are 30 validators in 6 groups', () => {
-      beforeEach(async () => {
-        await mockLockedGold.setTotalLockedGold(new BigNumber(10000e18 * 30 + 450000e18))
-        await mockValidators.setNumRegisteredValidators(30)
-        await mockLockedGold.incrementNonvotingAccountBalance(voter1.address, new BigNumber(1e30))
-        await election.setElectabilityThreshold(toFixed(0.001))
-        await election.setElectableValidators(1, 20)
-
-        await election.setMaxNumGroupsVotedFor(200)
-        let prev = NULL_ADDRESS
-        const randomVotes = [
-          new BigNumber(100000e18),
-          new BigNumber(50000e18),
-          new BigNumber(10000e18),
-          new BigNumber(10000e18),
-          new BigNumber(10000e18),
-          new BigNumber(10000e18),
-        ]
-        const pad = (a: string) => {
-          let res = a
-          while (res.length < 42) {
-            res = res + 'f'
-          }
-          return res
-        }
-        // randomVotes = randomVotes.sort((a, b) => b - a)
-        for (let i = 0; i < 6; i++) {
-          await mockValidators.setMembers(pad('0x00' + i), [
-            pad('0x1a' + i),
-            pad('0x2a' + i),
-            pad('0x3a' + i),
-            pad('0x4a' + i),
-            pad('0x5a' + i),
-          ])
-          /*
-          numbers[pad('0x1a' + i)] = randomVotes[i]
-          numbers[pad('0x2a' + i)] = randomVotes[i] / 2
-          numbers[pad('0x3a' + i)] = randomVotes[i] / 3
-          numbers[pad('0x4a' + i)] = randomVotes[i] / 4
-          numbers[pad('0x5a' + i)] = randomVotes[i] / 5
-          */
-          await registry.setAddressFor(CeloContractName.Validators, accounts[0])
-          await election.markGroupEligible(pad('0x00' + i), NULL_ADDRESS, prev)
-          await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-          await election.vote(pad('0x00' + i), randomVotes[i], NULL_ADDRESS, prev, {
-            from: voter1.address,
-          })
-          prev = pad('0x00' + i)
-        }
-      })
-      it('can elect correct validators', async () => {
-        const lst = await election.electNValidatorSigners(1, 20)
-        console.log(lst)
-      })
-    })
-
     describe('when there are some groups', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group1, [validator1, validator2, validator3, validator4])
