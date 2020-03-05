@@ -3,7 +3,7 @@ export enum Category {
   'Earn' = 'Earn',
   'Educate' = 'Educate',
   'Give' = 'Give',
-  'Invest' = 'Invest',
+  'Grow' = 'Grow',
   'Lend' = 'Lend',
   'Pay' = 'Pay',
   'Send' = 'Send',

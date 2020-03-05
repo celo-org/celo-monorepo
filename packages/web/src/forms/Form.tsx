@@ -9,7 +9,7 @@ interface State {
 
 type FormField = string
 
-type FormState = Record<FormField, string>
+type FormState = Record<FormField, any>
 
 interface NativeEvent {
   target: { name: string; value: string | boolean }

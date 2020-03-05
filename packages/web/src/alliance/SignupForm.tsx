@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import FormContainer from 'src/forms/Form'
+import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { CheckboxWithLabel, Form, LabeledInput } from 'src/forms/FormComponents'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -10,13 +10,28 @@ const BLANK_FORM = {
   name: '',
   email: '',
   contribution: '',
-  subscribe: '',
+  subscribe: false,
+}
+
+function validateWith(fields: Record<keyof typeof BLANK_FORM, string>) {
+  return Object.keys(fields).filter((key) => {
+    if (key === 'email') {
+      return !emailIsValid(fields[key])
+    } else if (key === 'subscribe' || key === 'contribution') {
+      return false
+    } else {
+      return !hasField(fields[key])
+    }
+  })
+}
+{
+  /* <ErrorMessage allErrors={formState.errors} field={'name'} t={t} /> */
 }
 
 export default function SignupForm() {
   const { t } = useTranslation(NameSpaces.alliance)
   return (
-    <FormContainer route="/" blankForm={BLANK_FORM}>
+    <FormContainer route="/api/alliance" blankForm={BLANK_FORM} validateWith={validateWith}>
       {({ formState, onInput, onCheck, onAltSubmit }) => (
         <Form>
           <View style={{ margin: 20 }}>

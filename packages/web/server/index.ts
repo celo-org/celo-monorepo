@@ -17,7 +17,6 @@ import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
-import getContributors from './getContributors'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
 import respondToError from './respondToError'
@@ -167,10 +166,10 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     }
   })
 
-  server.get('/api/contributors', async (_, res) => {
+  server.post('/api/alliance', async (req, res) => {
     try {
-      const assets = await getContributors()
-      res.json(assets)
+      // const assets = await getAssets(req.params.asset)
+      res.json(req.body)
     } catch (e) {
       respondToError(res, e)
     }

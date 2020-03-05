@@ -38,9 +38,7 @@ export default function Affirmations() {
         copy={t('affirmations.laboratoriaCopy')}
         image={laboratoria}
         preview={laboratoriaPreview}
-        logo={
-          <Image resizeMode="contain" source={laboratoriaLogo} style={{ width: 200, height: 70 }} />
-        }
+        logo={<Image resizeMode="contain" source={laboratoriaLogo} style={styles.laboratoria} />}
         contentStyle={styles.laborStyle}
       />
       <Exemplar
@@ -48,7 +46,7 @@ export default function Affirmations() {
         copy={t('affirmations.wfpCopy')}
         image={wfp}
         preview={wfpPreview}
-        logo={<Image resizeMode="contain" source={wfpLogo} style={{ width: 182, height: 80 }} />}
+        logo={<Image resizeMode="contain" source={wfpLogo} style={styles.wfpLogo} />}
         button={{ text: t('affirmations.wfpButton'), href: '/TODO' }}
         contentStyle={styles.cLabStyle}
       />
@@ -58,7 +56,7 @@ export default function Affirmations() {
         image={clabs}
         preview={clabsPreview}
         button={{ text: t('affirmations.cLabsButton'), href: '/TODO' }}
-        logo={<Image resizeMode="contain" source={cLabsLogo} style={{ width: 140, height: 50 }} />}
+        logo={<Image resizeMode="contain" source={cLabsLogo} style={styles.cLabsLogo} />}
         contentStyle={styles.wfpStyle}
       />
     </View>
@@ -84,8 +82,8 @@ function Exemplar({ image, logo, belief, copy, button, preview, contentStyle }: 
     <GridRow allStyle={standardStyles.elementalMargin}>
       <Cell span={Spans.half}>
         <View style={contentStyle}>
-          {logo}
-          <H4 style={standardStyles.elementalMargin}>{belief}</H4>
+          <H4 style={standardStyles.elementalMarginBottom}>{belief}</H4>
+          <View style={[standardStyles.elementalMargin]}>{logo}</View>
           <Text style={fonts.p}>{copy}</Text>
           {button && (
             <Button
@@ -116,6 +114,9 @@ function TransItalic({ i18nKey }: { i18nKey: string }) {
 }
 
 const styles = StyleSheet.create({
+  laboratoria: { width: 200, height: 35 },
+  wfpLogo: { width: 182, height: 80 },
+  cLabsLogo: { width: 140, height: 50 },
   photoContainer: { paddingHorizontal: 20 },
   laborStyle: { maxWidth: 440 },
   cLabStyle: { maxWidth: 475 },
