@@ -1,9 +1,6 @@
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 import { Platform } from 'react-native'
-import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
-import Mailer from 'react-native-mail'
-import { CELO_SUPPORT_EMAIL_ADDRESS } from 'src/config'
 
 class Logger extends ReactNativeLogger {
   getGethLogFilePath = () => {
@@ -65,38 +62,6 @@ class Logger extends ReactNativeLogger {
       this.showError('Failed to  copy files: ' + e)
       return false
     }
-  }
-
-  emailLogsToSupport = async (userId: string) => {
-    const combinedLogsPath = await this.createCombinedLogs()
-    if (!combinedLogsPath) {
-      return
-    }
-
-    const deviceInfo = {
-      version: DeviceInfo.getVersion(),
-      buildNumber: DeviceInfo.getBuildNumber(),
-      apiLevel: DeviceInfo.getApiLevelSync(),
-      deviceId: DeviceInfo.getDeviceId(),
-    }
-
-    const emailSubject = 'Celo support for ' + (userId || 'unknownUser')
-    Mailer.mail(
-      {
-        subject: emailSubject,
-        recipients: [CELO_SUPPORT_EMAIL_ADDRESS],
-        body: `<b>Support logs are attached...</b><b>${JSON.stringify(deviceInfo)}</b>`,
-        isHTML: true,
-        attachment: {
-          path: combinedLogsPath, // The absolute path of the file from which to read data.
-          type: 'text', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-          name: '', // Optional: Custom filename for attachment
-        },
-      },
-      (error: any, event: any) => {
-        this.showError(error + ' ' + event)
-      }
-    )
   }
 }
 

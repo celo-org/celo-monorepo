@@ -17,8 +17,9 @@
 @import Firebase;
 #import "RNFirebaseNotifications.h"
 #import "RNFirebaseMessaging.h"
-#import "RNSplashScreen.h"
+#import "RNFirebaseLinks.h"
 
+#import "RNSplashScreen.h"
 #import "ReactNativeConfig.h"
 
 // Use same key as react-native-secure-key-store
@@ -41,6 +42,7 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   [self resetKeychainIfNecessary];
   NSString *env = [ReactNativeConfig envFor:@"FIREBASE_ENABLED"];
   if (env.boolValue) {
+    [FIROptions defaultOptions].deepLinkURLScheme = @"celo";
     [FIRApp configure];
   }
   [RNFirebaseNotifications configure];
@@ -48,10 +50,10 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"celo"
                                             initialProperties:nil];
-
+  
   [RNSplashScreen showSplash:@"LaunchScreen" inRootView:rootView];
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
-
+  
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [UIViewController new];
   rootViewController.view = rootView;
@@ -90,7 +92,7 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
   if ([defaults boolForKey:kHasRunBeforeKey]) {
     return;
   }
-
+  
   NSArray *secItemClasses = @[(__bridge id)kSecClassGenericPassword,
                               (__bridge id)kSecAttrGeneric,
                               (__bridge id)kSecAttrAccount,
@@ -100,14 +102,28 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
     NSDictionary *spec = @{(__bridge id)kSecClass:secItemClass};
     SecItemDelete((__bridge CFDictionaryRef)spec);
   }
-
+  
   [defaults setBool:YES forKey:kHasRunBeforeKey];
   [defaults synchronize];
 }
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
-{
-  return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+  BOOL handled = [RCTLinkingManager application:application openURL:url options:options];
+  
+  if (!handled) {
+    handled = [[RNFirebaseLinks instance] application:application openURL:url options:options];
+  }
+  
+  return handled;
+}
+
+- (BOOL)application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray *))restorationHandler {
+  return [[RNFirebaseLinks instance] application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
