@@ -4,22 +4,14 @@ import * as React from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 
 interface LineItemProps {
-  currencySymbol: string
-  amount?: string
+  amount?: string | React.ReactNode
   title: string
   titleIcon?: React.ReactNode
   isLoading?: boolean
   hasError?: boolean
 }
 
-function LineItemRow({
-  currencySymbol,
-  amount,
-  title,
-  titleIcon,
-  isLoading,
-  hasError,
-}: LineItemProps) {
+function LineItemRow({ amount, title, titleIcon, isLoading, hasError }: LineItemProps) {
   return (
     <View style={style.lineItemRow}>
       <View style={style.lineItemDescription}>

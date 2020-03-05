@@ -19,7 +19,7 @@
   "securityFee": "Security Fee",
   "inviteAndSecurityFee": "Invitation Fee",
   "amountInCelloDollars": "Amount in Celo Dollars",
-  "localValueHint": "@ {{localValue}} {{localCurrencyCode}}",
+  "localValueHint": "@ <2></2>",
   "feeEducation": "Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Learn More",
   "inviteMoneyEscrow": "We’ll keep this money safe until your friend creates a Celo account",

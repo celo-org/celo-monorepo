@@ -13,7 +13,11 @@ import {
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
-import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
+import {
+  getFeeDisplayValue,
+  getMoneyDisplayValue,
+  getNetworkFeeDisplayValue,
+} from 'src/utils/formatting'
 
 export enum DisplayType {
   Default,
@@ -22,6 +26,7 @@ export enum DisplayType {
 
 export enum FormatType {
   Default,
+  Fee,
   NetworkFee,
   NetworkFeePrecise,
 }
@@ -32,20 +37,21 @@ interface Props {
   size: number // only used for DisplayType.Big
   useColors: boolean
   hideSymbol: boolean
+  hideCode: boolean
   showLocalAmount?: boolean
   formatType: FormatType
   style?: StyleProp<TextStyle>
 }
 
-const SYMBOL_RATIO = 0.6
+const BIG_SYMBOL_RATIO = 24 / 48
+const BIG_CODE_RATIO = 16 / 48
+const BIG_LINE_HEIGHT_RATIO = 64 / 48
 
 function getBigSymbolStyle(fontSize: number, color: string | undefined) {
-  const size = Math.floor(fontSize * SYMBOL_RATIO)
+  const size = Math.floor(fontSize * BIG_SYMBOL_RATIO)
   return {
     fontSize: size,
     color,
-    lineHeight: Math.round(size * 1.4),
-    transform: [{ translateY: Math.round(size * 0.1) }],
   }
 }
 
@@ -86,6 +92,8 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
   switch (formatType) {
     case FormatType.Default:
       return getMoneyDisplayValue
+    case FormatType.Fee:
+      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => getFeeDisplayValue(amount)
     case FormatType.NetworkFee:
       return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
         getNetworkFeeDisplayValue(amount)
@@ -101,6 +109,7 @@ export default function CurrencyDisplay({
   size,
   useColors,
   hideSymbol,
+  hideCode,
   showLocalAmount,
   amount,
   formatType,
@@ -135,6 +144,7 @@ export default function CurrencyDisplay({
   const formatAmount = getFormatFunction(formatType)
   const formattedValue =
     value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
+  const code = displayAmount?.currencyCode
 
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
@@ -149,7 +159,9 @@ export default function CurrencyDisplay({
     // see https://medium.com/@aaronmgdr/a-better-superscript-in-react-native-591b83db6caa
     const fontSize = size
     const symbolStyle = getBigSymbolStyle(fontSize, color)
-    const amountStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color }
+    const lineHeight = Math.round(fontSize * BIG_LINE_HEIGHT_RATIO)
+    const amountStyle = { fontSize, lineHeight, color }
+    const codeStyle = { fontSize: Math.round(fontSize * BIG_CODE_RATIO), lineHeight, color }
 
     return (
       <View style={[styles.bigContainer, style]}>
@@ -158,9 +170,14 @@ export default function CurrencyDisplay({
             {currencySymbol}
           </Text>
         )}
-        <Text numberOfLines={1} style={[fontStyles.regular, styles.bigCurrency, amountStyle]}>
+        <Text numberOfLines={1} style={[styles.bigCurrency, amountStyle]}>
           {formattedValue}
         </Text>
+        {!hideCode && !!code && (
+          <Text numberOfLines={1} style={[styles.bigCurrencyCode, codeStyle]}>
+            {code}
+          </Text>
+        )}
       </View>
     )
   }
@@ -170,6 +187,7 @@ export default function CurrencyDisplay({
       {sign}
       {!hideSymbol && currencySymbol}
       {formattedValue}
+      {!hideCode && !!code && ` ${code}`}
     </Text>
   )
 }
@@ -179,6 +197,7 @@ CurrencyDisplay.defaultProps = {
   size: 48,
   useColors: false,
   hideSymbol: false,
+  hideCode: true,
   formatType: FormatType.Default,
 }
 
@@ -190,6 +209,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   bigCurrency: {
+    ...fontStyles.regular,
     paddingHorizontal: 3,
+  },
+  bigCurrencyCode: {
+    ...fontStyles.regular,
+    marginLeft: 7,
+    alignSelf: 'flex-end',
   },
 })

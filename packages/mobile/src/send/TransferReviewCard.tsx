@@ -1,26 +1,22 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
+import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
-import {
-  useDollarsToLocalAmount,
-  useExchangeRate,
-  useLocalCurrencyCode,
-} from 'src/localCurrency/hooks'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { useExchangeRate, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
-import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 export interface OwnProps {
   address?: string
@@ -51,60 +47,92 @@ function TransferReviewCard({
   feeError,
 }: OwnProps & WithTranslation) {
   const localCurrencyCode = useLocalCurrencyCode()
-  const localValue = useDollarsToLocalAmount(value)
-  const exchangeRate = new BigNumber(useExchangeRate() as string)
-  const amountWithFees = value.plus(fee || 0)
+  const exchangeRate = useExchangeRate()
   const adjustedFee =
     type === TokenTransactionType.InviteSent && fee
       ? fee.minus(getInvitationVerificationFeeInDollars())
       : fee
+  const amount = { value: value.toString(), currencyCode: CURRENCIES[currency].code }
+  const amountWithFees = {
+    value: value.plus(fee || 0).toString(),
+    currencyCode: CURRENCIES[currency].code,
+  }
+  const isUsdLocalCurrency = localCurrencyCode === LocalCurrencyCode.USD
 
   return (
     <View style={style.container}>
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
-      {!!localCurrencyCode && localValue ? (
-        <MoneyAmount amount={getMoneyDisplayValue(localValue)} code={localCurrencyCode} />
-      ) : (
-        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
-      )}
+      <CurrencyDisplay
+        type={DisplayType.Big}
+        style={style.amount}
+        amount={amount}
+        hideCode={isUsdLocalCurrency}
+      />
       <View style={style.bottomContainer}>
         {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
         <HorizontalLine />
         <View style={style.feeContainer}>
-          {!!localCurrencyCode && localValue && (
+          {!isUsdLocalCurrency && exchangeRate && (
             <>
               <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getMoneyDisplayValue(value)}
                 title={t('amountInCelloDollars')}
+                amount={
+                  <CurrencyDisplay amount={amount} showLocalAmount={false} hideSymbol={true} />
+                }
               />
               <Text style={style.localValueHint}>
-                {t('localValueHint', {
-                  localValue: getMoneyDisplayValue(exchangeRate),
-                  localCurrencyCode,
-                })}
+                <Trans i18nKey="localValueHint" ns={Namespaces.sendFlow7}>
+                  @{' '}
+                  <CurrencyDisplay
+                    amount={{
+                      value: new BigNumber(exchangeRate).pow(-1).toString(),
+                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                    }}
+                    showLocalAmount={false}
+                  />
+                </Trans>
               </Text>
             </>
           )}
           {type === TokenTransactionType.InviteSent && (
             <LineItemRow
-              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
               title={t('inviteAndSecurityFee')}
+              amount={
+                <CurrencyDisplay
+                  amount={{
+                    value: getInvitationVerificationFeeInDollars().toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                  showLocalAmount={false}
+                  hideSymbol={true}
+                />
+              }
             />
           )}
           <LineItemRow
-            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-            amount={getFeeDisplayValue(adjustedFee)}
             title={t('securityFee')}
             titleIcon={<FeeIcon />}
+            amount={
+              adjustedFee && (
+                <CurrencyDisplay
+                  amount={{
+                    value: adjustedFee.toString(),
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                  formatType={FormatType.Fee}
+                  showLocalAmount={false}
+                  hideSymbol={true}
+                />
+              )
+            }
             isLoading={isLoadingFee}
             hasError={!!feeError}
           />
           <LineItemRow
-            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-            amount={getMoneyDisplayValue(amountWithFees)}
             title={t('total')}
+            amount={
+              <CurrencyDisplay amount={amountWithFees} showLocalAmount={false} hideSymbol={true} />
+            }
           />
         </View>
       </View>
@@ -129,6 +157,10 @@ const style = StyleSheet.create({
     marginBottom: 10,
     justifyContent: 'center',
     alignItems: 'stretch',
+  },
+  amount: {
+    marginTop: 15,
+    color: colors.darkSecondary,
   },
   pSmall: {
     fontSize: 14,
