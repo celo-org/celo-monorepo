@@ -912,7 +912,7 @@ describe('Transfer tests', function(this: any) {
             })
             testTxPoolFiltering({
               gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
-              feeToken: CeloContract.GoldToken,
+              feeToken: CeloContract.StableToken,
               expectedError: 'Returned error: transfers are currently frozen',
             })
           })
@@ -938,9 +938,11 @@ describe('Transfer tests', function(this: any) {
                 feeToken: CeloContract.GoldToken,
               })
             })
-            after('remove sender from transfer whitelist', async () => {
-              await setAddressWhitelist('http://localhost:8545', validatorAddress, [])
 
+            describe('when sender is removed again from whitelist', () => {
+              before('remove sender from whitelist', async () => {
+                await setAddressWhitelist('http://localhost:8545', validatorAddress, [])
+              })
               testTxPoolFiltering({
                 gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 feeToken: CeloContract.GoldToken,
@@ -949,10 +951,11 @@ describe('Transfer tests', function(this: any) {
             })
           })
 
-          after('unfreeze gold transfers', async () => {
-            await unfreeze('http://localhost:8545', validatorAddress, CeloContract.GoldToken)
-
-            it('should transfer normally when unfrozen', async () => {
+          describe('when gold transfers are unfrozen again', async () => {
+            before('unfreeze gold transfers', async () => {
+              await unfreeze('http://localhost:8545', validatorAddress, CeloContract.GoldToken)
+            })
+            it('should transfer normally', async () => {
               testTransferToken({
                 expectedGas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 transferToken: CeloContract.GoldToken,
