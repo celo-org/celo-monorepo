@@ -51,6 +51,10 @@ export function migrationOverrides() {
         envVar.ELECTION_MIN_VALIDATORS,
         DEFAULT_ELECTION_MIN_VALIDATORS
       ),
+      maxElectableValidators: fetchEnvOrFallback(
+        envVar.ELECTION_MAX_VALIDATORS,
+        fetchEnv(envVar.VALIDATORS)
+      ),
     },
     epochRewards: {
       frozen:
