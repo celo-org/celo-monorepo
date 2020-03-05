@@ -25,6 +25,7 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
 import { RootState } from 'src/redux/reducers'
 import { web3 } from 'src/web3/contracts'
+import { readPrivateKeyFromLocalDisk } from 'src/web3/saga'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
 interface State {
@@ -119,12 +120,17 @@ class PincodeEnter extends React.Component<Props, State> {
     const { fornoMode, navigation, currentAccount } = this.props
     const { pin } = this.state
     const withVerification = navigation.getParam('withVerification')
-    // TODO: Implement PIN verification for forno mode
-    if (withVerification && currentAccount && !fornoMode) {
-      web3.eth.personal
-        .unlockAccount(currentAccount, pin, 1)
-        .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
-        .catch(this.onWrongPin)
+    if (withVerification && currentAccount) {
+      if (fornoMode) {
+        readPrivateKeyFromLocalDisk(currentAccount, pin)
+          .then(() => this.onCorrectPin(pin))
+          .catch(this.onWrongPin)
+      } else {
+        web3.eth.personal
+          .unlockAccount(currentAccount, pin, 1)
+          .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
+          .catch(this.onWrongPin)
+      }
     } else {
       this.onCorrectPin(pin)
     }

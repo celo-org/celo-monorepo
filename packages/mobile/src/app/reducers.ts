@@ -39,6 +39,7 @@ export const appReducer = (
       return {
         ...state,
         ...getRehydratePayload(action, 'app'),
+        requestingAndroidPermission: false,
         appState: initialState.appState,
         locked: initialState.locked,
       }

@@ -52,7 +52,6 @@ interface StateProps {
   analyticsEnabled: boolean
   numberVerified: boolean
   pincodeType: PincodeType
-  fornoMode: boolean
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -69,7 +68,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     analyticsEnabled: state.app.analyticsEnabled,
     numberVerified: state.app.numberVerified,
     pincodeType: pincodeTypeSelector(state),
-    fornoMode: fornoSelector(state),
   }
 }
 
@@ -234,8 +232,8 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account, numberVerified, fornoMode, pincodeType } = this.props
-    const showSecurity = !fornoMode && pincodeType === PincodeType.CustomPin
+    const { t, account, numberVerified, pincodeType } = this.props
+    const showSecurity = pincodeType === PincodeType.CustomPin
 
     return (
       <ScrollView style={style.scrollView}>

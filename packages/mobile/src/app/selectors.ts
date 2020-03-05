@@ -1,9 +1,7 @@
 import { RootState } from 'src/redux/reducers'
-import { fornoSelector } from 'src/web3/selectors'
 
 export const getLockWithPinEnabled = (state: RootState) => {
-  // TODO remove `&& !fornoSelector`, when we can ensure PIN in forno mode
-  return state.app.lockWithPinEnabled && !fornoSelector(state)
+  return state.app.lockWithPinEnabled
 }
 
 export const getAppState = (state: RootState) => {
