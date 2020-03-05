@@ -34,7 +34,6 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { fornoSelector } from 'src/web3/selectors'
 
 interface DispatchProps {
   revokeVerification: typeof revokeVerification
