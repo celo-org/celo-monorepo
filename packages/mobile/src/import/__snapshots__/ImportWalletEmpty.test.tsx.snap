@@ -38,16 +38,24 @@ exports[`ImportWalletEmpty renders correctly 1`] = `
       }
     />
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "paddingBottom": 20,
-          "textAlign": "center",
-        }
+        Array [
+          Object {
+            "color": "#2E3338",
+          },
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          },
+        ]
       }
     >
+      
+      $
       0.00
     </Text>
     <Text
