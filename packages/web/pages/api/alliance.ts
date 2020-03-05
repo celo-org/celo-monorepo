@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import getAllies from 'server/getAllies'
+import getAllies from 'server/Alliance'
 import respondToError from 'server/respondToError'
 
 export default async function(req: NextApiRequest, res: NextApiResponse) {

@@ -1,7 +1,8 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
-import Ally from 'src/alliance/AllianceMember'
-import { Category } from 'src/alliance/CategoryEnum'
+import Ally, { NewMember } from 'src/alliance/AllianceMember'
+import { Category } from '../src/alliance/CategoryEnum'
+import addToCRM from './addToCRM'
 import airtableInit, { getImageRatio, getImageURI, ImageSizes } from './airtable'
 import { cache } from './cache'
 
@@ -17,18 +18,19 @@ interface Fields extends FieldSet {
   [LOGO_FIELD]: Attachment[]
 }
 
-const SHEET = 'MOU Tracking'
+const READ_SHEET = 'MOU Tracking'
+const WRITE_SHEET = 'Web Requests'
 
 export default async function getAllies() {
   return Promise.all(
     Object.keys(Category).map((category) => {
-      return cache(`air-${SHEET}-${category}`, fetchAllies, { args: category })
+      return cache(`air-${READ_SHEET}-${category}`, fetchAllies, { args: category })
     })
   )
 }
 
 async function fetchAllies(category: Category) {
-  return getAirtable(SHEET)
+  return getAirtable<Fields>(READ_SHEET)
     .select({
       filterByFormula: `AND(${IS_APROVED},SEARCH("${category}", {${CATEGORY_FIELD}}))`,
       fields: ['Name', 'Approved', CATEGORY_FIELD, LOGO_FIELD, URL_FIELD],
@@ -40,8 +42,8 @@ async function fetchAllies(category: Category) {
     })
 }
 
-function getAirtable(sheet: string) {
-  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_ALLIANCE_ID)(sheet) as Table<Fields>
+function getAirtable<T extends FieldSet>(sheet: string) {
+  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_ALLIANCE_ID)(sheet) as Table<T>
 }
 
 const IS_APROVED = 'Approved=1'
@@ -54,5 +56,34 @@ function normalize(asset: Fields): Ally {
       ratio: getImageRatio(asset['Logo Upload']),
     },
     url: asset[URL_FIELD],
+  }
+}
+
+// creates entry in airtable and (if opted in) in active campaign
+export async function create(data: NewMember) {
+  const actions: Array<Promise<any>> = [
+    getAirtable<WebRequestFields>(WRITE_SHEET).create(convertWebToAirtable(data)),
+  ]
+
+  if (data.subscribe) {
+    actions.push(addToCRM({ email: data.email, fullName: data.name, interest: 'Alliance' }))
+  }
+
+  return Promise.all(actions)
+}
+
+interface WebRequestFields extends FieldSet {
+  Name: string
+  Email: string
+  Contribution: string
+  Newsletter: boolean
+}
+
+function convertWebToAirtable(input: NewMember): WebRequestFields {
+  return {
+    Name: input.name,
+    Contribution: input.contribution,
+    Newsletter: input.subscribe,
+    Email: input.email,
   }
 }

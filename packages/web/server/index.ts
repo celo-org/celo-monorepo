@@ -12,6 +12,7 @@ import ecoFundSubmission from '../server/EcoFundApp'
 import Sentry, { initSentryServer } from '../server/sentry'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
+import { create } from './Alliance'
 import latestAnnouncements from './Announcement'
 import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
@@ -20,6 +21,10 @@ import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
 import respondToError from './respondToError'
+
+const CREATED = 201
+const NO_CONTENT = 204
+
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
@@ -121,7 +126,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
         deliverables,
         resume,
       })
-      res.status(204).json({ id: fellow.id })
+      res.status(CREATED).json({ id: fellow.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
@@ -134,7 +139,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.post('/ecosystem/:table', async (req, res) => {
     try {
       const record = await ecoFundSubmission(req.body, req.params.table as Tables)
-      res.status(204).json({ id: record.id })
+      res.status(CREATED).json({ id: record.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
@@ -154,7 +159,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.post('/contacts', async (req, res) => {
     await addToCRM(req.body)
-    res.status(204).send('ok')
+    res.status(NO_CONTENT).send('ok')
   })
 
   server.get('/announcement', async (req, res) => {
@@ -168,8 +173,8 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.post('/api/alliance', async (req, res) => {
     try {
-      // const assets = await getAssets(req.params.asset)
-      res.json(req.body)
+      await create(req.body)
+      res.sendStatus(CREATED)
     } catch (e) {
       respondToError(res, e)
     }
@@ -193,7 +198,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       subject: `New Partnership Email: ${email}`,
       text: email,
     })
-    res.status(204).send('ok')
+    res.status(NO_CONTENT).send('ok')
   })
 
   server.get('/proxy/medium', async (_, res) => {

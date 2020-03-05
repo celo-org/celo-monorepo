@@ -8,3 +8,10 @@ export interface Grouping {
   name: string
   records: AllianceMember[]
 }
+
+export interface NewMember {
+  name: string
+  email: string
+  contribution: string
+  subscribe: boolean
+}
