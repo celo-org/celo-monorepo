@@ -1,8 +1,8 @@
 import {
+  InteractiveProposalBuilder,
   ProposalBuilder,
   proposalToJSON,
   ProposalTransactionJSON,
-  InteractiveProposalBuilder,
 } from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'

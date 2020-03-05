@@ -161,7 +161,7 @@ export class InteractiveProposalBuilder {
   }
 
   async promptTransactions(num: number) {
-    let transactions: ProposalTransactionJSON[] = []
+    const transactions: ProposalTransactionJSON[] = []
     while (transactions.length < num) {
       console.log(`Transaction #${transactions.length + 1}:`)
       const contractPromptName = 'Celo Contract'
