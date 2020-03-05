@@ -181,8 +181,8 @@ function* watchAppState() {
 function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
   // When requesting Android Permissions app state
-  // would background, so we do not want to lock
-  // the in this case
+  // would become `background`, but we do not want to lock
+  // the app in this case, cause user has not left/closed the app
   const requestingAndroidPermission = yield select((state) => state.app.requestingAndroidPermission)
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
   if (

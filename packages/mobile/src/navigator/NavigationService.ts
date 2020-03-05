@@ -54,6 +54,11 @@ export function navigate(routeName: string, params?: NavigationParams) {
 export async function ensurePincode(disableGoingBack: boolean): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 
+  if (pincodeType === PincodeType.Unset) {
+    Logger.error(TAG + '@getPincode', 'Pin has never been set')
+    return false
+  }
+
   if (pincodeType === PincodeType.CustomPin) {
     Logger.debug(TAG + '@ensurePincode', 'Getting custom pin')
     let pin
