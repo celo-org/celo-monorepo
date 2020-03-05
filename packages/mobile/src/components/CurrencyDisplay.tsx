@@ -36,13 +36,16 @@ interface Props {
   amount: MoneyAmount
   size: number // only used for DisplayType.Big
   useColors: boolean
+  hideSign: boolean
   hideSymbol: boolean
   hideCode: boolean
   showLocalAmount?: boolean
+  showExplicitPositiveSign: boolean // shows '+' for a positive amount when true (default is false)
   formatType: FormatType
   style?: StyleProp<TextStyle>
 }
 
+const BIG_SIGN_RATIO = 34 / 48
 const BIG_SYMBOL_RATIO = 24 / 48
 const BIG_CODE_RATIO = 16 / 48
 const BIG_LINE_HEIGHT_RATIO = 64 / 48
@@ -108,9 +111,11 @@ export default function CurrencyDisplay({
   type,
   size,
   useColors,
+  hideSign,
   hideSymbol,
   hideCode,
   showLocalAmount,
+  showExplicitPositiveSign,
   amount,
   formatType,
   style,
@@ -140,7 +145,7 @@ export default function CurrencyDisplay({
       : CURRENCIES[currency].symbol
     : null
   const value = displayAmount ? new BigNumber(displayAmount.value) : null
-  const sign = value?.isNegative() ? '-' : ''
+  const sign = value?.isNegative() ? '-' : showExplicitPositiveSign ? '+' : ''
   const formatAmount = getFormatFunction(formatType)
   const formattedValue =
     value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
@@ -158,6 +163,7 @@ export default function CurrencyDisplay({
     // and have to involve a View, which prevents this type to be embedded into a Text node
     // see https://medium.com/@aaronmgdr/a-better-superscript-in-react-native-591b83db6caa
     const fontSize = size
+    const signStyle = { fontSize: Math.round(fontSize * BIG_SIGN_RATIO), color }
     const symbolStyle = getBigSymbolStyle(fontSize, color)
     const lineHeight = Math.round(fontSize * BIG_LINE_HEIGHT_RATIO)
     const amountStyle = { fontSize, lineHeight, color }
@@ -165,6 +171,11 @@ export default function CurrencyDisplay({
 
     return (
       <View style={[styles.bigContainer, style]}>
+        {!hideSign && (
+          <Text numberOfLines={1} style={[fontStyles.regular, signStyle]}>
+            {sign}
+          </Text>
+        )}
         {!hideSymbol && (
           <Text numberOfLines={1} style={[fontStyles.regular, symbolStyle]}>
             {currencySymbol}
@@ -184,7 +195,7 @@ export default function CurrencyDisplay({
 
   return (
     <Text numberOfLines={1} style={[{ color }, style]}>
-      {sign}
+      {!hideSign && sign}
       {!hideSymbol && currencySymbol}
       {formattedValue}
       {!hideCode && !!code && ` ${code}`}
@@ -196,8 +207,10 @@ CurrencyDisplay.defaultProps = {
   type: DisplayType.Default,
   size: 48,
   useColors: false,
+  hideSign: false,
   hideSymbol: false,
   hideCode: true,
+  showExplicitPositiveSign: false,
   formatType: FormatType.Default,
 }
 

@@ -73,10 +73,18 @@ const renderAmountSection = (props: Props) => {
           amount={amount}
           formatType={FormatType.NetworkFeePrecise}
           style={style.currency}
+          hideSign={true}
         />
       )
     default:
-      return <CurrencyDisplay type={DisplayType.Big} amount={amount} style={style.currency} />
+      return (
+        <CurrencyDisplay
+          type={DisplayType.Big}
+          amount={amount}
+          style={style.currency}
+          hideSign={true}
+        />
+      )
   }
 }
 
@@ -124,7 +132,12 @@ const renderBottomSection = (props: Props) => {
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <CurrencyDisplay type={DisplayType.Big} amount={amount} style={style.currency} />
+        <CurrencyDisplay
+          type={DisplayType.Big}
+          amount={amount}
+          style={style.currency}
+          hideSign={true}
+        />
       </View>
     )
   } else if (comment) {
