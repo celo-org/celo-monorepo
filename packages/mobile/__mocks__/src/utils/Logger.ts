@@ -1,3 +1,5 @@
+const createCombinedLogs = jest.fn()
+
 class Logger {
   error = (tag: string, statement: string, error?: any) => {
     console.info(`${tag}/${statement}`, error)
@@ -32,6 +34,8 @@ class Logger {
   showMessage = (message: string) => {
     console.log(message)
   }
+
+  createCombinedLogs = createCombinedLogs
 }
 
 export default new Logger()
