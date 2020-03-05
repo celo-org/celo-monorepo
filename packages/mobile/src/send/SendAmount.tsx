@@ -27,6 +27,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
+import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import {
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   MAX_COMMENT_LENGTH,
@@ -59,7 +60,6 @@ import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { getBalanceColor, getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
   ValidatedTextInput
@@ -381,7 +381,11 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
           <AmountInput
             keyboardType="numeric"
-            title={localCurrencyCode ? localCurrencyCode : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+            title={
+              localCurrencyCode !== LocalCurrencyCode.USD
+                ? localCurrencyCode
+                : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol
+            }
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
@@ -405,20 +409,29 @@ export class SendAmount extends React.Component<Props, State> {
               isLoading={!estimateFeeDollars}
               loadingLabelText={t('estimatingFee')}
               labelText={t('estimatedFee')}
-              valueText={getFeeDisplayValue(estimateFeeDollars)}
+              valueText={
+                estimateFeeDollars && (
+                  <CurrencyDisplay
+                    amount={{
+                      value: estimateFeeDollars.toString(),
+                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                    }}
+                    formatType={FormatType.Fee}
+                  />
+                )
+              }
               valueTextStyle={fontStyles.semiBold}
             />
             <View style={style.balanceContainer}>
               <Text style={fontStyles.bodySmall}>{t('newAccountBalance')}</Text>
-              <Text
-                style={[
-                  fontStyles.bodySmall,
-                  fontStyles.semiBold,
-                  { color: getBalanceColor(newAccountBalance) },
-                ]}
-              >
-                {getMoneyDisplayValue(newAccountBalance)}
-              </Text>
+              <CurrencyDisplay
+                style={[fontStyles.bodySmall, fontStyles.semiBold]}
+                amount={{
+                  value: newAccountBalance.toString(),
+                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                }}
+                useColors={true}
+              />
             </View>
           </View>
         </KeyboardAwareScrollView>
