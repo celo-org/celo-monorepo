@@ -370,7 +370,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     require(!isRevoked(), "Release schedule instance must not already be revoked");
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
-    emit ReleaseScheduleRevoked(revocationInfo.revokeTime, 0);
+    emit ReleaseScheduleRevoked(revocationInfo.revokeTime, totalWithdrawn);
   }
 
   /**
