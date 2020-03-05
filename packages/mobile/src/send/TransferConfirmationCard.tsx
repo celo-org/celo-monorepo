@@ -6,17 +6,15 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
 
 const iconSize = 40
@@ -91,20 +89,14 @@ const renderAmountSection = (props: Props) => {
 const renderBottomSection = (props: Props) => {
   const { t, amount, comment, type } = props
 
-  const currency =
-    amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
-      ? CURRENCY_ENUM.GOLD
-      : CURRENCY_ENUM.DOLLAR
-
   if (type === TokenTransactionType.VerificationFee) {
     return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
   } else if (type === TokenTransactionType.Faucet) {
     return (
       <Text style={style.pSmall}>
-        {t('receiveFlow8:receivedAmountFromCelo.0')}
-        {CURRENCIES[currency].symbol}
-        {getMoneyDisplayValue(amount.value)}
-        {t('receiveFlow8:receivedAmountFromCelo.1')}
+        <Trans i18nKey="receiveFlow8:receivedAmountFromCelo">
+          You received <CurrencyDisplay amount={amount} /> from Celo!
+        </Trans>
       </Text>
     )
   } else if (type === TokenTransactionType.NetworkFee) {
