@@ -164,6 +164,8 @@ export class InteractiveProposalBuilder {
     const transactions: ProposalTransactionJSON[] = []
     while (transactions.length < num) {
       console.log(`Transaction #${transactions.length + 1}:`)
+
+      // prompt for contract
       const contractPromptName = 'Celo Contract'
       const contractAnswer = await inquirer.prompt({
         name: contractPromptName,
@@ -173,20 +175,26 @@ export class InteractiveProposalBuilder {
       const contractName = contractAnswer[contractPromptName] as CeloContract
       const contractABI = require('@celo/contractkit/lib/generated/' + contractName)
         .ABI as ABIDefinition[]
-      const methodNames = contractABI
-        .filter((def) => def.type === 'function' && def.stateMutability !== 'view')
-        .map((def) => def.name!)
 
+      const txMethods = contractABI.filter(
+        (def) => def.type === 'function' && def.stateMutability !== 'view'
+      )
+      const txMethodNames = txMethods.map((def) => def.name!)
+
+      // prompt for function
       const functionPromptName = contractName + ' Function'
       const functionAnswer = await inquirer.prompt({
         name: functionPromptName,
         type: 'list',
-        choices: methodNames,
+        choices: txMethodNames,
       })
       const functionName = functionAnswer[functionPromptName] as string
-      const idx = methodNames.findIndex((m) => m === functionName)
+      const idx = txMethodNames.findIndex((m) => m === functionName)
+      const txDefinition = txMethods[idx]
+
+      // prompt individually for each argument
       const args = []
-      for (const functionInput of contractABI[idx].inputs!) {
+      for (const functionInput of txDefinition.inputs!) {
         const inputAnswer = await inquirer.prompt({
           name: functionInput.name,
           type: 'input',
@@ -198,17 +206,24 @@ export class InteractiveProposalBuilder {
         args.push(inputAnswer[functionInput.name])
       }
 
-      const valuePromptName = 'Value'
-      const valueAnswer = await inquirer.prompt({
-        name: valuePromptName,
-        type: 'input',
-      })
+      // prompt for value only when tx is payable
+      let value: string
+      if (txDefinition.payable) {
+        const valuePromptName = 'Value'
+        const valueAnswer = await inquirer.prompt({
+          name: valuePromptName,
+          type: 'input',
+        })
+        value = valueAnswer[valuePromptName]
+      } else {
+        value = '0'
+      }
 
       const tx: ProposalTransactionJSON = {
         contract: contractName,
         function: functionName,
         args,
-        value: valueAnswer[valuePromptName],
+        value,
       }
 
       try {
