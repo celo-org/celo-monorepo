@@ -849,12 +849,14 @@ jobs:
     <<: *defaults
     environment:
       CI_INTEGRATION_ENV: scenario2
-      DESIRED_VERSION: 2.11.0
+      DESIRED_VERSION: v2.11.0
     steps:
     - run:
         name: Install helm
         command: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
+    - attach_workspace:
+        at: ~/app
     - run:
         name: Run test
         no_output_timeout: 20m
@@ -927,6 +929,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - integration-celotool-install:
+          requires:
+            - lint-checks
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
@@ -965,15 +970,15 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
-  nightly-integration:
-    triggers:
-      - schedule:
-          # 11 AM in UTC = 3 AM in PDT (winter time)
-          cron: '20 9 * * *'
-          # filters:
-          #   branches:
-          #     only:
-          #       - master
-    jobs:
-      - install_dependencies
-      - integration-celotool-install
+  # nightly-integration:
+  #   triggers:
+  #     - schedule:
+  #         # 11 AM in UTC = 3 AM in PDT (winter time)
+  #         cron: '20 9 * * *'
+  #         # filters:
+  #         #   branches:
+  #         #     only:
+  #         #       - master
+  #   jobs:
+  #     - install_dependencies
+  #     - integration-celotool-install

@@ -1,8 +1,17 @@
 #!/bin/bash
 
+clean_env() {
+  packages=$(helm list --all --namespace "${ENV}" -q)
+  for package in "${packages[@]}"; do
+    helm delete --purge $package
+  done
+  kubectl delete namespace "${ENV}"
+}
+
 # ENV=${$1:-integration}
-# VERBOSE_OPTS=" --verbose"
-VERBOSE_OPTS=""
+VERBOSE_OPTS=" --verbose"
+CLEAN_ENV="true"
+# VERBOSE_OPTS=""
 ENV=scenario2
 NAMESPACE=$ENV
 
@@ -13,6 +22,8 @@ LOGS_DIR=$(mktemp -d -t nightly-XXXX)
 source "$DIR/../../../.env.${ENV}"
 # Change kubernetes contex
 gcloud --project="${TESTNET_PROJECT_NAME}" --region "${KUBERNETES_CLUSTER_ZONE}" container clusters get-credentials ${ENV} >/dev/null 2>&1
+
+[ "$CLEAN_ENV" = "true" ] && clean_env
 
 # Install the network
 # "$DIR/celotooljs.sh" deploy initial testnet -e ${ENV} --verbose 2>&1 | tee "${LOGS_DIR}/install.log" 
@@ -56,11 +67,13 @@ else
 fi
 
 # Deploy the contracts
-sleep 15
-"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} --verbose ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/migration.log"
+"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/migration.log"
 if [ $? = 1 ]; then
   CONTRACTS_FAILED=true
 fi
+
+# Verify contracts
+"$DIR/celotooljs.sh" deploy initial verify-contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/verify.log"
 
 # Install packages
 # Celostats
@@ -73,6 +86,7 @@ if [ $? = 1 ]; then
   ETHSTATS_FAILED=true
 fi
 
+# Blockscout
 gcloud --project="${TESTNET_PROJECT_NAME}" sql instances describe "${ENV}${BLOCKSCOUT_DB_SUFFIX}" >/dev/null 2>&1
 DB_EXISTS=$?
 helm list -a | grep "${ENV}-blockscout${BLOCKSCOUT_DB_SUFFIX}" >/dev/null 2>&1
@@ -94,3 +108,14 @@ fi
 if [ $? = 1 ]; then
   BLOCKSCOUT_FAILED=true
 fi
+
+# Oracle
+if helm list -a | grep "${ENV}-oracle" >/dev/null 2>&1; then
+  "$DIR/celotooljs.sh" deploy upgrade oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
+else
+  "$DIR/celotooljs.sh" deploy initial oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
+fi
+if [ $? = 1 ]; then
+  ORACLE_FAILED=true
+fi
+
