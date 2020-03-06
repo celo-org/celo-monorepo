@@ -239,6 +239,15 @@ describe('Transfer tests', function(this: any) {
 
   const restartWithCleanNodes = async () => {
     await hooks.restart()
+
+    kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+    kit.gasInflationFactor = 1
+
+    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
+    await sleep(2)
+    // Assuming empty password
+    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+
     await initAndSyncGethWithRetry(
       gethConfig,
       hooks.gethBinaryPath,
@@ -247,10 +256,6 @@ describe('Transfer tests', function(this: any) {
       verbose,
       3
     )
-
-    kit = newKitFromWeb3(new Web3('http://localhost:8545'))
-    kit.gasInflationFactor = 1
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -271,7 +276,7 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
-    const instance: GethInstanceConfig = {
+    currentGethInstance = {
       name: syncmode,
       validating: false,
       syncmode,
@@ -282,10 +287,10 @@ describe('Transfer tests', function(this: any) {
     }
 
     // Spin up the node to run transfers as.
-    currentGethInstance = await initAndSyncGethWithRetry(
+    await initAndSyncGethWithRetry(
       gethConfig,
       hooks.gethBinaryPath,
-      instance,
+      currentGethInstance,
       [fullInstance, currentGethInstance],
       verbose,
       3
