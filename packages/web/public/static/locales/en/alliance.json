@@ -34,6 +34,7 @@
       "pay": "Pay",
       "save": "Save",
       "give": "Give",
+      "insure": "Insure",
       "educate": "Educate",
       "validate": "Validate",
       "grow": "Grow",
@@ -50,6 +51,7 @@
       "educate": "Educate",
       "validate": "Validate",
       "grow": "Grow",
+      "insure": "Insure",
       "secure": "Secure",
       "build": "Build on Celo or use the open source wallet to deliver innovative customer solutions"
     }
