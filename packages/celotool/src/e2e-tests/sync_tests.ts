@@ -1,9 +1,8 @@
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { connectPeers, initAndStartGeth, tailLogFile } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, killInstance, waitForBlock, waitToFinishInstanceSyncing } from './utils'
+import { getHooks, initAndSyncGethWithRetry, killInstance, waitForBlock } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -65,10 +64,14 @@ describe('sync tests', function(this: any) {
     // await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
-
-    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
-    await connectPeers([...gethConfig.instances, fullNode], verbose)
-    await waitToFinishInstanceSyncing(fullNode)
+    await initAndSyncGethWithRetry(
+      gethConfig,
+      hooks.gethBinaryPath,
+      fullNode,
+      [...gethConfig.instances, fullNode],
+      verbose,
+      3
+    )
   })
 
   after(hooks.after)
@@ -88,25 +91,14 @@ describe('sync tests', function(this: any) {
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'lightest',
         }
-        const retries = 3
-        for (let i = 1; i <= retries; i++) {
-          try {
-            await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncNode, verbose)
-            await connectPeers([fullNode, syncNode], verbose)
-            await waitToFinishInstanceSyncing(syncNode)
-            break
-          } catch (error) {
-            console.info(`Syncmode ${syncmode} error: ${error}`)
-            console.info(await tailLogFile(gethConfig.runPath, syncNode, 50))
-            if (i == retries) {
-              console.info(`Retrying ${i}/${retries} ...`)
-              killInstance(syncNode)
-              continue
-            } else {
-              throw error
-            }
-          }
-        }
+        await initAndSyncGethWithRetry(
+          gethConfig,
+          hooks.gethBinaryPath,
+          syncNode,
+          [fullNode, syncNode],
+          verbose,
+          3
+        )
       })
 
       afterEach(() => killInstance(syncNode))
@@ -143,9 +135,14 @@ describe('sync tests', function(this: any) {
       await killInstance(instance)
       // copy instance
       const additionalInstance = { ...instance }
-      await initAndStartGeth(gethConfig, hooks.gethBinaryPath, additionalInstance, verbose)
-      await connectPeers([gethConfig.instances[0], additionalInstance], verbose)
-      await waitToFinishInstanceSyncing(additionalInstance)
+      await initAndSyncGethWithRetry(
+        gethConfig,
+        hooks.gethBinaryPath,
+        additionalInstance,
+        [gethConfig.instances[0], additionalInstance],
+        verbose,
+        3
+      )
 
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')

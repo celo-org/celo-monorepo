@@ -14,6 +14,7 @@ import {
 } from '../lib/generate_utils'
 import {
   buildGeth,
+  connectPeers,
   checkoutGethRepo,
   connectValidatorPeers,
   getEnodeAddress,
@@ -23,6 +24,7 @@ import {
   snapshotDatadir,
   spawnWithLog,
   startGeth,
+  tailLogFile,
   writeGenesis,
 } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
@@ -31,6 +33,34 @@ import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
+
+export async function initAndSyncGethWithRetry(
+  gethConfig: GethRunConfig,
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  connectInstances: GethInstanceConfig[],
+  verbose: boolean,
+  retries: number
+) {
+  for (let i = 1; i <= retries; i++) {
+    try {
+      await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
+      await connectPeers(connectInstances, verbose)
+      await waitToFinishInstanceSyncing(instance)
+      break
+    } catch (error) {
+      console.info(`initAndSyncGethWithRetry error: ${error}`)
+      console.info(await tailLogFile(gethConfig.runPath, instance, 50))
+      if (i == retries) {
+        console.info(`Retrying ${i}/${retries} ...`)
+        killInstance(instance)
+        continue
+      } else {
+        throw error
+      }
+    }
+  }
+}
 
 export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
   const { wsport, rpcport } = instance
