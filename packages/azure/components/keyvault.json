@@ -14,41 +14,6 @@
         "enableRbacAuthorization": false,
         "accessPolicies": [
           {
-            "objectId": "[parameters('userObjectId')]",
-            "tenantId": "[subscription().tenantId]",
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "secrets": ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          },
-          {
             "objectId":
               "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('validatorUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
             "tenantId": "[subscription().tenantId]",
@@ -86,41 +51,6 @@
         "enableRbacAuthorization": false,
         "accessPolicies": [
           {
-            "objectId": "[parameters('userObjectId')]",
-            "tenantId": "[subscription().tenantId]",
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "secrets": ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          },
-          {
             "objectId":
               "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('proxyUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
             "tenantId": "[subscription().tenantId]",
@@ -157,41 +87,6 @@
         "enabledForDiskEncryption": false,
         "enableRbacAuthorization": false,
         "accessPolicies": [
-          {
-            "objectId": "[parameters('userObjectId')]",
-            "tenantId": "[subscription().tenantId]",
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "secrets": ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          },
           {
             "objectId":
               "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('attesterUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",

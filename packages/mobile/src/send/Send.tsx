@@ -3,8 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -271,7 +270,9 @@ class Send extends React.Component<Props, State> {
     const { searchQuery } = this.state
 
     return (
-      <SafeAreaView style={style.body}>
+      // Intentionally not using SafeAreaView here as RecipientPicker
+      // needs fullscreen rendering
+      <View style={style.body}>
         <DisconnectBanner />
         <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
         <RecipientPicker
@@ -282,7 +283,7 @@ class Send extends React.Component<Props, State> {
           listHeaderComponent={this.renderListHeader}
           onSelectRecipient={this.onSelectRecipient}
         />
-      </SafeAreaView>
+      </View>
     )
   }
 }

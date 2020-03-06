@@ -42,7 +42,9 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
           "flexDirection": "row",
           "marginTop": 5,
         },
-        undefined,
+        Object {
+          "color": "#81868B",
+        },
       ]
     }
   >
@@ -264,7 +266,9 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
           "flexDirection": "row",
           "marginTop": 5,
         },
-        undefined,
+        Object {
+          "color": "#81868B",
+        },
       ]
     }
   >
@@ -470,7 +474,9 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           "flexDirection": "row",
           "marginTop": 5,
         },
-        undefined,
+        Object {
+          "color": "#81868B",
+        },
       ]
     }
   >
@@ -676,7 +682,9 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           "flexDirection": "row",
           "marginTop": 5,
         },
-        undefined,
+        Object {
+          "color": "#81868B",
+        },
       ]
     }
   >
@@ -900,7 +908,9 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           "flexDirection": "row",
           "marginTop": 5,
         },
-        undefined,
+        Object {
+          "color": "#81868B",
+        },
       ]
     }
   >
@@ -1010,7 +1020,9 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
           "flexDirection": "row",
           "marginTop": 5,
         },
-        undefined,
+        Object {
+          "color": "#81868B",
+        },
       ]
     }
   >

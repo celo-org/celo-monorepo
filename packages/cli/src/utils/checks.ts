@@ -3,7 +3,7 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -323,6 +323,9 @@ class CheckBuilder {
       `Account isn't a member of a validator group`,
       this.withValidators(async (v, _signer, account) => {
         const { affiliation } = await v.getValidator(account)
+        if (!affiliation || eqAddress(affiliation, NULL_ADDRESS)) {
+          return true
+        }
         const { members } = await v.getValidatorGroup(affiliation!)
         return !members.includes(account)
       })
