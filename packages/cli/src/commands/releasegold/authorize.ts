@@ -11,7 +11,6 @@ export default class Authorize extends BaseCommand {
     'Authorize an alternative key to be used for a given action (Vote, Validate, Attest) on behalf of the ReleaseGold instance contract.'
 
   // TODO(lucas): BLS key?
-  // TODO(lucas): Can't test because of 'delegate or account exists' issue
   static flags = {
     ...BaseCommand.flags,
     contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
@@ -20,9 +19,17 @@ export default class Authorize extends BaseCommand {
       required: true,
       description: 'The signer key that is to be used for voting through the ReleaseGold instance',
     }),
-    pop: flags.string({
-      description: 'Proof-of-possession of the signer key',
+    signature: flags.string({
+      description: 'Signature (a.k.a. proof-of-possession) of the signer key',
       required: true,
+    }),
+    blsKey: Flags.blsPublicKey({
+      description:
+        'The BLS public key that the validator is using for consensus, should pass proof of possession. 96 bytes.',
+    }),
+    blsPop: Flags.blsProofOfPossession({
+      description:
+        'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
     }),
   }
 
@@ -60,22 +67,20 @@ export default class Authorize extends BaseCommand {
       ? await releaseGoldWrapper.getReleaseOwner()
       : await releaseGoldWrapper.getBeneficiary()
     let tx: any
-    switch (action) {
-      case 'vote': {
-        tx = await releaseGoldWrapper.authorizeVoteSigner(flags.signer, sig)
-        break
-      }
-      case 'validator': {
-        tx = await releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
-        break
-      }
-      case 'attestation': {
-        tx = await releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
-        break
-      }
-      default: {
-        return this.error('Invalid action provided')
-      }
+    if (action === 'vote') {
+      tx = await releaseGoldWrapper.authorizeVoteSigner(flags.signer, sig)
+    } else if (action === 'validator' && flags.blsKey) {
+      tx = await releaseGoldWrapper.authorizeValidatorSignerWithKeys(
+        flags.signer,
+        sig,
+        flags.blsKey,
+        flags.blsPop
+      )
+      tx = await releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
+    } else if (action === 'validator') {
+      tx = await releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
+    } else {
+      return this.error('Invalid action provided')
     }
     await displaySendTx('authorize' + action + 'Tx', tx)
   }
