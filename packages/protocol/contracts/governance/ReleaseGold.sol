@@ -1,10 +1,12 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IReleaseGold.sol";
+import "./interfaces/IValidators.sol";
 import "../common/FixidityLib.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -36,6 +38,11 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   uint256 internal constant MAX_UINT = 0xffffffffffffffffffffffffffffffff;
+
+  // Duration (in seconds) after gold is fully released
+  // when gold should be switched back to control of releaseOwner.
+  // 2 years
+  uint256 public constant EXPIRATION_TIME = 63072000;
 
   // Beneficiary of the Celo Gold released in this contract.
   address payable public beneficiary;
@@ -131,7 +138,25 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     _;
   }
 
+  modifier onlyExpired() {
+    uint256 releaseEndTime = releaseSchedule.releaseStartTime.add(
+      releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
+    );
+    require(
+      block.timestamp >= releaseEndTime.add(EXPIRATION_TIME),
+      "`EXPIRATION_TIME` must have passed after the end of releasing"
+    );
+    _;
+  }
+
   function() external payable {} // solhint-disable no-empty-blocks
+
+  /**
+   * @notice Wrapper function for stable token transfer function.
+   */
+  function transfer(address to, uint256 value) external onlyWhenInProperState {
+    IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).transfer(to, value);
+  }
 
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
@@ -339,6 +364,22 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice Mark the contract as expired, freeing all remaining gold for refund to `refundAddress`
+   * @dev Only callable `EXPIRATION_TIME` after the final gold release.
+   */
+  function expire() external nonReentrant onlyReleaseOwner onlyExpired {
+    IValidators validators = getValidators();
+    require(
+      !validators.isValidator(address(this)) && !validators.isValidatorGroup(address(this)),
+      "Cannot call `expire` on an instance registered as a validator or group"
+    );
+    require(!isRevoked(), "Release schedule instance must not already be revoked");
+    revocationInfo.revokeTime = block.timestamp;
+    revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
+    emit ReleaseScheduleRevoked(revocationInfo.revokeTime, totalWithdrawn);
+  }
+
+  /**
    * @notice Calculates the total balance of the release schedule instance including withdrawals.
    * @return The total released instance gold balance.
    * @dev The returned amount may vary over time due to locked gold rewards.
@@ -470,6 +511,60 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     onlyWhenInProperState
   {
     getAccounts().authorizeValidatorSigner(signer, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer with public key account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @dev The v,r and s signature should be a signed message by the beneficiary
+   *      encrypting the authorized address.
+   */
+  function authorizeValidatorSignerWithPublicKey(
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer with keys account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @dev The v,r and s signature should be a signed message by the beneficiary
+   *      encrypting the authorized address.
+   */
+  function authorizeValidatorSignerWithKeys(
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    getAccounts().authorizeValidatorSignerWithKeys(
+      signer,
+      v,
+      r,
+      s,
+      ecdsaPublicKey,
+      blsPublicKey,
+      blsPop
+    );
   }
 
   /**

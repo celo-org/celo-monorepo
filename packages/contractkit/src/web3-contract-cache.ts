@@ -10,6 +10,7 @@ import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
+import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
@@ -21,6 +22,7 @@ import { newReserve } from './generated/Reserve'
 import { newReserveSpenderMultiSig } from './generated/ReserveSpenderMultiSig'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
+import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 import { ContractKit } from './kit'
 
@@ -37,6 +39,7 @@ const ContractFactories = {
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
+  [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
@@ -48,6 +51,7 @@ const ContractFactories = {
   [CeloContract.ReserveSpenderMultiSig]: newReserveSpenderMultiSig,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
+  [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
 
@@ -96,6 +100,9 @@ export class Web3ContractCache {
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
   }
+  getFreezer() {
+    return this.getContract(CeloContract.Freezer)
+  }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)
   }
@@ -128,6 +135,9 @@ export class Web3ContractCache {
   }
   getStableToken() {
     return this.getContract(CeloContract.StableToken)
+  }
+  getTransferWhitelist() {
+    return this.getContract(CeloContract.TransferWhitelist)
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)

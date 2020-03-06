@@ -34,7 +34,7 @@ export const getLocalCurrencyDisplayValue = (
   return includeSymbol ? symbol + formattedValue : formattedValue
 }
 
-// like getMoneyDisplayValue but only returns cents if they are sigificant
+// like getMoneyDisplayValue but only returns cents if they are significant
 export const getCentAwareMoneyDisplay = (value: BigNumber.Value): string => {
   return numeral(roundDown(value).toNumber()).format('0,0[.]00')
 }

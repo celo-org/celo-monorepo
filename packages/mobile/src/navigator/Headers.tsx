@@ -1,13 +1,14 @@
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
+import { Trans } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import BackButton from 'src/components/BackButton'
 import CancelButton from 'src/components/CancelButton'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 export const noHeader = {
   headerLeft: <View />,
@@ -58,9 +59,12 @@ export const exchangeHeader = (makerToken: CURRENCY_ENUM, makerTokenBalance: str
         <Text style={fontStyles.headerTitle}>{title}</Text>
         <View>
           <Text style={fontStyles.subSmall}>
-            {i18n.t('exchangeFlow9:moneyAvailable', {
-              moneyAmount: getMoneyDisplayValue(makerTokenBalance, makerToken, true),
-            })}
+            <Trans i18nKey="exchangeFlow9:moneyAvailable">
+              <CurrencyDisplay
+                amount={{ value: makerTokenBalance, currencyCode: CURRENCIES[makerToken].code }}
+              />
+              available
+            </Trans>
           </Text>
         </View>
       </View>
