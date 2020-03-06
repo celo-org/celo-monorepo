@@ -15,6 +15,7 @@ import {
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import {
   getCentAwareMoneyDisplay,
+  getExchangeRateDisplayValue,
   getFeeDisplayValue,
   getMoneyDisplayValue,
   getNetworkFeeDisplayValue,
@@ -31,6 +32,7 @@ export enum FormatType {
   Fee,
   NetworkFee,
   NetworkFeePrecise,
+  ExchangeRate,
 }
 
 interface Props {
@@ -107,6 +109,9 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
     case FormatType.NetworkFeePrecise:
       return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
         getNetworkFeeDisplayValue(amount, true)
+    case FormatType.ExchangeRate:
+      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+        getExchangeRateDisplayValue(amount)
   }
 }
 
