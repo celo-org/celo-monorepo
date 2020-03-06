@@ -115,16 +115,24 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
             <Text
@@ -150,16 +158,24 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
           </View>
@@ -545,16 +561,24 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
             <Text
@@ -580,16 +604,24 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
           </View>

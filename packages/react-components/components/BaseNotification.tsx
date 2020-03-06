@@ -15,6 +15,7 @@ interface Props {
   children: React.ReactNode
   ctas: CTA[]
   onPress?: () => unknown
+  testID?: string
 }
 
 export interface CTA {
@@ -32,14 +33,16 @@ function Wrapper({ onPress, children }: { children: React.ReactNode; onPress?: (
   )
 }
 
-export default function BaseNotification({ icon, title, children, ctas, onPress }: Props) {
+export default function BaseNotification({ icon, title, children, ctas, onPress, testID }: Props) {
   return (
     <View style={[styles.container, elevationShadowStyle(2)]}>
       <Wrapper onPress={onPress}>
         <View style={styles.innerContainer}>
           {icon && <View style={styles.iconArea}>{icon}</View>}
           <View style={styles.contentArea}>
-            <Text style={fontStyles.bodySmallSemiBold}>{title}</Text>
+            <Text style={fontStyles.bodySmallSemiBold} testID={testID && `${testID}/Title`}>
+              {title}
+            </Text>
             <View style={styles.body}>
               {children}
               <View style={styles.ctas}>

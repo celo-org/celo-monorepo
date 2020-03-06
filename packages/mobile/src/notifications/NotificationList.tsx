@@ -2,6 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import React, { useEffect } from 'react'
+import { Trans } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import {
@@ -10,11 +11,11 @@ import {
   NavigationScreenProp,
   NavigationState,
 } from 'react-navigation'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 
 const { contentPadding } = variables
 
@@ -42,23 +43,33 @@ export function NotificationList<T>(props: Props<T>) {
 }
 
 export function titleWithBalanceNavigationOptions(title: string) {
-  return ({ navigation }: { navigation: NavigationProp<NavigationState> }) => ({
-    ...headerWithBackButton,
-    headerTitle: (
-      <View style={styles.header}>
-        {title && <Text style={fontStyles.bodyBold}>{title}</Text>}
-        <Text style={styles.balanceText}>
-          {(navigation.state.params &&
-            navigation.state.params.dollarBalance &&
-            CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol +
-              i18n.t('sendFlow7:celoDollarsAvailable', {
-                CeloDollars: getCentAwareMoneyDisplay(navigation.state.params.dollarBalance || 0),
-              })) ||
-            i18n.t('global:loading')}
-        </Text>
-      </View>
-    ),
-  })
+  return ({ navigation }: { navigation: NavigationProp<NavigationState> }) => {
+    const dollarBalance = navigation?.state?.params?.dollarBalance
+
+    return {
+      ...headerWithBackButton,
+      headerTitle: (
+        <View style={styles.header}>
+          {title && <Text style={fontStyles.bodyBold}>{title}</Text>}
+          <Text style={styles.balanceText}>
+            {dollarBalance != null ? (
+              <Trans i18nKey="sendFlow7:celoDollarsAvailabl">
+                <CurrencyDisplay
+                  amount={{
+                    value: dollarBalance,
+                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                  }}
+                />{' '}
+                available
+              </Trans>
+            ) : (
+              i18n.t('global:loading')
+            )}
+          </Text>
+        </View>
+      ),
+    }
+  }
 }
 
 const styles = StyleSheet.create({

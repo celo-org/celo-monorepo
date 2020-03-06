@@ -13,7 +13,7 @@
   "payRequest": "Pay Request",
   "sendTo": "Send to",
   "amount": "Amount",
-  "celoDollarsAvailable": "{{CeloDollars}} Available",
+  "celoDollarsAvailable": "<0></0> available",
   "groceriesRent": "Groceries, rent, etc. (Optional)",
   "fee": "Fee",
   "securityFee": "Security Fee",

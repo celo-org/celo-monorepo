@@ -13,7 +13,7 @@
   "invite": "Invitar",
   "sendTo": "Enviar a",
   "amount": "Monto",
-  "celoDollarsAvailable": "{{CeloDollars}} disponibles",
+  "celoDollarsAvailable": "<0></0> disponibles",
   "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
