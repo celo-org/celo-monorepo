@@ -21,7 +21,7 @@ LOGS_DIR=$(mktemp -d -t nightly-XXXX)
 # Load ENV File
 source "$DIR/../../../.env.${ENV}"
 # Change kubernetes contex
-gcloud --project="${TESTNET_PROJECT_NAME}" --region "${KUBERNETES_CLUSTER_ZONE}" container clusters get-credentials ${ENV} >/dev/null 2>&1
+gcloud container clusters get-credentials ${KUBERNETES_CLUSTER_NAME} --project="${TESTNET_PROJECT_NAME}" --region "${KUBERNETES_CLUSTER_ZONE}" >/dev/null 2>&1
 
 [ "$CLEAN_ENV" = "true" ] && clean_env
 
