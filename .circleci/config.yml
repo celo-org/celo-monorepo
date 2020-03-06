@@ -844,6 +844,24 @@ jobs:
       - run:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
+  
+  integration-celotool-install:
+    <<: *defaults
+    environment:
+      CI_INTEGRATION_ENV: scenario2
+      DESIRED_VERSION: 2.11.0
+    steps:
+    - run:
+        name: Install helm
+        command: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
+    - run:
+        name: Run test
+        no_output_timeout: 20m
+        command: |
+          set -xe
+          cd packages/celotool/bin
+          bash integration.sh ${CI_INTEGRATION_ENV}
 
 workflows:
   version: 2
@@ -947,3 +965,15 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
+  nightly-integration:
+    triggers:
+      - schedule:
+          # 11 AM in UTC = 3 AM in PDT (winter time)
+          cron: '20 9 * * *'
+          # filters:
+          #   branches:
+          #     only:
+          #       - master
+    jobs:
+      - install_dependencies
+      - integration-celotool-install
