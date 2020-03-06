@@ -12,10 +12,10 @@ import DropDownGroup from 'src/shared/DropDownGroup'
 import Outbound, { externalizeURL } from 'src/shared/Outbound'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
-async function gatherAllies(persistFunc: (data: []) => void, abortController: AbortController) {
-  const response = await fetch('api/alliance', { signal: abortController.signal })
+async function gatherAllies(persistFunc: (data: []) => void, signal: { aborted: boolean }) {
+  const response = await fetch('api/alliance')
   const alliesByCategory = await response.json()
-  if (!abortController.signal.aborted) {
+  if (!signal.aborted) {
     persistFunc(alliesByCategory)
   }
 }
@@ -47,14 +47,14 @@ export default function Members() {
   const [selectedFilter, setFilter] = React.useState(ALL)
 
   React.useEffect(() => {
-    const abortController = new AbortController()
+    const signal = { aborted: false }
     // sometimes it is nessessary to break a rule
     // https://github.com/facebook/react/issues/14326
     // tslint:disable-next-line: no-floating-promises
-    gatherAllies(setAllies, abortController)
+    gatherAllies(setAllies, signal)
 
     return () => {
-      abortController.abort()
+      signal.aborted = true
     }
   }, [])
 
