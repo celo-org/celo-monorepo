@@ -1,11 +1,12 @@
 #!/bin/bash
 
 clean_env() {
+  # packages=$(helm list --all --namespace "${ENV}" -q | grep -vE "^${ENV}$" )
   packages=$(helm list --all --namespace "${ENV}" -q)
   for package in "${packages[@]}"; do
     helm delete --purge $package
   done
-  kubectl delete namespace "${ENV}"
+  kubectl get namespace "${ENV}" && kubectl delete namespace "${ENV}"
 }
 
 # ENV=${$1:-integration}
@@ -17,6 +18,7 @@ NAMESPACE=$ENV
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 LOGS_DIR=$(mktemp -d -t nightly-XXXX)
+echo "Logs directory: ${LOGS_DIR}"
 
 # Load ENV File
 source "$DIR/../../../.env.${ENV}"
@@ -26,8 +28,11 @@ gcloud container clusters get-credentials ${KUBERNETES_CLUSTER_NAME} --project="
 [ "$CLEAN_ENV" = "true" ] && clean_env
 
 # Install the network
-# "$DIR/celotooljs.sh" deploy initial testnet -e ${ENV} --verbose 2>&1 | tee "${LOGS_DIR}/install.log" 
-"$DIR/celotooljs.sh" deploy upgrade testnet --reset -e ${ENV} ${VERBOSE_OPTS} > "${LOGS_DIR}/install.log" 2>&1
+if helm list --namespace "${ENV}" -qa | grep -E "^${ENV}$" >/dev/null 2>&1; then
+  "$DIR/celotooljs.sh" deploy upgrade testnet --reset -e ${ENV} ${VERBOSE_OPTS} > "${LOGS_DIR}/install.log" 2>&1
+else
+  "$DIR/celotooljs.sh" deploy initial testnet -e ${ENV} ${VERBOSE_OPTS} > "${LOGS_DIR}/install.log" 2>&1
+fi
 
 # sleep 200
 
@@ -77,7 +82,7 @@ fi
 
 # Install packages
 # Celostats
-if helm list -a | grep "${ENV}-celostats" >/dev/null 2>&1; then
+if helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-celostats$" >/dev/null 2>&1; then
   "$DIR/celotooljs.sh" deploy upgrade celostats -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/celostats.log"
 else
   "$DIR/celotooljs.sh" deploy initial celostats -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/celostats.log"
@@ -89,7 +94,7 @@ fi
 # Blockscout
 gcloud --project="${TESTNET_PROJECT_NAME}" sql instances describe "${ENV}${BLOCKSCOUT_DB_SUFFIX}" >/dev/null 2>&1
 DB_EXISTS=$?
-helm list -a | grep "${ENV}-blockscout${BLOCKSCOUT_DB_SUFFIX}" >/dev/null 2>&1
+helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-blockscout${BLOCKSCOUT_DB_SUFFIX}$" >/dev/null 2>&1
 BLOCKSCOUT_HELM_EXISTS=$?
 if [ ${DB_EXISTS} -ne 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -ne 0 ]; then
   # Neither DB nor Helm release exists
@@ -110,7 +115,7 @@ if [ $? = 1 ]; then
 fi
 
 # Oracle
-if helm list -a | grep "${ENV}-oracle" >/dev/null 2>&1; then
+if helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-oracle$" >/dev/null 2>&1; then
   "$DIR/celotooljs.sh" deploy upgrade oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
 else
   "$DIR/celotooljs.sh" deploy initial oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
