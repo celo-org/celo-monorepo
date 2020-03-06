@@ -1,7 +1,7 @@
 import { AnyAction } from 'redux'
 import { call, select, spawn, takeEvery } from 'redux-saga/effects'
-import { devModeSelector } from 'src/account/reducer'
 import { accountSaga } from 'src/account/saga'
+import { devModeSelector } from 'src/account/selectors'
 import { appSaga, waitForRehydrate } from 'src/app/saga'
 import { dappKitSaga } from 'src/dappkit/dappkit'
 import { escrowSaga } from 'src/escrow/saga'
