@@ -61,7 +61,7 @@ describe('sync tests', function(this: any) {
 
   before(async () => {
     // Start validator nodes and migrate contracts.
-    // await hooks.before()
+    await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
     await initAndSyncGethWithRetry(
