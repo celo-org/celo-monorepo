@@ -15,8 +15,8 @@ import {
 } from '../lib/generate_utils'
 import {
   buildGeth,
-  connectPeers,
   checkoutGethRepo,
+  connectPeers,
   connectValidatorPeers,
   getEnodeAddress,
   getLogFilename,
@@ -54,11 +54,11 @@ export async function initAndSyncGethWithRetry(
       const logFilename = getLogFilename(gethConfig.runPath, instance)
       console.info(`tail -50 ${logFilename}`)
       console.info(await readLastLines.read(logFilename, 50))
-      if (i == retries) {
+      if (i === retries) {
         throw error
       } else {
         console.info(`Retrying ${i}/${retries} ...`)
-        killInstance(instance)
+        await killInstance(instance)
         continue
       }
     }
