@@ -850,6 +850,7 @@ jobs:
     environment:
       CI_INTEGRATION_ENV: scenario2
       DESIRED_VERSION: v2.11.0
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
     steps:
     - run:
         name: Install helm
@@ -862,6 +863,7 @@ jobs:
           echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
           gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
           gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+          echo $GCLOUD_SERVICE_KEY > $GOOGLE_APPLICATION_CREDENTIALS
     - attach_workspace:
         at: ~/app
     - run:
