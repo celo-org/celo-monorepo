@@ -1,6 +1,6 @@
 export default interface AllianceMember {
   name: string
-  logo: { uri: string; ratio: { width: number; height: number } }
+  logo: { uri: string; width: number; height: number }
   url: string
 }
 

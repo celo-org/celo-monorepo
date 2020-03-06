@@ -9,7 +9,7 @@ import { NameSpaces, Trans, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
-import Outbound from 'src/shared/Outbound'
+import Outbound, { externalizeURL } from 'src/shared/Outbound'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 async function gatherAllies(persistFunc: (data: []) => void) {
@@ -138,36 +138,39 @@ function Category({ name, members }: CategoryProps) {
 }
 
 const Member = React.memo(function _Member({ logo, name, url }: Ally) {
-  const divisor = logo.ratio.height / ROW_HEIGHT
-  return (
-    <View style={styles.member}>
-      {logo.uri ? (
-        <LazyFade>
-          {(onLoad: () => void) => (
+  const divisor = logo.height / ROW_HEIGHT
+  const href = url ? externalizeURL(url) : null
+  return logo.uri ? (
+    <LazyFade>
+      {(onLoad: () => void) => (
+        <a target={'_blank'} href={href}>
+          <View style={styles.member}>
             <Image
               resizeMode="contain"
               resizeMethod="resize"
               onLoad={onLoad}
               source={{ uri: logo.uri }}
               accessibilityLabel={name}
-              style={[styles.logo, { width: logo.ratio.width / divisor }]}
+              style={[styles.logo, { width: logo.width / divisor }]}
             />
-          )}
-        </LazyFade>
-      ) : (
-        <PlaceHolder text={name} url={url} />
+            {href && <Outbound url={href} />}
+          </View>
+        </a>
       )}
-      {url && <Outbound url={url} />}
-    </View>
+    </LazyFade>
+  ) : (
+    <FallBack text={name} url={href} />
   )
 })
 
-function PlaceHolder({ text, url }) {
+function FallBack({ text, url }) {
   return (
-    <View style={[standardStyles.centered, styles.logo]}>
-      <Text href={url} style={[fonts.legal, textStyles.center]}>
-        {text}
-      </Text>
+    <View style={styles.member}>
+      <View style={[standardStyles.centered, styles.logo]}>
+        <Text href={url} target="_blank" style={[fonts.legal, textStyles.center]}>
+          {text}
+        </Text>
+      </View>
     </View>
   )
 }
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 20,
     marginVertical: 20,
-    width: 170,
+    width: 180,
     height: ROW_HEIGHT,
   },
   logo: {

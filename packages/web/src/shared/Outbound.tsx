@@ -4,13 +4,13 @@ import { colors } from 'src/styles'
 
 export default function Outbound({ url }: { url: string }) {
   return (
-    <a href={externalize(url)} target="_blank">
+    <a href={externalizeURL(url)} target="_blank">
       <External size={12} color={colors.dark} />
     </a>
   )
 }
 
-function externalize(url: string) {
+export function externalizeURL(url: string) {
   try {
     const uri = new URL(url)
     return uri.href

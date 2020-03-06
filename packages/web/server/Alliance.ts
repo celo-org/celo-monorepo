@@ -53,7 +53,7 @@ function normalize(asset: Fields): Ally {
     name: asset.Name,
     logo: {
       uri: getImageURI(asset['Logo Upload'], ImageSizes.large),
-      ratio: getImageRatio(asset['Logo Upload']),
+      ...getImageRatio(asset['Logo Upload']),
     },
     url: asset[URL_FIELD],
   }
