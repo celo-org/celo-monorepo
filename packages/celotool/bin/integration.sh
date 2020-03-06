@@ -72,7 +72,7 @@ else
 fi
 
 # Deploy the contracts
-"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/migration.log" | sed -e '/Operation completed over.*/q'
+"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | sed -e '/Operation completed over.*/q' | tee "${LOGS_DIR}/migration.log" 
 if [ $? = 1 ]; then
   CONTRACTS_FAILED=true
 fi
