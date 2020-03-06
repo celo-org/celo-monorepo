@@ -22,6 +22,7 @@ interface MemberSwapper {
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
+const carbonOffsettingPartnerAddress = '0x1234567812345678123456781234567812345678'
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -198,6 +199,11 @@ describe('governance tests', () => {
         rpcport: 8553,
       },
     ],
+    migrationOverrides: {
+      epochRewards: {
+        carbonOffsettingPartner: carbonOffsettingPartnerAddress,
+      },
+    },
   }
 
   const hooks: any = getHooks(gethConfig)
@@ -216,6 +222,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
+    // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
@@ -812,6 +819,14 @@ describe('governance tests', () => {
             .times(fromFixed(communityRewardFrac))
             .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
 
+          const carbonOffsettingFrac = new BigNumber(
+            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber)
+          )
+          const expectedCarbonOffsettingPartnerAward = expectedVoterRewards
+            .plus(maxPotentialValidatorReward)
+            .times(fromFixed(carbonOffsettingFrac))
+            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const expectedGoldTotalSupplyChange = expectedCommunityReward
             .plus(expectedVoterRewards)
@@ -819,8 +834,10 @@ describe('governance tests', () => {
           // Check TS calc'd rewards against solidity calc'd rewards
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
+          const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
           assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
           assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
+          assertAlmostEqual(expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
           // Check TS calc'd rewards against what happened
           await assertVotesChanged(blockNumber, expectedVoterRewards)
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)

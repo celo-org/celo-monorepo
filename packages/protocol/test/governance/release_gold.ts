@@ -1104,6 +1104,21 @@ contract('ReleaseGold', (accounts: string[]) => {
             )
           })
         })
+
+        describe('when an instance is a registered validator or validator group', () => {
+          describe('registered validator', () => {
+            it('should revert', async () => {
+              await mockValidators.setValidator(releaseGoldInstance.address)
+              await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+            })
+          })
+          describe('registered validator', () => {
+            it('should revert', async () => {
+              await mockValidators.setValidatorGroup(releaseGoldInstance.address)
+              await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+            })
+          })
+        })
       })
     })
   })
