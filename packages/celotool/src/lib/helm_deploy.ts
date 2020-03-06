@@ -612,7 +612,7 @@ async function helmCommand(command: string) {
 function buildHelmChartDependencies(chartDir: string) {
   console.info(`Building any chart dependencies...`)
   console.info(`helm dep build ${chartDir}`)
-  // return helmCommand(`helm dep build ${chartDir}`)
+  return helmCommand(`helm dep build ${chartDir}`)
 }
 
 export async function installGenericHelmChart(
@@ -621,9 +621,9 @@ export async function installGenericHelmChart(
   chartDir: string,
   parameters: string[]
 ) {
-  // if (chartDir != 'stable/chaoskube') {
-  //   await buildHelmChartDependencies(chartDir)
-  // }
+  if (chartDir !== 'stable/chaoskube') {
+    await buildHelmChartDependencies(chartDir)
+  }
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
     `helm install ${chartDir} --name ${releaseName} --namespace ${celoEnv} ${parameters.join(' ')}`

@@ -855,6 +855,7 @@ jobs:
         name: Install helm
         command: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
+          helm init --client-only
     - run:
         name: Activate gcloud
         command: |
