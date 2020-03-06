@@ -34,6 +34,7 @@ a contract wrapper
 * [getEscrow](_web3_contract_cache_.web3contractcache.md#getescrow)
 * [getExchange](_web3_contract_cache_.web3contractcache.md#getexchange)
 * [getFeeCurrencyWhitelist](_web3_contract_cache_.web3contractcache.md#getfeecurrencywhitelist)
+* [getFreezer](_web3_contract_cache_.web3contractcache.md#getfreezer)
 * [getGasPriceMinimum](_web3_contract_cache_.web3contractcache.md#getgaspriceminimum)
 * [getGoldToken](_web3_contract_cache_.web3contractcache.md#getgoldtoken)
 * [getGovernance](_web3_contract_cache_.web3contractcache.md#getgovernance)
@@ -43,6 +44,7 @@ a contract wrapper
 * [getReserve](_web3_contract_cache_.web3contractcache.md#getreserve)
 * [getSortedOracles](_web3_contract_cache_.web3contractcache.md#getsortedoracles)
 * [getStableToken](_web3_contract_cache_.web3contractcache.md#getstabletoken)
+* [getTransferWhitelist](_web3_contract_cache_.web3contractcache.md#gettransferwhitelist)
 * [getValidators](_web3_contract_cache_.web3contractcache.md#getvalidators)
 
 ## Constructors
@@ -51,7 +53,7 @@ a contract wrapper
 
 \+ **new Web3ContractCache**(`kit`: [ContractKit](_kit_.contractkit.md)): *[Web3ContractCache](_web3_contract_cache_.web3contractcache.md)*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L62)*
+*Defined in [contractkit/src/web3-contract-cache.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L66)*
 
 **Parameters:**
 
@@ -67,7 +69,7 @@ Name | Type |
 
 • **kit**: *[ContractKit](_kit_.contractkit.md)*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L64)*
+*Defined in [contractkit/src/web3-contract-cache.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L68)*
 
 ## Methods
 
@@ -75,7 +77,7 @@ Name | Type |
 
 ▸ **getAccounts**(): *Promise‹Accounts‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L65)*
+*Defined in [contractkit/src/web3-contract-cache.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L69)*
 
 **Returns:** *Promise‹Accounts‹››*
 
@@ -85,7 +87,7 @@ ___
 
 ▸ **getAttestations**(): *Promise‹Attestations‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L68)*
+*Defined in [contractkit/src/web3-contract-cache.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L72)*
 
 **Returns:** *Promise‹Attestations‹››*
 
@@ -95,7 +97,7 @@ ___
 
 ▸ **getBlockchainParameters**(): *Promise‹BlockchainParameters‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L71)*
+*Defined in [contractkit/src/web3-contract-cache.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L75)*
 
 **Returns:** *Promise‹BlockchainParameters‹››*
 
@@ -105,7 +107,7 @@ ___
 
 ▸ **getContract**<**C**>(`contract`: C): *Promise‹ContractCacheMap[C] extends undefined | null ? never : ContractCacheMap[C]›*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L129)*
+*Defined in [contractkit/src/web3-contract-cache.ts:139](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L139)*
 
 Get native web3 contract wrapper
 
@@ -127,7 +129,7 @@ ___
 
 ▸ **getDoubleSigningSlasher**(): *Promise‹DoubleSigningSlasher‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L74)*
+*Defined in [contractkit/src/web3-contract-cache.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L78)*
 
 **Returns:** *Promise‹DoubleSigningSlasher‹››*
 
@@ -137,7 +139,7 @@ ___
 
 ▸ **getDowntimeSlasher**(): *Promise‹DowntimeSlasher‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L77)*
+*Defined in [contractkit/src/web3-contract-cache.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L81)*
 
 **Returns:** *Promise‹DowntimeSlasher‹››*
 
@@ -147,7 +149,7 @@ ___
 
 ▸ **getElection**(): *Promise‹Election‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L80)*
+*Defined in [contractkit/src/web3-contract-cache.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L84)*
 
 **Returns:** *Promise‹Election‹››*
 
@@ -157,7 +159,7 @@ ___
 
 ▸ **getEpochRewards**(): *Promise‹EpochRewards‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L83)*
+*Defined in [contractkit/src/web3-contract-cache.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L87)*
 
 **Returns:** *Promise‹EpochRewards‹››*
 
@@ -167,7 +169,7 @@ ___
 
 ▸ **getEscrow**(): *Promise‹Escrow‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L86)*
+*Defined in [contractkit/src/web3-contract-cache.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L90)*
 
 **Returns:** *Promise‹Escrow‹››*
 
@@ -177,7 +179,7 @@ ___
 
 ▸ **getExchange**(): *Promise‹Exchange‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L89)*
+*Defined in [contractkit/src/web3-contract-cache.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L93)*
 
 **Returns:** *Promise‹Exchange‹››*
 
@@ -187,9 +189,19 @@ ___
 
 ▸ **getFeeCurrencyWhitelist**(): *Promise‹FeeCurrencyWhitelist‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L92)*
+*Defined in [contractkit/src/web3-contract-cache.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L96)*
 
 **Returns:** *Promise‹FeeCurrencyWhitelist‹››*
+
+___
+
+###  getFreezer
+
+▸ **getFreezer**(): *Promise‹Freezer‹››*
+
+*Defined in [contractkit/src/web3-contract-cache.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L99)*
+
+**Returns:** *Promise‹Freezer‹››*
 
 ___
 
@@ -197,7 +209,7 @@ ___
 
 ▸ **getGasPriceMinimum**(): *Promise‹GasPriceMinimum‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L95)*
+*Defined in [contractkit/src/web3-contract-cache.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L102)*
 
 **Returns:** *Promise‹GasPriceMinimum‹››*
 
@@ -207,7 +219,7 @@ ___
 
 ▸ **getGoldToken**(): *Promise‹GoldToken‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L98)*
+*Defined in [contractkit/src/web3-contract-cache.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L105)*
 
 **Returns:** *Promise‹GoldToken‹››*
 
@@ -217,7 +229,7 @@ ___
 
 ▸ **getGovernance**(): *Promise‹Governance‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L101)*
+*Defined in [contractkit/src/web3-contract-cache.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L108)*
 
 **Returns:** *Promise‹Governance‹››*
 
@@ -227,7 +239,7 @@ ___
 
 ▸ **getLockedGold**(): *Promise‹LockedGold‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L104)*
+*Defined in [contractkit/src/web3-contract-cache.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L111)*
 
 **Returns:** *Promise‹LockedGold‹››*
 
@@ -237,7 +249,7 @@ ___
 
 ▸ **getRandom**(): *Promise‹Random‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L107)*
+*Defined in [contractkit/src/web3-contract-cache.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L114)*
 
 **Returns:** *Promise‹Random‹››*
 
@@ -247,7 +259,7 @@ ___
 
 ▸ **getRegistry**(): *Promise‹Registry‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L110)*
+*Defined in [contractkit/src/web3-contract-cache.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L117)*
 
 **Returns:** *Promise‹Registry‹››*
 
@@ -257,7 +269,7 @@ ___
 
 ▸ **getReserve**(): *Promise‹Reserve‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L113)*
+*Defined in [contractkit/src/web3-contract-cache.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L120)*
 
 **Returns:** *Promise‹Reserve‹››*
 
@@ -267,7 +279,7 @@ ___
 
 ▸ **getSortedOracles**(): *Promise‹SortedOracles‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L116)*
+*Defined in [contractkit/src/web3-contract-cache.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L123)*
 
 **Returns:** *Promise‹SortedOracles‹››*
 
@@ -277,9 +289,19 @@ ___
 
 ▸ **getStableToken**(): *Promise‹StableToken‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:119](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L119)*
+*Defined in [contractkit/src/web3-contract-cache.ts:126](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L126)*
 
 **Returns:** *Promise‹StableToken‹››*
+
+___
+
+###  getTransferWhitelist
+
+▸ **getTransferWhitelist**(): *Promise‹TransferWhitelist‹››*
+
+*Defined in [contractkit/src/web3-contract-cache.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L129)*
+
+**Returns:** *Promise‹TransferWhitelist‹››*
 
 ___
 
@@ -287,6 +309,6 @@ ___
 
 ▸ **getValidators**(): *Promise‹Validators‹››*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L122)*
+*Defined in [contractkit/src/web3-contract-cache.ts:132](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L132)*
 
 **Returns:** *Promise‹Validators‹››*
