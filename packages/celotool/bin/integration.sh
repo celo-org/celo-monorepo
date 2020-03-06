@@ -72,13 +72,13 @@ else
 fi
 
 # Deploy the contracts
-"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/migration.log"
+"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/migration.log" | sed -e '/Operation completed over.*/q'
 if [ $? = 1 ]; then
   CONTRACTS_FAILED=true
 fi
 
 # Verify contracts
-"$DIR/celotooljs.sh" deploy initial verify-contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/verify.log"
+# "$DIR/celotooljs.sh" deploy initial verify-contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/verify.log"
 
 # Install packages
 # Celostats
