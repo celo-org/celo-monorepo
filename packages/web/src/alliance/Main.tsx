@@ -39,19 +39,8 @@ export default function Main() {
           ]}
         >
           <PinWheel mobileContainerStyle={styles.mobileSweepInner}>
-            <View
-              style={{
-                // @ts-ignore
-                animationDuration: '4000ms',
-                animationIterationCount: 1,
-                animationFillMode: 'forwards',
-                animationTimingFunction: 'cubic-bezier(1,.06,1,.35)',
-                animationKeyframes: keyframes,
-              }}
-            >
-              <H4 style={[styles.thematicTitle, { mixBlendMode: 'darken' }]}>
-                {t('thematicStatement')}
-              </H4>
+            <View style={styles.rainbow}>
+              <H4 style={[styles.thematicTitle, blendStyle]}>{t('thematicStatement')}</H4>
             </View>
           </PinWheel>
         </View>
@@ -91,32 +80,6 @@ export default function Main() {
   )
 }
 
-const styles = StyleSheet.create({
-  thematicTitle: {
-    color: colors.white,
-    backgroundColor: colors.dark,
-  },
-  sweepContainer: {
-    transform: [
-      {
-        translateY: -100,
-      } as any,
-    ],
-  },
-  sweepContainerMobile: {
-    transform: [
-      {
-        translateY: -200,
-      } as any,
-    ],
-  },
-  mobileSweepInner: {
-    height: '100vh',
-    width: '95vw',
-    justifyContent: 'space-evenly',
-  },
-})
-
 const keyframes = [
   {
     '0%': {
@@ -151,8 +114,43 @@ const keyframes = [
       background: `linear-gradient(90deg, rgba(255,255,255,1) 86%, rgba(12,218,110,1) 97%, rgba(255,101,83,1) 98%, rgba(159,105,255,1) 100%, rgba(82,182,255,1) 100%)`,
     },
     '100%': {
-      opacity: 1,
+      opacity: 0.9,
       backgroundColor: colors.white,
     },
   },
 ]
+
+const blendStyle = { mixBlendMode: 'darken' }
+
+const styles = StyleSheet.create({
+  thematicTitle: {
+    color: colors.white,
+    backgroundColor: colors.dark,
+  },
+  sweepContainer: {
+    transform: [
+      {
+        translateY: -100,
+      } as any,
+    ],
+  },
+  sweepContainerMobile: {
+    transform: [
+      {
+        translateY: -200,
+      } as any,
+    ],
+  },
+  mobileSweepInner: {
+    height: '100vh',
+    width: '95vw',
+    justifyContent: 'space-evenly',
+  },
+  rainbow: {
+    animationDuration: '4000ms',
+    animationIterationCount: 1,
+    animationFillMode: 'forwards',
+    animationTimingFunction: 'cubic-bezier(1,.06,1,.35)',
+    animationKeyframes: keyframes,
+  },
+})

@@ -12,10 +12,12 @@ import DropDownGroup from 'src/shared/DropDownGroup'
 import Outbound, { externalizeURL } from 'src/shared/Outbound'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
-async function gatherAllies(persistFunc: (data: []) => void) {
-  const response = await fetch('api/alliance')
+async function gatherAllies(persistFunc: (data: []) => void, abortController: AbortController) {
+  const response = await fetch('api/alliance', { signal: abortController.signal })
   const alliesByCategory = await response.json()
-  persistFunc(alliesByCategory)
+  if (!abortController.signal.aborted) {
+    persistFunc(alliesByCategory)
+  }
 }
 
 function buildDropDownProps(t: TFunction, currentFilter: string): ListItem[] {
@@ -45,10 +47,15 @@ export default function Members() {
   const [selectedFilter, setFilter] = React.useState(ALL)
 
   React.useEffect(() => {
+    const abortController = new AbortController()
     // sometimes it is nessessary to break a rule
     // https://github.com/facebook/react/issues/14326
     // tslint:disable-next-line: no-floating-promises
-    gatherAllies(setAllies)
+    gatherAllies(setAllies, abortController)
+
+    return () => {
+      abortController.abort()
+    }
   }, [])
 
   const onClear = React.useCallback(() => setFilter(ALL), [])
@@ -79,13 +86,13 @@ export default function Members() {
         </Cell>
       </GridRow>
       <GridRow
-        allStyle={{ minHeight: 600 }}
+        allStyle={styles.membersArea}
         desktopStyle={standardStyles.sectionMarginBottom}
         tabletStyle={standardStyles.sectionMarginBottomTablet}
         mobileStyle={standardStyles.sectionMarginBottomMobile}
       >
         <Cell span={Spans.fourth}>
-          <View style={{ maxWidth: 220 }}>
+          <View style={styles.selectionArea}>
             <Text style={[fonts.h6, styles.filterLabel]}>{t('filterLabel')}</Text>
             <DropDownGroup
               data={[
@@ -143,8 +150,8 @@ const Member = React.memo(function _Member({ logo, name, url }: Ally) {
   return logo.uri ? (
     <LazyFade>
       {(onLoad: () => void) => (
-        <a target={'_blank'} href={href}>
-          <View style={styles.member}>
+        <View style={styles.member}>
+          <a target={'_blank'} href={href}>
             <Image
               resizeMode="contain"
               resizeMethod="resize"
@@ -153,9 +160,9 @@ const Member = React.memo(function _Member({ logo, name, url }: Ally) {
               accessibilityLabel={name}
               style={[styles.logo, { width: logo.width / divisor }]}
             />
-            {href && <Outbound url={href} />}
-          </View>
-        </a>
+          </a>
+          {href && <Outbound url={href} />}
+        </View>
       )}
     </LazyFade>
   ) : (
@@ -178,6 +185,8 @@ function FallBack({ text, url }) {
 const ROW_HEIGHT = 50
 
 const styles = StyleSheet.create({
+  selectionArea: { maxWidth: 220 },
+  membersArea: { minHeight: 600 },
   grayLine: {
     marginTop: 2,
     borderBottomColor: colors.gray,
