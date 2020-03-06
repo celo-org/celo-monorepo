@@ -113,6 +113,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
               "flex": 1,
               "fontFamily": "Hind-Regular",
               "padding": 8,
+              "textAlignVertical": "top",
             }
           }
           underlineColorAndroid="transparent"
@@ -351,6 +352,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               "flex": 1,
               "fontFamily": "Hind-Regular",
               "padding": 8,
+              "textAlignVertical": "top",
             }
           }
           underlineColorAndroid="transparent"

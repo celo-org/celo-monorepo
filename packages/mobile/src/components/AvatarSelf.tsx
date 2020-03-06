@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { e164NumberSelector, nameSelector, userContactDetailsSelector } from 'src/account/reducer'
+import { e164NumberSelector, nameSelector, userContactDetailsSelector } from 'src/account/selectors'
 import Avatar from 'src/components/Avatar'
 import { RecipientKind, RecipientWithContact } from 'src/recipients/recipient'
 
