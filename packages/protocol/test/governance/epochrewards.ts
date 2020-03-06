@@ -76,6 +76,8 @@ contract('EpochRewards', (accounts: string[]) => {
   }
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
   const communityRewardFraction = toFixed(new BigNumber(1 / 4))
+  const carbonOffsettingFraction = toFixed(new BigNumber(1 / 200))
+  const carbonOffsettingPartner = '0x0000000000000000000000000000000000000000'
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
@@ -119,7 +121,9 @@ contract('EpochRewards', (accounts: string[]) => {
       rewardsMultiplier.adjustments.overspend,
       targetVotingGoldFraction,
       targetValidatorEpochPayment,
-      communityRewardFraction
+      communityRewardFraction,
+      carbonOffsettingPartner,
+      carbonOffsettingFraction
     )
   })
 
@@ -159,7 +163,9 @@ contract('EpochRewards', (accounts: string[]) => {
           rewardsMultiplier.adjustments.overspend,
           targetVotingGoldFraction,
           targetValidatorEpochPayment,
-          communityRewardFraction
+          communityRewardFraction,
+          carbonOffsettingPartner,
+          carbonOffsettingFraction
         )
       )
     })

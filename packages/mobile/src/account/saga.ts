@@ -6,7 +6,8 @@ import {
   setPincodeFailure,
   setPincodeSuccess,
 } from 'src/account/actions'
-import { PincodeType, pincodeTypeSelector } from 'src/account/reducer'
+import { PincodeType } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'

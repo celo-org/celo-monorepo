@@ -35,7 +35,7 @@ class Press extends React.PureComponent<I18nProps> {
             ))}
           </View>
           <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
-            {/* <Button text={t('recentNews')} kind={BTN.NAKED} href={'https://medium.com/celohq'} /> */}
+            {/* <Button text={t('recentNews')} kind={BTN.NAKED} href={'https://medium.com/celoOrg'} /> */}
             <Button
               text={t('recentNews')}
               kind={BTN.NAKED}

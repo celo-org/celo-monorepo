@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Invite renders correctly with no recipients 1`] = `
-<SafeAreaView
+<View
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -113,6 +113,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
               "flex": 1,
               "fontFamily": "Hind-Regular",
               "padding": 8,
+              "textAlignVertical": "top",
             }
           }
           underlineColorAndroid="transparent"
@@ -165,6 +166,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
+      contentContainerStyle={
+        Object {
+          "paddingBottom": 0,
+        }
+      }
       data={Array []}
       disableVirtualization={false}
       getItem={[Function]}
@@ -230,11 +236,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
       </View>
     </RCTScrollView>
   </View>
-</SafeAreaView>
+</View>
 `;
 
 exports[`Invite renders correctly with recipients 1`] = `
-<SafeAreaView
+<View
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -346,6 +352,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               "flex": 1,
               "fontFamily": "Hind-Regular",
               "padding": 8,
+              "textAlignVertical": "top",
             }
           }
           underlineColorAndroid="transparent"
@@ -398,6 +405,11 @@ exports[`Invite renders correctly with recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
+      contentContainerStyle={
+        Object {
+          "paddingBottom": 0,
+        }
+      }
       data={
         Array [
           Object {
@@ -625,5 +637,5 @@ exports[`Invite renders correctly with recipients 1`] = `
       </View>
     </RCTScrollView>
   </View>
-</SafeAreaView>
+</View>
 `;
