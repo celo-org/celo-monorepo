@@ -13,6 +13,7 @@ contract MockValidators is IValidators {
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   mapping(address => bool) public isValidator;
+  mapping(address => bool) public isValidatorGroup;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private lockedGoldRequirements;
   mapping(address => bool) private doesNotMeetAccountLockedGoldRequirements;
@@ -33,6 +34,10 @@ contract MockValidators is IValidators {
 
   function setValidator(address account) external {
     isValidator[account] = true;
+  }
+
+  function setValidatorGroup(address group) external {
+    isValidatorGroup[group] = true;
   }
 
   function affiliate(address group) external returns (bool) {
