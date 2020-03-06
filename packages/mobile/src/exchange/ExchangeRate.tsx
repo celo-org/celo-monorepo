@@ -54,7 +54,7 @@ export default function ExchangeRate({ makerAmount, takerAmount, showFinePrint }
         {isRateValid ? t('exchangeRate') : t('loadingExchangeRate')}
       </Text>
       {isRateValid && (
-        <Text style={styles.ratio}>
+        <Text style={styles.ratio} testID="ExchangeRateRatio">
           <Trans
             i18nKey="exchangeRateValue"
             ns={Namespaces.exchangeFlow9}
