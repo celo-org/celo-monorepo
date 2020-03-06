@@ -9,10 +9,9 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -240,18 +239,18 @@ describe('Transfer tests', function(this: any) {
 
   const restartWithCleanNodes = async () => {
     await hooks.restart()
+    await initAndSyncGethWithRetry(
+      gethConfig,
+      hooks.gethBinaryPath,
+      fullInstance,
+      [...gethConfig.instances, fullInstance],
+      verbose,
+      3
+    )
 
     kit = newKitFromWeb3(new Web3('http://localhost:8545'))
     kit.gasInflationFactor = 1
-
-    // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
-    await sleep(2)
-    // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
-
-    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
-    await connectPeers([...gethConfig.instances, fullInstance], verbose)
-    await waitToFinishInstanceSyncing(fullInstance)
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -283,15 +282,14 @@ describe('Transfer tests', function(this: any) {
     }
 
     // Spin up the node to run transfers as.
-    currentGethInstance = await initAndStartGeth(
+    currentGethInstance = await initAndSyncGethWithRetry(
       gethConfig,
       hooks.gethBinaryPath,
       instance,
-      verbose
+      [fullInstance, currentGethInstance],
+      verbose,
+      3
     )
-
-    await connectPeers([fullInstance, currentGethInstance])
-    await waitToFinishInstanceSyncing(currentGethInstance)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')

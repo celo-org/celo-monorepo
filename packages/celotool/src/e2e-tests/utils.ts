@@ -4,6 +4,7 @@ import { assert } from 'chai'
 import fs from 'fs'
 import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
+import readLastLines from 'read-last-lines'
 import Web3 from 'web3'
 import {
   AccountType,
@@ -18,13 +19,13 @@ import {
   checkoutGethRepo,
   connectValidatorPeers,
   getEnodeAddress,
+  getLogFilename,
   initAndStartGeth,
   resetDataDir,
   restoreDatadir,
   snapshotDatadir,
   spawnWithLog,
   startGeth,
-  tailLogFile,
   writeGenesis,
 } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
@@ -50,7 +51,8 @@ export async function initAndSyncGethWithRetry(
       break
     } catch (error) {
       console.info(`initAndSyncGethWithRetry error: ${error}`)
-      console.info(await tailLogFile(gethConfig.runPath, instance, 50))
+      console.info(`tail -50 ${gethConfig.runPath}`)
+      console.info(await readLastLines.read(getLogFilename(gethConfig.runPath, instance), 50))
       if (i == retries) {
         console.info(`Retrying ${i}/${retries} ...`)
         killInstance(instance)
@@ -60,6 +62,7 @@ export async function initAndSyncGethWithRetry(
       }
     }
   }
+  return instance
 }
 
 export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
