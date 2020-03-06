@@ -42,7 +42,7 @@ export function getImageURI(previewField: Attachment[], size: ImageSizes) {
 
 export function getImageRatio(imageField: Attachment[]) {
   const thumb = getThumbnail(imageField, ImageSizes.large)
-  return thumb ? thumb.width / thumb.height : 1
+  return thumb ? { width: thumb.width, height: thumb.height } : { width: 1, height: 1 }
 }
 
 function getThumbnail(imageField: Attachment[], size: ImageSizes) {

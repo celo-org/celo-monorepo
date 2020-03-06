@@ -138,9 +138,10 @@ function Category({ name, members }: CategoryProps) {
 }
 
 const Member = React.memo(function _Member({ logo, name, url }: Ally) {
+  const divisor = logo.ratio.height / ROW_HEIGHT
   return (
     <View style={styles.member}>
-      {logo ? (
+      {logo.uri ? (
         <LazyFade>
           {(onLoad: () => void) => (
             <Image
@@ -149,7 +150,7 @@ const Member = React.memo(function _Member({ logo, name, url }: Ally) {
               onLoad={onLoad}
               source={{ uri: logo.uri }}
               accessibilityLabel={name}
-              style={styles.logo}
+              style={[styles.logo, { width: logo.ratio.width / divisor }]}
             />
           )}
         </LazyFade>
@@ -170,6 +171,8 @@ function PlaceHolder({ text, url }) {
     </View>
   )
 }
+
+const ROW_HEIGHT = 50
 
 const styles = StyleSheet.create({
   grayLine: {
@@ -192,14 +195,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 20,
     width: 170,
-    height: 50,
+    height: ROW_HEIGHT,
   },
   logo: {
     backgroundColor: colors.white,
     marginHorizontal: 10,
     padding: 5,
-    width: 150,
-    height: 50,
+    maxWidth: 150,
+    height: ROW_HEIGHT,
   },
   filterLabel: {
     marginBottom: 5,
