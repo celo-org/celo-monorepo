@@ -110,7 +110,7 @@ describe('sync tests', function(this: any) {
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
 
         const syncWeb3 = new Web3(`http://localhost:8555`)
-        await waitForBlock(syncWeb3, validatingFirstBlock + 1)
+        await waitForBlock(syncWeb3, validatingLatestBlock)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
 
         assert.isAbove(validatingLatestBlock, 1)

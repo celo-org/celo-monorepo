@@ -51,14 +51,15 @@ export async function initAndSyncGethWithRetry(
       break
     } catch (error) {
       console.info(`initAndSyncGethWithRetry error: ${error}`)
-      console.info(`tail -50 ${gethConfig.runPath}`)
-      console.info(await readLastLines.read(getLogFilename(gethConfig.runPath, instance), 50))
+      const logFilename = getLogFilename(gethConfig.runPath, instance)
+      console.info(`tail -50 ${logFilename}`)
+      console.info(await readLastLines.read(logFilename, 50))
       if (i == retries) {
+        throw error
+      } else {
         console.info(`Retrying ${i}/${retries} ...`)
         killInstance(instance)
         continue
-      } else {
-        throw error
       }
     }
   }
