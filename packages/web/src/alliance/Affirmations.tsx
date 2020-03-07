@@ -21,6 +21,7 @@ import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export default function Affirmations() {
   const { t } = useTranslation(NameSpaces.alliance)
+  const { isMobile } = useScreenSize()
   return (
     <View>
       <GridRow
@@ -28,9 +29,13 @@ export default function Affirmations() {
         tabletStyle={standardStyles.sectionMarginTopTablet}
         mobileStyle={standardStyles.sectionMarginTopMobile}
       >
-        <Cell span={Spans.full}>
-          <H3>{t('affirmations.smallTitle')}</H3>
-          <H2>{t('affirmations.title')}</H2>
+        <Cell span={Spans.full} style={isMobile && standardStyles.centered}>
+          <H3 style={isMobile && [textStyles.center, styles.mobileHeader]}>
+            {t('affirmations.smallTitle')}
+          </H3>
+          <H2 style={[standardStyles.halfElement, isMobile && textStyles.center]}>
+            {t('affirmations.title')}
+          </H2>
         </Cell>
       </GridRow>
       <Exemplar
@@ -89,8 +94,12 @@ function Exemplar({ image, logo, belief, copy, button, preview, contentStyle }: 
     <GridRow allStyle={standardStyles.elementalMargin}>
       <Cell span={Spans.half}>
         <View style={contentStyle}>
-          <H4 style={standardStyles.elementalMarginBottom}>{belief}</H4>
-          <View style={[standardStyles.elementalMargin]}>{logo}</View>
+          <H4 style={isMobile ? standardStyles.halfElement : standardStyles.elementalMarginBottom}>
+            {belief}
+          </H4>
+          <View style={isMobile ? standardStyles.halfElement : standardStyles.elementalMargin}>
+            {logo}
+          </View>
           <Text style={fonts.p}>{copy}</Text>
           {button && (
             <Button
@@ -120,6 +129,12 @@ function TransItalic({ i18nKey }: { i18nKey: string }) {
   )
 }
 
+// const mobileStyles = StyleSheet.create({
+//   laboratoria: { width: 200 / 2, height: 35 / 2 },
+//   wfpLogo: { width: 182 / 2, height: 80 / 2 },
+//   cLabsLogo: { width: 140 / 2, height: 50 / 2 },
+// })
+
 const styles = StyleSheet.create({
   laboratoria: { width: 200, height: 35 },
   wfpLogo: { width: 182, height: 80 },
@@ -128,4 +143,5 @@ const styles = StyleSheet.create({
   laborStyle: { maxWidth: 440 },
   cLabStyle: { maxWidth: 475 },
   wfpStyle: { maxWidth: 400 },
+  mobileHeader: { maxWidth: 300 },
 })

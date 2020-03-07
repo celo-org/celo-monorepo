@@ -314,6 +314,9 @@ export const standardStyles = StyleSheet.create({
   blockMarginBottomTablet: {
     marginBottom: tabletMargins.medium,
   },
+  halfElement: {
+    marginVertical: margins.small / 2,
+  },
   elementalMargin: {
     marginVertical: margins.small,
   },
