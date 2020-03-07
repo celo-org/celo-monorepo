@@ -21,7 +21,7 @@ contract Freezer is Ownable, Initializable, IFreezer {
   }
 
   /**
-   * @notice Unreezes the contract, enabling `onlyWhenNotFrozen` functions.
+   * @notice Unfreezes the contract, enabling `onlyWhenNotFrozen` functions.
    * @param target The address of the contract to freeze.
    */
   function unfreeze(address target) external onlyOwner {

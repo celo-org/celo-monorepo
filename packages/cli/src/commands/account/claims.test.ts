@@ -76,11 +76,11 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
       })
 
       test('can register metadata', async () => {
-        await RegisterMetadata.run(['--from', account, '--url', 'https://test.com'])
+        await RegisterMetadata.run(['--force', '--from', account, '--url', 'https://test.com'])
       })
 
       test('fails if url is missing', async () => {
-        await expect(RegisterMetadata.run(['--from', account])).rejects.toThrow(
+        await expect(RegisterMetadata.run(['--force', '--from', account])).rejects.toThrow(
           'Missing required flag'
         )
       })
@@ -88,7 +88,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
 
     it('cannot register metadata', async () => {
       await expect(
-        RegisterMetadata.run(['--from', account, '--url', 'https://test.com'])
+        RegisterMetadata.run(['--force', '--from', account, '--url', 'https://test.com'])
       ).rejects.toThrow("Some checks didn't pass!")
     })
   })
