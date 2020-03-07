@@ -4,6 +4,7 @@ import { NewMember } from 'src/alliance/AllianceMember'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { CheckboxWithLabel, Form, LabeledInput } from 'src/forms/FormComponents'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import { standardStyles } from 'src/styles'
 
@@ -25,24 +26,22 @@ function validateWith(fields: NewMember) {
     }
   })
 }
-{
-  /* <ErrorMessage allErrors={formState.errors} field={'name'} t={t} /> */
-}
 
 export default function SignupForm() {
   const { t } = useTranslation(NameSpaces.alliance)
+  const { isMobile } = useScreenSize()
   return (
     <FormContainer route="/api/alliance" blankForm={BLANK_FORM} validateWith={validateWith}>
       {({ formState, onInput, onCheck, onAltSubmit }) => (
         <Form>
-          <View style={{ margin: 20 }}>
-            <View style={standardStyles.row}>
+          <View style={styles.container}>
+            <View style={!isMobile && standardStyles.row}>
               <View style={styles.inputContainer}>
                 <LabeledInput
                   isDarkMode={true}
                   label={t('form.name')}
                   onInput={onInput}
-                  hasError={formState.errors.includes('name')}
+                  errors={formState.errors}
                   name="name"
                   value={formState.form.name as string}
                 />
@@ -96,4 +95,5 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 5,
   },
+  container: { margin: 20 },
 })
