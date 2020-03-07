@@ -137,11 +137,7 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
         onPress={this.onPress}
       >
         <View
-          style={[
-            { alignItems: align },
-            this.props.kind === BTN.INLINE && inlineStyle.container,
-            this.props.size === SIZE.fullWidth && baseStyles.fullWidthContainer,
-          ]}
+          style={[{ alignItems: align }, this.props.kind === BTN.INLINE && inlineStyle.container]}
         >
           {renderedButton}
         </View>

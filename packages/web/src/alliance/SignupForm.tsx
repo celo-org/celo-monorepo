@@ -76,7 +76,9 @@ export default function SignupForm() {
               />
             </View>
           </View>
-          <View style={[standardStyles.centered, styles.buttonContainer]}>
+          <View
+            style={[standardStyles.centered, styles.buttonContainer, isMobile && styles.stretch]}
+          >
             <Button
               text={t('form.btn')}
               onDarkBackground={true}
@@ -100,6 +102,9 @@ const styles = StyleSheet.create({
   buttonContainer: {
     paddingTop: 15,
     paddingHorizontal: 20,
+  },
+  stretch: {
+    alignItems: 'stretch',
   },
   buttonText: {
     fontSize: 20,
