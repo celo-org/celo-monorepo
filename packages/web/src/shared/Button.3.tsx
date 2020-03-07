@@ -29,6 +29,7 @@ interface AllButtonProps {
   disabled?: boolean
   onPress?: () => void
   iconRight?: React.ReactNode
+  size?: SIZE
   iconLeft?: React.ReactNode
   align?: 'center' | 'flex-start' | 'flex-end'
   style?: TextStyle | TextStyle[]
@@ -136,7 +137,11 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
         onPress={this.onPress}
       >
         <View
-          style={[{ alignItems: align }, this.props.kind === BTN.INLINE && inlineStyle.container]}
+          style={[
+            { alignItems: align },
+            this.props.kind === BTN.INLINE && inlineStyle.container,
+            this.props.size === SIZE.fullWidth && baseStyles.fullWidthContainer,
+          ]}
         >
           {renderedButton}
         </View>
@@ -144,15 +149,6 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
     )
   }
 }
-
-// function isExternalLink(url: string) {
-//   try {
-//     const uri = new URL(url)
-//     return !!uri
-//   } catch {
-//     return false
-//   }
-// }
 
 enum BTNStates {
   normal = 'normal',
@@ -539,6 +535,7 @@ const baseStyles = StyleSheet.create({
   iconRight: {
     paddingLeft: 8,
   },
+  fullWidthContainer: { width: '100%' },
 })
 
 const boxedVertical = StyleSheet.create({

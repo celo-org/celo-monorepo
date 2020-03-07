@@ -5,7 +5,7 @@ import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { CheckboxWithLabel, Form, LabeledInput } from 'src/forms/FormComponents'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { useScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { standardStyles } from 'src/styles'
 
 const BLANK_FORM: NewMember = {
@@ -41,9 +41,9 @@ export default function SignupForm() {
                   isDarkMode={true}
                   label={t('form.name')}
                   onInput={onInput}
-                  errors={formState.errors}
+                  hasError={formState.errors.includes('name')}
                   name="name"
-                  value={formState.form.name as string}
+                  value={formState.form.name}
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -53,7 +53,7 @@ export default function SignupForm() {
                   onInput={onInput}
                   hasError={formState.errors.includes('email')}
                   name="email"
-                  value={formState.form.email as string}
+                  value={formState.form.email}
                 />
               </View>
             </View>
@@ -64,7 +64,7 @@ export default function SignupForm() {
                 onInput={onInput}
                 hasError={formState.errors.includes('contribution')}
                 name="contribution"
-                value={formState.form.contribution as string}
+                value={formState.form.contribution}
               />
             </View>
             <View style={styles.inputContainer}>
@@ -76,12 +76,14 @@ export default function SignupForm() {
               />
             </View>
           </View>
-          <View style={standardStyles.centered}>
+          <View style={[standardStyles.centered, styles.buttonContainer]}>
             <Button
               text={t('form.btn')}
               onDarkBackground={true}
               onPress={onAltSubmit}
               kind={BTN.PRIMARY}
+              style={styles.buttonText}
+              size={isMobile && SIZE.fullWidth}
             />
           </View>
         </Form>
@@ -94,6 +96,13 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     marginHorizontal: 5,
+  },
+  buttonContainer: {
+    paddingTop: 15,
+    paddingHorizontal: 20,
+  },
+  buttonText: {
+    fontSize: 20,
   },
   container: { margin: 20 },
 })

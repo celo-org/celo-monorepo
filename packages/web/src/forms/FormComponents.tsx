@@ -271,6 +271,7 @@ export function CheckboxWithLabel({
 
 const checkBoxStyles = StyleSheet.create({
   border: {
+    paddingHorizontal: 2,
     borderRadius: 3,
     borderWidth: 1,
     borderColor: colors.gray,
@@ -286,5 +287,5 @@ const checkBoxStyles = StyleSheet.create({
     opacity: 1,
   },
   hidden: { opacity: 0 },
-  label: { paddingHorizontal: 10 },
+  label: { paddingHorizontal: 10, lineHeight: 20 },
 })
