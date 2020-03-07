@@ -36,7 +36,7 @@ fi
 
 # sleep 200
 
-waitTime=600
+waitTime=800
 iterations=0
 
 echo -n "waiting for pod"
