@@ -10,7 +10,7 @@ import { PincodeType } from 'src/account/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
-import BackupIcon from 'src/icons/BackupIcon'
+import LockedPhoneIcon from 'src/icons/LockedPhoneIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -74,7 +74,7 @@ class PincodeEducation extends React.Component<Props> {
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
-            <BackupIcon style={style.pincodeLogo} />
+            <LockedPhoneIcon style={style.pincodeLogo} /*TODO?*/ />
             <Text style={style.h1} testID="SystemAuthTitle">
               {t('pincodeEducation.title')}
             </Text>
