@@ -11,7 +11,8 @@ import ValidatorsList from 'src/dev/ValidatorsList'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import menuItems from 'src/shared/menu-items'
-import { standardStyles } from 'src/styles'
+import Spinner from 'src/shared/Spinner'
+import { colors, standardStyles } from 'src/styles'
 
 function createApolloClient() {
   return new ApolloClient({
@@ -46,6 +47,8 @@ const query = gql`
             name
             score
             usd
+            attestationsFulfilled
+            attestationsRequested
           }
         }
       }
@@ -74,7 +77,7 @@ class ValidatorsListApp extends React.PureComponent<I18nProps> {
         />
         <ApolloProvider client={createApolloClient()}>
           <Query query={query}>
-            {({ loading, error, data }) => {
+            {({ loading, error, data }: any) => {
               if (error) {
                 return (
                   <View
@@ -88,7 +91,20 @@ class ValidatorsListApp extends React.PureComponent<I18nProps> {
                   </View>
                 )
               }
-              return <ValidatorsList data={loading ? undefined : data} isLoading={loading} />
+              if (!data) {
+                return (
+                  <View
+                    style={[
+                      standardStyles.darkBackground,
+                      standardStyles.centered,
+                      styles.fullHeight,
+                    ]}
+                  >
+                    <Spinner size="medium" color={colors.white} />
+                  </View>
+                )
+              }
+              return <ValidatorsList data={data} isLoading={loading} />
             }}
           </Query>
         </ApolloProvider>
