@@ -174,7 +174,7 @@ function FallBack({ text, url }) {
   return (
     <View style={styles.member}>
       <View style={[standardStyles.centered, styles.logo]}>
-        <Text href={url} target="_blank" style={[fonts.legal, textStyles.center]}>
+        <Text href={url} target="_blank" style={[fonts.micro, textStyles.center]}>
           {text}
         </Text>
       </View>
@@ -183,6 +183,7 @@ function FallBack({ text, url }) {
 }
 
 const ROW_HEIGHT = 50
+const COLUMN_WIDTH = 180
 
 const styles = StyleSheet.create({
   selectionArea: { maxWidth: 220 },
@@ -194,7 +195,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   categoryContainer: {
-    marginVertical: 10,
+    display: 'grid',
+    gridTemplateColumns: `repeat(3, ${COLUMN_WIDTH}px)`,
+    justifyContent: 'space-between',
+    marginVertical: 30,
     flexDirection: 'row',
     flexWrap: 'wrap',
     minHeight: 90,
@@ -205,8 +209,8 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     justifyContent: 'center',
     marginHorizontal: 20,
-    marginVertical: 20,
-    width: 180,
+    marginVertical: 30,
+    width: COLUMN_WIDTH,
     height: ROW_HEIGHT,
   },
   logo: {

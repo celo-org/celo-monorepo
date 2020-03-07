@@ -10,9 +10,10 @@ import Svg from 'svgs'
 // since the coins animate in a delayed way the entire "animation" is longer than this
 const DURATION = 1100
 
-const INTERVAL_MS = DURATION * 2.1 // needs to be at least 4x DURATION to give the complete animation a chance to finish
+const INTERVAL_MS = DURATION * 2.1
 
 interface OwnProps {
+  static: boolean
   children?: React.ReactNode
   mobileContainerStyle: ViewStyle | ViewStyle[]
 }
@@ -25,22 +26,24 @@ class PinWheel extends React.Component<Props> {
     return (
       <View style={isMobile ? this.props.mobileContainerStyle : styles.sweepContainer}>
         <Svg width="100%" height="100%" viewBox="0 0 717 750" fill="none">
-          <G style={styles.lighting}>
-            {VECTORS.map((path, index) => {
-              const style = {
-                animationDelay: `${index * frame}ms`,
-              }
+          {!this.props.static && (
+            <G style={styles.lighting}>
+              {VECTORS.map((path, index) => {
+                const style = {
+                  animationDelay: `${index * frame}ms`,
+                }
 
-              return (
-                <Path
-                  key={path.slice(0, 10)}
-                  d={path}
-                  style={[styles.base, styles.cycle, baseCoinStyle, style]}
-                />
-              )
-            })}
-          </G>
-          <StableCircle />
+                return (
+                  <Path
+                    key={path.slice(0, 10)}
+                    d={path}
+                    style={[styles.base, styles.cycle, baseCoinStyle, style]}
+                  />
+                )
+              })}
+            </G>
+          )}
+          <Quadrants animate={!this.props.static} />
         </Svg>
         {this.props.children && (
           <View style={isMobile ? standardStyles.centered : styles.absoluteCenter}>
@@ -54,7 +57,10 @@ class PinWheel extends React.Component<Props> {
 
 export default withScreenSize(PinWheel)
 
-class StableCircle extends React.PureComponent {
+interface QuadrantProps {
+  animate: boolean
+}
+class Quadrants extends React.PureComponent<QuadrantProps> {
   render() {
     return (
       <G>
@@ -63,25 +69,33 @@ class StableCircle extends React.PureComponent {
             <Path
               key={path.slice(0, 11)}
               d={path}
-              style={[
-                styles.justCoin,
-                {
-                  mixBlendMode: 'screen',
-                  animationIterationCount: 1,
-                  animationDelay: `${INTERVAL_MS + index * 30}ms`,
-                  animationFillMode: 'both',
-                  animationDuration: `${DURATION / 3}ms`,
-                  animationKeyframes: solidFadeInFrames(
-                    quartColor(index),
-                    ((index * index) / VECTORS.length) * 200
-                  ),
-                },
-              ]}
+              style={[styles.justCoin, this.props.animate ? animated(index) : still(index)]}
             />
           )
         })}
       </G>
     )
+  }
+}
+
+function animated(index: number) {
+  return {
+    mixBlendMode: 'screen',
+    animationIterationCount: 1,
+    animationDelay: `${INTERVAL_MS + index * 30}ms`,
+    animationFillMode: 'both',
+    animationDuration: `${DURATION / 3}ms`,
+    animationKeyframes: solidFadeInFrames(
+      quartColor(index),
+      ((index * index) / VECTORS.length) * 200
+    ),
+  }
+}
+
+function still(index: number) {
+  return {
+    mixBlendMode: 'screen',
+    ...colorFrame(quartColor(index)),
   }
 }
 

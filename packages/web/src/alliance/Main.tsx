@@ -18,11 +18,11 @@ import { useScreenSize } from 'src/layout/ScreenSize'
 import BeautifulQuote from 'src/shared/BeautifulQuote'
 import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
-import { colors, standardStyles } from 'src/styles'
+import { colors, standardStyles, textStyles } from 'src/styles'
 
 export default function Main() {
   const { t } = useTranslation(NameSpaces.alliance)
-  const { isDesktop } = useScreenSize()
+  const { isDesktop, isMobile } = useScreenSize()
   return (
     <View>
       <OpenGraph
@@ -38,9 +38,18 @@ export default function Main() {
             isDesktop ? styles.sweepContainer : styles.sweepContainerMobile,
           ]}
         >
-          <PinWheel mobileContainerStyle={styles.mobileSweepInner}>
+          <PinWheel mobileContainerStyle={styles.mobileSweepInner} static={false}>
             <View style={styles.rainbow}>
-              <H4 style={[styles.thematicTitle, blendStyle]}>{t('thematicStatement')}</H4>
+              <H4
+                style={[
+                  styles.thematicTitle,
+                  blendStyle,
+                  textStyles.center,
+                  isMobile && { fontSize: 40 },
+                ]}
+              >
+                {t('thematicStatement')}
+              </H4>
             </View>
           </PinWheel>
         </View>
@@ -135,16 +144,13 @@ const styles = StyleSheet.create({
     ],
   },
   sweepContainerMobile: {
-    transform: [
-      {
-        translateY: -200,
-      } as any,
-    ],
+    height: '100vh',
   },
   mobileSweepInner: {
-    height: '100vh',
-    width: '95vw',
-    justifyContent: 'space-evenly',
+    paddingBottom: 40,
+    height: '80vh',
+    width: '90vw',
+    justifyContent: 'center',
   },
   rainbow: {
     animationDuration: '4000ms',

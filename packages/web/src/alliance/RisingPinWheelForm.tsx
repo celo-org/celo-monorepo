@@ -1,5 +1,4 @@
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
 import { StyleSheet, View } from 'react-native-web'
 import CollectiveMission from 'src/alliance/CollectiveMission'
 import PinWheel from 'src/alliance/PinWheel'
@@ -22,9 +21,7 @@ export default function RisingPinWheelForm() {
         </Cell>
       </GridRow>
       <View style={styles.pinWheelContainer}>
-        <LazyLoad offset={50}>
-          <PinWheel mobileContainerStyle={styles.innerPinWheelContainer} />
-        </LazyLoad>
+        <PinWheel mobileContainerStyle={styles.innerPinWheelContainer} static={true} />
       </View>
     </View>
   )

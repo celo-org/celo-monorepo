@@ -137,7 +137,7 @@ export class Header extends React.PureComponent<Props, State> {
 
   getBackgroundColor = () => {
     if (this.isTranslucent() && !this.state.belowFoldUpScroll) {
-      return this.state.isHovering ? `rgba(0,0,0,0.5)` : 'transparent'
+      return this.state.isHovering ? colors.darkTransparent : 'transparent'
     }
     return this.isDarkMode() ? colors.dark : colors.white
   }
