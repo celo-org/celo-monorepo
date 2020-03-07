@@ -29,13 +29,13 @@ function validateWith(fields: NewMember) {
 
 export default function SignupForm() {
   const { t } = useTranslation(NameSpaces.alliance)
-  const { isMobile } = useScreenSize()
+  const { isMobile, isDesktop } = useScreenSize()
   return (
     <FormContainer route="/api/alliance" blankForm={BLANK_FORM} validateWith={validateWith}>
       {({ formState, onInput, onCheck, onAltSubmit }) => (
         <Form>
           <View style={styles.container}>
-            <View style={!isMobile && standardStyles.row}>
+            <View style={isDesktop && standardStyles.row}>
               <View style={styles.inputContainer}>
                 <LabeledInput
                   isDarkMode={true}

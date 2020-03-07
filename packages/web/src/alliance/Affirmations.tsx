@@ -22,6 +22,9 @@ import { fonts, standardStyles, textStyles } from 'src/styles'
 export default function Affirmations() {
   const { t } = useTranslation(NameSpaces.alliance)
   const { isMobile } = useScreenSize()
+
+  const orgStyle = isMobile ? mobileStyles : styles
+
   return (
     <View>
       <GridRow
@@ -43,7 +46,7 @@ export default function Affirmations() {
         copy={t('affirmations.laboratoriaCopy')}
         image={laboratoria}
         preview={laboratoriaPreview}
-        logo={<Image resizeMode="contain" source={laboratoriaLogo} style={styles.laboratoria} />}
+        logo={<Image resizeMode="contain" source={laboratoriaLogo} style={orgStyle.laboratoria} />}
         contentStyle={styles.laborStyle}
       />
       <Exemplar
@@ -51,7 +54,7 @@ export default function Affirmations() {
         copy={t('affirmations.wfpCopy')}
         image={wfp}
         preview={wfpPreview}
-        logo={<Image resizeMode="contain" source={wfpLogo} style={styles.wfpLogo} />}
+        logo={<Image resizeMode="contain" source={wfpLogo} style={orgStyle.wfpLogo} />}
         button={{
           text: t('affirmations.wfpButton'),
           href:
@@ -68,7 +71,7 @@ export default function Affirmations() {
           text: t('affirmations.cLabsButton'),
           href: 'https://medium.com/celohq/a-cryptocurrency-for-every-juan-144144e62d5',
         }}
-        logo={<Image resizeMode="contain" source={cLabsLogo} style={styles.cLabsLogo} />}
+        logo={<Image resizeMode="contain" source={cLabsLogo} style={orgStyle.cLabsLogo} />}
         contentStyle={styles.wfpStyle}
       />
     </View>
@@ -129,11 +132,13 @@ function TransItalic({ i18nKey }: { i18nKey: string }) {
   )
 }
 
-// const mobileStyles = StyleSheet.create({
-//   laboratoria: { width: 200 / 2, height: 35 / 2 },
-//   wfpLogo: { width: 182 / 2, height: 80 / 2 },
-//   cLabsLogo: { width: 140 / 2, height: 50 / 2 },
-// })
+const SMALLER = 0.8
+
+const mobileStyles = StyleSheet.create({
+  laboratoria: { width: 200 * SMALLER, height: 35 * SMALLER },
+  wfpLogo: { width: 182 * SMALLER, height: 80 * SMALLER },
+  cLabsLogo: { width: 140 * SMALLER, height: 50 * SMALLER },
+})
 
 const styles = StyleSheet.create({
   laboratoria: { width: 200, height: 35 },

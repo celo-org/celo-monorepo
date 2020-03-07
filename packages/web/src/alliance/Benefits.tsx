@@ -10,6 +10,7 @@ import {
   expandReachOnLight,
 } from 'src/icons'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 const OFFERINGS = [
@@ -22,6 +23,7 @@ const OFFERINGS = [
 
 export default React.memo(function Benefits() {
   const { t } = useTranslation(NameSpaces.alliance)
+  const { isMobile } = useScreenSize()
   return (
     <GridRow
       desktopStyle={standardStyles.blockMargin}
@@ -29,8 +31,12 @@ export default React.memo(function Benefits() {
       mobileStyle={standardStyles.blockMarginMobile}
     >
       <Cell span={Spans.full}>
-        <Text style={fonts.h3Mobile}>{t('benefits.headline')}</Text>
-        <H2 style={standardStyles.elementalMargin}>{t('benefits.title')}</H2>
+        <Text style={[fonts.h3Mobile, isMobile && textStyles.center]}>
+          {t('benefits.headline')}
+        </Text>
+        <H2 style={[standardStyles.elementalMargin, isMobile && textStyles.center]}>
+          {t('benefits.title')}
+        </H2>
         <View
           style={[
             styles.offeringsArea,

@@ -7,6 +7,7 @@ import { Category as CategoryEnum } from 'src/alliance/CategoryEnum'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, Trans, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
 import Outbound, { externalizeURL } from 'src/shared/Outbound'
@@ -46,6 +47,8 @@ export default function Members() {
   const [alliesByCategory, setAllies] = React.useState(initialState())
   const [selectedFilter, setFilter] = React.useState(ALL)
 
+  const { isTablet, isMobile } = useScreenSize()
+
   React.useEffect(() => {
     const signal = { aborted: false }
     // sometimes it is nessessary to break a rule
@@ -71,14 +74,13 @@ export default function Members() {
   return (
     <View nativeID={'members'}>
       <GridRow
-        allStyle={standardStyles.centered}
-        desktopStyle={standardStyles.sectionMarginTop}
-        tabletStyle={standardStyles.sectionMarginTopTablet}
+        desktopStyle={[standardStyles.sectionMarginTop, standardStyles.centered]}
+        tabletStyle={[standardStyles.sectionMarginTopTablet, { justifyContent: 'flex-end' }]}
         mobileStyle={standardStyles.sectionMarginTopMobile}
       >
-        <Cell span={Spans.half}>
-          <H2 style={[{ marginBottom: 5 }, textStyles.center]}>{t('members.title')}</H2>
-          <H4 style={standardStyles.blockMarginBottomMobile}>
+        <Cell span={Spans.half} tabletSpan={Spans.three4th}>
+          <H2 style={[styles.memberTitle, !isTablet && textStyles.center]}>{t('members.title')}</H2>
+          <H4 style={[standardStyles.blockMarginBottomMobile, isMobile && textStyles.center]}>
             <Trans i18nKey={'members.subtitle'} ns={NameSpaces.alliance}>
               <Text style={textStyles.italic}>{}</Text>
             </Trans>
@@ -130,12 +132,18 @@ interface CategoryProps {
 
 function Category({ name, members }: CategoryProps) {
   const { t } = useTranslation(NameSpaces.alliance)
+  const { isDesktop, isMobile } = useScreenSize()
   return (
     <View>
       <H4>{t(`members.categoryTitle.${name}`)}</H4>
       <View style={styles.grayLine} />
       <Text style={fonts.p}>{t(`members.categoryText.${name}`)}</Text>
-      <View style={styles.categoryContainer}>
+      <View
+        style={[
+          styles.categoryContainer,
+          isMobile ? styles.categoryContainerMobile : isDesktop && styles.categoryContainerDesktop,
+        ]}
+      >
         {members.map(({ name: memberName, logo, url }) => (
           <Member key={memberName} name={memberName} logo={logo} url={url} />
         ))}
@@ -188,6 +196,7 @@ const COLUMN_WIDTH = 180
 const styles = StyleSheet.create({
   selectionArea: { maxWidth: 220 },
   membersArea: { minHeight: 600 },
+  memberTitle: { marginBottom: 5 },
   grayLine: {
     marginTop: 2,
     borderBottomColor: colors.gray,
@@ -195,13 +204,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   categoryContainer: {
-    display: 'grid',
-    gridTemplateColumns: `repeat(3, ${COLUMN_WIDTH}px)`,
     justifyContent: 'space-between',
     marginVertical: 30,
     flexDirection: 'row',
     flexWrap: 'wrap',
     minHeight: 90,
+  },
+  categoryContainerMobile: {
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+  categoryContainerDesktop: {
+    display: 'grid',
+    gridTemplateColumns: `repeat(3, ${COLUMN_WIDTH}px)`,
   },
   member: {
     flexDirection: 'row',
