@@ -11,12 +11,14 @@ export interface GethInstanceConfig {
   privateKey?: string
   etherbase?: string
   proxies?: Array<string[2]>
-  pid?: number
   isProxied?: boolean
   isProxy?: boolean
   bootnodeEnode?: string
+  nodekey?: string
   proxy?: string
   proxiedValidatorAddress?: string
   proxyAllowPrivateIp?: boolean
   ethstats?: string
+  pid?: number
+  args?: string[]
 }

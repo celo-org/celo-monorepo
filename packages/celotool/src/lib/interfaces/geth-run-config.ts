@@ -8,8 +8,6 @@ export interface GethRunConfig {
   migrateTo?: number
   migrationOverrides?: any
   keepData?: boolean
-  // ??
-  useBootnode?: boolean
   // genesis config
   genesisConfig?: GenesisConfig
   // network

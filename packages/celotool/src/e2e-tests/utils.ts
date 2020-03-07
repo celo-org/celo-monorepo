@@ -26,8 +26,8 @@ import {
   writeGenesis,
 } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
-import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { GethRepository } from '../lib/interfaces/geth-repository'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
@@ -212,8 +212,6 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
   const repo: GethRepository = gethConfig.repository || gethRepositoryFromFlags()
   const gethBinaryPath = `${repo.path}/build/bin/geth`
-  const bootnodeBinaryPath = `${repo.path}/build/bin/bootnode`
-
   const initialize = async () => {
     if (repo.remote) {
       await checkoutGethRepo(repo.branch || 'master', repo.path)
@@ -232,22 +230,12 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     await writeGenesis(gethConfig, validators, verbose)
 
-    let bootnodeEnode: string = ''
-
-    if (gethConfig.useBootnode) {
-      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
-    }
-
     let validatorIndex = 0
     let proxyIndex = 0
 
     for (const instance of gethConfig.instances) {
       // Non proxied validators and proxies should connect to the bootnode
-      if (!instance.isProxied) {
-        if (gethConfig.useBootnode) {
-          instance.bootnodeEnode = bootnodeEnode
-        }
-      } else {
+      if (instance.isProxied) {
         // Proxied validators should connect to only the proxy
         // Find this proxied validator's proxy
         const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
@@ -264,7 +252,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
       } else if (instance.isProxy) {
-        instance.privateKey = instance.privateKey || proxyPrivateKeys[proxyIndex]
+        instance.nodekey = instance.privateKey || proxyPrivateKeys[proxyIndex]
         proxyIndex++
       }
     }
@@ -289,13 +277,14 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
     }
 
+    // Directly connect validator peers that are not using a bootnode or proxy.
     await connectValidatorPeers(gethConfig.instances)
 
-    await Promise.all(
-      gethConfig.instances.filter((i) => i.validating).map((i) => waitToFinishInstanceSyncing(i))
-    )
-
     if (gethConfig.migrate || gethConfig.migrateTo) {
+      await Promise.all(
+        gethConfig.instances.filter((i) => i.validating).map((i) => waitToFinishInstanceSyncing(i))
+      )
+
       await migrateContracts(
         validatorPrivateKeys,
         attestationKeys,
@@ -320,11 +309,6 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
   const restart = async () => {
     await killGeth()
-
-    if (gethConfig.useBootnode) {
-      await killBootnode()
-      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
-    }
 
     // just in case
     gethConfig.keepData = true
