@@ -4067,7 +4067,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4145,7 +4145,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4223,7 +4223,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4301,7 +4301,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4379,7 +4379,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4457,7 +4457,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4535,7 +4535,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4717,7 +4717,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4795,7 +4795,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4873,7 +4873,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4951,7 +4951,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -5029,7 +5029,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
