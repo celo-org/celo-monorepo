@@ -16,16 +16,21 @@ import Fade from 'react-reveal/Fade'
 import { Cell, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
-export function ErrorMessage({ allErrors, field, t }) {
+function getErrorTransKey(field: string) {
   let key = 'generic'
 
   if (field === 'email' || key === 'unknownError') {
     key = field
   }
+  return key
+}
+
+export function ErrorMessage({ allErrors, field, t }) {
+  const key = getErrorTransKey(field)
 
   return allErrors.includes(field) ? (
     <Fade>
-      <Text style={[fonts.h6, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
+      <Text style={[fonts.h6, textStyles.error]}>{t(`common:validationErrors.${key}`)}</Text>
     </Fade>
   ) : (
     <View style={styles.errorPlaceholder} />
@@ -123,6 +128,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     color: colors.secondary,
+    lineHeight: 20,
   },
   labelBox: {
     marginBottom: 5,
@@ -287,5 +293,5 @@ const checkBoxStyles = StyleSheet.create({
     opacity: 1,
   },
   hidden: { opacity: 0 },
-  label: { paddingHorizontal: 10, lineHeight: 20 },
+  label: { paddingHorizontal: 10 },
 })

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { NewMember } from 'src/alliance/AllianceMember'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
-import { CheckboxWithLabel, Form, LabeledInput } from 'src/forms/FormComponents'
+import { CheckboxWithLabel, ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
@@ -37,6 +37,7 @@ export default function SignupForm() {
           <View style={styles.container}>
             <View style={isDesktop && standardStyles.row}>
               <View style={styles.inputContainer}>
+                <ErrorMessage t={t} field={'name'} allErrors={formState.errors} />
                 <LabeledInput
                   isDarkMode={true}
                   label={t('form.name')}
@@ -47,6 +48,7 @@ export default function SignupForm() {
                 />
               </View>
               <View style={styles.inputContainer}>
+                <ErrorMessage t={t} field={'email'} allErrors={formState.errors} />
                 <LabeledInput
                   isDarkMode={true}
                   label={t('form.email')}
