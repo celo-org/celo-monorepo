@@ -2088,8 +2088,6 @@ exports[`DevelopersPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://repl.it/@celoOrg/contractkit"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -2513,8 +2511,6 @@ exports[`DevelopersPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2618,8 +2614,6 @@ exports[`DevelopersPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2847,8 +2841,6 @@ exports[`DevelopersPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2952,8 +2944,6 @@ exports[`DevelopersPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -3181,8 +3171,6 @@ exports[`DevelopersPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3286,8 +3274,6 @@ exports[`DevelopersPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -3402,8 +3388,6 @@ exports[`DevelopersPage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://github.com/celo-org"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -4920,8 +4904,6 @@ exports[`DevelopersPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5613,8 +5595,6 @@ exports[`DevelopersPage renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://c-labs.typeform.com/to/gj9aUp"
-          onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -5895,8 +5875,6 @@ exports[`DevelopersPage renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="/code-of-conduct"
-          onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -6339,8 +6317,6 @@ exports[`DevelopersPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoDevs"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6384,8 +6360,6 @@ exports[`DevelopersPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/CeloOrg"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6929,8 +6903,6 @@ exports[`DevelopersPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {

@@ -2802,8 +2802,6 @@ exports[`Alliance renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -7611,8 +7609,6 @@ exports[`Alliance renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -8397,8 +8393,6 @@ exports[`Alliance renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="/code-of-conduct"
-          onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -8841,8 +8835,6 @@ exports[`Alliance renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoDevs"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -8886,8 +8878,6 @@ exports[`Alliance renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/CeloOrg"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -9431,8 +9421,6 @@ exports[`Alliance renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {

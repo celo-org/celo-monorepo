@@ -867,8 +867,6 @@ exports[`Community renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1999,8 +1997,6 @@ exports[`Community renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/code-of-conduct"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2484,8 +2480,6 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -3880,8 +3874,6 @@ exports[`Community renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -3991,8 +3983,6 @@ exports[`Community renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -4618,8 +4608,6 @@ exports[`Community renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5112,8 +5100,6 @@ exports[`Community renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5637,8 +5623,6 @@ exports[`Community renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://en.wikipedia.org/wiki/EigenTrust"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -5678,8 +5662,6 @@ exports[`Community renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://en.wikipedia.org/wiki/Sepandar_Kamvar"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6856,8 +6838,6 @@ exports[`Community renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -7057,8 +7037,6 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="/code-of-conduct"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -7501,8 +7479,6 @@ exports[`Community renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://twitter.com/@celoDevs"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -7546,8 +7522,6 @@ exports[`Community renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://twitter.com/CeloOrg"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -8091,8 +8065,6 @@ exports[`Community renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {

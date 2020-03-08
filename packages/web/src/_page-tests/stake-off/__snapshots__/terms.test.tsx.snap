@@ -284,8 +284,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="https://celo.org/privacy"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -358,8 +356,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="https://forum.celo.org"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -674,8 +670,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="mailto:stakeoff@celo.org"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -761,8 +755,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   data-focusable={true}
                   dir="auto"
                   href="https://celo.org/code-of-conduct"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1435,8 +1427,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="mailto:stakeoff@celo.org"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {

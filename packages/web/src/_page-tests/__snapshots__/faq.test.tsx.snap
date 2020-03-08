@@ -196,8 +196,6 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://celo.org"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1431,8 +1429,6 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://celo.org/privacy"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1654,8 +1650,6 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://docs.celo.org/celo-codebase/protocol/identity"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1784,8 +1778,6 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://celo.org/rewards"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -2007,8 +1999,6 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
