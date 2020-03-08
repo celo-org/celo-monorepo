@@ -325,7 +325,7 @@ exports[`Terms renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="/privacy"
+              href="/faq"
               role="link"
               style={
                 Object {
@@ -345,7 +345,7 @@ exports[`Terms renders 1`] = `
                 }
               }
             >
-              privacyPolicy
+              faq
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -419,7 +419,7 @@ exports[`Terms renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="/faq"
+              href="/privacy"
               role="link"
               style={
                 Object {
@@ -439,7 +439,7 @@ exports[`Terms renders 1`] = `
                 }
               }
             >
-              faq
+              privacyPolicy
               <div
                 className="css-view-1dbjc4n"
                 style={
