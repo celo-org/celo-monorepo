@@ -17,21 +17,33 @@ export function usePageTurner() {
   const [hasError, setError] = React.useState(false)
   const [route, setRoute] = React.useState('')
   React.useEffect(() => {
-    router.events.on(RouterEvents.routeChangeStart, (url) => {
-      setPageTurning(true)
-      setError(false)
-      setRoute(url)
-    })
-    router.events.on(RouterEvents.routeChangeComplete, () => {
-      setPageTurning(false)
-      setError(false)
-    })
-    router.events.on(RouterEvents.routeChangeError, (error, url) => {
-      if (error.cancelled) {
+    const eventHandlers = {
+      [RouterEvents.routeChangeStart]: (url) => {
+        setPageTurning(true)
+        setError(false)
         setRoute(url)
-      }
-      setError(true)
+      },
+      [RouterEvents.routeChangeComplete]: () => {
+        setPageTurning(false)
+        setError(false)
+      },
+      [RouterEvents.routeChangeError]: (error: { cancelled: boolean }, url: string) => {
+        if (error.cancelled) {
+          setRoute(url)
+        }
+        setError(true)
+      },
+    }
+
+    Object.keys(RouterEvents).forEach((eventType) => {
+      router.events.on(eventType, eventHandlers[eventType])
     })
+
+    return () => {
+      Object.keys(RouterEvents).forEach((eventType) => {
+        router.events.off(eventType, eventHandlers[eventType])
+      })
+    }
   }, [])
 
   return { isPageTurning, hasError, route }
