@@ -516,7 +516,6 @@ const baseStyles = StyleSheet.create({
   iconRight: {
     paddingLeft: 8,
   },
-  fullWidthContainer: { width: '100%' },
 })
 
 const boxedVertical = StyleSheet.create({
