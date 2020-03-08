@@ -113,11 +113,7 @@ export default function Members() {
         </Cell>
         <Cell span={Spans.three4th}>
           {displayedCategories.map((category) => (
-            <Category
-              key={category.name}
-              name={category.name.toLowerCase()}
-              members={category.records}
-            />
+            <Category key={category.name} name={category.name} members={category.records} />
           ))}
         </Cell>
       </GridRow>
@@ -130,14 +126,15 @@ interface CategoryProps {
   members: Ally[]
 }
 
-function Category({ name, members }: CategoryProps) {
+const Category = React.memo(function _Category({ name, members }: CategoryProps) {
+  const key = name.toLowerCase()
   const { t } = useTranslation(NameSpaces.alliance)
   const { isDesktop, isMobile } = useScreenSize()
   return (
     <View>
-      <H4>{t(`members.categoryTitle.${name}`)}</H4>
+      <H4>{t(`members.categoryTitle.${key}`)}</H4>
       <View style={styles.grayLine} />
-      <Text style={fonts.p}>{t(`members.categoryText.${name}`)}</Text>
+      <Text style={fonts.p}>{t(`members.categoryText.${key}`)}</Text>
       <View
         style={[
           styles.categoryContainer,
@@ -150,7 +147,7 @@ function Category({ name, members }: CategoryProps) {
       </View>
     </View>
   )
-}
+})
 
 const Member = React.memo(function _Member({ logo, name, url }: Ally) {
   const divisor = logo.height / ROW_HEIGHT

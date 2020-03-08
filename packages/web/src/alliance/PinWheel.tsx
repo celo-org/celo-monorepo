@@ -78,16 +78,19 @@ class Quadrants extends React.PureComponent<QuadrantProps> {
   }
 }
 
+const DELAYMENT = 30
+const QUARTERIZER = 200
+
 function animated(index: number) {
   return {
     mixBlendMode: 'screen',
     animationIterationCount: 1,
-    animationDelay: `${INTERVAL_MS + index * 30}ms`,
+    animationDelay: `${INTERVAL_MS + index * DELAYMENT}ms`,
     animationFillMode: 'both',
     animationDuration: `${DURATION / 3}ms`,
     animationKeyframes: solidFadeInFrames(
       quartColor(index),
-      ((index * index) / VECTORS.length) * 200
+      ((index * index) / VECTORS.length) * QUARTERIZER
     ),
   }
 }

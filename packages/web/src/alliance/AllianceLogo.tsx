@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Svg, { Path } from 'svgs'
-export default React.memo(function ColLogo() {
+export default React.memo(function AllianceLogo() {
   return (
     <Svg width="47" height="48" viewBox="0 0 47 48" fill="none">
       <Path

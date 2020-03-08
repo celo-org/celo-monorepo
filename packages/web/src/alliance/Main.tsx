@@ -45,7 +45,7 @@ export default function Main() {
                   styles.thematicTitle,
                   blendStyle,
                   textStyles.center,
-                  isMobile && { fontSize: 40 },
+                  isMobile && styles.thematicTitleMobile,
                 ]}
               >
                 {t('thematicStatement')}
@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     color: colors.white,
     backgroundColor: colors.dark,
   },
+  thematicTitleMobile: { fontSize: 32, lineHeight: 36 },
   sweepContainer: {
     transform: [
       {

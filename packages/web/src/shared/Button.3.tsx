@@ -29,7 +29,6 @@ interface AllButtonProps {
   disabled?: boolean
   onPress?: () => void
   iconRight?: React.ReactNode
-  size?: SIZE
   iconLeft?: React.ReactNode
   align?: 'center' | 'flex-start' | 'flex-end'
   style?: TextStyle | TextStyle[]
