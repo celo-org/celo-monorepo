@@ -2,7 +2,6 @@ import * as React from 'react'
 import { StyleSheet, Text, TextStyle, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
-import Link from 'src/shared/Link'
 import { colors, fonts, textStyles } from 'src/styles'
 
 export enum BTN {
@@ -266,27 +265,25 @@ function ButtonNaked(props: Props) {
   const fontSize = nakedSize(size)
   return (
     <View style={[baseStyles.base, baseStyles.floating, nakedStyles.container]}>
-      <Link href={href}>
-        <Text
-          accessibilityRole="link"
-          href={href}
-          target={target}
-          style={[
-            fonts.navigation,
-            baseStyles.verticallyAlign,
-            textStyle,
-            { fontSize },
-            textStyles.medium,
-            style,
-          ]}
-        >
-          {children}
+      <Text
+        accessibilityRole="link"
+        href={href}
+        target={target}
+        style={[
+          fonts.navigation,
+          baseStyles.verticallyAlign,
+          textStyle,
+          { fontSize },
+          textStyles.medium,
+          style,
+        ]}
+      >
+        {children}
 
-          <View style={nakedStyles.chevron}>
-            <Chevron color={color} opacity={opacity} size={'0.75em'} />
-          </View>
-        </Text>
-      </Link>
+        <View style={nakedStyles.chevron}>
+          <Chevron color={color} opacity={opacity} size={'0.75em'} />
+        </View>
+      </Text>
     </View>
   )
 }

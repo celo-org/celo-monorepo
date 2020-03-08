@@ -747,8 +747,6 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://forum.celo.org/"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -973,8 +971,6 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://docs.celo.org/celo-codebase/wallet/intro"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1106,8 +1102,6 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="http://alfajores-blockscout.celo-testnet.org/"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1239,8 +1233,6 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://docs.celo.org/getting-started/running-a-full-node"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {

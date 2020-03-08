@@ -992,8 +992,6 @@ Array [
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1691,8 +1689,6 @@ Array [
                   data-focusable={true}
                   dir="auto"
                   href="https://docs.celo.org/getting-started/alfajores-testnet"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {

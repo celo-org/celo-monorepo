@@ -4575,8 +4575,6 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4832,8 +4830,6 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5408,8 +5404,6 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/getting-started/running-a-validator"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5665,8 +5659,6 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {

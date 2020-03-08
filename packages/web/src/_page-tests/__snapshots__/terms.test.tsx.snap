@@ -232,8 +232,6 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/user-agreement"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -328,8 +326,6 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/privacy"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -424,8 +420,6 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/faq"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -520,8 +514,6 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://docs.celo.org/important-information/alfajores-testnet-disclaimer"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -726,8 +718,6 @@ exports[`Terms renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://docs.celo.org/celo-codebase/protocol/privacy"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

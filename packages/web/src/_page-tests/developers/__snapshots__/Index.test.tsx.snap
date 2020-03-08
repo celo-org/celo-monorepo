@@ -468,8 +468,6 @@ exports[`DevelopersPage renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/overview/introduction"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -666,8 +664,6 @@ exports[`DevelopersPage renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/start"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -864,8 +860,6 @@ exports[`DevelopersPage renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://github.com/celo-org"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -5183,8 +5177,6 @@ exports[`DevelopersPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5440,8 +5432,6 @@ exports[`DevelopersPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {

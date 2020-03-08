@@ -1213,8 +1213,6 @@ exports[`HomePage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1719,8 +1717,6 @@ exports[`HomePage renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="/validators"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -2663,8 +2659,6 @@ exports[`HomePage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/jobs"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -3257,8 +3251,6 @@ exports[`HomePage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/about#backers"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {

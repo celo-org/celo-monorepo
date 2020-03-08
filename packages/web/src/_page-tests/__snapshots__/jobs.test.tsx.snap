@@ -6409,8 +6409,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           data-focusable={true}
                           dir="auto"
                           href="example.com"
-                          onClick={[Function]}
-                          onMouseEnter={[Function]}
                           role="link"
                           style={
                             Object {
@@ -6755,8 +6753,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           data-focusable={true}
                           dir="auto"
                           href="example.com"
-                          onClick={[Function]}
-                          onMouseEnter={[Function]}
                           role="link"
                           style={
                             Object {
