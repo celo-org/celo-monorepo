@@ -8,6 +8,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 
@@ -22,7 +23,7 @@ interface StateProps {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    localCurrency: state.localCurrency.preferredCurrencyCode || LocalCurrencyCode.USD,
+    localCurrency: getLocalCurrencyCode(state),
     account: state.web3.account,
   }
 }

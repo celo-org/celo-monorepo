@@ -1,4 +1,4 @@
 const functions = require('firebase-functions')
-export const config = functions.config()
+export const functionConfig = functions.config()
 
-console.log(config)
+export const PHONE_NUMBER_PRIVACY_SECRET_KEY = functionConfig.envs.secret_key

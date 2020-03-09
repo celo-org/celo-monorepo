@@ -141,7 +141,7 @@ echo "Configuring Docker..."
 gcloud auth configure-docker
 
 # use GCP logging for Docker containers
-echo '{"log-driver":"gcplogs"}' > /etc/docker/daemon.json
+echo '{"log-driver":"fluentd","log-opts":{"fluentd-address":"0.0.0.0:24224","tag":"docker_logs"}}' > /etc/docker/daemon.json
 systemctl restart docker
 
 # ---- Set Up and Run Geth ----

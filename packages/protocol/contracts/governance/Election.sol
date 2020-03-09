@@ -867,7 +867,7 @@ contract Election is
     }
 
     // Assign a number of seats to each validator group.
-    while (totalNumMembersElected < electableValidators.max && electionGroups.length > 0) {
+    while (totalNumMembersElected < maxElectableValidators && electionGroups.length > 0) {
       uint256 groupIndex = keys[0];
       // All electable validators have been elected.
       if (votesForNextMember[groupIndex].unwrap() == 0) break;

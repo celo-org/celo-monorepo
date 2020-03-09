@@ -24,6 +24,8 @@ import Licenses from 'src/account/Licenses'
 import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import Security from 'src/account/Security'
+import Support from 'src/account/Support'
+import SupportContact from 'src/account/SupportContact'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
@@ -264,6 +266,8 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+    [Screens.Support]: { screen: Support },
+    [Screens.SupportContact]: { screen: SupportContact },
     [Screens.FiatExchange]: { screen: FiatExchange },
     ...verificationScreens,
   },

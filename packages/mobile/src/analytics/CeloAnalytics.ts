@@ -16,7 +16,8 @@ class WalletAnalytics extends CeloAnalytics {
   }
 
   isEnabled() {
-    return store.getState().app.analyticsEnabled
+    // Remove __DEV__ here to test analytics in dev builds
+    return !__DEV__ && store.getState().app.analyticsEnabled
   }
 
   track(eventName: EventNames, eventProperties: object = {}, attachDeviceInfo: boolean = false) {

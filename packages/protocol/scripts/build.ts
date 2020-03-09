@@ -38,6 +38,8 @@ export const CoreContracts = [
   'GoldToken',
   'MultiSig',
   'Registry',
+  'Freezer',
+  'TransferWhitelist',
 
   // governance
   'Election',

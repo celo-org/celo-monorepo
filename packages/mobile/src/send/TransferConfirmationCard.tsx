@@ -10,13 +10,13 @@ import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
-import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
+import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
-import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
+import { getMoneyDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
 
 const iconSize = 40
@@ -59,8 +59,6 @@ const renderTopSection = (props: Props) => {
   }
 }
 
-const formatNetworkFee = (value: BigNumber.Value) => getNetworkFeeDisplayValue(value, true)
-
 const renderAmountSection = (props: Props) => {
   const { amount, type } = props
 
@@ -73,12 +71,12 @@ const renderAmountSection = (props: Props) => {
         <CurrencyDisplay
           type={DisplayType.Big}
           amount={amount}
-          formatAmount={formatNetworkFee}
-          useColors={false}
+          formatType={FormatType.NetworkFeePrecise}
+          style={style.currency}
         />
       )
     default:
-      return <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
+      return <CurrencyDisplay type={DisplayType.Big} amount={amount} style={style.currency} />
   }
 }
 
@@ -126,7 +124,7 @@ const renderBottomSection = (props: Props) => {
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <CurrencyDisplay type={DisplayType.Big} amount={amount} useColors={false} />
+        <CurrencyDisplay type={DisplayType.Big} amount={amount} style={style.currency} />
       </View>
     )
   } else if (comment) {
@@ -175,6 +173,9 @@ const style = StyleSheet.create({
     ...fontStyles.pCurrency,
     textAlign: 'center',
     marginBottom: 5,
+  },
+  currency: {
+    color: colors.darkSecondary,
   },
 })
 

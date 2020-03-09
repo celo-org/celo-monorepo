@@ -5124,7 +5124,7 @@ exports[`BuildPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://medium.com/celohq/announcing-the-great-celo-stake-off-12eb15dd5eb0"
+                href="https://medium.com/celoOrg/announcing-the-great-celo-stake-off-12eb15dd5eb0"
                 role="link"
                 style={
                   Object {
@@ -5658,7 +5658,7 @@ exports[`BuildPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://medium.com/celohq/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
+                href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
                 role="link"
                 style={
                   Object {
@@ -6091,6 +6091,7 @@ exports[`BuildPage renders 1`] = `
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
+          href="/code-of-conduct"
           role="link"
           style={
             Object {
@@ -6575,7 +6576,7 @@ exports[`BuildPage renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
                   dir="auto"
-                  href="https://twitter.com/@celoOrg"
+                  href="https://twitter.com/CeloOrg"
                   role="link"
                   style={
                     Object {
