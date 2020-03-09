@@ -885,14 +885,16 @@ jobs:
     - run:
         name: Deploy contracts
         command: |
-          source "../../../.env.${CI_INTEGRATION_ENV}"
-          celotooljs.sh deploy initial contracts -e ${CI_INTEGRATION_ENV} --verbose 2>&1
+          echo $(pwd)
+          cd ~/app/
+          source ".env.${CI_INTEGRATION_ENV}"
+          packages/celotool/bin/celotooljs.sh deploy initial contracts -e ${CI_INTEGRATION_ENV} --verbose 2>&1
     - run:
         name: Deploy celostats
         command: |
-          celotooljs.sh deploy initial celostats -e ${CI_INTEGRATION_ENV} --verbose 2>&1
-
-
+          echo $(pwd)
+          cd ~/app/
+          packages/celotool/bin/celotooljs.sh deploy initial celostats -e ${CI_INTEGRATION_ENV} --verbose 2>&1
 workflows:
   version: 2
   celo-monorepo-build:
