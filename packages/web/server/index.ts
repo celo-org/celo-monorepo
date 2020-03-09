@@ -20,7 +20,7 @@ import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
-import respondToError from './respondToError'
+import respondError from './respondError'
 
 const CREATED = 201
 const NO_CONTENT = 204
@@ -132,7 +132,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
         scope.setTag('Service', 'Airtable')
         Sentry.captureException(e)
       })
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -145,7 +145,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
         scope.setTag('Service', 'Airtable')
         Sentry.captureEvent(e)
       })
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -167,7 +167,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const annoucements = await latestAnnouncements(req.ip)
       res.json(annoucements)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -176,7 +176,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       await create(req.body)
       res.sendStatus(CREATED)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -185,7 +185,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const assets = await getAssets(req.params.asset)
       res.json(assets)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -206,7 +206,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const articlesdata = await getFormattedMediumArticles()
       res.json(articlesdata)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -215,7 +215,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const events = await getFormattedEvents()
       res.json(events)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 

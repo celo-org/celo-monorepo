@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import getAllies from 'server/Alliance'
-import respondToError from 'server/respondToError'
+import respondError from 'server/respondError'
 
 export default async function(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -11,6 +11,6 @@ export default async function(req: NextApiRequest, res: NextApiResponse) {
       res.status(405)
     }
   } catch (e) {
-    respondToError(res, e)
+    respondError(res, e)
   }
 }

@@ -3,7 +3,7 @@ interface Response {
   json: (jsonCompatible: object) => void
 }
 
-export default function respondToError(
+export default function respondError(
   res: Response,
   error: { message: string; statusCode: number }
 ) {
