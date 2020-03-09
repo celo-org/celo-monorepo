@@ -21,6 +21,6 @@ done
 TARBALL=$NETWORK.tar.gz
 
 tar -zcvf $TARBALL build/$NETWORK
-# gsutil cp $TARBALL gs://$ARTIFACT_BUCKET/$NETWORK
+gsutil cp $TARBALL gs://$ARTIFACT_BUCKET/$NETWORK
 rm -f "$TARBALL"
 echo "Artifacts uploaded"
