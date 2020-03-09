@@ -858,10 +858,6 @@ jobs:
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
           helm init --client-only
     - run:
-        name: Install rclone
-        command: |
-          curl https://rclone.org/install.sh | sudo bash
-    - run:
         name: Activate gcloud
         command: |
           echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
