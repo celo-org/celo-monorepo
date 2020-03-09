@@ -1,14 +1,14 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
-import Ally, { NewMember } from 'src/alliance/AllianceMember'
+import Ally, { NewMember } from '../src/alliance/AllianceMember'
 import { Category } from '../src/alliance/CategoryEnum'
 import addToCRM from './addToCRM'
 import airtableInit, { getImageURI, getWidthAndHeight, ImageSizes } from './airtable'
 import { cache } from './cache'
 
-const CATEGORY_FIELD = 'Web Category*'
-const LOGO_FIELD = 'Logo Upload'
-const URL_FIELD = 'Company URL*'
+export const CATEGORY_FIELD = 'Web Category*'
+export const LOGO_FIELD = 'Logo Upload'
+export const URL_FIELD = 'Company URL*'
 
 interface Fields extends FieldSet {
   Name: string
@@ -48,7 +48,7 @@ function getAirtable<T extends FieldSet>(sheet: string) {
 
 const IS_APROVED = 'Approved=1'
 
-function normalize(asset: Fields): Ally {
+export function normalize(asset: Fields): Ally {
   return {
     name: asset.Name,
     logo: {
