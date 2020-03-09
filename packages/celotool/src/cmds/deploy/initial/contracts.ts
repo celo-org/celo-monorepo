@@ -92,7 +92,6 @@ export const handler = async (argv: InitialArgv) => {
   try {
     await portForwardAnd(argv.celoEnv, cb)
     await uploadArtifacts(argv.celoEnv)
-    console.log(`jcortejoso debug contracts deployment end`)
     return
   } catch (error) {
     console.error(`Unable to deploy smart contracts to ${argv.celoEnv}`)

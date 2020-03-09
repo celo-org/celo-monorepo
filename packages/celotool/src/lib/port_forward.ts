@@ -96,9 +96,9 @@ export async function portForwardAnd(
       await sleep(2000)
     }
     await cb()
-    childProcess.kill('SIGINT')
+    childProcess.kill('SIGKILL')
   } catch (error) {
-    childProcess.kill('SIGINT')
+    childProcess.kill('SIGKILL')
 
     console.error(error)
     process.exit(1)
