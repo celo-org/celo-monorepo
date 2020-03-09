@@ -6,6 +6,7 @@ export enum Category {
   'Grow' = 'Grow',
   'Lend' = 'Lend',
   'Pay' = 'Pay',
+  'Preserve' = 'Preserve',
   'Send' = 'Send',
   'Save' = 'Save',
   'Secure' = 'Secure',
