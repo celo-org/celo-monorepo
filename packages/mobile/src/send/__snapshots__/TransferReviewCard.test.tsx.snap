@@ -261,7 +261,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
               }
             }
           >
-            amountInCelloDollars
+            amountInCeloDollars
           </Text>
         </View>
         <Text
@@ -798,7 +798,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
               }
             }
           >
-            amountInCelloDollars
+            amountInCeloDollars
           </Text>
         </View>
         <Text
@@ -1257,7 +1257,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
               }
             }
           >
-            amountInCelloDollars
+            amountInCeloDollars
           </Text>
         </View>
         <Text

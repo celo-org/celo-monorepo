@@ -371,7 +371,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                         }
                       }
                     >
-                      amountInCelloDollars
+                      amountInCeloDollars
                     </Text>
                   </View>
                   <Text
@@ -1567,7 +1567,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                         }
                       }
                     >
-                      amountInCelloDollars
+                      amountInCeloDollars
                     </Text>
                   </View>
                   <Text
@@ -2763,7 +2763,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                         }
                       }
                     >
-                      amountInCelloDollars
+                      amountInCeloDollars
                     </Text>
                   </View>
                   <Text
@@ -3953,7 +3953,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                         }
                       }
                     >
-                      amountInCelloDollars
+                      amountInCeloDollars
                     </Text>
                   </View>
                   <Text
@@ -5149,7 +5149,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         }
                       }
                     >
-                      amountInCelloDollars
+                      amountInCeloDollars
                     </Text>
                   </View>
                   <Text
@@ -6345,7 +6345,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         }
                       }
                     >
-                      amountInCelloDollars
+                      amountInCeloDollars
                     </Text>
                   </View>
                   <Text

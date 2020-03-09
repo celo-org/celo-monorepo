@@ -75,7 +75,7 @@ function TransferReviewCard({
           {!isUsdLocalCurrency && exchangeRate && (
             <>
               <LineItemRow
-                title={t('amountInCelloDollars')}
+                title={t('amountInCeloDollars')}
                 amount={
                   <CurrencyDisplay amount={amount} showLocalAmount={false} hideSymbol={true} />
                 }

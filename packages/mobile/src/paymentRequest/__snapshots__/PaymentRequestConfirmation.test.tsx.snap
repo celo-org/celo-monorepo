@@ -356,7 +356,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                         }
                       }
                     >
-                      amountInCelloDollars
+                      amountInCeloDollars
                     </Text>
                   </View>
                   <Text
