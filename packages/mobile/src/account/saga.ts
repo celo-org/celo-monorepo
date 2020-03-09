@@ -56,9 +56,6 @@ export function* getPincode(withVerification = true) {
     if (!pin) {
       throw new Error('Keystore returned empty pin')
     }
-    if (onValidCustomPin) {
-      onValidCustomPin()
-    }
     return pin
   }
 

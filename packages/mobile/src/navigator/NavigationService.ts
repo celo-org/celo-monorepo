@@ -7,7 +7,8 @@ import {
   NavigationState,
 } from 'react-navigation'
 import sleep from 'sleep-promise'
-import { PincodeType, pincodeTypeSelector } from 'src/account/reducer'
+import { PincodeType } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { Screens } from 'src/navigator/Screens'

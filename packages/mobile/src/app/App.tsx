@@ -55,7 +55,7 @@ export class App extends React.Component {
     Linking.removeEventListener('url', this.handleOpenURL)
   }
 
-  handleOpenURL = (event: any) => {
+  handleOpenURL = (event: { url: string }) => {
     store.dispatch(openDeepLink(event.url))
   }
 

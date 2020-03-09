@@ -25,7 +25,7 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
 import { RootState } from 'src/redux/reducers'
 import { web3 } from 'src/web3/contracts'
-import { readPrivateKeyFromLocalDisk } from 'src/web3/saga'
+import { readPrivateKeyFromLocalDisk } from 'src/web3/privateKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
 interface State {
