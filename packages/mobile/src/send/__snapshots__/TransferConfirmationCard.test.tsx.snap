@@ -33,54 +33,84 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
       }
     }
   />
-  <View
-    style={
-      Array [
+  <View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 24,
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 48,
+              "lineHeight": 64,
+            },
+          ]
+        }
+      >
+        133.00
+      </Text>
+    </View>
+    <Text
+      style={
         Object {
-          "alignItems": "flex-start",
           "alignSelf": "center",
-          "flexDirection": "row",
-          "marginTop": 5,
-        },
-        Object {
-          "color": "#81868B",
-        },
-      ]
-    }
-  >
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 24,
-          },
-        ]
+          "color": "#B0B5B9",
+          "fontFamily": "Hind-Light",
+          "fontSize": 14,
+          "marginBottom": 20,
+          "marginTop": -10,
+        }
       }
     >
-      $
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "paddingHorizontal": 3,
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 48,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      133.00
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        100.00
+      </Text>
+       
+      Celo Dollars
     </Text>
   </View>
   <Text
@@ -262,54 +292,84 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
       </Text>
     </View>
   </View>
-  <View
-    style={
-      Array [
+  <View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 24,
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 48,
+              "lineHeight": 64,
+            },
+          ]
+        }
+      >
+        133.00
+      </Text>
+    </View>
+    <Text
+      style={
         Object {
-          "alignItems": "flex-start",
           "alignSelf": "center",
-          "flexDirection": "row",
-          "marginTop": 5,
-        },
-        Object {
-          "color": "#81868B",
-        },
-      ]
-    }
-  >
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 24,
-          },
-        ]
+          "color": "#B0B5B9",
+          "fontFamily": "Hind-Light",
+          "fontSize": 14,
+          "marginBottom": 20,
+          "marginTop": -10,
+        }
       }
     >
-      $
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "paddingHorizontal": 3,
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 48,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      133.00
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        100.00
+      </Text>
+       
+      Celo Dollars
     </Text>
   </View>
 </View>
@@ -462,54 +522,84 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
       </Text>
     </View>
   </View>
-  <View
-    style={
-      Array [
+  <View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 24,
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 48,
+              "lineHeight": 64,
+            },
+          ]
+        }
+      >
+        133.00
+      </Text>
+    </View>
+    <Text
+      style={
         Object {
-          "alignItems": "flex-start",
           "alignSelf": "center",
-          "flexDirection": "row",
-          "marginTop": 5,
-        },
-        Object {
-          "color": "#81868B",
-        },
-      ]
-    }
-  >
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 24,
-          },
-        ]
+          "color": "#B0B5B9",
+          "fontFamily": "Hind-Light",
+          "fontSize": 14,
+          "marginBottom": 20,
+          "marginTop": -10,
+        }
       }
     >
-      $
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "paddingHorizontal": 3,
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 48,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      133.00
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        100.00
+      </Text>
+       
+      Celo Dollars
     </Text>
   </View>
 </View>
@@ -662,54 +752,84 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
       </Text>
     </View>
   </View>
-  <View
-    style={
-      Array [
+  <View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 24,
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 48,
+              "lineHeight": 64,
+            },
+          ]
+        }
+      >
+        133.00
+      </Text>
+    </View>
+    <Text
+      style={
         Object {
-          "alignItems": "flex-start",
           "alignSelf": "center",
-          "flexDirection": "row",
-          "marginTop": 5,
-        },
-        Object {
-          "color": "#81868B",
-        },
-      ]
-    }
-  >
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 24,
-          },
-        ]
+          "color": "#B0B5B9",
+          "fontFamily": "Hind-Light",
+          "fontSize": 14,
+          "marginBottom": 20,
+          "marginTop": -10,
+        }
       }
     >
-      $
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "paddingHorizontal": 3,
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 48,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      133.00
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        100.00
+      </Text>
+       
+      Celo Dollars
     </Text>
   </View>
   <Text
@@ -880,54 +1000,84 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
       </Text>
     </View>
   </View>
-  <View
-    style={
-      Array [
+  <View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 24,
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 48,
+              "lineHeight": 64,
+            },
+          ]
+        }
+      >
+        133.00
+      </Text>
+    </View>
+    <Text
+      style={
         Object {
-          "alignItems": "flex-start",
           "alignSelf": "center",
-          "flexDirection": "row",
-          "marginTop": 5,
-        },
-        Object {
-          "color": "#81868B",
-        },
-      ]
-    }
-  >
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 24,
-          },
-        ]
+          "color": "#B0B5B9",
+          "fontFamily": "Hind-Light",
+          "fontSize": 14,
+          "marginBottom": 20,
+          "marginTop": -10,
+        }
       }
     >
-      $
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "paddingHorizontal": 3,
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 48,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      133.00
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        100.00
+      </Text>
+       
+      Celo Dollars
     </Text>
   </View>
   <Text
@@ -984,54 +1134,84 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
       }
     }
   />
-  <View
-    style={
-      Array [
+  <View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "flex-start",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "marginTop": 5,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 24,
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "color": "#81868B",
+              "fontSize": 48,
+              "lineHeight": 64,
+            },
+          ]
+        }
+      >
+        0.39
+      </Text>
+    </View>
+    <Text
+      style={
         Object {
-          "alignItems": "flex-start",
           "alignSelf": "center",
-          "flexDirection": "row",
-          "marginTop": 5,
-        },
-        Object {
-          "color": "#81868B",
-        },
-      ]
-    }
-  >
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 24,
-          },
-        ]
+          "color": "#B0B5B9",
+          "fontFamily": "Hind-Light",
+          "fontSize": 14,
+          "marginBottom": 20,
+          "marginTop": -10,
+        }
       }
     >
-      $
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "paddingHorizontal": 3,
-          },
-          Object {
-            "color": "#81868B",
-            "fontSize": 48,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      0.39
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        0.30
+      </Text>
+       
+      Celo Dollars
     </Text>
   </View>
   <Text

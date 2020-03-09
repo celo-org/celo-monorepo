@@ -4,6 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
@@ -14,8 +15,11 @@ import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/Currenc
 import { FAQ_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
 import { navigateToURI } from 'src/utils/linking'
+import { ExtractProps } from 'src/utils/typescript'
 
 const iconSize = 40
 
@@ -35,6 +39,38 @@ type Props = TransferConfirmationCardProps & WithTranslation
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
 const onPressGoToFaq = () => {
   navigateToURI(FAQ_LINK)
+}
+
+function Amount(props: ExtractProps<typeof CurrencyDisplay>) {
+  const localCurrencyCode = useLocalCurrencyCode()
+
+  const { amount } = props
+  const showDollarAmount =
+    amount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code &&
+    localCurrencyCode !== LocalCurrencyCode.USD
+
+  return (
+    <View>
+      <CurrencyDisplay type={DisplayType.Big} style={style.currency} hideSign={true} {...props} />
+      {showDollarAmount && (
+        <Text style={style.dollarAmount}>
+          <Trans
+            i18nKey="celoDollarAmount"
+            ns={Namespaces.sendFlow7}
+            count={new BigNumber(amount.value).absoluteValue().toNumber()}
+          >
+            <CurrencyDisplay
+              amount={amount}
+              showLocalAmount={false}
+              hideSign={true}
+              hideSymbol={true}
+            />{' '}
+            Celo Dollars
+          </Trans>
+        </Text>
+      )}
+    </View>
+  )
 }
 
 const renderTopSection = (props: Props) => {
@@ -65,24 +101,9 @@ const renderAmountSection = (props: Props) => {
     case TokenTransactionType.InviteReceived:
       return null
     case TokenTransactionType.NetworkFee:
-      return (
-        <CurrencyDisplay
-          type={DisplayType.Big}
-          amount={amount}
-          formatType={FormatType.NetworkFeePrecise}
-          style={style.currency}
-          hideSign={true}
-        />
-      )
+      return <Amount amount={amount} formatType={FormatType.NetworkFeePrecise} />
     default:
-      return (
-        <CurrencyDisplay
-          type={DisplayType.Big}
-          amount={amount}
-          style={style.currency}
-          hideSign={true}
-        />
-      )
+      return <Amount amount={amount} />
   }
 }
 
@@ -124,12 +145,7 @@ const renderBottomSection = (props: Props) => {
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <CurrencyDisplay
-          type={DisplayType.Big}
-          amount={amount}
-          style={style.currency}
-          hideSign={true}
-        />
+        <Amount amount={amount} />
       </View>
     )
   } else if (comment) {
@@ -181,6 +197,14 @@ const style = StyleSheet.create({
   },
   currency: {
     color: colors.darkSecondary,
+  },
+  dollarAmount: {
+    ...fontStyles.light,
+    fontSize: 14,
+    color: '#B0B5B9',
+    alignSelf: 'center',
+    marginBottom: 20,
+    marginTop: -10,
   },
 })
 

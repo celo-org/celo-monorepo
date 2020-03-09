@@ -13,6 +13,8 @@
   "payRequest": "Pay Request",
   "sendTo": "Send to",
   "amount": "Amount",
+  "celoDollarAmount": "<0></0> {{CeloDollar}}",
+  "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
   "celoDollarsAvailable": "<0></0> available",
   "groceriesRent": "Groceries, rent, etc. (Optional)",
   "fee": "Fee",
