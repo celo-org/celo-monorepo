@@ -132,12 +132,10 @@ function TransItalic({ i18nKey }: { i18nKey: string }) {
   )
 }
 
-const SMALLER = 0.8
-
 const mobileStyles = StyleSheet.create({
-  laboratoria: { width: 200 * SMALLER, height: 35 * SMALLER },
-  wfpLogo: { width: 182 * SMALLER, height: 80 * SMALLER },
-  cLabsLogo: { width: 140 * SMALLER, height: 50 * SMALLER },
+  laboratoria: { width: 160, height: 28 },
+  wfpLogo: { width: 146, height: 64 },
+  cLabsLogo: { width: 112, height: 40 },
 })
 
 const styles = StyleSheet.create({
