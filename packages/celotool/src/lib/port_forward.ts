@@ -96,10 +96,10 @@ export async function portForwardAnd(
       await sleep(2000)
     }
     await cb()
-    await execCmd(`pkill -9 -P ${childProcess.pid} || true`)
-    // childProcess.kill('SIGKILL')
+    // await execCmd(`pkill -9 -P ${childProcess.pid} || true`)
+    childProcess.kill('SIGTERM')
   } catch (error) {
-    childProcess.kill('SIGKILL')
+    childProcess.kill('SIGTERM')
 
     console.error(error)
     process.exit(1)
