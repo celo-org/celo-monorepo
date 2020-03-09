@@ -40,7 +40,9 @@ export async function uploadArtifacts(celoEnv: string, checkOrPromptIfStagingOrP
   }
   console.log(`Uploading artifacts for ${celoEnv}`)
   try {
+    console.log(`jcortejoso debug uploading contracts start`)
     await execCmd(baseCmd)
+    console.log(`jcortejoso debug uploading contracts end`)
   } catch (error) {
     console.error(`Unable to upload artifacts for ${celoEnv}`)
     console.error(error)

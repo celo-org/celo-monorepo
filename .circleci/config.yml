@@ -876,12 +876,12 @@ jobs:
           set -e
           yarn
           yarn run build
-    # - run:
-    #     name: Deploy network
-    #     no_output_timeout: 25m
-    #     command: |
-    #       cd packages/celotool/bin
-    #       bash integration.sh ${CI_INTEGRATION_ENV}
+    - run:
+        name: Deploy network
+        no_output_timeout: 25m
+        command: |
+          cd packages/celotool/bin
+          bash integration.sh ${CI_INTEGRATION_ENV}
     - run:
         name: Deploy contracts
         command: |
