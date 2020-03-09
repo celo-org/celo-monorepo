@@ -1,13 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { Reserve } from '../generated/types/Reserve'
-import {
-  BaseWrapper,
-  proxyCall,
-  toTransactionObject,
-  valueToBigNumber,
-  valueToString,
-} from './BaseWrapper'
+import { BaseWrapper, proxyCall, valueToBigNumber, valueToString } from './BaseWrapper'
 
 export interface ReserveConfig {
   tobinTaxStalenessThreshold: BigNumber
@@ -41,10 +35,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   async transferGold(to: Address, value: BigNumber.Value) {
     const multisig = await this.kit.contracts.getReserveSpenderMultiSig()
     const txData = this.contract.methods.transferGold(to, valueToString(value)).encodeABI()
-    return toTransactionObject(
-      this.kit,
-      multisig.submitTransaction(this.contract._address, txData).txo
-    )
+    return multisig.submitOrConfirmTransaction(this.contract._address, txData)
   }
 
   /**

@@ -512,10 +512,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const txData = this.contract.methods
       .approve(valueToString(proposalID), proposalIndex)
       .encodeABI()
-    return toTransactionObject(
-      this.kit,
-      multisig.submitTransaction(this.contract._address, txData).txo
-    )
+    return multisig.submitOrConfirmTransaction(this.contract._address, txData)
   }
 
   /**
