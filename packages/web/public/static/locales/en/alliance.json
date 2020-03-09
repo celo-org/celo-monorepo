@@ -44,14 +44,14 @@
     "categoryText": {
       "preserve": "Preserve natural resources by supporting projects through Celo rewards",
       "send": "Send remittances almost anywhere, instantly for as little as $.01",
-      "lend": "Accelerate speed of delivery and reduce costs by lending Celo Dollars",
+      "lend": "Accelerate speed of delivery and reduce costs by lending cUSD",
       "earn": "Earn a stable, digital asset for lending your talents for various tasks",
-      "pay": "Enable your communities to easily pay for mobile top ups, utilities, and shopping online with Celo Dollars",
-      "save": "Help your communities overcome inflation and build for their future by saving in Celo Dollars",
-      "give": "Increase transparency, reduce fraud, and increase mobility by giving Celo Dollars",
+      "pay": "Enable your communities to easily pay for mobile top ups, utilities, and shopping online with cUSD",
+      "save": "Help your communities overcome inflation and build for their future by saving in cUSD",
+      "give": "Increase transparency, reduce fraud, and increase mobility by giving cUSD",
       "educate": "Incentivize communities to learn about Celo and actively engage",
       "validate": "Help secure the Celo network by participating in Celo’s Proof of Stake protocol",
-      "grow": "Grow the protocol through the purchase of the native token, Celo Gold",
+      "grow": "Grow the protocol through the purchase of the native token, cGLD",
       "secure": "Provide custody for the Celo digital assets",
       "build": "Deliver innovative solutions for your customers by building on the Celo platform"
     }
