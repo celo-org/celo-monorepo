@@ -34,7 +34,6 @@
       "pay": "Pay",
       "save": "Save",
       "give": "Give",
-      "insure": "Insure",
       "educate": "Educate",
       "validate": "Validate",
       "grow": "Grow",
@@ -49,11 +48,10 @@
       "save": "Save Celo Dollars (pegged to USD) to help overcome inflation and build for your future",
       "give": "Give Celo Dollars to increase transparency, reduce fraud, and increase portability",
       "educate": "Educate",
-      "validate": "Validate",
-      "grow": "Grow",
-      "insure": "Insure",
+      "validate": "Help secure the Celo network by participating in Celo’s Proof of Stake protocol",
+      "grow": "Grow the protocol through the purchase of the native token, Celo Gold",
       "secure": "Secure",
-      "build": "Build on Celo or use the open source wallet to deliver innovative customer solutions"
+      "build": "Deliver innovative solutions for your customers by building on the Celo platform"
     }
   },
   "benefits": {

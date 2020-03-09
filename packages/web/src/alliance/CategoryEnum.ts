@@ -4,7 +4,6 @@ export enum Category {
   'Educate' = 'Educate',
   'Give' = 'Give',
   'Grow' = 'Grow',
-  'Insure' = 'Insure',
   'Lend' = 'Lend',
   'Pay' = 'Pay',
   'Send' = 'Send',
