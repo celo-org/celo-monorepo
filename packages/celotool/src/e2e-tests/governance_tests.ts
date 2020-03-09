@@ -741,6 +741,13 @@ describe('governance tests', () => {
         await assertBalanceChanged(reserve.options.address, blockNumber, expected, goldToken)
       }
 
+      const assertCarbonOffsettingBalanceChanged = async (
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        await assertBalanceChanged(carbonOffsettingPartnerAddress, blockNumber, expected, goldToken)
+      }
+
       const assertVotesUnchanged = async (blockNumber: number) => {
         await assertVotesChanged(blockNumber, new BigNumber(0))
       }
@@ -751,6 +758,10 @@ describe('governance tests', () => {
 
       const assertReserveBalanceUnchanged = async (blockNumber: number) => {
         await assertReserveBalanceChanged(blockNumber, new BigNumber(0))
+      }
+
+      const assertCarbonOffsettingBalanceUnchanged = async (blockNumber: number) => {
+        await assertCarbonOffsettingBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const getStableTokenSupplyChange = async (blockNumber: number) => {
@@ -847,12 +858,17 @@ describe('governance tests', () => {
           )
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
+          await assertCarbonOffsettingBalanceChanged(
+            blockNumber,
+            expectedCarbonOffsettingPartnerAward
+          )
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
           await assertReserveBalanceUnchanged(blockNumber)
           await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
+          await assertCarbonOffsettingBalanceUnchanged(blockNumber)
         }
       }
     })
