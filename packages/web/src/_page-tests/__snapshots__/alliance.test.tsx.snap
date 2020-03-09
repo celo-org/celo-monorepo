@@ -4181,13 +4181,13 @@ exports[`Alliance renders 1`] = `
         "WebkitBoxPack": "center",
         "WebkitJustifyContent": "center",
         "alignItems": "center",
-        "height": "510px",
         "justifyContent": "center",
+        "minHeight": "510px",
         "msFlexAlign": "center",
         "msFlexPack": "center",
         "paddingBottom": "15px",
-        "paddingLeft": "15px",
-        "paddingRight": "15px",
+        "paddingLeft": "30px",
+        "paddingRight": "30px",
         "paddingTop": "15px",
         "width": "100%",
       }
@@ -4248,12 +4248,15 @@ exports[`Alliance renders 1`] = `
           "fontSize": "65px",
           "fontStyle": "italic",
           "lineHeight": "72px",
+          "maxWidth": "1200px",
           "textAlign": "center",
           "textRendering": "geometricPrecision",
         }
       }
     >
-      "Viva La Local"
+      “
+      A fresh chance to build, interoperate, and secure new financial services applications.
+      ”
     </div>
     <div
       className="css-text-901oao"
@@ -4270,7 +4273,17 @@ exports[`Alliance renders 1`] = `
         }
       }
     >
-      who said it
+      <span
+        className="css-text-901oao css-textHasAncestor-16my406"
+        dir="auto"
+        style={
+          Object {
+            "fontSize": "36px",
+          }
+        }
+      >
+        Gigi Gatti, Grameen Foundation
+      </span>
     </div>
   </div>
   <div
@@ -4829,40 +4842,6 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.insure
-                </div>
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  onClick={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
-                  style={
-                    Object {
-                      "backgroundColor": "rgba(255,255,255,1.00)",
-                      "color": "rgba(46,51,56,1.00)",
-                      "cursor": "pointer",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "paddingBottom": "10px",
-                      "paddingLeft": "10px",
-                      "paddingRight": "10px",
-                      "paddingTop": "10px",
-                      "textOverflow": "ellipsis",
-                      "textRendering": "geometricPrecision",
-                      "whiteSpace": "nowrap",
-                    }
-                  }
-                >
                   members.categoryTitle.lend
                 </div>
                 <div
@@ -4898,6 +4877,40 @@ exports[`Alliance renders 1`] = `
                   }
                 >
                   members.categoryTitle.pay
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderRelease={[Function]}
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,1.00)",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "paddingBottom": "10px",
+                      "paddingLeft": "10px",
+                      "paddingRight": "10px",
+                      "paddingTop": "10px",
+                      "textOverflow": "ellipsis",
+                      "textRendering": "geometricPrecision",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  members.categoryTitle.preserve
                 </div>
                 <div
                   className="css-text-901oao"
@@ -5433,77 +5446,6 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.insure
-          </h4>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "borderBottomColor": "rgba(221,221,221,1.00)",
-                "borderBottomWidth": "1px",
-                "marginBottom": "10px",
-                "marginTop": "2px",
-              }
-            }
-          />
-          <div
-            className="css-text-901oao"
-            dir="auto"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
-                "textRendering": "geometricPrecision",
-              }
-            }
-          >
-            members.categoryText.insure
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitBoxDirection": "normal",
-                "WebkitBoxLines": "multiple",
-                "WebkitBoxOrient": "horizontal",
-                "WebkitBoxPack": "justify",
-                "WebkitFlexDirection": "row",
-                "WebkitFlexWrap": "wrap",
-                "WebkitJustifyContent": "space-between",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "justifyContent": "space-between",
-                "marginBottom": "30px",
-                "marginTop": "30px",
-                "minHeight": "90px",
-                "msFlexDirection": "row",
-                "msFlexPack": "justify",
-                "msFlexWrap": "wrap",
-              }
-            }
-          />
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-        >
-          <h4
-            aria-level="4"
-            className="css-reset-4rbku5 css-text-901oao"
-            dir="auto"
-            role="heading"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "24px",
-                "lineHeight": "32px",
-                "textRendering": "geometricPrecision",
-                "textTransform": "none",
-              }
-            }
-          >
             members.categoryTitle.lend
           </h4>
           <div
@@ -5602,6 +5544,77 @@ exports[`Alliance renders 1`] = `
             }
           >
             members.categoryText.pay
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxLines": "multiple",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "justify",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexWrap": "wrap",
+                "WebkitJustifyContent": "space-between",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-between",
+                "marginBottom": "30px",
+                "marginTop": "30px",
+                "minHeight": "90px",
+                "msFlexDirection": "row",
+                "msFlexPack": "justify",
+                "msFlexWrap": "wrap",
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            members.categoryTitle.preserve
+          </h4>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "borderBottomColor": "rgba(221,221,221,1.00)",
+                "borderBottomWidth": "1px",
+                "marginBottom": "10px",
+                "marginTop": "2px",
+              }
+            }
+          />
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            members.categoryText.preserve
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5923,13 +5936,13 @@ exports[`Alliance renders 1`] = `
         "WebkitBoxPack": "center",
         "WebkitJustifyContent": "center",
         "alignItems": "center",
-        "height": "510px",
         "justifyContent": "center",
+        "minHeight": "510px",
         "msFlexAlign": "center",
         "msFlexPack": "center",
         "paddingBottom": "15px",
-        "paddingLeft": "15px",
-        "paddingRight": "15px",
+        "paddingLeft": "30px",
+        "paddingRight": "30px",
         "paddingTop": "15px",
         "width": "100%",
       }
@@ -5990,12 +6003,15 @@ exports[`Alliance renders 1`] = `
           "fontSize": "65px",
           "fontStyle": "italic",
           "lineHeight": "72px",
+          "maxWidth": "1200px",
           "textAlign": "center",
           "textRendering": "geometricPrecision",
         }
       }
     >
-      "Just Do It"
+      “
+      Brings to life many of the potential possibilities of crypto.
+      ”
     </div>
     <div
       className="css-text-901oao"
@@ -6012,7 +6028,17 @@ exports[`Alliance renders 1`] = `
         }
       }
     >
-      Nike
+      <span
+        className="css-text-901oao css-textHasAncestor-16my406"
+        dir="auto"
+        style={
+          Object {
+            "fontSize": "36px",
+          }
+        }
+      >
+        Diogo Monica, Anchorage
+      </span>
     </div>
   </div>
   <div
