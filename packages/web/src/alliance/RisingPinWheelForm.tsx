@@ -8,7 +8,7 @@ import { standardStyles } from 'src/styles'
 
 export default function RisingPinWheelForm() {
   return (
-    <View style={[standardStyles.darkBackground]}>
+    <View style={standardStyles.darkBackground}>
       <GridRow
         desktopStyle={standardStyles.sectionMarginTop}
         tabletStyle={standardStyles.sectionMarginTopTablet}

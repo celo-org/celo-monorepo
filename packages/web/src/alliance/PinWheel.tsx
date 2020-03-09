@@ -115,6 +115,32 @@ function quartColor(index: number) {
   }
 }
 
+const standardStrokeFill = {
+  fill: 'transparent',
+}
+
+const KEY_FRAMES = [
+  {
+    '0%': standardStrokeFill,
+    '24%': standardStrokeFill,
+
+    '25%': colorFrame(colors.greenScreen),
+    '35%': colorFrame(colors.greenScreen),
+
+    '40%': colorFrame(colors.redScreen),
+    '54%': colorFrame(colors.redScreen),
+
+    '55%': colorFrame(colors.blueScreen),
+    '69%': colorFrame(colors.blueScreen),
+
+    '70%': colorFrame(colors.purpleScreen),
+    '80%': colorFrame(colors.purpleScreen),
+
+    '85%': standardStrokeFill,
+    '100%': standardStrokeFill,
+  },
+]
+
 const styles = StyleSheet.create({
   justCoin: {
     opacity: 0.3,
@@ -128,7 +154,7 @@ const styles = StyleSheet.create({
     animationDirection: 'normal',
   },
   cycle: {
-    animationKeyframes: getKeyframes(),
+    animationKeyframes: KEY_FRAMES,
   },
   sweepContainer: {
     width: '100%',
@@ -171,37 +197,7 @@ const styles = StyleSheet.create({
   },
 })
 
-function getKeyframes() {
-  const standardStrokeFill = {
-    fill: 'transparent',
-  }
-  return [
-    {
-      '0%': standardStrokeFill,
-      '24%': standardStrokeFill,
-
-      '25%': colorFrame(colors.greenScreen),
-      '35%': colorFrame(colors.greenScreen),
-
-      '40%': colorFrame(colors.redScreen),
-      '54%': colorFrame(colors.redScreen),
-
-      '55%': colorFrame(colors.blueScreen),
-      '69%': colorFrame(colors.blueScreen),
-
-      '70%': colorFrame(colors.purpleScreen),
-      '80%': colorFrame(colors.purpleScreen),
-
-      '85%': standardStrokeFill,
-      '100%': standardStrokeFill,
-    },
-  ]
-}
-
 function solidFadeInFrames(color: colors, donePercent: number) {
-  const standardStrokeFill = {
-    fill: 'transparent',
-  }
   return [{ '0%': standardStrokeFill, [donePercent]: colorFrame(color), '100%': colorFrame(color) }]
 }
 

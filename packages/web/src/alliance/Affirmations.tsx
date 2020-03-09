@@ -69,7 +69,7 @@ export default function Affirmations() {
         preview={clabsPreview}
         button={{
           text: t('affirmations.cLabsButton'),
-          href: 'https://medium.com/celohq/a-cryptocurrency-for-every-juan-144144e62d5',
+          href: 'https://medium.com/celoorg/a-cryptocurrency-for-every-juan-144144e62d5',
         }}
         logo={<Image resizeMode="contain" source={cLabsLogo} style={orgStyle.cLabsLogo} />}
         contentStyle={styles.wfpStyle}
