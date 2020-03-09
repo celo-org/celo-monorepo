@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Affirmations from 'src/alliance/Affirmations'
 import Benefits from 'src/alliance/Benefits'
@@ -71,15 +71,17 @@ export default function Main() {
       <BeautifulQuote
         color={colors.white}
         imgSource={aguaComunidad}
-        quote={'"Viva La Local"'}
-        citation={'who said it'}
+        quote={
+          'A fresh chance to build, interoperate, and secure new financial services applications.'
+        }
+        citation={<Text style={styles.citation}>Gigi Gatti, Grameen Foundation</Text>}
       />
       <Members />
       <BeautifulQuote
         color={colors.dark}
         imgSource={fences}
-        quote={'"Just Do It"'}
-        citation={'Nike'}
+        quote={'Brings to life many of the potential possibilities of crypto.'}
+        citation={<Text style={styles.citation}>Diogo Monica, Anchorage</Text>}
       />
       <ArticleData title={t('mediumArticlesTitle')} />
       <Benefits />
@@ -153,6 +155,7 @@ const styles = StyleSheet.create({
     width: '90vw',
     justifyContent: 'center',
   },
+  citation: { fontSize: 36 },
   rainbow: {
     animationDuration: '4000ms',
     animationIterationCount: 1,

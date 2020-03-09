@@ -27,7 +27,7 @@ export default React.memo(function BeautifulQuote(props: Props) {
           props.color && { color: props.color },
         ]}
       >
-        {props.quote}
+        “{props.quote}”
       </Text>
       <Text
         style={[
@@ -45,11 +45,12 @@ export default React.memo(function BeautifulQuote(props: Props) {
 })
 
 const styles = StyleSheet.create({
-  image: { width: '100%', height: 510, padding: 15 },
+  image: { width: '100%', minHeight: 510, paddingVertical: 15, paddingHorizontal: 30 },
   quote: {
     fontSize: 65,
     lineHeight: 72,
     fontStyle: 'italic',
+    maxWidth: 1200,
   },
   quoteMobile: {
     fontSize: 42,
