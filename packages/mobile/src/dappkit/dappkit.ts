@@ -70,11 +70,12 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
       // but that's throwing errors here. Not sure why, but txs work without it.
       const gatewayFeeRecipient = undefined
       const gatewayFee = '0x' + new BigNumber(10000).toString(16)
+      const gas = Math.round(tx.estimatedGas * 1.5)
 
       const params: any = {
         from: tx.from,
         gasPrice: '0',
-        gas: tx.estimatedGas * 1.5,
+        gas,
         data: tx.txData,
         nonce: tx.nonce,
         value: tx.value,
