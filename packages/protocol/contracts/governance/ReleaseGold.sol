@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IReleaseGold.sol";
+import "./interfaces/IValidators.sol";
 import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
@@ -367,6 +368,11 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev Only callable `EXPIRATION_TIME` after the final gold release.
    */
   function expire() external nonReentrant onlyReleaseOwner onlyExpired {
+    IValidators validators = getValidators();
+    require(
+      !validators.isValidator(address(this)) && !validators.isValidatorGroup(address(this)),
+      "Cannot call `expire` on an instance registered as a validator or group"
+    );
     require(!isRevoked(), "Release schedule instance must not already be revoked");
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
