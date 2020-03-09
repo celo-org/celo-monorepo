@@ -12,14 +12,15 @@ coverage:
         flags: web
         threshold: 2%
         target: 75%
-      protocol:
-        paths: 'packages/protocol/'
-        flags: protocol
-        threshold: 5%
-        target: 90%
-        if_no_uploads: error
-        if_not_found: success
-        if_ci_failed: error
+      # Protocol codecov disabled until coverage tests are fixed.
+      #protocol:
+        #paths: 'packages/protocol/'
+        #flags: protocol
+        #threshold: 5%
+        #target: 90%
+        #if_no_uploads: error
+        #if_not_found: success
+        #if_ci_failed: error
     patch:
       default: off
 
@@ -27,6 +28,6 @@ flags:
   mobile:
     paths:
       - packages/mobile/
-  protocol:
-    paths:
-      - packages/protocol/
+  #protocol:
+    #paths:
+      #- packages/protocol/

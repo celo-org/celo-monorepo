@@ -132,7 +132,7 @@ export class About extends React.Component<Props & I18nProps> {
             </Text>
             <Button
               kind={BTN.PRIMARY}
-              href="https://medium.com/celohq/celos-theory-of-change-b916de44945d"
+              href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
               text={t('learnMore')}
             />
           </BookLayout>

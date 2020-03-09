@@ -204,10 +204,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   /**
    * @notice Authorizes an address to sign consensus messages on behalf of the account.
    * @param signer The address of the signing key to authorize.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
   function authorizeValidatorSignerWithPublicKey(

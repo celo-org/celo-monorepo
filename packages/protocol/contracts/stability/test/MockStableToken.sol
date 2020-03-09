@@ -51,7 +51,12 @@ contract MockStableToken {
     return _targetTotalSupply;
   }
 
-  function transfer(address, uint256) external pure returns (bool) {
+  function transfer(address to, uint256 value) external returns (bool) {
+    if (balanceOf[msg.sender] < value) {
+      return false;
+    }
+    balanceOf[msg.sender] = balanceOf[msg.sender].sub(value);
+    balanceOf[to] = balanceOf[to].add(value);
     return true;
   }
 
