@@ -59,7 +59,8 @@ describe('sync tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  before(async () => {
+  before(async function(this: any) {
+    this.timeout(0)
     // Start validator nodes and migrate contracts.
     await hooks.before()
     // Restart validator nodes.
@@ -74,7 +75,10 @@ describe('sync tests', function(this: any) {
     )
   })
 
-  after(hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const syncModes = ['full', 'fast', 'light', 'lightest']
   for (const syncmode of syncModes) {

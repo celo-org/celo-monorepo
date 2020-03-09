@@ -134,7 +134,10 @@ describe('slashing tests', function(this: any) {
     await hooks.before()
   })
 
-  after(hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const restart = async () => {
     await hooks.restart()

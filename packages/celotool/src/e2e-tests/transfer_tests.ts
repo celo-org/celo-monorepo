@@ -221,8 +221,15 @@ describe('Transfer tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  after(hooks.after)
-  before(hooks.before)
+  before(async function(this: any) {
+    this.timeout(0)
+    await hooks.before()
+  })
+
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   // Spin up a node that we can sync with.
   const fullInstance: GethInstanceConfig = {
