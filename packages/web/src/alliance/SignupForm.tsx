@@ -87,7 +87,7 @@ export default function SignupForm() {
               onPress={onAltSubmit}
               kind={BTN.PRIMARY}
               style={styles.buttonText}
-              size={isMobile && SIZE.fullWidth}
+              size={isMobile ? SIZE.fullWidth : SIZE.big}
             />
           </View>
         </Form>
