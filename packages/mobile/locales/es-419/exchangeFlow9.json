@@ -24,7 +24,6 @@
   "sellGoldAmount": "Vender <2></2> $t(global:gold)",
   "includeExchangeFee": "* incluye la comisión de cambio",
   "available": "Disponible",
-  "moneyAvailable": "<0></0> disponible",
   "newBalance": "Saldo nuevo",
   "continue": "Continuar",
   "reviewExchange": "Revisar cambio",

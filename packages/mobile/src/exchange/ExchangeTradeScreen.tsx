@@ -74,9 +74,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken, makerTokenBalance } = navigation.getParam('makerTokenDisplay')
+    const { makerToken } = navigation.getParam('makerTokenDisplay')
     return {
-      ...exchangeHeader(makerToken, makerTokenBalance),
+      ...exchangeHeader(makerToken),
     }
   }
 

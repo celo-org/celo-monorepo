@@ -64,6 +64,7 @@
   "reclaim": "Reclaim",
   "celoGold": "Celo Gold",
   "celoDollars": "{{CeloDollars}}",
+  "balanceAvailable": "<0></0> available",
   "oops": "Oops!",
   "somethingWrong": "Something went wrong.",
   "verifyFailed": "Failed to verify",

@@ -24,7 +24,6 @@
   "sellGoldAmount": "Sell <2></2> $t(global:gold)",
   "includeExchangeFee": "*includes exchange fee",
   "available": "Available",
-  "moneyAvailable": "<0></0> available",
   "newBalance": "New Balance",
   "continue": "Continue",
   "reviewExchange": "Review Exchange",

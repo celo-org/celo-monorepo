@@ -15,7 +15,6 @@
   "amount": "Monto",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
-  "celoDollarsAvailable": "<0></0> disponibles",
   "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",

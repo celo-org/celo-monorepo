@@ -74,9 +74,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken, makerTokenBalance } = navigation.getParam('exchangeInput')
+    const { makerToken } = navigation.getParam('exchangeInput')
     return {
-      ...exchangeHeader(makerToken, makerTokenBalance),
+      ...exchangeHeader(makerToken),
     }
   }
 
