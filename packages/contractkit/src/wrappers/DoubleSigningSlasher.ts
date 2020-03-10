@@ -1,7 +1,7 @@
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
-import { DoubleSigningSlasher } from '../generated/types/DoubleSigningSlasher'
+import { DoubleSigningSlasher } from '../generated/DoubleSigningSlasher'
 import {
   BaseWrapper,
   CeloTransactionObject,

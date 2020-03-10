@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { range } from 'lodash'
 import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
-import { Election } from '../generated/types/Election'
+import { Election } from '../generated/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,

@@ -77,6 +77,7 @@
   },
   "devDependencies": {
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#9d77e02",
+    "@celo/typechain-target-web3-v1-celo": "0.0.2",
     "@celo/typescript": "0.0.1",
     "@types/bignumber.js": "^5.0.0",
     "@types/bn.js": "^4.11.0",
@@ -89,7 +90,6 @@
     "@types/underscore": "^1.8.8",
     "@types/yargs": "^13.0.2",
     "typechain": "1.0.5",
-    "typechain-target-web3-v1": "1.0.4",
     "typechain-target-truffle": "1.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.1.2",

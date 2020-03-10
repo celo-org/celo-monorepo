@@ -3,7 +3,7 @@ import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Transaction } from 'web3-eth'
 import { Address } from '../base'
-import { Governance } from '../generated/types/Governance'
+import { Governance } from '../generated/Governance'
 import {
   BaseWrapper,
   bufferToBytes,
