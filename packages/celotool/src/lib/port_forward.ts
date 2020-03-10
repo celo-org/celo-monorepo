@@ -97,7 +97,7 @@ export async function portForwardAnd(
     }
     await cb()
     console.log(`PID: ${childProcess.pid}`)
-    childProcess.disconnect()
+    childProcess.unref()
     await spawnCmd('pkill', ['-9', '-P', childProcess.pid.toString()], { silent: true })
     // childProcess.kill('SIGTERM')
   } catch (error) {
