@@ -75,3 +75,44 @@ export function testWithGanache(name: string, fn: (web3: Web3) => void) {
     fn(web3)
   })
 }
+
+export async function getContractFromEvent(
+  eventSignature: string,
+  web3: Web3,
+  canValidate: boolean
+): Promise<string> {
+  let currBlockNumber = await web3.eth.getBlockNumber()
+  let currBlock: any
+  let contractAddress: any
+  const target = web3.utils.sha3(eventSignature)
+  let found = false
+  while (true) {
+    currBlock = await web3.eth.getBlock(currBlockNumber)
+    for (const tx of currBlock.transactions) {
+      const txFull = await web3.eth.getTransactionReceipt(tx)
+      if (txFull.logs) {
+        for (const log of txFull.logs) {
+          if (log.topics) {
+            for (const topic of log.topics) {
+              if (topic === target) {
+                if (canValidate && !found) {
+                  found = true
+                } else {
+                  contractAddress = log.address
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    currBlockNumber--
+    if (contractAddress !== undefined) {
+      break
+    }
+    if (currBlockNumber < 0) {
+      throw Error('Error: ReleaseGoldInstance could not be found')
+    }
+  }
+  return contractAddress
+}

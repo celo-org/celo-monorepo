@@ -69,7 +69,6 @@ export default class Authorize extends BaseCommand {
       tx = await accounts.authorizeAttestationSigner(res.flags.signer, sig)
     } else {
       this.error(`Invalid role provided`)
-      return
     }
     await displaySendTx('authorizeTx', tx)
   }

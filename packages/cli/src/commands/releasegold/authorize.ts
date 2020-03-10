@@ -14,7 +14,7 @@ export default class Authorize extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
-    action: flags.string({ required: true, options: ['vote', 'validator', 'attestation'] }),
+    role: flags.string({ required: true, options: ['vote', 'validator', 'attestation'] }),
     signer: Flags.address({
       required: true,
       description: 'The signer key that is to be used for voting through the ReleaseGold instance',
@@ -36,16 +36,16 @@ export default class Authorize extends BaseCommand {
   static args = []
 
   static examples = [
-    'authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --action vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
-    'authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --action validator --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
-    'authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --action attestation --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
+    'authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
+    'authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role validator --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
+    'authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role attestation --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
   ]
 
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(Authorize)
     const contractAddress = flags.contract
-    const action = flags.action
+    const role = flags.role
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       this.kit,
       newReleaseGold(this.kit.web3, contractAddress)
@@ -59,7 +59,7 @@ export default class Authorize extends BaseCommand {
     const sig = accounts.parseSignatureOfAddress(
       releaseGoldWrapper.address,
       flags.signer,
-      flags.pop
+      flags.signature
     )
 
     const isRevoked = await releaseGoldWrapper.isRevoked()
@@ -67,21 +67,22 @@ export default class Authorize extends BaseCommand {
       ? await releaseGoldWrapper.getReleaseOwner()
       : await releaseGoldWrapper.getBeneficiary()
     let tx: any
-    if (action === 'vote') {
+    if (role === 'vote') {
       tx = await releaseGoldWrapper.authorizeVoteSigner(flags.signer, sig)
-    } else if (action === 'validator' && flags.blsKey) {
-      tx = await releaseGoldWrapper.authorizeValidatorSignerWithKeys(
+    } else if (role === 'validator' && flags.blsKey) {
+      tx = await releaseGoldWrapper.authorizeValidatorSignerAndBls(
         flags.signer,
         sig,
         flags.blsKey,
-        flags.blsPop
+        flags.blsPop!
       )
+    } else if (role === 'validator') {
       tx = await releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
-    } else if (action === 'validator') {
+    } else if (role === 'attestation') {
       tx = await releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
     } else {
-      return this.error('Invalid action provided')
+      this.error('Invalid role provided')
     }
-    await displaySendTx('authorize' + action + 'Tx', tx)
+    await displaySendTx('authorize' + role + 'Tx', tx)
   }
 }

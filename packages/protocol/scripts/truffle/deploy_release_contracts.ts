@@ -1,9 +1,8 @@
 import {
-  _setInitialProxyImplementation,
   getDeployedProxiedContract,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
-import fs = require('fs')
 import {
   GoldTokenInstance,
   RegistryInstance,
@@ -12,6 +11,7 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -56,12 +56,16 @@ module.exports = async (callback: (error?: any) => number) => {
           releaseGoldProxy.address,
           weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
         )
+        const releaseStartTime =
+          releaseGoldConfig.releaseStartTime === 'NOW'
+            ? new Date().getTime() / 1000
+            : new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
         const releaseGoldTxHash = await _setInitialProxyImplementation(
           web3,
           releaseGoldInstance,
           releaseGoldProxy,
           'ReleaseGold',
-          new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000,
+          Math.round(releaseStartTime),
           releaseGoldConfig.releaseCliffTime,
           releaseGoldConfig.numReleasePeriods,
           releaseGoldConfig.releasePeriod,

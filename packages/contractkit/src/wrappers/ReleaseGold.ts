@@ -1,4 +1,8 @@
-import { Signature } from '@celo/utils/lib/signatureUtils'
+import {
+  hashMessageWithPrefix,
+  Signature,
+  signedMessageToPublicKey,
+} from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { newReleaseGold } from '../generated/ReleaseGold'
@@ -8,12 +12,14 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  stringToBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
   valueToInt,
   valueToString,
 } from './BaseWrapper'
+import { PendingWithdrawal } from './LockedGold'
 
 export interface ReleaseSchedule {
   releaseStartTime: number
@@ -261,7 +267,45 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param index The index of the pending withdrawal to relock from.
    * @param value The value to relock from the specified pending withdrawal.
    */
-  relockGold: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+  async relockGold(value: BigNumber.Value): Promise<Array<CeloTransactionObject<void>>> {
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const pendingWithdrawals = await lockedGold.getPendingWithdrawals(this.address)
+    // Ensure there are enough pending withdrawals to relock.
+    const totalValue = await lockedGold.getPendingWithdrawalsTotalValue(this.address)
+    if (totalValue.isLessThan(value)) {
+      throw new Error(`Not enough pending withdrawals to relock ${value}`)
+    }
+    // Assert pending withdrawals are sorted by time (increasing), so that we can re-lock starting
+    // with those furthest away from being available (at the end).
+    const throwIfNotSorted = (pw: PendingWithdrawal, i: number) => {
+      if (i > 0 && !pw.time.isGreaterThanOrEqualTo(pendingWithdrawals[i - 1].time)) {
+        throw new Error('Pending withdrawals not sorted by timestamp')
+      }
+    }
+    pendingWithdrawals.forEach(throwIfNotSorted)
+
+    let remainingToRelock = new BigNumber(value)
+    const relockPw = (
+      acc: Array<CeloTransactionObject<void>>,
+      pw: PendingWithdrawal,
+      i: number
+    ) => {
+      const valueToRelock = BigNumber.minimum(pw.value, remainingToRelock)
+      if (!valueToRelock.isZero()) {
+        remainingToRelock = remainingToRelock.minus(valueToRelock)
+        acc.push(this._relockGold(i, valueToRelock))
+      }
+      return acc
+    }
+    return pendingWithdrawals.reduceRight(relockPw, []) as Array<CeloTransactionObject<void>>
+  }
+
+  /**
+   * Relocks gold that has been unlocked but not withdrawn.
+   * @param index The index of the pending withdrawal to relock from.
+   * @param value The value to relock from the specified pending withdrawal.
+   */
+  _relockGold: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.relockGold,
     tupleParser(valueToString, valueToString)
@@ -373,16 +417,79 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.authorizeValidatorSigner(
-        signer,
+    const validators = await this.kit.contracts.getValidators()
+    const account = this.address
+    if (await validators.isValidator(account)) {
+      const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
+      const prefixedMsg = hashMessageWithPrefix(message)
+      const pubKey = signedMessageToPublicKey(
+        prefixedMsg,
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s
       )
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSignerWithPublicKey(
+          signer,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          proofOfSigningKeyPossession.s,
+          stringToBytes(pubKey)
+        )
+      )
+    } else {
+      return toTransactionObject(
+        this.kit,
+        this.contract.methods.authorizeValidatorSigner(
+          signer,
+          proofOfSigningKeyPossession.v,
+          proofOfSigningKeyPossession.r,
+          proofOfSigningKeyPossession.s
+        )
+      )
+    }
+  }
+
+  /**
+   * Authorizes an address to sign consensus messages on behalf of the contract's account. Also switch BLS key at the same time.
+   * @param signer The address of the signing key to authorize.
+   * @param proofOfSigningKeyPossession The contract's account address signed by the signer address.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return A CeloTransactionObject
+   */
+  async authorizeValidatorSignerAndBls(
+    signer: Address,
+    proofOfSigningKeyPossession: Signature,
+    blsPublicKey: string,
+    blsPop: string
+  ): Promise<CeloTransactionObject<void>> {
+    const account = this.address
+    const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
+    const prefixedMsg = hashMessageWithPrefix(message)
+    const pubKey = signedMessageToPublicKey(
+      prefixedMsg,
+      proofOfSigningKeyPossession.v,
+      proofOfSigningKeyPossession.r,
+      proofOfSigningKeyPossession.s
+    )
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.authorizeValidatorSignerWithKeys(
+        signer,
+        proofOfSigningKeyPossession.v,
+        proofOfSigningKeyPossession.r,
+        proofOfSigningKeyPossession.s,
+        stringToBytes(pubKey),
+        stringToBytes(blsPublicKey),
+        stringToBytes(blsPop)
+      )
     )
   }
+
   /**
    * Authorizes an address to sign attestation messages on behalf of the account.
    * @param signer The address of the attestation signing key to authorize.
