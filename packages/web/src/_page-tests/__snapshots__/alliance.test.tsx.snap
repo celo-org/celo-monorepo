@@ -2860,6 +2860,11 @@ exports[`Alliance renders 1`] = `
   </div>
   <div
     className="css-view-1dbjc4n"
+    style={
+      Object {
+        "marginBottom": "75px",
+      }
+    }
   >
     <div
       className="css-view-1dbjc4n"

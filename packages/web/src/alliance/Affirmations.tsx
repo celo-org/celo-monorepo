@@ -2,10 +2,13 @@ import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import {
   clabs,
+  clabsMobile,
   clabsPreview,
   laboratoria,
+  laboratoriaMobile,
   laboratoriaPreview,
   wfp,
+  wfpMobile,
   wfpPreview,
 } from 'src/alliance/images/index'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
@@ -26,7 +29,13 @@ export default function Affirmations() {
   const orgStyle = isMobile ? mobileStyles : styles
 
   return (
-    <View>
+    <View
+      style={
+        isMobile
+          ? standardStyles.sectionMarginBottomMobile
+          : standardStyles.sectionMarginBottomTablet
+      }
+    >
       <GridRow
         desktopStyle={standardStyles.sectionMarginTop}
         tabletStyle={standardStyles.sectionMarginTopTablet}
@@ -45,14 +54,16 @@ export default function Affirmations() {
         belief={<TransItalic i18nKey="affirmations.laboratoriaBelief" />}
         copy={t('affirmations.laboratoriaCopy')}
         image={laboratoria}
+        imageMobile={laboratoriaMobile}
         preview={laboratoriaPreview}
         logo={<Image resizeMode="contain" source={laboratoriaLogo} style={orgStyle.laboratoria} />}
-        contentStyle={styles.laborStyle}
+        contentStyle={!isMobile && styles.laborStyle}
       />
       <Exemplar
         belief={<TransItalic i18nKey="affirmations.wfpBelief" />}
         copy={t('affirmations.wfpCopy')}
         image={wfp}
+        imageMobile={wfpMobile}
         preview={wfpPreview}
         logo={<Image resizeMode="contain" source={wfpLogo} style={orgStyle.wfpLogo} />}
         button={{
@@ -60,19 +71,20 @@ export default function Affirmations() {
           href:
             'https://medium.com/celoorg/how-to-design-for-all-stories-from-tanzania-refugees-8b34594d64ae',
         }}
-        contentStyle={styles.cLabStyle}
+        contentStyle={!isMobile && styles.cLabStyle}
       />
       <Exemplar
         belief={<TransItalic i18nKey="affirmations.cLabsBelief" />}
         copy={t('affirmations.cLabsCopy')}
         image={clabs}
+        imageMobile={clabsMobile}
         preview={clabsPreview}
         button={{
           text: t('affirmations.cLabsButton'),
           href: 'https://medium.com/celoorg/a-cryptocurrency-for-every-juan-144144e62d5',
         }}
         logo={<Image resizeMode="contain" source={cLabsLogo} style={orgStyle.cLabsLogo} />}
-        contentStyle={styles.wfpStyle}
+        contentStyle={!isMobile && styles.wfpStyle}
       />
     </View>
   )
@@ -80,6 +92,7 @@ export default function Affirmations() {
 
 interface Props {
   image: ImageSourcePropType
+  imageMobile: ImageSourcePropType
   preview: ImageSourcePropType
   logo: React.ReactNode
   belief: React.ReactNode
@@ -91,22 +104,44 @@ interface Props {
   }
 }
 
-function Exemplar({ image, logo, belief, copy, button, preview, contentStyle }: Props) {
+function Exemplar({
+  image,
+  imageMobile,
+  logo,
+  belief,
+  copy,
+  button,
+  preview,
+  contentStyle,
+}: Props) {
   const { isMobile } = useScreenSize()
   return (
     <GridRow allStyle={standardStyles.elementalMargin}>
       <Cell span={Spans.half}>
         <View style={contentStyle}>
-          <H4 style={isMobile ? standardStyles.halfElement : standardStyles.elementalMarginBottom}>
+          <H4
+            style={
+              isMobile
+                ? [standardStyles.halfElement, fonts.h4]
+                : standardStyles.elementalMarginBottom
+            }
+          >
             {belief}
           </H4>
           <View style={isMobile ? standardStyles.halfElement : standardStyles.elementalMargin}>
             {logo}
           </View>
+          {isMobile && (
+            <View style={styles.photoContainerMobile}>
+              <Photo image={imageMobile} ratio={16 / 10} preview={preview} />
+            </View>
+          )}
           <Text style={fonts.p}>{copy}</Text>
           {button && (
             <Button
-              style={standardStyles.blockMarginTopMobile}
+              style={
+                isMobile ? standardStyles.elementalMarginTop : standardStyles.blockMarginTopMobile
+              }
               kind={BTN.NAKED}
               size={SIZE.normal}
               text={button.text}
@@ -115,11 +150,13 @@ function Exemplar({ image, logo, belief, copy, button, preview, contentStyle }: 
           )}
         </View>
       </Cell>
-      <Cell span={Spans.half}>
-        <View style={!isMobile && styles.photoContainer}>
-          <Photo image={image} ratio={471 / 550} preview={preview} />
-        </View>
-      </Cell>
+      {!isMobile && (
+        <Cell span={Spans.half}>
+          <View style={!isMobile && styles.photoContainer}>
+            <Photo image={image} ratio={471 / 550} preview={preview} />
+          </View>
+        </Cell>
+      )}
     </GridRow>
   )
 }
@@ -143,6 +180,7 @@ const styles = StyleSheet.create({
   wfpLogo: { width: 182, height: 80 },
   cLabsLogo: { width: 140, height: 50 },
   photoContainer: { paddingHorizontal: 20 },
+  photoContainerMobile: { marginVertical: 10 },
   laborStyle: { maxWidth: 440 },
   cLabStyle: { maxWidth: 475 },
   wfpStyle: { maxWidth: 400 },
