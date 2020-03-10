@@ -6,7 +6,6 @@ import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -85,20 +84,18 @@ export function getInvitationVerificationFeeInWei() {
 export async function generateInviteLink(inviteCode: string) {
   let bundleId = DeviceInfo.getBundleId()
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
-  const encodedInvite = encodeURIComponent(`invite-code=${inviteCode}`)
 
-  // Android part
-  const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName: bundleId })
-  const playStoreUrl = `${playStoreLink}&referrer=${encodedInvite}`
-
-  // iOS part
-  const appStoreId = await getAppStoreId(bundleId)
-  const appStoreUrl = await VersionCheck.getAppStoreUrl({ appID: appStoreId })
+  // trying to fetch appStoreId needed to build a dynamic link
+  let appStoreId
+  try {
+    appStoreId = await getAppStoreId(bundleId)
+  } catch (error) {
+    Logger.error(TAG, 'Failed to load AppStore ID: ' + error.toString())
+  }
 
   const shortUrl = await generateShortInviteLink({
-    link: `https://celo.org/build/wallet`,
-    playStoreUrl,
-    appStoreUrl,
+    link: `https://celo.org/build/wallet?invite-code=${inviteCode}`,
+    appStoreId,
     bundleId,
   })
 

@@ -61,7 +61,7 @@ async function slashingOfGroups(
   const groups = await election.getGroupsVotedForByAccount(account)
   const res = []
   //
-  for (let i = groups.length - 1; i >= 0; i++) {
+  for (let i = groups.length - 1; i >= 0; i--) {
     const group = groups[i]
     const totalVotes = await election.getTotalVotesForGroup(group)
     const votes = await election.getTotalVotesForGroupByAccount(group, account)
@@ -86,6 +86,25 @@ async function findLessersAndGreaters(
   const changes = linkedListChanges(groups, changed)
   return { ...changes, indices: changed.map((a) => a.index) }
 }
+
+contract('Integration: Running elections', (_accounts: string[]) => {
+  let election: ElectionInstance
+
+  before(async () => {
+    election = await getDeployedProxiedContract('Election', artifacts)
+  })
+
+  describe('When getting the elected validators', () => {
+    it('should elect all 30 validators', async () => {
+      const elected = await election.electValidatorSigners()
+      assert.equal(elected.length, 30)
+    })
+    it('should elect specified number validators with electNValidatorSigners', async () => {
+      const elected = await election.electNValidatorSigners(1, 20)
+      assert.equal(elected.length, 20)
+    })
+  })
+})
 
 contract('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1

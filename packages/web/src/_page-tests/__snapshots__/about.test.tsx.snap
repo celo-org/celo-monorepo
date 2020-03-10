@@ -1915,7 +1915,7 @@ exports[`About renders 1`] = `
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
-          href="https://medium.com/celohq/celos-theory-of-change-b916de44945d"
+          href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
           role="link"
           style={
             Object {

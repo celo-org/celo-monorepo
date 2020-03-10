@@ -41,15 +41,10 @@ export const menuItems = {
     name: 'Join',
     link: '/jobs',
   },
-  MEDIUM: {
-    name: 'Medium',
-    link: 'https://medium.com/@celo.org',
-  },
   PRIVACY: {
     name: 'Privacy Policy',
     link: '/privacy',
   },
-
   TECH: {
     name: 'Technology',
     link: '/technology',
@@ -57,10 +52,6 @@ export const menuItems = {
   TERMS: {
     name: 'Terms',
     link: '/terms',
-  },
-  TWITTER: {
-    name: 'Twitter',
-    link: 'https://twitter.com/CeloHQ',
   },
   CODE_OF_CONDUCT: {
     name: 'Code of Conduct',
@@ -86,8 +77,11 @@ export enum CeloLinks {
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
+  twitter = 'https://twitter.com/CeloOrg',
+  mediumUser = 'https://medium.com/@celo.org',
+  mediumPublication = 'https://medium.com/celoOrg',
   fundingRequest = 'https://c-labs.typeform.com/to/gj9aUp',
-  linkedIn = 'https://www.linkedin.com/company/celohq/',
+  linkedIn = 'https://www.linkedin.com/company/celoOrg/',
   monorepo = 'https://github.com/celo-org/celo-monorepo',
   blockChainRepo = 'https://github.com/celo-org/celo-blockchain',
   playStoreWallet = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores',
