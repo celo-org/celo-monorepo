@@ -54,6 +54,9 @@ export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
     if (!pin) {
       throw new Error('Keystore returned empty pin')
     }
+    if (onValidCustomPin) {
+      onValidCustomPin()
+    }
     return pin
   }
 
@@ -62,6 +65,9 @@ export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
     if (useCache) {
       const cachedPin = getCachedPincode()
       if (cachedPin) {
+        if (onValidCustomPin) {
+          onValidCustomPin()
+        }
         return cachedPin
       }
     }
@@ -84,6 +90,9 @@ export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
     }
     if (useCache) {
       setCachedPincode(pin)
+    }
+    if (onValidCustomPin) {
+      onValidCustomPin()
     }
     return pin
   }
