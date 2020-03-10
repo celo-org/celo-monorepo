@@ -1,7 +1,7 @@
 /* tslint:disable: no-console */
 import { ChildProcess, spawnSync } from 'child_process'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
-import { execBackgroundCmd, execCmd } from './utils'
+import { execBackgroundCmd, execCmd, spawnCmd } from './utils'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -97,7 +97,8 @@ export async function portForwardAnd(
     }
     await cb()
     console.log(`PID: ${childProcess.pid}`)
-    await execCmd(`pkill -9 -P ${childProcess.pid} || true`)
+    childProcess.disconnect()
+    await spawnCmd('pkill', ['-9', '-P', childProcess.pid.toString()], { silent: true })
     // childProcess.kill('SIGTERM')
   } catch (error) {
     childProcess.kill('SIGTERM')
