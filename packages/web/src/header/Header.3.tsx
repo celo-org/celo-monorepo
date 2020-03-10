@@ -296,7 +296,9 @@ export class Header extends React.PureComponent<Props, State> {
         )}
 
         {this.willShowHamburger() && (
-          <View style={styles.hamburger}>
+          <View
+            style={[styles.hamburger, { transform: [{ translateY: this.state.bannerHeight }] }]}
+          >
             <div
               className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
                 this.state.mobileMenuActive ? cssStyles['is-active'] : ''
