@@ -72,6 +72,7 @@ else
 fi
 
 # Deploy the contracts
+ps auxf
 "$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | grep -v "Handling connection for 8545" | tee "${LOGS_DIR}/migration.log" 
 if [ $? = 1 ]; then
   CONTRACTS_FAILED=true

@@ -78,6 +78,12 @@ export async function portForwardAnd(
 
   try {
     childProcess = execBackgroundCmd(await getPortForwardCmd(celoEnv, component, ports))
+    // const portForwardCmd = await getPortForwardCmd(celoEnv, component, ports)
+    // const childProcess = spawnCmd(
+    //   portForwardCmd.split(' ')[0],
+    //   portForwardCmd.split(' ').slice(1),
+    //   { silent: true }
+    // )
   } catch (error) {
     console.error(error)
     process.exit(1)
