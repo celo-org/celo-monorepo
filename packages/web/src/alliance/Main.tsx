@@ -94,6 +94,9 @@ export default function Main() {
 const keyframes = [
   {
     '0%': {
+      opacity: 0,
+    },
+    '1%': {
       opacity: 0.1,
       background: `linear-gradient(90deg, rgba(12,218,110,1) 21%, rgba(255,101,83,1) 40%, rgba(159,105,255,1) 60%, rgba(82,182,255,1) 80%)`,
     },
@@ -157,10 +160,11 @@ const styles = StyleSheet.create({
   },
   citation: { fontSize: 36 },
   rainbow: {
-    animationDuration: '4000ms',
+    animationDelay: '1000ms',
+    animationDuration: '2800ms',
     animationIterationCount: 1,
-    animationFillMode: 'forwards',
-    animationTimingFunction: 'cubic-bezier(1,.06,1,.35)',
+    animationFillMode: 'both',
+    animationTimingFunction: 'cubic-bezier(.29,.02,.97,.62)',
     animationKeyframes: keyframes,
   },
 })

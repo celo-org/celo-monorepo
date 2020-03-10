@@ -2128,17 +2128,19 @@ exports[`Alliance renders 1`] = `
           }
         >
           <div
-            className="css-view-1dbjc4n r-animationKeyframes-x13bva"
+            className="css-view-1dbjc4n r-animationKeyframes-194ob10"
             style={
               Object {
-                "WebkitAnimationDuration": "4000ms",
-                "WebkitAnimationFillMode": "forwards",
+                "WebkitAnimationDelay": "1000ms",
+                "WebkitAnimationDuration": "2800ms",
+                "WebkitAnimationFillMode": "both",
                 "WebkitAnimationIterationCount": 1,
-                "WebkitAnimationTimingFunction": "cubic-bezier(1,.06,1,.35)",
-                "animationDuration": "4000ms",
-                "animationFillMode": "forwards",
+                "WebkitAnimationTimingFunction": "cubic-bezier(.29,.02,.97,.62)",
+                "animationDelay": "1000ms",
+                "animationDuration": "2800ms",
+                "animationFillMode": "both",
                 "animationIterationCount": 1,
-                "animationTimingFunction": "cubic-bezier(1,.06,1,.35)",
+                "animationTimingFunction": "cubic-bezier(.29,.02,.97,.62)",
               }
             }
           >
