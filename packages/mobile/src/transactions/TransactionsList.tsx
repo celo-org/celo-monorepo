@@ -113,11 +113,11 @@ function mapExchangeStandbyToFeedItem(
   const exchangeRate = new BigNumber(outAmount.value).dividedBy(inAmount.value)
   const localExchangeRate = new BigNumber(localCurrencyExchangeRate ?? 0)
   const makerLocalExchangeRate =
-    inAmount.currencyCode === localCurrencyCode
+    inAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code
       ? localExchangeRate
       : exchangeRate.multipliedBy(localExchangeRate)
   const takerLocalExchangeRate =
-    outAmount.currencyCode === localCurrencyCode
+    outAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code
       ? localExchangeRate
       : exchangeRate.pow(-1).multipliedBy(localExchangeRate)
 
