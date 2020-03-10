@@ -20,7 +20,7 @@ import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
-const BlueBanner = dynamic(import('src/header/BlueBanner'))
+const BlueBanner = dynamic(import('src/header/BlueBanner'), { loading: () => null, ssr: false })
 const CookieConsent = dynamic(
   (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
 )
