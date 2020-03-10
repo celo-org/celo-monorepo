@@ -16,7 +16,7 @@ import Button, { BTN } from 'src/shared/Button.3'
 import Footer from 'src/shared/Footer'
 import Hoverable from 'src/shared/Hoverable'
 import Link from 'src/shared/Link'
-import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
+import menu, { CeloLinks, mainMenu } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
@@ -25,7 +25,6 @@ const CookieConsent = dynamic(
   (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
 )
 
-const menuItems = MAIN_MENU
 const DARK_PAGES = new Set([
   menu.HOME.link,
   menu.COMMUNITY.link,
@@ -248,7 +247,7 @@ export class Header extends React.PureComponent<Props, State> {
                   this.state.menuFaded ? styles.menuInvisible : styles.menuVisible,
                 ]}
               >
-                {menuItems.map((item, index) => (
+                {mainMenu().map((item, index) => (
                   <View key={index} style={styles.linkWrapper}>
                     <Button
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
