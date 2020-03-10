@@ -87,6 +87,25 @@ async function findLessersAndGreaters(
   return { ...changes, indices: changed.map((a) => a.index) }
 }
 
+contract('Integration: Running elections', (_accounts: string[]) => {
+  let election: ElectionInstance
+
+  before(async () => {
+    election = await getDeployedProxiedContract('Election', artifacts)
+  })
+
+  describe('When getting the elected validators', () => {
+    it('should elect all 30 validators', async () => {
+      const elected = await election.electValidatorSigners()
+      assert.equal(elected.length, 30)
+    })
+    it('should elect specified number validators with electNValidatorSigners', async () => {
+      const elected = await election.electNValidatorSigners(1, 20)
+      assert.equal(elected.length, 20)
+    })
+  })
+})
+
 contract('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
