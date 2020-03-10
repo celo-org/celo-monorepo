@@ -28,8 +28,8 @@ const DefaultConfig = {
     gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
       major: 1,
-      minor: 8,
-      patch: 23,
+      minor: 9,
+      patch: 8,
     },
     blockGasLimit: 20000000,
   },
@@ -52,7 +52,7 @@ const DefaultConfig = {
     targetVotingYieldParameters: {
       initial: 0.00016, // (x + 1) ^ 365 = 1.06
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 1 / 365,
+      adjustmentFactor: 1 / 3650,
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -70,8 +70,7 @@ const DefaultConfig = {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE, // 5 minutes
-    // Should be upgraded via governance in advance of enabling the stability protocol.
-    minimumReports: 1,
+    minimumReports: 10,
     frozen: true,
   },
   gasPriceMinimum: {
@@ -83,12 +82,12 @@ const DefaultConfig = {
     frozen: true,
   },
   governance: {
-    queueExpiry: 4 * WEEK,
-    dequeueFrequency: WEEK,
-    concurrentProposals: 10,
-    approvalStageDuration: 3 * DAY,
-    referendumStageDuration: WEEK,
-    executionStageDuration: WEEK,
+    queueExpiry: WEEK, // Change to 4 weeks once mainnet activated
+    dequeueFrequency: DAY, // Change to 1 week once mainnet activated
+    concurrentProposals: 3, // Change to 10 once mainnet activated
+    approvalStageDuration: DAY, // Change to 3 days once mainnet activated
+    referendumStageDuration: DAY, // Change to 1 week once mainnet activated
+    executionStageDuration: DAY, // Change to 1 week once mainnet activated
     minDeposit: 100, // 100 cGLD
     participationBaseline: 8 / 10,
     participationBaselineFloor: 5 / 100,
