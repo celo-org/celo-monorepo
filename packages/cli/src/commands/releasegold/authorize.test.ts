@@ -22,6 +22,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       contractCanValidate
     )
     kit = newKitFromWeb3(web3)
+    await CreateAccount.run(['--contract', contractAddress])
   })
 
   describe('can authorize account signers', () => {
@@ -29,7 +30,6 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     let accounts: any
 
     beforeEach(async () => {
-      await CreateAccount.run(['--contract', contractAddress])
       accounts = await web3.eth.getAccounts()
       const accountsWrapper = await kit.contracts.getAccounts()
       pop = await accountsWrapper.generateProofOfKeyPossession(contractAddress, accounts[1])
@@ -76,7 +76,6 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
   })
 
   test('can register as a validator from an authorized signer', async () => {
-    await CreateAccount.run(['--contract', contractAddress])
     const accounts = await web3.eth.getAccounts()
     const accountsWrapper = await kit.contracts.getAccounts()
     const signer = accounts[1]
@@ -114,7 +113,6 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
   })
 
   test('can authorize signer with bls keys after registering as validator', async () => {
-    await CreateAccount.run(['--contract', contractAddress])
     const accounts = await web3.eth.getAccounts()
     const accountsWrapper = await kit.contracts.getAccounts()
     const signer = accounts[1]
