@@ -22,7 +22,7 @@ async function urlGetter(_str: string) {
 
 async function addUrl(address: string, domain: string, verified: boolean) {
   await client.query(
-    `UPDATE celo_account SET web_url = $1, web_url_verified = $2, web_url_timestamp=now() WHERE address = $3`,
+    `UPDATE celo_account SET domain = $1, domain_verified = $2, domain_timestamp=now() WHERE address = $3`,
     [domain, verified, Buffer.from(address, 'hex')]
   )
 }
@@ -37,7 +37,7 @@ async function handleItem(item: { url: string; address: string }) {
     }
     let claim = claims[0]
     let verified = (await verifyClaim(claim, item.address, urlGetter)) === undefined
-    addUrl(item.address, claim.domain, verified)
+    await addUrl(item.address, claim.domain, verified)
   } catch (err) {
     console.error('Cannot read metadata', err)
   }
@@ -45,14 +45,14 @@ async function handleItem(item: { url: string; address: string }) {
 
 async function main() {
   await client.connect()
-  addUrl('e89897510bfb2fc0647325fb6d580594c061acbf', 'http://test.com/', false)
   let items: { address: string; url: string }[] = await jsonQuery(
-    `SELECT address, url FROM celo_account WHERE web_url_timestamp is NULL AND url is NOT NULL LIMIT 5`
+    `SELECT address, url FROM celo_account WHERE domain_timestamp is NULL AND url is NOT NULL LIMIT 5`
   )
+  items = items || []
   items = items.map((a) => ({ ...a, address: normalizeAddress(a.address.substr(2)) }))
   console.log(items)
   for (let i of items) {
-    handleItem(i)
+    await handleItem(i)
   }
   await client.end()
 }
