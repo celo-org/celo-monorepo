@@ -6,7 +6,7 @@ import { chunk } from 'lodash'
 import { MinimalContact } from 'react-native-contacts'
 import { all, call, put, select } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
-import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
+import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {

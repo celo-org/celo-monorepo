@@ -742,6 +742,7 @@ contract('Attestations', (accounts: string[]) => {
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
       const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(phoneHash, v, r, s)
+      await mockStableToken.mint(attestations.address, attestationFee)
     })
 
     it('should remove the balance of available rewards for the issuer', async () => {

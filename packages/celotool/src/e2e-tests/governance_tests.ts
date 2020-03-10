@@ -22,6 +22,7 @@ interface MemberSwapper {
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
+const carbonOffsettingPartnerAddress = '0x1234567812345678123456781234567812345678'
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -198,6 +199,11 @@ describe('governance tests', () => {
         rpcport: 8553,
       },
     ],
+    migrationOverrides: {
+      epochRewards: {
+        carbonOffsettingPartner: carbonOffsettingPartnerAddress,
+      },
+    },
   }
 
   const hooks: any = getHooks(gethConfig)
@@ -216,6 +222,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
+    // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
@@ -734,6 +741,13 @@ describe('governance tests', () => {
         await assertBalanceChanged(reserve.options.address, blockNumber, expected, goldToken)
       }
 
+      const assertCarbonOffsettingBalanceChanged = async (
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        await assertBalanceChanged(carbonOffsettingPartnerAddress, blockNumber, expected, goldToken)
+      }
+
       const assertVotesUnchanged = async (blockNumber: number) => {
         await assertVotesChanged(blockNumber, new BigNumber(0))
       }
@@ -744,6 +758,10 @@ describe('governance tests', () => {
 
       const assertReserveBalanceUnchanged = async (blockNumber: number) => {
         await assertReserveBalanceChanged(blockNumber, new BigNumber(0))
+      }
+
+      const assertCarbonOffsettingBalanceUnchanged = async (blockNumber: number) => {
+        await assertCarbonOffsettingBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const getStableTokenSupplyChange = async (blockNumber: number) => {
@@ -812,6 +830,14 @@ describe('governance tests', () => {
             .times(fromFixed(communityRewardFrac))
             .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
 
+          const carbonOffsettingFrac = new BigNumber(
+            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber)
+          )
+          const expectedCarbonOffsettingPartnerAward = expectedVoterRewards
+            .plus(maxPotentialValidatorReward)
+            .times(fromFixed(carbonOffsettingFrac))
+            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const expectedGoldTotalSupplyChange = expectedCommunityReward
             .plus(expectedVoterRewards)
@@ -819,8 +845,10 @@ describe('governance tests', () => {
           // Check TS calc'd rewards against solidity calc'd rewards
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
+          const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
           assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
           assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
+          assertAlmostEqual(expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
           // Check TS calc'd rewards against what happened
           await assertVotesChanged(blockNumber, expectedVoterRewards)
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
@@ -830,12 +858,17 @@ describe('governance tests', () => {
           )
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
+          await assertCarbonOffsettingBalanceChanged(
+            blockNumber,
+            expectedCarbonOffsettingPartnerAward
+          )
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
           await assertReserveBalanceUnchanged(blockNumber)
           await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
+          await assertCarbonOffsettingBalanceUnchanged(blockNumber)
         }
       }
     })
