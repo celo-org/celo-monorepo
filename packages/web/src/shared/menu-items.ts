@@ -1,5 +1,3 @@
-import getConfig from 'next/config'
-
 export const pagePaths = {
   HOME: {
     name: 'Home',
@@ -67,23 +65,14 @@ export const pagePaths = {
   },
 }
 
-const ALLIANCE_PUB_TIME = Date.UTC(2020, 3, 11, 12) // 5AM PST == NOON UTC
-
-export function isAfterPubTime() {
-  const env = getConfig().publicRuntimeConfig.ENV
-  return env === 'production' || env === 'staging' ? Date.now() > ALLIANCE_PUB_TIME : true
-}
-
-export function mainMenu() {
-  return [
-    pagePaths.ABOUT_US,
-    pagePaths.JOBS,
-    pagePaths.BUILD,
-    pagePaths.DEVELOPERS,
-    isAfterPubTime() && pagePaths.ALLIANCE_COLLECTIVE,
-    pagePaths.COMMUNITY,
-  ].filter((page) => page)
-}
+export const MAIN_MENU = [
+  pagePaths.ABOUT_US,
+  pagePaths.JOBS,
+  pagePaths.BUILD,
+  pagePaths.DEVELOPERS,
+  pagePaths.ALLIANCE_COLLECTIVE,
+  pagePaths.COMMUNITY,
+]
 
 // TODO: Temporary link to the master branch documentation for 'sdkDocs' and 'sdkTutorial'
 export enum CeloLinks {

@@ -12,9 +12,10 @@ import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
 import ChangeStory from 'src/shared/ChangeStory'
 import InlineAnchor from 'src/shared/InlineAnchor'
-import menu, { CeloLinks, mainMenu } from 'src/shared/menu-items'
+import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+const FOOTER_MENU = [menu.HOME, ...MAIN_MENU]
 
 interface Props {
   isVertical?: boolean
@@ -104,7 +105,7 @@ const Navigation = React.memo(function _Navigation({
   return (
     <Responsive large={styles.menu} medium={isVertical ? styles.verticalMenu : styles.menuTablet}>
       <View style={isVertical ? styles.verticalMenu : styles.menuMobile}>
-        {[menu.HOME, ...mainMenu()].map((item, index) => {
+        {FOOTER_MENU.map((item, index) => {
           const linkIsToCurrentPage = isVertical && currentPage === item.link
           const btnKind = linkIsToCurrentPage ? BTN.TERTIARY : BTN.NAV
           return (
