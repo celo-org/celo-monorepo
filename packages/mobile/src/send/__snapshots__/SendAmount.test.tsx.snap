@@ -17,6 +17,11 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
   }
 >
   <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "paddingTop": 8,
+      }
+    }
     keyboardShouldPersistTaps="always"
   >
     <View>
@@ -217,7 +222,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-            MXN
+            $
           </Text>
         </View>
         <View
@@ -275,7 +280,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "textAlignVertical": "top",
               }
             }
-            title="MXN"
+            title="$"
             underlineColorAndroid="transparent"
             validator="decimal"
             value=""
@@ -447,58 +452,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             </Text>
           </Text>
         </View>
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-              "marginBottom": 15,
-              "marginTop": 7,
-            }
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            newAccountBalance
-          </Text>
-          <Text
-            numberOfLines={1}
-            style={
-              Array [
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                  },
-                  Object {
-                    "color": "#FD785B",
-                  },
-                ],
-                Object {
-                  "color": "#FD785B",
-                },
-              ]
-            }
-          >
-            -
-            $
-            0.00
-          </Text>
-        </View>
       </View>
     </View>
   </RCTScrollView>
@@ -584,6 +537,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               },
             ]
           }
+          testID="Request"
         >
           <View
             style={
@@ -707,6 +661,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               },
             ]
           }
+          testID="Send"
         >
           <View
             style={

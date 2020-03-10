@@ -81,6 +81,10 @@ export function HeaderTitleWithBalance({ title, token }: Props) {
   )
 }
 
+HeaderTitleWithBalance.defaultProps = {
+  token: CURRENCY_ENUM.DOLLAR,
+}
+
 export const exchangeHeader = (makerToken: CURRENCY_ENUM) => {
   const title =
     makerToken === CURRENCY_ENUM.DOLLAR
