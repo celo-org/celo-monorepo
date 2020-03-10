@@ -53,7 +53,7 @@ export function titleWithBalanceNavigationOptions(title: string) {
           {title && <Text style={fontStyles.bodyBold}>{title}</Text>}
           <Text style={styles.balanceText}>
             {dollarBalance != null ? (
-              <Trans i18nKey="sendFlow7:celoDollarsAvailabl">
+              <Trans i18nKey="sendFlow7:celoDollarsAvailable">
                 <CurrencyDisplay
                   amount={{
                     value: dollarBalance,
