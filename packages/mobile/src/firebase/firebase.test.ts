@@ -14,9 +14,10 @@ const hasPermissionMock = jest.fn(() => null)
 const requestPermissionMock = jest.fn(() => null)
 const getTokenMock = jest.fn(() => null)
 const onTokenRefreshMock = jest.fn(() => null)
-const onNotificationMock = jest.fn((fn) => null)
-const onNotificationOpenedMock = jest.fn((fn) => null)
+const onNotificationMock = jest.fn(() => null)
+const onNotificationOpenedMock = jest.fn(() => null)
 const getInitialNotificationMock = jest.fn(() => null)
+const setBackgroundMessageHandler = jest.fn(() => null)
 
 const address = mockAccount2
 const mockFcmToken = 'token'
@@ -27,6 +28,7 @@ const app: any = {
     requestPermission: requestPermissionMock,
     getToken: getTokenMock,
     onTokenRefresh: onTokenRefreshMock,
+    setBackgroundMessageHandler,
   }),
   notifications: () => ({
     onNotification: onNotificationMock,

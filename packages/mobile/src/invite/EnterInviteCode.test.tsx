@@ -1,6 +1,6 @@
+import dynamicLinks from '@react-native-firebase/dynamic-links'
 import * as React from 'react'
 import { Clipboard } from 'react-native'
-import firebase from 'react-native-firebase'
 import SendIntentAndroid from 'react-native-send-intent'
 import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
@@ -126,8 +126,8 @@ describe('EnterInviteCode Screen', () => {
 
   it('calls redeem invite with valid invite key in install referrer data', async () => {
     const redeem = jest.fn()
-    const getInitialLink = firebase.links().getInitialLink as jest.Mock
-    getInitialLink.mockResolvedValueOnce(VALID_REFERRER_INVITE_URL)
+    const getInitialLink = dynamicLinks().getInitialLink as jest.Mock
+    getInitialLink.mockResolvedValueOnce({ url: VALID_REFERRER_INVITE_URL })
 
     render(
       <Provider store={createMockStore()}>
@@ -151,8 +151,8 @@ describe('EnterInviteCode Screen', () => {
 
   it('does not proceed with an invalid invite key in install referrer data', async () => {
     const redeem = jest.fn()
-    const getInitialLink = firebase.links().getInitialLink as jest.Mock
-    getInitialLink.mockResolvedValueOnce(INVALID_REFERRER_INVITE_URL)
+    const getInitialLink = dynamicLinks().getInitialLink as jest.Mock
+    getInitialLink.mockResolvedValueOnce({ url: INVALID_REFERRER_INVITE_URL })
 
     render(
       <Provider store={createMockStore()}>

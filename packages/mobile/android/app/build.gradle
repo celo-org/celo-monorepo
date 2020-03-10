@@ -269,16 +269,6 @@ dependencies {
 
     def multidex_version = "2.0.1"
     implementation 'androidx.multidex:multidex:$multidex_version'
-
-    implementation platform("com.google.firebase:firebase-bom:22.2.0")
-    implementation 'com.google.android.gms:play-services-base'
-    implementation 'com.google.firebase:firebase-core'
-    implementation 'com.google.firebase:firebase-messaging'
-    implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-invites'
-    implementation 'com.google.firebase:firebase-storage'
-    implementation "com.google.firebase:firebase-dynamic-links"
     implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.7'
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'

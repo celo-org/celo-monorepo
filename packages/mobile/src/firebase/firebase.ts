@@ -1,8 +1,9 @@
+import firebase, { ReactNativeFirebase } from '@react-native-firebase/app'
+import _database from '@react-native-firebase/database'
+import _messaging from '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
-import firebase, { Firebase } from 'react-native-firebase'
-import { RemoteMessage } from 'react-native-firebase/messaging'
-import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
+// import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState } from 'src/account/types'
@@ -44,7 +45,7 @@ export function* watchFirebaseNotificationChannel(
   }
 }
 
-export const initializeAuth = async (app: Firebase, address: string) => {
+export const initializeAuth = async (app: ReactNativeFirebase.Module, address: string) => {
   Logger.info(TAG, 'Initializing Firebase auth')
   const user = await app.auth().signInAnonymously()
   if (!user) {
@@ -53,7 +54,7 @@ export const initializeAuth = async (app: Firebase, address: string) => {
 
   const userRef = app.database().ref('users')
   // Save some user data in DB if it's not there yet
-  await userRef.child(user.user.uid).transaction((userData) => {
+  await userRef.child(user.user.uid).transaction((userData?: { address: string }) => {
     if (userData == null) {
       return { address }
     } else if (userData.address !== undefined && userData.address !== address) {
@@ -65,7 +66,7 @@ export const initializeAuth = async (app: Firebase, address: string) => {
   Logger.info(TAG, 'Firebase Auth initialized successfully')
 }
 
-export function* initializeCloudMessaging(app: Firebase, address: string) {
+export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, address: string) {
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
 
   // this call needs to include context: https://github.com/redux-saga/redux-saga/issues/27
@@ -93,53 +94,56 @@ export function* initializeCloudMessaging(app: Firebase, address: string) {
   })
 
   // Listen for notification messages while the app is open
-  const channelOnNotification: EventChannel<{
-    notification: Notification
-    stateType: NotificationReceiveState
-  }> = eventChannel((emitter) => {
-    const unsuscribe = () => {
-      Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
-      app.notifications().onNotification(() => null)
-      app.notifications().onNotificationOpened(() => null)
-    }
+  // const channelOnNotification: EventChannel<{
+  // notification: Notification
+  // stateType: NotificationReceiveState
+  // }> = eventChannel((emitter) => {
+  // const unsuscribe = () => {
+  // Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
+  // app.notifications().onNotification(() => null)
+  // app.notifications().onNotificationOpened(() => null)
+  // }
 
-    app.notifications().onNotification((notification: Notification) => {
-      Logger.info(TAG, 'Notification received while open')
-      emitter({ notification, stateType: NotificationReceiveState.APP_ALREADY_OPEN })
-    })
+  // app.notifications().onNotification((notification: Notification) => {
+  // Logger.info(TAG, 'Notification received while open')
+  // emitter({ notification, stateType: NotificationReceiveState.APP_ALREADY_OPEN })
+  // })
 
-    app.notifications().onNotificationOpened((notification: NotificationOpen) => {
-      Logger.info(TAG, 'App opened via a notification')
-      emitter({
-        notification: notification.notification,
-        stateType: NotificationReceiveState.APP_FOREGROUNDED,
-      })
-    })
-    return unsuscribe
-  })
-  yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
+  // app.notifications().onNotificationOpened((notification: NotificationOpen) => {
+  // Logger.info(TAG, 'App opened via a notification')
+  // emitter({
+  // notification: notification.notification,
+  // stateType: NotificationReceiveState.APP_FOREGROUNDED,
+  // })
+  // })
+  // return unsuscribe
+  // })
+  // yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
-  const initialNotification = yield call([app.notifications(), 'getInitialNotification'])
-  if (initialNotification) {
-    Logger.info(TAG, 'App opened fresh via a notification')
-    yield call(
-      handleNotification,
-      initialNotification.notification,
-      NotificationReceiveState.APP_OPENED_FRESH
+  // const initialNotification = yield call([app.notifications(), 'getInitialNotification'])
+  // if (initialNotification) {
+  // Logger.info(TAG, 'App opened fresh via a notification')
+  // yield call(
+  // handleNotification,
+  // initialNotification.notification,
+  // NotificationReceiveState.APP_OPENED_FRESH
+  // )
+  // }
+
+  app.messaging().setBackgroundMessageHandler((remoteMessage) => {
+    Logger.info(TAG, 'recieved Notification while app in Background')
+    Sentry.captureMessage(
+      `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
     )
-  }
+    return Promise.resolve() // need to return a resolved promise so native code releases the JS context
+  })
 }
 
-export async function onBackgroundNotification(remoteMessage: RemoteMessage) {
-  Logger.info(TAG, 'recieved Notification while app in Background')
-  Sentry.captureMessage(
-    `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
-  )
-  // https://facebook.github.io/react-native/docs/0.44/appregistry#registerheadlesstask
-  return Promise.resolve() // need to return a resolved promise so native code releases the JS context
-}
-
-export const registerTokenToDb = async (app: Firebase, address: string, fcmToken: string) => {
+export const registerTokenToDb = async (
+  app: ReactNativeFirebase.Module,
+  address: string,
+  fcmToken: string
+) => {
   try {
     Logger.info(TAG, 'Registering Firebase client FCM token')
     const regRef = app.database().ref('registrations')
