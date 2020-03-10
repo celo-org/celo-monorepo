@@ -66,7 +66,7 @@ class BackupSocialIntro extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <SafeguardsPeopleIcon />
+          <SafeguardsPeopleIcon style={styles.logo} width={229} height={149} />
           <Text style={styles.h1}>{t('socialBackupIntro.header')}</Text>
           <Text style={styles.body}>{t('socialBackupIntro.body')}</Text>
           <Text style={[styles.body, fontStyles.bold]}>{t('socialBackupIntro.warning')}</Text>
@@ -107,15 +107,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     justifyContent: 'center',
   },
-  //TODO
-  // logo: {
-  //   alignSelf: 'center',
-  //   height: 75,
-  //   width: 75,
-  // },
+  logo: {
+    alignSelf: 'center',
+  },
   h1: {
     ...fontStyles.h1,
-    marginTop: 15,
+    marginTop: 30,
   },
   body: {
     ...fontStyles.body,

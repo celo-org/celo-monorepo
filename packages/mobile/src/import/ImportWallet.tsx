@@ -104,7 +104,7 @@ export class ImportWallet extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <BackupKeyIcon />
+          <BackupKeyIcon style={styles.logo} width={140} height={102} />
           <Text style={fontStyles.h1}>{t('title')}</Text>
           <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
           <BackupPhraseContainer
@@ -160,12 +160,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 0,
   },
-  // TODO
-  // logo: {
-  //   alignSelf: 'center',
-  //   height: 75,
-  //   width: 75,
-  // },
+  logo: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
   tip: {
     ...fontStyles.bodySmall,
     color: colors.darkSecondary,

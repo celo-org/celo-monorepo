@@ -74,7 +74,7 @@ class PincodeEducation extends React.Component<Props> {
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
-            <LockedPhoneIcon style={style.pincodeLogo} /*TODO?*/ />
+            <LockedPhoneIcon style={style.logo} height={150} width={150} />
             <Text style={style.h1} testID="SystemAuthTitle">
               {t('pincodeEducation.title')}
             </Text>
@@ -132,7 +132,7 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  pincodeLogo: {
+  logo: {
     alignSelf: 'center',
   },
   body: {

@@ -58,7 +58,7 @@ export class ImportWalletEmpty extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.emptyWarningContainer}>
-          <BackupKeyIcon />
+          <BackupKeyIcon style={styles.logo} />
           <Text style={fontStyles.h1}>{getMoneyDisplayValue(0)}</Text>
           <Text style={fontStyles.bodyLarge}>{t('emptyWalletWarning')}</Text>
           <Text style={fontStyles.bodyLarge}>{t('useEmptyAnyway')}</Text>
@@ -96,13 +96,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
-  //TODO
-  // logo: {
-  //   marginBottom: 20,
-  //   alignSelf: 'center',
-  //   height: 75,
-  //   width: 75,
-  // },
+  logo: {
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
   emptyWarningContainer: {
     flex: 1,
     alignItems: 'center',

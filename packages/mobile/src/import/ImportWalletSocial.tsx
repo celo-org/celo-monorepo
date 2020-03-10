@@ -101,7 +101,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <SafeguardsIcon />
+          <SafeguardsIcon style={styles.logo} width={147} height={75} />
           <Text style={fontStyles.h1}>{t('restoreSocial')}</Text>
           <Text style={fontStyles.body}>{t('socialImportInfo')}</Text>
           <BackupPhraseContainer
@@ -162,12 +162,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 0,
   },
-  //TODO
-  // logo: {
-  //   alignSelf: 'center',
-  //   height: 75,
-  //   width: 75,
-  // },
+  logo: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
   tip: {
     ...fontStyles.bodySmall,
     color: colors.darkSecondary,

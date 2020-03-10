@@ -101,7 +101,7 @@ class BackupIntroduction extends React.Component<Props> {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           {!backupCompleted && (
             <>
-              <BackupIntroIcon />
+              <BackupIntroIcon style={styles.logo} width={180} height={138} />
               <Text style={styles.h1}>{t('setUpBackupKey')}</Text>
               <Text style={styles.body}>{t('backupKeyIntro.0')}</Text>
               <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.1')}</Text>
@@ -110,7 +110,7 @@ class BackupIntroduction extends React.Component<Props> {
           )}
           {backupCompleted && !socialBackupCompleted && (
             <>
-              <SafeguardsIcon />
+              <SafeguardsIcon style={styles.logo} width={210} height={90} />
               <Text style={styles.h1}>{t('setUpSocialBackup')}</Text>
               <Text style={styles.body}>
                 {t('backupKeyIntro.2')}
@@ -121,7 +121,7 @@ class BackupIntroduction extends React.Component<Props> {
           )}
           {backupCompleted && socialBackupCompleted && (
             <>
-              <BackupKeyIcon />
+              <BackupKeyIcon style={styles.logo} width={170} height={125} />
               <Text style={styles.h1}>{t('backupComplete.header')}</Text>
               <Text style={styles.body}>
                 {t('backupKeyIntro.2')}
@@ -205,18 +205,15 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     paddingHorizontal: 30,
-    paddingBottom: 20,
+    paddingBottom: 30,
     justifyContent: 'center',
   },
-  //TODO
-  // logo: {
-  //   alignSelf: 'center',
-  //   height: 75,
-  //   width: 75,
-  // },
+  logo: {
+    alignSelf: 'center',
+    marginBottom: 30,
+  },
   h1: {
     ...fontStyles.h1,
-    marginTop: 15,
   },
   body: {
     ...fontStyles.body,
