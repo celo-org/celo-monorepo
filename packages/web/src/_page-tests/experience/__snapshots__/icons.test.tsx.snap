@@ -1135,9 +1135,15 @@ exports[`Experience/Icons renders 1`] = `
               dir="auto"
               style={
                 Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "20px",
+                  "fontWeight": "500",
+                  "lineHeight": "24px",
                   "marginLeft": "10px",
                   "marginRight": "10px",
                   "marginTop": "60px",
+                  "textRendering": "geometricPrecision",
                 }
               }
             >
@@ -1193,6 +1199,41 @@ exports[`Experience/Icons renders 1`] = `
                   }
                 >
                   Creative Commons Attribution-NoDerivatives 4.0 International License
+                </a>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/code-of-conduct"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "opacity": 1,
+                      "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
+                    }
+                  }
+                >
+                  Code of Conduct
                 </a>
               </div>
             </div>
