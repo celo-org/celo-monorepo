@@ -6,6 +6,7 @@
   "activity": "Activity",
   "goldActivity": "Gold Activity",
   "exchangeRate": "Exchange Rate",
+  "exchangeRateValue": "<0></0> : 1 {{takerTokenCode}}",
   "history": "History",
   "exchange": "Exchange",
   "buy": "Buy",

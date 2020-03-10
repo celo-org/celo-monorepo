@@ -6,6 +6,7 @@
   "activity": "Actividad",
   "goldActivity": "Actividad de Oro",
   "exchangeRate": "Tasa de cambio",
+  "exchangeRateValue": "<0></0> : 1 {{takerTokenCode}}",
   "history": "Historial",
   "exchange": "Cambio",
   "buy": "Comprar",
