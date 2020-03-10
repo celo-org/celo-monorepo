@@ -112,8 +112,8 @@ export class Web3ContractCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
-  getGovernanceApproverMultiSig() {
-    return this.getContract(CeloContract.GovernanceApproverMultiSig)
+  getGovernanceApproverMultiSig(address: string) {
+    return this.getContract(CeloContract.GovernanceApproverMultiSig, address)
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
@@ -127,8 +127,8 @@ export class Web3ContractCache {
   getReserve() {
     return this.getContract(CeloContract.Reserve)
   }
-  getReserveSpenderMultiSig() {
-    return this.getContract(CeloContract.ReserveSpenderMultiSig)
+  getReserveSpenderMultiSig(address: string) {
+    return this.getContract(CeloContract.ReserveSpenderMultiSig, address)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
@@ -146,14 +146,14 @@ export class Web3ContractCache {
   /**
    * Get native web3 contract wrapper
    */
-  async getContract<C extends keyof typeof ContractFactories>(contract: C) {
+  async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
       const createFn = ContractFactories[contract] as CFType[C]
       // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
-        await this.kit.registry.addressFor(contract)
+        address ? address : await this.kit.registry.addressFor(contract)
       ) as NonNullable<ContractCacheMap[C]>
     }
     // we know it's defined (thus the !)

@@ -9,6 +9,7 @@ import { ProposalBuilder } from '../governance'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { GovernanceWrapper, Proposal, VoteValue } from './Governance'
+import { GovernanceApproverMultiSigWrapper } from './GovernanceApproverMultiSig'
 import { LockedGoldWrapper } from './LockedGold'
 
 const expConfig = NetworkConfig.governance
@@ -21,6 +22,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
   let accounts: Address[] = []
   let governance: GovernanceWrapper
+  let governanceApproverMultiSig: GovernanceApproverMultiSigWrapper
   let lockedGold: LockedGoldWrapper
   let accountWrapper: AccountsWrapper
   let registry: Registry
@@ -29,6 +31,9 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     governance = await kit.contracts.getGovernance()
+    governanceApproverMultiSig = await kit.contracts.getGovernanceApproverMultiSig(
+      await governance.getApprover()
+    )
     registry = await kit._web3Contracts.getRegistry()
     lockedGold = await kit.contracts.getLockedGold()
     accountWrapper = await kit.contracts.getAccounts()
@@ -96,7 +101,11 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     // protocol/truffle-config defines approver address as accounts[0]
     const approveFn = async () => {
       const tx = await governance.approve(proposalID)
-      await tx.sendAndWaitForReceipt({ from: accounts[0] })
+      const multisigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
+        governance.address,
+        tx.txo
+      )
+      await multisigTx.sendAndWaitForReceipt({ from: accounts[0] })
       await timeTravel(expConfig.approvalStageDuration, web3)
     }
 

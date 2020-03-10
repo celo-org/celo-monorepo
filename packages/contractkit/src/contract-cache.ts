@@ -123,8 +123,8 @@ export class WrapperCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
-  getGovernanceApproverMultiSig() {
-    return this.getContract(CeloContract.GovernanceApproverMultiSig)
+  getGovernanceApproverMultiSig(address: string) {
+    return this.getContract(CeloContract.GovernanceApproverMultiSig, address)
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
@@ -135,8 +135,8 @@ export class WrapperCache {
   getReserve() {
     return this.getContract(CeloContract.Reserve)
   }
-  getReserveSpenderMultiSig() {
-    return this.getContract(CeloContract.ReserveSpenderMultiSig)
+  getReserveSpenderMultiSig(address: string) {
+    return this.getContract(CeloContract.ReserveSpenderMultiSig, address)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
@@ -151,9 +151,9 @@ export class WrapperCache {
   /**
    * Get Contract wrapper
    */
-  public async getContract<C extends ValidWrappers>(contract: C) {
+  public async getContract<C extends ValidWrappers>(contract: C, address?: string) {
     if (this.wrapperCache[contract] == null) {
-      const instance = await this.kit._web3Contracts.getContract(contract)
+      const instance = await this.kit._web3Contracts.getContract(contract, address)
       const Klass: CFType[C] = WrapperFactories[contract]
       this.wrapperCache[contract] = new Klass(this.kit, instance as any) as any
     }

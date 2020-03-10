@@ -104,7 +104,7 @@ export const handler = async (argv: FaucetArgv) => {
 
       if (!goldAmount.isZero()) {
         if (await reserve.isSpender(account)) {
-          await (await reserve.transferGold(address, goldAmount.toFixed())).sendAndWaitForReceipt()
+          await reserve.transferGold(address, goldAmount.toFixed()).sendAndWaitForReceipt()
         } else {
           await goldToken.transfer(address, goldAmount.toFixed()).sendAndWaitForReceipt()
         }

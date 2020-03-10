@@ -508,11 +508,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   async approve(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
-    const multisig = await this.kit.contracts.getGovernanceApproverMultiSig()
-    const txData = this.contract.methods
-      .approve(valueToString(proposalID), proposalIndex)
-      .encodeABI()
-    return multisig.submitOrConfirmTransaction(this.contract._address, txData)
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.approve(valueToString(proposalID), proposalIndex)
+    )
   }
 
   /**
