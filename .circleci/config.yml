@@ -878,13 +878,13 @@ jobs:
         command: |
           cd packages/celotool/bin
           bash integration.sh ${CI_INTEGRATION_ENV}
-    # - run:
-    #     name: Deploy contracts
-    #     command: |
-    #       echo $(pwd)
-    #       cd ~/app/
-    #       source ".env.${CI_INTEGRATION_ENV}"
-    #       packages/celotool/bin/celotooljs.sh deploy initial contracts -e ${CI_INTEGRATION_ENV} --verbose 2>&1
+    - run:
+        name: Deploy contracts
+        command: |
+          echo $(pwd)
+          cd ~/app/
+          source ".env.${CI_INTEGRATION_ENV}"
+          packages/celotool/bin/celotooljs.sh deploy initial contracts -e ${CI_INTEGRATION_ENV} --verbose 2>&1
     # - run:
     #     name: Deploy celostats
     #     command: |
