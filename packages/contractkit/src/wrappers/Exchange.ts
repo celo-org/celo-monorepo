@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { Exchange } from '../generated/types/Exchange'
+import { Exchange } from '../generated/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,

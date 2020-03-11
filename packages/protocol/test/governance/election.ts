@@ -948,7 +948,8 @@ contract('Election', (accounts: string[]) => {
           .map(normalizeAddressWith0x)
           .map((a) => numbers[a])
           .sort((a, b) => a - b)[0]
-        const number100th = Object.values(numbers).sort((a: any, b: any) => b - a)[99]
+        // TODO fix types
+        const number100th = (Object as any).values(numbers).sort((a: any, b: any) => b - a)[99]
         assert.equal(smallest, number100th)
       })
     })
