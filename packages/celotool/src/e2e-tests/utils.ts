@@ -135,6 +135,7 @@ export async function shutdownOrKill(processName: string) {
   }
 
   if (processRemaining) {
+    console.info('shutdownOrKill: clean shutdown failed')
     await spawnCmd('pkill', ['-SIGKILL', processName], { silent: true })
   }
 }
