@@ -71,56 +71,67 @@ else
   echo "INFO: Network started in ${networkStartTime} seconds"
 fi
 
-# # Deploy the contracts
-# ps auxf
-# "$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | grep -v "Handling connection for 8545" | tee "${LOGS_DIR}/migration.log" 
-# if [ $? = 1 ]; then
-#   CONTRACTS_FAILED=true
-# fi
+# Deploy the contracts
+"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | grep -v "Handling connection for 8545" | tee "${LOGS_DIR}/migration.log" &
+pid=$!
+contracts_timeout=600 #seconds
+CONTRACTS_FAILED=True
+while [[ "${CONTRACTS_FAILED}" == "True" ]] || ! [[ contracts_timeout -gt 0 ]]; do
+  if fgrep --quiet "Contracs deployed successfully to scenario2" "${LOGS_DIR}/migration.log"; then
+    kill $pid
+    CONTRACTS_FAILED=False
+  fi
+  sleep 10
+  contracts_timeout="$((contracts_timeout-10))"
+done
+if [[ ${CONTRACTS_FAILED} == "True" ]]; then
+  echo "Contract Deployment failed"
+  exit 1
+fi
 
-# # Verify contracts
-# # "$DIR/celotooljs.sh" deploy initial verify-contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/verify.log"
+# Verify contracts
+# "$DIR/celotooljs.sh" deploy initial verify-contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/verify.log"
 
-# # Install packages
-# # Celostats
-# if helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-celostats$" >/dev/null 2>&1; then
-#   "$DIR/celotooljs.sh" deploy upgrade celostats -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/celostats.log"
-# else
-#   "$DIR/celotooljs.sh" deploy initial celostats -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/celostats.log"
-# fi
-# if [ $? = 1 ]; then
-#   ETHSTATS_FAILED=true
-# fi
+# Install packages
+# Celostats
+if helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-celostats$" >/dev/null 2>&1; then
+  "$DIR/celotooljs.sh" deploy upgrade celostats -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/celostats.log"
+else
+  "$DIR/celotooljs.sh" deploy initial celostats -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/celostats.log"
+fi
+if [ $? = 1 ]; then
+  ETHSTATS_FAILED=true
+fi
 
-# # Blockscout
-# gcloud --project="${TESTNET_PROJECT_NAME}" sql instances describe "${ENV}${BLOCKSCOUT_DB_SUFFIX}" >/dev/null 2>&1
-# DB_EXISTS=$?
-# helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-blockscout${BLOCKSCOUT_DB_SUFFIX}$" >/dev/null 2>&1
-# BLOCKSCOUT_HELM_EXISTS=$?
-# if [ ${DB_EXISTS} -ne 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -ne 0 ]; then
-#   # Neither DB nor Helm release exists
-#   "$DIR/celotooljs.sh" deploy initial blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
-# elif [ ${DB_EXISTS} -ne 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -eq 0 ]; then
-#   # DB does not exist but helm release does. We should not have reach this situation
-#   helm delete --purge "${ENV}-blosckscout${BLOCKSCOUT_DB_SUFFIX}"
-#   "$DIR/celotooljs.sh" deploy initial blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
-# elif [ ${DB_EXISTS} -eq 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -ne 0 ]; then
-#   # DB exists but helm release does not
-#   "$DIR/celotooljs.sh" deploy migrate blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
-# elif [ ${DB_EXISTS} -eq 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -eq 0 ]; then
-#   # Blockscout and helm release already exists
-#   "$DIR/celotooljs.sh" deploy upgrade blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
-# fi
-# if [ $? = 1 ]; then
-#   BLOCKSCOUT_FAILED=true
-# fi
+# Blockscout
+gcloud --project="${TESTNET_PROJECT_NAME}" sql instances describe "${ENV}${BLOCKSCOUT_DB_SUFFIX}" >/dev/null 2>&1
+DB_EXISTS=$?
+helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-blockscout${BLOCKSCOUT_DB_SUFFIX}$" >/dev/null 2>&1
+BLOCKSCOUT_HELM_EXISTS=$?
+if [ ${DB_EXISTS} -ne 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -ne 0 ]; then
+  # Neither DB nor Helm release exists
+  "$DIR/celotooljs.sh" deploy initial blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
+elif [ ${DB_EXISTS} -ne 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -eq 0 ]; then
+  # DB does not exist but helm release does. We should not have reach this situation
+  helm delete --purge "${ENV}-blosckscout${BLOCKSCOUT_DB_SUFFIX}"
+  "$DIR/celotooljs.sh" deploy initial blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
+elif [ ${DB_EXISTS} -eq 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -ne 0 ]; then
+  # DB exists but helm release does not
+  "$DIR/celotooljs.sh" deploy migrate blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
+elif [ ${DB_EXISTS} -eq 0 ] && [ ${BLOCKSCOUT_HELM_EXISTS} -eq 0 ]; then
+  # Blockscout and helm release already exists
+  "$DIR/celotooljs.sh" deploy upgrade blockscout -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/blockscout.log"
+fi
+if [ $? = 1 ]; then
+  BLOCKSCOUT_FAILED=true
+fi
 
-# # Oracle
-# if helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-oracle$" >/dev/null 2>&1; then
-#   "$DIR/celotooljs.sh" deploy upgrade oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
-# else
-#   "$DIR/celotooljs.sh" deploy initial oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
-# fi
-# if [ $? = 1 ]; then
-#   ORACLE_FAILED=true
-# fi
+# Oracle
+if helm list --namespace "${ENV}" -aq | grep -E "^${ENV}-oracle$" >/dev/null 2>&1; then
+  "$DIR/celotooljs.sh" deploy upgrade oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
+else
+  "$DIR/celotooljs.sh" deploy initial oracle -e ${ENV} ${VERBOSE_OPTS} 2>&1 | tee "${LOGS_DIR}/oracle.log"
+fi
+if [ $? = 1 ]; then
+  ORACLE_FAILED=true
+fi
