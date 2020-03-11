@@ -19,11 +19,6 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     undefined,
     valueToBigNumber
   )
-
-  /**
-   * Check is spender is a signatory of the multiSig spender address
-   * @param account
-   */
   isSpender: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isSpender)
   transferGold = proxySend(this.kit, this.contract.methods.transferGold)
 

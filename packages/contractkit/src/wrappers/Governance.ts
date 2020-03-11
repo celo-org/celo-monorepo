@@ -502,7 +502,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   /**
    * Approves given proposal, allowing it to later move to `referendum`.
-   * Approval leverages multisig.
    * @param proposalID Governance proposal UUID
    * @notice Only the `approver` address will succeed in sending this transaction
    */

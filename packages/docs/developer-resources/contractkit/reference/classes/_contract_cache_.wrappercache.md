@@ -98,7 +98,7 @@ ___
 
 ###  getContract
 
-▸ **getContract**<**C**>(`contract`: C): *Promise‹WrapperCacheMap[C] extends undefined | null ? never : WrapperCacheMap[C]›*
+▸ **getContract**<**C**>(`contract`: C, `address?`: undefined | string): *Promise‹WrapperCacheMap[C] extends undefined | null ? never : WrapperCacheMap[C]›*
 
 *Defined in [contractkit/src/contract-cache.ts:154](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L154)*
 
@@ -113,6 +113,7 @@ Get Contract wrapper
 Name | Type |
 ------ | ------ |
 `contract` | C |
+`address?` | undefined &#124; string |
 
 **Returns:** *Promise‹WrapperCacheMap[C] extends undefined | null ? never : WrapperCacheMap[C]›*
 
@@ -200,9 +201,15 @@ ___
 
 ###  getGovernanceApproverMultiSig
 
-▸ **getGovernanceApproverMultiSig**(): *Promise‹[GovernanceApproverMultiSigWrapper](_wrappers_governanceapprovermultisig_.governanceapprovermultisigwrapper.md)‹››*
+▸ **getGovernanceApproverMultiSig**(`address`: string): *Promise‹[GovernanceApproverMultiSigWrapper](_wrappers_governanceapprovermultisig_.governanceapprovermultisigwrapper.md)‹››*
 
 *Defined in [contractkit/src/contract-cache.ts:126](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L126)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
 
 **Returns:** *Promise‹[GovernanceApproverMultiSigWrapper](_wrappers_governanceapprovermultisig_.governanceapprovermultisigwrapper.md)‹››*
 
@@ -230,9 +237,15 @@ ___
 
 ###  getReserveSpenderMultiSig
 
-▸ **getReserveSpenderMultiSig**(): *Promise‹[ReserveSpenderMultiSigWrapper](_wrappers_reservespendermultisig_.reservespendermultisigwrapper.md)‹››*
+▸ **getReserveSpenderMultiSig**(`address`: string): *Promise‹[ReserveSpenderMultiSigWrapper](_wrappers_reservespendermultisig_.reservespendermultisigwrapper.md)‹››*
 
 *Defined in [contractkit/src/contract-cache.ts:138](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L138)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
 
 **Returns:** *Promise‹[ReserveSpenderMultiSigWrapper](_wrappers_reservespendermultisig_.reservespendermultisigwrapper.md)‹››*
 

@@ -17,11 +17,14 @@ Contract for handling multisig goverance approvar actions
 ### Properties
 
 * [isowner](_wrappers_reservespendermultisig_.reservespendermultisigwrapper.md#isowner)
-* [submitTransaction](_wrappers_reservespendermultisig_.reservespendermultisigwrapper.md#submittransaction)
 
 ### Accessors
 
 * [address](_wrappers_reservespendermultisig_.reservespendermultisigwrapper.md#address)
+
+### Methods
+
+* [submitOrConfirmTransaction](_wrappers_reservespendermultisig_.reservespendermultisigwrapper.md#submitorconfirmtransaction)
 
 ## Constructors
 
@@ -50,7 +53,7 @@ Name | Type |
 
 *Inherited from [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md).[isowner](_wrappers_multisig_.multisigwrapper.md#isowner)*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L27)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L40)*
 
 #### Type declaration:
 
@@ -61,34 +64,6 @@ Name | Type |
 Name | Type |
 ------ | ------ |
 `owner` | [Address](../modules/_base_.md#address) |
-
-___
-
-###  submitTransaction
-
-• **submitTransaction**: *function* = proxySend(
-    this.kit,
-    this.contract.methods.submitTransaction,
-    submitTransactionsParams
-  )
-
-*Inherited from [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md).[submitTransaction](_wrappers_multisig_.multisigwrapper.md#submittransaction)*
-
-*Defined in [contractkit/src/wrappers/MultiSig.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L21)*
-
-Allows an owner to submit and confirm a transaction.
-
-**`param`** The index of the pending withdrawal to withdraw.
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
 
 ## Accessors
 
@@ -103,3 +78,24 @@ Name | Type |
 Contract address
 
 **Returns:** *string*
+
+## Methods
+
+###  submitOrConfirmTransaction
+
+▸ **submitOrConfirmTransaction**(`destination`: string, `txObject`: TransactionObject‹any›): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*
+
+*Inherited from [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md).[submitOrConfirmTransaction](_wrappers_multisig_.multisigwrapper.md#submitorconfirmtransaction)*
+
+*Defined in [contractkit/src/wrappers/MultiSig.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L19)*
+
+Allows an owner to submit and confirm a transaction.
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`destination` | string |
+`txObject` | TransactionObject‹any› |
+
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*

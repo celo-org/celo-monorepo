@@ -107,7 +107,7 @@ ___
 
 ###  getContract
 
-▸ **getContract**<**C**>(`contract`: C): *Promise‹ContractCacheMap[C] extends undefined | null ? never : ContractCacheMap[C]›*
+▸ **getContract**<**C**>(`contract`: C, `address?`: undefined | string): *Promise‹ContractCacheMap[C] extends undefined | null ? never : ContractCacheMap[C]›*
 
 *Defined in [contractkit/src/web3-contract-cache.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L149)*
 
@@ -122,6 +122,7 @@ Get native web3 contract wrapper
 Name | Type |
 ------ | ------ |
 `contract` | C |
+`address?` | undefined &#124; string |
 
 **Returns:** *Promise‹ContractCacheMap[C] extends undefined | null ? never : ContractCacheMap[C]›*
 
@@ -239,9 +240,15 @@ ___
 
 ###  getGovernanceApproverMultiSig
 
-▸ **getGovernanceApproverMultiSig**(): *Promise‹GovernanceApproverMultiSig‹››*
+▸ **getGovernanceApproverMultiSig**(`address`: string): *Promise‹GovernanceApproverMultiSig‹››*
 
 *Defined in [contractkit/src/web3-contract-cache.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L115)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
 
 **Returns:** *Promise‹GovernanceApproverMultiSig‹››*
 
@@ -289,9 +296,15 @@ ___
 
 ###  getReserveSpenderMultiSig
 
-▸ **getReserveSpenderMultiSig**(): *Promise‹ReserveSpenderMultiSig‹››*
+▸ **getReserveSpenderMultiSig**(`address`: string): *Promise‹ReserveSpenderMultiSig‹››*
 
 *Defined in [contractkit/src/web3-contract-cache.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L130)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
 
 **Returns:** *Promise‹ReserveSpenderMultiSig‹››*
 
