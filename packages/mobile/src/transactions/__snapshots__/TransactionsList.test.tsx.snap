@@ -201,7 +201,7 @@ exports[`ignores failed standby transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#42D689",
+                      "color": "#81868B",
                     },
                     Array [
                       Object {
@@ -365,7 +365,7 @@ exports[`ignores failed standby transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#42D689",
+                      "color": "#2E3338",
                     },
                     Array [
                       Object {
@@ -414,7 +414,7 @@ exports[`ignores failed standby transactions 1`] = `
                 }
               >
                 
-                0.10
+                0.100
               </Text>
               <View
                 style={
@@ -695,7 +695,7 @@ exports[`ignores pending standby transactions that are completed in the response
                 style={
                   Array [
                     Object {
-                      "color": "#42D689",
+                      "color": "#81868B",
                     },
                     Array [
                       Object {
@@ -859,7 +859,7 @@ exports[`ignores pending standby transactions that are completed in the response
                 style={
                   Array [
                     Object {
-                      "color": "#42D689",
+                      "color": "#2E3338",
                     },
                     Array [
                       Object {
@@ -908,7 +908,7 @@ exports[`ignores pending standby transactions that are completed in the response
                 }
               >
                 
-                0.10
+                0.100
               </Text>
               <View
                 style={
@@ -1214,7 +1214,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#42D689",
+                      "color": "#81868B",
                     },
                     Array [
                       Object {
@@ -1418,7 +1418,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#42D689",
+                      "color": "#81868B",
                     },
                     Array [
                       Object {
@@ -1582,7 +1582,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#42D689",
+                      "color": "#2E3338",
                     },
                     Array [
                       Object {
@@ -1631,7 +1631,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 }
               >
                 
-                0.10
+                0.100
               </Text>
               <View
                 style={

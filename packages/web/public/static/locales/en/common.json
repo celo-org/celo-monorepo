@@ -13,6 +13,7 @@
   "Twitter": "Twitter",
   "github": "GitHub",
   "Privacy Policy": "Privacy Policy",
+  "email": "Email",
   "weUseCookies": "We use cookies on our website",
   "weUseCookiesReasons": "to better understand how visitors use our site so that we can improve the experience.",
   "cookiesPrivacyInfo": "By selecting Agree, you consent to our use of cookies in accordance with our",
@@ -57,5 +58,10 @@
   "experienceLabel": "Experience",
   "conductLabel": "Code of Conduct",
   "conductText": "Shared norms and behaviors are the foundation of a beautiful community. Please read and respect our code of conduct.",
-  "socialLabel": "Engage"
+  "socialLabel": "Engage",
+  "validationErrors": {
+    "email": "Please enter a valid email",
+    "generic": "Oops I’m blank!",
+    "unknownError": "Something went wrong"
+  }
 }

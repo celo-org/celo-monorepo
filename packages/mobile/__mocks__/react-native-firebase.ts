@@ -1,18 +1,19 @@
 const createShortDynamicLink = jest.fn()
+const getInitialLink = jest.fn()
 
 function links() {
   return {
     createShortDynamicLink,
+    getInitialLink,
   }
 }
 
 links.DynamicLink = jest.fn(() => ({
   android: {
-    setFallbackUrl: jest.fn(),
     setPackageName: jest.fn(),
   },
   ios: {
-    setFallbackUrl: jest.fn(),
+    setAppStoreId: jest.fn(),
     setBundleId: jest.fn(),
   },
 }))
