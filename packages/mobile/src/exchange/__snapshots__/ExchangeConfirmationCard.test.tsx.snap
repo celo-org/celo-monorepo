@@ -232,6 +232,17 @@ exports[`renders correctly with giant numbers 1`] = `
         : 1 
         cGLD
       </Text>
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontSize": 12,
+            "textAlign": "center",
+          }
+        }
+      >
+        includeExchangeFee
+      </Text>
     </View>
   </View>
 </View>
@@ -468,6 +479,17 @@ exports[`renders correctly with no exchange rate 1`] = `
          
         : 1 
         cUSD
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontSize": 12,
+            "textAlign": "center",
+          }
+        }
+      >
+        includeExchangeFee
       </Text>
     </View>
   </View>

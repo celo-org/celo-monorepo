@@ -26,7 +26,7 @@ export default function ExchangeConfirmationCard(props: Props) {
         <CurrencyDisplay type={DisplayType.Big} amount={takerAmount} size={36} useColors={true} />
       </View>
       <View style={styles.details}>
-        <ExchangeRate makerAmount={makerAmount} takerAmount={takerAmount} />
+        <ExchangeRate makerAmount={makerAmount} takerAmount={takerAmount} showFinePrint={true} />
       </View>
     </View>
   )
