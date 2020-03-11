@@ -8,7 +8,6 @@ import CreateAccount from './create-account'
 import LockedGold from './locked-gold'
 
 process.env.NO_SYNCCHECK = 'true'
-jest.setTimeout(10000)
 
 testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
   let contractAddress: string

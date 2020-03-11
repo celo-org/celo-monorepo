@@ -8,7 +8,6 @@ import Revoke from './revoke'
 import Show from './show'
 
 process.env.NO_SYNCCHECK = 'true'
-jest.setTimeout(10000)
 
 testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   let contractAddress: any

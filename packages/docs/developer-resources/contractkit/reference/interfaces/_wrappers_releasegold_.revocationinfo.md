@@ -18,7 +18,7 @@
 
 • **releasedBalanceAtRevoke**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L28)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L34)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **revocable**: *boolean*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L27)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L33)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **revokeTime**: *number*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L29)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L35)*

@@ -13,24 +13,33 @@ USAGE
   $ celocli releasegold:authorize
 
 OPTIONS
-  --action=vote|validator|attestation                    (required)
+  --blsKey=0x                                            The BLS public key that the validator is using for consensus,
+                                                         should pass proof of possession. 96 bytes.
+
+  --blsPop=0x                                            The BLS public key proof-of-possession, which consists of a
+                                                         signature on the account address. 48 bytes.
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-  --pop=pop                                              (required) Proof-of-possession of the signer key
+
+  --role=vote|validator|attestation                      (required)
+
+  --signature=signature                                  (required) Signature (a.k.a. proof-of-possession) of the signer
+                                                         key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The signer key that is to be used for voting through
                                                          the ReleaseGold instance
 
 EXAMPLES
-  authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --action vote --signer
-  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop
+  authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
-  authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --action validator --signer
-  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop
+  authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role validator --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
-  authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --action attestation --signer
-  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --pop
+  authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role attestation --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
 ```
@@ -54,28 +63,26 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/releasegold/create-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/create-account.ts)_
 
-### Gold
+### Locked-gold
 
 Perform actions [lock, unlock, relock, withdraw] on the gold held in the given contract.
 
 ```
 USAGE
-  $ celocli releasegold:gold
+  $ celocli releasegold:locked-gold
 
 OPTIONS
   -a, --action=lock|unlock|relock|withdraw               (required) Action to perform on contract's gold
-  -i, --index=index                                      Index for relocking and withdrawing pending withdrawal
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
   --value=10000000000000000000000                        (required) Amount of gold to perform `action` with
 
 EXAMPLES
-  gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action lock --value 10000000000000000000000
-  gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action unlock --value 10000000000000000000000
-  gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action relock --value 10000000000000000000000 --index 0
-  gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action withdraw --value 10000000000000000000000 --index 0
+  locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action lock --value 10000000000000000000000
+  locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action unlock --value 10000000000000000000000
+  locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action withdraw --value 10000000000000000000000
 ```
 
-_See code: [packages/cli/src/commands/releasegold/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/gold.ts)_
+_See code: [packages/cli/src/commands/releasegold/locked-gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/locked-gold.ts)_
 
 ### Refund-and-finalize
 
@@ -257,6 +264,26 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/releasegold/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/show.ts)_
+
+### Transfer
+
+Transfer stable tokens from the given contract address
+
+```
+USAGE
+  $ celocli releasegold:transfer
+
+OPTIONS
+  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        (required) Address of the recipient of stable token transfer
+  --value=10000000000000000000000                        (required) Value (in Wei) of stable token to transfer
+
+EXAMPLE
+  transfer --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb --value
+  10000000000000000000000
+```
+
+_See code: [packages/cli/src/commands/releasegold/transfer.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/transfer.ts)_
 
 ### Withdraw
 

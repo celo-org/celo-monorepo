@@ -20,7 +20,7 @@
 
 • **amountReleasedPerPeriod**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L23)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L29)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **numReleasePeriods**: *number*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L21)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L27)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **releaseCliff**: *number*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L20)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L26)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **releasePeriod**: *number*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L22)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L28)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **releaseStartTime**: *number*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L19)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L25)*

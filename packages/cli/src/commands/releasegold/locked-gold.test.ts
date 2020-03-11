@@ -5,7 +5,6 @@ import CreateAccount from './create-account'
 import LockedGold from './locked-gold'
 
 process.env.NO_SYNCCHECK = 'true'
-jest.setTimeout(10000)
 
 testWithGanache('releasegold:locked-gold cmd', (web3: Web3) => {
   test('can lock gold with pending withdrawals', async () => {
