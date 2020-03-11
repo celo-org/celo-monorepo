@@ -119,6 +119,15 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
   const goldToken = await kit.contracts.getGoldToken()
   // const epochRewards = await kit.contracts.getEpochRewards()
 
+  enum LoggingCategory {
+    Block = 'RECEIVED_BLOCK',
+    ParsedLog = 'RECEIVED_PARSED_LOG',
+    ParsedTransaction = 'RECEIVED_PARSED_TRANSACTION',
+    State = 'RECEIVED_STATE',
+    Transaction = 'RECEIVED_TRANSACTION',
+    TransactionReceipt = 'RECEIVED_TRANSACTION_RECEIPT',
+  }
+
   function toMethodId(txInput: string, isKnownCall: boolean): string {
     let methodId: string
     if (txInput === '0x') {
@@ -140,36 +149,36 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     return parsedTxMap
   }
 
-  async function fetchState()   {
-
+  async function fetchState() {
     // Fetching public state
     // Stability
-    exchange.getBuyAndSellBuckets(true)
-      .then( buckets => logEvent('RECEIVED_STATE', buckets))
+    exchange
+      .getBuyAndSellBuckets(true)
+      .then((buckets) => logEvent(LoggingCategory.State, buckets))
       .catch()
 
-    sortedOracles.medianRate(CeloContract.StableToken)
-      .then( medianRate => logEvent('RECEIVED_STATE', medianRate))
+    sortedOracles
+      .medianRate(CeloContract.StableToken)
+      .then((medianRate) => logEvent(LoggingCategory.State, medianRate))
       .catch()
 
     // reserve.getReserveGoldBalance()
-    //   .then(goldBalance => logEvent('RECEIVED_STATE', goldBalance))
+    //   .then(goldBalance => logEvent(LoggingCategory.State, goldBalance))
     //   .catch()
 
     // PoS
-    goldToken.totalSupply()
-      .then( goldTokenTotalSupply => logEvent('RECEIVED_STATE', goldTokenTotalSupply))
+    goldToken
+      .totalSupply()
+      .then((goldTokenTotalSupply) => logEvent(LoggingCategory.State, goldTokenTotalSupply))
       .catch()
-    
 
     // epochRewards.getTargetGoldTotalSupply()
-    //   .then(rewardsAmount => logEvent('RECEIVED_STATE', rewardsAmount))
+    //   .then(rewardsAmount => logEvent(LoggingCategory.State, rewardsAmount))
     //   .catch()
 
     // epochRewards.getRewardsMultiplier()
-    //   .then(rewardsMultiplier => logEvent('RECEIVED_STATE', rewardsMultiplier))
+    //   .then(rewardsMultiplier => logEvent(LoggingCategory.State, rewardsMultiplier))
     //   .catch()
-   
   }
 
   return async (header: BlockHeader) => {
@@ -178,8 +187,8 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     const block = await blockExplorer.fetchBlock(header.number)
     const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
 
-    const blockTime = block.timestamp - Number(previousBlock.timestamp)
-    logEvent('RECEIVED_BLOCK', { ...block, blockTime })
+    const blockTime = block.timestamp - previousBlock.timestamp
+    logEvent(LoggingCategory.Block, { ...block, blockTime })
 
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
@@ -190,9 +199,9 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     for (const tx of parsedBlock.block.transactions) {
       const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)
 
-      logEvent('RECEIVED_TRANSACTION', tx)
+      logEvent(LoggingCategory.Transaction, tx)
       const receipt = await kit.web3.eth.getTransactionReceipt(tx.hash)
-      logEvent('RECEIVED_TRANSACTION_RECEIPT', receipt)
+      logEvent(LoggingCategory.TransactionReceipt, receipt)
 
       const labels = {
         to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
@@ -210,7 +219,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           function: parsedTx.callDetails.function,
         })
 
-        logEvent('RECEIVED_PARSED_TRANSACTION', { ...parsedTx.callDetails, hash: tx.hash })
+        logEvent(LoggingCategory.ParsedTransaction, { ...parsedTx.callDetails, hash: tx.hash })
 
         for (const event of logExplorer.getKnownLogs(receipt)) {
           Counters.transactionParsedLogs.inc({
@@ -223,7 +232,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           event.eventName = event.event
           delete event.event
 
-          logEvent('RECEIVED_PARSED_LOG', event)
+          logEvent(LoggingCategory.ParsedLog, event)
         }
       }
     }
