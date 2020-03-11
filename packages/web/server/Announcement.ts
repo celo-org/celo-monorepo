@@ -40,7 +40,7 @@ export default async function latestAnnouncements(ipAddress: string): Promise<Fi
 async function fetchAnouncmentRecords() {
   const records = (await getAirtable()
     .select({
-      maxRecords: 1,
+      maxRecords: 10,
       filterByFormula: IS_LIVE,
       sort: [{ field: 'order', direction: 'desc' }],
     })
