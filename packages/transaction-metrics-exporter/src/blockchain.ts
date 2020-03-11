@@ -16,10 +16,15 @@ const EMPTY_INPUT = 'empty_input'
 const NO_METHOD_ID = 'no_method_id'
 const NOT_WHITELISTED_ADDRESS = 'not_whitelisted_address'
 const UNKNOWN_METHOD = 'unknown_method'
+let BLOCK_INTERVAL = 1
 
-export async function metricExporterWithRestart(providerUrl: string) {
+export async function metricExporterWithRestart(providerUrl: string, blockInterval: number) {
   try {
+    BLOCK_INTERVAL = blockInterval
     console.log('MetricExporter: Start')
+    console.log('ProviderUrl: ' + providerUrl)
+    console.log('Block Interval: ' + BLOCK_INTERVAL)
+
     let kit = newKit(providerUrl)
     while (true) {
       console.log('MetricExporter: Run Start')
@@ -193,8 +198,10 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
 
-    // tslint:disable-next-line: no-floating-promises
-    fetchState()
+    if (header.number%BLOCK_INTERVAL === 0)  {
+      // tslint:disable-next-line: no-floating-promises
+      fetchState()
+    }
 
     for (const tx of parsedBlock.block.transactions) {
       const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)

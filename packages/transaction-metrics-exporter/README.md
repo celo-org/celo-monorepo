@@ -8,3 +8,10 @@ use `celotooljs port-forward -e SOME_ENV` and set `WEB3_PROVIDER="ws://localhost
 You can then start the server on port `3000` by running `yarn dev`.
 Metrics are exposed as the prometheus format under `/metrics` and it logs structured
 JSON of blocks and headers to STDOUT.
+
+You can specify the frequency that agent uses to fetch the public state from Smart Contracts using the `BLOCK_INTERVAL` environment variable (1 by default).
+
+```bash
+# Will fetch the public state each 5 blocks
+export BLOCK_INTERVAL=5 
+```
