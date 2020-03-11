@@ -13,7 +13,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
@@ -235,6 +235,7 @@ export class ExchangeReview extends React.Component<Props, State> {
                       value: tobinTax,
                       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                     }}
+                    formatType={FormatType.Fee}
                   />
                 }
               />
@@ -247,6 +248,7 @@ export class ExchangeReview extends React.Component<Props, State> {
                       value: fee,
                       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                     }}
+                    formatType={FormatType.Fee}
                   />
                 }
               />

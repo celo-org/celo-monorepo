@@ -274,7 +274,7 @@ exports[`ExchangeReview renders correctly 1`] = `
               >
                 
                 $
-                0.00
+                0.001
               </Text>
             </Text>
           </View>
@@ -389,7 +389,7 @@ exports[`ExchangeReview renders correctly 1`] = `
               >
                 
                 $
-                0.00
+                0.001
               </Text>
             </Text>
           </View>
