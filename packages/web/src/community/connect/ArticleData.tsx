@@ -12,7 +12,11 @@ async function getArticles() {
   return res.json()
 }
 
-export default class ArticleData extends React.PureComponent {
+interface Props {
+  title: string
+}
+
+export default class ArticleData extends React.PureComponent<Props> {
   state = { articles: [], loaded: false }
 
   componentDidMount = async () => {
@@ -22,6 +26,6 @@ export default class ArticleData extends React.PureComponent {
 
   render() {
     const { articles, loaded } = this.state
-    return <ArticlesSection articles={articles} loading={!loaded} />
+    return <ArticlesSection title={this.props.title} articles={articles} loading={!loaded} />
   }
 }

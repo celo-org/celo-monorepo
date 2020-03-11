@@ -10673,6 +10673,18 @@ bls12377js@celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49:
     ts-node "^8.4.1"
     typescript "^3.6.4"
 
+"bls12377js@https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac":
+  version "0.1.0"
+  resolved "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac"
+  dependencies:
+    "@stablelib/blake2xs" "0.10.4"
+    "@types/node" "^12.11.7"
+    big-integer "^1.6.44"
+    chai "^4.2.0"
+    mocha "^6.2.2"
+    ts-node "^8.4.1"
+    typescript "^3.6.4"
+
 "bls12377js@https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c":
   version "0.1.0"
   resolved "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
@@ -25108,7 +25120,7 @@ mysql2@2.0.0-alpha1:
     seq-queue "^0.0.5"
     sqlstring "^2.3.1"
 
-mz@^2.6.0:
+mz@^2.6.0, mz@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/mz/-/mz-2.7.0.tgz#95008057a56cafadc2bc63dde7f9ff6955948e32"
   integrity sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==
@@ -30119,6 +30131,13 @@ read-installed@~4.0.3:
     util-extend "^1.0.1"
   optionalDependencies:
     graceful-fs "^4.1.2"
+
+read-last-lines@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/read-last-lines/-/read-last-lines-1.7.2.tgz#d96d40566d70aca260a85acefb00d523ea3e74ad"
+  integrity sha512-K0yUvTYAYn6qpyLJufaJ7yC6BeL23qpgZ8SKM7/fA1R1rHotCDxB/zDp9i1I2JHvexWBW6/35jkt07iiIKKp4g==
+  dependencies:
+    mz "^2.7.0"
 
 "read-package-json@1 || 2", read-package-json@^2.0.0, read-package-json@^2.0.13, read-package-json@~2.0.4, read-package-json@~2.0.9:
   version "2.0.13"

@@ -7,5 +7,5 @@ export async function getCountryFromIP(ip: string) {
 
   const geodata = await fetch(`http://api.ipstack.com/${ip}?access_key=${key}`)
   const data = await geodata.json()
-  return data.country_code as string
+  return data.country_code || ''
 }
