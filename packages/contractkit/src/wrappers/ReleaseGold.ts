@@ -252,6 +252,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     tupleParser(valueToString)
   )
 
+  transfer: (to: Address, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.transfer,
+    tupleParser(valueToString, valueToString)
+  )
+
   /**
    * Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock
