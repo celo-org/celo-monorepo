@@ -192,7 +192,7 @@ const COLUMN_WIDTH = 180
 
 const styles = StyleSheet.create({
   selectionArea: { maxWidth: 220 },
-  membersArea: { minHeight: 600 },
+  membersArea: { minHeight: 650 },
   memberTitle: { marginBottom: 5 },
   grayLine: {
     marginTop: 2,

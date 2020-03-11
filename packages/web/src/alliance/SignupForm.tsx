@@ -4,9 +4,10 @@ import { NewMember } from 'src/alliance/AllianceMember'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { CheckboxWithLabel, ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import Checkmark from 'src/icons/Checkmark'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { standardStyles } from 'src/styles'
+import { colors, standardStyles } from 'src/styles'
 
 const BLANK_FORM: NewMember = {
   name: '',
@@ -87,6 +88,7 @@ export default function SignupForm() {
               onPress={onAltSubmit}
               kind={BTN.PRIMARY}
               style={styles.buttonText}
+              iconRight={formState.isComplete && <Checkmark color={colors.white} size={18} />}
               size={isMobile ? SIZE.fullWidth : SIZE.big}
             />
           </View>
