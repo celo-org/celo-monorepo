@@ -30,7 +30,7 @@ export interface OwnProps {
   recipient?: Recipient
 }
 
-// Bordered content placed in a ReviewFrame
+// Content placed in a ReviewFrame
 // Differs from TransferConfirmationCard which is used for viewing completed txs
 function TransferReviewCard({
   recipient,

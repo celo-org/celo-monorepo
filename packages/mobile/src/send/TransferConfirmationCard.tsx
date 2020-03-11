@@ -3,7 +3,6 @@ import Link from '@celo/react-components/components/Link'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -35,7 +34,7 @@ export interface TransferConfirmationCardProps {
 
 type Props = TransferConfirmationCardProps & WithTranslation
 
-// Bordered content placed in a ReviewFrame
+// Content placed in a ReviewFrame
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
 const onPressGoToFaq = () => {
   navigateToURI(FAQ_LINK)
@@ -156,7 +155,7 @@ const renderBottomSection = (props: Props) => {
 
 export function TransferConfirmationCard(props: Props) {
   return (
-    <View style={[componentStyles.roundedBorder, style.container]}>
+    <View style={style.container}>
       {renderTopSection(props)}
       {renderAmountSection(props)}
       {renderBottomSection(props)}
@@ -166,10 +165,7 @@ export function TransferConfirmationCard(props: Props) {
 
 const style = StyleSheet.create({
   container: {
-    paddingVertical: 40,
-    paddingHorizontal: 20,
     marginVertical: 20,
-    minWidth: variables.width * 0.75,
   },
   bottomContainer: {
     marginTop: 5,

@@ -1,4 +1,3 @@
-import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
@@ -34,8 +33,6 @@ export default function ExchangeConfirmationCard(props: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 1,
-    borderColor: colors.darkLightest,
     justifyContent: 'center',
     paddingHorizontal: 20,
   },

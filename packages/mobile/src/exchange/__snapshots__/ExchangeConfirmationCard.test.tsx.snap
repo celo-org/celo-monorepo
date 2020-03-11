@@ -4,8 +4,6 @@ exports[`renders correctly with giant numbers 1`] = `
 <View
   style={
     Object {
-      "borderColor": "#EEEEEE",
-      "borderWidth": 1,
       "justifyContent": "center",
       "paddingHorizontal": 20,
     }
@@ -252,8 +250,6 @@ exports[`renders correctly with no exchange rate 1`] = `
 <View
   style={
     Object {
-      "borderColor": "#EEEEEE",
-      "borderWidth": 1,
       "justifyContent": "center",
       "paddingHorizontal": 20,
     }

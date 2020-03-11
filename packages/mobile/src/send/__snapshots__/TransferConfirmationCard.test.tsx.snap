@@ -3,19 +3,9 @@
 exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "marginVertical": 20,
-        "minWidth": 562.5,
-        "paddingHorizontal": 20,
-        "paddingVertical": 40,
-      },
-    ]
+    Object {
+      "marginVertical": 20,
+    }
   }
 >
   <Image
@@ -148,19 +138,9 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
 exports[`TransferConfirmationCard renders correctly for received escrow transaction drilldown 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "marginVertical": 20,
-        "minWidth": 562.5,
-        "paddingHorizontal": 20,
-        "paddingVertical": 40,
-      },
-    ]
+    Object {
+      "marginVertical": 20,
+    }
   }
 >
   <View
@@ -378,19 +358,9 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
 exports[`TransferConfirmationCard renders correctly for received transaction drilldown 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "marginVertical": 20,
-        "minWidth": 562.5,
-        "paddingHorizontal": 20,
-        "paddingVertical": 40,
-      },
-    ]
+    Object {
+      "marginVertical": 20,
+    }
   }
 >
   <View
@@ -608,19 +578,9 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
 exports[`TransferConfirmationCard renders correctly for sent escrow transaction drilldown 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "marginVertical": 20,
-        "minWidth": 562.5,
-        "paddingHorizontal": 20,
-        "paddingVertical": 40,
-      },
-    ]
+    Object {
+      "marginVertical": 20,
+    }
   }
 >
   <View
@@ -856,19 +816,9 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
 exports[`TransferConfirmationCard renders correctly for sent transaction drilldown 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "marginVertical": 20,
-        "minWidth": 562.5,
-        "paddingHorizontal": 20,
-        "paddingVertical": 40,
-      },
-    ]
+    Object {
+      "marginVertical": 20,
+    }
   }
 >
   <View
@@ -1104,19 +1054,9 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
 exports[`TransferConfirmationCard renders correctly for verification fee drilldown 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "marginVertical": 20,
-        "minWidth": 562.5,
-        "paddingHorizontal": 20,
-        "paddingVertical": 40,
-      },
-    ]
+    Object {
+      "marginVertical": 20,
+    }
   }
 >
   <Image
