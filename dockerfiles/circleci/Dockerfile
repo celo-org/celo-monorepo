@@ -25,8 +25,8 @@ ENV PATH="/usr/local/go/bin:/home/circleci/.cargo/bin:${PATH}"
 
 RUN go version
 
-RUN rustup install 1.36.0 && \
-  rustup default 1.36.0
+RUN rustup install 1.41.0 && \
+  rustup default 1.41.0
 
 RUN mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
