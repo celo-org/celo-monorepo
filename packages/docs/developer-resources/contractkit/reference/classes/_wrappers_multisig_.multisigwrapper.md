@@ -55,7 +55,7 @@ Name | Type |
 
 • **isowner**: *function* = proxyCall(this.contract.methods.isOwner)
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L40)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L35)*
 
 #### Type declaration:
 
@@ -87,7 +87,7 @@ Contract address
 
 ▸ **submitOrConfirmTransaction**(`destination`: string, `txObject`: TransactionObject‹any›): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L19)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L14)*
 
 Allows an owner to submit and confirm a transaction.
 

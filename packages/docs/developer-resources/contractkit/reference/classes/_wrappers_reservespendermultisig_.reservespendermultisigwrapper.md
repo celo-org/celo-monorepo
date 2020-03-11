@@ -53,7 +53,7 @@ Name | Type |
 
 *Inherited from [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md).[isowner](_wrappers_multisig_.multisigwrapper.md#isowner)*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L40)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L35)*
 
 #### Type declaration:
 
@@ -87,7 +87,7 @@ Contract address
 
 *Inherited from [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md).[submitOrConfirmTransaction](_wrappers_multisig_.multisigwrapper.md#submitorconfirmtransaction)*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L19)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L14)*
 
 Allows an owner to submit and confirm a transaction.
 
