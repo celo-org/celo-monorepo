@@ -25,7 +25,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "alignItems": "center",
           "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
@@ -67,7 +66,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         <View
           style={
             Object {
-              "margin": 20,
+              "marginHorizontal": 16,
+              "marginVertical": 20,
             }
           }
         >
@@ -200,6 +200,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   "borderStyle": "solid",
                   "borderTopColor": "#EEEEEE",
                   "borderTopWidth": 1,
+                  "marginBottom": 15,
                   "marginTop": 10,
                   "width": "100%",
                 }
@@ -270,29 +271,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     totalSentInCeloDollars
@@ -300,12 +308,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 </View>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -355,29 +366,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               </Text>
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     securityFee
@@ -424,7 +442,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       style={
                         Object {
                           "height": 12,
-                          "tintColor": "#42D689",
+                          "tintColor": "#BDBDBD",
                           "width": 12,
                         }
                       }
@@ -452,29 +470,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               </View>
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     totalRefunded
@@ -482,12 +507,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 </View>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -728,7 +756,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "alignItems": "center",
           "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
@@ -770,7 +797,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           style={
             Object {
-              "margin": 20,
+              "marginHorizontal": 16,
+              "marginVertical": 20,
             }
           }
         >
@@ -903,6 +931,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   "borderStyle": "solid",
                   "borderTopColor": "#EEEEEE",
                   "borderTopWidth": 1,
+                  "marginBottom": 15,
                   "marginTop": 10,
                   "width": "100%",
                 }
@@ -973,29 +1002,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     totalSentInCeloDollars
@@ -1003,12 +1039,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 </View>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -1058,29 +1097,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               </Text>
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     securityFee
@@ -1127,7 +1173,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       style={
                         Object {
                           "height": 12,
-                          "tintColor": "#42D689",
+                          "tintColor": "#BDBDBD",
                           "width": 12,
                         }
                       }
@@ -1155,29 +1201,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               </View>
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     totalRefunded
@@ -1185,12 +1238,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 </View>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -1431,7 +1487,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "alignItems": "center",
           "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
@@ -1473,7 +1528,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           style={
             Object {
-              "margin": 20,
+              "marginHorizontal": 16,
+              "marginVertical": 20,
             }
           }
         >
@@ -1606,6 +1662,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   "borderStyle": "solid",
                   "borderTopColor": "#EEEEEE",
                   "borderTopWidth": 1,
+                  "marginBottom": 15,
                   "marginTop": 10,
                   "width": "100%",
                 }
@@ -1676,29 +1733,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     totalSentInCeloDollars
@@ -1706,12 +1770,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 </View>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text
@@ -1761,29 +1828,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               </Text>
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     securityFee
@@ -1830,7 +1904,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       style={
                         Object {
                           "height": 12,
-                          "tintColor": "#42D689",
+                          "tintColor": "#BDBDBD",
                           "width": 12,
                         }
                       }
@@ -1839,12 +1913,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 </View>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   ---
@@ -1852,29 +1929,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               </View>
               <View
                 style={
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginTop": 5,
-                  }
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginVertical": 5,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
                   style={
                     Object {
-                      "alignItems": "flex-start",
+                      "alignItems": "center",
                       "flexDirection": "row",
+                      "marginRight": 5,
                     }
                   }
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     totalRefunded
@@ -1882,12 +1966,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 </View>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <Text

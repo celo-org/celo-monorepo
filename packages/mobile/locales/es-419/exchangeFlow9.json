@@ -16,7 +16,6 @@
   "exchangeAmount": "Monto ({{tokenName}})",
   "switchTo": "Cambiar a {{tokenName}}",
   "subtotalAmount": "Total parcial @ <2></2>",
-  "subtotal": "Total parcial",
   "inputSubtotal": "Total parcial (@ <2></2>)",
   "inputSubtotal_gold": "$t(global:celoGold) (@ <2></2>)",
   "cancel": "Cancelar",

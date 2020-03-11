@@ -130,6 +130,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         "borderStyle": "solid",
         "borderTopColor": "#EEEEEE",
         "borderTopWidth": 1,
+        "marginBottom": 15,
         "marginTop": 10,
         "width": "100%",
       }
@@ -218,29 +219,36 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
   >
     <View
       style={
-        Object {
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginTop": 5,
-        }
+        Array [
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginVertical": 5,
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           Object {
-            "alignItems": "flex-start",
+            "alignItems": "center",
             "flexDirection": "row",
+            "marginRight": 5,
           }
         }
       >
         <Text
           style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 20,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 15,
+                "lineHeight": 24,
+              },
+              undefined,
+            ]
           }
         >
           totalSentInCeloDollars
@@ -248,12 +256,15 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       </View>
       <Text
         style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 20,
-          }
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 24,
+            },
+            undefined,
+          ]
         }
       >
         <Text
@@ -303,29 +314,36 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
     </Text>
     <View
       style={
-        Object {
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginTop": 5,
-        }
+        Array [
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginVertical": 5,
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           Object {
-            "alignItems": "flex-start",
+            "alignItems": "center",
             "flexDirection": "row",
+            "marginRight": 5,
           }
         }
       >
         <Text
           style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 20,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 15,
+                "lineHeight": 24,
+              },
+              undefined,
+            ]
           }
         >
           securityFee
@@ -372,7 +390,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             style={
               Object {
                 "height": 12,
-                "tintColor": "#42D689",
+                "tintColor": "#BDBDBD",
                 "width": 12,
               }
             }
@@ -381,12 +399,15 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       </View>
       <Text
         style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 20,
-          }
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 24,
+            },
+            undefined,
+          ]
         }
       >
         <Text
@@ -407,29 +428,36 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
     </View>
     <View
       style={
-        Object {
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginTop": 5,
-        }
+        Array [
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginVertical": 5,
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           Object {
-            "alignItems": "flex-start",
+            "alignItems": "center",
             "flexDirection": "row",
+            "marginRight": 5,
           }
         }
       >
         <Text
           style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 20,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 15,
+                "lineHeight": 24,
+              },
+              undefined,
+            ]
           }
         >
           totalRefunded
@@ -437,12 +465,15 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       </View>
       <Text
         style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 20,
-          }
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 24,
+            },
+            undefined,
+          ]
         }
       >
         <Text

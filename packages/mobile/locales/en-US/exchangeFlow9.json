@@ -16,7 +16,6 @@
   "exchangeAmount": "Amount ({{tokenName}})",
   "switchTo": "Switch to {{tokenName}}",
   "subtotalAmount": "Subtotal @ <2></2>",
-  "subtotal": "Subtotal",
   "inputSubtotal": "Subtotal (@ <2></2>)",
   "inputSubtotal_gold": "$t(global:celoGold) (@ <2></2>)",
   "cancel": "Cancel",

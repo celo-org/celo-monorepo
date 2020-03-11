@@ -25,7 +25,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "alignItems": "center",
           "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
@@ -67,7 +66,8 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         <View
           style={
             Object {
-              "margin": 20,
+              "marginHorizontal": 16,
+              "marginVertical": 20,
             }
           }
         >
@@ -314,6 +314,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     "borderStyle": "solid",
                     "borderTopColor": "#EEEEEE",
                     "borderTopWidth": 1,
+                    "marginBottom": 15,
                     "marginTop": 10,
                     "width": "100%",
                   }
@@ -331,29 +332,36 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               >
                 <View
                   style={
-                    Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "marginTop": 5,
-                    }
+                    Array [
+                      Object {
+                        "flexDirection": "row",
+                        "justifyContent": "space-between",
+                        "marginVertical": 5,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <View
                     style={
                       Object {
-                        "alignItems": "flex-start",
+                        "alignItems": "center",
                         "flexDirection": "row",
+                        "marginRight": 5,
                       }
                     }
                   >
                     <Text
                       style={
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 14,
-                          "lineHeight": 20,
-                        }
+                        Array [
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 15,
+                            "lineHeight": 24,
+                          },
+                          undefined,
+                        ]
                       }
                     >
                       amountInCeloDollars
@@ -361,12 +369,15 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   </View>
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     <Text
@@ -416,29 +427,36 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 </Text>
                 <View
                   style={
-                    Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "marginTop": 5,
-                    }
+                    Array [
+                      Object {
+                        "flexDirection": "row",
+                        "justifyContent": "space-between",
+                        "marginVertical": 5,
+                      },
+                      undefined,
+                    ]
                   }
                 >
                   <View
                     style={
                       Object {
-                        "alignItems": "flex-start",
+                        "alignItems": "center",
                         "flexDirection": "row",
+                        "marginRight": 5,
                       }
                     }
                   >
                     <Text
                       style={
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 14,
-                          "lineHeight": 20,
-                        }
+                        Array [
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 15,
+                            "lineHeight": 24,
+                          },
+                          undefined,
+                        ]
                       }
                     >
                       newAccountBalance
@@ -446,12 +464,15 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   </View>
                   <Text
                     style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 15,
+                          "lineHeight": 24,
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     <Text

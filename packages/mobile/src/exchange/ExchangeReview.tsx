@@ -15,6 +15,8 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
+import LineItemRow from 'src/components/LineItemRow'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -203,8 +205,8 @@ export class ExchangeReview extends React.Component<Props, State> {
                 />
               </View>
               <HorizontalLine />
-              <View style={styles.subtotalRowContainer}>
-                <Text style={styles.exchangeBodyText}>
+              <LineItemRow
+                title={
                   <Trans i18nKey="subtotalAmount" ns={Namespaces.exchangeFlow9}>
                     Subtotal @{' '}
                     <CurrencyDisplay
@@ -214,69 +216,42 @@ export class ExchangeReview extends React.Component<Props, State> {
                       }}
                     />
                   </Trans>
-                </Text>
-                <CurrencyDisplay
-                  style={styles.exchangeBodyText}
-                  amount={{
-                    value: dollarAmount.toString(),
-                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                  }}
-                />
-              </View>
-              <View style={styles.feeRowContainer}>
-                <View style={styles.feeTextWithIconContainer}>
-                  <Text style={styles.exchangeBodyText}>{t('exchangeFee')}</Text>
-                  <FeeIcon tintColor={colors.lightGray} isExchange={true} />
-                </View>
-                <CurrencyDisplay
-                  style={styles.exchangeBodyText}
-                  amount={{
-                    value: tobinTax,
-                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                  }}
-                />
-              </View>
-              <View style={styles.feeRowContainer}>
-                <View style={styles.feeTextWithIconContainer}>
-                  <Text style={styles.exchangeBodyText}>{t('securityFee')}</Text>
-                  <FeeIcon tintColor={colors.lightGray} />
-                </View>
-                <CurrencyDisplay
-                  style={styles.exchangeBodyText}
-                  amount={{
-                    value: fee,
-                    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                  }}
-                />
-              </View>
-              <HorizontalLine />
-              <View style={styles.totalContainer}>
-                <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
-                <CurrencyDisplay style={fontStyles.bodyBold} amount={totalAmount} />
-              </View>
-              {localCurrencyCode !== LocalCurrencyCode.USD && !!localCurrencyExchangeRate && (
-                <View style={styles.totalDollarsContainer}>
-                  <Text style={styles.dollarsText}>
-                    <Trans i18nKey="totalInDollars" ns={Namespaces.exchangeFlow9}>
-                      Celo Dollars (@{' '}
-                      <CurrencyDisplay
-                        amount={{
-                          value: new BigNumber(localCurrencyExchangeRate).pow(-1).toString(),
-                          currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                        }}
-                        showLocalAmount={false}
-                      />
-                      )
-                    </Trans>
-                  </Text>
+                }
+                amount={
                   <CurrencyDisplay
-                    style={styles.dollarsText}
-                    amount={totalAmount}
-                    hideSymbol={true}
-                    showLocalAmount={false}
+                    amount={{
+                      value: dollarAmount.toString(),
+                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                    }}
                   />
-                </View>
-              )}
+                }
+              />
+              <LineItemRow
+                title={t('exchangeFee')}
+                titleIcon={<FeeIcon />}
+                amount={
+                  <CurrencyDisplay
+                    amount={{
+                      value: tobinTax,
+                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                    }}
+                  />
+                }
+              />
+              <LineItemRow
+                title={t('securityFee')}
+                titleIcon={<FeeIcon isExchange={true} />}
+                amount={
+                  <CurrencyDisplay
+                    amount={{
+                      value: fee,
+                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                    }}
+                  />
+                }
+              />
+              <HorizontalLine />
+              <TotalLineItem amount={totalAmount} />
             </View>
           </ScrollView>
         </View>
@@ -324,30 +299,15 @@ const styles = StyleSheet.create({
   flexStart: {
     justifyContent: 'flex-start',
   },
-  headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
-  exchangeBodyText: { ...fontStyles.body, fontSize: 15 },
-  currencyAmountText: { ...fontStyles.body, fontSize: 24, lineHeight: 39, color: colors.celoGreen },
-  dollarsText: { ...fontStyles.body, fontSize: 15, color: colors.darkSecondary },
-  feeTextWithIconContainer: { flexDirection: 'row', alignItems: 'center' },
-  totalContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
+  exchangeBodyText: {
+    ...fontStyles.body,
+    fontSize: 15,
   },
-  totalDollarsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  subtotalRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-    marginTop: 20,
-  },
-  feeRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
+  currencyAmountText: {
+    ...fontStyles.body,
+    fontSize: 24,
+    lineHeight: 39,
+    color: colors.celoGreen,
   },
   amountRow: {
     flexDirection: 'row',
