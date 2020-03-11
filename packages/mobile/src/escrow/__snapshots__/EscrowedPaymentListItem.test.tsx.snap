@@ -84,7 +84,9 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               }
             }
           >
-            Invited (
+            Invited and paid 
+            +14155550000
+             (
             <Text
               numberOfLines={1}
               style={
@@ -100,8 +102,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               $
               0.00
             </Text>
-            ) 
-            +14155550000
+            )
           </Text>
           <View
             style={

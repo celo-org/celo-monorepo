@@ -141,17 +141,12 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                         numberOfLines={1}
                         style={
                           Array [
-                            Array [
-                              Object {
-                                "color": "#81868B",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 20,
-                              },
-                              Object {
-                                "fontFamily": "Hind-SemiBold",
-                              },
-                            ],
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
                             Object {
                               "color": "#81868B",
                             },
@@ -189,17 +184,12 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                         numberOfLines={1}
                         style={
                           Array [
-                            Array [
-                              Object {
-                                "color": "#81868B",
-                                "fontFamily": "Hind-Regular",
-                                "fontSize": 14,
-                                "lineHeight": 20,
-                              },
-                              Object {
-                                "fontFamily": "Hind-SemiBold",
-                              },
-                            ],
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
                             Object {
                               "color": "#81868B",
                             },

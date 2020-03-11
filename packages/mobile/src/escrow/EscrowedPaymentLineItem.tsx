@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
   phone: fontStyles.subSmall,
   amount: {
     ...fontStyles.subSmall,
-    ...fontStyles.semiBold,
   },
 })
 

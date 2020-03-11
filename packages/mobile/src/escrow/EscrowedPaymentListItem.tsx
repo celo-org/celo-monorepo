@@ -76,25 +76,25 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
 
   render() {
     const { t, payment } = this.props
-    const mobile = this.getDisplayName() || t('global:unknown')
+    const mobile = this.getDisplayName() || t('global:unknown').toLowerCase()
 
     return (
       <View style={styles.container}>
         <BaseNotification
           title={
             <Trans
-              i18nKey="escrowPaymentNotificationTitle"
+              i18nKey="escrowPaymentNotificationTitl"
               ns={Namespaces.inviteFlow11}
               values={{ mobile }}
             >
-              Invited (
+              Invited and paid {{ mobile }} (
               <CurrencyDisplay
                 amount={{
                   value: divideByWei(payment.amount).toString(),
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
               />
-              ) {{ mobile }}
+              )
             </Trans>
           }
           icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}

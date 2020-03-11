@@ -28,7 +28,7 @@ function PaymentRequestNotificationInner(props: Props & WithTranslation) {
       >
         <Text style={fontStyles.subSmall}>{{ displayName }} for </Text>
         <CurrencyDisplay
-          style={[fontStyles.subSmall, fontStyles.semiBold]}
+          style={fontStyles.subSmall}
           amount={{
             value: amount,
             currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,

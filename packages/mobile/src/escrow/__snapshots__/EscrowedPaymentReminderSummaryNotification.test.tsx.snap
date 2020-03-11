@@ -120,7 +120,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#81868B",
-                      "fontFamily": "Hind-SemiBold",
+                      "fontFamily": "Hind-Regular",
                       "fontSize": 14,
                       "lineHeight": 20,
                     },
@@ -163,7 +163,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#81868B",
-                      "fontFamily": "Hind-SemiBold",
+                      "fontFamily": "Hind-Regular",
                       "fontSize": 14,
                       "lineHeight": 20,
                     },
@@ -316,7 +316,9 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 }
               }
             >
-              Invited (
+              Invited and paid 
+              +491522345678
+               (
               <Text
                 numberOfLines={1}
                 style={
@@ -332,8 +334,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 $
                 9.31
               </Text>
-              ) 
-              +491522345678
+              )
             </Text>
             <View
               style={
@@ -566,7 +567,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                   Array [
                     Object {
                       "color": "#81868B",
-                      "fontFamily": "Hind-SemiBold",
+                      "fontFamily": "Hind-Regular",
                       "fontSize": 14,
                       "lineHeight": 20,
                     },
@@ -609,7 +610,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                   Array [
                     Object {
                       "color": "#81868B",
-                      "fontFamily": "Hind-SemiBold",
+                      "fontFamily": "Hind-Regular",
                       "fontSize": 14,
                       "lineHeight": 20,
                     },

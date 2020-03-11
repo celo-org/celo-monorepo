@@ -29,7 +29,7 @@ exports[`renders correctly 1`] = `
       Array [
         Object {
           "color": "#81868B",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Hind-Regular",
           "fontSize": 14,
           "lineHeight": 20,
         },
