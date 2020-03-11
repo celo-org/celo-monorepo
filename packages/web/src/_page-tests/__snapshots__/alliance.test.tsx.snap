@@ -4262,7 +4262,7 @@ exports[`Alliance renders 1`] = `
       }
     >
       “
-      A fresh chance to build, interoperate, and secure new financial services applications.
+      The Alliance for Prosperity gives us a fresh chance to build, interoperate, and secure new financial services applications
       ”
     </div>
     <div
@@ -4397,7 +4397,7 @@ exports[`Alliance renders 1`] = `
           "flexDirection": "column",
           "marginBottom": "50px",
           "maxWidth": "100vw",
-          "minHeight": "600px",
+          "minHeight": "650px",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "paddingLeft": "10px",
@@ -4679,6 +4679,74 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
+                  members.categoryTitle.accept
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderRelease={[Function]}
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,1.00)",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "paddingBottom": "10px",
+                      "paddingLeft": "10px",
+                      "paddingRight": "10px",
+                      "paddingTop": "10px",
+                      "textOverflow": "ellipsis",
+                      "textRendering": "geometricPrecision",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  members.categoryTitle.acquire
+                </div>
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderRelease={[Function]}
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,1.00)",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "paddingBottom": "10px",
+                      "paddingLeft": "10px",
+                      "paddingRight": "10px",
+                      "paddingTop": "10px",
+                      "textOverflow": "ellipsis",
+                      "textRendering": "geometricPrecision",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
                   members.categoryTitle.build
                 </div>
                 <div
@@ -4883,40 +4951,6 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.pay
-                </div>
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  onClick={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
-                  style={
-                    Object {
-                      "backgroundColor": "rgba(255,255,255,1.00)",
-                      "color": "rgba(46,51,56,1.00)",
-                      "cursor": "pointer",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "paddingBottom": "10px",
-                      "paddingLeft": "10px",
-                      "paddingRight": "10px",
-                      "paddingTop": "10px",
-                      "textOverflow": "ellipsis",
-                      "textRendering": "geometricPrecision",
-                      "whiteSpace": "nowrap",
-                    }
-                  }
-                >
                   members.categoryTitle.preserve
                 </div>
                 <div
@@ -5021,40 +5055,6 @@ exports[`Alliance renders 1`] = `
                 >
                   members.categoryTitle.send
                 </div>
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  onClick={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
-                  style={
-                    Object {
-                      "backgroundColor": "rgba(255,255,255,1.00)",
-                      "color": "rgba(46,51,56,1.00)",
-                      "cursor": "pointer",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "paddingBottom": "10px",
-                      "paddingLeft": "10px",
-                      "paddingRight": "10px",
-                      "paddingTop": "10px",
-                      "textOverflow": "ellipsis",
-                      "textRendering": "geometricPrecision",
-                      "whiteSpace": "nowrap",
-                    }
-                  }
-                >
-                  members.categoryTitle.validate
-                </div>
               </div>
             </div>
           </div>
@@ -5079,6 +5079,148 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            members.categoryTitle.accept
+          </h4>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "borderBottomColor": "rgba(221,221,221,1.00)",
+                "borderBottomWidth": "1px",
+                "marginBottom": "10px",
+                "marginTop": "2px",
+              }
+            }
+          />
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            members.categoryText.accept
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxLines": "multiple",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "justify",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexWrap": "wrap",
+                "WebkitJustifyContent": "space-between",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-between",
+                "marginBottom": "30px",
+                "marginTop": "30px",
+                "minHeight": "90px",
+                "msFlexDirection": "row",
+                "msFlexPack": "justify",
+                "msFlexWrap": "wrap",
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <h4
+            aria-level="4"
+            className="css-reset-4rbku5 css-text-901oao"
+            dir="auto"
+            role="heading"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "24px",
+                "lineHeight": "32px",
+                "textRendering": "geometricPrecision",
+                "textTransform": "none",
+              }
+            }
+          >
+            members.categoryTitle.acquire
+          </h4>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "borderBottomColor": "rgba(221,221,221,1.00)",
+                "borderBottomWidth": "1px",
+                "marginBottom": "10px",
+                "marginTop": "2px",
+              }
+            }
+          />
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            members.categoryText.acquire
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxLines": "multiple",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "justify",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexWrap": "wrap",
+                "WebkitJustifyContent": "space-between",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-between",
+                "marginBottom": "30px",
+                "marginTop": "30px",
+                "minHeight": "90px",
+                "msFlexDirection": "row",
+                "msFlexPack": "justify",
+                "msFlexWrap": "wrap",
+              }
+            }
+          />
+        </div>
         <div
           className="css-view-1dbjc4n"
         >
@@ -5524,77 +5666,6 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.pay
-          </h4>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "borderBottomColor": "rgba(221,221,221,1.00)",
-                "borderBottomWidth": "1px",
-                "marginBottom": "10px",
-                "marginTop": "2px",
-              }
-            }
-          />
-          <div
-            className="css-text-901oao"
-            dir="auto"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
-                "textRendering": "geometricPrecision",
-              }
-            }
-          >
-            members.categoryText.pay
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitBoxDirection": "normal",
-                "WebkitBoxLines": "multiple",
-                "WebkitBoxOrient": "horizontal",
-                "WebkitBoxPack": "justify",
-                "WebkitFlexDirection": "row",
-                "WebkitFlexWrap": "wrap",
-                "WebkitJustifyContent": "space-between",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "justifyContent": "space-between",
-                "marginBottom": "30px",
-                "marginTop": "30px",
-                "minHeight": "90px",
-                "msFlexDirection": "row",
-                "msFlexPack": "justify",
-                "msFlexWrap": "wrap",
-              }
-            }
-          />
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-        >
-          <h4
-            aria-level="4"
-            className="css-reset-4rbku5 css-text-901oao"
-            dir="auto"
-            role="heading"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "24px",
-                "lineHeight": "32px",
-                "textRendering": "geometricPrecision",
-                "textTransform": "none",
-              }
-            }
-          >
             members.categoryTitle.preserve
           </h4>
           <div
@@ -5860,77 +5931,6 @@ exports[`Alliance renders 1`] = `
             }
           />
         </div>
-        <div
-          className="css-view-1dbjc4n"
-        >
-          <h4
-            aria-level="4"
-            className="css-reset-4rbku5 css-text-901oao"
-            dir="auto"
-            role="heading"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "24px",
-                "lineHeight": "32px",
-                "textRendering": "geometricPrecision",
-                "textTransform": "none",
-              }
-            }
-          >
-            members.categoryTitle.validate
-          </h4>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "borderBottomColor": "rgba(221,221,221,1.00)",
-                "borderBottomWidth": "1px",
-                "marginBottom": "10px",
-                "marginTop": "2px",
-              }
-            }
-          />
-          <div
-            className="css-text-901oao"
-            dir="auto"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
-                "textRendering": "geometricPrecision",
-              }
-            }
-          >
-            members.categoryText.validate
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitBoxDirection": "normal",
-                "WebkitBoxLines": "multiple",
-                "WebkitBoxOrient": "horizontal",
-                "WebkitBoxPack": "justify",
-                "WebkitFlexDirection": "row",
-                "WebkitFlexWrap": "wrap",
-                "WebkitJustifyContent": "space-between",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "justifyContent": "space-between",
-                "marginBottom": "30px",
-                "marginTop": "30px",
-                "minHeight": "90px",
-                "msFlexDirection": "row",
-                "msFlexPack": "justify",
-                "msFlexWrap": "wrap",
-              }
-            }
-          />
-        </div>
       </div>
     </div>
   </div>
@@ -6017,7 +6017,7 @@ exports[`Alliance renders 1`] = `
       }
     >
       “
-      Brings to life many of the potential possibilities of crypto.
+      Our hope is that this Alliance will start unlocking the potential of internet money
       ”
     </div>
     <div
@@ -6044,7 +6044,7 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
-        Diogo Monica, Anchorage
+        Katie Haun, Andreessen Horowitz
       </span>
     </div>
   </div>
