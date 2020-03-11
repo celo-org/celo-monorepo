@@ -6,7 +6,7 @@ import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -83,7 +83,6 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
                   value: this.props.amount,
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
-                formatType={FormatType.CentAware}
               />{' '}
               from {{ name }}
             </Trans>

@@ -98,7 +98,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
             >
               
               $
-              0
+              0.00
             </Text>
             ) 
             +14155550000

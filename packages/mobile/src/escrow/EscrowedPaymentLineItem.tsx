@@ -2,7 +2,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { Trans, WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
@@ -31,7 +31,6 @@ function EscrowedPaymentLineItem(props: Props & WithTranslation) {
             value: divideByWei(amount).toString(),
             currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
           }}
-          formatType={FormatType.CentAware}
         />
       </Trans>
     </Text>

@@ -8,7 +8,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -93,7 +93,6 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
                   value: divideByWei(payment.amount).toString(),
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
-                formatType={FormatType.CentAware}
               />
               ) {{ mobile }}
             </Trans>
