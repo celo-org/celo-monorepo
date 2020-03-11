@@ -12,9 +12,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
    * @param index The index of the pending withdrawal to withdraw.
    */
   async submitOrConfirmTransaction(destination: string, txObject: TransactionObject<any>) {
-    // async submitOrConfirmTransaction(destination: string, transaction: string) {
     const data = stringToBytes(txObject.encodeABI())
-    // const data = stringToBytes(transaction)
     const transactionCount = await this.contract.methods.getTransactionCount(true, true).call()
     let transactionId
     for (transactionId = 0; transactionId < Number(transactionCount); transactionId++) {
