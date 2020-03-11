@@ -72,7 +72,7 @@ export default function Main() {
         color={colors.white}
         imgSource={aguaComunidad}
         quote={
-          'A fresh chance to build, interoperate, and secure new financial services applications.'
+          'The Alliance for Prosperity gives us a fresh chance to build, interoperate, and secure new financial services applications'
         }
         citation={<Text style={styles.citation}>Gigi Gatti, Grameen Foundation</Text>}
       />
@@ -80,8 +80,10 @@ export default function Main() {
       <BeautifulQuote
         color={colors.dark}
         imgSource={fences}
-        quote={'Brings to life many of the potential possibilities of crypto.'}
-        citation={<Text style={styles.citation}>Diogo Monica, Anchorage</Text>}
+        quote={
+          'Our hope is that this Alliance will start unlocking the potential of internet money'
+        }
+        citation={<Text style={styles.citation}>Katie Haun, Andreessen Horowitz</Text>}
       />
       <ArticleData title={t('mediumArticlesTitle')} />
       <Benefits />
