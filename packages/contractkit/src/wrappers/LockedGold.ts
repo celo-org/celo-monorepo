@@ -1,8 +1,8 @@
 import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3/types'
+import { EventLog } from 'web3-core'
 import { Address } from '../base'
-import { LockedGold } from '../generated/types/LockedGold'
+import { LockedGold } from '../generated/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,

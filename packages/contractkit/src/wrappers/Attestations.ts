@@ -5,7 +5,7 @@ import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
-import { Attestations } from '../generated/types/Attestations'
+import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
@@ -67,7 +67,7 @@ interface GetCompletableAttestationsResponse {
   0: string[]
   1: string[]
   2: string[]
-  3: string[]
+  3: string
 }
 function parseGetCompletableAttestations(response: GetCompletableAttestationsResponse) {
   const metadataURLs = parseSolidityStringArray(

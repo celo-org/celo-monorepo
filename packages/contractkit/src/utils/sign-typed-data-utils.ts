@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js'
-import * as ethUtil from 'ethereumjs-util'
+import { sha3 } from 'ethereumjs-util'
 import coder from 'web3-eth-abi'
 
 export interface EIP712Parameter {
@@ -30,7 +30,7 @@ export interface EIP712TypedData {
  * @return  A Buffer containing the hash of the typed data.
  */
 export function generateTypedDataHash(typedData: EIP712TypedData): Buffer {
-  return ethUtil.sha3(
+  return sha3(
     Buffer.concat([
       Buffer.from('1901', 'hex'),
       structHash('EIP712Domain', typedData.domain, typedData.types),
@@ -71,12 +71,12 @@ function encodeData(primaryType: string, data: EIP712Object, types: EIP712Types)
   for (const field of types[primaryType]) {
     const value = data[field.name]
     if (field.type === 'string' || field.type === 'bytes') {
-      const hashValue = ethUtil.sha3(value as string) as Buffer
+      const hashValue = sha3(value as string) as Buffer
       encodedTypes.push('bytes32')
       encodedValues.push(hashValue)
     } else if (types[field.type] !== undefined) {
       encodedTypes.push('bytes32')
-      const hashValue = ethUtil.sha3(
+      const hashValue = sha3(
         // tslint:disable-next-line:no-unnecessary-type-assertion
         encodeData(field.type, value as EIP712Object, types)
       ) as Buffer
@@ -100,9 +100,9 @@ function normalizeValue(type: string, value: any): EIP712ObjectValue {
 }
 
 function typeHash(primaryType: string, types: EIP712Types): Buffer {
-  return ethUtil.sha3(encodeType(primaryType, types)) as Buffer
+  return sha3(encodeType(primaryType, types)) as Buffer
 }
 
 function structHash(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
-  return ethUtil.sha3(encodeData(primaryType, data, types)) as Buffer
+  return sha3(encodeData(primaryType, data, types)) as Buffer
 }

@@ -1,11 +1,10 @@
-import { ContractKit, IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, IdentityMetadataWrapper, newKit } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { BigNumber } from 'bignumber.js'
 import fs from 'fs'
 import { google } from 'googleapis'
 import readline from 'readline'
-import Web3 from 'web3'
 
 process.on('unhandledRejection', (reason, _promise) => {
   console.log('Unhandled Rejection at:', reason.stack || reason)
@@ -278,8 +277,7 @@ async function updateAttestations(kit: ContractKit, rows: string[][], sheets: an
 }
 
 function main() {
-  const web3 = new Web3(LEADERBOARD_WEB3)
-  const kit: ContractKit = newKitFromWeb3(web3)
+  const kit: ContractKit = newKit(LEADERBOARD_WEB3)
   readSheet(async (rows: any[][], sheets: any) => {
     let addresses = rows.map((a) => a[0])
     updateNames(kit, addresses, sheets)
