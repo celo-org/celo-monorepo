@@ -35,8 +35,16 @@ describe('Blockchain parameters tests', function(this: any) {
   }
 
   const hooks = getHooks(gethConfig)
-  before(hooks.before)
-  after(hooks.after)
+
+  before(async function(this: any) {
+    this.timeout(0)
+    await hooks.before()
+  })
+
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const validatorAddress: string = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 

@@ -9,10 +9,9 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
-import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -222,8 +221,15 @@ describe('Transfer tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  after(hooks.after)
-  before(hooks.before)
+  before(async function(this: any) {
+    this.timeout(0)
+    await hooks.before()
+  })
+
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   // Spin up a node that we can sync with.
   const fullInstance: GethInstanceConfig = {
@@ -249,9 +255,14 @@ describe('Transfer tests', function(this: any) {
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
-    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
-    await connectPeers([...gethConfig.instances, fullInstance], verbose)
-    await waitToFinishInstanceSyncing(fullInstance)
+    await initAndSyncGethWithRetry(
+      gethConfig,
+      hooks.gethBinaryPath,
+      fullInstance,
+      [...gethConfig.instances, fullInstance],
+      verbose,
+      3
+    )
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -272,7 +283,7 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
-    const instance: GethInstanceConfig = {
+    currentGethInstance = {
       name: syncmode,
       validating: false,
       syncmode,
@@ -283,15 +294,14 @@ describe('Transfer tests', function(this: any) {
     }
 
     // Spin up the node to run transfers as.
-    currentGethInstance = await initAndStartGeth(
+    await initAndSyncGethWithRetry(
       gethConfig,
       hooks.gethBinaryPath,
-      instance,
-      verbose
+      currentGethInstance,
+      [fullInstance, currentGethInstance],
+      verbose,
+      3
     )
-
-    await connectPeers([fullInstance, currentGethInstance])
-    await waitToFinishInstanceSyncing(currentGethInstance)
 
     // Reset contracts to send RPCs through transferring node.
     kit.web3.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))

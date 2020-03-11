@@ -8,7 +8,7 @@ import { assert } from 'chai'
 import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, sleep } from './utils'
+import { getHooks, sleep, waitForBlock } from './utils'
 
 const headerHex =
   '0xf901f9a07285abd5b24742f184ad676e31f6054663b3529bc35ea2fcad8a3e0f642a46f7a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347948888f1f195afa192cfee860698584c030f4c9db1a0ecc60e00b3fe5ce9f6e1a10e5469764daf51f1fe93c22ec3f9a7583a80357217a0d35d334d87c0cc0a202e3756bf81fae08b1575f286c7ee7a3f8df4f0f3afc55da056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008302000001832fefd8825208845c47775c80a00000000000000000000000000000000000000000000000000000000000000000880000000000000000'
@@ -131,7 +131,10 @@ describe('slashing tests', function(this: any) {
     await hooks.before()
   })
 
-  after(hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const restart = async () => {
     await hooks.restart()
@@ -145,14 +148,6 @@ describe('slashing tests', function(this: any) {
     web3 = new Web3('http://localhost:8545')
     kit = newKitFromWeb3(web3)
     await sleep(1)
-  }
-
-  const waitUntilBlock = async (bn: number) => {
-    let blockNumber: number
-    do {
-      blockNumber = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (blockNumber < bn)
   }
 
   describe('when running a network', () => {
@@ -208,7 +203,7 @@ describe('slashing tests', function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDowntimeSlasher()
       const blockNumber = await web3.eth.getBlockNumber()
-      await waitUntilBlock(blockNumber + 20)
+      await waitForBlock(web3, blockNumber + 20)
 
       // Store this block for testing double signing
       doubleSigningBlock = await web3.eth.getBlock(blockNumber + 15)
@@ -254,7 +249,7 @@ describe('slashing tests', function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getDowntimeSlasher()
       const blockNumber = await web3.eth.getBlockNumber()
-      await waitUntilBlock(blockNumber + 20)
+      await waitForBlock(web3, blockNumber + 20)
 
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
@@ -283,7 +278,7 @@ describe('slashing tests', function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
 
-      await waitUntilBlock(doubleSigningBlock.number)
+      await waitForBlock(web3, doubleSigningBlock.number)
 
       const other = headerFromBlock(web3, doubleSigningBlock)
 
@@ -333,7 +328,7 @@ describe('slashing tests', function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getDoubleSigningSlasher()
       const election = await kit.contracts.getElection()
-      await waitUntilBlock(doubleSigningBlock.number)
+      await waitForBlock(web3, doubleSigningBlock.number)
 
       const other = headerFromBlock(web3, doubleSigningBlock)
       const num = await slasher.getBlockNumberFromHeader(other)
