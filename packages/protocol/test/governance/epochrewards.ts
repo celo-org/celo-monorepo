@@ -678,7 +678,7 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(fromFixed(communityRewardFraction))
           .times(expectedMultiplier)
           .integerValue(BigNumber.ROUND_FLOOR)
-        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected)
+        assertEqualDpBN((await epochRewards.calculateTargetEpochRewards())[2], expected, 9)
       })
     })
   })
