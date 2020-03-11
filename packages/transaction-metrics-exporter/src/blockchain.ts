@@ -117,7 +117,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
   const sortedOracles = await kit.contracts.getSortedOracles()
   const reserve = await kit.contracts.getReserve()
   const goldToken = await kit.contracts.getGoldToken()
-  const epochRewards = await kit.contracts.getEpochRewards()
+  // const epochRewards = await kit.contracts.getEpochRewards()
 
   function toMethodId(txInput: string, isKnownCall: boolean): string {
     let methodId: string
@@ -152,9 +152,9 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
       .then( medianRate => logEvent('RECEIVED_STATE', medianRate))
       .catch()
 
-    reserve.getReserveGoldBalance()
-      .then(goldBalance => logEvent('RECEIVED_STATE', goldBalance))
-      .catch()
+    // reserve.getReserveGoldBalance()
+    //   .then(goldBalance => logEvent('RECEIVED_STATE', goldBalance))
+    //   .catch()
 
     // PoS
     goldToken.totalSupply()
