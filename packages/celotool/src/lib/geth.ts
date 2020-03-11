@@ -691,6 +691,10 @@ export function importGenesis(genesisPath: string) {
   return JSON.parse(fs.readFileSync(genesisPath).toString())
 }
 
+export function getLogFilename(runPath: string, instance: GethInstanceConfig) {
+  return path.join(getDatadir(runPath, instance), 'logs.txt')
+}
+
 function getDatadir(runPath: string, instance: GethInstanceConfig) {
   const dir = path.join(getInstanceDir(runPath, instance), 'datadir')
   // @ts-ignore
@@ -970,7 +974,7 @@ export async function startGeth(
     throw new Error(`Geth crashed! Error: ${err}`)
   })
 
-  const secondsToWait = 5
+  const secondsToWait = 30
 
   // Give some time for geth to come up
   if (rpcport) {
