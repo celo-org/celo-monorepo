@@ -16,6 +16,8 @@ interface Record {
   fields: Fields
 }
 
+const COUNTRY_TTL = 1440 // 24 hours
+
 export default async function latestAnnouncements(ipAddress: string): Promise<Fields[]> {
   try {
     const announcements = await cache<Fields[]>('blue-announcements', fetchAnouncmentRecords)
@@ -27,7 +29,7 @@ export default async function latestAnnouncements(ipAddress: string): Promise<Fi
     if (anyBlocked) {
       const country = await cache(`geo-${ipAddress}`, getCountryFromIP, {
         args: ipAddress,
-        minutes: 240,
+        minutes: COUNTRY_TTL,
       })
 
       return censor(announcements, country)
