@@ -76,6 +76,12 @@ export function testWithGanache(name: string, fn: (web3: Web3) => void) {
   })
 }
 
+/**
+ * Gets a contract address by parsing blocks and matching event signatures against the given event.
+ * `canValidate` actually controls whether we grab the first or second contract associated with
+ * the given `eventSignature`. This is to allow for deployment of two contracts with distinct
+ * setup parameters for testing.
+ */
 export async function getContractFromEvent(
   eventSignature: string,
   web3: Web3,

@@ -10,22 +10,17 @@ import Withdraw from './withdraw'
 process.env.NO_SYNCCHECK = 'true'
 
 testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
-  let contractAddress: string
-  let kit: any
-
-  beforeEach(async () => {
+  test('can withdraw released gold to beneficiary', async () => {
     const contractCanValidate = true
-    contractAddress = await getContractFromEvent(
+    const contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
       contractCanValidate
     )
-    kit = newKitFromWeb3(web3)
+    const kit = newKitFromWeb3(web3)
     await CreateAccount.run(['--contract', contractAddress])
     await SetLiquidityProvision.run(['--contract', contractAddress])
-  })
 
-  test('can withdraw released gold to beneficiary', async () => {
     await timeTravel(100000000, web3)
     const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
     const beneficiary = await releaseGoldWrapper.getBeneficiary()
