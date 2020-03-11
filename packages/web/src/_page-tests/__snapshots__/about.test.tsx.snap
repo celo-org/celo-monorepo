@@ -1521,13 +1521,13 @@ exports[`About renders 1`] = `
         "WebkitBoxPack": "center",
         "WebkitJustifyContent": "center",
         "alignItems": "center",
-        "height": "510px",
         "justifyContent": "center",
+        "minHeight": "510px",
         "msFlexAlign": "center",
         "msFlexPack": "center",
         "paddingBottom": "15px",
-        "paddingLeft": "15px",
-        "paddingRight": "15px",
+        "paddingLeft": "30px",
+        "paddingRight": "30px",
         "paddingTop": "15px",
         "width": "100%",
       }
@@ -1588,12 +1588,15 @@ exports[`About renders 1`] = `
           "fontSize": "65px",
           "fontStyle": "italic",
           "lineHeight": "72px",
+          "maxWidth": "1200px",
           "textAlign": "center",
           "textRendering": "geometricPrecision",
         }
       }
     >
+      “
       beautifulLifeQuote
+      ”
     </div>
     <div
       className="css-text-901oao"
@@ -1610,8 +1613,7 @@ exports[`About renders 1`] = `
         }
       }
     >
-      – 
-      beautifulLifeSource
+      – beautifulLifeSource
     </div>
   </div>
   <div

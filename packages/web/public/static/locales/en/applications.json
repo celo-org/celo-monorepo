@@ -42,7 +42,4 @@
       "other": "Other"
     }
   },
-  "validationErrors": {
-    "email": "Invalid Email Address"
-  }
 }
