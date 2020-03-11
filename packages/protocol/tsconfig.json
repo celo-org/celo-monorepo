@@ -15,7 +15,6 @@
     "target": "es5",
     "downlevelIteration": true
   },
-  "include": ["src", "../contrackit/types"],
   "exclude": ["node_modules"],
   "references": [{ "path": "../utils" }]
 }
