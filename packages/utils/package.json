@@ -14,7 +14,9 @@
     "test:verbose": "jest --verbose",
     "lint": "tslint -c tslint.json --project ."
   },
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "dependencies": {
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bignumber.js": "^7.2.0",
