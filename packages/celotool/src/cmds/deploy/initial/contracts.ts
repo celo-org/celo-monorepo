@@ -87,11 +87,12 @@ export const handler = async (argv: InitialArgv) => {
     await concurrentMap(5, validatorKeys(), (privateKey, index) =>
       registerMetadata(argv.celoEnv, privateKey, index)
     )
+    await uploadArtifacts(argv.celoEnv)
   }
 
   try {
     await portForwardAnd(argv.celoEnv, cb)
-    await uploadArtifacts(argv.celoEnv)
+    // await uploadArtifacts(argv.celoEnv)
     return
   } catch (error) {
     console.error(`Unable to deploy smart contracts to ${argv.celoEnv}`)

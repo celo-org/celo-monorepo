@@ -1,7 +1,7 @@
 /* tslint:disable: no-console */
 import { ChildProcess, spawnSync } from 'child_process'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
-import { execBackgroundCmd, execCmd, spawnCmd } from './utils'
+import { execBackgroundCmd, execCmd } from './utils'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -78,12 +78,6 @@ export async function portForwardAnd(
 
   try {
     childProcess = execBackgroundCmd(await getPortForwardCmd(celoEnv, component, ports))
-    // const portForwardCmd = await getPortForwardCmd(celoEnv, component, ports)
-    // const childProcess = spawnCmd(
-    //   portForwardCmd.split(' ')[0],
-    //   portForwardCmd.split(' ').slice(1),
-    //   { silent: true }
-    // )
   } catch (error) {
     console.error(error)
     process.exit(1)
@@ -102,12 +96,10 @@ export async function portForwardAnd(
       await sleep(2000)
     }
     await cb()
-    console.log(`PID: ${childProcess.pid}`)
-    childProcess.unref()
-    await spawnCmd('pkill', ['-9', '-P', childProcess.pid.toString()], { silent: true })
-    // childProcess.kill('SIGTERM')
+    // await spawnCmd('pkill', ['-9', '-P', childProcess.pid.toString()], { silent: true })
+    childProcess.kill('SIGINT')
   } catch (error) {
-    childProcess.kill('SIGTERM')
+    childProcess.kill('SIGKILL')
 
     console.error(error)
     process.exit(1)

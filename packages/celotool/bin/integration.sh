@@ -3,9 +3,9 @@
 clean_env() {
   # packages=$(helm list --all --namespace "${ENV}" -q | grep -vE "^${ENV}$" )
   packages=$(helm list --all --namespace "${ENV}" -q)
-  for package in "${packages[@]}"; do
+  while IFS= read -r package; do
     helm delete --purge $package
-  done
+  done <<< "$packages"
   kubectl get namespace "${ENV}" && kubectl delete namespace "${ENV}"
 }
 
