@@ -32,6 +32,7 @@
     "bignumber.js": "^7.2.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
+    "ethereumjs-util": "^5.2.0",
     "eth-lib": "^0.2.8",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
