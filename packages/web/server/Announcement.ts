@@ -29,8 +29,8 @@ export default async function latestAnnouncements(ipAddress: string): Promise<Fi
         args: ipAddress,
         minutes: 240,
       })
-      const censored = censor(announcements, country)
-      return censored
+
+      return censor(announcements, country)
     }
     return announcements
   } catch (err) {
