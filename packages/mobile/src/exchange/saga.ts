@@ -235,7 +235,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
-    yield call(sendTransaction, approveTx, account, TAG, 'approval')
+    // TODO check types
+    yield call(sendTransaction as any, approveTx, account, TAG, 'approval')
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.arguments)}`)
 
     const tx = exchangeContract.methods.exchange(
@@ -248,7 +249,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, 'No txId. Did not exchange.')
       return
     }
-    yield call(sendAndMonitorTransaction, txId, tx, account)
+    // TODO check types
+    yield call(sendAndMonitorTransaction as any, txId, tx, account)
   } catch (error) {
     Logger.error(TAG, 'Error doing exchange', error)
     if (txId) {

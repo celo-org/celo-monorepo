@@ -1,5 +1,6 @@
-import { TransactionConfig } from 'web3-core'
 import BigNumber from 'bignumber.js'
+import 'web3-core'
+import { Tx } from 'web3-core'
 
 declare module 'web3-core' {
   export interface TransactionConfig extends TransactionConfig {
@@ -31,8 +32,6 @@ declare module 'web3-core' {
 }
 
 declare module 'web3-eth' {
-  import { Tx } from 'web3-core'
-
   export interface Transaction {
     feeCurrency?: string
     gatewayFeeRecipient?: string
