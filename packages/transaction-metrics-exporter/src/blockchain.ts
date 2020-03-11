@@ -1,4 +1,4 @@
-import { ContractKit, newKit } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import {
   newBlockExplorer,
   ParsedBlock,
@@ -112,6 +112,13 @@ const logEvent = (name: string, details: object) =>
 async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockHeader) => void> {
   const blockExplorer = await newBlockExplorer(kit)
   const logExplorer = await newLogExplorer(kit)
+
+  const exchange = await kit.contracts.getExchange()
+  const sortedOracles = await kit.contracts.getSortedOracles()
+  const reserve = await kit.contracts.getReserve()
+  const goldToken = await kit.contracts.getGoldToken()
+  const epochRewards = await kit.contracts.getEpochRewards()
+
   function toMethodId(txInput: string, isKnownCall: boolean): string {
     let methodId: string
     if (txInput === '0x') {
@@ -133,6 +140,38 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     return parsedTxMap
   }
 
+  async function fetchState()   {
+
+    // Fetching public state
+    // Stability
+    exchange.getBuyAndSellBuckets(true)
+      .then( buckets => logEvent('RECEIVED_STATE', buckets))
+      .catch()
+
+    sortedOracles.medianRate(CeloContract.StableToken)
+      .then( medianRate => logEvent('RECEIVED_STATE', medianRate))
+      .catch()
+
+    reserve.getReserveGoldBalance()
+      .then(goldBalance => logEvent('RECEIVED_STATE', goldBalance))
+      .catch()
+
+    // PoS
+    goldToken.totalSupply()
+      .then( goldTokenTotalSupply => logEvent('RECEIVED_STATE', goldTokenTotalSupply))
+      .catch()
+    
+
+    // epochRewards.getTargetGoldTotalSupply()
+    //   .then(rewardsAmount => logEvent('RECEIVED_STATE', rewardsAmount))
+    //   .catch()
+
+    // epochRewards.getRewardsMultiplier()
+    //   .then(rewardsMultiplier => logEvent('RECEIVED_STATE', rewardsMultiplier))
+    //   .catch()
+   
+  }
+
   return async (header: BlockHeader) => {
     Counters.blockheader.inc({ miner: header.miner })
 
@@ -144,6 +183,9 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
 
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
+
+    // tslint:disable-next-line: no-floating-promises
+    fetchState()
 
     for (const tx of parsedBlock.block.transactions) {
       const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)
