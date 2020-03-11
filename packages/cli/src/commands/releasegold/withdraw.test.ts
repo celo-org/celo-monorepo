@@ -8,6 +8,7 @@ import SetLiquidityProvision from './set-liquidity-provision'
 import Withdraw from './withdraw'
 
 process.env.NO_SYNCCHECK = 'true'
+jest.setTimeout(10000)
 
 testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
   let contractAddress: string

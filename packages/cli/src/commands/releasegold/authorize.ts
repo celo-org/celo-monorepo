@@ -10,7 +10,6 @@ export default class Authorize extends BaseCommand {
   static description =
     'Authorize an alternative key to be used for a given action (Vote, Validate, Attest) on behalf of the ReleaseGold instance contract.'
 
-  // TODO(lucas): BLS key?
   static flags = {
     ...BaseCommand.flags,
     contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
