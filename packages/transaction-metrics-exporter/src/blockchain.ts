@@ -11,6 +11,7 @@ import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/tas
 import { WebsocketProvider } from 'web3-core'
 import { Block, BlockHeader } from 'web3-eth'
 import { Counters } from './metrics'
+import { ViewDefinition } from './view-definition'
 
 const EMPTY_INPUT = 'empty_input'
 const NO_METHOD_ID = 'no_method_id'
@@ -155,34 +156,80 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
   }
 
   async function fetchState() {
+
     // Fetching public state
     // Stability
     exchange
       .getBuyAndSellBuckets(true)
-      .then((buckets) => logEvent(LoggingCategory.State, buckets))
+      .then( buckets => {
+        const view: ViewDefinition = {
+          contract: "Exchange",
+          function: "getBuyAndSellBuckets",
+          currentStableBucket:  Number(buckets[0]),
+          currentGoldBucket: Number(buckets[1])
+        }
+        logEvent(LoggingCategory.State, view)
+      })
       .catch()
 
     sortedOracles
       .medianRate(CeloContract.StableToken)
-      .then((medianRate) => logEvent(LoggingCategory.State, medianRate))
+      .then( medianRate => {
+        const view: ViewDefinition = {
+          contract: "SortedOracles",
+          function: "medianRate",
+          medianRate: Number(medianRate.rate)
+        }
+        logEvent(LoggingCategory.State, view)
+      })
       .catch()
 
+    // TODO: Pending of implement getReserveGoldBalance function in contractKit
     // reserve.getReserveGoldBalance()
-    //   .then(goldBalance => logEvent(LoggingCategory.State, goldBalance))
+    //   .then(goldBalance => {
+    //     const view: ViewDefinition = {
+    //       contract: "Reserve",
+    //       function: "getReserveGoldBalance",
+    //       goldBalance: Number(goldBalance)
+    //     }
+    //     logEvent(LoggingCategory.State, view)
+    //   })
     //   .catch()
 
     // PoS
     goldToken
       .totalSupply()
-      .then((goldTokenTotalSupply) => logEvent(LoggingCategory.State, goldTokenTotalSupply))
+      .then(goldTokenTotalSupply => {
+        const view: ViewDefinition = {
+          contract: "GoldToken",
+          function: "totalSupply",
+          goldTokenTotalSupply: Number(goldTokenTotalSupply)
+        }
+        logEvent(LoggingCategory.State, view)
+      })
       .catch()
 
+    // TODO: Pending EpochRewards wrapper implementation
     // epochRewards.getTargetGoldTotalSupply()
-    //   .then(rewardsAmount => logEvent(LoggingCategory.State, rewardsAmount))
+    //   .then(rewardsAmount => {
+    //     const view: ViewDefinition = {
+    //       contract: "EpochRewards",
+    //       function: "getTargetGoldTotalSupply",
+    //       rewardsAmount: Number(rewardsAmount)
+    //     }
+    //     logEvent(LoggingCategory.State, view)
+    //   })
     //   .catch()
 
     // epochRewards.getRewardsMultiplier()
-    //   .then(rewardsMultiplier => logEvent(LoggingCategory.State, rewardsMultiplier))
+    //   .then(rewardsMultiplier => {
+    //     const view: ViewDefinition = {
+    //       contract: "EpochRewards",
+    //       function: "getRewardsMultiplier",
+    //       rewardsMultiplier: Number(rewardsMultiplier)
+    //     }
+    //     logEvent(LoggingCategory.State, view)
+    //   })
     //   .catch()
   }
 

@@ -6,7 +6,7 @@ import { BlockchainParametersWrapper } from './wrappers/BlockchainParameters'
 import { DoubleSigningSlasherWrapper } from './wrappers/DoubleSigningSlasher'
 import { DowntimeSlasherWrapper } from './wrappers/DowntimeSlasher'
 import { ElectionWrapper } from './wrappers/Election'
-// import { EpochRewardsWrapper } from './wrappers/EpochRewards'
+import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
@@ -26,7 +26,7 @@ const WrapperFactories = {
   [CeloContract.DoubleSigningSlasher]: DoubleSigningSlasherWrapper,
   [CeloContract.DowntimeSlasher]: DowntimeSlasherWrapper,
   [CeloContract.Election]: ElectionWrapper,
-  // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
+  [CeloContract.EpochRewards]: EpochRewardsWrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
@@ -53,7 +53,7 @@ interface WrapperCacheMap {
   [CeloContract.DoubleSigningSlasher]?: DoubleSigningSlasherWrapper
   [CeloContract.DowntimeSlasher]?: DowntimeSlasherWrapper
   [CeloContract.Election]?: ElectionWrapper
-  // [CeloContract.EpochRewards]?: EpochRewardsWrapper
+  [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
@@ -99,9 +99,9 @@ export class WrapperCache {
   getElection() {
     return this.getContract(CeloContract.Election)
   }
-  // getEpochRewards() {
-  //   return this.getContract(CeloContract.EpochRewards)
-  // }
+  getEpochRewards() {
+    return this.getContract(CeloContract.EpochRewards)
+  }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
   }
