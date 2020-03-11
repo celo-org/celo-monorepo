@@ -55,7 +55,7 @@ Name | Type |
 
 • **isowner**: *function* = proxyCall(this.contract.methods.isOwner)
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L35)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L33)*
 
 #### Type declaration:
 
