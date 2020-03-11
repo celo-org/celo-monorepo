@@ -13,10 +13,11 @@ import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { useExchangeRate, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 
 interface Props {
+  title?: string
   amount: MoneyAmount
 }
 
-export default function TotalLineItem({ amount }: Props) {
+export default function TotalLineItem({ title, amount }: Props) {
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencyExchangeRate = useExchangeRate()
   const { t } = useTranslation(Namespaces.global)
@@ -24,7 +25,7 @@ export default function TotalLineItem({ amount }: Props) {
   return (
     <>
       <LineItemRow
-        title={t('total')}
+        title={title || t('total')}
         textStyle={fontStyles.bodyBold}
         amount={<CurrencyDisplay amount={amount} />}
       />

@@ -77,7 +77,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 "flex": 1,
                 "flexDirection": "column",
                 "justifyContent": "flex-start",
-                "paddingHorizontal": 40,
                 "paddingVertical": 25,
               }
             }
@@ -241,7 +240,23 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   ]
                 }
               >
-                +
+                
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-Regular",
+                    },
+                    Object {
+                      "color": "#81868B",
+                      "fontSize": 24,
+                    },
+                  ]
+                }
+              >
+                $
               </Text>
               <Text
                 numberOfLines={1}
@@ -261,153 +276,153 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               >
                 13.30
               </Text>
+            </View>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "textAlign": "center",
+                  },
+                  Object {
+                    "paddingTop": 5,
+                  },
+                ]
+              }
+            >
+              My Reason
+            </Text>
+            <View
+              style={
+                Object {
+                  "borderStyle": "solid",
+                  "borderTopColor": "#EEEEEE",
+                  "borderTopWidth": 1,
+                  "marginBottom": 15,
+                  "marginTop": 10,
+                  "width": "100%",
+                }
+              }
+            />
+            <View
+              style={
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "marginVertical": 5,
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "marginRight": 5,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                    ]
+                  }
+                >
+                  total
+                </Text>
+              </View>
               <Text
-                numberOfLines={1}
                 style={
                   Array [
                     Object {
-                      "alignSelf": "flex-end",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "marginLeft": 7,
+                      "fontSize": 15,
+                      "lineHeight": 24,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Bold",
                       "fontSize": 16,
-                      "lineHeight": 64,
+                      "lineHeight": 24,
                     },
                   ]
                 }
               >
-                MXN
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  $
+                  13.30
+                </Text>
               </Text>
             </View>
             <View
               style={
-                Object {
-                  "alignItems": "stretch",
-                  "flexDirection": "column",
-                  "marginTop": 5,
-                }
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "marginVertical": 5,
+                  },
+                  Object {
+                    "marginVertical": 0,
+                  },
+                ]
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
-                }
-              >
-                My Reason
-              </Text>
               <View
                 style={
                   Object {
-                    "borderStyle": "solid",
-                    "borderTopColor": "#EEEEEE",
-                    "borderTopWidth": 1,
-                    "marginBottom": 15,
-                    "marginTop": 10,
-                    "width": "100%",
-                  }
-                }
-              />
-              <View
-                style={
-                  Object {
-                    "alignItems": "stretch",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                    "marginTop": 10,
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "marginRight": 5,
                   }
                 }
               >
-                <View
+                <Text
                   style={
                     Array [
                       Object {
-                        "flexDirection": "row",
-                        "justifyContent": "space-between",
-                        "marginVertical": 5,
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 15,
+                        "lineHeight": 24,
                       },
-                      undefined,
+                      Object {
+                        "color": "#81868B",
+                      },
                     ]
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                        "marginRight": 5,
-                      }
-                    }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 15,
-                            "lineHeight": 24,
-                          },
-                          undefined,
-                        ]
-                      }
-                    >
-                      amountInCeloDollars
-                    </Text>
-                  </View>
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 15,
-                          "lineHeight": 24,
-                        },
-                        undefined,
-                      ]
-                    }
-                  >
-                    <Text
-                      numberOfLines={1}
-                      style={
-                        Array [
-                          undefined,
-                          Object {
-                            "color": undefined,
-                          },
-                        ]
-                      }
-                    >
-                      
-                      10.00
-                    </Text>
-                  </Text>
-                </View>
-                <Text
-                  style={
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                      "marginBottom": 3,
-                    }
-                  }
-                >
-                  @
+                  Celo Dollars (@
                    
                   <Text
                     numberOfLines={1}
@@ -424,74 +439,39 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     $
                     0.75
                   </Text>
+                  )
                 </Text>
-                <View
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 24,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "flexDirection": "row",
-                        "justifyContent": "space-between",
-                        "marginVertical": 5,
-                      },
                       undefined,
+                      Object {
+                        "color": undefined,
+                      },
                     ]
                   }
                 >
-                  <View
-                    style={
-                      Object {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                        "marginRight": 5,
-                      }
-                    }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 15,
-                            "lineHeight": 24,
-                          },
-                          undefined,
-                        ]
-                      }
-                    >
-                      newAccountBalance
-                    </Text>
-                  </View>
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 15,
-                          "lineHeight": 24,
-                        },
-                        undefined,
-                      ]
-                    }
-                  >
-                    <Text
-                      numberOfLines={1}
-                      style={
-                        Array [
-                          undefined,
-                          Object {
-                            "color": undefined,
-                          },
-                        ]
-                      }
-                    >
-                      
-                      10.00
-                    </Text>
-                  </Text>
-                </View>
-              </View>
+                  
+                  10.00
+                </Text>
+              </Text>
             </View>
           </View>
         </View>

@@ -3,147 +3,76 @@
 exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confirmation 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "flex": 1,
-        "justifyContent": "center",
-        "padding": 20,
-      },
-    ]
+    Object {
+      "flex": 1,
+      "justifyContent": "center",
+    }
   }
 >
   <View
     style={
       Object {
-        "alignSelf": "center",
-        "margin": "auto",
-        "marginVertical": 10,
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginBottom": 10,
       }
     }
   >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          Object {
+            "alignSelf": "center",
+            "margin": "auto",
+          },
+        ]
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#7AD6FE",
+              "borderRadius": 20,
+              "height": 40,
+              "width": 40,
+            },
+          ]
         }
-      }
-      style={
-        Object {
-          "height": 40,
-          "width": 40,
-        }
-      }
-    />
-  </View>
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "flex-start",
-          "alignSelf": "center",
-          "flexDirection": "row",
-          "marginTop": 5,
-        },
-        undefined,
-      ]
-    }
-  >
+      >
+        <Image
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+            }
+          }
+          style={
+            Array [
+              Object {
+                "alignSelf": "center",
+                "margin": "auto",
+              },
+              Object {
+                "height": 40,
+                "width": 40,
+              },
+            ]
+          }
+        />
+      </View>
+    </View>
     <Text
+      ellipsizeMode="tail"
       numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#42D689",
-            "fontSize": 34,
-          },
-        ]
-      }
-    >
-      +
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-          },
-          Object {
-            "color": "#42D689",
-            "fontSize": 24,
-          },
-        ]
-      }
-    >
-      $
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "paddingHorizontal": 3,
-          },
-          Object {
-            "color": "#42D689",
-            "fontSize": 48,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      13.28
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "alignSelf": "flex-end",
-            "fontFamily": "Hind-Regular",
-            "marginLeft": 7,
-          },
-          Object {
-            "color": "#42D689",
-            "fontSize": 16,
-            "lineHeight": 64,
-          },
-        ]
-      }
-    >
-      MXN
-    </Text>
-  </View>
-  <View
-    style={
-      Object {
-        "borderStyle": "solid",
-        "borderTopColor": "#EEEEEE",
-        "borderTopWidth": 1,
-        "marginBottom": 15,
-        "marginTop": 10,
-        "width": "100%",
-      }
-    }
-  />
-  <View
-    style={
-      Object {
-        "padding": 20,
-      }
-    }
-  >
-    <Text
       style={
         Array [
           Object {
@@ -153,6 +82,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "lineHeight": 18,
           },
           Object {
+            "marginHorizontal": 20,
             "paddingTop": 6,
             "textAlign": "center",
           },
@@ -210,50 +140,103 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
   </View>
   <View
     style={
-      Object {
-        "alignItems": "stretch",
-        "justifyContent": "center",
-        "marginBottom": 10,
+      Array [
+        Object {
+          "alignItems": "flex-start",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+        },
+        Object {
+          "color": "#81868B",
+        },
+      ]
+    }
+  >
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Regular",
+          },
+          Object {
+            "color": "#81868B",
+            "fontSize": 34,
+          },
+        ]
       }
+    >
+      
+    </Text>
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Regular",
+          },
+          Object {
+            "color": "#81868B",
+            "fontSize": 24,
+          },
+        ]
+      }
+    >
+      $
+    </Text>
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Regular",
+            "paddingHorizontal": 3,
+          },
+          Object {
+            "color": "#81868B",
+            "fontSize": 48,
+            "lineHeight": 64,
+          },
+        ]
+      }
+    >
+      13.30
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "borderStyle": "solid",
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginBottom": 15,
+        "marginTop": 10,
+        "width": "100%",
+      }
+    }
+  />
+  <View
+    style={
+      Array [
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginVertical": 5,
+        },
+        undefined,
+      ]
     }
   >
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "marginVertical": 5,
-          },
-          undefined,
-        ]
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginRight": 5,
+        }
       }
     >
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "marginRight": 5,
-          }
-        }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
-              },
-              undefined,
-            ]
-          }
-        >
-          totalSentInCeloDollars
-        </Text>
-      </View>
       <Text
         style={
           Array [
@@ -267,35 +250,22 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           ]
         }
       >
-        <Text
-          numberOfLines={1}
-          style={
-            Array [
-              undefined,
-              Object {
-                "color": undefined,
-              },
-            ]
-          }
-        >
-          
-          10.00
-        </Text>
+        totalSent
       </Text>
     </View>
     <Text
       style={
-        Object {
-          "color": "#BDBDBD",
-          "fontFamily": "Hind-Light",
-          "fontSize": 14,
-          "lineHeight": 20,
-          "marginBottom": 3,
-        }
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 15,
+            "lineHeight": 24,
+          },
+          undefined,
+        ]
       }
     >
-      @
-       
       <Text
         numberOfLines={1}
         style={
@@ -309,94 +279,31 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       >
         
         $
-        0.75
+        13.30
       </Text>
     </Text>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginVertical": 5,
+        },
+        undefined,
+      ]
+    }
+  >
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "marginVertical": 5,
-          },
-          undefined,
-        ]
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginRight": 5,
+        }
       }
     >
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "marginRight": 5,
-          }
-        }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
-              },
-              undefined,
-            ]
-          }
-        >
-          securityFee
-        </Text>
-        <View
-          accessible={true}
-          focusable={true}
-          hitSlop={
-            Object {
-              "bottom": 10,
-              "left": 10,
-              "right": 10,
-              "top": 10,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackgroundBorderless",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Object {
-              "alignItems": "center",
-              "justifyContent": "flex-end",
-              "paddingHorizontal": 5,
-            }
-          }
-        >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/info.png",
-              }
-            }
-            style={
-              Object {
-                "height": 12,
-                "tintColor": "#BDBDBD",
-                "width": 12,
-              }
-            }
-          />
-        </View>
-      </View>
       <Text
         style={
           Array [
@@ -410,59 +317,120 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           ]
         }
       >
-        <Text
-          numberOfLines={1}
-          style={
-            Array [
-              undefined,
-              Object {
-                "color": undefined,
-              },
-            ]
-          }
-        >
-          
-          0.01
-        </Text>
+        securityFee
       </Text>
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "justifyContent": "flex-end",
+            "paddingHorizontal": 5,
+          }
+        }
+      >
+        <Image
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/info.png",
+            }
+          }
+          style={
+            Object {
+              "height": 12,
+              "tintColor": "#BDBDBD",
+              "width": 12,
+            }
+          }
+        />
+      </View>
     </View>
-    <View
+    <Text
       style={
         Array [
           Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "marginVertical": 5,
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 15,
+            "lineHeight": 24,
           },
           undefined,
         ]
       }
     >
-      <View
+      <Text
+        numberOfLines={1}
         style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "marginRight": 5,
-          }
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
         }
       >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
-              },
-              undefined,
-            ]
-          }
-        >
-          totalRefunded
-        </Text>
-      </View>
+        -
+        $
+        0.0133
+      </Text>
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "borderStyle": "solid",
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginBottom": 15,
+        "marginTop": 10,
+        "width": "100%",
+      }
+    }
+  />
+  <View
+    style={
+      Array [
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginVertical": 5,
+        },
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginRight": 5,
+        }
+      }
+    >
       <Text
         style={
           Array [
@@ -472,10 +440,93 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
               "fontSize": 15,
               "lineHeight": 24,
             },
-            undefined,
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Bold",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
           ]
         }
       >
+        totalRefunded
+      </Text>
+    </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 15,
+            "lineHeight": 24,
+          },
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Bold",
+            "fontSize": 16,
+            "lineHeight": 24,
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        
+        $
+        13.28
+      </Text>
+    </Text>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginVertical": 5,
+        },
+        Object {
+          "marginVertical": 0,
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginRight": 5,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 24,
+            },
+            Object {
+              "color": "#81868B",
+            },
+          ]
+        }
+      >
+        Celo Dollars (@
+         
         <Text
           numberOfLines={1}
           style={
@@ -488,10 +539,42 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           }
         >
           
-          9.99
+          $
+          0.75
         </Text>
+        )
       </Text>
     </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 15,
+            "lineHeight": 24,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        
+        9.99
+      </Text>
+    </Text>
   </View>
 </View>
 `;
