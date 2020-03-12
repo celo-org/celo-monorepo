@@ -1,8 +1,8 @@
 import { CURRENCY_ENUM as Tokens } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
-import { TransactionConfig, TransactionReceipt } from 'web3-eth'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionConfig, TransactionReceipt } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
 import { Exchange } from '../types/Exchange'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
 import { GoldToken as GoldTokenType } from '../types/GoldToken'
@@ -171,10 +171,11 @@ export default class ContractUtils {
 
   static async getAddressForCurrencyContract(web3: Web3, currency: Tokens): Promise<string> {
     switch (currency) {
+      // TODO fix types
       case Tokens.DOLLAR:
-        return (await getStableTokenContract(web3))._address
+        return ((await getStableTokenContract(web3)) as any)._address
       case Tokens.GOLD:
-        return (await getGoldTokenContract(web3))._address
+        return ((await getGoldTokenContract(web3)) as any)._address
     }
   }
 }
