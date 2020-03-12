@@ -40,3 +40,74 @@ export const CONTRACT_OWNER_STORAGE_LOCATION =
   '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
 export const ISTANBUL_MIX_HASH =
   '0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365'
+
+export const INITIAL_ACCOUNTS = [
+  {
+    address: '0x36940810BfDB329B31e38d3e97aFD673081B497C', // ReserveCo genesis address
+    balance: '120000000000000000000000000', // 120MM
+  },
+  {
+    address: '0xfCf982bb4015852e706100B14E21f947a5Bb718E', // LLC genesis address
+    balance: '200000000000000000000000000', // 200MM
+  },
+  {
+    // TODO(lucas, alex): verify this amount
+    address: '0xbA8761304CEc7bE0f83C6F8Fa7EBBa3eE0b6Ae97', // API RAU genesis address
+    balance: '25260000000000000000000000', // 25.26MM
+  },
+  {
+    address: '0xDb39DBE5abE42466F122b24c44518b1089ef8fC8', // RegD genesis address
+    balance: '57416662000000000000000000', // 57.416662MM
+  },
+  {
+    // Foundation = 99,053,338 gold (99MM)
+    address: '0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe', // Foundation genesis 1
+    balance: '20000000000000000000000000', // 20MM
+  },
+  {
+    address: '0x868E39ef6c51b979526c15Fb801a7dD567CBCffF', // Foundation genesis 2
+    balance: '20000000000000000000000000', // 20MM
+  },
+  {
+    address: '0x4eC7a9e67FB05f555d775604cF591Ccb3C47d7b9', // Foundation genesis 3
+    balance: '20000000000000000000000000', // 20MM
+  },
+  {
+    address: '0xaB5FD29Ce411C7b5c0c41d04a11d40f8fbCdA7a2', // Foundation genesis 4
+    balance: '20000000000000000000000000', // 20MM
+  },
+  {
+    address: '0x14F40ca7600B5605D9fE704A949DA41806509497', // Foundation genesis 5
+    balance: '19053338000000000000000000', // 19.053338MM
+  },
+  {
+    address: '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C', // Core Contract deployer
+    balance: '20000000000000000000000', // 20k gold
+  },
+  {
+    // GrantCo = 66,250,000 gold (66MM)
+    address: '0x1cd43c11CaEaf4a43413258eF7E0704e157F7811', // GrantCo genesis 1
+    balance: '22000000000000000000000000', // 22MM
+  },
+  {
+    address: '0x9268f359CAD800a2746FBC96C4A5CF68eE1c4EC2', // GrantCo genesis 2
+    balance: '22000000000000000000000000', // 22MM
+  },
+  {
+    address: '0x10E0833be035607feEA41d32b6567D15D12511Ec', // GrantCo genesis 3
+    balance: '22250000000000000000000000', // 22.25MM
+  },
+  {
+    // APFCo = 32,000,000 gold (32MM)
+    address: '0x8f55CE88b4F62F22c663f5A539414dcCeF969c32', // APFCo genesis 1
+    balance: '11000000000000000000000000', // 11MM
+  },
+  {
+    address: '0xF607d4dd519B4bc963C9c48E8650E67C51DbC35b', // APFCo genesis 2
+    balance: '11000000000000000000000000', // 11MM
+  },
+  {
+    address: '0x515033209a0A29034DC3F037cC72a6014b902341', // APFCo genesis 3
+    balance: '10000000000000000000000000', // 10MM
+  },
+]
