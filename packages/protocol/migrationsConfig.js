@@ -121,8 +121,6 @@ const DefaultConfig = {
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
-    frozenGold: 105000000000000000000000000, // 105M
-    frozenDays: 3 * 365,
     spenders: [],
     // To be populated once addresses are generated.
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],

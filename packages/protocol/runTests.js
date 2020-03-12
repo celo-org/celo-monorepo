@@ -35,9 +35,7 @@ const migrationOverrides = {
     numInternalRequiredConfirmations: 1,
   },
   reserve: {
-    frozenGold: 105000000,
-    frozenDays: 365,
-    initialBalance: 120000000,
+    initialBalance: 100000000,
   },
   reserveSpenderMultiSig: {
     signatories: [network.from],
