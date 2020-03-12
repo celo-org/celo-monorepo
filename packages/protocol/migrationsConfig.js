@@ -68,9 +68,9 @@ const DefaultConfig = {
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1 / 100,
+    reserveFraction: 1 / 20,
     updateFrequency: 5 * MINUTE, // 5 minutes
-    minimumReports: 10,
+    minimumReports: 5,
     frozen: true,
   },
   gasPriceMinimum: {
@@ -87,7 +87,7 @@ const DefaultConfig = {
     concurrentProposals: 3, // Change to 10 once mainnet activated
     approvalStageDuration: DAY, // Change to 3 days once mainnet activated
     referendumStageDuration: DAY, // Change to 1 week once mainnet activated
-    executionStageDuration: DAY, // Change to 1 week once mainnet activated
+    executionStageDuration: WEEK,
     minDeposit: 100, // 100 cGLD
     participationBaseline: 8 / 10,
     participationBaselineFloor: 5 / 100,
@@ -121,8 +121,8 @@ const DefaultConfig = {
     spenders: [],
     // To be populated once addresses are generated.
     otherAddresses: [],
-    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH'],
-    assetAllocationWeights: [0.5, 0.3, 0.2],
+    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
+    assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
   },
   reserveSpenderMultiSig: {
     // Placeholder until addresses for 2/2 multsig are generated.
