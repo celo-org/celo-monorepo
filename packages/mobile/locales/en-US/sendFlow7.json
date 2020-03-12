@@ -18,7 +18,7 @@
   "groceriesRent": "Groceries, rent, etc. (Optional)",
   "fee": "Fee",
   "securityFee": "Security Fee",
-  "inviteAndSecurityFee": "Invitation Fee",
+  "inviteFee": "Invitation Fee",
   "amountInCeloDollars": "Amount in Celo Dollars",
   "localValueHint": "@ <2></2>",
   "feeEducation": "Sending payments and making exchanges include a small fee for service security and maintenance.",

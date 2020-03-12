@@ -329,74 +329,7 @@ exports[`InviteReview renders correctly 1`] = `
                       ]
                     }
                   >
-                    global:subtotal
-                  </Text>
-                </View>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
-                      },
-                      undefined,
-                    ]
-                  }
-                >
-                  <Text
-                    numberOfLines={1}
-                    style={
-                      Array [
-                        undefined,
-                        Object {
-                          "color": undefined,
-                        },
-                      ]
-                    }
-                  >
-                    
-                    $
-                    0.33
-                  </Text>
-                </Text>
-              </View>
-              <View
-                style={
-                  Array [
-                    Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "marginVertical": 5,
-                    },
-                    undefined,
-                  ]
-                }
-              >
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                      "marginRight": 5,
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 15,
-                          "lineHeight": 24,
-                        },
-                        undefined,
-                      ]
-                    }
-                  >
-                    inviteAndSecurityFee
+                    inviteFee
                   </Text>
                 </View>
                 <Text
@@ -514,35 +447,24 @@ exports[`InviteReview renders correctly 1`] = `
                     />
                   </View>
                 </View>
-                <Text
+                <View
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
-                      },
-                      undefined,
-                    ]
+                    Object {
+                      "transform": Array [
+                        Object {
+                          "scale": 0.7,
+                        },
+                      ],
+                    }
                   }
                 >
-                  <Text
-                    numberOfLines={1}
-                    style={
-                      Array [
-                        undefined,
-                        Object {
-                          "color": undefined,
-                        },
-                      ]
-                    }
-                  >
-                    -
-                    $
-                    0.3325
-                  </Text>
-                </Text>
+                  <ActivityIndicator
+                    animating={true}
+                    color="#42D689"
+                    hidesWhenStopped={true}
+                    size="small"
+                  />
+                </View>
               </View>
               <View
                 style={
@@ -629,7 +551,7 @@ exports[`InviteReview renders correctly 1`] = `
                   >
                     
                     $
-                    0.33
+                    0.00
                   </Text>
                 </Text>
               </View>
@@ -718,7 +640,7 @@ exports[`InviteReview renders correctly 1`] = `
                     }
                   >
                     
-                    0.25
+                    0.00
                   </Text>
                 </Text>
               </View>

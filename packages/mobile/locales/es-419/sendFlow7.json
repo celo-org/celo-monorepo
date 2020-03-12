@@ -18,7 +18,7 @@
   "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
-  "inviteAndSecurityFee": "Comisión de Invitación",
+  "inviteFee": "Comisión de Invitación",
   "amountInCeloDollars": "Cantidad en Celo dólares",
   "localValueHint": "@ <2></2>",
   "feeEducation": "Enviar pagos y hacer cambios incluye una pequeña comisión de seguridad y mantenimiento.",

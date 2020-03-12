@@ -306,7 +306,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             ]
           }
         >
-          inviteAndSecurityFee
+          inviteFee
         </Text>
       </View>
       <Text

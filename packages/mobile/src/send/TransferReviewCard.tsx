@@ -45,12 +45,27 @@ function TransferReviewCard({
   isLoadingFee,
   feeError,
 }: OwnProps & WithTranslation) {
-  const adjustedFee =
-    type === TokenTransactionType.InviteSent && fee
-      ? fee.minus(getInvitationVerificationFeeInDollars())
-      : fee
-  const amount = { value: value.toString(), currencyCode: CURRENCIES[currency].code }
-  const amountWithFees = {
+  const isInvite = type === TokenTransactionType.InviteSent
+  const inviteFee = getInvitationVerificationFeeInDollars()
+  const inviteFeeAmount = {
+    value: inviteFee.toString(),
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+  }
+
+  // 'fee' already contains the invitation fee for invites
+  // so we adjust it here
+  const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
+
+  const securityFeeAmount = securityFee && {
+    value: securityFee.toString(),
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+  }
+  const subtotalAmount = value.isGreaterThan(0) && {
+    value: value.toString(),
+    currencyCode: CURRENCIES[currency].code,
+  }
+  const amount = subtotalAmount || inviteFeeAmount
+  const totalAmount = {
     value: value.plus(fee || 0).toString(),
     currencyCode: CURRENCIES[currency].code,
   }
@@ -62,39 +77,31 @@ function TransferReviewCard({
       <View style={styles.bottomContainer}>
         {!!comment && <Text style={[styles.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
         <HorizontalLine />
-        <LineItemRow title={t('global:subtotal')} amount={<CurrencyDisplay amount={amount} />} />
-        {type === TokenTransactionType.InviteSent && (
+        {subtotalAmount && (
           <LineItemRow
-            title={t('inviteAndSecurityFee')}
-            amount={
-              <CurrencyDisplay
-                amount={{
-                  value: getInvitationVerificationFeeInDollars().toString(),
-                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                }}
-              />
-            }
+            title={t('global:subtotal')}
+            amount={<CurrencyDisplay amount={subtotalAmount} />}
+          />
+        )}
+        {isInvite && (
+          <LineItemRow
+            title={t('inviteFee')}
+            amount={<CurrencyDisplay amount={inviteFeeAmount} />}
           />
         )}
         <LineItemRow
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
           amount={
-            adjustedFee && (
-              <CurrencyDisplay
-                amount={{
-                  value: adjustedFee.toString(),
-                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                }}
-                formatType={FormatType.Fee}
-              />
+            securityFeeAmount && (
+              <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
             )
           }
           isLoading={isLoadingFee}
           hasError={!!feeError}
         />
         <HorizontalLine />
-        <TotalLineItem amount={amountWithFees} />
+        <TotalLineItem amount={totalAmount} />
       </View>
     </View>
   )
@@ -111,12 +118,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'stretch',
   },
-  feeContainer: {
-    marginTop: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'stretch',
-  },
   amount: {
     marginTop: 15,
     color: colors.darkSecondary,
@@ -127,13 +128,6 @@ const styles = StyleSheet.create({
     ...fontStyles.light,
     lineHeight: 18,
     textAlign: 'center',
-  },
-  localValueHint: {
-    ...fontStyles.light,
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.lightGray,
-    marginBottom: 3,
   },
 })
 
