@@ -51,13 +51,12 @@ export const INITIAL_ACCOUNTS = [
     balance: '200000000000000000000000000', // 200MM
   },
   {
-    // TODO(lucas, alex): verify this amount
     address: '0xbA8761304CEc7bE0f83C6F8Fa7EBBa3eE0b6Ae97', // API RAU genesis address
-    balance: '25260000000000000000000000', // 25.26MM
+    balance: '27375005000000000000000000', // 27,375,005 Gold
   },
   {
     address: '0xDb39DBE5abE42466F122b24c44518b1089ef8fC8', // RegD genesis address
-    balance: '57416662000000000000000000', // 57.416662MM
+    balance: '57291662000000000000000000', // 57,291,662 Gold
   },
   {
     // Foundation = 99,053,338 gold (99MM)
