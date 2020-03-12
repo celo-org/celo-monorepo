@@ -24,6 +24,7 @@ const migrationOverrides = {
   },
   exchange: {
     frozen: false,
+    minimumReports: 1,
   },
   goldToken: {
     frozen: false,
@@ -34,7 +35,9 @@ const migrationOverrides = {
     numInternalRequiredConfirmations: 1,
   },
   reserve: {
-    initialBalance: 100000000,
+    frozenGold: 105000000,
+    frozenDays: 365,
+    initialBalance: 120000000,
   },
   reserveSpenderMultiSig: {
     signatories: [network.from],
