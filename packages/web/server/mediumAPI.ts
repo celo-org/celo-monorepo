@@ -81,19 +81,22 @@ function parseXML(xmlData: string): JSONRSSItem[] {
   }
 }
 
-async function fetchMediumArticles(): Promise<string> {
-  const response = (await abortableFetch('https://medium.com/feed/celoOrg')) as Response
+const BASE_URL = 'https://medium.com/feed/celoOrg'
+
+async function fetchMediumArticles(tagged?: string): Promise<string> {
+  const url = tagged ? `${BASE_URL}/tagged/${tagged}` : BASE_URL
+  const response = (await abortableFetch(url)) as Response
   return response.text()
 }
 
-async function getAndTransform() {
-  const xmlString = await fetchMediumArticles()
+async function getAndTransform(tagged?: string) {
+  const xmlString = await fetchMediumArticles(tagged)
   return transform(parseXML(xmlString))
 }
 
-export async function getFormattedMediumArticles(): Promise<Articles> {
+export async function getFormattedMediumArticles(tagged?: string): Promise<Articles> {
   try {
-    const articles = await cache('medium-blog', getAndTransform)
+    const articles = await cache(`medium-blog-${tagged}`, getAndTransform, { args: tagged })
     return { articles }
   } catch (e) {
     Sentry.withScope((scope) => {
