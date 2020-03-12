@@ -1,7 +1,7 @@
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
-import { DowntimeSlasher } from '../generated/types/DowntimeSlasher'
+import { DowntimeSlasher } from '../generated/DowntimeSlasher'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -138,13 +138,14 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     const validators = await this.kit.contracts.getValidators()
     const membership = await validators.getValidatorMembershipHistoryIndex(validator, startBlock)
     const lockedGold = await this.kit.contracts.getLockedGold()
-    const slashValidator = await lockedGold.computeParametersForSlashing(
+    const slashValidator = await lockedGold.computeInitialParametersForSlashing(
       validator.address,
       incentives.penalty
     )
     const slashGroup = await lockedGold.computeParametersForSlashing(
       membership.group,
-      incentives.penalty
+      incentives.penalty,
+      slashValidator.list
     )
 
     return toTransactionObject(

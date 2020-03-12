@@ -107,5 +107,6 @@
   "emptyList": "Lista vacía",
   "timeframes": {
     "30d": "30 dias"
-  }
+  },
+  "message": "Mensaje"
 }

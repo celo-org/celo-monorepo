@@ -102,6 +102,9 @@
       - [Usage](developer-resources/dappkit/usage.md)
     <!-- - [Guide to Asset Custody]() -->
   - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+  - [Integrations](developer-resources/integrations/integrations.md)
+    - [General](developer-resources/integrations/general.md)
+    - [Custody](developer-resources/integrations/custody.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
@@ -177,6 +180,7 @@
       - [wrappers/BaseWrapper](developer-resources/contractkit/reference/modules/_wrappers_basewrapper_.md)
       - [BaseWrapper](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.basewrapper.md)
       - [CeloTransactionObject](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.celotransactionobject.md)
+      - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
       - [wrappers/BlockchainParameters](developer-resources/contractkit/reference/modules/_wrappers_blockchainparameters_.md)
       - [BlockchainParametersWrapper](developer-resources/contractkit/reference/classes/_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
       - [wrappers/DoubleSigningSlasher](developer-resources/contractkit/reference/modules/_wrappers_doublesigningslasher_.md)
@@ -299,6 +303,7 @@
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsconfig.md)
       - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
+      - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
       - [ElectableValidators](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electablevalidators.md)
       - [ElectionConfig](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electionconfig.md)
       - [GroupVote](developer-resources/contractkit/reference/interfaces/_wrappers_election_.groupvote.md)

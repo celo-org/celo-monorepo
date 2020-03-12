@@ -3,9 +3,9 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3/types'
+import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
-import { Validators } from '../generated/types/Validators'
+import { Validators } from '../generated/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -565,6 +565,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @return Index for epoch or -1.
    */
   findValidatorMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
-    return history.reverse().findIndex((x) => x.epoch <= epoch)
+    const revIndex = history
+      .slice()
+      .reverse()
+      .findIndex((x) => x.epoch <= epoch)
+    return revIndex < 0 ? -1 : history.length - revIndex - 1
   }
 }

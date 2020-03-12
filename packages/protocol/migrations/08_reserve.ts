@@ -1,7 +1,4 @@
 /* tslint:disable:no-console */
-import Web3 = require('web3')
-import Web3Utils = require('web3-utils')
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -10,6 +7,9 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { RegistryInstance, ReserveInstance, ReserveSpenderMultiSigInstance } from 'types'
+import Web3 from 'web3'
+import Web3Utils = require('web3-utils')
+
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<[
@@ -59,7 +59,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       await web3.eth.sendTransaction({
         from: network.from,
         to: reserve.address,
-        value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether') as string,
+        value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
       })
     }
 

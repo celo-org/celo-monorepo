@@ -11,9 +11,8 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
-
-import Web3 = require('web3')
-import { TransactionObject } from 'web3/eth/types'
+import Web3, * as Web3Class from 'web3'
+import { TransactionObject } from 'web3-eth'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 const bip39 = require('bip39')
@@ -102,7 +101,7 @@ async function registerValidatorGroup(
 
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.
-  const encryptionWeb3 = new Web3('http://localhost:8545')
+  const encryptionWeb3 = new (Web3Class as any)('http://localhost:8545')
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
@@ -248,8 +247,17 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   if (networkName === 'development') {
     isGanache = true
-    config.validators.validatorKeys = [...Array(7)].map((_, i) => ganachePrivateKey(i))
-    extraKeys = [...Array(3)].map((_, i) => ganachePrivateKey(i + 7))
+    const addr0 = privateKeyToAddress('0x' + ganachePrivateKey(0))
+    for (let i = 10; i < 36; i++) {
+      const key = '0x' + ganachePrivateKey(i)
+      const addr = privateKeyToAddress(key)
+      // @ts-ignore
+      await web3.eth.personal.importRawKey(key, 'passphrase')
+      await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
+      await web3.eth.sendTransaction({ from: addr0, to: addr, value: new BigNumber(11000e18) })
+    }
+    config.validators.validatorKeys = [...Array(30)].map((_, i) => ganachePrivateKey(i))
+    extraKeys = [...Array(6)].map((_, i) => ganachePrivateKey(i + 30))
     config.validators.attestationKeys = config.validators.validatorKeys
   }
 
@@ -270,9 +278,9 @@ module.exports = async (_deployer: any, networkName: string) => {
   // * Validator 1-n holds funds needed for their own stake
   const validator0Key = valKeys[0]
 
-  if (valKeys.length < config.validators.minElectableValidators) {
-    console.warn(
-      `  Warning: Have ${valKeys.length} Validator keys but require a minimum of ${config.validators.minElectableValidators} Validators in order for a new validator set to be elected.`
+  if (valKeys.length < parseInt(config.election.minElectableValidators, 10)) {
+    console.info(
+      `  Warning: Have ${valKeys.length} Validator keys but require a minimum of ${config.election.minElectableValidators} Validators in order for a new validator set to be elected.`
     )
   }
 

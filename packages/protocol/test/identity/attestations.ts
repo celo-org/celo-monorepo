@@ -1,5 +1,3 @@
-import Web3 = require('web3')
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
@@ -32,7 +30,12 @@ import {
   TestAttestationsContract,
   TestAttestationsInstance,
 } from 'types'
+import Web3 from 'web3'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
+// tslint:disable-next-line: ordered-imports
+import Web3X = require('web3')
+
+const Web3Class = (Web3X as any) as typeof Web3
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 /* We use a contract that behaves like the actual Attestations contract, but
@@ -57,8 +60,8 @@ contract('Attestations', (accounts: string[]) => {
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
-  const provider = new Web3.providers.HttpProvider('http://localhost:8545')
-  const web3: Web3 = new Web3(provider)
+  const provider = new Web3Class.providers.HttpProvider('http://localhost:8545')
+  const web3: Web3 = new Web3Class(provider)
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
   // Private keys of each of the 10 miners, in the same order as their addresses in 'accounts'.
@@ -739,6 +742,7 @@ contract('Attestations', (accounts: string[]) => {
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
       const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(phoneHash, v, r, s)
+      await mockStableToken.mint(attestations.address, attestationFee)
     })
 
     it('should remove the balance of available rewards for the issuer', async () => {

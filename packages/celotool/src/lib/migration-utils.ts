@@ -51,6 +51,10 @@ export function migrationOverrides() {
         envVar.ELECTION_MIN_VALIDATORS,
         DEFAULT_ELECTION_MIN_VALIDATORS
       ),
+      maxElectableValidators: fetchEnvOrFallback(
+        envVar.ELECTION_MAX_VALIDATORS,
+        fetchEnv(envVar.VALIDATORS)
+      ),
     },
     epochRewards: {
       frozen:
@@ -64,7 +68,7 @@ export function migrationOverrides() {
         addresses: initialAddresses,
         values: initialAddresses.map(() => initialBalance),
       },
-      oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
+      oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1), minerForEnv()],
     },
     validators: {
       validatorKeys: validatorKeys(),

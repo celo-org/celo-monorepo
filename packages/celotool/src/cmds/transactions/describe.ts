@@ -64,8 +64,12 @@ export const handler = async (argv: DescribeArgv) => {
     console.info('Transaction reverted, attempting to recover revert reason ...')
 
     const called = await web3.eth.call(
-      { data: transaction.input, to: transaction.to, from: transaction.from },
-      transaction.blockNumber
+      {
+        data: transaction.input,
+        to: transaction.to ? transaction.to : undefined,
+        from: transaction.from,
+      },
+      transaction.blockNumber!
     )
 
     if (called.startsWith('0x08c379a')) {

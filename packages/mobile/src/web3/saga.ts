@@ -1,14 +1,11 @@
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
-import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import * as Sentry from '@sentry/react-native'
-import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
-import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
-import { promptFornoIfNeededSelector } from 'src/account/reducer'
 import { getPincode } from 'src/account/saga'
+import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -29,7 +26,6 @@ import Logger from 'src/utils/Logger'
 import {
   Actions,
   completeWeb3Sync,
-  getLatestBlock,
   setAccount,
   setAccountInWeb3Keystore,
   setFornoMode,
@@ -39,16 +35,19 @@ import {
   Web3SyncProgress,
 } from 'src/web3/actions'
 import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
+import { readPrivateKeyFromLocalDisk, savePrivateKeyToLocalDisk } from 'src/web3/privateKey'
 import {
   currentAccountInWeb3KeystoreSelector,
   currentAccountSelector,
   fornoSelector,
 } from 'src/web3/selectors'
-import { Block } from 'web3/eth/types'
-const ETH_PRIVATE_KEY_LENGTH = 64
-const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
+import { getAccountAddressFromPrivateKey, getLatestBlock, isAccountLocked } from 'src/web3/utils'
+import { Block } from 'web3-eth'
 
 const TAG = 'web3/saga'
+
+const ETH_PRIVATE_KEY_LENGTH = 64
+const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
@@ -235,73 +234,6 @@ function* assignDataKeyFromPrivateKey(privateKey: string) {
   yield put(setPrivateCommentKey(privateCEK))
 }
 
-function getPrivateKeyFilePath(account: string): string {
-  return `${RNFS.DocumentDirectoryPath}/private_key_for_${account.toLowerCase()}.txt`
-}
-
-function ensureAddressAndKeyMatch(address: string, privateKey: string) {
-  const generatedAddress = getAccountAddressFromPrivateKey(privateKey)
-  if (!generatedAddress) {
-    throw new Error(`Failed to generate address from private key`)
-  }
-  if (address.toLowerCase() !== generatedAddress.toLowerCase()) {
-    throw new Error(
-      `Address from private key: ${generatedAddress}, ` + `address of sender ${address}`
-    )
-  }
-  Logger.debug(TAG + '@ensureAddressAndKeyMatch', `Sender and private key match`)
-}
-
-function savePrivateKeyToLocalDisk(
-  account: string,
-  privateKey: string,
-  encryptionPassword: string
-) {
-  ensureAddressAndKeyMatch(account, privateKey)
-  const filePath = getPrivateKeyFilePath(account)
-  const plainTextData = privateKey
-  const encryptedData: Buffer = getEncryptedData(plainTextData, encryptionPassword)
-  Logger.debug('savePrivateKeyToLocalDisk', `Writing encrypted private key to ${filePath}`)
-  return RNFS.writeFile(getPrivateKeyFilePath(account), encryptedData.toString('hex'))
-}
-
-// Reads and returns unencrypted private key
-export async function readPrivateKeyFromLocalDisk(
-  account: string,
-  encryptionPassword: string
-): Promise<string> {
-  const filePath = getPrivateKeyFilePath(account)
-  Logger.debug('readPrivateKeyFromLocalDisk', `Reading private key from ${filePath}`)
-  const hexEncodedEncryptedData: string = await RNFS.readFile(filePath)
-  const encryptedDataBuffer: Buffer = new Buffer(hexEncodedEncryptedData, 'hex')
-  const privateKey: string = getDecryptedData(encryptedDataBuffer, encryptionPassword)
-  ensureAddressAndKeyMatch(account, privateKey)
-  return privateKey
-}
-
-// Exported for testing
-export function getEncryptedData(plainTextData: string, password: string): Buffer {
-  try {
-    const cipher = Crypto.createCipher('aes-256-cbc', password)
-    return Buffer.concat([cipher.update(new Buffer(plainTextData, 'utf8')), cipher.final()])
-  } catch (e) {
-    Logger.error(TAG + '@getEncryptedData', 'Failed to write private key', e)
-    throw e // Re-throw
-  }
-}
-
-// Exported for testing
-export function getDecryptedData(encryptedData: Buffer, password: string): string {
-  try {
-    const decipher = Crypto.createDecipher('aes-256-cbc', password)
-    const decrypted = Buffer.concat([decipher.update(encryptedData), decipher.final()])
-    return decrypted.toString('utf8')
-  } catch (e) {
-    Logger.error(TAG + '@getDecryptedData', 'Failed to read private key', e)
-    throw e // Re-throw
-  }
-}
-
 // Wait for account to exist and then return it
 export function* getAccount() {
   while (true) {
@@ -322,23 +254,13 @@ export function* getAccount() {
   }
 }
 
-async function isLocked(address: string) {
-  try {
-    // Test account to see if it is unlocked
-    await web3.eth.sign('', address)
-  } catch (e) {
-    return true
-  }
-  return false
-}
-
 let accountAlreadyAddedInFornoMode = false
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   try {
-    const isAccountLocked = yield call(isLocked, account)
-    if (!isAccountLocked) {
+    const isLocked = yield call(isAccountLocked, account)
+    if (!isLocked) {
       return true
     }
 

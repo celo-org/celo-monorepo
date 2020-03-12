@@ -19,6 +19,8 @@ const initializeArgs = async (): Promise<any[]> => {
     toFixed(config.epochRewards.targetVotingGoldFraction).toFixed(),
     config.epochRewards.maxValidatorEpochPayment,
     toFixed(config.epochRewards.communityRewardFraction).toFixed(),
+    config.epochRewards.carbonOffsettingPartner,
+    toFixed(config.epochRewards.carbonOffsettingFraction).toFixed(),
   ]
 }
 

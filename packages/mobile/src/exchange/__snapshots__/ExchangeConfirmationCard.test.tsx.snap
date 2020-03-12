@@ -156,7 +156,7 @@ exports[`renders correctly with giant numbers 1`] = `
           ]
         }
       >
-        18,000,000,000.00
+        18,000,000,000.000
       </Text>
     </View>
   </View>
@@ -383,135 +383,6 @@ exports[`renders correctly with giant numbers 1`] = `
       </View>
     </View>
   </View>
-  <View
-    style={
-      Object {
-        "marginBottom": 20,
-      }
-    }
-  >
-    <View
-      style={
-        Object {
-          "borderBottomColor": "#EEEEEE",
-          "borderBottomWidth": 1,
-          "margin": 10,
-        }
-      }
-    />
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "justifyContent": "center",
-          "paddingTop": 15,
-        }
-      }
-    >
-      <Text
-        style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Regular",
-              "fontSize": 20,
-              "lineHeight": 32,
-            },
-            Object {
-              "marginVertical": 10,
-            },
-          ]
-        }
-      >
-        newBalance
-      </Text>
-    </View>
-    <View
-      style={
-        Object {
-          "alignSelf": "stretch",
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginHorizontal": 10,
-          "marginVertical": 5,
-          "paddingHorizontal": 40,
-        }
-      }
-    >
-      <Text
-        style={
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-          }
-        }
-      >
-        global:celoDollars
-      </Text>
-      <Text
-        numberOfLines={1}
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-            },
-            Object {
-              "color": "#42D689",
-            },
-          ]
-        }
-      >
-        $10,000,000.00
-      </Text>
-    </View>
-    <View
-      style={
-        Object {
-          "alignSelf": "stretch",
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginHorizontal": 10,
-          "marginVertical": 5,
-          "paddingHorizontal": 40,
-        }
-      }
-    >
-      <Text
-        style={
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-          }
-        }
-      >
-        global:celoGold
-      </Text>
-      <Text
-        numberOfLines={1}
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-            },
-            Object {
-              "color": "#FBCC5C",
-            },
-          ]
-        }
-      >
-        10,030,000.000
-      </Text>
-    </View>
-  </View>
 </View>
 `;
 
@@ -589,7 +460,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           ]
         }
       >
-        20.00
+        20.000
       </Text>
     </View>
     <View
@@ -715,7 +586,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           }
         }
       >
-         2 cGLD : 1 cUSD
+         10.0503 cGLD : 1 cUSD
       </Text>
     </View>
   </View>
@@ -896,135 +767,6 @@ exports[`renders correctly with no exchange rate 1`] = `
           />
         </View>
       </View>
-    </View>
-  </View>
-  <View
-    style={
-      Object {
-        "marginBottom": 20,
-      }
-    }
-  >
-    <View
-      style={
-        Object {
-          "borderBottomColor": "#EEEEEE",
-          "borderBottomWidth": 1,
-          "margin": 10,
-        }
-      }
-    />
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "justifyContent": "center",
-          "paddingTop": 15,
-        }
-      }
-    >
-      <Text
-        style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Regular",
-              "fontSize": 20,
-              "lineHeight": 32,
-            },
-            Object {
-              "marginVertical": 10,
-            },
-          ]
-        }
-      >
-        newBalance
-      </Text>
-    </View>
-    <View
-      style={
-        Object {
-          "alignSelf": "stretch",
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginHorizontal": 10,
-          "marginVertical": 5,
-          "paddingHorizontal": 40,
-        }
-      }
-    >
-      <Text
-        style={
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-          }
-        }
-      >
-        global:celoDollars
-      </Text>
-      <Text
-        numberOfLines={1}
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-            },
-            Object {
-              "color": "#42D689",
-            },
-          ]
-        }
-      >
-        $189.90
-      </Text>
-    </View>
-    <View
-      style={
-        Object {
-          "alignSelf": "stretch",
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "marginHorizontal": 10,
-          "marginVertical": 5,
-          "paddingHorizontal": 40,
-        }
-      }
-    >
-      <Text
-        style={
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-          }
-        }
-      >
-        global:celoGold
-      </Text>
-      <Text
-        numberOfLines={1}
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-            },
-            Object {
-              "color": "#FBCC5C",
-            },
-          ]
-        }
-      >
-        207.810
-      </Text>
     </View>
   </View>
 </View>

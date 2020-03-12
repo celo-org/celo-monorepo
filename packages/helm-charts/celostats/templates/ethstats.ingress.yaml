@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Namespace }}-ethstats-ingress
+  labels:
+    app: celostats
+    chart: celostats
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: ethstats
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($http_upgrade != "websocket") {
+        return 301 https://{{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org/;
+      }
+spec:
+  tls:
+  - hosts:
+    - {{ .Release.Namespace }}-ethstats.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Namespace }}-ethstats-tls
+  rules:
+  - host: {{ .Release.Namespace }}-ethstats.{{ .Values.domain.name }}.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Release.Namespace }}-celostats-server
+          servicePort: 80

@@ -63,7 +63,10 @@ describe('attestations tests', () => {
     await context.hooks.before()
   })
 
-  after(context.hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await context.hooks.after()
+  })
 
   const restart = async () => {
     await context.hooks.restart()
