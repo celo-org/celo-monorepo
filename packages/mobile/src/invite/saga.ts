@@ -59,7 +59,8 @@ export async function getInviteTxGas(
   return getSendTxGas(account, contractGetter, {
     amount,
     comment,
-    recipientAddress: escrowContract._address,
+    // TODO check types
+    recipientAddress: (escrowContract as any)._address,
   })
 }
 
