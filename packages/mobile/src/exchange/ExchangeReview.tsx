@@ -21,8 +21,6 @@ import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/a
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -33,8 +31,6 @@ import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
-  localCurrencyCode: LocalCurrencyCode
-  localCurrencyExchangeRate: string | null | undefined
   tobinTax: string
   fee: string
   appConnected: boolean
@@ -67,8 +63,6 @@ type Props = StateProps & WithTranslation & DispatchProps & NavigationInjectedPr
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
-  localCurrencyCode: getLocalCurrencyCode(state),
-  localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
   tobinTax: state.exchange.tobinTax || '0',
   fee: '0',
   appConnected: isAppConnected(state),
@@ -159,15 +153,7 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      exchangeRatePair,
-      localCurrencyCode,
-      localCurrencyExchangeRate,
-      fee,
-      t,
-      appConnected,
-      tobinTax,
-    } = this.props
+    const { exchangeRatePair, fee, t, appConnected, tobinTax } = this.props
 
     const exchangeRate = getRateForMakerToken(
       exchangeRatePair,
@@ -176,12 +162,37 @@ export class ExchangeReview extends React.Component<Props, State> {
     )
     const dollarAmount = this.getInputAmountInToken(CURRENCY_ENUM.DOLLAR)
 
+    const exchangeAmount = {
+      value: this.state.inputAmount.toString(),
+      currencyCode: CURRENCIES[this.state.inputToken].code,
+    }
+    const exchangeRateAmount = {
+      value: exchangeRate.toString(),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+    const subtotalAmount = {
+      value: dollarAmount.toString(),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+    const exchangeFeeAmount = {
+      value: tobinTax,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+    const securityFeeAmount = {
+      value: fee,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
     const totalAmount = {
       value: dollarAmount
         .plus(tobinTax)
         .plus(fee)
         .toString(),
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+
+    const goldAmount = {
+      value: this.getInputAmountInToken(CURRENCY_ENUM.GOLD).toString(),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
     }
 
     return (
@@ -193,64 +204,29 @@ export class ExchangeReview extends React.Component<Props, State> {
               <View style={styles.amountRow}>
                 <Text style={styles.exchangeBodyText}>
                   {t('exchangeAmount', {
-                    tokenName: t(`global:${this.state.inputTokenDisplayName}`),
+                    tokenName: this.state.inputTokenDisplayName,
                   })}
                 </Text>
-                <CurrencyDisplay
-                  style={styles.currencyAmountText}
-                  amount={{
-                    value: this.state.inputAmount.toString(),
-                    currencyCode: CURRENCIES[this.state.inputToken].code,
-                  }}
-                />
+                <CurrencyDisplay style={styles.currencyAmountText} amount={exchangeAmount} />
               </View>
               <HorizontalLine />
               <LineItemRow
                 title={
                   <Trans i18nKey="subtotalAmount" ns={Namespaces.exchangeFlow9}>
-                    Subtotal @{' '}
-                    <CurrencyDisplay
-                      amount={{
-                        value: exchangeRate.toString(),
-                        currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                      }}
-                    />
+                    Subtotal @ <CurrencyDisplay amount={exchangeRateAmount} />
                   </Trans>
                 }
-                amount={
-                  <CurrencyDisplay
-                    amount={{
-                      value: dollarAmount.toString(),
-                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                    }}
-                  />
-                }
+                amount={<CurrencyDisplay amount={subtotalAmount} />}
               />
               <LineItemRow
                 title={t('exchangeFee')}
                 titleIcon={<FeeIcon />}
-                amount={
-                  <CurrencyDisplay
-                    amount={{
-                      value: tobinTax,
-                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                    }}
-                    formatType={FormatType.Fee}
-                  />
-                }
+                amount={<CurrencyDisplay amount={exchangeFeeAmount} formatType={FormatType.Fee} />}
               />
               <LineItemRow
                 title={t('securityFee')}
                 titleIcon={<FeeIcon isExchange={true} />}
-                amount={
-                  <CurrencyDisplay
-                    amount={{
-                      value: fee,
-                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                    }}
-                    formatType={FormatType.Fee}
-                  />
-                }
+                amount={<CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />}
               />
               <HorizontalLine />
               <TotalLineItem amount={totalAmount} />
@@ -270,14 +246,7 @@ export class ExchangeReview extends React.Component<Props, State> {
                 }
                 ns={Namespaces.exchangeFlow9}
               >
-                Buy or sell{' '}
-                <CurrencyDisplay
-                  amount={{
-                    value: this.getInputAmountInToken(CURRENCY_ENUM.GOLD).toString(),
-                    currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
-                  }}
-                />
-                Gold
+                Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
               </Trans>
             }
             standard={false}

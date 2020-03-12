@@ -114,8 +114,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                   ]
                 }
               >
-                Subtotal @
-                 
+                Subtotal @ 
                 <Text
                   numberOfLines={1}
                   style={
@@ -663,8 +662,7 @@ exports[`ExchangeReview renders correctly 1`] = `
               ]
             }
           >
-            Buy or sell
-             
+            Buy or sell 
             <Text
               numberOfLines={1}
               style={
@@ -680,7 +678,7 @@ exports[`ExchangeReview renders correctly 1`] = `
               
               10.000
             </Text>
-            Gold
+             Gold
           </Text>
         </View>
       </View>
