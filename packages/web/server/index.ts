@@ -201,15 +201,6 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     res.status(NO_CONTENT).send('ok')
   })
 
-  server.get('/proxy/medium', async (_, res) => {
-    try {
-      const articlesdata = await getFormattedMediumArticles()
-      res.json(articlesdata)
-    } catch (e) {
-      respondError(res, e)
-    }
-  })
-
   server.get('/proxy/events/', async (_, res) => {
     try {
       const events = await getFormattedEvents()
