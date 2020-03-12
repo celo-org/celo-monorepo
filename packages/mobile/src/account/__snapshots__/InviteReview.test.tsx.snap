@@ -217,7 +217,6 @@ exports[`InviteReview renders correctly 1`] = `
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -231,7 +230,7 @@ exports[`InviteReview renders correctly 1`] = `
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -247,7 +246,7 @@ exports[`InviteReview renders correctly 1`] = `
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -264,7 +263,7 @@ exports[`InviteReview renders correctly 1`] = `
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },

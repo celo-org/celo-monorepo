@@ -4,18 +4,14 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { connect } from 'react-redux'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
 import { Recipient } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
 
-export interface OwnProps {
+interface Props {
   address?: string
   comment?: string
   value: BigNumber
@@ -24,27 +20,15 @@ export interface OwnProps {
   recipient?: Recipient
 }
 
-interface StateProps {
-  dollarBalance: string
-}
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    dollarBalance: state.stableToken.balance || '0',
-  }
-}
-
 // Content placed in a ReviewFrame for summarizing a payment request
-function PaymentRequestReviewCard({
+export default function PaymentRequestReviewCard({
   recipient,
   address,
   e164PhoneNumber,
-  t,
-  dollarBalance,
   currency,
   value,
   comment,
-}: OwnProps & StateProps & WithTranslation) {
+}: Props) {
   const amount = { value: value.toString(), currencyCode: CURRENCIES[currency].code }
   const totalAmount = amount // TODO: add fee?
 
@@ -52,7 +36,7 @@ function PaymentRequestReviewCard({
     <View style={styles.container}>
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
       <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={amount} />
-      {!!comment && <Text style={[styles.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+      {!!comment && <Text style={styles.comment}>{comment}</Text>}
       <HorizontalLine />
       <TotalLineItem amount={totalAmount} />
     </View>
@@ -73,17 +57,13 @@ const styles = StyleSheet.create({
   },
   amount: {
     marginTop: 15,
-    color: colors.darkSecondary,
   },
-  pSmall: {
+  comment: {
+    ...fontStyles.light,
+    ...componentStyles.paddingTop5,
     fontSize: 14,
     color: colors.darkSecondary,
-    ...fontStyles.light,
     lineHeight: 18,
     textAlign: 'center',
   },
 })
-
-export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.sendFlow7)(PaymentRequestReviewCard)
-)

@@ -33,9 +33,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
             "flexDirection": "row",
             "marginTop": 5,
           },
-          Object {
-            "color": "#81868B",
-          },
+          undefined,
         ]
       }
     >
@@ -47,7 +45,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               "fontFamily": "Hind-Regular",
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 24,
             },
           ]
@@ -64,7 +62,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
               "paddingHorizontal": 3,
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 48,
               "lineHeight": 64,
             },
@@ -282,9 +280,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
             "flexDirection": "row",
             "marginTop": 5,
           },
-          Object {
-            "color": "#81868B",
-          },
+          undefined,
         ]
       }
     >
@@ -296,7 +292,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               "fontFamily": "Hind-Regular",
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 24,
             },
           ]
@@ -313,7 +309,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               "paddingHorizontal": 3,
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 48,
               "lineHeight": 64,
             },
@@ -502,9 +498,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             "flexDirection": "row",
             "marginTop": 5,
           },
-          Object {
-            "color": "#81868B",
-          },
+          undefined,
         ]
       }
     >
@@ -516,7 +510,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               "fontFamily": "Hind-Regular",
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 24,
             },
           ]
@@ -533,7 +527,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               "paddingHorizontal": 3,
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 48,
               "lineHeight": 64,
             },
@@ -722,9 +716,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
             "flexDirection": "row",
             "marginTop": 5,
           },
-          Object {
-            "color": "#81868B",
-          },
+          undefined,
         ]
       }
     >
@@ -736,7 +728,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               "fontFamily": "Hind-Regular",
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 24,
             },
           ]
@@ -753,7 +745,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               "paddingHorizontal": 3,
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 48,
               "lineHeight": 64,
             },
@@ -960,9 +952,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             "flexDirection": "row",
             "marginTop": 5,
           },
-          Object {
-            "color": "#81868B",
-          },
+          undefined,
         ]
       }
     >
@@ -974,7 +964,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               "fontFamily": "Hind-Regular",
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 24,
             },
           ]
@@ -991,7 +981,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               "paddingHorizontal": 3,
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 48,
               "lineHeight": 64,
             },
@@ -1084,9 +1074,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
             "flexDirection": "row",
             "marginTop": 5,
           },
-          Object {
-            "color": "#81868B",
-          },
+          undefined,
         ]
       }
     >
@@ -1098,7 +1086,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
               "fontFamily": "Hind-Regular",
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 24,
             },
           ]
@@ -1115,7 +1103,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
               "paddingHorizontal": 3,
             },
             Object {
-              "color": "#81868B",
+              "color": undefined,
               "fontSize": 48,
               "lineHeight": 64,
             },

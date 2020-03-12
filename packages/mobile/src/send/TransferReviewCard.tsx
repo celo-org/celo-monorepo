@@ -4,7 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
@@ -13,11 +13,11 @@ import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { Recipient } from 'src/recipients/recipient'
 
-export interface OwnProps {
+interface Props {
   address?: string
   comment?: string
   value: BigNumber
@@ -32,19 +32,19 @@ export interface OwnProps {
 
 // Content placed in a ReviewFrame
 // Differs from TransferConfirmationCard which is used for viewing completed txs
-function TransferReviewCard({
+export default function TransferReviewCard({
   recipient,
   address,
   e164PhoneNumber,
   currency,
-  t,
   type,
   value,
   comment,
   fee,
   isLoadingFee,
   feeError,
-}: OwnProps & WithTranslation) {
+}: Props) {
+  const { t } = useTranslation(Namespaces.sendFlow7)
   const isInvite = type === TokenTransactionType.InviteSent
   const inviteFee = getInvitationVerificationFeeInDollars()
   const inviteFeeAmount = {
@@ -75,7 +75,7 @@ function TransferReviewCard({
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
       <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={amount} />
       <View style={styles.bottomContainer}>
-        {!!comment && <Text style={[styles.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+        {!!comment && <Text style={styles.comment}>{comment}</Text>}
         <HorizontalLine />
         {subtotalAmount && (
           <LineItemRow
@@ -120,15 +120,13 @@ const styles = StyleSheet.create({
   },
   amount: {
     marginTop: 15,
-    color: colors.darkSecondary,
   },
-  pSmall: {
+  comment: {
+    ...componentStyles.paddingTop5,
+    ...fontStyles.light,
     fontSize: 14,
     color: colors.darkSecondary,
-    ...fontStyles.light,
     lineHeight: 18,
     textAlign: 'center',
   },
 })
-
-export default withTranslation(Namespaces.sendFlow7)(TransferReviewCard)

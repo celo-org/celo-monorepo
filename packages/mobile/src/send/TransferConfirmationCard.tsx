@@ -50,7 +50,7 @@ function Amount(props: ExtractProps<typeof CurrencyDisplay>) {
 
   return (
     <View>
-      <CurrencyDisplay type={DisplayType.Big} style={style.currency} hideSign={true} {...props} />
+      <CurrencyDisplay type={DisplayType.Big} hideSign={true} {...props} />
       {showDollarAmount && (
         <Text style={style.dollarAmount}>
           <Trans
@@ -190,9 +190,6 @@ const style = StyleSheet.create({
     ...fontStyles.pCurrency,
     textAlign: 'center',
     marginBottom: 5,
-  },
-  currency: {
-    color: colors.darkSecondary,
   },
   dollarAmount: {
     ...fontStyles.light,

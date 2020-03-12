@@ -147,9 +147,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           "flexDirection": "row",
           "marginTop": 5,
         },
-        Object {
-          "color": "#81868B",
-        },
+        undefined,
       ]
     }
   >
@@ -161,7 +159,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 34,
           },
         ]
@@ -177,7 +175,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 24,
           },
         ]
@@ -194,7 +192,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "paddingHorizontal": 3,
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 48,
             "lineHeight": 64,
           },
@@ -250,7 +248,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           ]
         }
       >
-        totalSent
+        amount
       </Text>
     </View>
     <Text

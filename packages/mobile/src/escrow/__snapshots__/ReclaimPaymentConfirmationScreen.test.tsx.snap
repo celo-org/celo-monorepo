@@ -217,9 +217,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     "flexDirection": "row",
                     "marginTop": 5,
                   },
-                  Object {
-                    "color": "#81868B",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -231,7 +229,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -247,7 +245,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -264,7 +262,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -320,7 +318,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  totalSent
+                  amount
                 </Text>
               </View>
               <Text
@@ -1048,9 +1046,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     "flexDirection": "row",
                     "marginTop": 5,
                   },
-                  Object {
-                    "color": "#81868B",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -1062,7 +1058,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -1078,7 +1074,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -1095,7 +1091,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -1151,7 +1147,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  totalSent
+                  amount
                 </Text>
               </View>
               <Text
@@ -1879,9 +1875,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     "flexDirection": "row",
                     "marginTop": 5,
                   },
-                  Object {
-                    "color": "#81868B",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -1893,7 +1887,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -1909,7 +1903,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -1926,7 +1920,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -1982,7 +1976,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  totalSent
+                  amount
                 </Text>
               </View>
               <Text

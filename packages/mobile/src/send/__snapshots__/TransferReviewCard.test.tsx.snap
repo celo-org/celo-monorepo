@@ -127,7 +127,6 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
           "marginTop": 5,
         },
         Object {
-          "color": "#81868B",
           "marginTop": 15,
         },
       ]
@@ -141,7 +140,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 34,
           },
         ]
@@ -157,7 +156,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 24,
           },
         ]
@@ -174,7 +173,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             "paddingHorizontal": 3,
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 48,
             "lineHeight": 64,
           },
@@ -756,7 +755,6 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           "marginTop": 5,
         },
         Object {
-          "color": "#81868B",
           "marginTop": 15,
         },
       ]
@@ -770,7 +768,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 34,
           },
         ]
@@ -786,7 +784,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 24,
           },
         ]
@@ -803,7 +801,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
             "paddingHorizontal": 3,
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 48,
             "lineHeight": 64,
           },
@@ -1296,7 +1294,6 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
           "marginTop": 5,
         },
         Object {
-          "color": "#81868B",
           "marginTop": 15,
         },
       ]
@@ -1310,7 +1307,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 34,
           },
         ]
@@ -1326,7 +1323,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             "fontFamily": "Hind-Regular",
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 24,
           },
         ]
@@ -1343,7 +1340,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             "paddingHorizontal": 3,
           },
           Object {
-            "color": "#81868B",
+            "color": undefined,
             "fontSize": 48,
             "lineHeight": 64,
           },

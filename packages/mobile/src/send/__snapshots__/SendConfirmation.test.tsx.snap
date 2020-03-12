@@ -219,7 +219,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -233,7 +232,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -249,7 +248,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -266,7 +265,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -287,18 +286,14 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "paddingTop": 5,
+                    "textAlign": "center",
+                  }
                 }
               >
                 My Reason
@@ -1496,7 +1491,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -1510,7 +1504,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -1526,7 +1520,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -1543,7 +1537,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -1564,18 +1558,14 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "paddingTop": 5,
+                    "textAlign": "center",
+                  }
                 }
               >
                 My Reason
@@ -2773,7 +2763,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -2787,7 +2776,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -2803,7 +2792,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -2820,7 +2809,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -2841,18 +2830,14 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "paddingTop": 5,
+                    "textAlign": "center",
+                  }
                 }
               >
                 My Reason
@@ -4047,7 +4032,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -4061,7 +4045,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -4077,7 +4061,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -4094,7 +4078,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -4115,18 +4099,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "paddingTop": 5,
+                    "textAlign": "center",
+                  }
                 }
               >
                 My Reason
@@ -5324,7 +5304,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -5338,7 +5317,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -5354,7 +5333,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -5371,7 +5350,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -5392,18 +5371,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "paddingTop": 5,
+                    "textAlign": "center",
+                  }
                 }
               >
                 My Reason
@@ -6601,7 +6576,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -6615,7 +6589,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -6631,7 +6605,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -6648,7 +6622,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -6669,18 +6643,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                    "paddingTop": 5,
+                    "textAlign": "center",
+                  }
                 }
               >
                 My Reason

@@ -220,7 +220,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     "marginTop": 5,
                   },
                   Object {
-                    "color": "#81868B",
                     "marginTop": 15,
                   },
                 ]
@@ -234,7 +233,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 34,
                     },
                   ]
@@ -250,7 +249,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       "fontFamily": "Hind-Regular",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 24,
                     },
                   ]
@@ -267,7 +266,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       "paddingHorizontal": 3,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": undefined,
                       "fontSize": 48,
                       "lineHeight": 64,
                     },
@@ -279,18 +278,14 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
             </View>
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                    "textAlign": "center",
-                  },
-                  Object {
-                    "paddingTop": 5,
-                  },
-                ]
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingTop": 5,
+                  "textAlign": "center",
+                }
               }
             >
               My Reason
