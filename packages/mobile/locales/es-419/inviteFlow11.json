@@ -28,5 +28,5 @@
   "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)",
   "escrowPaymentNotificationLine": "<0>{{recipientPhone}} por</0> <1></1>",
   "escrowPaymentNotificationLine_missingRecipientPhone": "<0>Desconocido por</0> <1></1>",
-  "defaultComment": "Invitación enviada"
+  "defaultComment": "Pago invitado y enviado"
 }

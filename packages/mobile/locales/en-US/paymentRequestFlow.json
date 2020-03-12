@@ -7,6 +7,6 @@
   "paymentRequestUpdateFailed": "Cannot update payment request",
   "incomingPaymentRequestNotificationTitle": "{{name}} requested <3></3>",
   "outgoingPaymentRequestNotificationTitle": "Requested <2></2> from {{name}}",
-  "defaultComment": "Payment Requested",
+  "defaultComment": "Payment requested",
   "paymentRequestNotificationLine": "<0>{{displayName}} for</0> <1></1>"
 }
