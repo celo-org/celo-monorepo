@@ -399,6 +399,23 @@ exports[`Experience/Brandkit renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "MozTransitionProperty": "transform,",
+              "WebkitTransform": "scaleY(0)",
+              "WebkitTransformOrigin": "top",
+              "WebkitTransitionDuration": "500ms",
+              "WebkitTransitionProperty": "-webkit-transform,transform,",
+              "marginLeft": "20px",
+              "transform": "scaleY(0)",
+              "transformOrigin": "top",
+              "transitionDuration": "500ms",
+              "transitionProperty": "-webkit-transform,transform,",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitFlexDirection": "row",
@@ -1271,7 +1288,7 @@ exports[`Experience/Brandkit renders 1`] = `
         </div>
         <div
           className="css-view-1dbjc4n"
-          id="brandvoice"
+          id="brand-voice"
         >
           <div
             className="css-view-1dbjc4n"
@@ -1344,6 +1361,7 @@ exports[`Experience/Brandkit renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://docs.google.com/document/d/1Y1mfpBGad_8ZxSuIqwX52MWGEMfoWGt5HXc7sZp9h70/edit?usp=sharing"
+                  rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
@@ -1355,6 +1373,7 @@ exports[`Experience/Brandkit renders 1`] = `
                       "textDecorationStyle": "solid",
                     }
                   }
+                  target="_blank"
                 />
               </div>
             </div>

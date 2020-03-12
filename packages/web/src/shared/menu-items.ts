@@ -126,6 +126,7 @@ export const hashNav = {
   },
   join: { roles: 'roles' },
   home: { partnerships: 'partnerships' },
+  brandIntro: { overview: 'overview', brandVoice: 'brand-voice' },
   brandLogo: { overview: 'overview', space: 'space-and-sizing', backgrounds: 'backgrounds' },
   brandColor: { overview: 'overview', backgrounds: 'background-colors' },
   brandComposition: {
