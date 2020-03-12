@@ -35,7 +35,7 @@ const DefaultConfig = {
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD
-    penalty: '5000000000000000000000', // 5000 cGLD
+    penalty: '9000000000000000000000', // 9000 cGLD
   },
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
@@ -97,10 +97,11 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
-    // 2/1 placeholder until addresses for 2/5 multsig are generated.
+    // 1/3 placeholder until addresses for 2/5 multsig are generated.
     signatories: [
       '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606',
       '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
+      '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
     ],
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
