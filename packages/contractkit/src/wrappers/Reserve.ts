@@ -23,6 +23,12 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   transferGold = proxySend(this.kit, this.contract.methods.transferGold)
 
   /**
+   * Returns the reserve cGLD balance.
+   * @returns cGLD balance.
+   */
+  getReserveGoldBalance = proxyCall(this.contract.methods.getReserveGoldBalance, undefined, valueToBigNumber)
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ReserveConfig> {

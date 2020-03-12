@@ -156,17 +156,16 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
   }
 
   async function fetchState() {
-
     // Fetching public state
     // Stability
     exchange
       .getBuyAndSellBuckets(true)
-      .then( buckets => {
+      .then((buckets) => {
         const view: ViewDefinition = {
-          contract: "Exchange",
-          function: "getBuyAndSellBuckets",
-          currentStableBucket:  Number(buckets[0]),
-          currentGoldBucket: Number(buckets[1])
+          contract: 'Exchange',
+          function: 'getBuyAndSellBuckets',
+          currentStableBucket: Number(buckets[0]),
+          currentGoldBucket: Number(buckets[1]),
         }
         logEvent(LoggingCategory.State, view)
       })
@@ -174,36 +173,37 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
 
     sortedOracles
       .medianRate(CeloContract.StableToken)
-      .then( medianRate => {
+      .then((medianRate) => {
         const view: ViewDefinition = {
-          contract: "SortedOracles",
-          function: "medianRate",
-          medianRate: Number(medianRate.rate)
+          contract: 'SortedOracles',
+          function: 'medianRate',
+          medianRate: Number(medianRate.rate),
         }
         logEvent(LoggingCategory.State, view)
       })
       .catch()
 
     // TODO: Pending of implement getReserveGoldBalance function in contractKit
-    // reserve.getReserveGoldBalance()
-    //   .then(goldBalance => {
-    //     const view: ViewDefinition = {
-    //       contract: "Reserve",
-    //       function: "getReserveGoldBalance",
-    //       goldBalance: Number(goldBalance)
-    //     }
-    //     logEvent(LoggingCategory.State, view)
-    //   })
-    //   .catch()
+    reserve
+      .getReserveGoldBalance()
+      .then((goldBalance) => {
+        const view: ViewDefinition = {
+          contract: 'Reserve',
+          function: 'getReserveGoldBalance',
+          goldBalance: Number(goldBalance),
+        }
+        logEvent(LoggingCategory.State, view)
+      })
+      .catch()
 
     // PoS
     goldToken
       .totalSupply()
-      .then(goldTokenTotalSupply => {
+      .then((goldTokenTotalSupply) => {
         const view: ViewDefinition = {
-          contract: "GoldToken",
-          function: "totalSupply",
-          goldTokenTotalSupply: Number(goldTokenTotalSupply)
+          contract: 'GoldToken',
+          function: 'totalSupply',
+          goldTokenTotalSupply: Number(goldTokenTotalSupply),
         }
         logEvent(LoggingCategory.State, view)
       })
@@ -245,7 +245,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
 
-    if (header.number%BLOCK_INTERVAL === 0)  {
+    if (header.number % BLOCK_INTERVAL === 0) {
       // tslint:disable-next-line: no-floating-promises
       fetchState()
     }
