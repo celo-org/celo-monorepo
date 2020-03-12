@@ -6,7 +6,7 @@ import * as _ from 'underscore'
 import * as helpers from 'web3-core-helpers'
 import * as utils from 'web3-utils'
 
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 function isNot(value: any) {
   return _.isUndefined(value) || _.isNull(value)
