@@ -19,7 +19,6 @@ import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
-import { getFormattedMediumArticles } from './mediumAPI'
 import respondError from './respondError'
 
 const CREATED = 201
