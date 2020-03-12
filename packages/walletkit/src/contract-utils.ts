@@ -2,9 +2,9 @@ import BigNumber from 'bignumber.js'
 import { values } from 'lodash'
 import sleep from 'sleep-promise'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3-eth'
-import Contract from 'web3/eth/contract'
-import { TransactionObject, Tx } from 'web3/eth/types'
+import { Tx } from 'web3-core'
+import { TransactionObject, TransactionReceipt } from 'web3-eth'
+import { Contract } from 'web3-eth-contract'
 import * as ContractList from '../contracts/index'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
 import { GoldToken } from '../types/GoldToken'
@@ -284,8 +284,8 @@ export async function sendTransactionAsync<T>(
     logger(Started)
     const txParams: Tx = {
       from: account,
-      // @ts-ignore web3 doesn't know about this Celo-specific prop
-      feeCurrency: feeCurrencyContract._address,
+      // web3 doesn't know about this Celo-specific prop
+      feeCurrency: (feeCurrencyContract as any)._address,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
       // the suggested price in the selected feeCurrency.
       gasPrice: '0',
@@ -394,12 +394,13 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
 
   try {
     logger(Started)
-    const feeCurrency = feeCurrencyContract._address
+    // web3 doesn't know about this Celo-specific prop
+    const feeCurrency = (feeCurrencyContract as any)._address
     Logger.debug(tag, `Using nonce ${nonce} for account ${account} and fee currency ${feeCurrency}`)
 
     const txParams: Tx = {
       from: account,
-      // @ts-ignore web3 doesn't know about this Celo-specific prop
+      // web3 doesn't know about this Celo-specific prop
       feeCurrency,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
       // the suggested price in the selected feeCurrency.

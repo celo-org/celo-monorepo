@@ -2,6 +2,7 @@
   "getBackupKey": "Obtener Clave de Respaldo",
   "getYourKey": "Obtenga su clave",
   "viewBackupKey": "Ver Clave de Respaldo",
+  "setUpBackupKey": "Configurar Clave de Respaldo",
   "setUpSocialBackup": "Configurar Salvaguardas",
   "viewSafeguards": "Ver Salvaguardas",
   "failedFetchMnemonic": "No se pudo obtener su clave de respaldo",
@@ -19,14 +20,14 @@
     "4": "Para mayor seguridad, configure las Salvaguardas de su billetera.",
     "5":
       "¡También ha configurado las salvaguardas! Podrá restaurar su cuenta con la ayuda de dos amigos. ",
-    "6": "MANTENGA EN SECRETO SUS SALVAGUARDAS"
+    "6": "MANTENGA EN SECRETO SUS SALVAGUARDAS",
+    "7": "Ahora, configuraremos su clave para que usted, y solo usted, pueda acceder a sus fondos en cualquier momento y en cualquier lugar."
   },
   "backupSkipText": {
     "0": "Sin una clave de respaldo, puede perder el acceso a la billetera ",
     "1": "para siempre."
   },
-  "backupRecovery":
-    "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
+  "backupRecovery": "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
   "securityTip": "Si pierde su clave de respaldo, perderá el acceso a sus dólares y oro Celo.",
   "backupKeySummary":
     "Escriba su clave de respaldo. Si se pierde o le roban su teléfono, necesitará su clave de respaldo para acceder a la billetera Celo.",
@@ -49,6 +50,7 @@
   "importBackupFailed": "No se pudo importar la billetera",
   "backupQuizFailed": "Clave de respaldo incorrecta; vuelva a intentarlo",
   "backupComplete": {
+    "header": "Copia de Seguridad Completa",
     "0": "¡Correcto!",
     "1": "Ahora puede configurar las salvaguardas.",
     "2": "¡Está todo configurado!"

@@ -1,7 +1,7 @@
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
-import { DowntimeSlasher } from '../generated/types/DowntimeSlasher'
+import { DowntimeSlasher } from '../generated/DowntimeSlasher'
 import {
   BaseWrapper,
   CeloTransactionObject,
