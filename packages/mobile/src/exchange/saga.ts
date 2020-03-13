@@ -271,7 +271,7 @@ function* createStandbyTx(
   exchangeRate: BigNumber,
   account: string
 ) {
-  const takerAmount = getTakerAmount(makerAmount, exchangeRate, 2)
+  const takerAmount = getTakerAmount(makerAmount, exchangeRate)
   const txId = generateStandbyTransactionId(account)
   yield put(
     addStandbyTransaction({

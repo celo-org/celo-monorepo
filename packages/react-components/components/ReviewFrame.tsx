@@ -108,10 +108,10 @@ const styles = StyleSheet.create({
   scrollViewContentContainer: {
     paddingVertical: 10,
     justifyContent: 'flex-start',
-    alignItems: 'center',
   },
   confirmationContainer: {
-    margin: 20,
+    marginVertical: 20,
+    marginHorizontal: 16,
   },
   circleButtonContainer: {
     marginVertical: 20,

@@ -24,6 +24,7 @@ exports[`renders correctly 1`] = `
      for 
   </Text>
   <Text
+    numberOfLines={1}
     style={
       Array [
         Object {
@@ -33,12 +34,14 @@ exports[`renders correctly 1`] = `
           "lineHeight": 20,
         },
         Object {
-          "fontFamily": "Hind-SemiBold",
+          "color": "#81868B",
         },
       ]
     }
   >
-    24
+    
+    $
+    31.92
   </Text>
 </Text>
 `;
