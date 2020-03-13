@@ -15,14 +15,14 @@ interface LineItemProps {
 
 export default function LineItemRow({
   style,
-  textStyle: passedTextStyle,
+  textStyle: textStyleProp,
   amount,
   title,
   titleIcon,
   isLoading,
   hasError,
 }: LineItemProps) {
-  const textStyle = [styles.text, passedTextStyle]
+  const textStyle = [styles.text, textStyleProp]
 
   return (
     <View style={[styles.container, style]}>

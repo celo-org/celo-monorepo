@@ -25,20 +25,20 @@ interface Props {
 export default function ReclaimPaymentConfirmationCard({
   recipientPhone,
   recipientContact,
-  amount: passedAmount,
+  amount: amountProp,
   fee,
   isLoadingFee,
   feeError,
   currency,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const amount = { value: passedAmount.toString(), currencyCode: CURRENCIES[currency].code }
+  const amount = { value: amountProp.toString(), currencyCode: CURRENCIES[currency].code }
   const securityFeeAmount = fee && {
     value: fee.negated().toString(),
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
   const totalAmount = {
-    value: passedAmount.minus(fee || 0).toString(),
+    value: amountProp.minus(fee || 0).toString(),
     currencyCode: amount.currencyCode,
   }
 
