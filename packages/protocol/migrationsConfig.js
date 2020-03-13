@@ -43,16 +43,16 @@ const DefaultConfig = {
     slashableDowntime: (12 * HOUR) / 5, // ~12 hours
   },
   election: {
-    minElectableValidators: '50',
+    minElectableValidators: '5', // Change to 50 once mainnet activated
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      initial: 0, // Change to 0.00016 once mainnet activated // (x + 1) ^ 365 = 1.06
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 1 / 3650,
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated 1 / 3650
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -85,10 +85,10 @@ const DefaultConfig = {
   },
   governance: {
     queueExpiry: WEEK, // Change to 4 weeks once mainnet activated
-    dequeueFrequency: DAY, // Change to 1 week once mainnet activated
+    dequeueFrequency: MINUTE, // Change to 1 week once mainnet activated
     concurrentProposals: 3, // Change to 10 once mainnet activated
-    approvalStageDuration: DAY, // Change to 3 days once mainnet activated
-    referendumStageDuration: DAY, // Change to 1 week once mainnet activated
+    approvalStageDuration: 30 * minute, // Change to 3 days once mainnet activated
+    referendumStageDuration: HOUR, // Change to 1 week once mainnet activated
     executionStageDuration: WEEK,
     minDeposit: 100, // 100 cGLD
     participationBaseline: 8 / 10,
