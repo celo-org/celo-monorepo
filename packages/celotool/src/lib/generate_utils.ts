@@ -15,11 +15,11 @@ import {
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
-import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
+import { GenesisConfig } from './interfaces/genesis-config'
 
 const ec = new EC('secp256k1')
 
