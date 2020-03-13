@@ -16,7 +16,6 @@ import {
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
-  useBalanceInNavigationParam,
 } from 'src/notifications/NotificationList'
 import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRequestListItem'
 import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
@@ -74,8 +73,6 @@ export const listItemRenderer = (params: {
 }
 
 const OutgoingPaymentRequestListScreen = (props: Props) => {
-  const { dollarBalance, navigation } = props
-  useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList
       items={props.paymentRequests}

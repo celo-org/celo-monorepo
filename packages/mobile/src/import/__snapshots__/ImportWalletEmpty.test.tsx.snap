@@ -51,16 +51,24 @@ exports[`ImportWalletEmpty renders correctly 1`] = `
       </svg>
     </View>
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "paddingBottom": 20,
-          "textAlign": "center",
-        }
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          },
+          Object {
+            "color": "#2E3338",
+          },
+        ]
       }
     >
+      
+      $
       0.00
     </Text>
     <Text

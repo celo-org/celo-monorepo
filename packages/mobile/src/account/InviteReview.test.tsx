@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import InviteReviewConnected, { InviteReview } from 'src/account/InviteReview'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockCountryCode, mockNavigation } from 'test/values'
+import { mockNavigation } from 'test/values'
 
 jest.mock('src/geth/GethAwareButton', () => {
   return mockButton
@@ -23,8 +23,6 @@ describe('InviteReview', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore()}>
-        {/*
-          // @ts-ignore */}
         <InviteReviewConnected navigation={mockNavigation} />
       </Provider>
     )
@@ -40,15 +38,14 @@ describe('InviteReview', () => {
     const inviteReview = render(
       <Provider store={createMockStore()}>
         <InviteReview
+          account="0xabc"
           inviteInProgress={false}
-          defaultCountryCode={mockCountryCode}
           dollarBalance={'100'}
           fetchDollarBalance={jest.fn()}
           hideAlert={hideAlert}
           showError={jest.fn()}
           sendInvite={sendInvite}
           {...getMockI18nProps()}
-          // @ts-ignore
           navigation={mockNavigation}
         />
       </Provider>

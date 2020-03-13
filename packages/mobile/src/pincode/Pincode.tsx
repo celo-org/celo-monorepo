@@ -82,7 +82,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
   },
   keypadContainer: {
-    marginVertical: 15,
+    marginBottom: 15,
     paddingHorizontal: 20,
   },
 })
