@@ -97,14 +97,15 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
-    // 1/3 placeholder until addresses for 2/5 multsig are generated.
+    // 2/4 multsig
     signatories: [
       '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606',
       '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
       '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
+      '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02',
     ],
-    numRequiredConfirmations: 1,
-    numInternalRequiredConfirmations: 1,
+    numRequiredConfirmations: 2,
+    numInternalRequiredConfirmations: 2,
     useMultiSig: true,
   },
   lockedGold: {
@@ -123,7 +124,6 @@ const DefaultConfig = {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
-    // To be populated once addresses are generated.
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
@@ -135,7 +135,7 @@ const DefaultConfig = {
       '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
     ],
     numRequiredConfirmations: 2,
-    numInternalRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 2,
   },
   stableToken: {
     decimals: 18,
@@ -153,21 +153,21 @@ const DefaultConfig = {
   },
   transferWhitelist: {
     addresses: [
-      '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF', // Reserve spender 1
-      '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3', // Reserve spender 2
-      '0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0', // Other reserve address
-      '0x36940810BfDB329B31e38d3e97aFD673081B497C', // ReserveCo genesis address
-      '0xfCf982bb4015852e706100B14E21f947a5Bb718E', // LLC genesis address
-      '0xe90bB6dE0996D41cb0A843A06839EEf38c6E5456', // LLC treasury address
-      '0xbA8761304CEc7bE0f83C6F8Fa7EBBa3eE0b6Ae97', // API RAU genesis address
-      '0xb566bB6D1850A345FA39EF38fefaC4E892348d51', // cLabs RAU genesis address
-      '0xDb39DBE5abE42466F122b24c44518b1089ef8fC8', // RegD genesis address
-      '0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe', // Foundation genesis 1
-      '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C', // Core Contract deployer
-      '0x8f55CE88b4F62F22c663f5A539414dcCeF969c32', // APFCo genesis 1
-      '0xF607d4dd519B4bc963C9c48E8650E67C51DbC35b', // APFCo genesis 2
-      '0x515033209a0A29034DC3F037cC72a6014b902341', // APFCo genesis 3
-      '0x6E36F0D3cF12aa592FF88D03938584562c9239cA', // cLabs treasury 1
+      '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
+      '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
+      '0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0',
+      '0x36940810BfDB329B31e38d3e97aFD673081B497C',
+      '0xfCf982bb4015852e706100B14E21f947a5Bb718E',
+      '0xe90bB6dE0996D41cb0A843A06839EEf38c6E5456',
+      '0xbA8761304CEc7bE0f83C6F8Fa7EBBa3eE0b6Ae97',
+      '0xb566bB6D1850A345FA39EF38fefaC4E892348d51',
+      '0xDb39DBE5abE42466F122b24c44518b1089ef8fC8',
+      '0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe',
+      '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C',
+      '0x8f55CE88b4F62F22c663f5A539414dcCeF969c32',
+      '0xF607d4dd519B4bc963C9c48E8650E67C51DbC35b',
+      '0x515033209a0A29034DC3F037cC72a6014b902341',
+      '0x6E36F0D3cF12aa592FF88D03938584562c9239cA',
     ],
     registryIds: [
       web3.utils.soliditySha3(CeloContractName.Governance),

@@ -6,7 +6,6 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import BigNumber from 'bignumber.js'
 import { RegistryInstance, ReserveInstance, ReserveSpenderMultiSigInstance } from 'types'
 import Web3 from 'web3'
 import Web3Utils = require('web3-utils')
@@ -30,8 +29,8 @@ const initializeArgs = async (): Promise<[
     registry.address,
     config.reserve.tobinTaxStalenessThreshold,
     config.reserve.dailySpendingRatio,
-    0, // frozenGold must be set after initial balance
-    0, // frozenGold must be set after initial balance
+    0, // frozenGold cannot be set until the reserve us funded
+    0, // frozenGold cannot be set until the reserve us funded
     config.reserve.assetAllocationSymbols.map((assetSymbol) =>
       Web3Utils.padRight(Web3Utils.utf8ToHex(assetSymbol), 64)
     ),
@@ -60,9 +59,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       await web3.eth.sendTransaction({
         from: network.from,
         to: reserve.address,
-        value: new BigNumber(
-          web3.utils.toWei(new BigNumber(config.reserve.initialBalance).toString(10), 'ether')
-        ).toString(),
+        value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
       })
     }
 
