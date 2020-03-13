@@ -16,7 +16,6 @@ exports[`renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "alignItems": "center",
         "justifyContent": "flex-start",
         "paddingVertical": 10,
       }
@@ -70,7 +69,8 @@ exports[`renders correctly 1`] = `
       <View
         style={
           Object {
-            "margin": 20,
+            "marginHorizontal": 16,
+            "marginVertical": 20,
           }
         }
       />

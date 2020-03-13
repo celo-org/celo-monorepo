@@ -86,7 +86,7 @@ function resolveAmount(
   return {
     ...moneyAmount,
     localAmount: {
-      value: new BigNumber(moneyAmount.value).multipliedBy(exchangeRate).toString(),
+      value: new BigNumber(moneyAmount.value).multipliedBy(exchangeRate),
       currencyCode: localCurrencyCode as string,
       exchangeRate,
     },
@@ -102,22 +102,22 @@ function mapExchangeStandbyToFeedItem(
   const { type, hash, status, timestamp, inValue, inSymbol, outValue, outSymbol } = standbyTx
 
   const inAmount = {
-    value: inValue,
+    value: new BigNumber(inValue),
     currencyCode: CURRENCIES[inSymbol].code,
   }
   const outAmount = {
-    value: outValue,
+    value: new BigNumber(outValue),
     currencyCode: CURRENCIES[outSymbol].code,
   }
 
   const exchangeRate = new BigNumber(outAmount.value).dividedBy(inAmount.value)
   const localExchangeRate = new BigNumber(localCurrencyExchangeRate ?? 0)
   const makerLocalExchangeRate =
-    inAmount.currencyCode === localCurrencyCode
+    inAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code
       ? localExchangeRate
       : exchangeRate.multipliedBy(localExchangeRate)
   const takerLocalExchangeRate =
-    outAmount.currencyCode === localCurrencyCode
+    outAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code
       ? localExchangeRate
       : exchangeRate.pow(-1).multipliedBy(localExchangeRate)
 
@@ -144,9 +144,9 @@ function mapExchangeStandbyToFeedItem(
       {
         ...accountAmount,
         // Signed amount relative to the queried account currency
-        value: new BigNumber(accountAmount.value)
-          .multipliedBy(accountAmount === makerAmount ? -1 : 1)
-          .toString(),
+        value: new BigNumber(accountAmount.value).multipliedBy(
+          accountAmount === makerAmount ? -1 : 1
+        ),
       },
       localCurrencyCode,
       accountAmount.localAmount?.exchangeRate
@@ -173,7 +173,7 @@ function mapTransferStandbyToFeedItem(
       {
         // Signed amount relative to the queried account currency
         // Standby transfers are always outgoing
-        value: new BigNumber(value).multipliedBy(-1).toString(),
+        value: new BigNumber(value).multipliedBy(-1),
         currencyCode: CURRENCIES[symbol].code,
       },
       localCurrencyCode,
