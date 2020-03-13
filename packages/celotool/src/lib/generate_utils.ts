@@ -11,7 +11,6 @@ import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
-  INITIAL_ACCOUNTS,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
   TEMPLATE,
@@ -215,8 +214,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
   // Use hardcoded account addresses if provided, otherwise generate from mnemonic.
-  const initialAccounts =
-    INITIAL_ACCOUNTS.length > 0 ? INITIAL_ACCOUNTS : getFaucetedAccounts(mnemonic)
+  const initialAccounts = getFaucetedAccounts(mnemonic)
   if (genesisAccountsEnv !== '') {
     const genesisAccountsPath = path.resolve(monorepoRoot, genesisAccountsEnv)
     const genesisAccounts = JSON.parse(fs.readFileSync(genesisAccountsPath).toString())
@@ -356,10 +354,7 @@ export const generateGenesis = ({
       genesis.alloc[contract] = {
         code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
         storage: {
-          [CONTRACT_OWNER_STORAGE_LOCATION]:
-            INITIAL_ACCOUNTS.length > 0
-              ? '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
-              : validators[0].address,
+          [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
         },
         balance: '0',
       }
