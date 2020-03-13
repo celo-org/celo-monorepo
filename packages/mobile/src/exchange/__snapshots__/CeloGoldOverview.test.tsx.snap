@@ -35,10 +35,10 @@ exports[`renders correctly when not ready 1`] = `
       style={
         Array [
           Object {
-            "color": undefined,
+            "fontFamily": "Hind-SemiBold",
           },
           Object {
-            "fontFamily": "Hind-SemiBold",
+            "color": undefined,
           },
         ]
       }
@@ -62,10 +62,10 @@ exports[`renders correctly when not ready 1`] = `
       numberOfLines={1}
       style={
         Array [
+          undefined,
           Object {
             "color": undefined,
           },
-          undefined,
         ]
       }
     >
@@ -111,10 +111,10 @@ exports[`renders correctly when ready 1`] = `
       style={
         Array [
           Object {
-            "color": undefined,
+            "fontFamily": "Hind-SemiBold",
           },
           Object {
-            "fontFamily": "Hind-SemiBold",
+            "color": undefined,
           },
         ]
       }
@@ -138,10 +138,10 @@ exports[`renders correctly when ready 1`] = `
       numberOfLines={1}
       style={
         Array [
+          undefined,
           Object {
             "color": undefined,
           },
-          undefined,
         ]
       }
     >
