@@ -16,7 +16,7 @@ describe('Pincode', () => {
     expect(toJSON()).toMatchSnapshot()
 
     // second render shows pin re-enter set screen
-    fireEvent.press(getByTestId('Pincode-Enter'))
+    fireEvent.press(getByTestId('Pincode-Submit'))
     expect(toJSON()).toMatchSnapshot()
   })
 })

@@ -619,7 +619,7 @@ exports[`PincodeEnter renders correctly 1`] = `
           },
         ]
       }
-      testID="Pincode-Enter"
+      testID="Pincode-Submit"
     >
       <View
         style={

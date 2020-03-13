@@ -647,7 +647,7 @@ exports[`Pincode renders correctly 1`] = `
           },
         ]
       }
-      testID="Pincode-Enter"
+      testID="Pincode-Submit"
     >
       <View
         style={
@@ -1331,7 +1331,7 @@ exports[`Pincode renders correctly 2`] = `
           },
         ]
       }
-      testID="Pincode-ReEnter"
+      testID="Pincode-Submit"
     >
       <View
         style={

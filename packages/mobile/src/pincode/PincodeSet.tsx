@@ -1,12 +1,7 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
@@ -21,7 +16,7 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import PincodeTextbox from 'src/pincode/PincodeTextbox'
+import Pincode from 'src/pincode/Pincode'
 
 interface DispatchProps {
   showError: typeof showError
@@ -83,32 +78,6 @@ export class PincodeSet extends React.Component<Props, State> {
     }
   }
 
-  onDigitPress = (digit: number) => {
-    const { pin1, pin2, isPin1Inputted } = this.state
-    if (!isPin1Inputted) {
-      this.setState({
-        pin1: (pin1 + digit).substr(0, 6),
-      })
-    } else {
-      this.setState({
-        pin2: (pin2 + digit).substr(0, 6),
-      })
-    }
-  }
-
-  onBackspacePress = () => {
-    const { pin1, pin2, isPin1Inputted } = this.state
-    if (!isPin1Inputted) {
-      this.setState({
-        pin1: pin1.substr(0, pin1.length - 1),
-      })
-    } else {
-      this.setState({
-        pin2: pin2.substr(0, pin2.length - 1),
-      })
-    }
-  }
-
   render() {
     const { t } = this.props
     const { isPin1Inputted, pin1, pin2 } = this.state
@@ -116,47 +85,29 @@ export class PincodeSet extends React.Component<Props, State> {
     return (
       <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
-        <ScrollView contentContainerStyle={style.scrollContainer}>
-          <View>
-            <Text style={[fontStyles.h1, componentStyles.marginTop15]}>
-              {isPin1Inputted ? t('verifyPin.title') : t('createPin.title')}
-            </Text>
-            <View style={style.pincodeContainer}>
-              <PincodeTextbox
-                pin={isPin1Inputted ? pin2 : pin1}
-                placeholder={t('createPin.yourPin')}
-              />
-            </View>
-          </View>
-          <View>
-            <HorizontalLine />
-            <View style={style.keypadContainer}>
-              <NumberKeypad
-                showDecimal={false}
-                onDigitPress={this.onDigitPress}
-                onBackspacePress={this.onBackspacePress}
-              />
-            </View>
-          </View>
-        </ScrollView>
-        {!isPin1Inputted && (
-          <Button
-            testID="Pincode-Enter"
-            text={t('global:continue')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            onPress={this.onPressPin1Continue}
-            disabled={!this.isPin1Valid()}
-          />
-        )}
-        {isPin1Inputted && (
-          <Button
-            testID="Pincode-ReEnter"
-            text={t('global:save')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
+        {isPin1Inputted ? (
+          // Verify
+          <Pincode
+            title={t('verifyPin.title')}
+            placeholder={t('createPin.yourPin')}
+            buttonText={t('global:save')}
+            isPinValid={this.isPin2Valid}
             onPress={this.onPressPin2Continue}
-            disabled={!this.isPin2Valid()}
+            pin={pin2}
+            onChangePin={this.onChangePin2}
+            maxLength={6}
+          />
+        ) : (
+          // Create
+          <Pincode
+            title={t('createPin.title')}
+            placeholder={t('createPin.yourPin')}
+            buttonText={t('global:continue')}
+            isPinValid={this.isPin1Valid}
+            onPress={this.onPressPin1Continue}
+            pin={pin1}
+            onChangePin={this.onChangePin1}
+            maxLength={6}
           />
         )}
       </SafeAreaView>
@@ -169,20 +120,6 @@ const style = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     justifyContent: 'space-between',
-  },
-  scrollContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-    paddingTop: 0,
-  },
-  pincodeContainer: {
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  keypadContainer: {
-    marginVertical: 15,
-    paddingHorizontal: 20,
   },
 })
 
