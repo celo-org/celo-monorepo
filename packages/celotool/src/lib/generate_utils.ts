@@ -15,11 +15,11 @@ import {
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
-import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
+import { GenesisConfig } from './interfaces/genesis-config'
 
 const ec = new EC('secp256k1')
 
@@ -213,7 +213,6 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const lookbackwindow = parseInt(fetchEnvOrFallback(envVar.LOOKBACK, '12'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  // Use hardcoded account addresses if provided, otherwise generate from mnemonic.
   const initialAccounts = getFaucetedAccounts(mnemonic)
   if (genesisAccountsEnv !== '') {
     const genesisAccountsPath = path.resolve(monorepoRoot, genesisAccountsEnv)
