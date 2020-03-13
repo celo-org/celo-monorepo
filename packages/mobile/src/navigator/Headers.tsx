@@ -74,6 +74,7 @@ export function HeaderTitleWithBalance({ title, token }: Props) {
             available
           </Trans>
         ) : (
+          // TODO: a null balance doesn't necessarily mean it's loading
           i18n.t('global:loading')
         )}
       </Text>
