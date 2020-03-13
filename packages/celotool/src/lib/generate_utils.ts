@@ -15,11 +15,11 @@ import {
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
+import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
-import { GenesisConfig } from './interfaces/genesis-config'
 
 const ec = new EC('secp256k1')
 
@@ -328,13 +328,13 @@ export const generateGenesis = ({
     }
   }
 
-  if (validators) {
-    for (const validator of validators) {
-      genesis.alloc[validator.address] = {
-        balance: validator.balance,
-      }
-    }
-  }
+  // if (validators) {
+  //   for (const validator of validators) {
+  //     genesis.alloc[validator.address] = {
+  //       balance: validator.balance,
+  //     }
+  //   }
+  // }
 
   for (const account of otherAccounts) {
     genesis.alloc[account.address] = {
