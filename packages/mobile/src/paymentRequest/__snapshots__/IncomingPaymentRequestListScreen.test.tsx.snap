@@ -178,8 +178,26 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           "lineHeight": 18,
                         }
                       }
+                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      incomingPaymentRequestNotificationTitle
+                      +1555-867-5309
+                       requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        26.60
+                      </Text>
                     </Text>
                     <View
                       style={
@@ -420,8 +438,26 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           "lineHeight": 18,
                         }
                       }
+                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      incomingPaymentRequestNotificationTitle
+                      +14155550000
+                       requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        135.66
+                      </Text>
                     </Text>
                     <View
                       style={
@@ -662,8 +698,26 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           "lineHeight": 18,
                         }
                       }
+                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      incomingPaymentRequestNotificationTitle
+                      +14155550000
+                       requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        1.33
+                      </Text>
                     </Text>
                     <View
                       style={
