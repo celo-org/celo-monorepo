@@ -195,7 +195,6 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
-  // TODO(lucas): overwrite with stakeoff winners
   const validators = getValidatorsInformation(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
@@ -215,8 +214,9 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const lookbackwindow = parseInt(fetchEnvOrFallback(envVar.LOOKBACK, '12'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  const initialAccounts = INITIAL_ACCOUNTS
-  // const initialAccounts = getFaucetedAccounts(mnemonic)
+  // Use hardcoded account addresses if provided, otherwise generate from mnemonic.
+  const initialAccounts =
+    INITIAL_ACCOUNTS.length > 0 ? INITIAL_ACCOUNTS : getFaucetedAccounts(mnemonic)
   if (genesisAccountsEnv !== '') {
     const genesisAccountsPath = path.resolve(monorepoRoot, genesisAccountsEnv)
     const genesisAccounts = JSON.parse(fs.readFileSync(genesisAccountsPath).toString())
@@ -356,7 +356,10 @@ export const generateGenesis = ({
       genesis.alloc[contract] = {
         code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
         storage: {
-          [CONTRACT_OWNER_STORAGE_LOCATION]: '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C',
+          [CONTRACT_OWNER_STORAGE_LOCATION]:
+            INITIAL_ACCOUNTS.length > 0
+              ? '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
+              : validators[0].address,
         },
         balance: '0',
       }
