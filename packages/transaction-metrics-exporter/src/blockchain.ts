@@ -8,10 +8,11 @@ import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
-import { WebsocketProvider } from 'web3-core'
+import { Transaction, WebsocketProvider } from 'web3-core'
 import { Block, BlockHeader } from 'web3-eth'
 import { Counters } from './metrics'
 import { ViewDefinition } from './view-definition'
+import { labelValues } from 'prom-client'
 
 const EMPTY_INPUT = 'empty_input'
 const NO_METHOD_ID = 'no_method_id'
@@ -250,7 +251,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
       fetchState()
     }
 
-    for (const tx of parsedBlock.block.transactions) {
+    for (const tx of parsedBlock.block.transactions as Transaction[]) {
       const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)
 
       logEvent(LoggingCategory.Transaction, tx)
@@ -261,7 +262,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
         to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
         methodId: toMethodId(tx.input, parsedTx != null),
         status: receipt.status.toString(),
-      }
+      } as labelValues
 
       Counters.transaction.inc(labels)
       Counters.transactionGasUsed.observe(labels, receipt.gasUsed)
