@@ -356,7 +356,7 @@ export const generateGenesis = ({
       genesis.alloc[contract] = {
         code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
         storage: {
-          [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
+          [CONTRACT_OWNER_STORAGE_LOCATION]: '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C',
         },
         balance: '0',
       }
