@@ -1,4 +1,5 @@
 import fetch from 'cross-fetch'
+import ArticleProps from 'fullstack/ArticleProps'
 import * as React from 'react'
 import ArticlesSection from 'src/community/connect/ArticlesSection'
 import { getSentry } from 'src/utils/sentry'
@@ -20,7 +21,7 @@ interface Props {
 interface State {
   loaded: boolean
   errored: boolean
-  articles: any[]
+  articles: ArticleProps[]
 }
 
 export default class ArticleData extends React.PureComponent<Props, State> {

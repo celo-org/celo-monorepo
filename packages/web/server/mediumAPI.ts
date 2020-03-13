@@ -75,8 +75,8 @@ function transform(items: JSONRSSItem[]) {
 function parseXML(xmlData: string): JSONRSSItem[] {
   if (validate(xmlData) === true) {
     const jsonRSS: JSONRSS = parse(xmlData, {})
-    // this happens when there is only one item aka article returned
     const item = jsonRSS.rss.channel.item
+    // this happens when there is only one item aka article returned
     return item instanceof Array ? item : [item]
   } else {
     return []
