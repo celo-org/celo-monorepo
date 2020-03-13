@@ -185,6 +185,7 @@ spec:
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --metrics \
+            --vmodule=p2p/*=4,consensus/istanbul/*=5,eth/downloader/*=4 \
             --allow-insecure-unlock \
             ${PING_IP_FROM_PACKET_FLAG} \
             ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
