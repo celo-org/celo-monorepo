@@ -239,7 +239,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     const block = await blockExplorer.fetchBlock(header.number)
     const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
 
-    const blockTime = block.timestamp - previousBlock.timestamp
+    const blockTime = Number(block.timestamp) - Number(previousBlock.timestamp)
     logEvent(LoggingCategory.Block, { ...block, blockTime })
 
     const parsedBlock = blockExplorer.parseBlock(block)
