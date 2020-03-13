@@ -100,7 +100,9 @@ const setAddressWhitelist = async (
 ) => {
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods.setWhitelist(whitelist).send({ from: validatorAddress })
+  await whitelistContract.methods
+    .setWhitelist(whitelist)
+    .send({ from: validatorAddress, gas: 500000 })
 }
 
 const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
