@@ -5,8 +5,7 @@ import {
 } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
-import { newReleaseGold } from '../generated/ReleaseGold'
-import { ReleaseGold } from '../generated/types/ReleaseGold'
+import { newReleaseGold, ReleaseGold } from '../generated/ReleaseGold'
 import {
   BaseWrapper,
   CeloTransactionObject,

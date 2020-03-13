@@ -1,15 +1,13 @@
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { Flags } from '../../utils/command'
-export default class CreateAccount extends BaseCommand {
+import { ReleaseGoldCommand } from './release-gold'
+export default class CreateAccount extends ReleaseGoldCommand {
   static description = 'Creates a new account for the ReleaseGold instance'
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
   }
 
   static args = []
