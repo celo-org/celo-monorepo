@@ -11,15 +11,16 @@ import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
+  INITIAL_ACCOUNTS,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
+import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
-import { GenesisConfig } from './interfaces/genesis-config'
 
 const ec = new EC('secp256k1')
 
@@ -213,7 +214,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const lookbackwindow = parseInt(fetchEnvOrFallback(envVar.LOOKBACK, '12'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  const initialAccounts = getFaucetedAccounts(mnemonic)
+  const initialAccounts = INITIAL_ACCOUNTS
   if (genesisAccountsEnv !== '') {
     const genesisAccountsPath = path.resolve(monorepoRoot, genesisAccountsEnv)
     const genesisAccounts = JSON.parse(fs.readFileSync(genesisAccountsPath).toString())
@@ -353,7 +354,7 @@ export const generateGenesis = ({
       genesis.alloc[contract] = {
         code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
         storage: {
-          [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
+          [CONTRACT_OWNER_STORAGE_LOCATION]: '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C',
         },
         balance: '0',
       }
