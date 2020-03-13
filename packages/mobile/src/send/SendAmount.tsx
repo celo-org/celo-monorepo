@@ -417,7 +417,7 @@ export class SendAmount extends React.Component<Props, State> {
                 estimateFeeDollars && (
                   <CurrencyDisplay
                     amount={{
-                      value: estimateFeeDollars.toString(),
+                      value: estimateFeeDollars,
                       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                     }}
                     formatType={FormatType.Fee}

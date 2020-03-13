@@ -163,15 +163,15 @@ export class ExchangeReview extends React.Component<Props, State> {
     const dollarAmount = this.getInputAmountInToken(CURRENCY_ENUM.DOLLAR)
 
     const exchangeAmount = {
-      value: this.state.inputAmount.toString(),
+      value: this.state.inputAmount,
       currencyCode: CURRENCIES[this.state.inputToken].code,
     }
     const exchangeRateAmount = {
-      value: exchangeRate.toString(),
+      value: exchangeRate,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
     const subtotalAmount = {
-      value: dollarAmount.toString(),
+      value: dollarAmount,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
     const exchangeFeeAmount = {
@@ -183,15 +183,12 @@ export class ExchangeReview extends React.Component<Props, State> {
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
     const totalAmount = {
-      value: dollarAmount
-        .plus(tobinTax)
-        .plus(fee)
-        .toString(),
+      value: dollarAmount.plus(tobinTax).plus(fee),
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 
     const goldAmount = {
-      value: this.getInputAmountInToken(CURRENCY_ENUM.GOLD).toString(),
+      value: this.getInputAmountInToken(CURRENCY_ENUM.GOLD),
       currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
     }
 

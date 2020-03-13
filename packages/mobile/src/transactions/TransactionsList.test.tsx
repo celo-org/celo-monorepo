@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { MockedProvider } from 'react-apollo/test-utils'
 import { render, waitForElement } from 'react-native-testing-library'
@@ -174,10 +175,10 @@ it('renders the received data along with the standby transactions', async () => 
   // Check standby transfer
   const standbyTransfer = data[0]
   expect(standbyTransfer.amount).toMatchObject({
-    value: '-100',
+    value: new BigNumber(-100),
     currencyCode: 'cUSD',
     localAmount: {
-      value: '-133',
+      value: new BigNumber(-133),
       currencyCode: 'MXN',
       exchangeRate: '1.33',
     },
@@ -186,28 +187,30 @@ it('renders the received data along with the standby transactions', async () => 
   // Check standby cUSD -> cGLD
   const standbyDollarToGold = data[1]
   expect(standbyDollarToGold.amount).toMatchObject({
-    value: '-20',
+    value: new BigNumber(-20),
     currencyCode: 'cUSD',
     localAmount: {
-      value: '-26.6',
+      value: new BigNumber(-26.6),
       currencyCode: 'MXN',
       exchangeRate: '1.33',
     },
   })
   expect(standbyDollarToGold.makerAmount).toMatchObject({
-    value: '20',
+    value: new BigNumber(20),
     currencyCode: 'cUSD',
     localAmount: {
-      value: '26.6',
+      value: new BigNumber(26.6),
       currencyCode: 'MXN',
       exchangeRate: '1.33',
     },
   })
   expect(standbyDollarToGold.takerAmount).toMatchObject({
-    value: '30',
+    value: new BigNumber(30),
     currencyCode: 'cGLD',
     localAmount: {
-      value: '26.6000000000000000000000000000000000000000000000000000000000000000000000000000133',
+      value: new BigNumber(
+        '26.6000000000000000000000000000000000000000000000000000000000000000000000000000133'
+      ),
       currencyCode: 'MXN',
       exchangeRate:
         '0.88666666666666666666666666666666666666666666666666666666666666666666666666666711',
@@ -217,29 +220,31 @@ it('renders the received data along with the standby transactions', async () => 
   // Check standby cGLD -> cUSD
   const standbyGoldToDollar = data[2]
   expect(standbyGoldToDollar.amount).toMatchObject({
-    value: '20',
+    value: new BigNumber(20),
     currencyCode: 'cUSD',
     localAmount: {
-      value: '26.6',
+      value: new BigNumber(26.6),
       currencyCode: 'MXN',
       exchangeRate: '1.33',
     },
   })
   expect(standbyGoldToDollar.makerAmount).toMatchObject({
-    value: '30',
+    value: new BigNumber(30),
     currencyCode: 'cGLD',
     localAmount: {
-      value: '26.6000000000000000000000000000000000000000000000000000000000000000000000000000133',
+      value: new BigNumber(
+        '26.6000000000000000000000000000000000000000000000000000000000000000000000000000133'
+      ),
       currencyCode: 'MXN',
       exchangeRate:
         '0.88666666666666666666666666666666666666666666666666666666666666666666666666666711',
     },
   })
   expect(standbyGoldToDollar.takerAmount).toMatchObject({
-    value: '20',
+    value: new BigNumber(20),
     currencyCode: 'cUSD',
     localAmount: {
-      value: '26.6',
+      value: new BigNumber(26.6),
       currencyCode: 'MXN',
       exchangeRate: '1.33',
     },

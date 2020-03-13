@@ -36,7 +36,7 @@ export default function TotalLineItem({ title, amount }: Props) {
               Celo Dollars (@{' '}
               <CurrencyDisplay
                 amount={{
-                  value: new BigNumber(localCurrencyExchangeRate).pow(-1).toString(),
+                  value: new BigNumber(localCurrencyExchangeRate).pow(-1),
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
                 showLocalAmount={false}

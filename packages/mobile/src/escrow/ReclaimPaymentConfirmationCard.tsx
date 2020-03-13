@@ -32,13 +32,13 @@ export default function ReclaimPaymentConfirmationCard({
   currency,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const amount = { value: amountProp.toString(), currencyCode: CURRENCIES[currency].code }
+  const amount = { value: amountProp, currencyCode: CURRENCIES[currency].code }
   const securityFeeAmount = fee && {
-    value: fee.negated().toString(),
+    value: fee.negated(),
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
   const totalAmount = {
-    value: amountProp.minus(fee || 0).toString(),
+    value: amountProp.minus(fee || 0),
     currencyCode: amount.currencyCode,
   }
 

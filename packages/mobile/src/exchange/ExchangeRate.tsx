@@ -61,7 +61,7 @@ export default function ExchangeRate({ makerAmount, takerAmount, showFinePrint }
             values={{ takerTokenCode }}
           >
             <CurrencyDisplay
-              amount={{ value: rate.toString(), currencyCode: displayedMakerAmount.currencyCode }}
+              amount={{ value: rate, currencyCode: displayedMakerAmount.currencyCode }}
               formatType={FormatType.ExchangeRate}
               hideSymbol={true}
               hideCode={false}

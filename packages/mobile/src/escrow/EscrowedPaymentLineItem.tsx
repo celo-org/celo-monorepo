@@ -28,7 +28,7 @@ function EscrowedPaymentLineItem(props: Props & WithTranslation) {
         <CurrencyDisplay
           style={styles.amount}
           amount={{
-            value: divideByWei(amount).toString(),
+            value: divideByWei(amount),
             currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
           }}
         />

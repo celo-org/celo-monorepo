@@ -90,7 +90,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
               Invited and paid {{ mobile }} (
               <CurrencyDisplay
                 amount={{
-                  value: divideByWei(payment.amount).toString(),
+                  value: divideByWei(payment.amount),
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
               />

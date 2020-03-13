@@ -29,7 +29,7 @@ export default function PaymentRequestReviewCard({
   value,
   comment,
 }: Props) {
-  const amount = { value: value.toString(), currencyCode: CURRENCIES[currency].code }
+  const amount = { value, currencyCode: CURRENCIES[currency].code }
   const totalAmount = amount // TODO: add fee?
 
   return (

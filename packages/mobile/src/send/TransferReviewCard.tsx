@@ -48,7 +48,7 @@ export default function TransferReviewCard({
   const isInvite = type === TokenTransactionType.InviteSent
   const inviteFee = getInvitationVerificationFeeInDollars()
   const inviteFeeAmount = {
-    value: inviteFee.toString(),
+    value: inviteFee,
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
 
@@ -57,16 +57,16 @@ export default function TransferReviewCard({
   const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
   const securityFeeAmount = securityFee && {
-    value: securityFee.toString(),
+    value: securityFee,
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
   const subtotalAmount = value.isGreaterThan(0) && {
-    value: value.toString(),
+    value,
     currencyCode: CURRENCIES[currency].code,
   }
   const amount = subtotalAmount || inviteFeeAmount
   const totalAmount = {
-    value: value.plus(fee || 0).toString(),
+    value: value.plus(fee || 0),
     currencyCode: CURRENCIES[currency].code,
   }
 

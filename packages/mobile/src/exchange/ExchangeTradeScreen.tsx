@@ -236,7 +236,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   getSubtotalAmount = (): MoneyAmount => {
     return {
-      value: this.getOppositeInputTokenAmount(this.getInputTokenAmount()).toString(),
+      value: this.getOppositeInputTokenAmount(this.getInputTokenAmount()),
       currencyCode: CURRENCIES[this.getOppositeInputToken()].code,
     }
   }
@@ -296,7 +296,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 Subtotal (@{' '}
                 <CurrencyDisplay
                   amount={{
-                    value: exchangeRateDisplay.toString(),
+                    value: exchangeRateDisplay,
                     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                   }}
                 />
