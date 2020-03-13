@@ -12,6 +12,7 @@ import HomeHero from 'src/home/version3/HomeHero'
 import HomeWork from 'src/home/version3/HomeWork'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
+import CoinList from './CoinList'
 
 interface State {
   mobile: boolean
@@ -49,6 +50,7 @@ export class Home extends React.Component<I18nProps, State> {
         <HomeCover />
         <HomeHero />
         <Press />
+        <CoinList />
         <HomeSystems />
         <HomeWork />
         <HomeCarousel />
