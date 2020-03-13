@@ -2,7 +2,6 @@ import * as React from 'react'
 import { StyleSheet, Text, TextStyle, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
-import Link from 'src/shared/Link'
 import { colors, fonts, textStyles } from 'src/styles'
 
 export enum BTN {
@@ -117,7 +116,7 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
   }
 
   render() {
-    const { text, href, align, iconRight, iconLeft } = this.props
+    const { text, align, iconRight, iconLeft } = this.props
     const ButtonComponent = this.getButtonComponent()
     const renderedButton = (
       <ButtonComponent status={this.getStatus()} {...this.props}>
@@ -137,7 +136,7 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
         <View
           style={[{ alignItems: align }, this.props.kind === BTN.INLINE && inlineStyle.container]}
         >
-          {href ? <Link href={href}>{renderedButton}</Link> : renderedButton}
+          {renderedButton}
         </View>
       </Hoverable>
     )

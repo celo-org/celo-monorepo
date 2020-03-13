@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, ScrollView, StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -12,7 +12,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
-import backupIcon from 'src/images/backup-icon.png'
+import SafeguardsPeopleIcon from 'src/icons/SafeguardsPeopleIcon'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate, navigateHome, navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -53,7 +53,7 @@ class BackupSocialIntro extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Image source={backupIcon} style={styles.logo} />
+          <SafeguardsPeopleIcon style={styles.logo} width={229} height={149} />
           <Text style={styles.h1}>{t('socialBackupIntro.header')}</Text>
           <Text style={styles.body}>{t('socialBackupIntro.body')}</Text>
           <Text style={[styles.body, fontStyles.bold]}>{t('socialBackupIntro.warning')}</Text>
@@ -93,12 +93,10 @@ const styles = StyleSheet.create({
   },
   logo: {
     alignSelf: 'center',
-    height: 75,
-    width: 75,
   },
   h1: {
     ...fontStyles.h1,
-    marginTop: 15,
+    marginTop: 30,
   },
   body: {
     ...fontStyles.body,

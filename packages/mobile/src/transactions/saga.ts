@@ -14,7 +14,7 @@ import {
 } from 'src/transactions/actions'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject } from 'web3-eth'
 
 const TAG = 'transactions/saga'
 
