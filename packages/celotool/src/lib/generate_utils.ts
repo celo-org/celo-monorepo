@@ -328,13 +328,13 @@ export const generateGenesis = ({
     }
   }
 
-  // if (validators) {
-  //   for (const validator of validators) {
-  //     genesis.alloc[validator.address] = {
-  //       balance: validator.balance,
-  //     }
-  //   }
-  // }
+  if (validators) {
+    for (const validator of validators) {
+      genesis.alloc[validator.address] = {
+        balance: validator.balance,
+      }
+    }
+  }
 
   for (const account of otherAccounts) {
     genesis.alloc[account.address] = {
