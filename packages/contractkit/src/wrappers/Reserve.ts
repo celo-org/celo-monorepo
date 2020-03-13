@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { Reserve } from '../generated/types/Reserve'
+import { Reserve } from '../generated/Reserve'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 
 export interface ReserveConfig {

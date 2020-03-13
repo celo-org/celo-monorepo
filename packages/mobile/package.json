@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -38,10 +38,10 @@
   },
   "dependencies": {
     "@celo/client": "0.0.266",
-    "@celo/contractkit": "0.2.15-dev",
+    "@celo/contractkit": "0.3.1-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "0.1.8-dev",
+    "@celo/utils": "0.1.9-dev",
     "@celo/walletkit": "^0.0.15",
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/netinfo": "^4.4.0",
@@ -157,7 +157,6 @@
     "@types/react-test-renderer": "^16.9.0",
     "@types/redux-mock-store": "^1.0.0",
     "@types/utf8": "^2.1.6",
-    "@types/web3": "^1.0.18",
     "babel-core": "7.0.0-bridge.0",
     "detox": "^15.0.0",
     "enzyme": "^3.9.0",
@@ -178,7 +177,9 @@
     "react-test-renderer": "16.9.0",
     "redux-mock-store": "^1.5.3",
     "redux-saga-test-plan": "^4.0.0-beta.2",
-    "remote-redux-devtools": "^0.5.12"
+    "remote-redux-devtools": "^0.5.12",
+    "web3-eth": "1.2.4",
+    "web3-core": "1.2.4"
   },
   "detox": {
     "test-runner": "jest",

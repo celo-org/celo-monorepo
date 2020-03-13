@@ -383,7 +383,9 @@ contract EpochRewards is
     // increase /= (1 - fraction) st the final community reward is fraction * increase
     targetGoldSupplyIncrease = FixidityLib
       .newFixed(targetGoldSupplyIncrease)
-      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
+      .divide(
+      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
+    )
       .fromFixed();
     return targetGoldSupplyIncrease;
   }

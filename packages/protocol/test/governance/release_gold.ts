@@ -34,7 +34,7 @@ import {
   ReleaseGoldContract,
   ReleaseGoldInstance,
 } from 'types'
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
 
@@ -167,9 +167,8 @@ contract('ReleaseGold', (accounts: string[]) => {
     )
   }
 
-  const getCurrentBlockchainTimestamp = async (web3: Web3) => {
-    return (await web3.eth.getBlock('latest')).timestamp
-  }
+  const getCurrentBlockchainTimestamp = (web3: Web3): Promise<number> =>
+    web3.eth.getBlock('latest').then((block) => Number(block.timestamp))
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()

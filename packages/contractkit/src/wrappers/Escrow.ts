@@ -1,4 +1,4 @@
-import { Escrow } from '../generated/types/Escrow'
+import { Escrow } from '../generated/Escrow'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 
 /**

@@ -1,5 +1,4 @@
-import { DecodedParamsObject } from 'web3-eth-abi'
-import { ABIDefinition } from 'web3/eth/abi'
+import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
 
 export const getAbiTypes = (abi: ABIDefinition[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)

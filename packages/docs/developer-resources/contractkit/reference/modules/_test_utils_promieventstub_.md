@@ -12,7 +12,7 @@
 
 ▸ **promiEventSpy**<**T**>(): *PromiEventStub‹T›*
 
-*Defined in [contractkit/src/test-utils/PromiEventStub.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/test-utils/PromiEventStub.ts#L12)*
+*Defined in [contractkit/src/test-utils/PromiEventStub.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/test-utils/PromiEventStub.ts#L11)*
 
 **Type parameters:**
 

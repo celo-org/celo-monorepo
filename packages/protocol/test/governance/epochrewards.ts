@@ -633,7 +633,11 @@ contract('EpochRewards', (accounts: string[]) => {
         )
         expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards
           .plus(expectedTargetTotalEpochPaymentsInGold)
-          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
           .integerValue(BigNumber.ROUND_FLOOR)
         const expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta)
         const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
@@ -666,7 +670,12 @@ contract('EpochRewards', (accounts: string[]) => {
         const votingReward = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
         const expected = validatorReward
           .plus(votingReward)
-          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
+          .integerValue(BigNumber.ROUND_FLOOR)
           .times(fromFixed(communityRewardFraction))
           .times(expectedMultiplier)
           .integerValue(BigNumber.ROUND_FLOOR)
