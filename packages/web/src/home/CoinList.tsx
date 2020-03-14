@@ -23,6 +23,7 @@ export default function CoinList() {
     >
       <Cell span={Spans.half}>
         <Image
+          accessibilityLabel="coinlist logo"
           source={CoinListLogo}
           style={isMobile ? styles.clLogoMobile : styles.clLogo}
           resizeMode="contain"
