@@ -1,5 +1,6 @@
 pragma solidity ^0.5.8;
 import "contracts/governance/Election.sol";
+import "contracts/common/Accounts.sol";
 import "specs/harnesses/LockedGoldHarness.sol";
 contract ElectionHarness is Election {
   LockedGoldHarness lockedGold;
