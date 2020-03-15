@@ -147,4 +147,71 @@ contract ElectionHarness is Election {
   function votesForGroup(address groupId) public returns (uint256) {
     return votes.total.eligible.getValue(groupId);
   }
+  
+  // overriding to havoc more
+  mapping (uint256 => mapping (uint256 => bytes32)) input_validatorSignerAddressFromCurrentSet;
+  mapping (uint256 => mapping (uint256 => bytes32)) input_validatorSignerAddressFromSet;
+   function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+    bytes memory out;
+    bool success;
+    // let's not pack stuff and this will be easier on the solver
+    bytes32 _input = input_validatorSignerAddressFromCurrentSet[index][block.number];
+    bytes memory input = new bytes(32);
+    assembly {
+      mstore(add(input,32),_input)
+    }
+    (success, out) = GET_VALIDATOR.staticcall(input);
+    require(success);
+    return address(getUint256FromBytes(out, 0));
+  }
+  
+  // TODO: Suggested Lucas to merge the two
+    function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
+    public
+    view
+    returns (address)
+  {
+    bytes memory out;
+    bool success;
+     // let's not pack stuff and this will be easier on the solver
+    bytes32 _input = input_validatorSignerAddressFromSet[index][blockNumber];
+    bytes memory input = new bytes(32);
+    assembly {
+      mstore(add(input,32),_input)
+    }
+    (success, out) = GET_VALIDATOR.staticcall(input);
+    require(success);
+    return address(getUint256FromBytes(out, 0));
+  }
+
+mapping (uint256 => mapping (uint256 => mapping (uint256 => mapping (uint256 => mapping (uint256 => mapping (uint256 => bytes32)))))) input_fractionMulExp;
+ function fractionMulExp(
+    uint256 aNumerator,
+    uint256 aDenominator,
+    uint256 bNumerator,
+    uint256 bDenominator,
+    uint256 exponent,
+    uint256 _decimals
+  ) public view returns (uint256, uint256) {
+    require(aDenominator != 0 && bDenominator != 0);
+    uint256 returnNumerator;
+    uint256 returnDenominator;
+    bool success;
+    bytes memory out;
+    bytes32 _input = input_fractionMulExp[aNumerator][aDenominator][bNumerator][bDenominator][exponent][_decimals];
+    bytes memory input = new bytes(32);
+    assembly {
+      mstore(add(input,32),_input)
+    }
+    (success, out) = FRACTION_MUL.staticcall(
+      input
+    );
+    require(
+      success,
+      "UsingPrecompiles :: fractionMulExp Unsuccessful invocation of fraction exponent"
+    );
+    returnNumerator = getUint256FromBytes(out, 0);
+    returnDenominator = getUint256FromBytes(out, 32);
+    return (returnNumerator, returnDenominator);
+  }
 }
