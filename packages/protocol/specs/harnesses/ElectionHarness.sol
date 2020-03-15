@@ -10,7 +10,7 @@ contract ElectionHarness is Election {
     return lockedGold;
   }
   
-  function getAccount() internal view returns (Accounts) {
+  function getAccounts() internal view returns (IAccounts) {
 	return accounts;
   }
 
