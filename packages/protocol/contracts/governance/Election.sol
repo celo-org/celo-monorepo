@@ -86,7 +86,7 @@ contract Election is
     uint256 max;
   }
 
-  Votes private votes;
+  Votes internal votes;
   // Governs the minimum and maximum number of validators that can be elected.
   ElectableValidators public electableValidators;
   // Governs how many validator groups a single account can vote for.
@@ -885,7 +885,7 @@ contract Election is
     uint256[] memory numMembers,
     uint256 totalNumMembersElected,
     uint256[] memory numMembersElected
-  ) private view returns (uint256, bool) {
+  ) internal view returns (uint256, bool) {
     bool memberElected = false;
     uint256 groupIndex = 0;
     FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);

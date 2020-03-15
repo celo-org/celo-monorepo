@@ -3,9 +3,14 @@ import "contracts/governance/Election.sol";
 import "specs/harnesses/LockedGoldHarness.sol";
 contract ElectionHarness is Election {
   LockedGoldHarness lockedGold;
+  Accounts accounts;
 
   function getLockedGold() internal view returns (ILockedGold) {
     return lockedGold;
+  }
+  
+  function getAccount() internal view returns (Accounts) {
+	return accounts;
   }
 
   function init_state() public {}
@@ -45,6 +50,16 @@ contract ElectionHarness is Election {
     }
     return total;
   }
+  
+  function getTotalElectionPendingVotesForGroup(address group) public view returns (uint256) {
+    return votes.pending.forGroup[group].total;
+  }
+  
+  
+  function getTotalElectionActiveVotesForGroup(address group) public view returns (uint256) {
+    return votes.active.forGroup[group].total;
+  }
+  
 
   function unlock(uint256 value) public {
     lockedGold.unlock(value);
@@ -87,8 +102,9 @@ contract ElectionHarness is Election {
   address[] public electionGroups;
   uint256[] public numMembers;
   uint256[] public numMembersElected = new uint256[](2000);
-  function dHondWrapper() public returns (uint256, bool) {
-    return dHondt(electionGroups, numMembers, numMembersElected);
+  uint256  public totalNumMembersElected;
+  function dHondtWrapper() public returns (uint256, bool) {
+    return dHondt(electionGroups, numMembers, totalNumMembersElected, numMembersElected);
   }
 
   function getNumGroups() public returns (uint256) {
