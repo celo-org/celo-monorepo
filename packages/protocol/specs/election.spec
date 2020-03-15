@@ -85,11 +85,11 @@ rule electValidatorReturnValues {
  ***/ 
  
  /* An ineligible group can not be elected */ 
-rule ineligibileGroupCannotBeElected(address group) {
+rule ineligibleGroupCannotBeElected(address group) {
 	env e;
 	sinvoke markGroupIneligible(e,group);
 	// safely assume that the group is not in the ghost list
-	//require !sinvoke groupInGhostElectionGroups(e,group);
+	require !sinvoke groupInGhostElectionGroups(e,group); // TODO write a rule for markGroupIneligible? (although it can be inferred from the list check of `remove`)
 	uint256 groupIndex;
 	bool memberElected;
 	groupIndex,memberElected = sinvoke dHondtWrapper(e);

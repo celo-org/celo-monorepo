@@ -100,11 +100,12 @@ contract ElectionHarness is Election {
 
   }
 
-  address[] public electionGroups;
-  uint256[] public numMembers;
-  uint256[] public numMembersElected = new uint256[](2000);
-  uint256  public totalNumMembersElected;
+  address[] internal electionGroups;
+  uint256[] internal numMembers;
+  uint256[] internal numMembersElected;
+  uint256  internal totalNumMembersElected;
   function dHondtWrapper() public returns (uint256, bool) {
+    require (numMembersElected.length == electionGroups.length); // This looks like an invariant of the original calls to dHondt()
     return dHondt(electionGroups, numMembers, totalNumMembersElected, numMembersElected);
   }
 
