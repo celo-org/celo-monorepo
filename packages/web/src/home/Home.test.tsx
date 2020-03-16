@@ -1,6 +1,6 @@
-import Home from 'src/home/Home'
 import { render, waitForDomChange, waitForElement } from '@testing-library/react'
 import * as React from 'react'
+import Home from 'src/home/Home'
 
 describe('when isRestricted is true', () => {
   it('never shows the coinlist logo or button', async () => {
@@ -27,8 +27,8 @@ describe('when isRestricted is false', () => {
 })
 
 describe('static getInitialProps', () => {
-  it('returns isRestricted', () => {
-    // @ts-ignore
-    expect(Home.getInitialProps())
+  it('returns isRestricted as true by default', async () => {
+    // @ts-ignore -- getInitialProps not set as static method
+    expect(await Home.getInitialProps({})).toEqual({ isRestricted: true })
   })
 })
