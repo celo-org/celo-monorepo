@@ -59,6 +59,9 @@ type EndReason =
   | { reason: 'not-listening' }
 
 export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
+  // WORKAROUND to use subscriptions
+  ;(kit.web3 as any).currentProvider = (kit.web3 as any).currentProvider.existingProvider
+
   const blockProcessor = await newBlockHeaderProcessor(kit)
   const provider = kit.web3.currentProvider as WebsocketProvider
   const subscription = await kit.web3.eth.subscribe('newBlockHeaders')
