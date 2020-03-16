@@ -29,6 +29,11 @@ export class CeloProvider {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = new DefaultWallet()
+
+    // Deleting on method if the provider doesn't allow subscriptions
+    if (!(existingProvider as any)?.on) {
+      delete this.on
+    }
   }
 
   addAccount(privateKey: string) {
@@ -43,6 +48,13 @@ export class CeloProvider {
 
   isLocalAccount(address?: string): boolean {
     return this.wallet.hasAccount(address)
+  }
+
+  /**
+   * Proxy of `on` method
+   */
+  on?(...args: any[]) {
+    ;(this.existingProvider as any)?.on(...args)
   }
 
   /**
