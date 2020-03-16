@@ -43,7 +43,7 @@ exports[`renders correctly 1`] = `
     style={
       Object {
         "height": 12,
-        "tintColor": "#42D689",
+        "tintColor": "#BDBDBD",
         "width": 12,
       }
     }

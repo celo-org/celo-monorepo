@@ -33,7 +33,7 @@ class TermsPortal extends React.PureComponent<I18nProps> {
           <SideTitledSection title={t('helpfulLinks')}>
             <View style={styles.links}>
               <HelpfullLink text={t('userAgreementLink')} href={CeloLinks.agreement} />
-              <HelpfullLink text={t('faq')} href={CeloLinks.faq} />
+              <HelpfullLink text={t('faq')} href={menuItems.FAQ.link} />
               <HelpfullLink text={t('privacyPolicy')} href={menuItems.PRIVACY.link} />
               <HelpfullLink text={t('disclaimer')} href={CeloLinks.disclaimer} />
             </View>

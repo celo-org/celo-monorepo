@@ -4,6 +4,7 @@ import { assert } from 'chai'
 import fs from 'fs'
 import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
+import readLastLines from 'read-last-lines'
 import Web3 from 'web3'
 import {
   AccountType,
@@ -15,8 +16,10 @@ import {
 import {
   buildGeth,
   checkoutGethRepo,
+  connectPeers,
   connectValidatorPeers,
   getEnodeAddress,
+  getLogFilename,
   initAndStartGeth,
   resetDataDir,
   restoreDatadir,
@@ -32,6 +35,37 @@ import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
 
+export async function initAndSyncGethWithRetry(
+  gethConfig: GethRunConfig,
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  connectInstances: GethInstanceConfig[],
+  verbose: boolean,
+  retries: number
+) {
+  for (let i = 1; i <= retries; i++) {
+    try {
+      await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
+      await connectPeers(connectInstances, verbose)
+      await waitToFinishInstanceSyncing(instance)
+      break
+    } catch (error) {
+      console.info(`initAndSyncGethWithRetry error: ${error}`)
+      const logFilename = getLogFilename(gethConfig.runPath, instance)
+      console.info(`tail -50 ${logFilename}`)
+      console.info(await readLastLines.read(logFilename, 50))
+      if (i === retries) {
+        throw error
+      } else {
+        console.info(`Retrying ${i}/${retries} ...`)
+        await killInstance(instance)
+        continue
+      }
+    }
+  }
+  return instance
+}
+
 export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
   const { wsport, rpcport } = instance
   await waitToFinishSyncing(new Web3(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`))
@@ -41,6 +75,24 @@ export async function waitToFinishSyncing(web3: any) {
   while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
     await sleep(0.1)
   }
+}
+
+export async function waitForBlock(web3: Web3, blockNumber: number) {
+  // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
+  let currentBlock: number
+  do {
+    currentBlock = await web3.eth.getBlockNumber()
+    await sleep(0.1)
+  } while (currentBlock < blockNumber)
+}
+
+export async function waitForEpochTransition(web3: Web3, epoch: number) {
+  // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
+  let blockNumber: number
+  do {
+    blockNumber = await web3.eth.getBlockNumber()
+    await sleep(0.1)
+  } while (blockNumber % epoch !== 1)
 }
 
 export function assertAlmostEqual(
@@ -64,12 +116,28 @@ export function assertAlmostEqual(
 
 export async function killBootnode() {
   console.info(`Killing the bootnode`)
-  await spawnCmd('pkill', ['-SIGINT', 'bootnode'], { silent: true })
+  await shutdownOrKill('bootnode')
 }
 
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
-  await spawnCmd('pkill', ['-SIGINT', 'geth'], { silent: true })
+  await shutdownOrKill('geth')
+}
+
+export async function shutdownOrKill(processName: string) {
+  await spawnCmd('pkill', ['-SIGINT', processName], { silent: true })
+
+  let processRemaining = true
+  for (let i = 0; i < 15 && processRemaining; i++) {
+    await sleep(2)
+    const pgrepResult = await spawnCmd('pgrep', [processName], { silent: true })
+    processRemaining = pgrepResult === 0
+  }
+
+  if (processRemaining) {
+    console.info('shutdownOrKill: clean shutdown failed')
+    await spawnCmd('pkill', ['-SIGKILL', processName], { silent: true })
+  }
 }
 
 export async function killInstance(instance: GethInstanceConfig) {
@@ -299,7 +367,6 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     }
 
     await killGeth()
-    await sleep(2)
 
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.

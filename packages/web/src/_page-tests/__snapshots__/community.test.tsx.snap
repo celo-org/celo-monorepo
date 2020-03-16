@@ -808,7 +808,7 @@ exports[`Community renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="form.email*"
+                placeholder="common:email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}
@@ -4049,7 +4049,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4127,7 +4127,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4205,7 +4205,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4283,7 +4283,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4361,7 +4361,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4439,7 +4439,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4517,7 +4517,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4697,7 +4697,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4775,7 +4775,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4853,7 +4853,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4931,7 +4931,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -5009,7 +5009,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -7908,6 +7908,7 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -7921,6 +7922,12 @@ exports[`Community renders 1`] = `
                   "zIndex": -1,
                 }
               }
+            />
+            <img
+              alt=""
+              className="css-accessibilityImage-9pa8cd"
+              draggable={false}
+              src="image.png"
             />
           </div>
           <div
@@ -7991,7 +7998,7 @@ exports[`Community renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="form.email*"
+                placeholder="common:email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}

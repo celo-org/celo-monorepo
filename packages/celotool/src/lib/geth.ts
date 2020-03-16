@@ -1,4 +1,6 @@
-/* tslint:disable: no-console */
+// tslint:disable:no-console
+// tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -12,8 +14,8 @@ import { range } from 'lodash'
 import fetch from 'node-fetch'
 import path from 'path'
 import sleep from 'sleep-promise'
+import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
-import { TransactionReceipt } from 'web3/types'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -691,6 +693,10 @@ export function importGenesis(genesisPath: string) {
   return JSON.parse(fs.readFileSync(genesisPath).toString())
 }
 
+export function getLogFilename(runPath: string, instance: GethInstanceConfig) {
+  return path.join(getDatadir(runPath, instance), 'logs.txt')
+}
+
 function getDatadir(runPath: string, instance: GethInstanceConfig) {
   const dir = path.join(getInstanceDir(runPath, instance), 'datadir')
   // @ts-ignore
@@ -970,7 +976,7 @@ export async function startGeth(
     throw new Error(`Geth crashed! Error: ${err}`)
   })
 
-  const secondsToWait = 5
+  const secondsToWait = 30
 
   // Give some time for geth to come up
   if (rpcport) {

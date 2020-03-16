@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
