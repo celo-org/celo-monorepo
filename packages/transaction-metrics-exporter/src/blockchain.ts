@@ -122,7 +122,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
 
   const exchange = await kit.contracts.getExchange()
   const sortedOracles = await kit.contracts.getSortedOracles()
-  const reserve = await kit.contracts.getReserve()
+  // const reserve = await kit.contracts.getReserve()
   const goldToken = await kit.contracts.getGoldToken()
   // const epochRewards = await kit.contracts.getEpochRewards()
 
@@ -185,17 +185,17 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
       .catch()
 
     // TODO: Pending of implement getReserveGoldBalance function in contractKit
-    reserve
-      .getReserveGoldBalance()
-      .then((goldBalance) => {
-        const view: ViewDefinition = {
-          contract: 'Reserve',
-          function: 'getReserveGoldBalance',
-          goldBalance: Number(goldBalance),
-        }
-        logEvent(LoggingCategory.State, view)
-      })
-      .catch()
+    // reserve
+    //   .getReserveGoldBalance()
+    //   .then((goldBalance) => {
+    //     const view: ViewDefinition = {
+    //       contract: 'Reserve',
+    //       function: 'getReserveGoldBalance',
+    //       goldBalance: Number(goldBalance),
+    //     }
+    //     logEvent(LoggingCategory.State, view)
+    //   })
+    //   .catch()
 
     // PoS
     goldToken
