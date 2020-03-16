@@ -5,8 +5,8 @@
   "requestDeclined": "Request Declined",
   "requestPaid": "Request Paid",
   "paymentRequestUpdateFailed": "Cannot update payment request",
-  "incomingPaymentRequestNotificationTitle": "{{name}} requested {{amount}}",
-  "outgoingPaymentRequestNotificationTitle": "Requested {{amount}} from {{name}}",
-  "defaultComment": "Payment Requested",
-  "paymentRequestNotificationLine": "<0>{{displayName}} for</0> <1>{{amount}}</1>"
+  "incomingPaymentRequestNotificationTitle": "{{name}} requested <3></3>",
+  "outgoingPaymentRequestNotificationTitle": "Requested <2></2> from {{name}}",
+  "defaultComment": "Payment requested",
+  "paymentRequestNotificationLine": "<0>{{displayName}} for</0> <1></1>"
 }

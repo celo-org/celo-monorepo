@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "0.1.8-dev",
+  "version": "0.1.9-dev",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -33,7 +33,7 @@
     "keccak256": "^1.0.0",
     "lodash": "^4.17.14",
     "numeral": "^2.0.6",
-    "web3-utils": "1.0.0-beta.37"
+    "web3-utils": "1.2.4"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
@@ -42,8 +42,7 @@
     "@types/ethereumjs-util": "^5.2.0",
     "@types/google-libphonenumber": "^7.4.17",
     "@types/lodash": "^4.14.136",
-    "@types/node": "^10.12.18",
-    "@types/web3": "^1.0.18"
+    "@types/node": "^10.12.18"
   },
   "resolutions": {
     "elliptic/bn.js": "4.11.8",

@@ -16,7 +16,7 @@
 
 ▸ **toTxResult**(`pe`: PromiEvent‹any›): *[TransactionResult](../classes/_utils_tx_result_.transactionresult.md)‹›*
 
-*Defined in [contractkit/src/utils/tx-result.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L13)*
+*Defined in [contractkit/src/utils/tx-result.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L12)*
 
 Transforms a `PromiEvent` to a `TransactionResult`.
 

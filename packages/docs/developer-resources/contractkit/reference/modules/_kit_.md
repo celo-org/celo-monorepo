@@ -22,7 +22,7 @@
 
 ▸ **newKit**(`url`: string): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [contractkit/src/kit.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L28)*
+*Defined in [contractkit/src/kit.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L29)*
 
 Creates a new instance of `ContractKit` give a nodeUrl
 
@@ -40,7 +40,7 @@ ___
 
 ▸ **newKitFromWeb3**(`web3`: Web3): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [contractkit/src/kit.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L36)*
+*Defined in [contractkit/src/kit.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L37)*
 
 Creates a new instance of `ContractKit` give a web3 instance
 

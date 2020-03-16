@@ -2,16 +2,16 @@ import BaseNotification from '@celo/react-components/components/BaseNotification
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -54,25 +54,39 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   }
 
   render() {
-    const { requestee, t } = this.props
+    const { requestee, id, t } = this.props
+    const name = requestee.displayName
+
     return (
       <View style={styles.container}>
         <BaseNotification
+          testID={`OutgoingPaymentRequestNotification/${id}`}
           icon={
             <ContactCircle
               size={AVATAR_SIZE}
               address={requestee.address}
-              name={requestee.displayName}
+              name={name}
               thumbnailPath={getRecipientThumbnail(requestee)}
             >
               <Image source={unknownUserIcon} style={styles.unknownUser} />
             </ContactCircle>
           }
-          title={t('outgoingPaymentRequestNotificationTitle', {
-            name: requestee.displayName,
-            amount:
-              CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
-          })}
+          title={
+            <Trans
+              i18nKey="outgoingPaymentRequestNotificationTitle"
+              ns={Namespaces.paymentRequestFlow}
+              values={{ name }}
+            >
+              Requested{' '}
+              <CurrencyDisplay
+                amount={{
+                  value: this.props.amount,
+                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                }}
+              />{' '}
+              from {{ name }}
+            </Trans>
+          }
           ctas={this.getCTA()}
         >
           <Text style={fontStyles.bodySmall}>{this.props.comment || t('defaultComment')}</Text>

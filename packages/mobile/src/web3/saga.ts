@@ -42,7 +42,7 @@ import {
   fornoSelector,
 } from 'src/web3/selectors'
 import { getAccountAddressFromPrivateKey, getLatestBlock, isAccountLocked } from 'src/web3/utils'
-import { Block } from 'web3/eth/types'
+import { Block } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
