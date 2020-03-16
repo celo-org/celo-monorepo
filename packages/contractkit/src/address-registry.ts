@@ -33,7 +33,8 @@ export class AddressRegistry {
 
       debug('Fetched address:  %s = %s', address)
       if (!address || address === NULL_ADDRESS) {
-        throw new Error(`Failed to get address for ${contract} from the Registry`)
+        // TODO: Remove this!
+        console.error(`Failed to get address for ${contract} from the Registry`)
       }
       this.cache.set(contract, address)
     }
