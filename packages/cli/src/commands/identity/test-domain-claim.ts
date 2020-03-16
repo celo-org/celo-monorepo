@@ -22,11 +22,15 @@ export default class TestDomainClaim extends ClaimCommand {
     const res = this.parse(TestDomainClaim)
     const metadata = this.readMetadata()
 
-    const signature = JSON.parse(metadata).meta.signature
+    const signature = JSON.parse(metadata.toString()).meta.signature
     const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
     console.info('Fetching domain ' + res.flags.domain + ' TXT records for verification')
 
-    resolveTxt(res.flags.domain, (error, domainRecords) => {
+    resolveTxt(res.flags.domain, (_error, domainRecords) => {
+      if (_error) {
+        console.error('Unable to fetch domain TXT records: ' + _error.toString())
+        process.exit(1)
+      }
       console.info('Reading TXT records for domain ' + res.flags.domain)
 
       domainRecords.forEach((record) => {

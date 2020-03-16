@@ -22,7 +22,7 @@ export default class ClaimDomain extends ClaimCommand {
     await this.addClaim(metadata, createDomainClaim(res.flags.domain))
     this.writeMetadata(metadata)
 
-    const signature = JSON.parse(metadata).meta.signature
+    const signature = JSON.parse(metadata.toString()).meta.signature
     const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
     console.info('Please add the following TXT record to your domain:')
     console.info('celo-site-verification=' + signatureBase64 + '\n')
