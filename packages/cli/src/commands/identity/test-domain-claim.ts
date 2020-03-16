@@ -48,7 +48,6 @@ export default class TestDomainClaim extends ClaimCommand {
           res.flags.domain +
           ' domain'
       )
-      // console.log(domainRecords)
     })
   }
 }
