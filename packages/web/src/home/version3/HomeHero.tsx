@@ -6,8 +6,8 @@ import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Inclusive from 'src/illustrations/03-Inclusive-money-(light-bg).png'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { standardStyles, textStyles } from 'src/styles'
 import VideoModal from 'src/shared/VideoModal'
+import { standardStyles, textStyles } from 'src/styles'
 
 import image from 'src/join/claire-video-banner.jpg'
 
