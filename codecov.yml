@@ -3,12 +3,14 @@ coverage:
     project:
       default: off
       mobile:
-        paths: 'packages/mobile/'
+        paths:
+          - packages/mobile/
         flags: mobile
         threshold: 5%
         target: 70%
       web:
-        paths: 'packages/web/'
+        paths:
+          - packages/web/
         flags: web
         threshold: 2%
         target: 75%
