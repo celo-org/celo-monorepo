@@ -5,13 +5,15 @@ coverage:
       mobile:
         paths:
           - packages/mobile/
-        flags: mobile
+        flags:
+          - mobile
         threshold: 5%
         target: 70%
       web:
         paths:
           - packages/web/
-        flags: web
+        flags:
+          - web
         threshold: 2%
         target: 75%
       # Protocol codecov disabled until coverage tests are fixed.
