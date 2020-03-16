@@ -14,17 +14,16 @@ import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
-import { newGovernanceApproverMultiSig } from './generated/GovernanceApproverMultiSig'
 import { newLockedGold } from './generated/LockedGold'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
-import { newReserveSpenderMultiSig } from './generated/ReserveSpenderMultiSig'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
 import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 import { ContractKit } from './kit'
+import { newMultiSig } from './generated/MultiSig'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
@@ -43,12 +42,11 @@ const ContractFactories = {
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
-  [CeloContract.GovernanceApproverMultiSig]: newGovernanceApproverMultiSig,
   [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
-  [CeloContract.ReserveSpenderMultiSig]: newReserveSpenderMultiSig,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
@@ -112,11 +110,11 @@ export class Web3ContractCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
-  getGovernanceApproverMultiSig(address: string) {
-    return this.getContract(CeloContract.GovernanceApproverMultiSig, address)
-  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
+  }
+  getMultiSig(address: string) {
+    return this.getContract(CeloContract.MultiSig, address)
   }
   getRandom() {
     return this.getContract(CeloContract.Random)
@@ -126,9 +124,6 @@ export class Web3ContractCache {
   }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
-  }
-  getReserveSpenderMultiSig(address: string) {
-    return this.getContract(CeloContract.ReserveSpenderMultiSig, address)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)

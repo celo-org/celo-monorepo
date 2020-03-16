@@ -21,6 +21,12 @@
     "minDeposit": 1,
     "concurrentProposals": 5
   },
+  "governanceApproverMultiSig": {
+    "signatories": [
+      "0x5409ed021d9299bf6814279a6a1411a7e866a631"
+    ],
+    "numRequiredConfirmations": 1
+  },
   "reserve": {
     "initialBalance": 100000000,
     "otherAddresses": ["0x91c987bf62D25945dB517BDAa840A6c661374402"]
