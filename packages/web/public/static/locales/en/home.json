@@ -71,7 +71,7 @@
   "whitepaperCopy":
     "Celo is a proof-of-stake based blockchain with smart contracts. The technology uses a phone number-based identity system with address-based encryption and eigentrust-based reputation.",
   "stabilityAnalysisCopy":
-    "Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, is pegged to the US Dollar.",
+    "Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, tracks the value of the US Dollar.",
   "downloadPDF": "Download .PDF",
   "learnMore": "Learn More",
   "hero3":

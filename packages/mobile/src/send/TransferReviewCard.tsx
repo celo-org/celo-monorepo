@@ -1,28 +1,23 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
+import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
-import {
-  useDollarsToLocalAmount,
-  useExchangeRate,
-  useLocalCurrencyCode,
-} from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
-import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
-export interface OwnProps {
+interface Props {
   address?: string
   comment?: string
   value: BigNumber
@@ -35,115 +30,103 @@ export interface OwnProps {
   recipient?: Recipient
 }
 
-// Bordered content placed in a ReviewFrame
+// Content placed in a ReviewFrame
 // Differs from TransferConfirmationCard which is used for viewing completed txs
-function TransferReviewCard({
+export default function TransferReviewCard({
   recipient,
   address,
   e164PhoneNumber,
   currency,
-  t,
   type,
   value,
   comment,
   fee,
   isLoadingFee,
   feeError,
-}: OwnProps & WithTranslation) {
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localValue = useDollarsToLocalAmount(value)
-  const exchangeRate = new BigNumber(useExchangeRate() as string)
-  const amountWithFees = value.plus(fee || 0)
-  const adjustedFee =
-    type === TokenTransactionType.InviteSent && fee
-      ? fee.minus(getInvitationVerificationFeeInDollars())
-      : fee
+}: Props) {
+  const { t } = useTranslation(Namespaces.sendFlow7)
+  const isInvite = type === TokenTransactionType.InviteSent
+  const inviteFee = getInvitationVerificationFeeInDollars()
+  const inviteFeeAmount = {
+    value: inviteFee,
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+  }
+
+  // 'fee' already contains the invitation fee for invites
+  // so we adjust it here
+  const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
+
+  const securityFeeAmount = securityFee && {
+    value: securityFee,
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+  }
+  const subtotalAmount = value.isGreaterThan(0) && {
+    value,
+    currencyCode: CURRENCIES[currency].code,
+  }
+  const amount = subtotalAmount || inviteFeeAmount
+  const totalAmount = {
+    value: value.plus(fee || 0),
+    currencyCode: CURRENCIES[currency].code,
+  }
 
   return (
-    <View style={style.container}>
+    <View style={styles.container}>
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
-      {!!localCurrencyCode && localValue ? (
-        <MoneyAmount amount={getMoneyDisplayValue(localValue)} code={localCurrencyCode} />
-      ) : (
-        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
-      )}
-      <View style={style.bottomContainer}>
-        {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+      <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={amount} />
+      <View style={styles.bottomContainer}>
+        {!!comment && <Text style={styles.comment}>{comment}</Text>}
         <HorizontalLine />
-        <View style={style.feeContainer}>
-          {!!localCurrencyCode && localValue && (
-            <>
-              <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getMoneyDisplayValue(value)}
-                title={t('amountInCelloDollars')}
-              />
-              <Text style={style.localValueHint}>
-                {t('localValueHint', {
-                  localValue: getMoneyDisplayValue(exchangeRate),
-                  localCurrencyCode,
-                })}
-              </Text>
-            </>
-          )}
-          {type === TokenTransactionType.InviteSent && (
-            <LineItemRow
-              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
-              title={t('inviteAndSecurityFee')}
-            />
-          )}
+        {subtotalAmount && (
           <LineItemRow
-            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-            amount={getFeeDisplayValue(adjustedFee)}
-            title={t('securityFee')}
-            titleIcon={<FeeIcon />}
-            isLoading={isLoadingFee}
-            hasError={!!feeError}
+            title={t('global:subtotal')}
+            amount={<CurrencyDisplay amount={subtotalAmount} />}
           />
+        )}
+        {isInvite && (
           <LineItemRow
-            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-            amount={getMoneyDisplayValue(amountWithFees)}
-            title={t('total')}
+            title={t('inviteFee')}
+            amount={<CurrencyDisplay amount={inviteFeeAmount} />}
           />
-        </View>
+        )}
+        <LineItemRow
+          title={t('securityFee')}
+          titleIcon={<FeeIcon />}
+          amount={
+            securityFeeAmount && (
+              <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
+            )
+          }
+          isLoading={isLoadingFee}
+          hasError={!!feeError}
+        />
+        <HorizontalLine />
+        <TotalLineItem amount={totalAmount} />
       </View>
     </View>
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'flex-start',
     paddingBottom: 25,
-    paddingHorizontal: 20,
   },
   bottomContainer: {
     marginTop: 5,
     flexDirection: 'column',
     alignItems: 'stretch',
   },
-  feeContainer: {
-    marginTop: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'stretch',
+  amount: {
+    marginTop: 15,
   },
-  pSmall: {
+  comment: {
+    ...componentStyles.paddingTop5,
+    ...fontStyles.light,
     fontSize: 14,
     color: colors.darkSecondary,
-    ...fontStyles.light,
     lineHeight: 18,
     textAlign: 'center',
   },
-  localValueHint: {
-    ...fontStyles.light,
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.lightGray,
-    marginBottom: 3,
-  },
 })
-
-export default withTranslation(Namespaces.sendFlow7)(TransferReviewCard)

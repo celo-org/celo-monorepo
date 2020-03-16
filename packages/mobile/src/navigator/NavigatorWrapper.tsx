@@ -2,12 +2,12 @@ import AsyncStorage from '@react-native-community/async-storage'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import { createAppContainer, NavigationState } from 'react-navigation'
+import { createAppContainer } from 'react-navigation'
 import { connect } from 'react-redux'
 import AlertBanner from 'src/alert/AlertBanner'
 import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
-import { recordStateChange, setTopLevelNavigator } from 'src/navigator/NavigationService'
+import { handleNavigationStateChange, setTopLevelNavigator } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
 import { RootState } from 'src/redux/reducers'
 import BackupPrompt from 'src/shared/BackupPrompt'
@@ -39,9 +39,6 @@ function getPersistenceFunctions() {
   }
 }
 
-const navigationStateChange = (prev: NavigationState, current: NavigationState) =>
-  recordStateChange(prev, current)
-
 interface DispatchProps {
   setTopLevelNavigator: typeof setTopLevelNavigator
 }
@@ -71,7 +68,7 @@ export class NavigatorWrapper extends React.Component<Props> {
       <View style={styles.container}>
         <AppContainer
           ref={this.setNavigator}
-          onNavigationStateChange={navigationStateChange}
+          onNavigationStateChange={handleNavigationStateChange}
           {...getPersistenceFunctions()}
         />
 

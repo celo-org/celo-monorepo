@@ -6971,6 +6971,7 @@ exports[`BuildPage renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"image.png\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "contain",
@@ -6984,6 +6985,12 @@ exports[`BuildPage renders 1`] = `
                 "zIndex": -1,
               }
             }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="image.png"
           />
         </div>
         <div
@@ -7054,7 +7061,7 @@ exports[`BuildPage renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.email*"
+              placeholder="common:email*"
               readOnly={false}
               required={true}
               spellCheck={true}
