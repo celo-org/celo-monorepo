@@ -1,17 +1,14 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetAccountWalletAddress extends BaseCommand {
+export default class SetAccountWalletAddress extends ReleaseGoldCommand {
   static description = "Set the ReleaseGold contract account's wallet address"
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     walletAddress: Flags.address({
       required: true,
       description:
@@ -32,15 +29,10 @@ export default class SetAccountWalletAddress extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(SetAccountWalletAddress)
-    const contractAddress = flags.contract
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, contractAddress)
-    )
-    const isRevoked = await releaseGoldWrapper.isRevoked()
+    const isRevoked = await this.releaseGoldWrapper.isRevoked()
 
     const checkBuilder = newCheckBuilder(this)
-      .isAccount(releaseGoldWrapper.address)
+      .isAccount(this.releaseGoldWrapper.address)
       .addCheck('Contract is not revoked', () => !isRevoked)
 
     let sig: any
@@ -52,7 +44,11 @@ export default class SetAccountWalletAddress extends BaseCommand {
       )
       await checkBuilder.runChecks()
       const pop = String(flags.pop)
-      sig = accounts.parseSignatureOfAddress(releaseGoldWrapper.address, flags.walletAddress, pop)
+      sig = accounts.parseSignatureOfAddress(
+        this.releaseGoldWrapper.address,
+        flags.walletAddress,
+        pop
+      )
     } else {
       await checkBuilder.runChecks()
       sig = {}
@@ -61,10 +57,10 @@ export default class SetAccountWalletAddress extends BaseCommand {
       sig.s = '0x0'
     }
 
-    this.kit.defaultAccount = await releaseGoldWrapper.getBeneficiary()
+    this.kit.defaultAccount = await this.releaseGoldWrapper.getBeneficiary()
     await displaySendTx(
       'setAccountWalletAddressTx',
-      releaseGoldWrapper.setAccountWalletAddress(flags.walletAddress, sig.v, sig.r, sig.s)
+      this.releaseGoldWrapper.setAccountWalletAddress(flags.walletAddress, sig.v, sig.r, sig.s)
     )
   }
 }

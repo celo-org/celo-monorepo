@@ -1,17 +1,13 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetMaxDistribution extends BaseCommand {
+export default class SetMaxDistribution extends ReleaseGoldCommand {
   static description = 'Set the maximum distribution of gold for the given contract'
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     distributionRatio: flags.string({
       required: true,
       description:
@@ -28,12 +24,7 @@ export default class SetMaxDistribution extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(SetMaxDistribution)
-    const contractAddress = flags.contract
     const distributionRatio = Number(flags.distributionRatio)
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, contractAddress)
-    )
 
     await newCheckBuilder(this)
       .addCheck(
@@ -42,10 +33,10 @@ export default class SetMaxDistribution extends BaseCommand {
       )
       .runChecks()
 
-    this.kit.defaultAccount = await releaseGoldWrapper.getReleaseOwner()
+    this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()
     await displaySendTx(
       'setMaxDistribution',
-      releaseGoldWrapper.setMaxDistribution(distributionRatio)
+      this.releaseGoldWrapper.setMaxDistribution(distributionRatio)
     )
   }
 }

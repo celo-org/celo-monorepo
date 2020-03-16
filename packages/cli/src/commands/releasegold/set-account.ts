@@ -1,18 +1,14 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetAccount extends BaseCommand {
+export default class SetAccount extends ReleaseGoldCommand {
   static description =
     'Set account properties of the ReleaseGold instance account such as name, data encryption key, and the metadata URL'
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     property: flags.string({
       char: 'p',
       options: ['name', 'dataEncryptionKey', 'metaURL'],
@@ -37,30 +33,25 @@ export default class SetAccount extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(SetAccount)
-    const contractAddress = flags.contract
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, contractAddress)
-    )
-    const isRevoked = await releaseGoldWrapper.isRevoked()
+    const isRevoked = await this.releaseGoldWrapper.isRevoked()
 
     await newCheckBuilder(this)
-      .isAccount(releaseGoldWrapper.address)
+      .isAccount(this.releaseGoldWrapper.address)
       .addCheck('Contract is not revoked', () => !isRevoked)
       .runChecks()
 
     let tx: any
     if (flags.property === 'name') {
-      tx = releaseGoldWrapper.setAccountName(flags.value)
+      tx = this.releaseGoldWrapper.setAccountName(flags.value)
     } else if (flags.property === 'dataEncryptionKey') {
-      tx = releaseGoldWrapper.setAccountDataEncryptionKey(flags.value as any)
+      tx = this.releaseGoldWrapper.setAccountDataEncryptionKey(flags.value)
     } else if (flags.property === 'metaURL') {
-      tx = releaseGoldWrapper.setAccountMetadataURL(flags.value)
+      tx = this.releaseGoldWrapper.setAccountMetadataURL(flags.value)
     } else {
       return this.error(`Invalid property provided`)
     }
 
-    this.kit.defaultAccount = await releaseGoldWrapper.getBeneficiary()
+    this.kit.defaultAccount = await this.releaseGoldWrapper.getBeneficiary()
     await displaySendTx('setAccount' + flags.property + 'Tx', tx)
   }
 }

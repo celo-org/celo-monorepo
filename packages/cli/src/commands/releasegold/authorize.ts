@@ -1,18 +1,15 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class Authorize extends BaseCommand {
+export default class Authorize extends ReleaseGoldCommand {
   static description =
     'Authorize an alternative key to be used for a given action (Vote, Validate, Attest) on behalf of the ReleaseGold instance contract.'
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     role: flags.string({ required: true, options: ['vote', 'validator', 'attestation'] }),
     signer: Flags.address({
       required: true,
@@ -43,42 +40,37 @@ export default class Authorize extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(Authorize)
-    const contractAddress = flags.contract
     const role = flags.role
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, contractAddress)
-    )
 
     await newCheckBuilder(this)
-      .isAccount(releaseGoldWrapper.address)
+      .isAccount(this.releaseGoldWrapper.address)
       .runChecks()
 
     const accounts = await this.kit.contracts.getAccounts()
     const sig = accounts.parseSignatureOfAddress(
-      releaseGoldWrapper.address,
+      this.releaseGoldWrapper.address,
       flags.signer,
       flags.signature
     )
 
-    const isRevoked = await releaseGoldWrapper.isRevoked()
+    const isRevoked = await this.releaseGoldWrapper.isRevoked()
     this.kit.defaultAccount = isRevoked
-      ? await releaseGoldWrapper.getReleaseOwner()
-      : await releaseGoldWrapper.getBeneficiary()
+      ? await this.releaseGoldWrapper.getReleaseOwner()
+      : await this.releaseGoldWrapper.getBeneficiary()
     let tx: any
     if (role === 'vote') {
-      tx = await releaseGoldWrapper.authorizeVoteSigner(flags.signer, sig)
+      tx = await this.releaseGoldWrapper.authorizeVoteSigner(flags.signer, sig)
     } else if (role === 'validator' && flags.blsKey) {
-      tx = await releaseGoldWrapper.authorizeValidatorSignerAndBls(
+      tx = await this.releaseGoldWrapper.authorizeValidatorSignerAndBls(
         flags.signer,
         sig,
         flags.blsKey,
         flags.blsPop!
       )
     } else if (role === 'validator') {
-      tx = await releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
+      tx = await this.releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
     } else if (role === 'attestation') {
-      tx = await releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
+      tx = await this.releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
     } else {
       this.error('Invalid role provided')
     }

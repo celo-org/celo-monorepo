@@ -1,18 +1,15 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class RevokeVotes extends BaseCommand {
+export default class RevokeVotes extends ReleaseGoldCommand {
   static description = "Revokes votes for the given contract's account"
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     type: flags.string({
       char: 'a',
       options: ['active', 'pending'],
@@ -35,22 +32,18 @@ export default class RevokeVotes extends BaseCommand {
     // tslint:disable-next-line
     const { flags } = this.parse(RevokeVotes)
 
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, flags.contract)
-    )
     let tx: any
-    const isRevoked = await releaseGoldWrapper.isRevoked()
-    const beneficiary = await releaseGoldWrapper.getBeneficiary()
-    const releaseOwner = await releaseGoldWrapper.getReleaseOwner()
+    const isRevoked = await this.releaseGoldWrapper.isRevoked()
+    const beneficiary = await this.releaseGoldWrapper.getBeneficiary()
+    const releaseOwner = await this.releaseGoldWrapper.getReleaseOwner()
     const votes = new BigNumber(flags.votes)
     const checkBuilder = newCheckBuilder(this)
-      .isAccount(releaseGoldWrapper.address)
+      .isAccount(this.releaseGoldWrapper.address)
       .isValidatorGroup(flags.group)
 
     const election = await this.kit.contracts.getElection()
     const votesForGroup = await election.getVotesForGroupByAccount(
-      releaseGoldWrapper.address,
+      this.releaseGoldWrapper.address,
       flags.group
     )
     await checkBuilder
@@ -62,10 +55,18 @@ export default class RevokeVotes extends BaseCommand {
       .runChecks()
     if (flags.type === 'pending') {
       this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
-      tx = await releaseGoldWrapper.revokePending(releaseGoldWrapper.address, flags.group, votes)
+      tx = await this.releaseGoldWrapper.revokePending(
+        this.releaseGoldWrapper.address,
+        flags.group,
+        votes
+      )
     } else if (flags.type === 'active') {
       this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
-      tx = await releaseGoldWrapper.revokeActive(releaseGoldWrapper.address, flags.group, votes)
+      tx = await this.releaseGoldWrapper.revokeActive(
+        this.releaseGoldWrapper.address,
+        flags.group,
+        votes
+      )
     } else {
       return this.error('Invalid action provided')
     }

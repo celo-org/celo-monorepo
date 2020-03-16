@@ -1,16 +1,13 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetBeneficiary extends BaseCommand {
+export default class SetBeneficiary extends ReleaseGoldCommand {
   static description = 'Set the beneficiary of the ReleaseGold contract'
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     owner: Flags.address({
       required: true,
       description: 'Owner of `contract` capable of setting the new beneficiary (multisig)',
@@ -27,23 +24,18 @@ export default class SetBeneficiary extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(SetBeneficiary)
-    const contractAddress = flags.contract
     const owner = flags.owner
     const newBeneficiary = flags.beneficiary
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, contractAddress)
-    )
 
     await newCheckBuilder(this)
       .addCheck(
         'Owner argument is contract owner',
-        async () => owner === (await releaseGoldWrapper.getOwner())
+        async () => owner === (await this.releaseGoldWrapper.getOwner())
       )
       .runChecks()
 
     this.kit.defaultAccount = owner
-    const tx = releaseGoldWrapper.setBeneficiary(newBeneficiary)
+    const tx = this.releaseGoldWrapper.setBeneficiary(newBeneficiary)
     await displaySendTx('setBeneficiary', tx)
   }
 }

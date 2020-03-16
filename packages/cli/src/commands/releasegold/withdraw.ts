@@ -1,17 +1,14 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class Withdraw extends BaseCommand {
+export default class Withdraw extends ReleaseGoldCommand {
   static description =
     'Withdraws `value` released gold to the beneficiary address. Fails if `value` worth of gold has not been released yet.'
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     value: Flags.wei({
       required: true,
       description: 'Amount of released gold (in wei) to withdraw',
@@ -27,16 +24,11 @@ export default class Withdraw extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(Withdraw)
-    const contractAddress = flags.contract
     const value = flags.value
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, contractAddress)
-    )
 
-    const remainingUnlockedBalance = await releaseGoldWrapper.getRemainingUnlockedBalance()
-    const maxDistribution = await releaseGoldWrapper.getMaxDistribution()
-    const totalWithdrawn = await releaseGoldWrapper.getTotalWithdrawn()
+    const remainingUnlockedBalance = await this.releaseGoldWrapper.getRemainingUnlockedBalance()
+    const maxDistribution = await this.releaseGoldWrapper.getMaxDistribution()
+    const totalWithdrawn = await this.releaseGoldWrapper.getTotalWithdrawn()
     await newCheckBuilder(this)
       .addCheck('Value does not exceed available unlocked gold', () =>
         value.lte(remainingUnlockedBalance)
@@ -45,11 +37,11 @@ export default class Withdraw extends BaseCommand {
         value.plus(totalWithdrawn).lte(maxDistribution)
       )
       .addCheck('Contract has met liquidity provision if applicable', () =>
-        releaseGoldWrapper.getLiquidityProvisionMet()
+        this.releaseGoldWrapper.getLiquidityProvisionMet()
       )
       .runChecks()
 
-    this.kit.defaultAccount = await releaseGoldWrapper.getBeneficiary()
-    await displaySendTx('withdrawTx', releaseGoldWrapper.withdraw(value.toNumber()))
+    this.kit.defaultAccount = await this.releaseGoldWrapper.getBeneficiary()
+    await displaySendTx('withdrawTx', this.releaseGoldWrapper.withdraw(value.toNumber()))
   }
 }

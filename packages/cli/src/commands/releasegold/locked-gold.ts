@@ -1,19 +1,16 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
-import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
-import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { ReleaseGoldCommand } from './release-gold'
 
-export default class LockedGold extends BaseCommand {
+export default class LockedGold extends ReleaseGoldCommand {
   static description =
     'Perform actions [lock, unlock, relock, withdraw] on the gold held in the given contract.'
 
   static flags = {
-    ...BaseCommand.flags,
-    contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
+    ...ReleaseGoldCommand.flags,
     action: flags.string({
       char: 'a',
       options: ['lock', 'unlock', 'relock', 'withdraw'],
@@ -32,64 +29,60 @@ export default class LockedGold extends BaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(LockedGold)
-    const contractAddress = flags.contract
     const value = new BigNumber(flags.value)
-
-    const releaseGoldWrapper = new ReleaseGoldWrapper(
-      this.kit,
-      newReleaseGold(this.kit.web3, contractAddress)
-    )
-    const checkBuilder = newCheckBuilder(this, contractAddress).isAccount(contractAddress)
-    const isRevoked = await releaseGoldWrapper.isRevoked()
-    const beneficiary = await releaseGoldWrapper.getBeneficiary()
-    const releaseOwner = await releaseGoldWrapper.getReleaseOwner()
+    const checkBuilder = newCheckBuilder(this, this.contractAddress).isAccount(this.contractAddress)
+    const isRevoked = await this.releaseGoldWrapper.isRevoked()
+    const beneficiary = await this.releaseGoldWrapper.getBeneficiary()
+    const releaseOwner = await this.releaseGoldWrapper.getReleaseOwner()
     const lockedGold = await this.kit.contracts.getLockedGold()
 
     if (flags.action === 'lock') {
       const pendingWithdrawalsValue = await lockedGold.getPendingWithdrawalsTotalValue(
-        contractAddress
+        this.contractAddress
       )
       const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
       const lockValue = value.minus(relockValue)
       this.kit.defaultAccount = beneficiary
       await checkBuilder
         .addCheck('Is not revoked', () => !isRevoked)
-        .hasEnoughGold(contractAddress, lockValue)
+        .hasEnoughGold(this.contractAddress, lockValue)
         .runChecks()
-      const txos = await releaseGoldWrapper.relockGold(relockValue)
+      const txos = await this.releaseGoldWrapper.relockGold(relockValue)
       for (const txo of txos) {
         await displaySendTx('lockedGoldRelock', txo, { from: beneficiary })
       }
       if (lockValue.gt(new BigNumber(0))) {
-        await displaySendTx('lockedGoldLock', releaseGoldWrapper.lockGold(lockValue))
+        await displaySendTx('lockedGoldLock', this.releaseGoldWrapper.lockGold(lockValue))
       }
     } else if (flags.action === 'unlock') {
       await checkBuilder
-        .isNotVoting(contractAddress)
+        .isNotVoting(this.contractAddress)
         .hasEnoughLockedGoldToUnlock(value)
         .runChecks()
       this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
-      await displaySendTx('lockedGoldUnlock', releaseGoldWrapper.unlockGold(flags.value))
+      await displaySendTx('lockedGoldUnlock', this.releaseGoldWrapper.unlockGold(flags.value))
     } else if (flags.action === 'withdraw') {
       await checkBuilder.runChecks()
       const currentTime = Math.round(new Date().getTime() / 1000)
       while (true) {
         let madeWithdrawal = false
-        const pendingWithdrawals = await lockedGold.getPendingWithdrawals(contractAddress)
+        const pendingWithdrawals = await lockedGold.getPendingWithdrawals(this.contractAddress)
         for (let i = 0; i < pendingWithdrawals.length; i++) {
           const pendingWithdrawal = pendingWithdrawals[i]
           if (pendingWithdrawal.time.isLessThan(currentTime)) {
             console.log(
               `Found available pending withdrawal of value ${pendingWithdrawal.value.toFixed()}, withdrawing`
             )
-            await displaySendTx('lockedGoldWithdraw', releaseGoldWrapper.withdrawLockedGold(i))
+            await displaySendTx('lockedGoldWithdraw', this.releaseGoldWrapper.withdrawLockedGold(i))
             madeWithdrawal = true
             break
           }
         }
         if (!madeWithdrawal) break
       }
-      const remainingPendingWithdrawals = await lockedGold.getPendingWithdrawals(contractAddress)
+      const remainingPendingWithdrawals = await lockedGold.getPendingWithdrawals(
+        this.contractAddress
+      )
       for (const pendingWithdrawal of remainingPendingWithdrawals) {
         console.log(
           `Pending withdrawal of value ${pendingWithdrawal.value.toFixed()} available for withdrawal in ${pendingWithdrawal.time

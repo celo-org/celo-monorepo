@@ -5,7 +5,7 @@ import {
 } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
-import { newReleaseGold, ReleaseGold } from '../generated/ReleaseGold'
+import { ReleaseGold } from '../generated/ReleaseGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -20,7 +20,31 @@ import {
 } from './BaseWrapper'
 import { PendingWithdrawal } from './LockedGold'
 
-export interface ReleaseSchedule {
+export interface BalanceState {
+  totalWithdrawn: string
+  maxDistribution: string
+  totalBalance: string
+  remainingTotalBalance: string
+  remainingUnlockedBalance: string
+  remainingLockedBalance: string
+  currentReleasedTotalAmount: string
+}
+
+export interface ReleaseGoldInfo {
+  releaseGoldWrapperAddress: string
+  beneficiary: string
+  releaseOwner: string
+  refundAddress: string
+  liquidityProvisionMet: boolean
+  canValidate: boolean
+  canVote: boolean
+  releaseSchedule: ReleaseSchedule
+  isRevoked: boolean
+  revokedStateData: RevocationInfo
+  balanceStateData: BalanceState
+}
+
+interface ReleaseSchedule {
   releaseStartTime: number
   releaseCliff: number
   numReleasePeriods: number
@@ -28,7 +52,7 @@ export interface ReleaseSchedule {
   amountReleasedPerPeriod: BigNumber
 }
 
-export interface RevocationInfo {
+interface RevocationInfo {
   revocable: boolean
   releasedBalanceAtRevoke: BigNumber
   revokeTime: number
@@ -38,15 +62,6 @@ export interface RevocationInfo {
  * Contract for handling an instance of a ReleaseGold contract.
  */
 export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
-  /**
-   * Returns the ReleaseGold instance at the given contract address.
-   * @param contractAddress The address of the desired ReleaseGold contract.
-   * @return The ReleaseGold instance contract
-   */
-  async getReleaseGoldAt(contractAddress: string) {
-    return new ReleaseGoldWrapper(this.kit, newReleaseGold(this.kit.web3, contractAddress))
-  }
-
   /**
    * Returns the underlying Release schedule of the ReleaseGold contract
    * @return A ReleaseSchedule.
