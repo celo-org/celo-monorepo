@@ -156,7 +156,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     return parsedTxMap
   }
 
-  async function fetchState() {
+  async function fetchState(blockNumber: number) {
     // Fetching public state
     // Stability
     exchange
@@ -167,6 +167,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           function: 'getBuyAndSellBuckets',
           currentStableBucket: Number(buckets[0]),
           currentGoldBucket: Number(buckets[1]),
+          blockNumber: blockNumber,
         }
         logEvent(LoggingCategory.State, view)
       })
@@ -179,6 +180,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           contract: 'SortedOracles',
           function: 'medianRate',
           medianRate: Number(medianRate.rate),
+          blockNumber: blockNumber,
         }
         logEvent(LoggingCategory.State, view)
       })
@@ -205,6 +207,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           contract: 'GoldToken',
           function: 'totalSupply',
           goldTokenTotalSupply: Number(goldTokenTotalSupply),
+          blockNumber: blockNumber,
         }
         logEvent(LoggingCategory.State, view)
       })
@@ -248,7 +251,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
 
     if (header.number % BLOCK_INTERVAL === 0) {
       // tslint:disable-next-line: no-floating-promises
-      fetchState()
+      fetchState(header.number)
     }
 
     for (const tx of parsedBlock.block.transactions as Transaction[]) {
