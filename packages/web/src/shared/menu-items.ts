@@ -91,6 +91,7 @@ export enum CeloLinks {
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
+  instagram = 'https://www.instagram.com/celoorg/',
   twitter = 'https://twitter.com/CeloOrg',
   medium = 'https://medium.com/celoOrg',
   mediumUser = 'https://medium.com/@celoorg',

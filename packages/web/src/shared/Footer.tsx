@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import TwiterLogo from 'src/icons/TwitterLogo'
+import InstagramLogo from 'src/icons/instagram.png'
 import YouTube from 'src/icons/YouTube'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import RingsGlyph from 'src/logos/RingsGlyph'
@@ -86,6 +87,11 @@ const Social = React.memo(function _Social() {
             <YouTube color={colors.dark} size={height} />
           </a>
         </View>
+        <View style={styles.socialIcon}>
+          <a target="_blank" rel="noopener" href={CeloLinks.instagram}>
+            <Image source={InstagramLogo} style={styles.imageIcon} />
+          </a>
+        </View>
       </View>
     </Responsive>
   )
@@ -163,12 +169,17 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
 const styles = StyleSheet.create({
   social: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     width: '100%',
     marginTop: 30,
   },
   socialMobile: { alignSelf: 'center', justifyContent: 'center' },
   socialDesktop: { marginTop: 10 },
+  imageIcon: {
+    height: 25,
+    width: 25,
+  },
   socialIcon: {
     paddingRight: 25,
   },
