@@ -44,7 +44,7 @@ export default function CoinList() {
           href={CeloLinks.coinlist}
           target="_blank"
           text={t('coinlist.btn')}
-          size={isMobile && SIZE.normal}
+          size={isMobile && SIZE.fullWidth}
         />
       </Cell>
     </GridRow>
@@ -54,15 +54,16 @@ export default function CoinList() {
 const styles = StyleSheet.create({
   clLogo: {
     maxWidth: '95%',
-    marginTop: 70,
+    marginTop: 60,
     alignSelf: 'center',
     width: 322,
     height: 55,
   },
   clLogoMobile: {
+    marginBottom: 15,
     maxWidth: '100%',
-    width: 340,
-    height: 60,
+    width: 345,
+    height: 70,
   },
   glyph: {
     height: 40,
