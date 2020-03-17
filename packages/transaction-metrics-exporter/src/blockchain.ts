@@ -62,7 +62,15 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   const blockProcessor = await newBlockHeaderProcessor(kit)
   const provider = kit.web3.currentProvider as WebsocketProvider
   const subscription = await kit.web3.eth.subscribe('newBlockHeaders')
-  subscription.on('data', blockProcessor)
+
+  let lastBlocks: number[] = []
+  subscription.on('data', header => {
+    if (!lastBlocks.includes(header.number)) {
+      blockProcessor(header)
+    }
+    lastBlocks.push(header.number)
+    lastBlocks = lastBlocks.slice(-10)
+  })
 
   const listeningWatcher = conditionWatcher({
     name: 'check:kit:isListening',
