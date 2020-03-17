@@ -21,7 +21,7 @@ export default class Approve extends BaseCommand {
     const id = res.flags.proposalID
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
-    const governanceApproverMultiSig = await this.kit.contracts.getGovernanceApproverMultiSig(
+    const governanceApproverMultiSig = await this.kit.contracts.getMultiSig(
       await governance.getApprover()
     )
 
