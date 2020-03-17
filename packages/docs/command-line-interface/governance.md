@@ -15,6 +15,7 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
   --proposalID=proposalID                            (required) UUID of proposal to approve
+  --useMultiSig                                      True means the request will be sent through multisig.
 
 EXAMPLE
   approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
