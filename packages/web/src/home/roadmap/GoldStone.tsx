@@ -13,7 +13,7 @@ interface Props {
   isLast?: boolean
 }
 
-const heading = [fonts.p, textStyles.heavy]
+const heading = [fonts.legal, textStyles.heavy]
 
 export default React.memo(function GoldStone({ date, title, text, isLast, index }: Props) {
   const { isMobile } = useScreenSize()
@@ -35,7 +35,7 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index 
         <Fade delay={10 * index}>
           <Text style={[...heading, styles.date]}>{date}</Text>
           <Text style={heading}>{title}</Text>
-          <Text style={fonts.p}>{text}</Text>
+          <Text style={fonts.legal}>{text}</Text>
         </Fade>
       </View>
     </View>
@@ -45,6 +45,7 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index 
 const styles = StyleSheet.create({
   date: { color: colors.gold },
   container: {
+    maxWidth: 450,
     marginHorizontal: 15,
     flexDirection: 'row',
     flex: 1,
@@ -62,7 +63,8 @@ const styles = StyleSheet.create({
   box: {
     marginVertical: 0,
     paddingLeft: 15,
-    paddingBottom: 75,
+    paddingBottom: 50,
+    paddingRight: 10,
     flex: 1,
   },
   coin: {

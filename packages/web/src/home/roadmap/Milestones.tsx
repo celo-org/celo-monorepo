@@ -23,7 +23,7 @@ export default function MileStones() {
         mobileStyle={standardStyles.sectionMarginTopMobile}
         nativeID={hashNav.home.timeline}
       >
-        <Cell span={Spans.half}>
+        <Cell span={Spans.half} tabletSpan={Spans.three4th}>
           <Image source={valueOFGold} style={styles.rising} resizeMode="contain" />
           <H3>{t('milestones.subtitle')}</H3>
           <H1 ariaLevel="2">{t('milestones.title')}</H1>
@@ -69,8 +69,8 @@ function Upcoming({ title, text }) {
   return (
     <View style={styles.upcoming}>
       <Fade delay={200}>
-        <Text style={[fonts.p, textStyles.heavy]}>{title}</Text>
-        <Text style={fonts.p}>{text}</Text>
+        <Text style={[fonts.legal, textStyles.heavy]}>{title}</Text>
+        <Text style={fonts.legal}>{text}</Text>
       </Fade>
     </View>
   )
@@ -81,8 +81,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   upcoming: {
-    marginBottom: 40,
-    marginRight: 20,
+    marginBottom: 30,
+    marginRight: 40,
+    maxWidth: 400,
   },
   rising: {
     width: 75,
