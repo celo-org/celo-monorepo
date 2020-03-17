@@ -303,4 +303,31 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       })
     )
   }
+
+  async getGoldUnlockedEvents(blockNumber: number): Promise<GoldUnlocked[]> {
+    const events = await this.getPastEvents('GoldUnlocked', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    return events.map(
+      (e: EventLog): GoldUnlocked => ({
+        account: e.returnValues.account,
+        value: valueToBigNumber(e.returnValues.value),
+        available: valueToBigNumber(e.returnValues.available),
+      })
+    )
+  }
+
+  async getGoldWithdrawnEvents(blockNumber: number): Promise<GoldWithdrawn[]> {
+    const events = await this.getPastEvents('GoldWithdrawn', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    return events.map(
+      (e: EventLog): GoldWithdrawn => ({
+        account: e.returnValues.account,
+        value: valueToBigNumber(e.returnValues.value),
+      })
+    )
+  }
 }
