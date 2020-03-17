@@ -42,6 +42,22 @@ interface PendingWithdrawal {
   value: BigNumber
 }
 
+export interface GoldLocked {
+  account: Address
+  value: BigNumber
+}
+
+export interface GoldUnlocked {
+  account: Address
+  value: BigNumber
+  available: BigNumber
+}
+
+export interface GoldWithdrawn {
+  account: Address
+  value: BigNumber
+}
+
 export interface LockedGoldConfig {
   unlockingPeriod: BigNumber
 }
@@ -273,5 +289,18 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       }
     }
     return res
+  }
+
+  async getGoldLockedEvents(blockNumber: number): Promise<GoldLocked[]> {
+    const events = await this.getPastEvents('GoldLocked', {
+      fromBlock: blockNumber,
+      toBlock: blockNumber,
+    })
+    return events.map(
+      (e: EventLog): GoldLocked => ({
+        account: e.returnValues.account,
+        value: valueToBigNumber(e.returnValues.value),
+      })
+    )
   }
 }
