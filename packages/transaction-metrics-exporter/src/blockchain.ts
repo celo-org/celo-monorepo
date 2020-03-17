@@ -20,6 +20,15 @@ const NOT_WHITELISTED_ADDRESS = 'not_whitelisted_address'
 const UNKNOWN_METHOD = 'unknown_method'
 let BLOCK_INTERVAL = 1
 
+enum LoggingCategory {
+  Block = 'RECEIVED_BLOCK',
+  ParsedLog = 'RECEIVED_PARSED_LOG',
+  ParsedTransaction = 'RECEIVED_PARSED_TRANSACTION',
+  State = 'RECEIVED_STATE',
+  Transaction = 'RECEIVED_TRANSACTION',
+  TransactionReceipt = 'RECEIVED_TRANSACTION_RECEIPT',
+}
+
 export async function metricExporterWithRestart(providerUrl: string, blockInterval: number) {
   try {
     BLOCK_INTERVAL = blockInterval
@@ -64,7 +73,7 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   const subscription = await kit.web3.eth.subscribe('newBlockHeaders')
 
   let lastBlocks: number[] = []
-  subscription.on('data', header => {
+  subscription.on('data', (header) => {
     if (!lastBlocks.includes(header.number)) {
       blockProcessor(header)
     }
@@ -121,8 +130,9 @@ async function newListeningKit(providerUrl: string): Promise<null | ContractKit>
   }
 }
 
-const logEvent = (name: string, details: object) =>
+const logEvent = (name: string, details: object) => {
   console.log(JSON.stringify({ event: name, ...details }))
+}
 
 async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockHeader) => void> {
   const blockExplorer = await newBlockExplorer(kit)
@@ -132,16 +142,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
   const sortedOracles = await kit.contracts.getSortedOracles()
   // const reserve = await kit.contracts.getReserve()
   const goldToken = await kit.contracts.getGoldToken()
-  // const epochRewards = await kit.contracts.getEpochRewards()
-
-  enum LoggingCategory {
-    Block = 'RECEIVED_BLOCK',
-    ParsedLog = 'RECEIVED_PARSED_LOG',
-    ParsedTransaction = 'RECEIVED_PARSED_TRANSACTION',
-    State = 'RECEIVED_STATE',
-    Transaction = 'RECEIVED_TRANSACTION',
-    TransactionReceipt = 'RECEIVED_TRANSACTION_RECEIPT',
-  }
+  const epochRewards = await kit.contracts.getEpochRewards()
 
   function toMethodId(txInput: string, isKnownCall: boolean): string {
     let methodId: string
@@ -175,7 +176,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           function: 'getBuyAndSellBuckets',
           currentStableBucket: Number(buckets[0]),
           currentGoldBucket: Number(buckets[1]),
-          blockNumber: blockNumber,
+          blockNumber,
         }
         logEvent(LoggingCategory.State, view)
       })
@@ -188,7 +189,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           contract: 'SortedOracles',
           function: 'medianRate',
           medianRate: Number(medianRate.rate),
-          blockNumber: blockNumber,
+          blockNumber,
         }
         logEvent(LoggingCategory.State, view)
       })
@@ -215,34 +216,38 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           contract: 'GoldToken',
           function: 'totalSupply',
           goldTokenTotalSupply: Number(goldTokenTotalSupply),
-          blockNumber: blockNumber,
+          blockNumber,
         }
         logEvent(LoggingCategory.State, view)
       })
       .catch()
 
     // TODO: Pending EpochRewards wrapper implementation
-    // epochRewards.getTargetGoldTotalSupply()
-    //   .then(rewardsAmount => {
-    //     const view: ViewDefinition = {
-    //       contract: "EpochRewards",
-    //       function: "getTargetGoldTotalSupply",
-    //       rewardsAmount: Number(rewardsAmount)
-    //     }
-    //     logEvent(LoggingCategory.State, view)
-    //   })
-    //   .catch()
+    epochRewards
+      .getTargetGoldTotalSupply()
+      .then((rewardsAmount) => {
+        const view: ViewDefinition = {
+          contract: 'EpochRewards',
+          function: 'getTargetGoldTotalSupply',
+          rewardsAmount: Number(rewardsAmount),
+          blockNumber,
+        }
+        logEvent(LoggingCategory.State, view)
+      })
+      .catch()
 
-    // epochRewards.getRewardsMultiplier()
-    //   .then(rewardsMultiplier => {
-    //     const view: ViewDefinition = {
-    //       contract: "EpochRewards",
-    //       function: "getRewardsMultiplier",
-    //       rewardsMultiplier: Number(rewardsMultiplier)
-    //     }
-    //     logEvent(LoggingCategory.State, view)
-    //   })
-    //   .catch()
+    epochRewards
+      .getRewardsMultiplier()
+      .then((rewardsMultiplier) => {
+        const view: ViewDefinition = {
+          contract: 'EpochRewards',
+          function: 'getRewardsMultiplier',
+          rewardsMultiplier: Number(rewardsMultiplier),
+          blockNumber,
+        }
+        logEvent(LoggingCategory.State, view)
+      })
+      .catch()
   }
 
   return async (header: BlockHeader) => {
