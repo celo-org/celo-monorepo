@@ -73,6 +73,7 @@ export default class Authorize extends ReleaseGoldCommand {
       tx = await this.releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
     } else {
       this.error('Invalid role provided')
+      return
     }
     await displaySendTx('authorize' + role + 'Tx', tx)
   }

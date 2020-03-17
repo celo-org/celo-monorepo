@@ -3,7 +3,8 @@ import { displaySendTx } from '../../utils/cli'
 import { ReleaseGoldCommand } from './release-gold'
 
 export default class Revoke extends ReleaseGoldCommand {
-  static description = 'Revoke the given contract instance'
+  static description =
+    'Revoke the given contract instance. Once revoked, any Locked Gold can be unlocked by the release owner. The beneficiary will then be able to withdraw any released Gold that had yet to be withdrawn, and the remainder can be transferred by the release owner to the refund address. Note that not all ReleaseGold instances are revokable.'
 
   static args = []
 

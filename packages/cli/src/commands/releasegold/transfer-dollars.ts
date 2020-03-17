@@ -2,16 +2,17 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { ReleaseGoldCommand } from './release-gold'
 
-export default class Transfer extends ReleaseGoldCommand {
-  static description = 'Transfer stable tokens from the given contract address'
+export default class TransferDollars extends ReleaseGoldCommand {
+  static description =
+    'Transfer Celo Dollars from the given contract address. Dollars may be accrued to the ReleaseGold contract via validator epoch rewards.'
 
   static flags = {
     ...ReleaseGoldCommand.flags,
     to: Flags.address({
       required: true,
-      description: 'Address of the recipient of stable token transfer',
+      description: 'Address of the recipient of Celo Dollars transfer',
     }),
-    value: Flags.wei({ required: true, description: 'Value (in Wei) of stable token to transfer' }),
+    value: Flags.wei({ required: true, description: 'Value (in Wei) of Celo Dollars to transfer' }),
   }
 
   static args = []
@@ -22,7 +23,7 @@ export default class Transfer extends ReleaseGoldCommand {
 
   async run() {
     // tslint:disable-next-line
-    const { flags } = this.parse(Transfer)
+    const { flags } = this.parse(TransferDollars)
     const isRevoked = await this.releaseGoldWrapper.isRevoked()
     this.kit.defaultAccount = isRevoked
       ? await this.releaseGoldWrapper.getBeneficiary()

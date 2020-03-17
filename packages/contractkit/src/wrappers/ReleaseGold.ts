@@ -580,4 +580,26 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
     )
   }
+
+  async revoke(
+    account: Address,
+    group: Address,
+    value: BigNumber
+  ): Promise<Array<CeloTransactionObject<void>>> {
+    const electionContract = await this.kit.contracts.getElection()
+    const vote = await electionContract.getVotesForGroupByAccount(account, group)
+    if (value.gt(vote.pending.plus(vote.active))) {
+      throw new Error(`can't revoke more votes for ${group} than have been made by ${account}`)
+    }
+    const txos = []
+    const pendingValue = BigNumber.minimum(vote.pending, value)
+    if (!pendingValue.isZero()) {
+      txos.push(await this.revokePending(account, group, pendingValue))
+    }
+    if (pendingValue.lt(value)) {
+      const activeValue = value.minus(pendingValue)
+      txos.push(await this.revokeActive(account, group, activeValue))
+    }
+    return txos
+  }
 }

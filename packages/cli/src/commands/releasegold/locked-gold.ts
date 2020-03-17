@@ -7,13 +7,13 @@ import { ReleaseGoldCommand } from './release-gold'
 
 export default class LockedGold extends ReleaseGoldCommand {
   static description =
-    'Perform actions [lock, unlock, relock, withdraw] on the gold held in the given contract.'
+    'Perform actions [lock, unlock, withdraw] on Celo Gold that has been locked via the provided ReleaseGold contract.'
 
   static flags = {
     ...ReleaseGoldCommand.flags,
     action: flags.string({
       char: 'a',
-      options: ['lock', 'unlock', 'relock', 'withdraw'],
+      options: ['lock', 'unlock', 'withdraw'],
       description: "Action to perform on contract's gold",
       required: true,
     }),

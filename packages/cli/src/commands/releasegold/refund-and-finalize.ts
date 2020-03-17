@@ -4,7 +4,7 @@ import { ReleaseGoldCommand } from './release-gold'
 
 export default class RefundAndFinalize extends ReleaseGoldCommand {
   static description =
-    "Refund the given contract's balance to the appopriate parties and destroy the contact"
+    "Refund the given contract's balance to the appopriate parties and destroy the contact. Can only be called by the release owner of revocable ReleaseGold instances."
 
   static flags = {
     ...ReleaseGoldCommand.flags,
