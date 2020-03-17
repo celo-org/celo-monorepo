@@ -312,9 +312,9 @@ describe('slashing tests', function(this: any) {
         )
         .send({ from: validator, gas: 5000000 })
 
-      // Penalty is defined to be 5000 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      assert.equal(balance.toString(10), '5000000000000000000000')
+      assert.equal(balance.toString(10), '1000000000000000000000')
     })
   })
 
@@ -344,10 +344,10 @@ describe('slashing tests', function(this: any) {
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)
 
-      // Penalty is defined to be 5000 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld
       const lockedGold = await kit.contracts.getLockedGold()
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      assert.equal(balance.toString(10), '5000000000000000000000')
+      assert.equal(balance.toString(10), '1000000000000000000000')
     })
   })
 })
