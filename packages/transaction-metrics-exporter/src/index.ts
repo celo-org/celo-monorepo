@@ -14,7 +14,12 @@ if (host === undefined) {
   throw new Error("so tsc doesn't complains")
 }
 
-metricExporterWithRestart(host).catch((err) => {
+let blockInterval = 1
+if (!(process.env.BLOCK_INTERVAL === undefined) && (Number(process.env.BLOCK_INTERVAL) > 1)) {
+  blockInterval =  Number(process.env.BLOCK_INTERVAL)
+}
+
+metricExporterWithRestart(host, blockInterval).catch((err) => {
   console.error('Unknown Error: %O', err)
   process.exit(1)
 })

@@ -1,4 +1,4 @@
-import { ContractKit, newKit } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import {
   newBlockExplorer,
   ParsedBlock,
@@ -8,18 +8,25 @@ import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
-import { WebsocketProvider } from 'web3-core'
+import { Transaction, WebsocketProvider } from 'web3-core'
 import { Block, BlockHeader } from 'web3-eth'
 import { Counters } from './metrics'
+import { ViewDefinition } from './view-definition'
+import { labelValues } from 'prom-client'
 
 const EMPTY_INPUT = 'empty_input'
 const NO_METHOD_ID = 'no_method_id'
 const NOT_WHITELISTED_ADDRESS = 'not_whitelisted_address'
 const UNKNOWN_METHOD = 'unknown_method'
+let BLOCK_INTERVAL = 1
 
-export async function metricExporterWithRestart(providerUrl: string) {
+export async function metricExporterWithRestart(providerUrl: string, blockInterval: number) {
   try {
+    BLOCK_INTERVAL = blockInterval
     console.log('MetricExporter: Start')
+    console.log('ProviderUrl: ' + providerUrl)
+    console.log('Block Interval: ' + BLOCK_INTERVAL)
+
     let kit = newKit(providerUrl)
     while (true) {
       console.log('MetricExporter: Run Start')
@@ -112,6 +119,22 @@ const logEvent = (name: string, details: object) =>
 async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockHeader) => void> {
   const blockExplorer = await newBlockExplorer(kit)
   const logExplorer = await newLogExplorer(kit)
+
+  const exchange = await kit.contracts.getExchange()
+  const sortedOracles = await kit.contracts.getSortedOracles()
+  const reserve = await kit.contracts.getReserve()
+  const goldToken = await kit.contracts.getGoldToken()
+  // const epochRewards = await kit.contracts.getEpochRewards()
+
+  enum LoggingCategory {
+    Block = 'RECEIVED_BLOCK',
+    ParsedLog = 'RECEIVED_PARSED_LOG',
+    ParsedTransaction = 'RECEIVED_PARSED_TRANSACTION',
+    State = 'RECEIVED_STATE',
+    Transaction = 'RECEIVED_TRANSACTION',
+    TransactionReceipt = 'RECEIVED_TRANSACTION_RECEIPT',
+  }
+
   function toMethodId(txInput: string, isKnownCall: boolean): string {
     let methodId: string
     if (txInput === '0x') {
@@ -133,30 +156,113 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     return parsedTxMap
   }
 
+  async function fetchState() {
+    // Fetching public state
+    // Stability
+    exchange
+      .getBuyAndSellBuckets(true)
+      .then((buckets) => {
+        const view: ViewDefinition = {
+          contract: 'Exchange',
+          function: 'getBuyAndSellBuckets',
+          currentStableBucket: Number(buckets[0]),
+          currentGoldBucket: Number(buckets[1]),
+        }
+        logEvent(LoggingCategory.State, view)
+      })
+      .catch()
+
+    sortedOracles
+      .medianRate(CeloContract.StableToken)
+      .then((medianRate) => {
+        const view: ViewDefinition = {
+          contract: 'SortedOracles',
+          function: 'medianRate',
+          medianRate: Number(medianRate.rate),
+        }
+        logEvent(LoggingCategory.State, view)
+      })
+      .catch()
+
+    // TODO: Pending of implement getReserveGoldBalance function in contractKit
+    reserve
+      .getReserveGoldBalance()
+      .then((goldBalance) => {
+        const view: ViewDefinition = {
+          contract: 'Reserve',
+          function: 'getReserveGoldBalance',
+          goldBalance: Number(goldBalance),
+        }
+        logEvent(LoggingCategory.State, view)
+      })
+      .catch()
+
+    // PoS
+    goldToken
+      .totalSupply()
+      .then((goldTokenTotalSupply) => {
+        const view: ViewDefinition = {
+          contract: 'GoldToken',
+          function: 'totalSupply',
+          goldTokenTotalSupply: Number(goldTokenTotalSupply),
+        }
+        logEvent(LoggingCategory.State, view)
+      })
+      .catch()
+
+    // TODO: Pending EpochRewards wrapper implementation
+    // epochRewards.getTargetGoldTotalSupply()
+    //   .then(rewardsAmount => {
+    //     const view: ViewDefinition = {
+    //       contract: "EpochRewards",
+    //       function: "getTargetGoldTotalSupply",
+    //       rewardsAmount: Number(rewardsAmount)
+    //     }
+    //     logEvent(LoggingCategory.State, view)
+    //   })
+    //   .catch()
+
+    // epochRewards.getRewardsMultiplier()
+    //   .then(rewardsMultiplier => {
+    //     const view: ViewDefinition = {
+    //       contract: "EpochRewards",
+    //       function: "getRewardsMultiplier",
+    //       rewardsMultiplier: Number(rewardsMultiplier)
+    //     }
+    //     logEvent(LoggingCategory.State, view)
+    //   })
+    //   .catch()
+  }
+
   return async (header: BlockHeader) => {
     Counters.blockheader.inc({ miner: header.miner })
 
     const block = await blockExplorer.fetchBlock(header.number)
     const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
 
-    const blockTime = block.timestamp - Number(previousBlock.timestamp)
-    logEvent('RECEIVED_BLOCK', { ...block, blockTime })
+    const blockTime = Number(block.timestamp) - Number(previousBlock.timestamp)
+    logEvent(LoggingCategory.Block, { ...block, blockTime })
 
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
 
-    for (const tx of parsedBlock.block.transactions) {
+    if (header.number % BLOCK_INTERVAL === 0) {
+      // tslint:disable-next-line: no-floating-promises
+      fetchState()
+    }
+
+    for (const tx of parsedBlock.block.transactions as Transaction[]) {
       const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)
 
-      logEvent('RECEIVED_TRANSACTION', tx)
+      logEvent(LoggingCategory.Transaction, tx)
       const receipt = await kit.web3.eth.getTransactionReceipt(tx.hash)
-      logEvent('RECEIVED_TRANSACTION_RECEIPT', receipt)
+      logEvent(LoggingCategory.TransactionReceipt, receipt)
 
       const labels = {
         to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
         methodId: toMethodId(tx.input, parsedTx != null),
         status: receipt.status.toString(),
-      }
+      } as labelValues
 
       Counters.transaction.inc(labels)
       Counters.transactionGasUsed.observe(labels, receipt.gasUsed)
@@ -168,7 +274,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           function: parsedTx.callDetails.function,
         })
 
-        logEvent('RECEIVED_PARSED_TRANSACTION', { ...parsedTx.callDetails, hash: tx.hash })
+        logEvent(LoggingCategory.ParsedTransaction, { ...parsedTx.callDetails, hash: tx.hash })
 
         for (const event of logExplorer.getKnownLogs(receipt)) {
           Counters.transactionParsedLogs.inc({
@@ -181,7 +287,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
           event.eventName = event.event
           delete event.event
 
-          logEvent('RECEIVED_PARSED_LOG', event)
+          logEvent(LoggingCategory.ParsedLog, event)
         }
       }
     }
