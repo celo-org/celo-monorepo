@@ -1,13 +1,9 @@
+import {} from 'web3-eth-abi'
+import { AbiItem } from 'web3-utils'
 declare module 'web3-eth-abi' {
-  export interface ABIDefinition {
-    constant?: boolean
-    payable?: boolean
-    stateMutability?: 'pure' | 'view' | 'nonpayable' | 'payable'
-    anonymous?: boolean
+  export interface ABIDefinition extends AbiItem {
     inputs?: ABIInputParameter[]
-    name?: string
     outputs?: ABIOutputParameter[]
-    type: 'function' | 'constructor' | 'event' | 'fallback'
     signature: string
   }
 
@@ -19,6 +15,13 @@ declare module 'web3-eth-abi' {
   }
   export interface ABIInputParameter extends ABIOutputParameter {
     indexed?: boolean
+  }
+
+  export interface AbiInput {
+    name: string
+    type: string
+    indexed?: boolean
+    components?: AbiInput[]
   }
 
   export interface DecodedParamsArray {

@@ -34,9 +34,9 @@ android-defaults: &android-defaults
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: celohq/circleci:geth1.9
+    - image: celohq/circleci:geth1.9-2
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: mrsmkl/gas-payment-change-m02-alt
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 
 general:
   artifacts:

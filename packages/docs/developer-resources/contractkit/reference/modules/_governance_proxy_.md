@@ -71,7 +71,7 @@ ___
 
 ### `Const` setImplementationOnProxy
 
-▸ **setImplementationOnProxy**(`address`: string): *TransactionObject‹any›*
+▸ **setImplementationOnProxy**(`address`: string): *any*
 
 *Defined in [contractkit/src/governance/proxy.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L45)*
 
@@ -81,4 +81,4 @@ Name | Type |
 ------ | ------ |
 `address` | string |
 
-**Returns:** *TransactionObject‹any›*
+**Returns:** *any*

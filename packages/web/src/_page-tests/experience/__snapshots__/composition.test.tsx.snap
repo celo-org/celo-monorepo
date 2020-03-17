@@ -399,6 +399,23 @@ exports[`Experience/Composition renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "MozTransitionProperty": "transform,",
+              "WebkitTransform": "scaleY(0)",
+              "WebkitTransformOrigin": "top",
+              "WebkitTransitionDuration": "500ms",
+              "WebkitTransitionProperty": "-webkit-transform,transform,",
+              "marginLeft": "20px",
+              "transform": "scaleY(0)",
+              "transformOrigin": "top",
+              "transitionDuration": "500ms",
+              "transitionProperty": "-webkit-transform,transform,",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitFlexDirection": "row",
@@ -3032,6 +3049,79 @@ exports[`Experience/Composition renders 1`] = `
                 }
               >
                 Developers
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "10px",
+                "marginLeft": "10px",
+                "marginRight": "10px",
+                "marginTop": "10px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "alignItems": "center",
+                  "msFlexAlign": "center",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/alliance"
+                role="link"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline-flex",
+                    "flexGrow": 0,
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "justifyContent": "center",
+                    "lineHeight": "16px",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "textAlign": "center",
+                    "textRendering": "geometricPrecision",
+                    "width": "fit-content",
+                  }
+                }
+              >
+                Alliance
               </a>
             </div>
           </div>

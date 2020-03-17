@@ -1,24 +1,18 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
-import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { StyleSheet, View } from 'react-native'
+import Avatar from 'src/components/Avatar'
+import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
-import Logo from 'src/icons/Logo'
+import { Namespaces } from 'src/i18n'
 import { RecipientWithContact } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
-import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
-export interface OwnProps {
+interface Props {
   recipientPhone: string
   recipientContact?: RecipientWithContact
   amount: BigNumber
@@ -28,109 +22,52 @@ export interface OwnProps {
   currency: CURRENCY_ENUM
 }
 
-interface StateProps {
-  defaultCountryCode: string
-}
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    defaultCountryCode: state.account.defaultCountryCode,
+export default function ReclaimPaymentConfirmationCard({
+  recipientPhone,
+  recipientContact,
+  amount: amountProp,
+  fee,
+  isLoadingFee,
+  feeError,
+  currency,
+}: Props) {
+  const { t } = useTranslation(Namespaces.sendFlow7)
+  const amount = { value: amountProp, currencyCode: CURRENCIES[currency].code }
+  const securityFeeAmount = fee && {
+    value: fee.negated(),
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
-}
-
-type Props = OwnProps & StateProps & WithTranslation
-
-class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
-  render() {
-    const {
-      recipientPhone,
-      recipientContact,
-      amount,
-      fee,
-      isLoadingFee,
-      feeError,
-      currency,
-      defaultCountryCode,
-      t,
-    } = this.props
-    const currencySymbol = CURRENCIES[currency].symbol
-    const amountWithFees = getMoneyDisplayValue(amount.minus(fee || 0))
-
-    return (
-      <View style={[componentStyles.roundedBorder, style.container]}>
-        <View style={style.logo}>
-          <Logo height={40} />
-        </View>
-        <MoneyAmount
-          symbol={currencySymbol}
-          amount={amountWithFees}
-          sign={'+'}
-          color={colors.celoGreen}
-        />
-        <HorizontalLine />
-        <View style={style.details}>
-          {recipientContact && (
-            <Text style={[fontStyles.bodySmallSemiBold, style.contactName]}>
-              {recipientContact.displayName}
-            </Text>
-          )}
-          {recipientPhone && (
-            <PhoneNumberWithFlag
-              e164PhoneNumber={recipientPhone}
-              defaultCountryCode={defaultCountryCode}
-            />
-          )}
-        </View>
-        <View style={style.feeContainer}>
-          <LineItemRow
-            currencySymbol={currencySymbol}
-            amount={amount.toString()}
-            title={t('totalSent')}
-          />
-          <LineItemRow
-            currencySymbol={currencySymbol}
-            amount={getFeeDisplayValue(fee)}
-            title={t('securityFee')}
-            titleIcon={<FeeIcon />}
-            isLoading={isLoadingFee}
-            hasError={!!feeError}
-          />
-          <LineItemRow
-            currencySymbol={currencySymbol}
-            amount={amountWithFees}
-            title={t('totalRefunded')}
-          />
-        </View>
-      </View>
-    )
+  const totalAmount = {
+    value: amountProp.minus(fee || 0),
+    currencyCode: amount.currencyCode,
   }
+
+  return (
+    <View style={styles.container}>
+      <Avatar recipient={recipientContact} e164Number={recipientPhone} />
+      <CurrencyDisplay type={DisplayType.Big} amount={amount} />
+      <HorizontalLine />
+      <LineItemRow title={t('amount')} amount={<CurrencyDisplay amount={amount} />} />
+      <LineItemRow
+        title={t('securityFee')}
+        titleIcon={<FeeIcon />}
+        amount={
+          securityFeeAmount && (
+            <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
+          )
+        }
+        isLoading={isLoadingFee}
+        hasError={!!feeError}
+      />
+      <HorizontalLine />
+      <TotalLineItem title={t('totalRefunded')} amount={totalAmount} />
+    </View>
+  )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
-  },
-  feeContainer: {
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'stretch',
-  },
-  contactName: {
-    paddingTop: 6,
-    textAlign: 'center',
-  },
-  logo: {
-    alignSelf: 'center',
-    margin: 'auto',
-    marginVertical: 10,
-  },
-  details: {
-    padding: 20,
   },
 })
-
-export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.sendFlow7)(ReclaimPaymentConfirmationCard)
-)

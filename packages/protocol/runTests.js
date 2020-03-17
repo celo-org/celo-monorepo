@@ -16,11 +16,15 @@ const migrationOverrides = {
   downtimeSlasher: {
     slashableDowntime: 60, // epoch length is 100 for unit tests
   },
+  election: {
+    minElectableValidators: '10',
+  },
   epochRewards: {
     frozen: false,
   },
   exchange: {
     frozen: false,
+    minimumReports: 1,
   },
   goldToken: {
     frozen: false,
