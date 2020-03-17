@@ -231,19 +231,26 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log('Deploying', name)
-    deployer.deploy(ContractProxy)
-    deployer.deploy(Contract)
+    if (false) {
+      console.log('Deploying', name)
+      deployer.deploy(ContractProxy)
+      deployer.deploy(Contract)
+    }
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
-      await proxy._transferOwnership(_accounts[0])
-      const proxiedContract: ContractInstance = await setInitialProxyImplementation<
-        ContractInstance
-      >(web3, artifacts, name, ...(await args(networkName)))
+      if (false) {
+        await proxy._transferOwnership(_accounts[0])
+      }
+      const proxiedContract = await getDeployedProxiedContract<ContractInstance>(name, artifacts)
+      if (false) {
+        const proxiedContract: ContractInstance = await setInitialProxyImplementation<
+          ContractInstance
+        >(web3, artifacts, name, ...(await args(networkName)))
 
-      if (registerAddress) {
-        const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-        await registry.setAddressFor(name, proxiedContract.address)
+        if (registerAddress) {
+          const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+          await registry.setAddressFor(name, proxiedContract.address)
+        }
       }
 
       if (then) {
@@ -277,6 +284,7 @@ export async function transferOwnershipOfProxy(
 ) {
   const Proxy = artifacts.require(contractName + 'Proxy')
   const proxy: ProxyInstance = await Proxy.deployed()
+  console.log(await proxy._getOwner())
   await proxy._transferOwnership(owner)
 }
 
@@ -288,6 +296,7 @@ export async function transferOwnershipOfProxyAndImplementation<
     contractName,
     artifacts
   )
+  console.log(await contract.owner())
   await contract.transferOwnership(owner)
   await transferOwnershipOfProxy(contractName, owner, artifacts)
 }

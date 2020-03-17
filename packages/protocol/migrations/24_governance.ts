@@ -44,19 +44,18 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
   CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    console.info('Setting constitution thresholds')
-    await Promise.all(
+    if (false) {
+      console.info('Setting constitution thresholds')
       Object.keys(constitution)
         .filter((contractName) => contractName !== 'proxy')
-        .map(async (contractName) => {
+        .forEach(async (contractName) => {
+          console.log(`\tSetting constitution thresholds for ${contractName}`)
           const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
             contractName,
             artifacts
           )
-
           const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
           selectors.default = ['0x00000000']
-
           const thresholds = { ...constitution.proxy, ...constitution[contractName] }
           await Promise.all(
             Object.keys(thresholds).map((func) =>
@@ -68,7 +67,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
             )
           )
         })
-    )
+    }
 
     const proxyAndImplementationOwnedByGovernance = [
       'Accounts',
@@ -95,10 +94,8 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Validators',
     ]
 
-    await Promise.all(
-      proxyAndImplementationOwnedByGovernance.map((contractName) =>
-        transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
-      )
-    )
+    proxyAndImplementationOwnedByGovernance.forEach(async (contractName) => {
+      await transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
+    })
   }
 )
