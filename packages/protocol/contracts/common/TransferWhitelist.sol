@@ -14,8 +14,8 @@ contract TransferWhitelist is Ownable, UsingRegistry {
   address[] public whitelist;
   bytes32[] public registeredContracts;
 
-  event WhitelistedAddress(address addr);
-  event WhitelistedRegistryId(bytes32 registryId);
+  event WhitelistedAddress(address indexed addr);
+  event WhitelistedRegistryId(bytes32 indexed registryId);
 
   constructor(address registryAddress) public {
     _transferOwnership(msg.sender);

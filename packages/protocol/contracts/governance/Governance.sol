@@ -100,7 +100,7 @@ contract Governance is
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
 
-  event ApproverSet(address approver);
+  event ApproverSet(address indexed approver);
 
   event ConcurrentProposalsSet(uint256 concurrentProposals);
 
