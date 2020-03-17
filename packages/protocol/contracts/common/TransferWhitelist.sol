@@ -11,7 +11,7 @@ import "./UsingRegistry.sol";
 contract TransferWhitelist is Ownable, UsingRegistry {
   using SafeMath for uint256;
 
-  address[] public whitelist;
+  address[] private whitelist;
   bytes32[] public registeredContracts;
 
   event WhitelistedAddress(address addr);
