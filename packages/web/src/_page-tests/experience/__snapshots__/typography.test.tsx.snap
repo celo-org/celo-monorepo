@@ -399,6 +399,23 @@ exports[`Experience/Typography renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "MozTransitionProperty": "transform,",
+              "WebkitTransform": "scaleY(0)",
+              "WebkitTransformOrigin": "top",
+              "WebkitTransitionDuration": "500ms",
+              "WebkitTransitionProperty": "-webkit-transform,transform,",
+              "marginLeft": "20px",
+              "transform": "scaleY(0)",
+              "transformOrigin": "top",
+              "transitionDuration": "500ms",
+              "transitionProperty": "-webkit-transform,transform,",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitFlexDirection": "row",
