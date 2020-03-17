@@ -197,7 +197,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
    * @param value The amount of Celo Gold to transfer.
    * @return True if the transaction succeeds.
    */
-  function _transfer(address to, uint256 value) internal onlyWhenNotFrozen returns (bool) {
+  function _transfer(address to, uint256 value) internal returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
