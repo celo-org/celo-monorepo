@@ -24,6 +24,7 @@ const migrationOverrides = {
   },
   exchange: {
     frozen: false,
+    minimumReports: 1,
   },
   goldToken: {
     frozen: false,

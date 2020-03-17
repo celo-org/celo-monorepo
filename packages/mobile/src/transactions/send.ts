@@ -15,7 +15,7 @@ import { assertNever } from 'src/utils/typescript'
 import { web3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 import { getLatestNonce } from 'src/web3/utils'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject } from 'web3-eth'
 
 const TAG = 'transactions/send'
 const TX_NUM_RETRIES = 3 // Try txs up to 3 times
