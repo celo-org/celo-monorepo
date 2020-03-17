@@ -2,7 +2,7 @@ import getConfig from 'next/config'
 import airtableInit from '../server/airtable'
 import Sentry from '../server/sentry'
 import cache from './cache'
-import { getCountryFromIP } from './geoip'
+import { getCountryFromIPCached } from './geoip'
 
 export interface Fields {
   live?: boolean
@@ -25,10 +25,8 @@ export default async function latestAnnouncements(ipAddress: string): Promise<Fi
     )
 
     if (anyBlocked) {
-      const country = await cache(`geo-${ipAddress}`, getCountryFromIP, {
-        args: ipAddress,
-        minutes: 240,
-      })
+      const country = await getCountryFromIPCached(ipAddress)
+
       return censor(announcements, country)
     }
     return announcements
@@ -40,7 +38,7 @@ export default async function latestAnnouncements(ipAddress: string): Promise<Fi
 async function fetchAnouncmentRecords() {
   const records = (await getAirtable()
     .select({
-      maxRecords: 1,
+      maxRecords: 10,
       filterByFormula: IS_LIVE,
       sort: [{ field: 'order', direction: 'desc' }],
     })
@@ -54,9 +52,15 @@ function getAirtable() {
 
 // just export for testing!
 // remove announcements that have been marked as blocked for the country our ip says we are in
-export function censor(announcements: Fields[], country: string) {
+export function censor(announcements: Fields[], country?: string) {
+  const lowerCountry = country && country.toLowerCase && country.toLowerCase()
+
+  if (!country) {
+    return announcements.filter((announcement) => !announcement.block)
+  }
+
   return announcements.filter((announcement) =>
-    announcement.block ? !announcement.block.includes(country.toLowerCase()) : true
+    announcement.block ? !announcement.block.includes(lowerCountry) : true
   )
 }
 

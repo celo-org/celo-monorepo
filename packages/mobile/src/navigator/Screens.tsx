@@ -13,6 +13,7 @@ export enum Stacks {
 }
 
 export enum Screens {
+  AppLoading = 'AppLoading',
   Account = 'Account',
   Analytics = 'Analytics',
   Background = 'Background',

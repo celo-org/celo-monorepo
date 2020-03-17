@@ -7,7 +7,7 @@ import { IPC_PATH } from 'src/geth/geth'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import Web3 from 'web3'
-import { Provider } from 'web3/providers'
+import { provider } from 'web3-core'
 
 // Logging tag
 const tag = 'web3/contracts'
@@ -57,15 +57,15 @@ function getIpcProvider() {
   return ipcProvider
 }
 
-function getHttpProvider(url: string): Provider {
+function getHttpProvider(url: string): provider {
   Logger.debug(tag, 'creating HttpProvider...')
-  const provider = new Web3.providers.HttpProvider(url)
+  const httpProvider = new Web3.providers.HttpProvider(url)
   Logger.debug(tag, 'created HttpProvider')
   // In the future, we might decide to over-ride the error handler via the following code.
   // provider.on('error', () => {
   //   Logger.showError('Error occurred')
   // })
-  return provider as Provider
+  return httpProvider
 }
 
 function getWeb3(): Web3 {

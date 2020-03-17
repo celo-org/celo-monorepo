@@ -27,13 +27,12 @@
     "firebase-functions": "^3.3.0",
     "rlp": "^2.2.3",
     "twilio": "^3.39.3",
-    "web3": "1.0.0-beta.37",
-    "web3-core-helpers": "1.0.0-beta.37"
+    "web3": "1.2.4",
+    "web3-core-helpers": "1.2.4"
   },
   "devDependencies": {
     "@types/debug": "^4.1.4",
     "@types/twilio": "^0.0.10",
-    "@types/web3": "1.0.19",
     "@types/yargs": "^13.0.2",
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",

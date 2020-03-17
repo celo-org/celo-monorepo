@@ -36,6 +36,8 @@ Base ContractWrapper
 
   ↳ [LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)
 
+  ↳ [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)
+
   ↳ [ReserveWrapper](_wrappers_reserve_.reservewrapper.md)
 
   ↳ [SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)
@@ -58,7 +60,7 @@ Base ContractWrapper
 
 \+ **new BaseWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: T): *[BaseWrapper](_wrappers_basewrapper_.basewrapper.md)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L15)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
 
 **Parameters:**
 
@@ -75,7 +77,7 @@ Name | Type |
 
 • **get address**(): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
 
 Contract address
 

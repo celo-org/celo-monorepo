@@ -54,12 +54,19 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     const convertedAmount = web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.methods.approve(escrow.options.address, convertedAmount)
 
-    yield call(sendTransaction, approvalTx, account, TAG, 'approval')
+    // TODO check types
+    yield call(sendTransaction as any, approvalTx, account, TAG, 'approval')
 
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
-    const transferTxId = generateStandbyTransactionId(escrow._address)
-    yield call(registerStandbyTransaction, transferTxId, amount.toString(), escrow._address)
+    // TODO fix types
+    const transferTxId = generateStandbyTransactionId((escrow as any)._address)
+    yield call(
+      registerStandbyTransaction,
+      transferTxId,
+      amount.toString(),
+      (escrow as any)._address
+    )
 
     const transferTx = escrow.methods.transfer(
       phoneHash,
@@ -69,8 +76,8 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       tempWalletAddress,
       NUM_ATTESTATIONS_REQUIRED
     )
-
-    yield call(sendAndMonitorTransaction, transferTxId, transferTx, account)
+    // TODO check types
+    yield call(sendAndMonitorTransaction as any, transferTxId, transferTx, account)
     yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
@@ -151,7 +158,8 @@ function* withdrawFromEscrow() {
     const withdrawTx = escrow.methods.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
 
-    yield call(sendTransaction, withdrawTx, account, TAG, txID)
+    // TODO check types
+    yield call(sendTransaction as any, withdrawTx, account, TAG, txID)
 
     yield put(fetchDollarBalance())
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
@@ -175,7 +183,8 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
-    feeCurrency: (await getStableTokenContract(web3))._address,
+    // TODO fix types
+    feeCurrency: ((await getStableTokenContract(web3)) as any)._address,
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
