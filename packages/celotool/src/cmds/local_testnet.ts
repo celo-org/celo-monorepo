@@ -10,7 +10,7 @@ import yargs from 'yargs'
 const Account: any = require('eth-lib/lib/account')
 
 export const command = 'local-testnet'
-export const describe = 'Command to run a local testnet of geth instances. Can create '
+export const describe = 'Command to run a local testnet of geth instances.'
 
 interface LocalTestnetArgs {
   localgeth?: string
@@ -77,7 +77,7 @@ export const builder = (argv: yargs.Argv) => {
     })
     .option('keepdata', {
       type: 'boolean',
-      decription: 'keep the data directory, instead of purging it, if set',
+      decription: 'keep the data directory from any previous runs',
     })
 }
 
@@ -93,7 +93,6 @@ async function repl(config: GethRunConfig) {
     Web3,
     Admin,
     testnet: config,
-    url: getRpcUrl,
     ...config.instances.reduce(
       (o, instance) => ({
         ...o,
