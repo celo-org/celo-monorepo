@@ -85,5 +85,10 @@
   "reachOut": "Reach out to participate in Celo’s ecosystem",
   "receiveUpdates": "Receive the latest updates to your inbox",
   "startConversation": "Start A Conversation",
-  "recentNews": "Recent News"
+  "recentNews": "Recent News",
+  "coinlist": {
+    "title": "Become a Backer of Celo",
+    "text": "Celo Gold will be available for purchase via CoinList. Everyone participating pays the same fair price and the minimum contribution is $100 USD. Available to non-US persons only, other restrictions apply.",
+    "btn": "Participate"
+  }
 }
