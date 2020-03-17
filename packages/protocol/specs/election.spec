@@ -1,40 +1,58 @@
 
-/*
-certoraRun.py election.conf --path $PWD/contracts  --settings -assumeUnwindCond,-t=30,-ping,-patient=0,-graphDrawLimit=0 --solc solc5.12.exe
-*/
- 
- 
+
  
 pragma specify 0.1
 
 methods {
 	init_state()
 	getElectableValidators() returns uint256,uint256 envfree
+	userVotedFor(address,address) returns bool envfree
+	//getActiveVotesForGroupByAccount is a function that computes the active votes 
+	getActiveVotesForGroupByAccount(address, address )returns uint256 envfree
+	//getActiveVotesForGroupByAccountRAW function is for the getting the raw information form the strcture
+	getActiveVotesForGroupByAccountRAW(address, address )returns uint256 envfree
+	getPendingVotesForGroupByAccount(address, address )returns uint256 envfree
+	getTotalElectionPendingVotesForGroup(address)  returns uint256 envfree
+    getTotalElectionActiveVotesForGroup(address)  returns uint256 envfree
+	getTotalUnitsVotingForGroup(address) returns uint256 envfree
+	getTotalActiveVotesForGroup(address) returns uint256 envfree
+	isAccount(address) returns bool envfree
+	getGroupEligibility(address) returns bool envfree 
+	// todo - check if needed
 	getTotalPendingWithdrawals(address) returns uint256 
 	getAccountNonvotingLockedGold(address) returns uint256 
 	getPendingWithdrawalsLength(address) returns uint256 
 	getPendingVotes(address,address) returns uint256 envfree
 	withdraw(uint256) 
-	userVotedFor(address,address) returns bool envfree
-	getActiveVotesForGroupByAccount(address, address )returns uint256 envfree
-	getPendingVotesForGroupByAccount(address, address )returns uint256 envfree
-	getTotalElectionPendingVotesForGroup(address)  returns uint256 envfree
-    getTotalElectionActiveVotesForGroup(address)  returns uint256 envfree
+	
 }
 
 
 /***
 If a user account voted for group than there is some pending or active votes for that group from this user
 ***/
-invariant userVotedHasLockedGoldInGroup(address account, address group) sinvoke userVotedFor(account,group) <=> (sinvoke getPendingVotesForGroupByAccount(group,account) > 0 || sinvoke getActiveVotesForGroupByAccount(group,account) > 0)
+invariant userVotedHasLockedGoldInGroup(address account, address group) sinvoke userVotedFor(account,group) <=> (sinvoke getPendingVotesForGroupByAccount(group,account) > 0 || sinvoke getActiveVotesForGroupByAccountRAW(group,account) > 0)
 
+/****
+A group's total voting in units is at least as much as the total active votes  
+***/
+invariant unitsMoreThanActive(address group) 
+	sinvoke getTotalUnitsVotingForGroup(group) >= sinvoke getTotalActiveVotesForGroup(group)    
 
-rule checkAll(method f) {
-	env eF;
-	calldataarg arg;
-	sinvoke f(eF,arg);
-	assert false;
-}
+/****
+A group's total active is at least as the votes from an account 
+TODO certora
+
+invariant totalActiveVotesMoreThanAccountVotes(address group )
+	sum for address account. sinvoke getActiveVotesForGroupByAccountRAW(group,account) <= sinvoke getTotalActiveVotesForGroup(group)
+****/	
+
+/****
+A group is a valid account 
+****/
+invariant validGroup(address group)
+	sinvoke getGroupEligibility(group) =>  sinvoke isAccount(group)	
+
 
 
 /*** 
@@ -62,7 +80,8 @@ rule  valid_electableValidators(method f) {
 
 /***
 If elect validator  returns more than one validator than they are different 
-***/
+****/
+
 rule electValidatorReturnValues {
 	
 	env e;
@@ -157,4 +176,5 @@ rule revokeDecreaseVotes(
 	assert totalvotesAfter == totalvotesBefore - value, "when revoking expecting total votes to decrease accordingly";
 		
 }
+
 
