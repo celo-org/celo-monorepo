@@ -18,12 +18,11 @@
 * [GasPriceMinimum](_base_.celocontract.md#gaspriceminimum)
 * [GoldToken](_base_.celocontract.md#goldtoken)
 * [Governance](_base_.celocontract.md#governance)
-* [GovernanceApproverMultiSig](_base_.celocontract.md#governanceapprovermultisig)
 * [LockedGold](_base_.celocontract.md#lockedgold)
+* [MultiSig](_base_.celocontract.md#multisig)
 * [Random](_base_.celocontract.md#random)
 * [Registry](_base_.celocontract.md#registry)
 * [Reserve](_base_.celocontract.md#reserve)
-* [ReserveSpenderMultiSig](_base_.celocontract.md#reservespendermultisig)
 * [SortedOracles](_base_.celocontract.md#sortedoracles)
 * [StableToken](_base_.celocontract.md#stabletoken)
 * [TransferWhitelist](_base_.celocontract.md#transferwhitelist)
@@ -143,17 +142,17 @@ ___
 
 ___
 
-###  GovernanceApproverMultiSig
+###  LockedGold
 
-• **GovernanceApproverMultiSig**: = "GovernanceApproverMultiSig"
+• **LockedGold**: = "LockedGold"
 
 *Defined in [contractkit/src/base.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L18)*
 
 ___
 
-###  LockedGold
+###  MultiSig
 
-• **LockedGold**: = "LockedGold"
+• **MultiSig**: = "MultiSig"
 
 *Defined in [contractkit/src/base.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L19)*
 
@@ -183,19 +182,11 @@ ___
 
 ___
 
-###  ReserveSpenderMultiSig
-
-• **ReserveSpenderMultiSig**: = "ReserveSpenderMultiSig"
-
-*Defined in [contractkit/src/base.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L23)*
-
-___
-
 ###  SortedOracles
 
 • **SortedOracles**: = "SortedOracles"
 
-*Defined in [contractkit/src/base.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L24)*
+*Defined in [contractkit/src/base.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L23)*
 
 ___
 
@@ -203,7 +194,7 @@ ___
 
 • **StableToken**: = "StableToken"
 
-*Defined in [contractkit/src/base.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L25)*
+*Defined in [contractkit/src/base.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L24)*
 
 ___
 
@@ -211,7 +202,7 @@ ___
 
 • **TransferWhitelist**: = "TransferWhitelist"
 
-*Defined in [contractkit/src/base.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L26)*
+*Defined in [contractkit/src/base.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L25)*
 
 ___
 
@@ -219,4 +210,4 @@ ___
 
 • **Validators**: = "Validators"
 
-*Defined in [contractkit/src/base.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L27)*
+*Defined in [contractkit/src/base.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L26)*

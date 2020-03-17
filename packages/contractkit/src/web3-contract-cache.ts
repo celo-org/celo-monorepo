@@ -15,6 +15,7 @@ import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
+import { newMultiSig } from './generated/MultiSig'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
@@ -23,7 +24,6 @@ import { newStableToken } from './generated/StableToken'
 import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 import { ContractKit } from './kit'
-import { newMultiSig } from './generated/MultiSig'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
