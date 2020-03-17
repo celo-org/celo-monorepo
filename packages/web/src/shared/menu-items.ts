@@ -140,7 +140,7 @@ export const hashNav = {
     newsletter: 'newsletter',
   },
   join: { roles: 'roles' },
-  home: { partnerships: 'partnerships' },
+  home: { partnerships: 'partnerships', timeline: 'timeline' },
   brandIntro: { overview: 'overview', brandVoice: 'brand-voice' },
   brandLogo: { overview: 'overview', space: 'space-and-sizing', backgrounds: 'backgrounds' },
   brandColor: { overview: 'overview', backgrounds: 'background-colors' },

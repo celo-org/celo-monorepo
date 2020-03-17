@@ -6,6 +6,7 @@ import celoHero from 'src/home/celo-hero.png'
 import HomeBackers from 'src/home/HomeBackers'
 import HomeCarousel from 'src/home/HomeCarousel'
 import HomeSystems from 'src/home/HomeSystems'
+import MileStones from 'src/home/roadmap/Milestones'
 import HomeCover from 'src/home/version3/HomeCover'
 import HomeEmail from 'src/home/version3/HomeEmail'
 import HomeHero from 'src/home/version3/HomeHero'
@@ -50,6 +51,7 @@ export class Home extends React.Component<I18nProps, State> {
         <HomeHero />
         <Press />
         <HomeSystems />
+        <MileStones />
         <HomeWork />
         <HomeCarousel />
         <HomeBackers />

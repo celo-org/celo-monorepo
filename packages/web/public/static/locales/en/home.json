@@ -85,5 +85,77 @@
   "reachOut": "Reach out to participate in Celo’s ecosystem",
   "receiveUpdates": "Receive the latest updates to your inbox",
   "startConversation": "Start A Conversation",
-  "recentNews": "Recent News"
+  "recentNews": "Recent News",
+  "milestones": {
+    "title": "Celo's Journey",
+    "subtitle": "Milestones & RoadMap",
+    "intro": "The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.",
+    "upcomingTitle": "Upcoming Milestones",
+    "upcoming": [{
+      "title": "1. New Baklava Testnet",
+      "text": "Validators stand up new testnet with feature complete software"
+    },
+    {
+      "title": "2. Security audits complete",
+      "text": "Resolve any outstanding issues to harden codebase"
+    },
+    {
+      "title": "3. Mainnet Release Candidate 1",
+      "text": "Validators stand up release candidate network with production-ready software"
+    },
+    {
+      "title": "4. Validator Elections Start",
+      "text": "When sufficient validators and groups are registered and staked, validator elections and epoch rewards can be enabled via on-chain governance proposal"
+    },
+    {
+      "title": "5. Mainnet Release Candidate X",
+      "text": "Possible additional release candidates in the event critical issues are discovered"
+    },
+    {
+      "title": "6. Celo Gold is live",
+      "text": "When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal"
+    },
+    {
+      "title": "7. Celo Dollar is live",
+      "text": "When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal"
+    },
+    {
+      "title": "8. Mainnet Mobile Wallet Release",
+      "text": "The Mainnet Mobile Wallet will be fully available for download on iOS and Android"
+    }
+    ],
+    "pastTitle": "Previous Milestones",
+    "past" : [
+      {
+        "title": "SDK Release",
+        "date": "Feb 2020",
+        "text": "ContractKit and DAppKit simplify development of dApps"
+      },
+      {
+        "date": "Nov 2019",
+        "title": "Baklava Testnet – The Great Celo Stake Off",
+        "text": "Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened"       
+      },
+      {
+        "date": "Sep 2019",
+        "title": "More than 100 Community Events Organized",
+        "text": ""       
+      },
+      {
+        "date": "July 2019",
+        "title": "Alfajores Testnet",
+        "text": "First full network release for protocol and app developers"       
+      },
+      {
+        "date": "Feb 2019",
+        "title": "MIT Stability Challenge",
+        "text": "Ongoing research in test environments"       
+      },
+      {
+        "date": "Aug 2018",
+        "title": "First user research trip",
+        "text": ""       
+      }
+    ]
+  }
 }
