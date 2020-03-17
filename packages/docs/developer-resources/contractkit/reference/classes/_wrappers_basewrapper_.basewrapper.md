@@ -36,13 +36,13 @@ Base ContractWrapper
 
   ↳ [LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)
 
+  ↳ [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)
+
   ↳ [ReserveWrapper](_wrappers_reserve_.reservewrapper.md)
 
   ↳ [SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)
 
   ↳ [StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)
-
-  ↳ [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)
 
 ## Index
 
