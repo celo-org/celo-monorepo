@@ -1,4 +1,8 @@
+import { provider } from 'web3-core'
 import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
+import { Debug } from 'web3-eth-debug'
+import Web3Utils from 'web3-utils'
+import { getProviderUrl, stopProvider } from '../utils/provider-utils'
 
 export const getAbiTypes = (abi: ABIDefinition[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)
@@ -14,4 +18,30 @@ export const parseDecodedParams = (params: DecodedParamsObject) => {
     }
   })
   return { args, params }
+}
+
+export async function traceTransaction(
+  defaultProvider: provider,
+  transaction: string,
+  tracer: string
+): Promise<Record<string, any>> {
+  const args: { [key: string]: string } = { tracer }
+  const url = getProviderUrl(defaultProvider)
+  const debug = new Debug(url)
+  const trace = await debug.getTransactionTrace(transaction, args)
+  stopProvider(debug.currentProvider as any)
+  return trace
+}
+
+export async function traceBlock(
+  defaultProvider: provider,
+  blockNumber: number,
+  tracer: string
+): Promise<Record<string, any>> {
+  const args: { [key: string]: string } = { tracer }
+  const url = getProviderUrl(defaultProvider)
+  const debug = new Debug(url)
+  const trace = await debug.getBlockTraceByNumber(Web3Utils.toHex(blockNumber), args)
+  stopProvider(debug.currentProvider as any)
+  return trace
 }

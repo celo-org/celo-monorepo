@@ -43,3 +43,19 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/transfer/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/gold.ts)_
+
+### Trace
+
+Trace a transaction
+
+```
+USAGE
+  $ celocli transfer:trace
+
+OPTIONS
+  --blockNumber=blockNumber  Block number to trace
+  --tracer=tracer            Javascript tracer code
+  --transaction=transaction  Transaction hash to trace
+```
+
+_See code: [packages/cli/src/commands/transfer/trace.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/trace.ts)_
