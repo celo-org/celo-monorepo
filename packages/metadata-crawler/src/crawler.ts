@@ -4,9 +4,19 @@ import { ClaimTypes } from '@celo/contractkit/src/identity'
 import { verifyClaim } from '@celo/contractkit/src/identity/claims/verify'
 import { normalizeAddress } from '@celo/utils/src/address'
 
-const CRAWLER_DATABASE = process.env['CRAWLER_DATABASE'] || 'blockscout'
+const PGUSER = process.env['PGUSER'] || 'postgres'
+const PGPASSWORD = process.env['PGPASSWORD'] || ''
+const PGHOST = process.env['PGHOST'] || '127.0.0.1'
+const PGPORT = process.env['PGPORT'] || '5432'
+const PGDATABASE = process.env['PGDATABASE'] || 'blockscout'
 
-const client = new Client({ database: CRAWLER_DATABASE })
+const client = new Client({
+  user: PGUSER,
+  password: PGPASSWORD,
+  host: PGHOST,
+  port: Number(PGPORT),
+  database: PGDATABASE,
+})
 
 // read all from table
 // when they were last modified?
@@ -44,9 +54,10 @@ async function handleItem(item: { url: string; address: string }) {
 }
 
 async function main() {
+  console.debug('Connecting to: ' + PGHOST)
   await client.connect()
   let items: { address: string; url: string }[] = await jsonQuery(
-    `SELECT address, url FROM celo_account WHERE domain_timestamp is NULL AND url is NOT NULL LIMIT 5`
+    `SELECT address, url FROM celo_account WHERE domain_timestamp is NULL AND url is NOT NULL ` //
   )
   items = items || []
   items = items.map((a) => ({ ...a, address: normalizeAddress(a.address.substr(2)) }))

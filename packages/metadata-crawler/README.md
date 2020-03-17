@@ -7,7 +7,29 @@ could be verified succesfully.
 For this package to work properly, the software must have SELECT and UPDATE 
 access to the Blockscout database.
 
-The env variable `CRAWLER_DATABASE` must be set. When testing locally, you can 
-set `CRAWLER_DATABASE="postgres://postgres:password@127.0.0.1:5432/blockscout?ssl=false"`
 
-You can start the crawler running `yarn dev`
+## Build
+
+You can build the crawler executing:
+
+```bash
+yarn && yarn build
+```
+
+## Running the crawler
+
+For connecting to the Blockscout is necessary to setup the following environment variables:
+
+```bash
+export PGUSER="postgres" # Database user
+export PGPASSWORD="" # Database password
+export PGHOST="127.0.0.1" # Database host
+export PGPORT="5432" # Database port
+export PGDATABASE="blockscout" # Database name
+```
+
+You can start the crawler executing:
+
+```bash
+yarn dev
+```
