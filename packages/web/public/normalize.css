@@ -81,7 +81,7 @@ a {
   text-decoration: none;
 }
 
-a:-webkit-any-link {
+:-webkit-any-link {
   text-decoration: none;
 }
 
