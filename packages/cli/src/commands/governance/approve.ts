@@ -11,6 +11,10 @@ export default class Approve extends BaseCommand {
     ...BaseCommand.flags,
     proposalID: flags.string({ required: true, description: 'UUID of proposal to approve' }),
     from: Flags.address({ required: true, description: "Approver's address" }),
+    useMultiSig: flags.boolean({
+      required: false,
+      description: 'True means the request will be sent through multisig.',
+    }),
   }
 
   static examples = ['approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
@@ -18,12 +22,13 @@ export default class Approve extends BaseCommand {
   async run() {
     const res = this.parse(Approve)
     const account = res.flags.from
+    const useMultiSig = res.flags.useMultiSig
     const id = res.flags.proposalID
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
-    const governanceApproverMultiSig = await this.kit.contracts.getMultiSig(
-      await governance.getApprover()
-    )
+    const multiSigAddress = await governance.getApprover()
+    const governanceApproverMultiSig = await this.kit.contracts.getMultiSig(multiSigAddress)
+    const approver = useMultiSig ? multiSigAddress : account
 
     // in case target is queued
     if (await governance.isQueued(id)) {
@@ -31,17 +36,22 @@ export default class Approve extends BaseCommand {
     }
 
     await newCheckBuilder(this)
-      .isApprover(account)
+      .isApprover(approver)
+      .addCheck(
+        `${account} is not multisig signatory`,
+        async () => useMultiSig && !(await governanceApproverMultiSig.isowner(account))
+      )
       .proposalExists(id)
       .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
       .proposalInStage(id, 'Approval')
       .runChecks()
 
-    const tx = await governance.approve(id)
+    const governanceTx = await governance.approve(id)
     const multiSigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
       governance.address,
-      tx.txo
+      governanceTx.txo
     )
-    await displaySendTx<any>('approveTx', multiSigTx, {}, 'ProposalApproved')
+    const tx = useMultiSig ? multiSigTx : governanceTx
+    await displaySendTx<any>('approveTx', tx, {}, 'ProposalApproved')
   }
 }
