@@ -1,7 +1,7 @@
 import { flags } from '@oclif/command'
-import { ClaimCommand } from '../../utils/identity'
-import { resolveTxt } from 'dns'
 import chalk from 'chalk'
+import { resolveTxt } from 'dns'
+import { ClaimCommand } from '../../utils/identity'
 
 export default class TestDomainClaim extends ClaimCommand {
   static description =
