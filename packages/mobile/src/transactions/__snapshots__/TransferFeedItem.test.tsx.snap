@@ -84,9 +84,6 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -99,6 +96,9 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -235,9 +235,6 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#2E3338",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -250,6 +247,9 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#2E3338",
+              },
             ]
           }
         >
@@ -416,9 +416,6 @@ exports[`transfer feed item renders correctly for known received 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#2E3338",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -431,6 +428,9 @@ exports[`transfer feed item renders correctly for known received 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#2E3338",
+              },
             ]
           }
         >
@@ -583,9 +583,6 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -598,6 +595,9 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -720,9 +720,6 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -735,6 +732,9 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -901,9 +901,6 @@ exports[`transfer feed item renders correctly for received 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#2E3338",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -916,6 +913,9 @@ exports[`transfer feed item renders correctly for received 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#2E3338",
+              },
             ]
           }
         >
@@ -1038,9 +1038,6 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#2E3338",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -1053,6 +1050,9 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#2E3338",
+              },
             ]
           }
         >
@@ -1219,9 +1219,6 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#2E3338",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -1234,6 +1231,9 @@ exports[`transfer feed item renders correctly for received with encrypted commen
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#2E3338",
+              },
             ]
           }
         >
@@ -1400,9 +1400,6 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -1415,6 +1412,9 @@ exports[`transfer feed item renders correctly for sent 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -1537,9 +1537,6 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -1552,6 +1549,9 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -1718,9 +1718,6 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -1733,6 +1730,9 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -1899,9 +1899,6 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -1914,6 +1911,9 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -2050,9 +2050,6 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#81868B",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -2065,6 +2062,9 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -2220,9 +2220,6 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#2E3338",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -2235,6 +2232,9 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#2E3338",
+              },
             ]
           }
         >

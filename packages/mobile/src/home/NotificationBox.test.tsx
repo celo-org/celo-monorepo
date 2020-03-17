@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
-import { createMockStore } from 'test/utils'
+import { createMockStore, getElementText } from 'test/utils'
 import { mockPaymentRequests } from 'test/values'
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 1000
@@ -91,12 +91,14 @@ describe('NotificationBox', () => {
         incomingPaymentRequests: [mockPaymentRequests[0]],
       },
     })
-    const { getByText } = render(
+    const { getByTestId } = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('incomingPaymentRequestNotificationTitle')).toBeTruthy()
+
+    const element = getByTestId('IncomingPaymentRequestNotification/fas12fas4fa141241/Title')
+    expect(getElementText(element)).toBe('+14155550000 requested $16.41')
   })
 
   it('renders incoming payment requests when they exist', () => {
@@ -139,12 +141,13 @@ describe('NotificationBox', () => {
         outgoingPaymentRequests: [mockPaymentRequests[0]],
       },
     })
-    const { getByText } = render(
+    const { getByTestId } = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('outgoingPaymentRequestNotificationTitle')).toBeTruthy()
+    const element = getByTestId('OutgoingPaymentRequestNotification/fas12fas4fa141241/Title')
+    expect(getElementText(element)).toBe('Requested $16.41 from +14155550000')
   })
 
   it('renders verification reminder when not verified', () => {
