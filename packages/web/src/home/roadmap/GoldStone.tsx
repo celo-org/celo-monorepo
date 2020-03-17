@@ -32,7 +32,7 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index 
         <View style={styles.coin}>
           <OvalCoin size={20} color={colors.gold} />
         </View>
-        <Fade right={true} delay={10 * index}>
+        <Fade delay={10 * index}>
           <Text style={[...heading, styles.date]}>{date}</Text>
           <Text style={heading}>{title}</Text>
           <Text style={fonts.p}>{text}</Text>
