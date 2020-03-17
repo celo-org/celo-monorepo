@@ -13,6 +13,9 @@ rbac:
 # enableProfiling is a flag to enable pprof in controller-manager and chaos-daemon.
 enableProfiling: false
 
+
+kubectlImage: bitnami/kubectl:latest
+
 controllerManager:
   serviceAccount: chaos-controller-manager
 
@@ -66,6 +69,8 @@ chaosDaemon:
   # config below to use containerd as the runtime in chaos-daemon.
   # runtime: containerd
   # socketPath: /run/containerd/containerd.sock
+
+  tolerations: []
 
 dashboard:
   create: false
@@ -151,3 +156,17 @@ webhook:
   # FailurePolicy defines how unrecognized errors and timeout errors from the admission webhook are handled.
   # https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
   FailurePolicy: Ignore
+
+  CRDS:
+    - podchaos
+    - iochaos
+    - timechaos
+    - networkchaos
+    - kernelchaos
+
+bpfki:
+  create: false
+  image: pingcap/chaos-kernel:latest
+  imagePullPolicy: Always
+  grpcPort: 50051
+  podAnnotations: {}
