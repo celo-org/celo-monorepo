@@ -44,30 +44,28 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
   CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    if (false) {
-      console.info('Setting constitution thresholds')
-      Object.keys(constitution)
-        .filter((contractName) => contractName !== 'proxy')
-        .forEach(async (contractName) => {
-          console.log(`\tSetting constitution thresholds for ${contractName}`)
-          const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
-            contractName,
-            artifacts
-          )
-          const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
-          selectors.default = ['0x00000000']
-          const thresholds = { ...constitution.proxy, ...constitution[contractName] }
-          await Promise.all(
-            Object.keys(thresholds).map((func) =>
-              Promise.all(
-                selectors[func].map((selector) =>
-                  governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
-                )
+    console.info('Setting constitution thresholds')
+    Object.keys(constitution)
+      .filter((contractName) => contractName !== 'proxy')
+      .forEach(async (contractName) => {
+        console.log(`\tSetting constitution thresholds for ${contractName}`)
+        const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifacts
+        )
+        const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+        selectors.default = ['0x00000000']
+        const thresholds = { ...constitution.proxy, ...constitution[contractName] }
+        await Promise.all(
+          Object.keys(thresholds).map((func) =>
+            Promise.all(
+              selectors[func].map((selector) =>
+                governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
               )
             )
           )
-        })
-    }
+        )
+      })
 
     const proxyAndImplementationOwnedByGovernance = [
       'Accounts',

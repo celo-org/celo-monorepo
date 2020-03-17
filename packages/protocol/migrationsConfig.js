@@ -148,7 +148,7 @@ const DefaultConfig = {
       addresses: [],
       values: [],
     },
-    oracles: ['0x469be98fe71aff8f6e7f64f9b732e28a03596b5c'],
+    oracles: [],
     frozen: true,
   },
   transferWhitelist: {
