@@ -455,7 +455,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
     it('removes item for whitelist', async () => {
       await lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0)
-      assert.equal([], await lockedGold.getSlashingWhitelist())
+      assert.equal(0, (await lockedGold.getSlashingWhitelist()).length)
     })
     it('can only be called by owner', async () => {
       await assertRevert(
