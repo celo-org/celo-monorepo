@@ -1,8 +1,8 @@
 import { IdentityMetadataWrapper } from '@celo/contractkit'
 import { Client } from 'pg'
-import { ClaimTypes } from '@celo/contractkit/src/identity'
-import { verifyClaim } from '@celo/contractkit/src/identity/claims/verify'
-import { normalizeAddress } from '@celo/utils/src/address'
+import { ClaimTypes } from '@celo/contractkit/lib/identity'
+import { verifyClaim } from '@celo/contractkit/lib/identity/claims/verify'
+import { normalizeAddress } from '@celo/utils/lib/address'
 
 const PGUSER = process.env['PGUSER'] || 'postgres'
 const PGPASSWORD = process.env['PGPASSWORD'] || ''
