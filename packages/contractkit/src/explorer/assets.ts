@@ -39,11 +39,13 @@ export class AccountAssets extends DerivedAccountAssets {
   }
 }
 
-export async function getCredits(
+export async function trackTransfers(
   kit: ContractKit,
-  blockNumber: number
+  blockNumber: number,
+  assets: Record<Address, AccountAssets> | undefined = undefined,
+  filter: boolean = false
 ): Promise<Record<Address, AccountAssets>> {
-  const ret: Record<Address, AccountAssets> = {}
+  const ret = assets || {}
 
   const goldTransfers = await traceBlock(
     kit.web3.currentProvider,
@@ -51,16 +53,24 @@ export async function getCredits(
     'cgld_transfer_tracer'
   )
   for (const transfer of goldTransfers.values) {
-    const account = ret[normalizeAddress(transfer.to)]
-    account.gold = account.gold.plus(transfer.value)
+    const fromAddress = normalizeAddress(transfer.from)
+    const toAddress = normalizeAddress(transfer.to)
+    if (filter && !(fromAddress in ret) && !(toAddress in ret)) continue
+    const from = ret[fromAddress]
+    const to = ret[toAddress]
+    from.gold = from.gold.minus(transfer.value)
+    to.gold = to.gold.plus(transfer.value)
   }
 
   const lockedGold = await kit.contracts.getLockedGold()
   const goldLocked = await lockedGold.getGoldLockedEvents(blockNumber)
   for (const locked of goldLocked) {
     const account = ret[normalizeAddress(locked.account)]
-    // needs event change to distuinguish LockedGold lock() and relock() from only logs
+    // For lock() the gold was debited from account.gold by cgld_transfer_tracer
     account.lockedGold = account.lockedGold.plus(locked.value)
+    // Can't distuinguish LockedGold lock() and relock() only from logs
+    // await pendingWithdrawls = lockedGold.getPendingWithdrawls(account)
+    // await sumPendingWithdrals =
   }
 
   const goldUnlocked = await lockedGold.getGoldUnlockedEvents(blockNumber)

@@ -2,9 +2,11 @@
 /// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
+import { Address } from '@celo/contractkit/lib/base'
+import { AccountAssets, trackTransfers } from '@celo/contractkit/lib/explorer/assets'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { eqAddress } from '@celo/utils/src/address'
+import { eqAddress /*, normalizeAddress*/ } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -225,7 +227,7 @@ describe('Transfer tests', function(this: any) {
 
   before(async function(this: any) {
     this.timeout(0)
-    await hooks.before()
+    //await hooks.before()
   })
 
   after(async function(this: any) {
@@ -386,6 +388,7 @@ describe('Transfer tests', function(this: any) {
     fees: Fees
     gas: GasUsage
     events: any[]
+    receipt: TransactionReceipt | undefined
   }
 
   const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
@@ -457,7 +460,7 @@ describe('Transfer tests', function(this: any) {
       used: receipt && receipt.gasUsed,
       expected: expectedGasUsed,
     }
-    return { ok, fees, gas, events }
+    return { ok, fees, gas, events, receipt }
   }
 
   function testTxPoolFiltering({
@@ -510,6 +513,7 @@ describe('Transfer tests', function(this: any) {
   }) {
     let txRes: TestTxResults
     let balances: BalanceWatcher
+    let trackBalances: Record<Address, AccountAssets> | undefined
 
     before(async () => {
       const feeCurrency =
@@ -544,6 +548,10 @@ describe('Transfer tests', function(this: any) {
       txRes = await runTestTransaction(txResult, expectedGas, feeCurrency)
 
       await balances.update()
+
+      trackBalances = txRes.receipt
+        ? await trackTransfers(kit, txRes.receipt.blockNumber)
+        : undefined
     })
 
     if (expectSuccess) {
@@ -576,6 +584,12 @@ describe('Transfer tests', function(this: any) {
 
         it(`should decrement the sender's ${feeToken} balance by the total fees`, () =>
           assertEqualBN(balances.delta(fromAddress, feeToken).negated(), txRes.fees.total))
+      }
+
+      if (transferToken !== CeloContract.StableToken) {
+        console.info(trackBalances || '')
+        //it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+        //assertEqualBN(trackBalances[normalizeAddress(fromAddress)].gold, new BigNumber(-TransferAmount)))
       }
     } else {
       it(`should fail`, () => assert.isFalse(txRes.ok))
@@ -621,7 +635,7 @@ describe('Transfer tests', function(this: any) {
       describe(`${syncMode} Node >`, () => {
         before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
 
-        describe('Transfer CeloGold >', () => {
+        describe.only('Transfer CeloGold >', () => {
           describe('with feeCurrency = CeloGold >', () => {
             if (syncMode === 'light' || syncMode === 'lightest') {
               describe('when running in light/lightest sync mode', () => {
