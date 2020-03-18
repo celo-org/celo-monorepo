@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
 import { LabeledInput } from 'src/forms/LabeledInput'
 
@@ -15,7 +15,7 @@ describe(LabeledInput, () => {
         />
       )
 
-      expect(getComputedStyle(getByText('common:validationErrors.generic')).opacity).toEqual(100)
+      expect(getComputedStyle(getByText('common:validationErrors.generic')).opacity).toEqual('100')
     })
   })
   describe('when there is no error', () => {
@@ -30,7 +30,28 @@ describe(LabeledInput, () => {
         />
       )
 
-      expect(getComputedStyle(queryByText('common:validationErrors.generic')).opacity).toEqual(0)
+      expect(getComputedStyle(queryByText('common:validationErrors.generic')).opacity).toEqual('0')
+    })
+  })
+  describe('when typing', () => {
+    it('calls the onInput function', () => {
+      const mockFunc = jest.fn()
+
+      const { queryByLabelText } = render(
+        <LabeledInput
+          allErrors={[]}
+          name={'machinereadable'}
+          value={'begin'}
+          label="Human Label"
+          onInput={mockFunc}
+        />
+      )
+
+      const el = queryByLabelText('Human Label')
+
+      fireEvent.change(el, { target: { value: 'a' } })
+
+      expect(mockFunc).toBeCalled()
     })
   })
 })
