@@ -1,7 +1,7 @@
 coverage:
   status:
     project:
-      # default: off
+      default: off
       mobile:
         paths:
           - packages/mobile/
