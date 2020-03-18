@@ -9,11 +9,10 @@ import { eqAddress } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
-import { TxPromises } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -32,7 +31,7 @@ import {
 } from 'src/identity/actions'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
-import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
+import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -357,14 +356,7 @@ function* requestAttestations(
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(e164Number)
 
-  const txPromises: TxPromises = yield call(
-    sendTransactionPromises,
-    selectIssuersTx.txo,
-    account,
-    TAG,
-    'Select Issuer'
-  )
-  yield txPromises.receipt
+  yield call(sendTransaction, selectIssuersTx.txo, account, TAG, 'Select Issuer')
 
   CeloAnalytics.track(CustomEventNames.verification_requested_attestations)
 }

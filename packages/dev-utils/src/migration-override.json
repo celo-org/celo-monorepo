@@ -6,6 +6,10 @@
     "frozen": false
   },
   "exchange": {
+    "frozen": false,
+    "minimumReports": 1
+  },
+  "goldToken": {
     "frozen": false
   },
   "governance": {
@@ -42,15 +46,6 @@
       "0x7457d5E02197480Db681D3fdF256c7acA21bDc12"
     ],
     "frozen": false
-  },
-  "governance": {
-    "dequeueFrequency": 30,
-    "queueExpiry": 1000,
-    "approvalStageDuration": 100,
-    "referendumStageDuration": 100,
-    "executionStageDuration": 100,
-    "minDeposit": 1,
-    "concurrentProposals": 5
   },
   "governanceApproverMultiSig": {
     "useMultiSig": false

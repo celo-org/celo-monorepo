@@ -112,6 +112,7 @@ const style = StyleSheet.create({
     borderRadius: 3,
     padding: 8,
     backgroundColor: '#FFFFFF',
+    textAlignVertical: 'top',
   },
   iconStyle: {
     marginRight: 8,

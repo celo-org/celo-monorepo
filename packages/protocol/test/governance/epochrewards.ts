@@ -76,6 +76,8 @@ contract('EpochRewards', (accounts: string[]) => {
   }
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
   const communityRewardFraction = toFixed(new BigNumber(1 / 4))
+  const carbonOffsettingFraction = toFixed(new BigNumber(1 / 200))
+  const carbonOffsettingPartner = '0x0000000000000000000000000000000000000000'
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
@@ -119,7 +121,9 @@ contract('EpochRewards', (accounts: string[]) => {
       rewardsMultiplier.adjustments.overspend,
       targetVotingGoldFraction,
       targetValidatorEpochPayment,
-      communityRewardFraction
+      communityRewardFraction,
+      carbonOffsettingPartner,
+      carbonOffsettingFraction
     )
   })
 
@@ -159,7 +163,9 @@ contract('EpochRewards', (accounts: string[]) => {
           rewardsMultiplier.adjustments.overspend,
           targetVotingGoldFraction,
           targetValidatorEpochPayment,
-          communityRewardFraction
+          communityRewardFraction,
+          carbonOffsettingPartner,
+          carbonOffsettingFraction
         )
       )
     })
@@ -627,7 +633,11 @@ contract('EpochRewards', (accounts: string[]) => {
         )
         expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards
           .plus(expectedTargetTotalEpochPaymentsInGold)
-          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
           .integerValue(BigNumber.ROUND_FLOOR)
         const expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta)
         const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
@@ -660,7 +670,12 @@ contract('EpochRewards', (accounts: string[]) => {
         const votingReward = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
         const expected = validatorReward
           .plus(votingReward)
-          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
+          .integerValue(BigNumber.ROUND_FLOOR)
           .times(fromFixed(communityRewardFraction))
           .times(expectedMultiplier)
           .integerValue(BigNumber.ROUND_FLOOR)

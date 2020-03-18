@@ -5894,6 +5894,9 @@ exports[`DevelopersPage renders 1`] = `
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
+          href="/code-of-conduct"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -6777,6 +6780,7 @@ exports[`DevelopersPage renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"image.png\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "contain",
@@ -6790,6 +6794,12 @@ exports[`DevelopersPage renders 1`] = `
                 "zIndex": -1,
               }
             }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="image.png"
           />
         </div>
         <div
@@ -6860,7 +6870,7 @@ exports[`DevelopersPage renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.email*"
+              placeholder="common:email*"
               readOnly={false}
               required={true}
               spellCheck={true}

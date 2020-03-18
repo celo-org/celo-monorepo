@@ -20,7 +20,7 @@ export enum BtnTypes {
 export interface ButtonProps {
   onPress: () => void
   style?: any
-  text: string
+  text: string | React.ReactNode
   accessibilityLabel?: string
   lineHeight?: number
   type: BtnTypes

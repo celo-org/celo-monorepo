@@ -6,8 +6,5 @@
   "at": "at",
   "receivedDollars": "Received {{CeloDollars}}",
   "verificationMessage": "You paid a fee to verify your account. Welcome to Celo!",
-  "receivedAmountFromCelo": {
-    "0": "You received ",
-    "1": " from Celo!"
-  }
+  "receivedAmountFromCelo": "You received <1></1> from Celo!"
 }

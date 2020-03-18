@@ -132,8 +132,26 @@ Array [
                   "lineHeight": 18,
                 }
               }
+              testID="IncomingPaymentRequestNotification/1/Title"
             >
-              incomingPaymentRequestNotificationTitle
+              5126608970
+               requested
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                31.92
+              </Text>
             </Text>
             <View
               style={

@@ -13,6 +13,7 @@ export enum Stacks {
 }
 
 export enum Screens {
+  AppLoading = 'AppLoading',
   Account = 'Account',
   Analytics = 'Analytics',
   Background = 'Background',
@@ -46,6 +47,8 @@ export enum Screens {
   JoinCelo = 'JoinCelo',
   Language = 'Language',
   Licenses = 'Licenses',
+  Support = 'Support',
+  SupportContact = 'SupportContact',
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
   OutgoingPaymentRequestListScreen = 'OutgoingPaymentRequestListScreen',
   EscrowedPaymentListScreen = 'EscrowedPaymentListScreen',

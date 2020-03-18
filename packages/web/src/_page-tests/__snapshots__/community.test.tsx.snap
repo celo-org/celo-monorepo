@@ -808,7 +808,7 @@ exports[`Community renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="form.email*"
+                placeholder="common:email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}
@@ -3106,7 +3106,7 @@ exports[`Community renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="https://medium.com/@celo.org"
+              href="https://medium.com/@celoorg"
               onClick={[Function]}
               onMouseEnter={[Function]}
               role="link"
@@ -3314,7 +3314,7 @@ exports[`Community renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://medium.com/celohq/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
+                href="https://medium.com/celoOrg/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
                 onClick={[Function]}
                 onMouseEnter={[Function]}
                 role="link"
@@ -4061,7 +4061,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4139,7 +4139,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4217,7 +4217,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4295,7 +4295,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4373,7 +4373,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4451,7 +4451,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4529,7 +4529,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4709,7 +4709,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4787,7 +4787,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4865,7 +4865,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -4943,7 +4943,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -5021,7 +5021,7 @@ exports[`Community renders 1`] = `
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "fontSize": "16px",
                     "fontWeight": "500",
-                    "lineHeight": "16px",
+                    "lineHeight": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
@@ -7044,6 +7044,9 @@ exports[`Community renders 1`] = `
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
+            href="/code-of-conduct"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -7927,6 +7930,7 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -7940,6 +7944,12 @@ exports[`Community renders 1`] = `
                   "zIndex": -1,
                 }
               }
+            />
+            <img
+              alt=""
+              className="css-accessibilityImage-9pa8cd"
+              draggable={false}
+              src="image.png"
             />
           </div>
           <div
@@ -8010,7 +8020,7 @@ exports[`Community renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="form.email*"
+                placeholder="common:email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}

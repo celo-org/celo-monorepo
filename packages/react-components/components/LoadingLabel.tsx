@@ -8,7 +8,7 @@ interface Props {
   loadingLabelText: string
   labelText?: string
   labelTextStyle?: TextStyle
-  valueText?: string
+  valueText?: string | React.ReactNode
   valueTextStyle?: TextStyle
 }
 

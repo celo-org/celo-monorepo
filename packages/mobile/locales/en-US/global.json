@@ -1,8 +1,7 @@
 {
   "at": "at",
   "yourClockIsBroke": "Your phone date and time is inaccurate",
-  "adjustYourClock":
-    "Adjust your clock to read time automatically and try again. If the issue persists, you may need to restart the application",
+  "adjustYourClock": "Adjust your clock to read time automatically and try again. If the issue persists, you may need to restart the application",
   "adjustDate": "Adjust Date",
   "submit": "Submit",
   "continue": "Continue",
@@ -31,8 +30,7 @@
   "refreshFailedUnexpectedly": "Failed to refresh, please check your connectivity",
   "edit": "Edit",
   "receivedPayment": "Received Payment",
-  "readOnlyState":
-    "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
+  "readOnlyState": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getStarted": "Get Started",
   "manageCeloDollars": "Manage {{CeloDollars}}",
   "sendCeloDollars": "Send {{CeloDollars}}",
@@ -66,6 +64,10 @@
   "reclaim": "Reclaim",
   "celoGold": "Celo Gold",
   "celoDollars": "{{CeloDollars}}",
+  "balanceAvailable": "<0></0> available",
+  "subtotal": "Subtotal",
+  "total": "Total",
+  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
   "oops": "Oops!",
   "somethingWrong": "Something went wrong.",
   "verifyFailed": "Failed to verify",
@@ -86,8 +88,7 @@
     "0": "Bad Connection",
     "1": "some features disabled"
   },
-  "networkConnectionFailed":
-    "Could not connect with the network, please check your data connection",
+  "networkConnectionFailed": "Could not connect with the network, please check your data connection",
   "firebaseFailed": "Could not connect to Firebase",
   "gasPriceUpdateFailed": "Could not update fee",
   "appHasToBeUpdated": "App has to be updated",
@@ -110,5 +111,6 @@
   "emptyList": "Empty list",
   "timeframes": {
     "30d": "30 days"
-  }
+  },
+  "message": "Message"
 }
