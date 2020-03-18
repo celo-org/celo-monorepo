@@ -5,7 +5,7 @@
 set -exu
 
 # This makes the scheme use the specified envfile
-# See https://github.com/luggit/react-native-config#availability-in-build-settings-and-infoplist
+# See https://github.com/luggit/react-native-config#ios-1
 echo "$1" > /tmp/envfile
 
 # This makes envfile config available in xcode build settings
