@@ -1,18 +1,8 @@
-import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
-import {
-  newBlockExplorer,
-  ParsedBlock,
-  ParsedTx,
-} from '@celo/contractkit/lib/explorer/block-explorer'
-import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
+import { ContractKit, newKit } from '@celo/contractkit'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
-import { labelValues } from 'prom-client'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
-import { Transaction, WebsocketProvider } from 'web3-core'
-import { Block, BlockHeader } from 'web3-eth'
-import { Counters } from './metrics'
-import { ViewDefinition } from './view-definition'
+import { WebsocketProvider } from 'web3-core'
 import { BlockProcessor } from './block-processor'
 
 let BLOCK_INTERVAL = 1
@@ -57,7 +47,7 @@ interface EndReason {
 
 export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   // Start exporting metrics
-  new BlockProcessor(kit).init()
+  await new BlockProcessor(kit).init()
 
   const provider = kit.web3.currentProvider as WebsocketProvider
   const subscription = await kit.web3.eth.subscribe('newBlockHeaders')

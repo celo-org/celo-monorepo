@@ -1,6 +1,6 @@
 /* tslint:disable:ban-types */
 
-import { ContractKit, CeloContract } from '@celo/contractkit'
+import { CeloContract, ContractKit } from '@celo/contractkit'
 
 type PromiseValue<T> = T extends PromiseLike<infer U> ? U : T
 type ContractWrapperType<C extends any> = PromiseValue<ReturnType<ContractKit['contracts'][C]>>

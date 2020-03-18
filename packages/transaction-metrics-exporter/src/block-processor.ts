@@ -1,14 +1,13 @@
-import { Block, BlockHeader } from 'web3-eth'
-import { Transaction } from 'web3-core'
-import { ContractKit, CeloContract } from '@celo/contractkit'
+import { ContractKit } from '@celo/contractkit'
 import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
 import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { labelValues } from 'prom-client'
+import { Transaction } from 'web3-core'
+import { Block, BlockHeader } from 'web3-eth'
 
-import { toTxMap, toMethodId } from './utils'
 import { Counters } from './metrics'
-import { ViewDefinition } from './view-definition'
 import { Contracts, stateGetters } from './states'
+import { toMethodId, toTxMap } from './utils'
 
 enum LoggingCategory {
   Block = 'RECEIVED_BLOCK',
@@ -31,7 +30,7 @@ export class BlockProcessor {
     }
 
     await this.loadContracts()
-    this.initSubscription()
+    await this.initSubscription()
   }
 
   async loadContracts() {
@@ -47,9 +46,9 @@ export class BlockProcessor {
 
     // Prevent same block multiples times
     let lastBlocks: number[] = []
-    subscription.on('data', (header) => {
+    subscription.on('data', async (header) => {
       if (!lastBlocks.includes(header.number)) {
-        this.onNewBlock(header)
+        await this.onNewBlock(header)
       }
       lastBlocks.push(header.number)
       lastBlocks = lastBlocks.slice(-10)
@@ -60,7 +59,8 @@ export class BlockProcessor {
     if (header.number % this.blockInterval === 0) {
       // tslint:disable-next-line: no-floating-promises
       this.fetchBlockState(header.number)
-      // this.processBlockHeader(header)
+      // tslint:disable-next-line: no-floating-promises
+      this.processBlockHeader(header)
     }
   }
 
@@ -104,6 +104,7 @@ export class BlockProcessor {
       const receipt = await this.kit.web3.eth.getTransactionReceipt(tx.hash)
       this.logEvent(LoggingCategory.TransactionReceipt, receipt)
 
+      // tslint:disable-next-line
       const labels = {
         to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
         methodId: toMethodId(tx.input, parsedTx != null),
