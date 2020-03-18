@@ -86,8 +86,8 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   const endExporter = (reason: EndReason) => {
     listeningWatcher.stop()
     ;(subscription as any).unsubscribe()
-    provider.removeAllListeners('error')
-    ;(provider as any).disconnect()
+    provider.removeAllListeners?.('error')
+    ;(provider as any).disconnect?.()
     endReason.resolve(reason)
   }
 

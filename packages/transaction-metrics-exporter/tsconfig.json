@@ -1,6 +1,7 @@
 {
   "extends": "../typescript/tsconfig.library.json",
   "compilerOptions": {
+  	"noUnusedLocals": false,
     "rootDir": "src",
     "outDir": "lib"
   },
