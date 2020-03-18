@@ -1,3 +1,4 @@
+import prompts from 'prompts'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { ReleaseGoldCommand } from './release-gold'
@@ -5,6 +6,10 @@ import { ReleaseGoldCommand } from './release-gold'
 export default class SetLiquidityProvision extends ReleaseGoldCommand {
   static description =
     'Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.'
+
+  static flags = {
+    ...ReleaseGoldCommand.flags,
+  }
 
   static args = []
 
@@ -19,6 +24,17 @@ export default class SetLiquidityProvision extends ReleaseGoldCommand {
         return !liquidityProvisionMet
       })
       .runChecks()
+
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message: 'Are you sure you want to enable the liquidity provision? (y/n)',
+    })
+
+    if (!response.confirmation) {
+      console.info('Aborting due to user response')
+      process.exit(0)
+    }
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()
     await displaySendTx('setLiquidityProvision', this.releaseGoldWrapper.setLiquidityProvision())

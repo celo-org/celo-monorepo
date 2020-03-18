@@ -21,10 +21,6 @@ testWithGanache('releasegold:locked-gold cmd', (web3: Web3) => {
     await LockedGold.run(['--contract', contractAddress, '--action', 'unlock', '--value', '50'])
     await LockedGold.run(['--contract', contractAddress, '--action', 'lock', '--value', '75'])
     await LockedGold.run(['--contract', contractAddress, '--action', 'unlock', '--value', '50'])
-    // Expected to fail "silently" because `locked-gold` uses ts time which we can't spoof
-    // So we cannot wait for the unlocking period.
-    // `withdraw` has been verified outside of the testing framework.
-    await LockedGold.run(['--contract', contractAddress, '--action', 'withdraw', '--value', '50'])
     const pendingWithdrawalsTotalValue = await lockedGold.getPendingWithdrawalsTotalValue(
       contractAddress
     )

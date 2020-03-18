@@ -1,9 +1,9 @@
 import {
-  _setInitialProxyImplementation,
   getDeployedProxiedContract,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
-import fs = require('fs')
+import * as prompts from 'prompts'
 import {
   GoldTokenInstance,
   RegistryInstance,
@@ -12,6 +12,7 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -35,6 +36,20 @@ module.exports = async (callback: (error?: any) => number) => {
         throw err
       }
       for (const releaseGoldConfig of JSON.parse(data)) {
+        const message =
+          'Are you sure you want to deploy this contract?\n Total Grant Value: ' +
+          releaseGoldConfig.numReleasePeriods * releaseGoldConfig.amountReleasedPerPeriod +
+          '? (y/n)'
+        const response = await prompts({
+          type: 'confirm',
+          name: 'confirmation',
+          message,
+        })
+
+        if (!response.confirmation) {
+          console.info('Skipping grant due to user response')
+          continue
+        }
         const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new()
         const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
         const multiSigTxHash = await _setInitialProxyImplementation(

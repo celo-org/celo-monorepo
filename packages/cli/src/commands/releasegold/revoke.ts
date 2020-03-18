@@ -1,3 +1,4 @@
+import prompts from 'prompts'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { ReleaseGoldCommand } from './release-gold'
@@ -5,6 +6,10 @@ import { ReleaseGoldCommand } from './release-gold'
 export default class Revoke extends ReleaseGoldCommand {
   static description =
     'Revoke the given contract instance. Once revoked, any Locked Gold can be unlocked by the release owner. The beneficiary will then be able to withdraw any released Gold that had yet to be withdrawn, and the remainder can be transferred by the release owner to the refund address. Note that not all ReleaseGold instances are revokable.'
+
+  static flags = {
+    ...ReleaseGoldCommand.flags,
+  }
 
   static args = []
 
@@ -18,6 +23,17 @@ export default class Revoke extends ReleaseGoldCommand {
       .addCheck('Contract is not revoked', () => !isRevoked)
       .addCheck('Contract is revocable', () => isRevocable)
       .runChecks()
+
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message: 'Are you sure you want to revoke this contract? (y/n)',
+    })
+
+    if (!response.confirmation) {
+      console.info('Aborting due to user response')
+      process.exit(0)
+    }
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()
     await displaySendTx('revokeReleasing', await this.releaseGoldWrapper.revokeReleasing())

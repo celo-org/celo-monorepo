@@ -1,4 +1,5 @@
 import { flags } from '@oclif/command'
+import prompts from 'prompts'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { ReleaseGoldCommand } from './release-gold'
@@ -32,6 +33,20 @@ export default class SetMaxDistribution extends ReleaseGoldCommand {
         () => distributionRatio >= 0 && distributionRatio <= 1000
       )
       .runChecks()
+
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message:
+        'Are you sure you want to set the new maximum distribution ratio to ' +
+        distributionRatio +
+        '? (y/n)',
+    })
+
+    if (!response.confirmation) {
+      console.info('Aborting due to user response')
+      process.exit(0)
+    }
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()
     await displaySendTx(

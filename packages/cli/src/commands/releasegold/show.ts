@@ -5,6 +5,10 @@ import { ReleaseGoldCommand } from './release-gold'
 export default class Show extends ReleaseGoldCommand {
   static description = 'Show info on a ReleaseGold instance contract.'
 
+  static flags = {
+    ...ReleaseGoldCommand.flags,
+  }
+
   static examples = ['show --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95']
 
   async run() {
