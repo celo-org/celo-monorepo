@@ -17,7 +17,10 @@ export default class Approve extends BaseCommand {
     }),
   }
 
-  static examples = ['approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
+  static examples = [
+    'approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+    'approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig true',
+  ]
 
   async run() {
     const res = this.parse(Approve)

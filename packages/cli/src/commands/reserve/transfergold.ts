@@ -11,7 +11,7 @@ export default class TransferGold extends BaseCommand {
     ...BaseCommand.flags,
     value: flags.string({ required: true, description: 'The unit amount of Celo Gold (cGLD)' }),
     to: Flags.address({ required: true, description: 'Receiving address' }),
-    from: Flags.address({ required: true, description: "Sender's address" }),
+    from: Flags.address({ required: true, description: "Spender's address" }),
     useMultiSig: flags.boolean({
       required: false,
       description: 'True means the request will be sent through multisig.',
@@ -20,6 +20,7 @@ export default class TransferGold extends BaseCommand {
 
   static examples = [
     'transfergold --value 9000 --to 0x91c987bf62D25945dB517BDAa840A6c661374402 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+    'transfergold --value 9000 --to 0x91c987bf62D25945dB517BDAa840A6c661374402 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig true',
   ]
 
   async run() {
