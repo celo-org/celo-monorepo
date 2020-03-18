@@ -44,7 +44,9 @@ echo "Current directory: `pwd`"
 
 # Read values from the .env file and put them in env vars
 ENV_FILENAME="${ENVFILE:-.env}"
-export $(grep -v '^#' $ENV_FILENAME | xargs)
+# From https://stackoverflow.com/a/56229034/158525
+# Supports vars with spaces and single or double quotes
+eval $(grep -v -e '^#' $ENV_FILENAME | xargs -I {} echo export \'{}\')
 
 if [ -z "$NETWORK" ]; then
   echo "No network set, using $DEFAULT_TESTNET network set in $ENV_FILENAME file."
