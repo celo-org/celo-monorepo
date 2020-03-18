@@ -160,8 +160,9 @@ library FixidityLib {
   /**
    * @notice x*y. If any of the operators is higher than the max multiplier value it
    * might overflow.
-   * @dev The maximum value that can be safely used as a multiplication operator (maxFixedMul) is calculated is
-   * sqrt(maxUint256()*fixed1()), or 340282366920938463463374607431768211455999999999999
+   * @dev The maximum value that can be safely used as a multiplication operator
+   * (maxFixedMul) is calculated is sqrt(maxUint256()*fixed1()),
+   * or 340282366920938463463374607431768211455999999999999
    * Test multiply(0,0) returns 0
    * Test multiply(maxFixedMul,0) returns 0
    * Test multiply(0,maxFixedMul) returns 0
