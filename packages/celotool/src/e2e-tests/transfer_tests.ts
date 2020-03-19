@@ -6,7 +6,7 @@ import { Address } from '@celo/contractkit/lib/base'
 import { AccountAssets, trackTransfers } from '@celo/contractkit/lib/explorer/assets'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { eqAddress /*, normalizeAddress*/ } from '@celo/utils/src/address'
+import { eqAddress, normalizeAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -206,7 +206,7 @@ describe('Transfer tests', function(this: any) {
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
-  const syncModes = ['full', 'fast', 'light', 'lightest']
+  const syncModes = ['full'] //, 'fast', 'light', 'lightest']
   const gethConfig: GethRunConfig = {
     migrateTo: 20,
     networkId: 1101,
@@ -491,6 +491,7 @@ describe('Transfer tests', function(this: any) {
   }
 
   function testTransferToken({
+    syncMode,
     transferToken,
     feeToken,
     expectedGas,
@@ -499,6 +500,7 @@ describe('Transfer tests', function(this: any) {
     fromAddress = FromAddress,
     toAddress = ToAddress,
   }: {
+    syncMode: string
     transferToken: CeloToken
     feeToken: CeloToken
     expectedGas: number
@@ -513,7 +515,7 @@ describe('Transfer tests', function(this: any) {
   }) {
     let txRes: TestTxResults
     let balances: BalanceWatcher
-    let trackBalances: Record<Address, AccountAssets> | undefined
+    let trackBalances: Record<Address, AccountAssets>
 
     before(async () => {
       const feeCurrency =
@@ -549,9 +551,10 @@ describe('Transfer tests', function(this: any) {
 
       await balances.update()
 
-      trackBalances = txRes.receipt
-        ? await trackTransfers(kit, txRes.receipt.blockNumber)
-        : undefined
+      trackBalances =
+        syncMode === 'full' && txRes.receipt
+          ? await trackTransfers(kit, txRes.receipt.blockNumber)
+          : {}
     })
 
     if (expectSuccess) {
@@ -586,10 +589,17 @@ describe('Transfer tests', function(this: any) {
           assertEqualBN(balances.delta(fromAddress, feeToken).negated(), txRes.fees.total))
       }
 
-      if (transferToken !== CeloContract.StableToken) {
-        console.info(trackBalances || '')
-        //it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        //assertEqualBN(trackBalances[normalizeAddress(fromAddress)].gold, new BigNumber(-TransferAmount)))
+      if (syncMode === 'full' && transferToken !== CeloContract.StableToken) {
+        it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
+          assertEqualBN(
+            trackBalances[normalizeAddress(toAddress)].gold,
+            new BigNumber(TransferAmount)
+          ))
+        it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+          assertEqualBN(
+            trackBalances[normalizeAddress(fromAddress)].gold,
+            new BigNumber(-TransferAmount)
+          ))
       }
     } else {
       it(`should fail`, () => assert.isFalse(txRes.ok))
@@ -694,6 +704,7 @@ describe('Transfer tests', function(this: any) {
                             transferToken: CeloContract.GoldToken,
                             feeToken: CeloContract.GoldToken,
                             txOptions,
+                            syncMode,
                           })
                         }
                       })
@@ -706,6 +717,7 @@ describe('Transfer tests', function(this: any) {
                 expectedGas: INTRINSIC_TX_GAS_COST,
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
+                syncMode,
               })
             }
           })
@@ -719,6 +731,7 @@ describe('Transfer tests', function(this: any) {
                   expectedGas: intrinsicGas,
                   transferToken: CeloContract.GoldToken,
                   feeToken: CeloContract.StableToken,
+                  syncMode,
                 }))
 
               describe('when setting a gas amount less than the intrinsic gas amount', () => {
@@ -750,6 +763,7 @@ describe('Transfer tests', function(this: any) {
                 ADDITIONAL_INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
+              syncMode,
             })
           })
 
@@ -758,6 +772,7 @@ describe('Transfer tests', function(this: any) {
               expectedGas: stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
+              syncMode,
             })
           })
         })
@@ -795,6 +810,7 @@ describe('Transfer tests', function(this: any) {
                   expectedGas: intrinsicGas,
                   transferToken: CeloContract.GoldToken,
                   feeToken: CeloContract.StableToken,
+                  syncMode,
                 }))
 
               describe('when setting a gas amount less than the intrinsic gas amount', () => {
@@ -817,6 +833,7 @@ describe('Transfer tests', function(this: any) {
                 INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.StableToken,
+              syncMode,
             })
           })
         })
@@ -950,6 +967,7 @@ describe('Transfer tests', function(this: any) {
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
                 toAddress: whitelistedAddress,
+                syncMode,
               })
             })
           })
@@ -962,6 +980,7 @@ describe('Transfer tests', function(this: any) {
                 expectedGas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
+                syncMode,
               })
             })
 
@@ -986,6 +1005,7 @@ describe('Transfer tests', function(this: any) {
                 expectedGas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 transferToken: CeloContract.GoldToken,
                 feeToken: CeloContract.GoldToken,
+                syncMode,
               })
             })
           })

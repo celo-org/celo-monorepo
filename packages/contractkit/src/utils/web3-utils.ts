@@ -24,11 +24,11 @@ export async function traceTransaction(
   defaultProvider: provider,
   transaction: string,
   tracer: string
-): Promise<Record<string, any>> {
+): Promise<any[]> {
   const args: { [key: string]: string } = { tracer }
   const url = getProviderUrl(defaultProvider)
   const debug = new Debug(url)
-  const trace = await debug.getTransactionTrace(transaction, args)
+  const trace: any = await debug.getTransactionTrace(transaction, args)
   stopProvider(debug.currentProvider as any)
   return trace
 }
@@ -37,11 +37,11 @@ export async function traceBlock(
   defaultProvider: provider,
   blockNumber: number,
   tracer: string
-): Promise<Record<string, any>> {
+): Promise<any[]> {
   const args: { [key: string]: string } = { tracer }
   const url = getProviderUrl(defaultProvider)
   const debug = new Debug(url)
-  const trace = await debug.getBlockTraceByNumber(Web3Utils.toHex(blockNumber), args)
+  const trace: any = await debug.getBlockTraceByNumber(Web3Utils.toHex(blockNumber), args)
   stopProvider(debug.currentProvider as any)
-  return trace
+  return trace[0].result
 }

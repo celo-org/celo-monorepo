@@ -50,14 +50,14 @@ export async function trackTransfers(
   const goldTransfers = await traceBlock(
     kit.web3.currentProvider,
     blockNumber,
-    'cgld_transfer_tracer'
+    'cgldTransferTracer'
   )
-  for (const transfer of goldTransfers.values) {
+  for (const transfer of goldTransfers) {
     const fromAddress = normalizeAddress(transfer.from)
     const toAddress = normalizeAddress(transfer.to)
     if (filter && !(fromAddress in ret) && !(toAddress in ret)) continue
-    const from = ret[fromAddress]
-    const to = ret[toAddress]
+    const from = ret[fromAddress] || (ret[fromAddress] = new AccountAssets())
+    const to = ret[toAddress] || (ret[toAddress] = new AccountAssets())
     from.gold = from.gold.minus(transfer.value)
     to.gold = to.gold.plus(transfer.value)
   }
@@ -108,15 +108,16 @@ export async function trackTransfers(
   }
 
   // StableToken.creditTo and StableToken.debitFrom should emit a Transfer event like StableToken._mint
-  const stableToken = await kit.contracts.getStableToken()
+  /*const stableToken = await kit.contracts.getStableToken()
   const tokenTransfers = await stableToken.getTransferEvents(blockNumber)
+
   for (const transfer of tokenTransfers) {
     const to = ret[normalizeAddress(transfer.to)]
     // needs event change to distuinguish StableToken instances from only logs
     const name = 'cUSD'
     // needs conversion to units
     to.tokenUnits[name] = (to.tokenUnits[name] || new BigNumber(0)).plus(transfer.value)
-  }
+  }*/
 
   // ReleaseGold
 
