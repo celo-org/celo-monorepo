@@ -1,9 +1,9 @@
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { Transaction } from 'web3/eth/types'
+import { Transaction } from 'web3-eth'
 import { Address } from '../base'
-import { Governance } from '../generated/types/Governance'
+import { Governance } from '../generated/Governance'
 import {
   BaseWrapper,
   bufferToBytes,
@@ -59,7 +59,7 @@ export const proposalToParams = (proposal: Proposal, descriptionURL: string): Pr
   const data = proposal.map((tx) => stringToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
-    proposal.map((tx) => tx.to),
+    proposal.map((tx) => tx.to!),
     bufferToBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
     descriptionURL,
@@ -502,7 +502,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   /**
    * Approves given proposal, allowing it to later move to `referendum`.
-   * This will be deprecated in favor of the multiSig implementation for approver.
    * @param proposalID Governance proposal UUID
    * @notice Only the `approver` address will succeed in sending this transaction
    */

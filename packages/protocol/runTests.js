@@ -24,6 +24,7 @@ const migrationOverrides = {
   },
   exchange: {
     frozen: false,
+    minimumReports: 1,
   },
   goldToken: {
     frozen: false,
@@ -35,6 +36,7 @@ const migrationOverrides = {
   },
   reserve: {
     initialBalance: 100000000,
+    otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
   },
   reserveSpenderMultiSig: {
     signatories: [network.from],

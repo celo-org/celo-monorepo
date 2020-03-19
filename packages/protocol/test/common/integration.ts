@@ -23,6 +23,7 @@ import {
   LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
+  ReserveSpenderMultiSigInstance,
   StableTokenInstance,
 } from 'types'
 
@@ -384,7 +385,9 @@ contract('Integration: Governance', (accounts: string[]) => {
 contract('Integration: Exchange', (accounts: string[]) => {
   const sellAmount = new BigNumber('1000000000000000000')
   const minBuyAmount = 1
+  const transferAmount = 10
   let exchange: ExchangeInstance
+  let multiSig: ReserveSpenderMultiSigInstance
   let reserve: ReserveInstance
   let goldToken: GoldTokenInstance
   let stableToken: StableTokenInstance
@@ -396,6 +399,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
 
   before(async () => {
     exchange = await getDeployedProxiedContract('Exchange', artifacts)
+    multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
     reserve = await getDeployedProxiedContract('Reserve', artifacts)
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
@@ -464,6 +468,35 @@ contract('Integration: Exchange', (accounts: string[]) => {
       const finalReserve = await goldToken.balanceOf(reserve.address)
 
       assert.isTrue(finalReserve.lt(originalReserve))
+    })
+  })
+
+  describe('When transferring gold', () => {
+    const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
+    let originalOtherAccount
+    beforeEach(async () => {
+      originalReserve = await goldToken.balanceOf(reserve.address)
+      originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
+    })
+
+    it(`should transfer gold`, async () => {
+      // @ts-ignore
+      const txData = reserve.contract.methods
+        .transferGold(otherReserveAddress, transferAmount)
+        .encodeABI()
+      await multiSig.submitTransaction(reserve.address, 0, txData, {
+        from: accounts[0],
+      })
+      assert.isTrue(
+        (await goldToken.balanceOf(reserve.address)).isEqualTo(
+          originalReserve.minus(transferAmount)
+        )
+      )
+      assert.isTrue(
+        (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
+          originalOtherAccount.plus(transferAmount)
+        )
+      )
     })
   })
 })

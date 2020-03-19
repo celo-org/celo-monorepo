@@ -2,11 +2,8 @@ import { shallow } from 'enzyme'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { StatusBar } from 'react-native'
-import SplashScreen from 'react-native-splash-screen'
-import { PersistGate } from 'redux-persist/integration/react'
 import App from 'src/app/App'
 import ErrorBoundary from 'src/app/ErrorBoundary'
-const hide = SplashScreen.hide
 
 jest.mock('react-apollo', () => {
   return {
@@ -29,12 +26,6 @@ describe('App', () => {
   it('renders an ApolloProvider', () => {
     const wrapper = shallow(<App />)
     expect(wrapper.find(ApolloProvider).exists()).toBe(true)
-  })
-
-  it('hides the spash screen', () => {
-    const wrapper = shallow(<App />)
-    wrapper.find(PersistGate).simulate('beforeLift')
-    expect(hide).toBeCalled()
   })
 
   it('renders an ErrorBoundary', () => {

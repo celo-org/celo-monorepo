@@ -1,6 +1,7 @@
 /* Utilities to facilitate testing */
 import BigNumber from 'bignumber.js'
 import { NavigationScreenProp } from 'react-navigation'
+import { ReactTestInstance } from 'react-test-renderer'
 import configureMockStore from 'redux-mock-store'
 import { InitializationState } from 'src/geth/reducer'
 import i18n from 'src/i18n'
@@ -128,4 +129,15 @@ export function getMockI18nProps() {
     t: i18n.t,
     tReady: true,
   }
+}
+
+export function getElementText(instance: ReactTestInstance | string): string {
+  if (typeof instance === 'string') {
+    return instance
+  }
+  return instance.children
+    .map((child) => {
+      return getElementText(child)
+    })
+    .join('')
 }

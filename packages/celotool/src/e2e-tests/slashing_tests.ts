@@ -1,12 +1,11 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3.d.ts" />
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ensureLeading0x, NULL_ADDRESS } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import * as rlp from 'rlp'
-import { Buffer } from 'safe-buffer'
 import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep, waitForBlock } from './utils'
@@ -15,8 +14,6 @@ const headerHex =
   '0xf901f9a07285abd5b24742f184ad676e31f6054663b3529bc35ea2fcad8a3e0f642a46f7a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347948888f1f195afa192cfee860698584c030f4c9db1a0ecc60e00b3fe5ce9f6e1a10e5469764daf51f1fe93c22ec3f9a7583a80357217a0d35d334d87c0cc0a202e3756bf81fae08b1575f286c7ee7a3f8df4f0f3afc55da056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008302000001832fefd8825208845c47775c80a00000000000000000000000000000000000000000000000000000000000000000880000000000000000'
 
 const TMP_PATH = '/tmp/e2e'
-
-const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
 function headerArray(web3: Web3, block: any) {
   return [
@@ -39,14 +36,14 @@ function headerArray(web3: Web3, block: any) {
 }
 
 function headerFromBlock(web3: Web3, block: any) {
-  return rlp.encode(headerArray(web3, block))
+  return ensureLeading0x(rlp.encode(headerArray(web3, block)).toString('hex'))
 }
 
 // Find a validator that double signed. Both blocks will have signatures from exactly 2F+1 validators.
 async function findDoubleSignerIndex(
   kit: ContractKit,
-  header: Buffer,
-  other: Buffer
+  header: string,
+  other: string
 ): Promise<number> {
   const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
   const bitmap1 = await slasher.methods.getVerifiedSealBitmapFromHeader(header).call()
@@ -125,7 +122,7 @@ describe('slashing tests', function(this: any) {
 
   const hooks: any = getHooks(gethConfig)
   const hooksDown: any = getHooks(gethConfigDown)
-  let web3: any
+  let web3: Web3
   let kit: ContractKit
 
   before(async function(this: any) {
@@ -165,16 +162,16 @@ describe('slashing tests', function(this: any) {
       const header = kit.web3.utils.hexToBytes(headerHex)
 
       const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
-      assert.equal(blockNumber, 1)
+      assert.equal(blockNumber, '1')
     })
 
     it('should parse blockNumber from current header', async () => {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const rlpEncodedBlock = rlp.encode(headerArray(kit.web3, block))
-      const blockNumber = await contract.methods.getBlockNumberFromHeader(rlpEncodedBlock).call()
-      assert.equal(blockNumber, current)
+      const header = headerFromBlock(kit.web3, block)
+      const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
+      assert.equal(blockNumber, current.toString())
     })
 
     it('should hash test header correctly', async () => {
@@ -188,8 +185,8 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const rlpEncodedBlock = rlp.encode(headerArray(kit.web3, block))
-      const blockHash = await contract.methods.hashHeader(rlpEncodedBlock).call()
+      const header = headerFromBlock(kit.web3, block)
+      const blockHash = await contract.methods.hashHeader(header).call()
       assert.equal(blockHash, block.hash)
     })
   })
@@ -315,9 +312,9 @@ describe('slashing tests', function(this: any) {
         )
         .send({ from: validator, gas: 5000000 })
 
-      // Penalty is defined to be 5000 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      assert.equal(balance.toString(10), '5000000000000000000000')
+      assert.equal(balance.toString(10), '1000000000000000000000')
     })
   })
 
@@ -334,7 +331,7 @@ describe('slashing tests', function(this: any) {
       await waitForBlock(web3, doubleSigningBlock.number)
 
       const other = headerFromBlock(web3, doubleSigningBlock)
-      const num = await slasher.getBlockNumberFromHeader(bufferToString(other))
+      const num = await slasher.getBlockNumberFromHeader(other)
       const header = headerFromBlock(web3, await web3.eth.getBlock(num))
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await election.validatorSignerAddressFromSet(signerIdx, num)
@@ -342,15 +339,15 @@ describe('slashing tests', function(this: any) {
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
 
-      const tx = await slasher.slashSigner(signer, bufferToString(header), bufferToString(other))
+      const tx = await slasher.slashSigner(signer, header, other)
       const txResult = await tx.send({ from: validator, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)
 
-      // Penalty is defined to be 5000 cGLD in migrations, locked gold is 10000 cGLD for a validator
+      // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld
       const lockedGold = await kit.contracts.getLockedGold()
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      assert.equal(balance.toString(10), '5000000000000000000000')
+      assert.equal(balance.toString(10), '1000000000000000000000')
     })
   })
 })
