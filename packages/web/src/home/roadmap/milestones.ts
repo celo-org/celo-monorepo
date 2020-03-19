@@ -60,7 +60,7 @@ const stones: Milestone[] = [
     status: Status.complete,
   },
   {
-    date: 'Nov 2019',
+    date: 'Nov 2019 - Feb 2020',
     key: 'Baklava_Testnet',
     status: Status.complete,
   },

@@ -94,8 +94,8 @@
     "pastTitle": "Previous Milestones",
     "legendTitle": "Milestone Key",
     "legend": {
-      "half": "Active Progress",
-      "empty": "Queued"
+      "half": "In Progress",
+      "empty": "Pending"
     },
     "milestones": {
       "New_Baklava_Testnet": {
@@ -124,7 +124,7 @@
       "text": "When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal"
     },
     "Celo_Dollar_is_live": {
-      "title": "Celo Dollar Live",
+      "title": "Celo Dollars Live",
       "text": "When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal"
     },
     "Mainnet_Mobile_Wallet_Release": {
@@ -140,11 +140,11 @@
       "text": "Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened"       
     },
     "100_Community": {
-      "title": "100th Community Event Organized",
-      "text": "Over 100 events held in 100 days in more than 5 countries"       
+      "title": "100th Community Event",
+      "text": "100 events hosted in 100 days in more than 35 countries"  
     },
     "Alfajores_Testnet": {
-      "title": "Alfajores Testnet",
+      "title": "Alfajores Testnet Release",
       "text": "First full network release for protocol and app developers"       
     },
     "MIT_Stability_Challenge": {
