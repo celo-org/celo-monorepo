@@ -8,5 +8,5 @@
 
 ### Interfaces
 
-* [ReleaseSchedule](../interfaces/_wrappers_releasegold_.releaseschedule.md)
-* [RevocationInfo](../interfaces/_wrappers_releasegold_.revocationinfo.md)
+* [BalanceState](../interfaces/_wrappers_releasegold_.balancestate.md)
+* [ReleaseGoldInfo](../interfaces/_wrappers_releasegold_.releasegoldinfo.md)
