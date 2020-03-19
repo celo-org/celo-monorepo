@@ -102,22 +102,36 @@ export const verifyDomainClaim = async (
   }
 
   const signature = JSON.parse(metadata.toString()).meta.signature
-  const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
+  // const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
   const address = JSON.parse(metadata.toString()).meta.address
+  // const domainClaims = metadata.filterClaims(ClaimTypes.DOMAIN)
+
+  return await verifyDomainRecord(signature, address, claim.domain, metadata, dnsResolver)
+}
+
+export const verifyDomainRecord = async (
+  signature: string,
+  address: string,
+  domain: string,
+  metadata: IdentityMetadataWrapper,
+  dnsResolver: dnsResolverFunction = resolveTxt
+) => {
+  const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
   const domainClaims = metadata.filterClaims(ClaimTypes.DOMAIN)
 
   let found = false
   domainClaims.forEach((domainClaim) => {
-    console.log(`${claim.domain} === ${domainClaim.domain}`)
-    if (claim.domain === domainClaim.domain) {
+    if (domain === domainClaim.domain) {
+      console.log(`${domain} === ${domainClaim.domain}`)
       dnsResolver(domainClaim.domain, (_error, domainRecords) => {
         if (_error) {
           console.log(`Unable to fetch domain TXT records: ${_error.toString()}`)
         } else {
           domainRecords.forEach((record) => {
             record.forEach((entry) => {
+              console.log(`Entry ${entry}`)
               if (entry === 'celo-site-verification=' + signatureBase64) {
-                // TXT Record celo-site-verification found in ${domainClaim.domain}
+                console.log(`TXT Record celo-site-verification found in ${domainClaim.domain}`)
                 found = verifySignature(hashOfClaims(metadata.claims), signature, address)
               }
             })
@@ -126,6 +140,7 @@ export const verifyDomainClaim = async (
       })
     }
   })
+  console.log(`FOUND: ${found}`)
   if (found) {
     return
   }

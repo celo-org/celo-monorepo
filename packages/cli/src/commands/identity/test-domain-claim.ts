@@ -1,6 +1,8 @@
+import { createDomainClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { verifyDomainRecord } from '@celo/contractkit/lib/identity/claims/verify'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
-import { resolveTxt } from 'dns'
+// import { resolveTxt } from 'dns'
 import { ClaimCommand } from '../../utils/identity'
 
 export default class TestDomainClaim extends ClaimCommand {
@@ -22,10 +24,31 @@ export default class TestDomainClaim extends ClaimCommand {
     const res = this.parse(TestDomainClaim)
     const metadata = this.readMetadata()
 
-    const signature = JSON.parse(metadata.toString()).meta.signature
-    const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
+    const metadataJson = JSON.parse(metadata.toString())
+    const signature = metadataJson.meta.signature
+    // const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
     console.info('Fetching domain ' + res.flags.domain + ' TXT records for verification')
 
+    const claim = createDomainClaim(res.flags.domain)
+    // const output = await verifyDomainClaim(claim, metadataJson.meta.address, metadataUrlGetter)
+    const output = await verifyDomainRecord(
+      signature,
+      metadataJson.meta.address,
+      claim.domain,
+      metadata
+    )
+
+    if (output === undefined)
+      console.info(
+        chalk.green('✓') +
+          ` TXT Record celo-site-verification correctly found in ${res.flags.domain}`
+      )
+    else
+      console.info(
+        chalk.red('x') +
+          ` Unable to find a valid celo-site-verification TXT record in ${res.flags.domain} domain`
+      )
+    /*
     resolveTxt(res.flags.domain, (_error, domainRecords) => {
       if (_error) {
         console.error('Unable to fetch domain TXT records: ' + _error.toString())
@@ -53,5 +76,6 @@ export default class TestDomainClaim extends ClaimCommand {
           ' domain'
       )
     })
+*/
   }
 }
