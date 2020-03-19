@@ -72,7 +72,7 @@ export class BlockProcessor {
           this.logEvent(LoggingCategory.State, {
             contract,
             function: method,
-            params,
+            params: JSON.stringify(params),
             blockNumber,
             values: transformValues(returnData),
           })
