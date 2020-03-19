@@ -142,7 +142,8 @@ spec:
               --delay {{ .Values.delay }} \
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
-              --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }}
+              --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }} \
+              --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
             memory: 256Mi

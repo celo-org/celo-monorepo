@@ -12,9 +12,10 @@ export async function installHelmChart(
   celoEnv: string,
   blockscoutProb: number,
   delayMs: number,
-  replicas: number
+  replicas: number,
+  threads: number
 ) {
-  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
+  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas, threads)
   return installGenericHelmChart(
     celoEnv,
     celoEnv + '-load-test',
@@ -27,9 +28,10 @@ export async function upgradeHelmChart(
   celoEnv: string,
   blockscoutProb: number,
   delayMs: number,
-  replicas: number
+  replicas: number,
+  threads: number
 ) {
-  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
+  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas, threads)
   await upgradeGenericHelmChart(
     celoEnv,
     celoEnv + '-load-test',
@@ -46,7 +48,8 @@ async function helmParameters(
   celoEnv: string,
   blockscoutProb: number,
   delayMs: number,
-  replicas: number
+  replicas: number,
+  threads: number
 ) {
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
@@ -69,5 +72,6 @@ async function helmParameters(
     `--set geth.verbosity=${fetchEnv('GETH_VERBOSITY')}`,
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set replicas=${replicas}`,
+    `--set threads=${threads}`,
   ]
 }
