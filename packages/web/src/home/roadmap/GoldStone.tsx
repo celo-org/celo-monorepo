@@ -16,7 +16,7 @@ interface Props {
   index: number
   isLast?: boolean
 }
-const DELAY_BASE = 30
+const DELAY_BASE = 40
 
 const heading = [fonts.legal, textStyles.heavy]
 

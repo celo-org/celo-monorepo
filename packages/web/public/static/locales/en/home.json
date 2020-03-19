@@ -104,7 +104,7 @@
     },
     "Security_audits_complete": 
     {
-      "title": "Security audits complete",
+      "title": "Security Audits Complete",
       "text": "Resolve any outstanding issues to harden codebase"
     },
     "Mainnet_Release_Candidate_1": {
@@ -120,11 +120,11 @@
       "text": "Possible additional release candidates in the event critical issues are discovered"
     },
     "Celo_Gold_is_live": {
-      "title": "Celo Gold is live",
+      "title": "Celo Gold Live",
       "text": "When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal"
     },
     "Celo_Dollar_is_live": {
-      "title": "Celo Dollar is live",
+      "title": "Celo Dollar Live",
       "text": "When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal"
     },
     "Mainnet_Mobile_Wallet_Release": {
@@ -152,11 +152,11 @@
       "text": "Stability Protocol tested and improved"       
     },
     "First_user_research_trip": {
-      "title": "First user research trip",
+      "title": "First User Research Trip",
       "text": "Field research on mobile money adoption in Kenya"       
     },
     "Wallet_in_market_testing_begins": {
-      "title": "Mobile Wallet in market testing begins",
+      "title": "Mobile Wallet in Market Testing Begins",
       "text": "Ongoing research in emerging markets"     
     }
   },
