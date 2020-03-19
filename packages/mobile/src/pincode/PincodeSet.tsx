@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
@@ -17,6 +17,7 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Pincode from 'src/pincode/Pincode'
+import { isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 
 interface DispatchProps {
   showError: typeof showError
@@ -53,12 +54,12 @@ export class PincodeSet extends React.Component<Props, State> {
     this.setState({ pin2 })
   }
 
-  isPin1Valid = () => {
-    return this.state.pin1.length === 6
+  isPin1Valid = (pin: string) => {
+    return isPinValid(pin)
   }
 
-  isPin2Valid = () => {
-    return this.state.pin1 === this.state.pin2
+  isPin2Valid = (pin: string) => {
+    return this.state.pin1 === pin
   }
 
   onPressPin1Continue = () => {
@@ -70,7 +71,8 @@ export class PincodeSet extends React.Component<Props, State> {
 
   onPressPin2Continue = () => {
     CeloAnalytics.track(CustomEventNames.pin_create_button)
-    if (this.isPin1Valid() && this.isPin2Valid()) {
+    const { pin1, pin2 } = this.state
+    if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
       navigate(Screens.EnterInviteCode)
     } else {
@@ -95,7 +97,7 @@ export class PincodeSet extends React.Component<Props, State> {
             onPress={this.onPressPin2Continue}
             pin={pin2}
             onChangePin={this.onChangePin2}
-            maxLength={6}
+            maxLength={PIN_LENGTH}
           />
         ) : (
           // Create
@@ -107,7 +109,7 @@ export class PincodeSet extends React.Component<Props, State> {
             onPress={this.onPressPin1Continue}
             pin={pin1}
             onChangePin={this.onChangePin1}
-            maxLength={6}
+            maxLength={PIN_LENGTH}
           />
         )}
       </SafeAreaView>

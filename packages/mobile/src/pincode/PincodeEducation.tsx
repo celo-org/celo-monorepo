@@ -14,7 +14,7 @@ import LockedPhoneIcon from 'src/icons/LockedPhoneIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { isPhoneAuthSupported } from 'src/pincode/PincodeUtils.android'
+import { isPhoneAuthSupported } from 'src/pincode/PhoneAuthUtils'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {

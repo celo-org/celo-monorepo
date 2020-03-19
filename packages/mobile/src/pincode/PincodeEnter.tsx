@@ -11,9 +11,8 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import Pincode from 'src/pincode/Pincode'
+import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
-import { web3 } from 'src/web3/contracts'
-import { readPrivateKeyFromLocalDisk } from 'src/web3/privateKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
 interface State {
@@ -74,10 +73,6 @@ class PincodeEnter extends React.Component<Props, State> {
     this.setState({ pin })
   }
 
-  isPinValid = () => {
-    return this.state.pin.length === 6
-  }
-
   onCorrectPin = (pin: string) => {
     const onSuccess = this.props.navigation.getParam('onSuccess')
     if (onSuccess) {
@@ -95,16 +90,9 @@ class PincodeEnter extends React.Component<Props, State> {
     const { pin } = this.state
     const withVerification = navigation.getParam('withVerification')
     if (withVerification && currentAccount) {
-      if (fornoMode) {
-        readPrivateKeyFromLocalDisk(currentAccount, pin)
-          .then(() => this.onCorrectPin(pin))
-          .catch(this.onWrongPin)
-      } else {
-        web3.eth.personal
-          .unlockAccount(currentAccount, pin, 1)
-          .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
-          .catch(this.onWrongPin)
-      }
+      isPinCorrect(pin, fornoMode, currentAccount)
+        .then(this.onCorrectPin)
+        .catch(this.onWrongPin)
     } else {
       this.onCorrectPin(pin)
     }
@@ -119,11 +107,11 @@ class PincodeEnter extends React.Component<Props, State> {
           title={t('confirmPin.title')}
           placeholder={t('createPin.yourPin')}
           buttonText={t('global:submit')}
-          isPinValid={this.isPinValid}
+          isPinValid={isPinValid}
           onPress={this.onPressConfirm}
           pin={pin}
           onChangePin={this.onChangePin}
-          maxLength={6}
+          maxLength={PIN_LENGTH}
         />
       </SafeAreaView>
     )

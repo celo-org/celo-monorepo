@@ -7,8 +7,8 @@ import { pincodeTypeSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { setPinInKeystore } from 'src/pincode/PhoneAuthUtils'
 import { getCachedPincode, setCachedPincode } from 'src/pincode/PincodeCache'
-import { setPinInKeystore } from 'src/pincode/PincodeUtils'
 
 const mockPin = '123456'
 

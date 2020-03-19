@@ -9,6 +9,7 @@ import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { handleNavigationStateChange, setTopLevelNavigator } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import PincodeLock from 'src/pincode/PincodeLock'
 import { RootState } from 'src/redux/reducers'
 import BackupPrompt from 'src/shared/BackupPrompt'
 import Logger from 'src/utils/Logger'
@@ -66,11 +67,13 @@ export class NavigatorWrapper extends React.Component<Props> {
     const { appLocked } = this.props
     return (
       <View style={styles.container}>
-        <AppContainer
-          ref={this.setNavigator}
-          onNavigationStateChange={handleNavigationStateChange}
-          {...getPersistenceFunctions()}
-        />
+        {(appLocked && false && <PincodeLock />) || (
+          <AppContainer
+            ref={this.setNavigator}
+            onNavigationStateChange={handleNavigationStateChange}
+            {...getPersistenceFunctions()}
+          />
+        )}
 
         <View style={styles.floating}>
           {!appLocked && <BackupPrompt />}

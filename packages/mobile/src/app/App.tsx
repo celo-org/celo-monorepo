@@ -5,6 +5,7 @@ import { withTranslation } from 'react-i18next'
 import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useScreens } from 'react-native-screens'
+import SplashScreen from 'react-native-splash-screen'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -58,13 +59,21 @@ export class App extends React.Component {
     store.dispatch(openDeepLink(event.url))
   }
 
+  hideSplashScreen() {
+    SplashScreen.hide()
+  }
+
   render() {
     return (
       // @ts-ignore Apollo doesn't like the typings
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
           <SafeAreaProvider>
-            <PersistGate loading={<AppLoading />} persistor={persistor}>
+            <PersistGate
+              onBeforeLift={this.hideSplashScreen}
+              loading={<AppLoading />}
+              persistor={persistor}
+            >
               <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
               <ErrorBoundary>
                 <WrappedNavigator />

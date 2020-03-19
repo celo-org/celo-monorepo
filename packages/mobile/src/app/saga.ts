@@ -1,22 +1,18 @@
-import { AppState, Linking, Platform } from 'react-native'
+import { AppState, Linking } from 'react-native'
 import { NavigationParams } from 'react-navigation'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
-import { Actions, OpenDeepLink, SetAppState, setAppState, setLanguage } from 'src/app/actions'
+import { Actions, lock, OpenDeepLink, SetAppState, setAppState, setLanguage } from 'src/app/actions'
 import { getAppLocked, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import {
-  lockCurrentScreen,
-  NavActions,
-  navigate,
-  navigateProtected,
-} from 'src/navigator/NavigationService'
+import { NavActions, navigate, navigateProtected } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
+import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
@@ -181,18 +177,11 @@ function* watchAppState() {
 
 function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
-  // When requesting Android Permissions app state
-  // would become `background`, but we do not want to lock
-  // the app in this case, cause user has not left/closed the app
-  const requestingAndroidPermission = yield select((state) => state.app.requestingAndroidPermission)
+  const cachedPin = false // getCachedPincode()
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (
-    lockWithPinEnabled &&
-    action.state === 'background' &&
-    !appLocked &&
-    (Platform.OS !== 'android' || !requestingAndroidPermission)
-  ) {
-    lockCurrentScreen()
+  if (!cachedPin && lockWithPinEnabled && action.state === 'active' && !appLocked) {
+    console.log('LOCK')
+    yield put(lock())
   }
 }
 

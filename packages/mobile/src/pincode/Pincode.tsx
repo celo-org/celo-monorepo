@@ -25,7 +25,7 @@ function Pincode(props: Props) {
     (digit) => {
       let newPin = pin + digit
       if (maxLength) {
-        newPin = newPin.substr(0, 6)
+        newPin = newPin.substr(0, maxLength)
       }
       onChangePin(newPin)
     },
