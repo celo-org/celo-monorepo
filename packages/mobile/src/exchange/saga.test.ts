@@ -17,11 +17,11 @@ export const mockReserveContractWrapper = {
 }
 
 jest.mock('src/web3/contracts', () => ({
-  contractKit: {
+  getContractKit: () => ({
     _web3Contracts: {
       getReserve: () => mockReserveContractWrapper,
     },
-  },
+  }),
 }))
 
 describe(doFetchTobinTax, () => {

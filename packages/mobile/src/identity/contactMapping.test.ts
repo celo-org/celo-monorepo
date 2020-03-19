@@ -12,7 +12,7 @@ import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { contractKit } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 import {
   mockAccount,
@@ -25,12 +25,12 @@ import {
 
 // TODO implement a smarter way to have contract kit mocked well across the whole project
 jest.mock('src/web3/contracts', () => ({
-  contractKit: {
+  getContractKit: () => ({
     contracts: {
       getAttestations: jest.fn(),
       getAccounts: jest.fn(),
     },
-  },
+  }),
 }))
 
 const mockPhoneNumberLookup = {
@@ -49,6 +49,7 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],
@@ -86,6 +87,7 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],

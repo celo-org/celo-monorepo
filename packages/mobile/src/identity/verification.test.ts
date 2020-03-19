@@ -20,10 +20,10 @@ import {
   doVerificationFlow,
   requestAndRetrieveAttestations,
   startVerification,
-  VERIFICATION_TIMEOUT,
   VerificationStatus,
+  VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
-import { contractKit } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
@@ -56,12 +56,12 @@ jest.mock('@celo/utils', () => {
 })
 
 jest.mock('src/web3/contracts', () => ({
-  contractKit: {
+  getContractKit: () => ({
     contracts: {
       getAttestations: jest.fn(),
       getAccounts: jest.fn(),
     },
-  },
+  }),
 }))
 
 const attestationCode0: AttestationCode = {
@@ -184,6 +184,7 @@ describe('Start Verification Saga', () => {
 
 describe('Do Verification Saga', () => {
   it('succeeds for unverified users', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -208,6 +209,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for partly verified users', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -228,6 +230,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for verified users', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -245,6 +248,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('shows error on unexpected failure', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -269,6 +273,7 @@ describe('Do Verification Saga', () => {
         throw new Error('Reveal error')
       }),
     }
+    const contractKit = getContractKit()
 
     await expectSaga(doVerificationFlow)
       .provide([
