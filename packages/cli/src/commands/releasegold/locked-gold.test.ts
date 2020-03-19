@@ -19,11 +19,6 @@ testWithGanache('releasegold:locked-gold cmd', (web3: Web3) => {
     )
     kit = newKitFromWeb3(web3)
     await CreateAccount.run(['--contract', contractAddress])
-    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // Attempt to avoid timing errors
-  })
-
-  afterAll(async () => {
-    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // Attempt to avoid timing errors
   })
 
   test('can lock gold with pending withdrawals', async () => {

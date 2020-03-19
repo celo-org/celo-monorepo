@@ -22,11 +22,6 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     )
     kit = newKitFromWeb3(web3)
     await CreateAccount.run(['--contract', contractAddress])
-    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // avoid jest open handle error
-  })
-
-  afterAll(async () => {
-    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // avoid jest open handle error
   })
 
   describe('can authorize account signers', () => {
