@@ -35,12 +35,39 @@ module.exports = async (callback: (error?: any) => number) => {
       if (err) {
         throw err
       }
-      for (const releaseGoldConfig of JSON.parse(data)) {
+      const grants = JSON.parse(data)
+      const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
+        return sum + curr.amountReleasedPerPeriod
+      }, 0)
+      const totalTransferFees = argv.start_gold * grants.length
+      const totalValue = totalTransferFees + totalGoldGrant
+      let response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message:
+          'Grants in provided json would send ' +
+          totalGoldGrant +
+          'cGld and ' +
+          totalTransferFees +
+          'cGld in transfer fees, totalling ' +
+          totalValue +
+          'cGld.\nIs this OK (y/n)?',
+      })
+
+      if (!response.confirmation) {
+        console.info('Abandoning grant deployment.')
+        process.exit(0)
+      }
+      let currGrant = 1
+      for (const releaseGoldConfig of grants) {
+        console.info('Processing grant number ' + currGrant)
+        currGrant++
+
         const message =
           'Are you sure you want to deploy this contract?\n Total Grant Value: ' +
           releaseGoldConfig.numReleasePeriods * releaseGoldConfig.amountReleasedPerPeriod +
           '? (y/n)'
-        const response = await prompts({
+        response = await prompts({
           type: 'confirm',
           name: 'confirmation',
           message,
@@ -109,8 +136,18 @@ module.exports = async (callback: (error?: any) => number) => {
           ReleaseGoldTxHash: releaseGoldTxHash,
         })
       }
-      // tslint:disable-next-line: no-console
-      console.log(releases)
+      if (argv.output_file) {
+        fs.writeFile(argv.output_file, JSON.stringify(releases, null, 4), (writeError) => {
+          if (writeError) {
+            console.error(writeError)
+            return
+          }
+          console.info('Wrote release results to file ' + argv.output_file + '.')
+        })
+      } else {
+        // tslint:disable-next-line: no-console
+        console.log(releases)
+      }
     }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
