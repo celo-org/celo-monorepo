@@ -88,7 +88,6 @@ export default class VideoModal extends React.Component<Props, State> {
             }
 
             .ReactModal__Overlay {
-              transform: translateY(-100vh);
               transition: transform 1000ms ease-in-out;
             }
             
