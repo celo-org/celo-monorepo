@@ -16,4 +16,4 @@
 
 • **tobinTaxStalenessThreshold**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L6)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L8)*
