@@ -41,12 +41,10 @@ export default class Approve extends BaseCommand {
 
     await newCheckBuilder(this)
       .isApprover(approver)
-      .addConditionalCheck(
-        `${account} is multisig signatory`,
-        useMultiSig,
-        async () =>
-          governanceApproverMultiSig != undefined &&
-          (await governanceApproverMultiSig.isowner(account))
+      .addConditionalCheck(`${account} is multisig signatory`, useMultiSig, async () =>
+        governanceApproverMultiSig !== undefined
+          ? governanceApproverMultiSig.isowner(account)
+          : new Promise<boolean>(() => false)
       )
       .proposalExists(id)
       .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
@@ -55,7 +53,7 @@ export default class Approve extends BaseCommand {
 
     const governanceTx = await governance.approve(id)
     const tx =
-      governanceApproverMultiSig == undefined
+      governanceApproverMultiSig === undefined
         ? governanceTx
         : await governanceApproverMultiSig.submitOrConfirmTransaction(
             governance.address,

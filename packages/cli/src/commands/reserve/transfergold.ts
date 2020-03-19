@@ -39,18 +39,17 @@ export default class TransferGold extends BaseCommand {
     const spender = useMultiSig ? multiSigAddress : account
 
     await newCheckBuilder(this)
-      .addCheck(`${spender} is a reserve spender`, async () => await reserve.isSpender(spender))
-      .addConditionalCheck(
-        `${account} is a multisig signatory`,
-        useMultiSig,
-        async () =>
-          reserveSpenderMultiSig != undefined && (await reserveSpenderMultiSig.isowner(account))
+      .addCheck(`${spender} is a reserve spender`, async () => reserve.isSpender(spender))
+      .addConditionalCheck(`${account} is a multisig signatory`, useMultiSig, async () =>
+        reserveSpenderMultiSig !== undefined
+          ? reserveSpenderMultiSig.isowner(account)
+          : new Promise<boolean>(() => false)
       )
       .runChecks()
 
     const reserveTx = await reserve.transferGold(to, value)
     const tx =
-      reserveSpenderMultiSig == undefined
+      reserveSpenderMultiSig === undefined
         ? reserveTx
         : await reserveSpenderMultiSig.submitOrConfirmTransaction(reserve.address, reserveTx.txo)
     await displaySendTx<string | void | boolean>('transferGoldTx', tx, {}, 'ReserveGoldTransferred')
