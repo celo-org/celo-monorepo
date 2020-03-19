@@ -20,8 +20,6 @@ export default React.memo(function TimeLine() {
   const { t } = useTranslation(NameSpaces.home)
   const { isMobile } = useScreenSize()
 
-  const subTitleStyle = [fonts.h6, standardStyles.elementalMargin]
-
   return (
     <>
       <GridRow
@@ -42,6 +40,7 @@ export default React.memo(function TimeLine() {
       </GridRow>
       <GridRow allStyle={styles.container}>
         <Cell span={Spans.half} style={styles.fillSpace}>
+          {isMobile && <Legend />}
           <Text style={subTitleStyle}>{t('timeline.pastTitle')}</Text>
           {(isMobile ? PAST_CHRONOLOGICAL : PAST).map(({ key, date, status }, index) => {
             return (
@@ -58,17 +57,7 @@ export default React.memo(function TimeLine() {
           })}
         </Cell>
         <Cell span={Spans.half}>
-          <Text style={subTitleStyle}>{t('timeline.legendTitle')}</Text>
-          <View style={styles.legendArea}>
-            <View style={isMobile ? [styles.legend, styles.legendAugMobile] : styles.legend}>
-              <CoinHalfFull size={18} color={colors.gold} />
-              <Text style={[fonts.legal, styles.legendText]}>{t('timeline.legend.half')}</Text>
-            </View>
-            <View style={isMobile ? [styles.legend, styles.legendAugMobile] : styles.legend}>
-              <HollowCoin size={18} color={colors.gold} />
-              <Text style={[fonts.legal, styles.legendText]}>{t('timeline.legend.empty')}</Text>
-            </View>
-          </View>
+          {!isMobile && <Legend />}
           <Text style={subTitleStyle}>{t('timeline.upcomingTitle')}</Text>
           {UPCOMING.map(({ key, status }, index) => (
             <GoldStone
@@ -82,6 +71,27 @@ export default React.memo(function TimeLine() {
           ))}
         </Cell>
       </GridRow>
+    </>
+  )
+})
+
+const Legend = React.memo(() => {
+  const { t } = useTranslation(NameSpaces.home)
+  const { isMobile } = useScreenSize()
+
+  return (
+    <>
+      <Text style={subTitleStyle}>{t('timeline.legendTitle')}</Text>
+      <View style={styles.legendArea}>
+        <View style={isMobile ? [styles.legend, styles.legendAugMobile] : styles.legend}>
+          <CoinHalfFull size={18} color={colors.gold} />
+          <Text style={[fonts.legal, styles.legendText]}>{t('timeline.legend.half')}</Text>
+        </View>
+        <View style={isMobile ? [styles.legend, styles.legendAugMobile] : styles.legend}>
+          <HollowCoin size={18} color={colors.gold} />
+          <Text style={[fonts.legal, styles.legendText]}>{t('timeline.legend.empty')}</Text>
+        </View>
+      </View>
     </>
   )
 })
@@ -123,3 +133,5 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
 })
+
+const subTitleStyle = [fonts.h6, standardStyles.elementalMargin]
