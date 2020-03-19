@@ -1276,6 +1276,8 @@ contract('ReleaseGold', (accounts: string[]) => {
         await lockedGoldInstance.getAccountTotalLockedGold(releaseGoldInstance.address),
         0
       )
+      // ReleaseGold locked balance should still reflect pending withdrawals
+      assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), lockAmount)
       assertEqualBN(
         await lockedGoldInstance.getAccountNonvotingLockedGold(releaseGoldInstance.address),
         0
@@ -1347,6 +1349,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           )
           assert.equal(values.length, 0)
           assert.equal(timestamps.length, 0)
+          assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), 0)
         })
       })
 
