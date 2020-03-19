@@ -46,6 +46,7 @@
 * ["wrappers/GoldTokenWrapper"](modules/_wrappers_goldtokenwrapper_.md)
 * ["wrappers/Governance"](modules/_wrappers_governance_.md)
 * ["wrappers/LockedGold"](modules/_wrappers_lockedgold_.md)
+* ["wrappers/MultiSig"](modules/_wrappers_multisig_.md)
 * ["wrappers/Reserve"](modules/_wrappers_reserve_.md)
 * ["wrappers/SortedOracles"](modules/_wrappers_sortedoracles_.md)
 * ["wrappers/StableTokenWrapper"](modules/_wrappers_stabletokenwrapper_.md)
