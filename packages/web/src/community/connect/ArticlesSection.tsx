@@ -46,7 +46,7 @@ class ArticlesSection extends React.PureComponent<Props> {
               text={t('common:readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
               size={SIZE.normal}
-              href={CeloLinks.mediumUser}
+              href={CeloLinks.mediumPublication}
               target={'_blog'}
               iconRight={<MediumLogo height={16} color={colors.dark} wrapWithLink={false} />}
             />
