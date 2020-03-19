@@ -11,13 +11,15 @@ process.env.NO_SYNCCHECK = 'true'
 
 testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
   let contractAddress: string
-  beforeAll(async () => {
+  let kit: any
+  beforeEach(async () => {
     const contractCanValidate = true
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
       contractCanValidate
     )
+    kit = newKitFromWeb3(web3)
     await CreateAccount.run(['--contract', contractAddress])
     await new Promise((resolve) => setTimeout(() => resolve(), 500)) // avoid jest open handle error
   })
@@ -26,9 +28,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
   })
 
   test('can withdraw released gold to beneficiary', async () => {
-    const kit = newKitFromWeb3(web3)
     await SetLiquidityProvision.run(['--contract', contractAddress, '--yesreally'])
-
     await timeTravel(100000000, web3)
     const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
     const beneficiary = await releaseGoldWrapper.getBeneficiary()
