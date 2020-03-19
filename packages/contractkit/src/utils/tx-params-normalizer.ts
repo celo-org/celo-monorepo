@@ -18,7 +18,6 @@ function isEmpty(value: string | undefined) {
 
 export class TxParamsNormalizer {
   private chainId: number | null = null
-  private gatewayFeeRecipient: string | null = null
 
   constructor(readonly rpcCaller: RpcCaller) {}
 
