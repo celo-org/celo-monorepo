@@ -61,8 +61,8 @@ export const builder = () => {
 export const handler = async (argv: SimulateClientArgv) => {
   // So we can transactions to another load testing account
   for (let x = 0; x < argv.clientCount; x++) {
-    const senderIndex = parseInt(argv.index.toString() + x, 10)
-    const recipientIndex = parseInt(argv.recipientIndex.toString() + x, 10)
+    const senderIndex = parseInt(argv.index.toString() + x.toString(), 10)
+    const recipientIndex = parseInt(argv.recipientIndex.toString() + x.toString(), 10)
     const senderAddress = generateAddress(
       argv.mnemonic,
       AccountType.LOAD_TESTING_ACCOUNT,
