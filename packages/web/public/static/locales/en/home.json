@@ -88,11 +88,15 @@
   "recentNews": "Recent News",
   "timeline": {
     "title": "Celo's Journey",
-    "subtitle": "Milestones & RoadMap",
+    "subtitle": "Milestones",
     "intro": "The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.",
     "upcomingTitle": "Upcoming Milestones",
     "pastTitle": "Previous Milestones",
-
+    "legendTitle": "Milestone Key",
+    "legend": {
+      "half": "Active Progress",
+      "empty": "Queued"
+    },
     "milestones": {
       "New_Baklava_Testnet": {
       "title": "New Baklava Testnet",
@@ -136,8 +140,8 @@
       "text": "Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened"       
     },
     "100_Community": {
-      "title": "More than 100 Community Events Organized",
-      "text": ""       
+      "title": "100th Community Event Organized",
+      "text": "100 events in 100 days held in more than 5 countries"       
     },
     "Alfajores_Testnet": {
       "title": "Alfajores Testnet",
@@ -145,11 +149,15 @@
     },
     "MIT_Stability_Challenge": {
       "title": "MIT Stability Challenge",
-      "text": "Ongoing research in test environments"       
+      "text": "Stability Protocol tested and improved"       
     },
     "First_user_research_trip": {
       "title": "First user research trip",
-      "text": ""       
+      "text": "Field research on mobile money adoption in Kenya"       
+    },
+    "Wallet_in_market_testing_begins": {
+      "title": "Mobile Wallet in market testing begins",
+      "text": "Ongoing research in emerging markets"     
     }
   },
   "coinlist": {
@@ -157,4 +165,5 @@
     "text": "Celo Gold will be available for purchase via CoinList. Everyone participating pays the same fair price and the minimum contribution is $100 USD. Available to non-US persons only, other restrictions apply.",
     "btn": "Participate"
   }
+}
 }

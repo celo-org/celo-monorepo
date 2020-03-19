@@ -22,12 +22,19 @@ const heading = [fonts.legal, textStyles.heavy]
 export default React.memo(function GoldStone({ date, title, text, isLast, index, status }: Props) {
   const { isMobile } = useScreenSize()
   const Coin = getCoinType(status)
+  const isComplete = status === Status.complete
   const delay = 30 * index * status
   return (
-    <View style={[styles.container, isMobile && styles.containerMobile]}>
+    <View
+      style={[
+        styles.container,
+        isMobile && styles.containerMobile,
+        isComplete && !isLast && styles.fillSpace,
+      ]}
+    >
       <View
         style={
-          status === Status.complete
+          isComplete
             ? [
                 styles.thruline,
                 isLast && {
@@ -40,7 +47,7 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index,
       />
 
       <View style={styles.box}>
-        <View style={status === Status.complete ? styles.coin : styles.futureCoin}>
+        <View style={isComplete ? styles.coin : styles.futureCoin}>
           <Fade delay={delay}>
             <Coin size={18} color={colors.gold} />
           </Fade>
@@ -76,6 +83,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     flexDirection: 'row',
   },
+  fillSpace: { flex: 1 },
   containerMobile: {
     height: 'inherit',
     marginHorizontal: 10,
@@ -99,7 +107,7 @@ const styles = StyleSheet.create({
   futureCoin: {
     position: 'absolute',
     transform: [
-      { translateX: -HORIZONTAL_SPACE - DISTANCE_COIN_TO_BE_CENTER_ONLINE - 1 },
+      { translateX: -HORIZONTAL_SPACE - DISTANCE_COIN_TO_BE_CENTER_ONLINE + 1 },
       { translateY: 1 },
     ],
   },

@@ -80,6 +80,11 @@ const stones: Milestone[] = [
     status: Status.complete,
   },
   {
+    date: 'Dec 2018',
+    key: 'Wallet_in_market_testing_begins',
+    status: Status.complete,
+  },
+  {
     date: 'Aug 2018',
     key: 'First_user_research_trip',
     status: Status.complete,
