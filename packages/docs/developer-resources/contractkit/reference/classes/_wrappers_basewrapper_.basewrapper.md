@@ -42,6 +42,8 @@ Base ContractWrapper
 
   ↳ [StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)
 
+  ↳ [ReleaseGoldWrapper](_wrappers_releasegold_.releasegoldwrapper.md)
+
 ## Index
 
 ### Constructors

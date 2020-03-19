@@ -108,6 +108,9 @@
       },
       "validatorgroup": {
         "description": "View and manage Validator Groups"
+      },
+      "releasegold": {
+        "description": "View and manage Release Gold contracts"
       }
     },
     "bin": "celocli",
