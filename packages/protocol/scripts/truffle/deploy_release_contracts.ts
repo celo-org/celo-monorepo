@@ -1,9 +1,9 @@
 import {
-  _setInitialProxyImplementation,
   getDeployedProxiedContract,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
-import fs = require('fs')
+import chalk from 'chalk'
 import * as prompts from 'prompts'
 import {
   GoldTokenInstance,
@@ -13,6 +13,7 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 let argv: any
 let registry: any
@@ -39,7 +40,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     })
 
     if (!response.confirmation) {
-      console.info('Skipping grant due to user response')
+      console.info(chalk.yellow('Skipping grant due to user response'))
       return
     }
   }
@@ -117,6 +118,44 @@ async function handleJSONFile(err, data) {
     throw err
   }
   const grants = JSON.parse(data)
+
+  if (grants.length === 0) {
+    console.error(
+      chalk.red('Provided grants file ' + argv.grants + ' does not contain any grants.\nExiting.')
+    )
+    return
+  }
+
+  // Each grant type has a defined template - either they can validate and can't be revoked,
+  // or vice versa. Their distribution ratios and liquidity provisions should be the same.
+  // We check the first grant here and use that as a template for all grants
+  // to verify the grant file is uniformly typed to hopefully avoid user errors.
+  const template = {
+    revocable: grants[0].revocable,
+    canVote: grants[0].canVote,
+    canValidate: grants[0].canValidate,
+    subjectToLiquidityProvision: grants[0].subjectToLiquidityProvision,
+    initialDistributionRatio: grants[0].initialDistributionRatio,
+  }
+  if (!argv.yesreally) {
+    grants.map((grant) => {
+      if (
+        grant.revocable !== template.revocable ||
+        grant.canVote !== template.canVote ||
+        grant.canValidate !== template.canValidate ||
+        grant.subjectToLiquidityProvision !== template.subjectToLiquidityProvision ||
+        grant.initialDistributionRatio !== template.initialDistributionRatio
+      ) {
+        console.error(
+          chalk.red(
+            'Grants are not uniformly typed.\nWe expect all grants of a given JSON to have the same boolean values for `revocable`, `canVote`, `canValidate`, and `subjectToLiquidityProvision`, as well as having the same value for `initialDistributionRatio`.\nExiting'
+          )
+        )
+        process.exit(0)
+      }
+    })
+  }
+
   const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
     return sum + curr.amountReleasedPerPeriod
   }, 0)
@@ -137,7 +176,7 @@ async function handleJSONFile(err, data) {
     })
 
     if (!response.confirmation) {
-      console.info('Abandoning grant deployment.')
+      console.info(chalk.red('Abandoning grant deployment due to user response.'))
       process.exit(0)
     }
   }
@@ -146,6 +185,8 @@ async function handleJSONFile(err, data) {
     await handleGrant(releaseGoldConfig, currGrant)
     currGrant++
   }
+  // tslint:disable-next-line: no-console
+  console.log(chalk.green('Grants deployed successfully.'))
   if (argv.output_file) {
     fs.writeFile(argv.output_file, JSON.stringify(releases, null, 4), (writeError) => {
       if (writeError) {
