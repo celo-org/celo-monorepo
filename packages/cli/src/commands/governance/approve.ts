@@ -12,14 +12,13 @@ export default class Approve extends BaseCommand {
     proposalID: flags.string({ required: true, description: 'UUID of proposal to approve' }),
     from: Flags.address({ required: true, description: "Approver's address" }),
     useMultiSig: flags.boolean({
-      required: false,
       description: 'True means the request will be sent through multisig.',
     }),
   }
 
   static examples = [
     'approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
-    'approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig true',
+    'approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig',
   ]
 
   async run() {
@@ -29,8 +28,10 @@ export default class Approve extends BaseCommand {
     const id = res.flags.proposalID
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
-    const multiSigAddress = await governance.getApprover()
-    const governanceApproverMultiSig = await this.kit.contracts.getMultiSig(multiSigAddress)
+    const multiSigAddress = useMultiSig ? await governance.getApprover() : ''
+    const governanceApproverMultiSig = useMultiSig
+      ? await this.kit.contracts.getMultiSig(multiSigAddress)
+      : undefined
     const approver = useMultiSig ? multiSigAddress : account
 
     // in case target is queued
@@ -40,9 +41,12 @@ export default class Approve extends BaseCommand {
 
     await newCheckBuilder(this)
       .isApprover(approver)
-      .addCheck(
-        `${account} is not multisig signatory`,
-        async () => useMultiSig && !(await governanceApproverMultiSig.isowner(account))
+      .addConditionalCheck(
+        `${account} is multisig signatory`,
+        useMultiSig,
+        async () =>
+          governanceApproverMultiSig != undefined &&
+          (await governanceApproverMultiSig.isowner(account))
       )
       .proposalExists(id)
       .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
@@ -50,11 +54,13 @@ export default class Approve extends BaseCommand {
       .runChecks()
 
     const governanceTx = await governance.approve(id)
-    const multiSigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
-      governance.address,
-      governanceTx.txo
-    )
-    const tx = useMultiSig ? multiSigTx : governanceTx
-    await displaySendTx<any>('approveTx', tx, {}, 'ProposalApproved')
+    const tx =
+      governanceApproverMultiSig == undefined
+        ? governanceTx
+        : await governanceApproverMultiSig.submitOrConfirmTransaction(
+            governance.address,
+            governanceTx.txo
+          )
+    await displaySendTx<string | void | boolean>('approveTx', tx, {}, 'ProposalApproved')
   }
 }
