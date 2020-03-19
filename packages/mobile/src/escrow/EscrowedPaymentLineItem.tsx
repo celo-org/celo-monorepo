@@ -2,10 +2,11 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { Trans, WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { divideByWei, getCentAwareMoneyDisplay } from 'src/utils/formatting'
+import { divideByWei } from 'src/utils/formatting'
 
 interface Props {
   payment: EscrowedPayment
@@ -17,17 +18,20 @@ function EscrowedPaymentLineItem(props: Props & WithTranslation) {
     <Text numberOfLines={1} ellipsizeMode="middle" style={styles.oneLine}>
       <Trans
         i18nKey="escrowPaymentNotificationLine"
-        // @ts-ignore tOptions prop is missing in type bindings, but exists in the implementation
+        ns={Namespaces.inviteFlow11}
         tOptions={{ context: !recipientPhone ? 'missingRecipientPhone' : null }}
         values={{
-          amount:
-            CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol +
-            getCentAwareMoneyDisplay(divideByWei(amount.toString())),
           recipientPhone,
         }}
       >
         <Text style={styles.phone}>{{ recipientPhone }} for </Text>
-        <Text style={styles.amount}>{{ amount }}</Text>
+        <CurrencyDisplay
+          style={styles.amount}
+          amount={{
+            value: divideByWei(amount),
+            currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+          }}
+        />
       </Trans>
     </Text>
   )
@@ -40,7 +44,6 @@ const styles = StyleSheet.create({
   phone: fontStyles.subSmall,
   amount: {
     ...fontStyles.subSmall,
-    ...fontStyles.semiBold,
   },
 })
 

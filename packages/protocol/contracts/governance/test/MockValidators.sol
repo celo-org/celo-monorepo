@@ -1,14 +1,19 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 import "../interfaces/IValidators.sol";
 
 /**
  * @title Holds a list of addresses of validators
  */
 contract MockValidators is IValidators {
+  using SafeMath for uint256;
+
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   mapping(address => bool) public isValidator;
+  mapping(address => bool) public isValidatorGroup;
   mapping(address => uint256) private numGroupMembers;
   mapping(address => uint256) private lockedGoldRequirements;
   mapping(address => bool) private doesNotMeetAccountLockedGoldRequirements;
@@ -20,8 +25,19 @@ contract MockValidators is IValidators {
     return true;
   }
 
+  function updatePublicKeys(address, address, bytes calldata, bytes calldata, bytes calldata)
+    external
+    returns (bool)
+  {
+    return true;
+  }
+
   function setValidator(address account) external {
     isValidator[account] = true;
+  }
+
+  function setValidatorGroup(address group) external {
+    isValidatorGroup[group] = true;
   }
 
   function affiliate(address group) external returns (bool) {
@@ -72,7 +88,7 @@ contract MockValidators is IValidators {
   {
     require(n <= members[group].length);
     address[] memory validators = new address[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       validators[i] = members[group][i];
     }
     return validators;
@@ -80,7 +96,7 @@ contract MockValidators is IValidators {
 
   function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
     uint256[] memory numMembers = new uint256[](groups.length);
-    for (uint256 i = 0; i < groups.length; i++) {
+    for (uint256 i = 0; i < groups.length; i = i.add(1)) {
       numMembers[i] = getGroupNumMembers(groups[i]);
     }
     return numMembers;

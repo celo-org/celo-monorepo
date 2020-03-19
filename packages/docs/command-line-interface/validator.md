@@ -104,6 +104,7 @@ OPTIONS
   --blsSignature=0x                                  (required) BLS Proof-of-Possession
   --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
+  --yes                                              Answer yes to prompt
 
 EXAMPLE
   register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey
@@ -183,8 +184,6 @@ OPTIONS
 
   --lookback=lookback                                     [default: 100] how many blocks to look back for signer
                                                           activity
-
-  --no-truncate                                           Don't truncate fields to fit line
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
 

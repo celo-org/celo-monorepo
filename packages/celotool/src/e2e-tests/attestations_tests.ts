@@ -1,20 +1,56 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { assert } from 'chai'
-import { getContext, GethTestConfig, sleep } from './utils'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { getContext, sleep } from './utils'
 
 const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 const phoneNumber = '+15555555555'
 
+const TMP_PATH = '/tmp/e2e'
+
 describe('attestations tests', () => {
-  const gethConfig: GethTestConfig = {
+  const gethConfig: GethRunConfig = {
+    runPath: TMP_PATH,
+    networkId: 1101,
+    network: 'local',
     migrate: true,
     instances: [
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
-      { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
+      {
+        name: 'validator0',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      },
+      {
+        name: 'validator1',
+        validating: true,
+        syncmode: 'full',
+        port: 30305,
+        rpcport: 8547,
+      },
+      {
+        name: 'validator2',
+        validating: true,
+        syncmode: 'full',
+        port: 30307,
+        rpcport: 8549,
+      },
+      {
+        name: 'validator3',
+        validating: true,
+        syncmode: 'full',
+        port: 30309,
+        rpcport: 8551,
+      },
+      {
+        name: 'validator4',
+        validating: true,
+        syncmode: 'full',
+        port: 30311,
+        rpcport: 8553,
+      },
     ],
   }
 
@@ -27,7 +63,10 @@ describe('attestations tests', () => {
     await context.hooks.before()
   })
 
-  after(context.hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await context.hooks.after()
+  })
 
   const restart = async () => {
     await context.hooks.restart()

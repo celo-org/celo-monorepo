@@ -3,20 +3,17 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { PaymentRequestStatus } from 'src/account/types'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -24,7 +21,7 @@ interface OwnProps {
   amount: string
   comment: string
   id: string
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
+  declinePaymentRequest: typeof declinePaymentRequest
 }
 
 type Props = OwnProps & WithTranslation
@@ -33,7 +30,7 @@ const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
-    const { amount, comment: reason, requester: recipient } = this.props
+    const { id, amount, comment: reason, requester: recipient } = this.props
     navigate(Screens.SendConfirmation, {
       confirmationInput: {
         reason,
@@ -41,25 +38,15 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
         amount: new BigNumber(amount),
         recipientAddress: recipient.address,
         type: TokenTransactionType.PayRequest,
+        firebasePendingRequestUid: id,
       },
-      onConfirm: this.onPaymentSuccess,
-      onCancel: this.onPaymentDecline,
     })
-  }
-
-  onPaymentSuccess = () => {
-    const { id } = this.props
-    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.COMPLETED)
-    Logger.showMessage(this.props.t('requestPaid'))
-    CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
-    navigate(Screens.WalletHome)
   }
 
   onPaymentDecline = () => {
     const { id } = this.props
-    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.DECLINED)
+    this.props.declinePaymentRequest(id)
     Logger.showMessage(this.props.t('requestDeclined'))
-    CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
   }
 
   getCTA = () => {
@@ -76,10 +63,13 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
   }
 
   render() {
-    const { requester, t } = this.props
+    const { requester, id, t } = this.props
+    const name = requester.displayName
+
     return (
       <View style={styles.container}>
         <BaseNotification
+          testID={`IncomingPaymentRequestNotification/${id}`}
           icon={
             <ContactCircle
               size={AVATAR_SIZE}
@@ -90,11 +80,21 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
               <Image source={unknownUserIcon} style={styles.unknownUser} />
             </ContactCircle>
           }
-          title={t('incomingPaymentRequestNotificationTitle', {
-            name: requester.displayName,
-            amount:
-              CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
-          })}
+          title={
+            <Trans
+              i18nKey="incomingPaymentRequestNotificationTitle"
+              ns={Namespaces.paymentRequestFlow}
+              values={{ name }}
+            >
+              {{ name }} requested{' '}
+              <CurrencyDisplay
+                amount={{
+                  value: this.props.amount,
+                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                }}
+              />
+            </Trans>
+          }
           ctas={this.getCTA()}
           onPress={this.onPay}
         >

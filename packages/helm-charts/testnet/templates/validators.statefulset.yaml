@@ -28,7 +28,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Gi
+          storage: 2Gi
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
@@ -142,8 +142,7 @@ spec:
         - "-c"
         - |-
           set -euo pipefail
-          # For idempotency, don't delete the private key.
-          # rm /root/.celo/pkey
+          rm /root/.celo/pkey || true
 
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
@@ -186,6 +185,7 @@ spec:
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --metrics \
+            --allow-insecure-unlock \
             ${PING_IP_FROM_PACKET_FLAG} \
             ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
             ${PROXIED_FLAGS}

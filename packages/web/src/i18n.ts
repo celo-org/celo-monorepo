@@ -13,6 +13,7 @@ export interface I18nProps {
 export default NextI18NextInstance
 export const { appWithTranslation, withTranslation } = NextI18NextInstance
 export const withNamespaces = withTranslation
+export const useTranslation = NextI18NextInstance.useTranslation
 
 export enum NameSpaces {
   common = 'common',
@@ -21,6 +22,7 @@ export enum NameSpaces {
   brand = 'brand',
   codeofconduct = 'codeofconduct',
   community = 'community',
+  alliance = 'alliance',
   download = 'download',
   dev = 'dev',
   faucet = 'faucet',

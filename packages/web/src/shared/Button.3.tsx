@@ -2,7 +2,6 @@ import * as React from 'react'
 import { StyleSheet, Text, TextStyle, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
-import Link from 'src/shared/Link'
 import { colors, fonts, textStyles } from 'src/styles'
 
 export enum BTN {
@@ -117,10 +116,9 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
   }
 
   render() {
-    const { text, href, align, iconRight, iconLeft } = this.props
+    const { text, align, iconRight, iconLeft } = this.props
     const ButtonComponent = this.getButtonComponent()
     const renderedButton = (
-      // @ts-ignore
       <ButtonComponent status={this.getStatus()} {...this.props}>
         {iconLeft && <View style={baseStyles.iconLeft}>{iconLeft}</View>}
         {text}
@@ -138,7 +136,7 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
         <View
           style={[{ alignItems: align }, this.props.kind === BTN.INLINE && inlineStyle.container]}
         >
-          {href ? <Link href={href}>{renderedButton}</Link> : renderedButton}
+          {renderedButton}
         </View>
       </Hoverable>
     )
@@ -157,7 +155,7 @@ interface Props {
   kind?: BTN
   children: React.ReactNode
   size?: SIZE
-  style?: TextStyle
+  style?: TextStyle | TextStyle[]
   href?: string
   target?: string
   onDarkBackground?: boolean
@@ -342,6 +340,7 @@ function ButtonInline(props: Props) {
 const inlineStyle = StyleSheet.create({
   text: {
     cursor: 'pointer',
+    textDecorationStyle: 'solid',
     textDecorationLine: 'underline',
   },
   container: {

@@ -6,6 +6,7 @@ import {
   mineBlocks,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { normalizeAddressWith0x } from '@celo/utils/lib/address'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -894,118 +895,177 @@ contract('Election', (accounts: string[]) => {
       random.addTestRandomness((await web3.eth.getBlockNumber()) + 1, hash)
 
     beforeEach(async () => {
-      await mockValidators.setMembers(group1, [validator1, validator2, validator3, validator4])
-      await mockValidators.setMembers(group2, [validator5, validator6])
-      await mockValidators.setMembers(group3, [validator7])
-
-      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
-      await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
-      await election.markGroupEligible(group2, NULL_ADDRESS, group1)
-      await election.markGroupEligible(group3, NULL_ADDRESS, group2)
-      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-
-      for (const voter of [voter1, voter2, voter3]) {
-        await mockLockedGold.incrementNonvotingAccountBalance(voter.address, voter.weight)
-      }
-      await mockLockedGold.setTotalLockedGold(totalLockedGold)
-      await mockValidators.setNumRegisteredValidators(7)
-
       random = await MockRandom.new()
       await registry.setAddressFor(CeloContractName.Random, random.address)
     })
 
-    describe('when a single group has >= minElectableValidators as members and received votes', () => {
+    describe('when there is a large number of groups', () => {
+      const numbers: any = {}
       beforeEach(async () => {
-        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
-      })
+        await mockLockedGold.setTotalLockedGold(new BigNumber(1e25))
+        await mockValidators.setNumRegisteredValidators(400)
+        await mockLockedGold.incrementNonvotingAccountBalance(voter1.address, new BigNumber(1e25))
+        await election.setElectabilityThreshold(0)
+        await election.setElectableValidators(10, 100)
 
-      it("should return that group's member list", async () => {
-        await setRandomness(hash1)
-        assertSameAddresses(await election.electValidatorSigners(), [
-          validator1,
-          validator2,
-          validator3,
-          validator4,
-        ])
+        await election.setMaxNumGroupsVotedFor(200)
+        let prev = NULL_ADDRESS
+        let randomVotes = []
+        for (let i = 0; i < 100; i++) {
+          randomVotes.push(Math.floor(Math.random() * 1e14))
+        }
+        const pad = (a: string) => {
+          let res = a
+          while (res.length < 42) {
+            res = res + 'f'
+          }
+          return res
+        }
+        randomVotes = randomVotes.sort((a, b) => b - a)
+        for (let i = 0; i < 100; i++) {
+          await mockValidators.setMembers(pad('0x00' + i), [
+            pad('0x1a' + i),
+            pad('0x2a' + i),
+            pad('0x3a' + i),
+            pad('0x4a' + i),
+          ])
+          numbers[pad('0x1a' + i)] = randomVotes[i]
+          numbers[pad('0x2a' + i)] = randomVotes[i] / 2
+          numbers[pad('0x3a' + i)] = randomVotes[i] / 3
+          numbers[pad('0x4a' + i)] = randomVotes[i] / 4
+          await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+          await election.markGroupEligible(pad('0x00' + i), NULL_ADDRESS, prev)
+          await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+          await election.vote(pad('0x00' + i), randomVotes[i], NULL_ADDRESS, prev, {
+            from: voter1.address,
+          })
+          prev = pad('0x00' + i)
+        }
+      })
+      it('can elect correct validators', async () => {
+        const lst = await election.electValidatorSigners()
+        const smallest = lst
+          .map(normalizeAddressWith0x)
+          .map((a) => numbers[a])
+          .sort((a, b) => a - b)[0]
+        // TODO fix types
+        const number100th = (Object as any).values(numbers).sort((a: any, b: any) => b - a)[99]
+        assert.equal(smallest, number100th)
       })
     })
 
-    describe("when > maxElectableValidators members' groups receive votes", () => {
+    describe('when there are some groups', () => {
       beforeEach(async () => {
-        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
-        await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
-        await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        await mockValidators.setMembers(group1, [validator1, validator2, validator3, validator4])
+        await mockValidators.setMembers(group2, [validator5, validator6])
+        await mockValidators.setMembers(group3, [validator7])
+
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
+        await election.markGroupEligible(group2, NULL_ADDRESS, group1)
+        await election.markGroupEligible(group3, NULL_ADDRESS, group2)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+
+        for (const voter of [voter1, voter2, voter3]) {
+          await mockLockedGold.incrementNonvotingAccountBalance(voter.address, voter.weight)
+        }
+        await mockLockedGold.setTotalLockedGold(totalLockedGold)
+        await mockValidators.setNumRegisteredValidators(7)
       })
 
-      it('should return maxElectableValidators elected validators', async () => {
-        await setRandomness(hash1)
-        assertSameAddresses(await election.electValidatorSigners(), [
-          validator1,
-          validator2,
-          validator3,
-          validator5,
-          validator6,
-          validator7,
-        ])
-      })
-    })
+      describe('when a single group has >= minElectableValidators as members and received votes', () => {
+        beforeEach(async () => {
+          await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
+        })
 
-    describe('when a group receives enough votes for > n seats but only has n members', () => {
-      beforeEach(async () => {
-        // By incrementing the total votes by 80, we allow group3 to receive 80 votes from voter3.
-        const increment = 80
-        const votes = 80
-        await mockLockedGold.incrementNonvotingAccountBalance(voter3.address, increment)
-        await mockLockedGold.setTotalLockedGold(totalLockedGold + increment)
-        await election.vote(group3, votes, group2, NULL_ADDRESS, { from: voter3.address })
-        await election.vote(group1, voter1.weight, NULL_ADDRESS, group3, { from: voter1.address })
-        await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
+        it("should return that group's member list", async () => {
+          await setRandomness(hash1)
+          assertSameAddresses(await election.electValidatorSigners(), [
+            validator1,
+            validator2,
+            validator3,
+            validator4,
+          ])
+        })
       })
 
-      it('should elect only n members from that group', async () => {
-        await setRandomness(hash1)
-        assertSameAddresses(await election.electValidatorSigners(), [
-          validator7,
-          validator1,
-          validator2,
-          validator3,
-          validator5,
-          validator6,
-        ])
-      })
-    })
+      describe("when > maxElectableValidators members' groups receive votes", () => {
+        beforeEach(async () => {
+          await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
+          await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
+          await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        })
 
-    describe('when a group does not receive `electabilityThresholdVotes', () => {
-      beforeEach(async () => {
-        const thresholdExcludingGroup3 = (voter3.weight + 1) / totalLockedGold
-        await election.setElectabilityThreshold(toFixed(thresholdExcludingGroup3))
-        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
-        await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
-        await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        it('should return maxElectableValidators elected validators', async () => {
+          await setRandomness(hash1)
+          assertSameAddresses(await election.electValidatorSigners(), [
+            validator1,
+            validator2,
+            validator3,
+            validator5,
+            validator6,
+            validator7,
+          ])
+        })
       })
 
-      it('should not elect any members from that group', async () => {
-        await setRandomness(hash1)
-        assertSameAddresses(await election.electValidatorSigners(), [
-          validator1,
-          validator2,
-          validator3,
-          validator4,
-          validator5,
-          validator6,
-        ])
-      })
-    })
+      describe('when a group receives enough votes for > n seats but only has n members', () => {
+        beforeEach(async () => {
+          // By incrementing the total votes by 80, we allow group3 to receive 80 votes from voter3.
+          const increment = 80
+          const votes = 80
+          await mockLockedGold.incrementNonvotingAccountBalance(voter3.address, increment)
+          await mockLockedGold.setTotalLockedGold(totalLockedGold + increment)
+          await election.vote(group3, votes, group2, NULL_ADDRESS, { from: voter3.address })
+          await election.vote(group1, voter1.weight, NULL_ADDRESS, group3, { from: voter1.address })
+          await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
+        })
 
-    describe('when there are not enough electable validators', () => {
-      beforeEach(async () => {
-        await election.vote(group2, voter2.weight, group1, NULL_ADDRESS, { from: voter2.address })
-        await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        it('should elect only n members from that group', async () => {
+          await setRandomness(hash1)
+          assertSameAddresses(await election.electValidatorSigners(), [
+            validator7,
+            validator1,
+            validator2,
+            validator3,
+            validator5,
+            validator6,
+          ])
+        })
       })
 
-      it('should revert', async () => {
-        await setRandomness(hash1)
-        await assertRevert(election.electValidatorSigners())
+      describe('when a group does not receive `electabilityThresholdVotes', () => {
+        beforeEach(async () => {
+          const thresholdExcludingGroup3 = (voter3.weight + 1) / totalLockedGold
+          await election.setElectabilityThreshold(toFixed(thresholdExcludingGroup3))
+          await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
+          await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
+          await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        })
+
+        it('should not elect any members from that group', async () => {
+          await setRandomness(hash1)
+          assertSameAddresses(await election.electValidatorSigners(), [
+            validator1,
+            validator2,
+            validator3,
+            validator4,
+            validator5,
+            validator6,
+          ])
+        })
+      })
+
+      describe('when there are not enough electable validators', () => {
+        beforeEach(async () => {
+          await election.vote(group2, voter2.weight, group1, NULL_ADDRESS, { from: voter2.address })
+          await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        })
+
+        it('should revert', async () => {
+          await setRandomness(hash1)
+          await assertRevert(election.electValidatorSigners())
+        })
       })
     })
   })

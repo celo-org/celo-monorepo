@@ -5,6 +5,7 @@ import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
+import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
@@ -37,8 +38,9 @@ async function failIfSecretMissing(secretName: string, namespace: string) {
 
 async function copySecret(secretName: string, srcNamespace: string, destNamespace: string) {
   console.info(`Copying secret ${secretName} from namespace ${srcNamespace} to ${destNamespace}`)
-  await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} --export -o yaml |\
-  kubectl apply --namespace=${destNamespace} -f -`)
+  await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} -o yaml |\
+  grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid |\
+  sed 's/default/${destNamespace}/' | kubectl apply --namespace=${destNamespace} -f -`)
 }
 
 export async function createCloudSQLInstance(celoEnv: string, instanceName: string) {
@@ -67,7 +69,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 
   try {
     await execCmd(
-      `gcloud sql instances create ${instanceName} --gce-zone ${fetchEnv(
+      `gcloud sql instances create ${instanceName} --zone ${fetchEnv(
         envVar.KUBERNETES_CLUSTER_ZONE
       )} --database-version POSTGRES_9_6 --cpu 1 --memory 4G`
     )
@@ -79,7 +81,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   if (envType !== EnvTypes.DEVELOPMENT) {
     try {
       await execCmdWithExitOnFailure(
-        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --gce-zone ${fetchEnv(
+        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --zone ${fetchEnv(
           envVar.KUBERNETES_CLUSTER_ZONE
         )}`
       )
@@ -253,27 +255,36 @@ export async function installAndEnableMetricsDeps() {
   }
 }
 
-export async function grantRoles(
-  serviceAccountName: string,
-  role: string
-): Promise<[string, string]> {
+export async function grantRoles(serviceAccountName: string, role: string) {
   const projectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
 
   const serviceAccountFullName = `${serviceAccountName}@${projectName}.iam.gserviceaccount.com`
-  const cmd =
-    `gcloud projects add-iam-policy-binding ${projectName} ` +
-    `--role=${role} ` +
-    `--member=serviceAccount:${serviceAccountFullName}`
-  return execCmd(cmd)
+  const commandRolesAlreadyGranted = `gcloud projects get-iam-policy ${projectName}  \
+  --flatten="bindings[].members" \
+  --format='table(bindings.role)' \
+  --filter="bindings.members:serviceAccount:${serviceAccountFullName}"`
+  const rolesAlreadyGranted = await outputIncludes(
+    commandRolesAlreadyGranted,
+    role,
+    `Role ${role} already granted for account ${serviceAccountFullName}, skipping binding`
+  )
+  if (!rolesAlreadyGranted) {
+    const cmd =
+      `gcloud projects add-iam-policy-binding ${projectName} ` +
+      `--role=${role} ` +
+      `--member=serviceAccount:${serviceAccountFullName}`
+    await execCmd(cmd)
+  }
+  return
 }
 
 export async function retrieveCloudSQLConnectionInfo(celoEnv: string, instanceName: string) {
   await validateExistingCloudSQLInstance(instanceName)
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout --export -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout --export -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -522,7 +533,7 @@ async function helmIPParameters(celoEnv: string) {
   return ipAddressParameters
 }
 
-async function helmParameters(celoEnv: string) {
+async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   const bucketName = isProduction() ? 'contract_artifacts_production' : 'contract_artifacts'
   const productionTagOverrides = isProduction()
     ? [
@@ -531,12 +542,16 @@ async function helmParameters(celoEnv: string) {
       ]
     : []
 
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.node.cpu_request=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
     `--set geth.node.memory_request=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
-    `--set geth.genesisFile=${Buffer.from(generateGenesisFromEnv()).toString('base64')}`,
+    `--set geth.genesisFile=${Buffer.from(genesisContent).toString('base64')}`,
     `--set geth.genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.image.repository=${fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
@@ -633,25 +648,25 @@ export async function removeGenericHelmChart(releaseName: string) {
   }
 }
 
-export async function installHelmChart(celoEnv: string) {
+export async function installHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
   await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   return installGenericHelmChart(
     celoEnv,
     celoEnv,
     '../helm-charts/testnet',
-    await helmParameters(celoEnv)
+    await helmParameters(celoEnv, useExistingGenesis)
   )
 }
 
-export async function upgradeHelmChart(celoEnv: string) {
+export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   console.info(`Upgrading helm release ${celoEnv}`)
-  const parameters = await helmParameters(celoEnv)
+  const parameters = await helmParameters(celoEnv, useExistingGenesis)
   await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
   console.info(`Helm release ${celoEnv} upgrade successful`)
 }
 
-export async function resetAndUpgradeHelmChart(celoEnv: string) {
+export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
   const bootnodeName = `${celoEnv}-bootnode`
@@ -667,7 +682,7 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   await deletePersistentVolumeClaims(celoEnv)
   await sleep(10000)
 
-  await upgradeHelmChart(celoEnv)
+  await upgradeHelmChart(celoEnv, useExistingGenesis)
   await sleep(10000)
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)

@@ -31,7 +31,7 @@ export default class Privacy extends React.Component {
         </GridRow>
         <GridRow>
           <Cell span={Spans.fourth}>
-            <Text style={fonts.h6}>Valid as of Jan 7, 2019</Text>
+            <Text style={fonts.h6}>Valid as of Feb 24, 2020</Text>
           </Cell>
           <Cell span={Spans.three4th}>
             <P>
@@ -214,6 +214,11 @@ export default class Privacy extends React.Component {
               <TD>Mixpanel</TD>
               <TD>Site Visitor Analytics</TD>
               <TD>United States</TD>
+            </TR>
+            <TR>
+              <TD>ipstack</TD>
+              <TD>IP Address Geolocation</TD>
+              <TD>Austria</TD>
             </TR>
           </TABLE>
         </SideTitledSection>

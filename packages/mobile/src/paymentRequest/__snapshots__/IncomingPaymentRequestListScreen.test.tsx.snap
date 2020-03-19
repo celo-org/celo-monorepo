@@ -172,21 +172,39 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                     <Text
                       style={
                         Object {
-                          "color": "#81868B",
-                          "fontFamily": "Hind-Regular",
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
                           "fontSize": 14,
                           "lineHeight": 18,
                         }
                       }
+                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      incomingPaymentRequestNotificationTitle
+                      +1555-867-5309
+                       requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        26.60
+                      </Text>
                     </Text>
                     <View
                       style={
                         Object {
                           "justifyContent": "space-between",
                           "minHeight": 60,
-                          "paddingTop": 8,
+                          "paddingTop": 2,
                         }
                       }
                     >
@@ -206,7 +224,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         style={
                           Object {
                             "flexDirection": "row",
-                            "marginTop": 5,
+                            "marginTop": 12,
                           }
                         }
                       >
@@ -414,21 +432,39 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                     <Text
                       style={
                         Object {
-                          "color": "#81868B",
-                          "fontFamily": "Hind-Regular",
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
                           "fontSize": 14,
                           "lineHeight": 18,
                         }
                       }
+                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      incomingPaymentRequestNotificationTitle
+                      +14155550000
+                       requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        135.66
+                      </Text>
                     </Text>
                     <View
                       style={
                         Object {
                           "justifyContent": "space-between",
                           "minHeight": 60,
-                          "paddingTop": 8,
+                          "paddingTop": 2,
                         }
                       }
                     >
@@ -448,7 +484,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         style={
                           Object {
                             "flexDirection": "row",
-                            "marginTop": 5,
+                            "marginTop": 12,
                           }
                         }
                       >
@@ -656,21 +692,39 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                     <Text
                       style={
                         Object {
-                          "color": "#81868B",
-                          "fontFamily": "Hind-Regular",
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
                           "fontSize": 14,
                           "lineHeight": 18,
                         }
                       }
+                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      incomingPaymentRequestNotificationTitle
+                      +14155550000
+                       requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        1.33
+                      </Text>
                     </Text>
                     <View
                       style={
                         Object {
                           "justifyContent": "space-between",
                           "minHeight": 60,
-                          "paddingTop": 8,
+                          "paddingTop": 2,
                         }
                       }
                     >
@@ -690,7 +744,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         style={
                           Object {
                             "flexDirection": "row",
-                            "marginTop": 5,
+                            "marginTop": 12,
                           }
                         }
                       >

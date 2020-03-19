@@ -63,6 +63,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                 "opacity": 1,
               }
             }
+            testID="ExchangeSwitchInput"
           >
             <Text
               style={
@@ -103,6 +104,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               "textAlign": "right",
             }
           }
+          testID="ExchangeInput"
           underlineColorAndroid="transparent"
           value=""
         />
@@ -113,6 +115,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             "borderStyle": "solid",
             "borderTopColor": "#EEEEEE",
             "borderTopWidth": 1,
+            "marginBottom": 15,
             "marginTop": 10,
             "width": "100%",
           }
@@ -120,35 +123,98 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
       />
       <View
         style={
-          Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "marginTop": 16,
-          }
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            undefined,
+          ]
         }
       >
-        <Text
+        <View
           style={
             Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 15,
-              "fontWeight": "600",
-              "lineHeight": 20,
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
             }
           }
         >
-          inputSubtotal
-        </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 15,
+                  "fontWeight": "600",
+                  "lineHeight": 20,
+                },
+              ]
+            }
+          >
+            Subtotal (@
+             
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              12.09
+            </Text>
+            )
+          </Text>
+        </View>
         <Text
           style={
-            Object {
-              "fontFamily": "Hind-Regular",
-              "marginLeft": 10,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 15,
+                "lineHeight": 24,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Bold",
+                "fontSize": 15,
+                "fontWeight": "600",
+                "lineHeight": 20,
+              },
+            ]
           }
         >
-          $0.00
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            $
+            0.00
+          </Text>
         </Text>
       </View>
     </View>
@@ -213,6 +279,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             },
           ]
         }
+        testID="ExchangeReviewButton"
       >
         <View
           style={

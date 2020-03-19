@@ -7,14 +7,13 @@ import { keccak256 } from 'ethereumjs-util'
 import {
   ProxyInstance,
   RegistryInstance,
-  ReserveInstance,
   UsingRegistryInstance,
 } from 'types'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
@@ -38,23 +37,27 @@ export function assertContainSubset(superset: any, subset: any) {
 
 export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
-    web3.currentProvider.send(
-      {
-        jsonrpc: '2.0',
-        method,
-        params,
-        // salt id generation, milliseconds might not be
-        // enough to generate unique ids
-        id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
-      },
-      // @ts-ignore
-      (err: any, result: any) => {
-        if (err) {
-          return reject(err)
+    if (typeof web3.currentProvider !== 'string') {
+      web3.currentProvider.send(
+        {
+          jsonrpc: '2.0',
+          method,
+          params,
+          // salt id generation, milliseconds might not be
+          // enough to generate unique ids
+          id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
+        },
+        // @ts-ignore
+        (err: any, result: any) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(result)
         }
-        return resolve(result)
-      }
-    )
+      )
+    } else {
+      reject(new Error('Invalid Provider'))
+    }
   })
 }
 
@@ -71,13 +74,28 @@ export async function mineBlocks(blocks: number, web3: Web3) {
 
 export async function currentEpochNumber(web3) {
   const blockNumber = await web3.eth.getBlockNumber()
-  return Math.floor((blockNumber - 1) / EPOCH)
+  // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+  const epochNumber = Math.floor(blockNumber / EPOCH)
+  if (blockNumber % EPOCH === 0) {
+    return epochNumber
+  } else {
+    return epochNumber + 1
+  }
+}
+
+// Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+export function getFirstBlockNumberForEpoch(epochNumber: number) {
+  if (epochNumber === 0) {
+    // No first block for epoch 0
+    return 0
+  }
+  return (epochNumber - 1) * EPOCH + 1
 }
 
 export async function mineToNextEpoch(web3) {
   const blockNumber = await web3.eth.getBlockNumber()
   const epochNumber = await currentEpochNumber(web3)
-  const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+  const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
   await mineBlocks(blocksUntilNextEpoch, web3)
 }
 
@@ -293,11 +311,6 @@ export function assertGteBN(
     `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
       ''}`
   )
-}
-
-export const getReserveBalance = async (web3: Web3, getContract: any): Promise<string> => {
-  const reserve: ReserveInstance = await getContract('Reserve', 'proxiedContract')
-  return (await web3.eth.getBalance(reserve.address)).toString()
 }
 
 export const isSameAddress = (minerAddress, otherAddress) => {

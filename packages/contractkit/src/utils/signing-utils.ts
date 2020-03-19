@@ -1,9 +1,9 @@
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
+import { EncodedTransaction, Tx } from 'web3-core'
 // @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
-import { CeloTx } from './tx-signing'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -28,8 +28,8 @@ function makeEven(hex: string) {
   return hex
 }
 
-export async function signTransaction(txn: any, privateKey: string) {
-  let result: any
+export async function signTransaction(txn: any, privateKey: string): Promise<EncodedTransaction> {
+  let result: EncodedTransaction
 
   if (!txn) {
     throw new Error('No transaction object given!')
@@ -91,12 +91,21 @@ export async function signTransaction(txn: any, privateKey: string) {
       const rawTransaction = RLP.encode(rawTx)
 
       const values = RLP.decode(rawTransaction)
+
       result = {
-        messageHash: hash,
-        v: trimLeadingZero(values[9]),
-        r: trimLeadingZero(values[10]),
-        s: trimLeadingZero(values[11]),
-        rawTransaction,
+        tx: {
+          nonce: transaction.nonce,
+          gasPrice: transaction.gasPrice,
+          gas: transaction.gas,
+          to: transaction.to,
+          value: transaction.value,
+          input: transaction.input,
+          v: trimLeadingZero(values[9]),
+          r: trimLeadingZero(values[10]),
+          s: trimLeadingZero(values[11]),
+          hash,
+        },
+        raw: rawTransaction,
       }
     } catch (e) {
       throw e
@@ -128,10 +137,13 @@ export async function signTransaction(txn: any, privateKey: string) {
 
 // Recover transaction and sender address from a raw transaction.
 // This is used for testing.
-export function recoverTransaction(rawTx: string): [CeloTx, string] {
+export function recoverTransaction(rawTx: string): [Tx, string] {
   const rawValues = RLP.decode(rawTx)
   debug('signing-utils@recoverTransaction: values are %s', rawValues)
-  const celoTx: CeloTx = {
+  const recovery = Bytes.toNumber(rawValues[9])
+  // tslint:disable-next-line:no-bitwise
+  const chainId = Bytes.fromNumber((recovery - 35) >> 1)
+  const celoTx: Tx = {
     nonce: rawValues[0].toLowerCase() === '0x' ? 0 : parseInt(rawValues[0], 16),
     gasPrice: rawValues[1].toLowerCase() === '0x' ? 0 : parseInt(rawValues[1], 16),
     gas: rawValues[2].toLowerCase() === '0x' ? 0 : parseInt(rawValues[2], 16),
@@ -141,12 +153,10 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
     to: rawValues[6],
     value: rawValues[7],
     data: rawValues[8],
-    chainId: rawValues[9],
+    chainId,
   }
   const signature = Account.encodeSignature(rawValues.slice(9, 12))
-  const recovery = Bytes.toNumber(rawValues[9])
-  // tslint:disable-next-line:no-bitwise
-  const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']
+  const extraData = recovery < 35 ? [] : [chainId, '0x', '0x']
   const signingData = rawValues.slice(0, 9).concat(extraData)
   const signingDataHex = RLP.encode(signingData)
   const signer = Account.recover(Hash.keccak256(signingDataHex), signature)

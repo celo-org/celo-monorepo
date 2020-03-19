@@ -217,10 +217,12 @@ exports[`UserAgreement renders 1`] = `
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -263,10 +265,12 @@ You understand that you are participating in a test, and that the Celo Services 
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -314,10 +318,12 @@ The Company reserves the right in its sole and absolute discretion to terminate 
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >

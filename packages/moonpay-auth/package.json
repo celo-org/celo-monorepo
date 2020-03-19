@@ -1,0 +1,27 @@
+{
+  "name": "celo-moonpay-auth",
+  "version": "1.0.0",
+  "description": "Signs Moonpay requests with private api key",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "serve": "firebase serve --only functions",
+    "copy-env-to-firebase": "firebase functions:config:set envs.public_key=$(grep PUBLIC_KEY .env | cut -d '=' -f 2-) envs.private_key=$(grep PRIVATE_KEY .env | cut -d '=' -f 2-)",
+    "predeploy": "yarn copy-env-to-firebase",
+    "deploy": "firebase deploy --only functions",
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint --project ."
+  },
+  "dependencies": {
+    "firebase-admin": "^8.9.2",
+    "firebase-functions": "^3.3.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^0.1.6"
+  },
+  "engines": {
+    "node": "10"
+  }
+}

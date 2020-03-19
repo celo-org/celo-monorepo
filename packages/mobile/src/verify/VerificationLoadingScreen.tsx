@@ -20,7 +20,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import VerificationFailedModal from 'src/verify/VerificationFailedModal'
+import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 
 const TAG = 'VerificationLoadingScreen'
 
@@ -99,21 +99,26 @@ class VerificationLoadingScreen extends React.Component<Props> {
     ]
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.buttonCancelContainer}>
-          <CancelButton onCancel={this.onCancel} />
-        </View>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
-          <View style={styles.statusContainer}>
-            <LoadingSpinner />
-            <Text style={styles.textPhoneNumber}>
-              {t('loading.verifyingNumber', { number: e164Number })}
-            </Text>
-            <Text style={styles.textOpenTip}>{t('loading.keepOpen')}</Text>
+        <View style={styles.innerContainer}>
+          <View style={styles.buttonCancelContainer}>
+            <CancelButton onCancel={this.onCancel} />
           </View>
-          <Carousel containerStyle={styles.carouselContainer} items={items} />
-        </ScrollView>
-        <VerificationFailedModal isVisible={verificationStatus === VerificationStatus.Failed} />
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
+            <View style={styles.statusContainer}>
+              <LoadingSpinner />
+              <Text style={styles.textPhoneNumber}>
+                {t('loading.verifyingNumber', { number: e164Number })}
+              </Text>
+              <Text style={styles.textOpenTip}>{t('loading.keepOpen')}</Text>
+            </View>
+            <Carousel containerStyle={styles.carouselContainer} items={items} />
+          </ScrollView>
+        </View>
+        <VerificationFailedModal
+          verificationStatus={verificationStatus}
+          cancelVerification={this.props.cancelVerification}
+        />
       </SafeAreaView>
     )
   }
@@ -122,21 +127,24 @@ class VerificationLoadingScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
     backgroundColor: colors.backgroundDarker,
   },
-  scrollContainer: {
+  innerContainer: {
     flex: 1,
-    paddingTop: 30,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   buttonCancelContainer: {
+    position: 'absolute',
     left: 5,
   },
   statusContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 46,
   },
   textPhoneNumber: {
     ...fontStyles.body,
@@ -148,7 +156,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   carouselContainer: {
-    marginVertical: 20,
+    paddingVertical: 20,
   },
 })
 

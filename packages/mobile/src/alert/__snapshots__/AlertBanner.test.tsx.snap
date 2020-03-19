@@ -39,7 +39,8 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
     <View
       style={
         Object {
-          "marginHorizontal": 5,
+          "marginLeft": 5,
+          "marginRight": 8,
         }
       }
       testID="ErrorIcon"

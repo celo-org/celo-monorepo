@@ -16,13 +16,18 @@ import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
 import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
+import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import Invite from 'src/account/Invite'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
+import Security from 'src/account/Security'
+import Support from 'src/account/Support'
+import SupportContact from 'src/account/SupportContact'
 import AppLoading from 'src/app/AppLoading'
+import Background from 'src/app/Background'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -103,6 +108,7 @@ export const commonScreens = {
   [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
   [Screens.Debug]: { screen: Debug },
   [Screens.DataSaver]: { screen: DataSaver },
+  [Screens.Background]: { screen: Background },
 }
 
 const verificationScreens = {
@@ -253,6 +259,7 @@ const SettingsStack = createStackNavigator(
     [Screens.Account]: { screen: Account },
     [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Language]: { screen: Language },
+    [Screens.Security]: { screen: Security },
     [Screens.Analytics]: { screen: Analytics },
     [Screens.DataSaver]: { screen: DataSaver },
     [Screens.EditProfile]: { screen: EditProfile },
@@ -261,6 +268,9 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+    [Screens.Support]: { screen: Support },
+    [Screens.SupportContact]: { screen: SupportContact },
+    [Screens.FiatExchange]: { screen: FiatExchange },
     ...verificationScreens,
   },
   {
@@ -306,12 +316,12 @@ const AppStack = createStackNavigator(
 
 const AppNavigator = createSwitchNavigator(
   {
-    AppLoading,
+    [Screens.AppLoading]: AppLoading,
     [Stacks.NuxStack]: NuxStack,
     [Stacks.AppStack]: AppStack,
   },
   {
-    initialRouteName: 'AppLoading',
+    initialRouteName: Screens.AppLoading,
   }
 )
 

@@ -9,11 +9,10 @@ import { eqAddress } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
-import { TxPromises } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -32,7 +31,7 @@ import {
 } from 'src/identity/actions'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
-import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
+import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { contractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -50,7 +49,8 @@ export enum VerificationStatus {
   GettingStatus = 2,
   RequestingAttestations = 3,
   RevealingNumber = 4,
-  Done = 5,
+  RevealAttemptFailed = 5,
+  Done = 6,
 }
 
 export enum CodeInputType {
@@ -356,14 +356,7 @@ function* requestAttestations(
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(e164Number)
 
-  const txPromises: TxPromises = yield call(
-    sendTransactionPromises,
-    selectIssuersTx.txo,
-    account,
-    TAG,
-    'Select Issuer'
-  )
-  yield txPromises.receipt
+  yield call(sendTransaction, selectIssuersTx.txo, account, TAG, 'Select Issuer')
 
   CeloAnalytics.track(CustomEventNames.verification_requested_attestations)
 }
@@ -470,21 +463,8 @@ function* revealAndCompleteAttestation(
   attestation: ActionableAttestation
 ) {
   const issuer = attestation.issuer
-  Logger.debug(TAG + '@revealAttestation', `Revealing an attestation for issuer: ${issuer}`)
-  CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
 
-  const response = yield call(
-    [attestationsWrapper, attestationsWrapper.revealPhoneNumberToIssuer],
-    e164Number,
-    account,
-    attestation.issuer,
-    attestation.attestationServiceURL
-  )
-  if (!response.ok) {
-    throw new Error(
-      `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
-    )
-  }
+  yield call(tryRevealPhoneNumber, attestationsWrapper, account, e164Number, attestation)
 
   const code: AttestationCode = yield call(waitForAttestationCode, issuer)
 
@@ -505,6 +485,41 @@ function* revealAndCompleteAttestation(
 
   yield put(completeAttestationCode())
   Logger.debug(TAG + '@revealAttestation', `Attestation for issuer ${issuer} completed`)
+}
+
+function* tryRevealPhoneNumber(
+  attestationsWrapper: AttestationsWrapper,
+  account: string,
+  e164Number: string,
+  attestation: ActionableAttestation
+) {
+  const issuer = attestation.issuer
+  Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
+  CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
+
+  try {
+    const response = yield call(
+      [attestationsWrapper, attestationsWrapper.revealPhoneNumberToIssuer],
+      e164Number,
+      account,
+      attestation.issuer,
+      attestation.attestationServiceURL
+    )
+    if (!response.ok) {
+      throw new Error(
+        `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
+      )
+    }
+
+    Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
+  } catch (error) {
+    // This is considered a recoverable error because the user may have received the code in a previous run
+    // So instead of propagating the error, we catch it just update status. This will trigger the modal,
+    // allowing the user to enter codes manually or skip verification.
+    Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal for issuer ${issuer} failed`, error)
+    yield put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
+    yield put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
+  }
 }
 
 // Get the code from the store if it's already there, otherwise wait for it

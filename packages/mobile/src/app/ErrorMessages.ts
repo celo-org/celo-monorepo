@@ -1,5 +1,6 @@
 export enum ErrorMessages {
   TRANSACTION_FAILED = 'transactionFailed',
+  TRANSACTION_TIMEOUT = 'transactionTimeout',
   EXCHANGE_FAILED = 'exchangeFailed',
   INVALID_INVITATION = 'invalidInvite',
   INCORRECT_PIN = 'incorrectPin',
@@ -18,6 +19,7 @@ export enum ErrorMessages {
   EMPTY_ATTESTATION_CODE = 'nuxVerification2:emptyVerificationCode',
   INVALID_ATTESTATION_CODE = 'nuxVerification2:invalidVerificationCode',
   REPEAT_ATTESTATION_CODE = 'nuxVerification2:repeatVerificationCode',
+  REVEAL_ATTESTATION_FAILURE = 'nuxVerification2:revealAttestationFailure',
   VERIFICATION_FAILURE = 'nuxVerification2:verificationFailure',
   VERIFICATION_TIMEOUT = 'nuxVerification2:verificationTimeout',
   INVALID_ACCOUNT = 'invalidAccount',
@@ -25,6 +27,7 @@ export enum ErrorMessages {
   CAN_NOT_REQUEST_FROM_UNVERIFIED = 'canNotRequestFromUnverified',
   REFRESH_FAILED = 'refreshFailedUnexpectedly',
   INVITE_FAILED = 'inviteFailed',
+  INVITE_OPEN_APP_FAILED = 'inviteOpenAppFailed',
   SEND_PAYMENT_FAILED = 'sendPaymentFailed',
   PAYMENT_REQUEST_FAILED = 'paymentRequestFailed',
   ESCROW_TRANSFER_FAILED = 'escrowTransferFailed',

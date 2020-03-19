@@ -5,14 +5,12 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
-import { getReclaimableEscrowPayments } from 'src/escrow/saga'
-import { updatePaymentRequestStatus } from 'src/firebase/actions'
+import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
-  useBalanceInNavigationParam,
 } from 'src/notifications/NotificationList'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -25,13 +23,12 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  updatePaymentRequestStatus: typeof updatePaymentRequestStatus
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
-  sentEscrowedPayments: getReclaimableEscrowPayments(state.escrow.sentEscrowedPayments),
+  sentEscrowedPayments: getReclaimableEscrowPayments(state),
   recipientCache: recipientCacheSelector(state),
 })
 
@@ -46,8 +43,6 @@ export const listItemRenderer = (payment: EscrowedPayment, key: number | undefin
 }
 
 const EscrowedPaymentListScreen = (props: Props) => {
-  const { dollarBalance, navigation } = props
-  useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList
       items={props.sentEscrowedPayments}
@@ -62,6 +57,5 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
 )
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  updatePaymentRequestStatus,
   fetchPhoneAddresses,
 })(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))
