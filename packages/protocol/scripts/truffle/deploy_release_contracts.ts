@@ -77,7 +77,6 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
   }
-  console.info('ReleaseSTarttime', releaseStartTime)
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,
