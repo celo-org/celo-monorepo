@@ -68,7 +68,6 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 2`] = `
         "flex": 1,
         "fontFamily": "Hind-Regular",
         "padding": 8,
-        "textAlignVertical": "top",
       }
     }
     underlineColorAndroid="transparent"

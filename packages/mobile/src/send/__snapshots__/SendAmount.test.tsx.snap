@@ -277,7 +277,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "flex": 1,
                 "fontFamily": "Hind-Regular",
                 "padding": 8,
-                "textAlignVertical": "top",
               }
             }
             title="$"
@@ -380,7 +379,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "flex": 1,
                 "fontFamily": "Hind-Regular",
                 "padding": 8,
-                "textAlignVertical": "top",
               }
             }
             title="global:for"
