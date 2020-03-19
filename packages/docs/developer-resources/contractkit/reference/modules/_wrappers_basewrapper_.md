@@ -7,6 +7,10 @@
 * [BaseWrapper](../classes/_wrappers_basewrapper_.basewrapper.md)
 * [CeloTransactionObject](../classes/_wrappers_basewrapper_.celotransactionobject.md)
 
+### Interfaces
+
+* [Filter](../interfaces/_wrappers_basewrapper_.filter.md)
+
 ### Type aliases
 
 * [CeloTransactionParams](_wrappers_basewrapper_.md#celotransactionparams)
@@ -27,6 +31,7 @@
 * [toTransactionObject](_wrappers_basewrapper_.md#totransactionobject)
 * [tupleParser](_wrappers_basewrapper_.md#tupleparser)
 * [valueToBigNumber](_wrappers_basewrapper_.md#const-valuetobignumber)
+* [valueToFixidityString](_wrappers_basewrapper_.md#const-valuetofixiditystring)
 * [valueToFrac](_wrappers_basewrapper_.md#const-valuetofrac)
 * [valueToInt](_wrappers_basewrapper_.md#const-valuetoint)
 * [valueToString](_wrappers_basewrapper_.md#const-valuetostring)
@@ -61,7 +66,7 @@ Name | Type |
 
 ### `Const` bufferToBytes
 
-▸ **bufferToBytes**(`input`: Buffer): *string | number[][]*
+▸ **bufferToBytes**(`input`: Buffer): *string | number[]*
 
 *Defined in [contractkit/src/wrappers/BaseWrapper.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L59)*
 
@@ -71,7 +76,7 @@ Name | Type |
 ------ | ------ |
 `input` | Buffer |
 
-**Returns:** *string | number[][]*
+**Returns:** *string | number[]*
 
 ___
 
@@ -336,7 +341,7 @@ ___
 
 ### `Const` stringToBytes
 
-▸ **stringToBytes**(`input`: string): *string | number[][]*
+▸ **stringToBytes**(`input`: string): *string | number[]*
 
 *Defined in [contractkit/src/wrappers/BaseWrapper.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L57)*
 
@@ -346,7 +351,7 @@ Name | Type |
 ------ | ------ |
 `input` | string |
 
-**Returns:** *string | number[][]*
+**Returns:** *string | number[]*
 
 ___
 
@@ -517,7 +522,7 @@ ___
 
 ▸ **valueToBigNumber**(`input`: BigNumber.Value): *BigNumber‹›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L37)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
 
 **Parameters:**
 
@@ -526,6 +531,22 @@ Name | Type |
 `input` | BigNumber.Value |
 
 **Returns:** *BigNumber‹›*
+
+___
+
+### `Const` valueToFixidityString
+
+▸ **valueToFixidityString**(`input`: BigNumber.Value): *string*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L38)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`input` | BigNumber.Value |
+
+**Returns:** *string*
 
 ___
 
@@ -566,7 +587,7 @@ ___
 
 ▸ **valueToString**(`input`: BigNumber.Value): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L36)*
 
 **Parameters:**
 

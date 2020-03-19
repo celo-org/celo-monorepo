@@ -36,7 +36,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorGroupMembers)
 
-    if (!(res.flags.accept || res.flags.remove || res.flags.reorder)) {
+    if (!(res.flags.accept || res.flags.remove || typeof res.flags.reorder === 'number')) {
       this.error(`Specify action: --accept, --remove or --reorder`)
       return
     }

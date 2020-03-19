@@ -22,6 +22,7 @@ export enum NameSpaces {
   brand = 'brand',
   codeofconduct = 'codeofconduct',
   community = 'community',
+  alliance = 'alliance',
   download = 'download',
   dev = 'dev',
   faucet = 'faucet',

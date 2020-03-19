@@ -1,7 +1,8 @@
+// @ts-ignore
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 import { extend, isNull, isUndefined } from 'lodash'
 import * as util from 'util'
-import * as helpers from 'web3-core-helpers'
+import { formatters } from 'web3-core-helpers'
 import * as utils from 'web3-utils'
 import { Logger } from './logger'
 import { getAccountAddressFromPrivateKey } from './new-web3-utils'
@@ -95,7 +96,7 @@ export async function signTransaction(txn: CeloPartialTxParams, privateKey: stri
     }
 
     try {
-      tx = helpers.formatters.inputCallFormatter(tx)
+      tx = formatters.inputCallFormatter(tx)
 
       const transaction = tx
       transaction.to = tx.to || '0x'

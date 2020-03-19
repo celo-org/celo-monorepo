@@ -2,7 +2,6 @@ import Contacts from 'react-native-contacts'
 
 export async function requestPhoneStatePermission() {
   throw new Error('Unimplemented method')
-  return false
 }
 
 export async function requestContactsPermission(): Promise<boolean> {

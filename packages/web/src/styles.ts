@@ -9,6 +9,7 @@ export enum colors {
   placeholderDarkMode = '#838486',
   secondary = '#81868B',
   dark = '#2E3338',
+  darkTransparent = 'rgba(46, 51, 56, 0.5)',
   gold = '#FBCC5C',
   goldSelect = 'rgba(251, 204, 92, 0.4)',
   goldSubtle = 'rgba(251, 204, 92, 0.2)',
@@ -197,6 +198,7 @@ export const textStyles = StyleSheet.create({
   left: {
     textAlign: 'left',
   },
+  lean: { fontWeight: '300' },
   medium: {
     fontWeight: '500',
   },
@@ -311,6 +313,9 @@ export const standardStyles = StyleSheet.create({
   },
   blockMarginBottomTablet: {
     marginBottom: tabletMargins.medium,
+  },
+  halfElement: {
+    marginVertical: margins.small / 2,
   },
   elementalMargin: {
     marginVertical: margins.small,

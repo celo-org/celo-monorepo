@@ -12,14 +12,19 @@ import ecoFundSubmission from '../server/EcoFundApp'
 import Sentry, { initSentryServer } from '../server/sentry'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
+import { create } from './Alliance'
 import latestAnnouncements from './Announcement'
 import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
-import getContributors from './getContributors'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
+import respondError from './respondError'
+
+const CREATED = 201
+const NO_CONTENT = 204
+
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
@@ -65,10 +70,24 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       res.redirect('/terms')
     })
   })
-  ;['/applications', '/technology', '/dev', '/developer'].forEach((path) => {
+  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/developer'].forEach((path) => {
     server.get(path, (_, res) => {
-      res.redirect('/build')
+      res.redirect('/developers')
     })
+  })
+  ;['/build'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/validators')
+    })
+  })
+  ;['/build/validators'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/validators/explore')
+    })
+  })
+
+  server.get('/build/*', (req, res) => {
+    res.redirect(`/developers/${req.params[0]}`)
   })
   ;['/download', '/app', '/mobile-app', '/invite', 'build/download'].forEach((path) => {
     server.get(path, (_, res) => {
@@ -107,26 +126,26 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
         deliverables,
         resume,
       })
-      res.status(204).json({ id: fellow.id })
+      res.status(CREATED).json({ id: fellow.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
         Sentry.captureException(e)
       })
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
   server.post('/ecosystem/:table', async (req, res) => {
     try {
       const record = await ecoFundSubmission(req.body, req.params.table as Tables)
-      res.status(204).json({ id: record.id })
+      res.status(CREATED).json({ id: record.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
         Sentry.captureEvent(e)
       })
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -140,24 +159,24 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.post('/contacts', async (req, res) => {
     await addToCRM(req.body)
-    res.status(204).send('ok')
+    res.status(NO_CONTENT).send('ok')
   })
 
-  server.get('/announcement', async (_, res) => {
+  server.get('/announcement', async (req, res) => {
     try {
-      const annoucements = await latestAnnouncements()
+      const annoucements = await latestAnnouncements(req.ip)
       res.json(annoucements)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
-  server.get('/api/contributors', async (_, res) => {
+  server.post('/api/alliance', async (req, res) => {
     try {
-      const assets = await getContributors()
-      res.json(assets)
+      await create(req.body)
+      res.sendStatus(CREATED)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -166,7 +185,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const assets = await getAssets(req.params.asset)
       res.json(assets)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -179,7 +198,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       subject: `New Partnership Email: ${email}`,
       text: email,
     })
-    res.status(204).send('ok')
+    res.status(NO_CONTENT).send('ok')
   })
 
   server.get('/proxy/medium', async (_, res) => {
@@ -187,7 +206,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const articlesdata = await getFormattedMediumArticles()
       res.json(articlesdata)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -196,7 +215,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const events = await getFormattedEvents()
       res.json(events)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -210,7 +229,3 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   // tslint:disable-next-line
   console.log(`> Ready on http://localhost:${port}`)
 })()
-
-function respondToError(res: express.Response, error: { message: string; statusCode: number }) {
-  res.status(error.statusCode || 500).json({ message: error.message || 'unknownError' })
-}

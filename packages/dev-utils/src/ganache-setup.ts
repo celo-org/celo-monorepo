@@ -1,10 +1,8 @@
 // @ts-ignore
 import * as ganache from '@celo/ganache-cli'
-import ncp from 'ncp'
+import * as fs from 'fs-extra'
+import * as path from 'path'
 import * as targz from 'targz'
-import * as tmp from 'tmp'
-
-tmp.setGracefulCleanup()
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 export const ACCOUNT_PRIVATE_KEYS = [
@@ -33,7 +31,8 @@ export const ACCOUNT_ADDRESSES = [
 ]
 
 export async function startGanache(
-  dataPath: string,
+  filePath: string,
+  datafile: string,
   opts: { verbose?: boolean; from_targz?: boolean } = {}
 ) {
   const logFn = opts.verbose
@@ -42,14 +41,22 @@ export async function startGanache(
     : () => {
         /*nothing*/
       }
+  const chainCopy: string = path.resolve(path.join(filePath, 'tmp/copychain'))
+  console.log(filePath, datafile)
+  const filenameWithPath: string = path.resolve(path.join(filePath, datafile))
 
-  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
-  console.log(`Creating tmp folder: ${chainCopy.name}`)
+  // erases tmp chain
+  if (fs.existsSync(chainCopy)) {
+    console.log(`Removing old chain tmp folder: ${chainCopy}`)
+    fs.removeSync(chainCopy)
+  }
+  console.log(`Creating chain tmp folder: ${chainCopy}`)
+  fs.mkdirsSync(chainCopy)
 
   if (opts.from_targz) {
-    await decompressChain(dataPath, chainCopy.name)
+    await decompressChain(filenameWithPath, chainCopy)
   } else {
-    await copyChain(dataPath, chainCopy.name)
+    fs.copySync(filenameWithPath, chainCopy)
   }
 
   const server = ganache.server({
@@ -58,7 +65,7 @@ export async function startGanache(
       log: logFn,
     },
     network_id: 1101,
-    db_path: chainCopy.name,
+    db_path: chainCopy,
     mnemonic: MNEMONIC,
     gasLimit: 20000000,
     allowUnlimitedContractSize: true,
@@ -77,9 +84,6 @@ export async function startGanache(
   return () =>
     new Promise((resolve, reject) => {
       server.close((err: any) => {
-        // remove it in both cases
-        console.log('Removing chain copy')
-        chainCopy.removeCallback()
         if (err) {
           reject(err)
         } else {
@@ -87,21 +91,6 @@ export async function startGanache(
         }
       })
     })
-}
-
-function copyChain(chainPath: string, copyChainPath: string) {
-  console.log('Copying chain')
-  return new Promise((resolve, reject) => {
-    ncp(chainPath, copyChainPath, (err) => {
-      if (err) {
-        console.error(err)
-        reject(err)
-      } else {
-        console.log('Chain copied')
-        resolve()
-      }
-    })
-  })
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
@@ -120,10 +109,11 @@ function decompressChain(tarPath: string, copyChainPath: string): Promise<void> 
 }
 
 export default function setup(
-  dataPath: string,
+  filePath: string,
+  datafile: string,
   opts: { verbose?: boolean; from_targz?: boolean } = {}
 ) {
-  return startGanache(dataPath, opts)
+  return startGanache(filePath, datafile, opts)
     .then((stopGanache) => {
       ;(global as any).stopGanache = stopGanache
     })

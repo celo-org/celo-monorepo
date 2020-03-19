@@ -1,6 +1,8 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
+import SplashScreen from 'react-native-splash-screen'
 import {
   NavigationActions,
+  NavigationBackActionPayload,
   NavigationContainerComponent,
   NavigationParams,
   NavigationState,
@@ -48,29 +50,54 @@ export function navigate(routeName: string, params?: NavigationParams) {
     })
 }
 
+export function navigateAfterPinEntered(routeName: string, params?: NavigationParams) {
+  navigate('Background', {
+    onUnlock() {
+      navigate(routeName, params)
+    },
+  })
+}
+
 // Source: https://v1.reactnavigation.org/docs/screen-tracking.html
-export function recordStateChange(prevState: NavigationState, currentState: NavigationState) {
-  const getCurrentRouteName = (navState: NavigationState): string => {
-    if (!navState) {
-      return ''
-    }
-    const route = navState.routes[navState.index]
-    // dive into nested navigators
-    // @ts-ignore
-    if (route.routes) {
-      // @ts-ignore
-      return getCurrentRouteName(route)
-    }
-    return route.routeName
+function getCurrentRouteName(navState: NavigationState): string {
+  if (!navState) {
+    return ''
   }
+
+  const route = navState.routes[navState.index]
+  // dive into nested navigators
+  // @ts-ignore
+  if (route.routes) {
+    // @ts-ignore
+    return getCurrentRouteName(route)
+  }
+  return route.routeName
+}
+
+let splashHidden = false
+
+export function handleNavigationStateChange(
+  prevState: NavigationState,
+  currentState: NavigationState
+) {
   const currentScreen = getCurrentRouteName(currentState)
   const previousScreen = getCurrentRouteName(prevState)
+
+  // Hide native splash if necessary, once we navigate away from AppLoading
+  if (!splashHidden && currentScreen && currentScreen !== Screens.AppLoading) {
+    splashHidden = true
+    // Use requestAnimationFrame to prevent a one frame gap when hiding
+    requestAnimationFrame(() => {
+      SplashScreen.hide()
+    })
+  }
+
   CeloAnalytics.page(currentScreen, { previousScreen, currentScreen })
 }
 
-export function navigateBack() {
+export function navigateBack(params?: NavigationBackActionPayload) {
   Logger.debug(`${TAG}@navigate`, `Dispatch navigate back`)
-  navigator.dispatch(NavigationActions.back())
+  navigator.dispatch(NavigationActions.back(params))
 }
 
 export function navigateHome(params?: NavigationParams) {

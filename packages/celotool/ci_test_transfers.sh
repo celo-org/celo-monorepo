@@ -8,6 +8,7 @@ set -euo pipefail
 # For testing the local Geth dir (usually, for manual testing)
 # Usage: ci_test_transfers.sh local <location_of_local_geth_dir>
 
+export TS_NODE_FILES=true
 if [ "${1}" == "checkout" ]; then
     # Test master by default.
     BRANCH_TO_TEST=${2:-"master"}

@@ -25,6 +25,9 @@ PODS:
   - Firebase/Database (5.20.2):
     - Firebase/CoreOnly
     - FirebaseDatabase (= 5.1.1)
+  - Firebase/DynamicLinks (5.20.2):
+    - Firebase/CoreOnly
+    - FirebaseDynamicLinks (= 3.4.3)
   - Firebase/Messaging (5.20.2):
     - Firebase/CoreOnly
     - FirebaseMessaging (= 3.5.0)
@@ -54,6 +57,10 @@ PODS:
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 5.2)
     - leveldb-library (~> 1.18)
+  - FirebaseDynamicLinks (3.4.3):
+    - FirebaseAnalytics (~> 5.1)
+    - FirebaseAnalyticsInterop (~> 1.0)
+    - FirebaseCore (~> 5.2)
   - FirebaseInstanceID (3.8.1):
     - FirebaseCore (~> 5.2)
     - GoogleUtilities/Environment (~> 5.2)
@@ -317,6 +324,9 @@ PODS:
     - React
   - react-native-safe-area-context (0.5.0):
     - React
+  - react-native-simple-toast (1.0.0):
+    - React
+    - Toast (~> 4.0.0)
   - react-native-sms (1.9.0):
     - React
   - react-native-splash-screen (3.2.0):
@@ -324,8 +334,6 @@ PODS:
   - react-native-tcp (3.3.0):
     - React
   - react-native-udp (2.6.1):
-    - React
-  - react-native-version-check (3.3.0):
     - React
   - react-native-webview (7.4.1):
     - React
@@ -403,7 +411,7 @@ PODS:
     - React
   - RNSecureKeyStore (1.0.0):
     - React
-  - RNSentry (1.0.7):
+  - RNSentry (1.3.3):
     - React
     - Sentry (~> 4.4.0)
   - RNShare (2.0.0):
@@ -420,6 +428,7 @@ PODS:
   - Sentry (4.4.0):
     - Sentry/Core (= 4.4.0)
   - Sentry/Core (4.4.0)
+  - Toast (4.0.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -430,6 +439,7 @@ DEPENDENCIES:
   - Firebase/Auth
   - Firebase/Core (~> 5.20.2)
   - Firebase/Database
+  - Firebase/DynamicLinks
   - Firebase/Messaging
   - Firebase/Storage
   - Folly (from `../../../node_modules/react-native/third-party-podspecs/Folly.podspec`)
@@ -457,11 +467,11 @@ DEPENDENCIES:
   - react-native-mail (from `../../../node_modules/react-native-mail`)
   - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
+  - react-native-simple-toast (from `../../../node_modules/react-native-simple-toast`)
   - react-native-sms (from `../../../node_modules/react-native-sms`)
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
   - react-native-tcp (from `../../../node_modules/react-native-tcp`)
   - react-native-udp (from `../../../node_modules/react-native-udp`)
-  - react-native-version-check (from `../../../node_modules/react-native-version-check`)
   - react-native-webview (from `../../../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -507,6 +517,7 @@ SPEC REPOS:
     - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseDatabase
+    - FirebaseDynamicLinks
     - FirebaseInstanceID
     - FirebaseMessaging
     - FirebaseStorage
@@ -517,6 +528,7 @@ SPEC REPOS:
     - nanopb
     - Protobuf
     - Sentry
+    - Toast
 
 EXTERNAL SOURCES:
   CeloBlockchain:
@@ -571,6 +583,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
     :path: "../../../node_modules/react-native-safe-area-context"
+  react-native-simple-toast:
+    :path: "../../../node_modules/react-native-simple-toast"
   react-native-sms:
     :path: "../../../node_modules/react-native-sms"
   react-native-splash-screen:
@@ -579,8 +593,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-tcp"
   react-native-udp:
     :path: "../../../node_modules/react-native-udp"
-  react-native-version-check:
-    :path: "../../../node_modules/react-native-version-check"
   react-native-webview:
     :path: "../../../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -664,6 +676,7 @@ SPEC CHECKSUMS:
   FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
   FirebaseCore: f1a9a8be1aee4bf71a2fc0f4096df6788bdfda61
   FirebaseDatabase: 2c15b0ea6f2c6eb5e57413f9d6340f1e50b81ae3
+  FirebaseDynamicLinks: f7a8717e2c7ea652923882a2d60b0045d6fd99d5
   FirebaseInstanceID: a122b0c258720cf250551bb2bedf48c699f80d90
   FirebaseMessaging: 4235f949ce1c4e827aeb19705ba5c53f9b85aa10
   FirebaseStorage: 6162ef4322502b818d9de0ec552f5226d283de43
@@ -695,11 +708,11 @@ SPEC CHECKSUMS:
   react-native-mail: 7e37dfbe93ff0d4c7df346b738854dbed533e86f
   react-native-netinfo: 6bb847e64f45a2d69c6173741111cfd95c669301
   react-native-safe-area-context: 13004a45f3021328fdd9ee1f987c3131fb65928d
+  react-native-simple-toast: 6c376bd79b1e255a4bee90a72ead6447f96ea10d
   react-native-sms: 6fc6a1581970f77253981c8c69cd0d303e1d991c
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
-  react-native-version-check: 7d578f3405cd9d673bbfd1225f727c87991e9ef9
   react-native-webview: e800df5dd1a0f3555fd543ebf7d881a9014851f2
   React-RCTActionSheet: 89b037c0fb7d2671607cb645760164e7e0c013f6
   React-RCTAnimation: e3cefa93c38c004c318f7ec04b883eb14b8b8235
@@ -725,13 +738,14 @@ SPEC CHECKSUMS:
   RNReanimated: 6abbbae2e5e72609d85aabd92a982a94566885f1
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
-  RNSentry: e57b6acd2424e185ba2e23ef78aa2186a40e83e0
+  RNSentry: 86baf0c87120cd5eb491d073989f8cbc1a2174c6
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
   RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
   Segment-Firebase: 5ab5aa1e962148c60e5582734ad68b320c647cef
   Sentry: 26650184fe71eb7476dfd2737acb5ea6cc64b4b1
+  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: b648e79fc10c230dea64306812303977c1371c46
+PODFILE CHECKSUM: b3a2d5a110fb5997ac07b1c1e6ca7416a059f01c
 
 COCOAPODS: 1.7.5

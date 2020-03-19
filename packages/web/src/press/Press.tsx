@@ -35,13 +35,12 @@ class Press extends React.PureComponent<I18nProps> {
             ))}
           </View>
           <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
-            {/* <Button text={t('recentNews')} kind={BTN.NAKED} href={'https://medium.com/celohq'} /> */}
             <Button
               text={t('recentNews')}
               kind={BTN.NAKED}
               size={SIZE.normal}
               href={
-                'https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600'
+                'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project'
               }
             />
           </View>
@@ -92,12 +91,6 @@ const logos: Logo[] = [
     url:
       'https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600',
   },
-  // {
-  //   source: ventureBeat,
-  //   size: {},
-  //   url:
-  //     'https://venturebeat.com/2018/09/05/googles-launchpad-studio-introduces-class-of-financial-ai-startups/',
-  // },
   {
     source: fortune,
     size: {},
@@ -107,8 +100,7 @@ const logos: Logo[] = [
   {
     source: coindesk,
     size: {},
-    url:
-      'https://www.coindesk.com/a16z-polychain-invest-25-million-into-crypto-payments-startup-celo',
+    url: 'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project',
   },
   {
     source: techcrunch,

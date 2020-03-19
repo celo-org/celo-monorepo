@@ -1,7 +1,7 @@
 import { AnyAction } from 'redux'
 import { call, select, spawn, takeEvery } from 'redux-saga/effects'
-import { devModeSelector } from 'src/account/reducer'
 import { accountSaga } from 'src/account/saga'
+import { devModeSelector } from 'src/account/selectors'
 import { appSaga, waitForRehydrate } from 'src/app/saga'
 import { dappKitSaga } from 'src/dappkit/dappkit'
 import { escrowSaga } from 'src/escrow/saga'
@@ -34,6 +34,7 @@ const loggerBlacklist = [
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   'IDENTITY/FETCH_PHONE_ADDRESSES',
   'INVITE/REDEEM_INVITE',
+  'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
 ]
 

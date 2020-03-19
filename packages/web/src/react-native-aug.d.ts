@@ -10,27 +10,34 @@ declare module 'react-native' {
     gridArea?: string
   }
 
+  interface KeyFrame {
+    [string]: ViewStyle
+  }
+
   interface ViewStyle {
-    position?: 'absolute' | 'relative' | 'fixed' | 'static'
-    isolation?: 'isolate'
     appearance?: string
-    transformOrigin?: string | number
     animationDelay?: string
     animationDuration?: string
     animationFillMode?: 'both' | 'backwards' | 'forwards' | 'none'
     animationIterationCount?: 'infinite' | number
-    animationKeyframes?: unknown[]
+    animationKeyframes?: KeyFrame[]
     animationTimingFunction?: string
-    gridArea?: string
-    gridRowGap?: string | number
-    gridColumnGap?: string | number
-    gridTemplateColumns?: string
+    boxShadow?: string
     cursor?: string
     display?: 'none' | 'flex' | 'inline' | 'inline-flex' | 'list-item' | 'block' | 'grid'
     fill?: string
     filter?: string
+    gridArea?: string
+    gridRowGap?: string | number
+    gridColumnGap?: string | number
+    gridTemplateColumns?: string
+    isolation?: 'isolate'
     mixBlendMode?: 'multiply' | 'screen'
+    position?: 'absolute' | 'relative' | 'fixed' | 'static'
     scrollPadding?: number
+    transformOrigin?: string | number
+    transitionProperty?: string
+    transitionDuration?: string
   }
 
   interface ImageProps {

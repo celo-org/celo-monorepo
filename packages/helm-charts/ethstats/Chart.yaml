@@ -1,8 +1,0 @@
-name: ethstats
-version: 0.0.1
-description: Chart which is used to deploy an ethstats setup for a celo testnet
-keywords:
-- ethereum
-- blockchain
-- ethstats
-appVersion: v1.7.3
