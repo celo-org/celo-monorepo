@@ -26,8 +26,17 @@ testWithGanache('Domain claims', (web3) => {
     const myUrl = 'https://test.com'
     const domain = 'test.com'
     const originalFetchFromURLImplementation = IdentityMetadataWrapper.fetchFromURL
-    const dnsResolver = (_hostname: string, callback: (err: any, addresses: string[][]) => void) =>
-      callback(null, [[`header=xxx`], [`celo-site-verification=${signatureBase64}`, `header=yyy`]])
+    const dnsResolver = (
+      _hostname: string,
+      callback: (err: any, addresses: string[][]) => void
+    ) => {
+      setTimeout(() => {
+        callback(null, [
+          [`header=xxx`],
+          [`celo-site-verification=${signatureBase64}`, `header=yyy`],
+        ])
+      }, 10)
+    }
 
     beforeEach(async () => {
       metadataUrlGetter = (_addr: string) => Promise.resolve(myUrl)

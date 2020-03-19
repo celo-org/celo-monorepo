@@ -102,11 +102,9 @@ export const verifyDomainClaim = async (
   }
 
   const signature = JSON.parse(metadata.toString()).meta.signature
-  // const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
   const address = JSON.parse(metadata.toString()).meta.address
-  // const domainClaims = metadata.filterClaims(ClaimTypes.DOMAIN)
 
-  return await verifyDomainRecord(signature, address, claim.domain, metadata, dnsResolver)
+  return verifyDomainRecord(signature, address, claim.domain, metadata, dnsResolver)
 }
 
 export const verifyDomainRecord = async (
@@ -120,27 +118,30 @@ export const verifyDomainRecord = async (
   const domainClaims = metadata.filterClaims(ClaimTypes.DOMAIN)
 
   let found = false
-  domainClaims.forEach((domainClaim) => {
-    if (domain === domainClaim.domain) {
-      console.log(`${domain} === ${domainClaim.domain}`)
-      dnsResolver(domainClaim.domain, (_error, domainRecords) => {
-        if (_error) {
-          console.log(`Unable to fetch domain TXT records: ${_error.toString()}`)
-        } else {
-          domainRecords.forEach((record) => {
-            record.forEach((entry) => {
-              console.log(`Entry ${entry}`)
-              if (entry === 'celo-site-verification=' + signatureBase64) {
-                console.log(`TXT Record celo-site-verification found in ${domainClaim.domain}`)
-                found = verifySignature(hashOfClaims(metadata.claims), signature, address)
-              }
+  const domainPromises = domainClaims.map((domainClaim) => {
+    return new Promise((resolve) => {
+      if (domain === domainClaim.domain) {
+        dnsResolver(domainClaim.domain, (_error, domainRecords) => {
+          if (_error) {
+            console.log(`Unable to fetch domain TXT records: ${_error.toString()}`)
+          } else {
+            domainRecords.forEach((record) => {
+              record.forEach((entry) => {
+                if (entry === 'celo-site-verification=' + signatureBase64) {
+                  console.debug(`TXT Record celo-site-verification found in ${domainClaim.domain}`)
+                  found = verifySignature(hashOfClaims(metadata.claims), signature, address)
+                }
+              })
             })
-          })
-        }
-      })
-    }
+          }
+          resolve()
+        })
+      }
+    })
   })
-  console.log(`FOUND: ${found}`)
+
+  await Promise.all(domainPromises)
+
   if (found) {
     return
   }
