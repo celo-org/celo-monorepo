@@ -18,7 +18,7 @@ export interface Contracts {
 export interface StateGetter {
   contract: string
   method: string
-  params: any[]
+  args: any[]
   transformValues: Function
 }
 
@@ -28,9 +28,9 @@ export function getter<T extends keyof Contracts, M extends keyof Contracts[T] &
   transformValues: (
     state: PromiseValue<ReturnMethodType<Contracts[T][M] & Function>>
   ) => { [key: string]: any },
-  params: ArgumentTypes<Contracts[T][M] & Function> = [] as any
+  args: ArgumentTypes<Contracts[T][M] & Function> = [] as any
 ): StateGetter {
-  return { contract, method, params, transformValues }
+  return { contract, method, args, transformValues }
 }
 
 export const stateGetters: StateGetter[] = [

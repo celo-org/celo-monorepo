@@ -66,13 +66,13 @@ export class BlockProcessor {
   }
 
   fetchBlockState(blockNumber: number) {
-    stateGetters.forEach(({ contract, method, params, transformValues }) => {
-      ;(this.contracts as any)[contract][method](...params)
+    stateGetters.forEach(({ contract, method, args, transformValues }) => {
+      ;(this.contracts as any)[contract][method](...args)
         .then((returnData: any) =>
           this.logEvent(LoggingCategory.State, {
             contract,
             function: method,
-            params: JSON.stringify(params),
+            args: JSON.stringify(args),
             blockNumber,
             values: transformValues(returnData),
           })
