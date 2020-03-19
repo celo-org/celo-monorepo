@@ -108,10 +108,12 @@ export async function trackTransfers(
   }
 
   // StableToken.creditTo and StableToken.debitFrom should emit a Transfer event like StableToken._mint
-  /*const stableToken = await kit.contracts.getStableToken()
+  const stableToken = await kit.contracts.getStableToken()
   const tokenTransfers = await stableToken.getTransferEvents(blockNumber)
+  console.info('tokenTransfers')
+  console.info(tokenTransfers)
 
-  for (const transfer of tokenTransfers) {
+  /*for (const transfer of tokenTransfers) {
     const to = ret[normalizeAddress(transfer.to)]
     // needs event change to distuinguish StableToken instances from only logs
     const name = 'cUSD'
