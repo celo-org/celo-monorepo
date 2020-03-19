@@ -3,7 +3,9 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
+import chalk from 'chalk'
 import fs = require('fs')
+import * as prompts from 'prompts'
 import {
   GoldTokenInstance,
   RegistryInstance,
@@ -12,6 +14,16 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+
+let argv: any
+let registry: any
+let goldToken: any
+let releases: any
+let startGold: any
+let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
+let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
+let ReleaseGold: ReleaseGoldContract
+let ReleaseGoldProxy: ReleaseGoldProxyContract
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
