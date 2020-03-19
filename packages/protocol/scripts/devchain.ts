@@ -220,6 +220,8 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push(releaseGoldContracts)
   cmdArgs.push('--start_gold')
   cmdArgs.push('10')
+  // --yesreally command to bypass prompts
+  cmdArgs.push('--yesreally')
   cmdArgs.push('--build_directory')
   cmdArgs.push(ProtocolRoot + 'build')
 

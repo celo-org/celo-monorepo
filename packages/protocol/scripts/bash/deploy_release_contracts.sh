@@ -8,6 +8,7 @@ set -euo pipefail
 # -f: File containing grant information
 # -g: Amount of gold for beneficiary to start with for transactions
 # -o: (Optional) File to output results to
+# -really: (Optional) Reply "yes" to prompts about deploying grants (Be careful!)
 #
 # Example:
 # `./scripts/bash/deploy_release_contracts.sh -n development -f scripts/truffle/releaseGoldContracts.json -g 50`
@@ -16,13 +17,15 @@ NETWORK=""
 GRANTS_FILE=""
 START_GOLD=""
 OUTPUT_FILE=""
+REALLY=""
 
-while getopts 'n:f:g:o:' flag; do
+while getopts 'n:f:g:o:r:' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
     f) GRANTS_FILE="${OPTARG}" ;;
     g) START_GOLD="${OPTARG}" ;;
     o) OUTPUT_FILE="${OPTARG}" ;;
+    r) REALLY="--yesreally" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -39,4 +42,4 @@ fi
 
 yarn run build && \
 yarn run truffle exec ./scripts/truffle/deploy_release_contracts.js \
-  --network $NETWORK --grants $GRANTS_FILE --start_gold $START_GOLD --output_file $OUTPUT_FILE --build_directory $PWD/build/$NETWORK \
+  --network $NETWORK --grants $GRANTS_FILE --start_gold $START_GOLD --output_file $OUTPUT_FILE $REALLY --build_directory $PWD/build/$NETWORK \
