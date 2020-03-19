@@ -161,7 +161,7 @@ library FixidityLib {
    * @notice x*y. If any of the operators is higher than the max multiplier value it
    * might overflow.
    * @dev The maximum value that can be safely used as a multiplication operator
-   * (maxFixedMul) is calculated is sqrt(maxUint256()*fixed1()),
+   * (maxFixedMul) is calculated as sqrt(maxUint256()*fixed1()),
    * or 340282366920938463463374607431768211455999999999999
    * Test multiply(0,0) returns 0
    * Test multiply(maxFixedMul,0) returns 0
@@ -228,15 +228,15 @@ library FixidityLib {
   /**
    * @notice x/y. If the dividend is higher than the max dividend value, it
    * might overflow. You can use multiply(x,reciprocal(y)) instead.
-   * @dev The maximum value that can be safely used as a dividend (maxFixedDividend) is defined as
-   * divide(maxFixedDividend,newFixedFraction(1,fixed1())) is around maxUint256().
+   * @dev The maximum value that can be safely used as a dividend (maxNewFixed) is defined as
+   * divide(maxNewFixed,newFixedFraction(1,fixed1())) is around maxUint256().
    * This yields the value 115792089237316195423570985008687907853269984665640564.
-   * Test maxFixedDividend equals maxUint256()/fixed1()
-   * Test divide(maxFixedDividend,1) equals maxFixedDividend*(fixed1)
-   * Test divide(maxFixedDividend+1,multiply(mulPrecision(),mulPrecision())) throws
+   * Test maxNewFixed equals maxUint256()/fixed1()
+   * Test divide(maxNewFixed,1) equals maxNewFixed*(fixed1)
+   * Test divide(maxNewFixed+1,multiply(mulPrecision(),mulPrecision())) throws
    * Test divide(fixed1(),0) fails
-   * Test divide(maxFixedDividend,1) = maxFixedDividend*(10^digits())
-   * Test divide(maxFixedDividend+1,1) throws
+   * Test divide(maxNewFixed,1) = maxNewFixed*(10^digits())
+   * Test divide(maxNewFixed+1,1) throws
    */
   function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     require(y.value != 0, "can't divide by 0");
