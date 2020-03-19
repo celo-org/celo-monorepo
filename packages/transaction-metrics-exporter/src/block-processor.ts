@@ -48,7 +48,8 @@ export class BlockProcessor {
     let lastBlocks: number[] = []
     subscription.on('data', async (header) => {
       if (!lastBlocks.includes(header.number)) {
-        await this.onNewBlock(header)
+        // tslint:disable-next-line: no-floating-promises
+        this.onNewBlock(header)
       }
       lastBlocks.push(header.number)
       lastBlocks = lastBlocks.slice(-10)
