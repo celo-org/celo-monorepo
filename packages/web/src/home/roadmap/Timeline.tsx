@@ -16,7 +16,7 @@ const UPCOMING = milestones.filter((milestone) => milestone.status !== Status.co
 const PAST = milestones.filter((milestone) => milestone.status === Status.complete)
 const PAST_CHRONOLOGICAL = PAST.slice().reverse()
 
-export default function TimeLine() {
+export default React.memo(function TimeLine() {
   const { t } = useTranslation(NameSpaces.home)
   const { isMobile } = useScreenSize()
 
@@ -84,7 +84,7 @@ export default function TimeLine() {
       </GridRow>
     </>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

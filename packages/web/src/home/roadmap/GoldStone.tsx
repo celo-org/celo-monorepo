@@ -16,6 +16,7 @@ interface Props {
   index: number
   isLast?: boolean
 }
+const DELAY_BASE = 30
 
 const heading = [fonts.legal, textStyles.heavy]
 
@@ -23,7 +24,7 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index,
   const { isMobile } = useScreenSize()
   const Coin = getCoinType(status)
   const isComplete = status === Status.complete
-  const delay = 30 * index * status
+  const delay = DELAY_BASE * index * status
   return (
     <View
       style={[
@@ -38,7 +39,8 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index,
             ? [
                 styles.thruline,
                 isLast && {
-                  // @ts-ignore
+                  // @ts-ignore -- not supposed to use background in RNS but
+                  // this is the only way to use a css linear gradient.
                   background: `linear-gradient(${colors.gold}, ${colors.white})`,
                 },
               ]
