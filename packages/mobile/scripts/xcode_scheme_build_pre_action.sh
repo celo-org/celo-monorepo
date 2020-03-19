@@ -10,4 +10,4 @@ echo "$1" > /tmp/envfile
 
 # This makes envfile config available in xcode build settings
 # See https://github.com/luggit/react-native-config#availability-in-build-settings-and-infoplist
-"${SRCROOT}/../../../node_modules/react-native-config/ios/ReactNativeConfig/BuildXCConfig.rb" "${SRCROOT}/.." "${SRCROOT}/tmp.xcconfig"
+"${SRCROOT}/../../../node_modules/react-native-config/ios/ReactNativeConfig/BuildXCConfig.rb" "${SRCROOT}/.." "${SRCROOT}/env.xcconfig"
