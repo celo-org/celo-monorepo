@@ -1,3 +1,4 @@
+import { flags } from '@oclif/command'
 import prompts from 'prompts'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -9,6 +10,7 @@ export default class SetLiquidityProvision extends ReleaseGoldCommand {
 
   static flags = {
     ...ReleaseGoldCommand.flags,
+    yesreally: flags.boolean({ description: 'Override prompt to set liquidity (be careful!)' }),
   }
 
   static args = []
@@ -18,6 +20,9 @@ export default class SetLiquidityProvision extends ReleaseGoldCommand {
   ]
 
   async run() {
+    // tslint:disable-next-line
+    const { flags } = this.parse(SetLiquidityProvision)
+
     await newCheckBuilder(this)
       .addCheck('The liquidity provision has not already been set', async () => {
         const liquidityProvisionMet = await this.releaseGoldWrapper.getLiquidityProvisionMet()
@@ -25,15 +30,17 @@ export default class SetLiquidityProvision extends ReleaseGoldCommand {
       })
       .runChecks()
 
-    const response = await prompts({
-      type: 'confirm',
-      name: 'confirmation',
-      message: 'Are you sure you want to enable the liquidity provision? (y/n)',
-    })
+    if (!flags.yesreally) {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message: 'Are you sure you want to enable the liquidity provision? (y/n)',
+      })
 
-    if (!response.confirmation) {
-      console.info('Aborting due to user response')
-      process.exit(0)
+      if (!response.confirmation) {
+        console.info('Aborting due to user response')
+        process.exit(0)
+      }
     }
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()

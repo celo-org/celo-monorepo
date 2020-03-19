@@ -7,16 +7,26 @@ import LockedGold from './locked-gold'
 process.env.NO_SYNCCHECK = 'true'
 
 testWithGanache('releasegold:locked-gold cmd', (web3: Web3) => {
-  test('can lock gold with pending withdrawals', async () => {
+  let contractAddress: string
+
+  beforeAll(async () => {
     const contractCanValdiate = true
-    const contractAddress = await getContractFromEvent(
+    contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
       contractCanValdiate
     )
+    await CreateAccount.run(['--contract', contractAddress])
+    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // Attempt to avoid timing errors
+  })
+
+  afterAll(async () => {
+    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // Attempt to avoid timing errors
+  })
+
+  test('can lock gold with pending withdrawals', async () => {
     const kit = newKitFromWeb3(web3)
     const lockedGold = await kit.contracts.getLockedGold()
-    await CreateAccount.run(['--contract', contractAddress])
     await LockedGold.run(['--contract', contractAddress, '--action', 'lock', '--value', '100'])
     await LockedGold.run(['--contract', contractAddress, '--action', 'unlock', '--value', '50'])
     await LockedGold.run(['--contract', contractAddress, '--action', 'lock', '--value', '75'])
@@ -24,6 +34,6 @@ testWithGanache('releasegold:locked-gold cmd', (web3: Web3) => {
     const pendingWithdrawalsTotalValue = await lockedGold.getPendingWithdrawalsTotalValue(
       contractAddress
     )
-    expect(pendingWithdrawalsTotalValue.toFixed()).toBe('50')
+    await expect(pendingWithdrawalsTotalValue.toFixed()).toBe('50')
   })
 })

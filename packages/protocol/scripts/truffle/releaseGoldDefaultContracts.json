@@ -1,6 +1,6 @@
 [
   {
-    "releaseStartTime": "NOW",
+    "releaseStartTime": "MAINNET+0",
     "releaseCliffTime": 1,
     "numReleasePeriods": 1,
     "releasePeriod": 100000000,
@@ -15,7 +15,7 @@
     "canVote": true
   },
   {
-    "releaseStartTime": "NOW",
+    "releaseStartTime": "MAINNET+0",
     "releaseCliffTime": 1,
     "numReleasePeriods": 1,
     "releasePeriod": 100000000,

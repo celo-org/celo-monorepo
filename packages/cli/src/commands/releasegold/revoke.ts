@@ -1,3 +1,4 @@
+import { flags } from '@oclif/command'
 import prompts from 'prompts'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -9,6 +10,7 @@ export default class Revoke extends ReleaseGoldCommand {
 
   static flags = {
     ...ReleaseGoldCommand.flags,
+    yesreally: flags.boolean({ description: 'Override prompt to set liquidity (be careful!)' }),
   }
 
   static args = []
@@ -16,6 +18,9 @@ export default class Revoke extends ReleaseGoldCommand {
   static examples = ['revoke --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631']
 
   async run() {
+    // tslint:disable-next-line
+    const { flags } = this.parse(Revoke)
+
     const isRevoked = await this.releaseGoldWrapper.isRevoked()
     const isRevocable = await this.releaseGoldWrapper.isRevocable()
 
@@ -24,15 +29,17 @@ export default class Revoke extends ReleaseGoldCommand {
       .addCheck('Contract is revocable', () => isRevocable)
       .runChecks()
 
-    const response = await prompts({
-      type: 'confirm',
-      name: 'confirmation',
-      message: 'Are you sure you want to revoke this contract? (y/n)',
-    })
+    if (!flags.yesreally) {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message: 'Are you sure you want to revoke this contract? (y/n)',
+      })
 
-    if (!response.confirmation) {
-      console.info('Aborting due to user response')
-      process.exit(0)
+      if (!response.confirmation) {
+        console.info('Aborting due to user response')
+        process.exit(0)
+      }
     }
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()

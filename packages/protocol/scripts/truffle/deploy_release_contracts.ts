@@ -64,10 +64,19 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldProxy.address,
     weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
   )
-  const releaseStartTime =
-    releaseGoldConfig.releaseStartTime === 'NOW'
-      ? new Date().getTime() / 1000
-      : new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+  let releaseStartTime: number
+  // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
+  // This is to account for the dynamic start date for mainnet,
+  // and some grants rely on x months post mainnet launch.
+  if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
+    const addedMonths = releaseGoldConfig.releaseStartTime.split('+')[1]
+    const date = new Date()
+    date.setMonth(date.getMonth() + Number(addedMonths))
+    releaseStartTime = date.getTime() / 1000
+  } else {
+    releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+  }
+  console.info('ReleaseSTarttime', releaseStartTime)
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,

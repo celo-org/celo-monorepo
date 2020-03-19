@@ -24,7 +24,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   })
 
   test('can refund gold', async () => {
-    await Revoke.run(['--contract', contractAddress])
+    await Revoke.run(['--contract', contractAddress, '--yesreally'])
     const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
     const refundAddress = await releaseGoldWrapper.getRefundAddress()
     const balanceBefore = await kit.getTotalBalance(refundAddress)
@@ -34,7 +34,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   })
 
   test('can finalize the contract', async () => {
-    await Revoke.run(['--contract', contractAddress])
+    await Revoke.run(['--contract', contractAddress, '--yesreally'])
     await RefundAndFinalize.run(['--contract', contractAddress])
     await expect(Show.run(['--contract', contractAddress])).rejects.toThrow()
   })

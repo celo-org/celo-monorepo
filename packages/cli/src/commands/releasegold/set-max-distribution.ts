@@ -14,6 +14,7 @@ export default class SetMaxDistribution extends ReleaseGoldCommand {
       description:
         'Amount in range [0, 1000] (3 significant figures) indicating % of total balance available for distribution.',
     }),
+    yesreally: flags.boolean({ description: 'Override prompt to set liquidity (be careful!)' }),
   }
 
   static args = []
@@ -34,18 +35,20 @@ export default class SetMaxDistribution extends ReleaseGoldCommand {
       )
       .runChecks()
 
-    const response = await prompts({
-      type: 'confirm',
-      name: 'confirmation',
-      message:
-        'Are you sure you want to set the new maximum distribution ratio to ' +
-        distributionRatio +
-        '? (y/n)',
-    })
+    if (!flags.yesreally) {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message:
+          'Are you sure you want to set the new maximum distribution ratio to ' +
+          distributionRatio +
+          '? (y/n)',
+      })
 
-    if (!response.confirmation) {
-      console.info('Aborting due to user response')
-      process.exit(0)
+      if (!response.confirmation) {
+        console.info('Aborting due to user response')
+        process.exit(0)
+      }
     }
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()

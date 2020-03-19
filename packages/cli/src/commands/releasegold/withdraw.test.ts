@@ -10,16 +10,24 @@ import Withdraw from './withdraw'
 process.env.NO_SYNCCHECK = 'true'
 
 testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
-  test('can withdraw released gold to beneficiary', async () => {
+  let contractAddress: string
+  beforeAll(async () => {
     const contractCanValidate = true
-    const contractAddress = await getContractFromEvent(
+    contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
       contractCanValidate
     )
-    const kit = newKitFromWeb3(web3)
     await CreateAccount.run(['--contract', contractAddress])
-    await SetLiquidityProvision.run(['--contract', contractAddress])
+    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // avoid jest open handle error
+  })
+  afterAll(async () => {
+    await new Promise((resolve) => setTimeout(() => resolve(), 500)) // avoid jest open handle error
+  })
+
+  test('can withdraw released gold to beneficiary', async () => {
+    const kit = newKitFromWeb3(web3)
+    await SetLiquidityProvision.run(['--contract', contractAddress, '--yesreally'])
 
     await timeTravel(100000000, web3)
     const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
@@ -27,6 +35,6 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     const balanceBefore = await kit.getTotalBalance(beneficiary)
     await Withdraw.run(['--contract', contractAddress, '--value', '10000000000000000000000'])
     const balanceAfter = await kit.getTotalBalance(beneficiary)
-    expect(balanceBefore.gold.toNumber()).toBeLessThan(balanceAfter.gold.toNumber())
+    await expect(balanceBefore.gold.toNumber()).toBeLessThan(balanceAfter.gold.toNumber())
   })
 })
