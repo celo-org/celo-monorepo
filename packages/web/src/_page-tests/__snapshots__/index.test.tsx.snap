@@ -753,6 +753,48 @@ exports[`HomePage renders 1`] = `
       }
     >
       <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitFlexBasis": "auto",
+            "flexBasis": "auto",
+            "height": "126px",
+            "msFlexPreferredSize": "auto",
+            "overflowX": "hidden",
+            "overflowY": "hidden",
+            "width": "242px",
+            "zIndex": 0,
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "backgroundImage": "url(\\"image.png\\")",
+              "backgroundPosition": "center",
+              "backgroundRepeat": "no-repeat",
+              "backgroundSize": "contain",
+              "bottom": "0px",
+              "height": "100%",
+              "left": "0px",
+              "position": "absolute",
+              "right": "0px",
+              "top": "0px",
+              "width": "100%",
+              "zIndex": -1,
+            }
+          }
+        />
+        <img
+          alt=""
+          className="css-accessibilityImage-9pa8cd"
+          draggable={false}
+          src="image.png"
+        />
+      </div>
+      <div
         className="react-reveal"
         style={
           Object {
@@ -764,12 +806,12 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "maxWidth": "600px",
+              "maxWidth": "550px",
             }
           }
         >
-          <h1
-            aria-level="1"
+          <h2
+            aria-level="2"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
             role="heading"
@@ -777,8 +819,8 @@ exports[`HomePage renders 1`] = `
               Object {
                 "color": "rgba(46,51,56,1.00)",
                 "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "36px",
-                "lineHeight": "40px",
+                "fontSize": "28px",
+                "lineHeight": "32px",
                 "textAlign": "center",
                 "textRendering": "geometricPrecision",
                 "textTransform": "none",
@@ -786,7 +828,7 @@ exports[`HomePage renders 1`] = `
             }
           >
             hero3
-          </h1>
+          </h2>
         </div>
       </div>
     </div>
@@ -808,7 +850,7 @@ exports[`HomePage renders 1`] = `
         "flexDirection": "column",
         "justifyContent": "center",
         "marginBottom": "30px",
-        "marginTop": "30px",
+        "marginTop": "20px",
         "maxWidth": "100vw",
         "msFlexAlign": "center",
         "msFlexDirection": "column",
@@ -824,36 +866,201 @@ exports[`HomePage renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
-          "WebkitFlexBasis": "auto",
-          "flexBasis": "auto",
-          "height": "313px",
-          "msFlexPreferredSize": "auto",
-          "overflowX": "hidden",
-          "overflowY": "hidden",
-          "width": "622px",
-          "zIndex": 0,
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
         }
       }
     >
+      <style>
+        
+            .ReactModal__Body--open {
+              position: fixed;
+            }
+
+            .ReactModal__Content iframe {
+              position: absolute;
+              bottom: 60px;
+              left: 0;
+              width: calc(100% - 5px);
+              height: calc(90% - 60px);
+            }
+
+            .ReactModal__Overlay {
+              transform: translateY(-100vh);
+              transition: transform 1000ms ease-in-out;
+            }
+            
+            .ReactModal__Overlay--after-open{
+              transform: translateY(0);
+            }
+
+            .ReactModal__Overlay--before-close {
+              transform: translateY(-100vh);
+            }
+          
+      </style>
       <div
         className="css-view-1dbjc4n"
+        data-focusable={true}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
+            "MozUserSelect": "none",
+            "WebkitUserSelect": "none",
             "backgroundColor": "rgba(0,0,0,0.00)",
-            "backgroundPosition": "center",
-            "backgroundRepeat": "no-repeat",
-            "backgroundSize": "cover",
-            "bottom": "0px",
-            "height": "100%",
-            "left": "0px",
-            "position": "absolute",
-            "right": "0px",
-            "top": "0px",
-            "width": "100%",
-            "zIndex": -1,
+            "cursor": "pointer",
+            "msTouchAction": "manipulation",
+            "msUserSelect": "none",
+            "touchAction": "manipulation",
+            "userSelect": "none",
           }
         }
-      />
+        tabIndex="0"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "height": "360px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "display": "block",
+                "height": "360px",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+              }
+            }
+          >
+            <div
+              style={
+                Object {
+                  "display": "block",
+                  "paddingBottom": "319.3333333333333%",
+                  "width": "100%",
+                }
+              }
+            />
+            <div
+              style={
+                Object {
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "top": "0px",
+                  "width": "100%",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitFlexBasis": "auto",
+                    "flexBasis": "auto",
+                    "height": "100%",
+                    "msFlexPreferredSize": "auto",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                    "width": "100%",
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "backgroundImage": "url(\\"image.png\\")",
+                      "backgroundPosition": "center",
+                      "backgroundRepeat": "no-repeat",
+                      "backgroundSize": "cover",
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "right": "0px",
+                      "top": "0px",
+                      "width": "100%",
+                      "zIndex": -1,
+                    }
+                  }
+                />
+                <img
+                  alt=""
+                  className="css-accessibilityImage-9pa8cd"
+                  draggable={false}
+                  src="image.png"
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxPack": "center",
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "height": "100%",
+                "justifyContent": "center",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "position": "absolute",
+                "width": "100%",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height="68"
+              style={Object {}}
+              viewBox="0 0 68 68"
+              width="68"
+            >
+              <ellipse
+                cx="33.9123"
+                cy="34.0865"
+                fill="#35D07F"
+                rx="33.4196"
+                ry="33.4947"
+                style={Object {}}
+              />
+              <path
+                d="M46.8013 33.4895C47.4921 33.8694 47.4921 34.862 46.8013 35.2419L27.0396 46.1111C26.3731 46.4777 25.5576 45.9955 25.5576 45.2349L25.5576 23.4965C25.5576 22.7359 26.3731 22.2537 27.0396 22.6203L46.8013 33.4895Z"
+                fill="white"
+                style={Object {}}
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div />
     </div>
   </div>
   <div
