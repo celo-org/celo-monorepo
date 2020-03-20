@@ -32,7 +32,7 @@ import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
-const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+export const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
 
 export async function initAndSyncGethWithRetry(

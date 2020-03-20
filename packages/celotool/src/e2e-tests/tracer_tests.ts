@@ -10,7 +10,8 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getContext, sleep } from './utils'
+import { MonorepoRoot, getContext, sleep } from './utils'
+import { spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const TMP_PATH = '/tmp/e2e'
 
@@ -287,6 +288,26 @@ describe('tracer tests', () => {
           trackBalances[normalizeAddress(FromAddress)].gold,
           new BigNumber(TransferAmount)
         ))
+    })
+
+    describe(`Deploying release gold`, () => {
+      before(async function(this: any) {
+        this.timeout(0)
+        const startBlockNumber = await this.web3.eth.getBlockNumber()
+        const args = [
+          '--cwd',
+          `${MonorepoRoot}/packages/protocol`,
+          'init-network',
+          '-n',
+          'testing',
+          '-m',
+          //JSON.stringify(migrationOverrides),
+          //'-t',
+          //to.toString(),
+        ]
+        await spawnCmdWithExitOnFailure('yarn', args)
+        const endBlockNumber = await this.web3.eth.getBlockNumber()
+      })
     })
   })
 })
