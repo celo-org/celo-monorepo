@@ -147,7 +147,7 @@ contract Governance is
 
   event ProposalExecuted(uint256 indexed proposalId);
 
-  event ProposalExpired(uint256 proposalId);
+  event ProposalExpired(uint256 indexed proposalId);
 
   event ParticipationBaselineUpdated(uint256 participationBaseline);
 
