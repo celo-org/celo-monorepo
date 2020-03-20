@@ -5,7 +5,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
-import "./interfaces/IStableToken.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
