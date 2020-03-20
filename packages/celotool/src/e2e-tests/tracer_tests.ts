@@ -2,10 +2,13 @@ import { CeloContract } from '@celo/contractkit'
 import { ContractKit, newKit } from '@celo/contractkit'
 import { Address } from '@celo/contractkit/lib/base'
 import { AccountAssets, trackTransfers } from '@celo/contractkit/lib/explorer/assets'
+import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { normalizeAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
+import { TransactionReceipt } from 'web3-core'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, sleep } from './utils'
 
@@ -56,6 +59,7 @@ describe('tracer tests', () => {
 
   const context: any = getContext(gethConfig)
   let kit: ContractKit
+  let goldToken: GoldTokenWrapper
 
   before(async function(this: any) {
     this.timeout(0)
@@ -72,6 +76,7 @@ describe('tracer tests', () => {
     await context.hooks.restart()
     kit = newKit('http://localhost:8545')
     kit.defaultAccount = validatorAddress
+    goldToken = await kit.contracts.getGoldToken()
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
@@ -129,61 +134,80 @@ describe('tracer tests', () => {
     return res
   }
 
+  const testTransferGold = (
+    name: string,
+    transferFn: () => Promise<TransactionResult>,
+    goldGasCurrency: boolean = true
+  ) => {
+    let trackBalances: Record<Address, AccountAssets>
+    let fromInitialBalance: BigNumber
+    let fromFinalBalance: BigNumber
+    let toInitialBalance: BigNumber
+    let toFinalBalance: BigNumber
+    let receipt: TransactionReceipt
+    let txn: any
+
+    describe(`transfer cGLD: ${name}`, () => {
+      before(async function(this: any) {
+        this.timeout(0)
+        fromInitialBalance = await goldToken.balanceOf(FromAddress)
+        toInitialBalance = await goldToken.balanceOf(ToAddress)
+        const txResult = await transferFn()
+        receipt = await txResult.waitReceipt()
+        txn = await kit.web3.eth.getTransaction(receipt.transactionHash)
+        console.info('TXN')
+        console.info(txn)
+
+        fromFinalBalance = await goldToken.balanceOf(FromAddress)
+        toFinalBalance = await goldToken.balanceOf(ToAddress)
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        console.info(`${name} receipt`)
+        console.info(receipt)
+        console.info(`${name} trackBalances`)
+        console.info(trackBalances)
+      })
+
+      it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
+        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(TransferAmount)))
+      it(`balanceOf should decrement the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          fromFinalBalance.minus(fromInitialBalance),
+          new BigNumber(-TransferAmount).minus(
+            goldGasCurrency
+              ? new BigNumber(receipt.gasUsed).times(new BigNumber(txn.gasPrice))
+              : new BigNumber(0)
+          )
+        ))
+      it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(ToAddress)].gold,
+          new BigNumber(TransferAmount)
+        ))
+      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].gold,
+          new BigNumber(-TransferAmount)
+        ))
+    })
+  }
+
   describe('Tracer tests', () => {
     before(async function() {
       this.timeout(0)
       await restart()
     })
 
-    describe('transfer cGLD', () => {
-      let trackBalances: Record<Address, AccountAssets>
-      before(async function(this: any) {
-        this.timeout(0)
-        const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount)
-        const receipt = await txResult.waitReceipt()
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        console.info('first receipt')
-        console.info(receipt)
-        console.info('first trackBalances')
-        console.info(trackBalances)
-      })
-      it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackBalances[normalizeAddress(ToAddress)].gold,
-          new BigNumber(TransferAmount)
-        ))
-      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
-          new BigNumber(-TransferAmount)
-        ))
-    })
+    testTransferGold('normal', () => transferCeloGold(FromAddress, ToAddress, TransferAmount))
 
-    describe('transfer cGLD with feeCurrency cUSD', () => {
-      let trackBalances: Record<Address, AccountAssets>
-      before(async function(this: any) {
-        this.timeout(0)
+    testTransferGold(
+      'with feeCurrency cUSD',
+      async () => {
         const feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-        const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+        return transferCeloGold(FromAddress, ToAddress, TransferAmount, {
           feeCurrency,
         })
-        const receipt = await txResult.waitReceipt()
-        console.info('receipt')
-        console.info(receipt)
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        console.info('trackBalances')
-        console.info(trackBalances)
-      })
-      it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackBalances[normalizeAddress(ToAddress)].gold,
-          new BigNumber(TransferAmount)
-        ))
-      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
-          new BigNumber(-TransferAmount)
-        ))
-    })
+      },
+      false
+    )
   })
 })
