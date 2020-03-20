@@ -45,7 +45,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
    * @return True if the transaction succeeds.
    */
   // solhint-disable-next-line no-simple-event-func-name
-  function transfer(address to, uint256 value) external onlyWhenNotFrozen returns (bool) {
+  function transfer(address to, uint256 value) external returns (bool) {
     return _transfer(to, value);
   }
 
@@ -58,7 +58,6 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
    */
   function transferWithComment(address to, uint256 value, string calldata comment)
     external
-    onlyWhenNotFrozen
     returns (bool)
   {
     bool succeeded = _transfer(to, value);
