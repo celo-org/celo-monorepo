@@ -854,13 +854,11 @@ contract Election is
     uint256 totalNumMembersElected = 0;
 
     uint256[] memory keys = new uint256[](electionGroups.length);
-    for (uint256 i = 0; i < electionGroups.length; i++) {
-      keys[i] = i;
-    }
     FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
       electionGroups.length
     );
     for (uint256 i = 0; i < electionGroups.length; i++) {
+      keys[i] = i;
       votesForNextMember[i] = FixidityLib.newFixed(
         votes.total.eligible.getValue(electionGroups[i])
       );

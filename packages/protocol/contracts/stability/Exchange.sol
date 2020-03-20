@@ -342,6 +342,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     )
       .medianRate(stable);
+    require(rateDenominator > 0, "exchange rate denominator must be greater than 0");
     return (rateNumerator, rateDenominator);
   }
 }
