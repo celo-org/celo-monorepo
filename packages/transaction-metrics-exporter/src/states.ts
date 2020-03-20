@@ -20,25 +20,35 @@ export interface StateGetter {
   method: string
   args: any[]
   transformValues: Function
+  maxBucketSize: { [key: string]: number }
 }
 
-export function getter<T extends keyof Contracts, M extends keyof Contracts[T] & string>(
+export function getter<
+  T extends keyof Contracts,
+  M extends keyof Contracts[T] & string,
+  RV extends string
+>(
   contract: T,
   method: M,
   transformValues: (
     state: PromiseValue<ReturnMethodType<Contracts[T][M] & Function>>
-  ) => { [key: string]: any },
-  args: ArgumentTypes<Contracts[T][M] & Function> = [] as any
+  ) => { [key in RV]: any },
+  args: ArgumentTypes<Contracts[T][M] & Function> = [] as any,
+  maxBucketSize: { [key in RV]: any } = {} as any
 ): StateGetter {
-  return { contract, method, args, transformValues }
+  return { contract, method, args, transformValues, maxBucketSize }
 }
 
 export const stateGetters: StateGetter[] = [
   getter(
     'Exchange',
     'getBuyAndSellBuckets',
-    ([currentStableBucket, currentGoldBucket]) => ({ currentStableBucket, currentGoldBucket }),
-    [true]
+    ([currentStableBucket, currentGoldBucket]) => ({
+      currentStableBucket: +currentStableBucket,
+      currentGoldBucket: +currentGoldBucket,
+    }),
+    [true],
+    { currentStableBucket: 10 ** 26, currentGoldBucket: 10 ** 26 }
   ),
   getter('SortedOracles', 'medianRate', ({ rate }) => ({ medianRate: +rate }), [
     CeloContract.StableToken,
@@ -48,9 +58,15 @@ export const stateGetters: StateGetter[] = [
   //   'getReserveGoldBalance',
   //   (goldBalance) => ({goldBalance: +goldBalance}),
   // ),
-  getter('GoldToken', 'totalSupply', (goldTokenTotalSupply) => ({
-    goldTokenTotalSupply: +goldTokenTotalSupply,
-  })),
+  getter(
+    'GoldToken',
+    'totalSupply',
+    (goldTokenTotalSupply) => ({
+      goldTokenTotalSupply: +goldTokenTotalSupply,
+    }),
+    undefined,
+    { goldTokenTotalSupply: 10 ** 27 }
+  ),
   getter('EpochRewards', 'getTargetGoldTotalSupply', (rewardsAmount) => ({
     rewardsAmount: +rewardsAmount,
   })),

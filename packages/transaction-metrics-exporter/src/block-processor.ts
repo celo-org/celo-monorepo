@@ -1,7 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
 import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
-import { labelValues } from 'prom-client'
+import { labelValues, Histogram, linearBuckets } from 'prom-client'
 import { Transaction } from 'web3-core'
 import { Block } from 'web3-eth'
 
@@ -18,9 +18,18 @@ enum LoggingCategory {
   TransactionReceipt = 'RECEIVED_TRANSACTION_RECEIPT',
 }
 
+interface DataResult {
+  contract: string
+  function: string
+  args: any
+  blockNumber: number
+  values: { [metric: string]: number }
+}
+
 export class BlockProcessor {
   private contracts: Contracts = {} as any
   private initialized = false
+  private histograms: { [key: string]: Histogram } = {}
 
   constructor(
     private kit: ContractKit,
@@ -81,21 +90,25 @@ export class BlockProcessor {
   }
 
   async fetchBlockState(blockNumber: number) {
-    const promises = stateGetters.map(({ contract, method, args, transformValues }) => {
-      this.contracts[contract].setDefaultBlock(blockNumber)
-      return (this.contracts as any)[contract][method](...args)
-        .then((returnData: any) => {
-          this.contracts[contract].setDefaultBlock('latest')
-          this.logEvent(LoggingCategory.State, {
-            contract,
-            function: method,
-            args: JSON.stringify(args),
-            blockNumber,
-            values: transformValues(returnData),
+    const promises = stateGetters.map(
+      ({ contract, method, args, transformValues, maxBucketSize }) => {
+        this.contracts[contract].setDefaultBlock(blockNumber)
+        return (this.contracts as any)[contract][method](...args)
+          .then((returnData: any) => {
+            this.contracts[contract].setDefaultBlock('latest')
+            const data: DataResult = {
+              contract,
+              function: method,
+              args: JSON.stringify(args),
+              blockNumber,
+              values: transformValues(returnData),
+            }
+            this.logEvent(LoggingCategory.State, data)
+            this.logHistogram({ ...data, args }, maxBucketSize)
           })
-        })
-        .catch() as Promise<any>
-    })
+          .catch() as Promise<any>
+      }
+    )
     await Promise.all(promises)
   }
 
@@ -161,5 +174,37 @@ export class BlockProcessor {
 
   private logEvent(name: string, details: object) {
     console.log(JSON.stringify({ event: name, ...details }))
+  }
+
+  private logHistogram(
+    { contract, function: functionName, args, values }: DataResult,
+    maxBucketSize: any
+  ) {
+    const argsKey = args.join('_')
+    Object.keys(values).forEach((valueKey) => {
+      const key = `state_metric_${contract}_${functionName}:${argsKey}:${valueKey}`
+
+      if (!this.histograms[key]) {
+        let buckets: number[] = [0]
+        if (maxBucketSize[valueKey]) {
+          buckets = linearBuckets(0, maxBucketSize[valueKey] / 10, 10)
+        }
+        this.histograms[key] = new Histogram({
+          name: key,
+          help: `Histogram generated of the contract ${contract}, using the method ${functionName} and logging the value ${valueKey}`,
+          labelNames: ['contract', 'function', 'args'],
+          buckets,
+        })
+      }
+
+      this.histograms[key].observe(
+        {
+          contract,
+          function: functionName,
+          args: argsKey,
+        },
+        values[valueKey]
+      )
+    })
   }
 }
