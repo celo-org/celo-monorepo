@@ -399,6 +399,23 @@ exports[`Experience/KeyImagery renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "MozTransitionProperty": "transform,",
+              "WebkitTransform": "scaleY(0)",
+              "WebkitTransformOrigin": "top",
+              "WebkitTransitionDuration": "500ms",
+              "WebkitTransitionProperty": "-webkit-transform,transform,",
+              "marginLeft": "20px",
+              "transform": "scaleY(0)",
+              "transformOrigin": "top",
+              "transitionDuration": "500ms",
+              "transitionProperty": "-webkit-transform,transform,",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitFlexDirection": "row",
@@ -1129,9 +1146,15 @@ exports[`Experience/KeyImagery renders 1`] = `
               dir="auto"
               style={
                 Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "20px",
+                  "fontWeight": "500",
+                  "lineHeight": "24px",
                   "marginLeft": "10px",
                   "marginRight": "10px",
                   "marginTop": "60px",
+                  "textRendering": "geometricPrecision",
                 }
               }
             >
@@ -1173,7 +1196,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
                   dir="auto"
-                  href="https://creativecommons.org/licenses/by-nd/4.0/legalcode"
+                  href="/code-of-conduct"
                   role="link"
                   style={
                     Object {
@@ -1186,7 +1209,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                     }
                   }
                 >
-                  Creative Commons Attribution-NoDerivatives 4.0 International License
+                  Code of Conduct
                 </a>
               </div>
             </div>
@@ -1884,19 +1907,23 @@ exports[`Experience/KeyImagery renders 1`] = `
               "WebkitAlignSelf": "center",
               "WebkitBoxAlign": "center",
               "WebkitBoxDirection": "normal",
+              "WebkitBoxLines": "multiple",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "center",
               "WebkitFlexDirection": "row",
+              "WebkitFlexWrap": "wrap",
               "WebkitJustifyContent": "center",
               "alignItems": "center",
               "alignSelf": "center",
               "flexDirection": "row",
+              "flexWrap": "wrap",
               "justifyContent": "center",
               "marginTop": "30px",
               "msFlexAlign": "center",
               "msFlexDirection": "row",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msFlexWrap": "wrap",
               "width": "100%",
             }
           }
@@ -2089,6 +2116,63 @@ exports[`Experience/KeyImagery renders 1`] = `
                   style={Object {}}
                 />
               </svg>
+            </a>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "paddingRight": "25px",
+              }
+            }
+          >
+            <a
+              href="https://www.instagram.com/celoorg/"
+              rel="noopener"
+              target="_blank"
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitFlexBasis": "auto",
+                    "flexBasis": "auto",
+                    "height": "25px",
+                    "msFlexPreferredSize": "auto",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                    "width": "25px",
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "backgroundImage": "url(\\"image.png\\")",
+                      "backgroundPosition": "center",
+                      "backgroundRepeat": "no-repeat",
+                      "backgroundSize": "cover",
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "right": "0px",
+                      "top": "0px",
+                      "width": "100%",
+                      "zIndex": -1,
+                    }
+                  }
+                />
+                <img
+                  alt=""
+                  className="css-accessibilityImage-9pa8cd"
+                  draggable={false}
+                  src="image.png"
+                />
+              </div>
             </a>
           </div>
         </div>
