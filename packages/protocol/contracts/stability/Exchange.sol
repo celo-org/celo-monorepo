@@ -23,7 +23,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
   event UpdateFrequencySet(uint256 updateFrequency);
   event MinimumReportsSet(uint256 minimumReports);
-  event StableTokenSet(address stable);
+  event StableTokenSet(address indexed stable);
   event SpreadSet(uint256 spread);
   event ReserveFractionSet(uint256 reserveFraction);
 
