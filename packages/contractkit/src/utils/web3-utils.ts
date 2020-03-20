@@ -43,5 +43,5 @@ export async function traceBlock(
   const debug = new Debug(url)
   const trace: any = await debug.getBlockTraceByNumber(Web3Utils.toHex(blockNumber), args)
   stopProvider(debug.currentProvider as any)
-  return trace[0].result
+  return trace.map((e: any) => e.result)
 }

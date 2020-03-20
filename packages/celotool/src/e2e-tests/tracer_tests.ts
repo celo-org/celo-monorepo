@@ -1,3 +1,4 @@
+import { CeloContract } from '@celo/contractkit'
 import { ContractKit, newKit } from '@celo/contractkit'
 import { Address } from '@celo/contractkit/lib/base'
 import { AccountAssets, trackTransfers } from '@celo/contractkit/lib/explorer/assets'
@@ -134,12 +135,38 @@ describe('tracer tests', () => {
       await restart()
     })
 
-    describe('transfer celo gold', () => {
+    describe('transfer cGLD', () => {
       let trackBalances: Record<Address, AccountAssets>
-
       before(async function(this: any) {
         this.timeout(0)
         const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount)
+        const receipt = await txResult.waitReceipt()
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        console.info('first receipt')
+        console.info(receipt)
+        console.info('first trackBalances')
+        console.info(trackBalances)
+      })
+      it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(ToAddress)].gold,
+          new BigNumber(TransferAmount)
+        ))
+      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].gold,
+          new BigNumber(-TransferAmount)
+        ))
+    })
+
+    describe('transfer cGLD with feeCurrency cUSD', () => {
+      let trackBalances: Record<Address, AccountAssets>
+      before(async function(this: any) {
+        this.timeout(0)
+        const feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+        const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+          feeCurrency,
+        })
         const receipt = await txResult.waitReceipt()
         console.info('receipt')
         console.info(receipt)

@@ -39,6 +39,16 @@ export class AccountAssets extends DerivedAccountAssets {
   }
 }
 
+function getAccount(
+  accounts: Record<Address, AccountAssets>,
+  accountAddress: Address,
+  filter: boolean
+): AccountAssets | undefined {
+  const address = normalizeAddress(accountAddress)
+  if (filter && !(address in accounts)) return undefined
+  return accounts[address] || (accounts[address] = new AccountAssets())
+}
+
 export async function trackTransfers(
   kit: ContractKit,
   blockNumber: number,
@@ -52,14 +62,13 @@ export async function trackTransfers(
     blockNumber,
     'cgldTransferTracer'
   )
-  for (const transfer of goldTransfers) {
-    const fromAddress = normalizeAddress(transfer.from)
-    const toAddress = normalizeAddress(transfer.to)
-    if (filter && !(fromAddress in ret) && !(toAddress in ret)) continue
-    const from = ret[fromAddress] || (ret[fromAddress] = new AccountAssets())
-    const to = ret[toAddress] || (ret[toAddress] = new AccountAssets())
-    from.gold = from.gold.minus(transfer.value)
-    to.gold = to.gold.plus(transfer.value)
+  for (const transaction of goldTransfers) {
+    for (const transfer of transaction) {
+      const from = getAccount(ret, transfer.from, filter)
+      const to = getAccount(ret, transfer.to, filter)
+      if (from) from.gold = from.gold.minus(transfer.value)
+      if (to) to.gold = to.gold.plus(transfer.value)
+    }
   }
 
   const lockedGold = await kit.contracts.getLockedGold()
@@ -108,18 +117,23 @@ export async function trackTransfers(
   }
 
   // StableToken.creditTo and StableToken.debitFrom should emit a Transfer event like StableToken._mint
+  const stableTokenName = 'cUSD'
   const stableToken = await kit.contracts.getStableToken()
-  const tokenTransfers = await stableToken.getTransferEvents(blockNumber)
-  console.info('tokenTransfers')
-  console.info(tokenTransfers)
-
-  /*for (const transfer of tokenTransfers) {
-    const to = ret[normalizeAddress(transfer.to)]
+  const stableTransfers = await stableToken.getTransferEvents(blockNumber)
+  for (const transfer of stableTransfers) {
+    const from = getAccount(ret, transfer.from, filter)
+    const to = getAccount(ret, transfer.to, filter)
     // needs event change to distuinguish StableToken instances from only logs
-    const name = 'cUSD'
     // needs conversion to units
-    to.tokenUnits[name] = (to.tokenUnits[name] || new BigNumber(0)).plus(transfer.value)
-  }*/
+    if (from)
+      from.tokenUnits[stableTokenName] = (
+        from.tokenUnits[stableTokenName] || new BigNumber(0)
+      ).minus(transfer.value)
+    if (to)
+      to.tokenUnits[stableTokenName] = (to.tokenUnits[stableTokenName] || new BigNumber(0)).plus(
+        transfer.value
+      )
+  }
 
   // ReleaseGold
 

@@ -30,10 +30,12 @@ export default class Trace extends BaseCommand {
 
     if (res.flags.transaction) {
       printValueMapRecursive(
-        await traceTransaction(this.originalProvider, res.flags.transaction, tracer)
+        await traceTransaction(this.kit.web3.currentProvider, res.flags.transaction, tracer)
       )
     } else if (res.flags.blockNumber) {
-      printValueMapRecursive(await traceBlock(this.originalProvider, res.flags.blockNumber, tracer))
+      printValueMapRecursive(
+        await traceBlock(this.kit.web3.currentProvider, res.flags.blockNumber, tracer)
+      )
 
       const stableToken = await this.kit.contracts.getStableToken()
       const tokenTransfers = await stableToken.getTransferEvents(res.flags.blockNumber)

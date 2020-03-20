@@ -52,10 +52,6 @@ export abstract class BaseCommand extends LocalCommand {
   // We need access to the original provider, so that, we can close it.
   private _originalProvider: any | null = null
 
-  get originalProvider() {
-    return this._originalProvider
-  }
-
   get web3() {
     if (!this._web3) {
       const res: ParserOutput<any, any> = this.parse()
