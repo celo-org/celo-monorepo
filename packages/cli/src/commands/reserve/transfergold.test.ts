@@ -42,6 +42,15 @@ testWithGanache('reserve:transfergold cmd', (web3: Web3) => {
       accounts[9],
       '--useMultiSig',
     ])
-    expect(await goldToken.balanceOf(accounts[9])).toEqual(initialBalance)
+    await TransferGold.run([
+      '--from',
+      accounts[7],
+      '--value',
+      transferAmt.toString(10),
+      '--to',
+      accounts[9],
+      '--useMultiSig',
+    ])
+    expect(await goldToken.balanceOf(accounts[9])).toEqual(initialBalance.plus(transferAmt))
   })
 })

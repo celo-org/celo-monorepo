@@ -45,6 +45,7 @@ export default class TransferGold extends BaseCommand {
           ? reserveSpenderMultiSig.isowner(account)
           : new Promise<boolean>(() => false)
       )
+      .addCheck(`${to} is another reserve address`, async () => reserve.isOtherReserveAddress(to))
       .runChecks()
 
     const reserveTx = await reserve.transferGold(to, value)
