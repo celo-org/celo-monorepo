@@ -115,7 +115,7 @@
     "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^9.11.1",
     "react-native-swiper": "^1.5.14",
-    "react-native-tcp": "https://github.com/cmcewen/react-native-tcp#65a1e45",
+    "react-native-tcp": "https://github.com/celo-org/react-native-tcp#96cdfeb",
     "react-native-udp": "git+https://github.com/celo-org/react-native-udp#730f295",
     "react-native-webview": "^7.4.1",
     "react-navigation": "^4.0.10",
@@ -204,7 +204,7 @@
       },
       "ios.sim.debug": {
         "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/celo.app",
-        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
+        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-dev -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone 11"
@@ -212,7 +212,7 @@
       },
       "ios.sim.release": {
         "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/celo.app",
-        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo -configuration Release -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
+        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-dev -configuration Release -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone 11"
