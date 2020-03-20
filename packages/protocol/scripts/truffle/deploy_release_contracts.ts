@@ -1,9 +1,10 @@
 import {
-  getDeployedProxiedContract,
   _setInitialProxyImplementation,
+  getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
+import fs = require('fs')
 import * as prompts from 'prompts'
 import {
   GoldTokenInstance,
@@ -13,7 +14,6 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
-import fs = require('fs')
 
 let argv: any
 let registry: any
@@ -72,7 +72,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
     const addedMonths = releaseGoldConfig.releaseStartTime.split('+')[1]
     const date = new Date()
-    date.setMonth(date.getMonth() + Number(addedMonths))
+    date.setDate(date.getDate() + Number(addedMonths) * 30)
     releaseStartTime = date.getTime() / 1000
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
