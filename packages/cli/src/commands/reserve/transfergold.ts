@@ -52,6 +52,6 @@ export default class TransferGold extends BaseCommand {
       reserveSpenderMultiSig === undefined
         ? reserveTx
         : await reserveSpenderMultiSig.submitOrConfirmTransaction(reserve.address, reserveTx.txo)
-    await displaySendTx<string | void | boolean>('transferGoldTx', tx, {}, 'ReserveGoldTransferred')
+    await displaySendTx<string | void | boolean>('transferGoldTx', tx)
   }
 }
