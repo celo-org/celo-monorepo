@@ -1,0 +1,62 @@
+[
+  {
+    "releaseStartTime": "08-16-2019",
+    "releaseCliffTime": 31536000,
+    "numReleasePeriods": 24,
+    "releasePeriod": 2628000.0,
+    "amountReleasedPerPeriod": "8333.333333330000000000",
+    "revocable": true,
+    "beneficiary": "0x2d53f860286AF78c48DE12B6B3b60F6aAe4F17C2",
+    "releaseOwner": "0x65578A43610f2Ccb46A283f325AB47F1bd9D687C",
+    "refundAddress": "0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe",
+    "subjectToLiquidityProvision": true,
+    "initialDistributionRatio": 1000,
+    "canValidate": false,
+    "canVote": true
+  },
+  {
+    "releaseStartTime": "12-21-2018",
+    "releaseCliffTime": 31536000,
+    "numReleasePeriods": 48,
+    "releasePeriod": 2628000.0,
+    "amountReleasedPerPeriod": "125000.000000000000000000",
+    "revocable": true,
+    "beneficiary": "0xd4A5bc4EB4Cd2DE7290e690A9B0f543781D38A61",
+    "releaseOwner": "0x65578A43610f2Ccb46A283f325AB47F1bd9D687C",
+    "refundAddress": "0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe",
+    "subjectToLiquidityProvision": true,
+    "initialDistributionRatio": 1000,
+    "canValidate": false,
+    "canVote": true
+  },
+  {
+    "releaseStartTime": "12-21-2018",
+    "releaseCliffTime": 31536000,
+    "numReleasePeriods": 48,
+    "releasePeriod": 2628000.0,
+    "amountReleasedPerPeriod": "41666.666666670000000000",
+    "revocable": true,
+    "beneficiary": "0x775a5c899fd4a7cdd54e9f41738087748cfcb316",
+    "releaseOwner": "0x65578A43610f2Ccb46A283f325AB47F1bd9D687C",
+    "refundAddress": "0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe",
+    "subjectToLiquidityProvision": true,
+    "initialDistributionRatio": 1000,
+    "canValidate": false,
+    "canVote": true
+  },
+  {
+    "releaseStartTime": "12-21-2018",
+    "releaseCliffTime": 31536000,
+    "numReleasePeriods": 48,
+    "releasePeriod": 2628000.0,
+    "amountReleasedPerPeriod": "41666.666666670000000000",
+    "revocable": true,
+    "beneficiary": "0x775a5c899fd4a7cdd54e9f41738087748cfcb317",
+    "releaseOwner": "0x65578A43610f2Ccb46A283f325AB47F1bd9D687C",
+    "refundAddress": "0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe",
+    "subjectToLiquidityProvision": true,
+    "initialDistributionRatio": 1000,
+    "canValidate": false,
+    "canVote": true
+  }
+]

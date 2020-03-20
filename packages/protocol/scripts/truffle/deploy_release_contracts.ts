@@ -1,23 +1,21 @@
 import {
-  _setInitialProxyImplementation,
   getDeployedProxiedContract,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs = require('fs')
 import * as prompts from 'prompts'
 import {
-  GoldTokenInstance,
   RegistryInstance,
   ReleaseGoldContract,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 let argv: any
 let registry: any
-let goldToken: any
 let releases: any
 let startGold: any
 let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
@@ -30,7 +28,8 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   const message =
     'Are you sure you want to deploy this contract?\n Total Grant Value: ' +
-    releaseGoldConfig.numReleasePeriods * releaseGoldConfig.amountReleasedPerPeriod +
+    Number(releaseGoldConfig.numReleasePeriods) *
+      Number(releaseGoldConfig.amountReleasedPerPeriod) +
     '? (y/n)'
   if (!argv.yesreally) {
     const response = await prompts({
@@ -44,27 +43,36 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
-  const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new()
-  const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
+  console.log('Pre new')
+  console.log(argv.from)
+  const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new({ from: argv.from })
+  console.log('Post new')
+  const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new({ from: argv.from })
+  console.log('Post new2')
   const multiSigTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldMultiSigInstance,
     releaseGoldMultiSigProxy,
     'ReleaseGoldMultiSig',
+    argv.from,
+    0,
     [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
     2,
     2
   )
-  await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address)
-  const releaseGoldProxy = await ReleaseGoldProxy.new()
-  const releaseGoldInstance = await ReleaseGold.new()
+  console.log('Post init')
+  await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address, {
+    from: argv.from,
+  })
+  console.log('Post transfer')
+  const releaseGoldProxy = await ReleaseGoldProxy.new({ from: argv.from })
+  console.log('post new3')
+  const releaseGoldInstance = await ReleaseGold.new({ from: argv.from })
+  console.log('post new4')
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  await goldToken.transfer(
-    releaseGoldProxy.address,
-    weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
-  )
+  console.log('Post transfer')
   let releaseStartTime: number
   // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
   // This is to account for the dynamic start date for mainnet,
@@ -77,12 +85,14 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
   }
-  console.info('ReleaseSTarttime', releaseStartTime)
+  console.log('Pre RG INIT')
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,
     releaseGoldProxy,
     'ReleaseGold',
+    argv.from,
+    weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods).toFixed(),
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
     releaseGoldConfig.numReleasePeriods,
@@ -98,11 +108,19 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.canVote,
     registry.address
   )
+  console.log('Ppost RG INIT')
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
-  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address)
-  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address)
+  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
+  console.log('Post proxy transfer')
+  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
+  console.log('Post proxy transfer 2')
   // Send starting gold amount to the beneficiary so they can perform transactions.
-  await goldToken.transfer(releaseGoldConfig.beneficiary, startGold)
+  await web3.eth.sendTransaction({
+    from: argv.from,
+    to: releaseGoldConfig.beneficiary,
+    value: startGold,
+  })
+  console.log('Post small transfer')
 
   releases.push({
     Beneficiary: releaseGoldConfig.beneficiary,
@@ -157,10 +175,10 @@ async function handleJSONFile(err, data) {
   }
 
   const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
-    return sum + curr.amountReleasedPerPeriod
+    return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
-  const totalTransferFees = argv.start_gold * grants.length
-  const totalValue = totalTransferFees + totalGoldGrant
+  const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
+  const totalValue = Number(totalTransferFees) + Number(totalGoldGrant)
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
@@ -204,10 +222,10 @@ async function handleJSONFile(err, data) {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     argv = require('minimist')(process.argv.slice(5), {
-      string: ['network', 'grants', 'start_gold', 'output_file', 'really'],
+      string: ['network', 'from', 'grants', 'start_gold', 'output_file', 'really'],
     })
+    web3.eth.defaultAccount = argv.from
     registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-    goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
     ReleaseGold = artifacts.require('ReleaseGold')

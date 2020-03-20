@@ -3,12 +3,12 @@
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { Address, privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
+import Web3 from 'web3'
 import { TransactionObject } from 'web3-eth'
 
-import Web3 from 'web3'
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
@@ -147,13 +147,13 @@ export async function setInitialProxyImplementation<
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
-  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, ...args)
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, web3.eth.defaultAccount, 0, ...args)
   return Contract.at(proxy.address) as ContractInstance
 }
 
 export async function _setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, implementation: ContractInstance, proxy: ProxyInstance, contractName: string, ...args: any[]) {
+>(web3: Web3, implementation: ContractInstance, proxy: ProxyInstance, contractName: string, from: Address, value: number | string, ...args: any[]) {
   const initializerAbi = (implementation as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
@@ -163,9 +163,9 @@ export async function _setInitialProxyImplementation<
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
     console.log(`  Setting initial ${contractName} implementation on proxy`)
-    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, from, value, ...args)
   } else {
-    receipt = await proxy._setImplementation(implementation.address)
+    receipt = await proxy._setImplementation(implementation.address, { from, value })
   }
   return receipt.tx
 }

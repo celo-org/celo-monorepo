@@ -52,6 +52,7 @@ const networks = {
     port: 8545,
     from: RC0_FROM,
     network_id: 200312,
+    gas: gasLimit,
     gasPrice: 100000000000,
   },
   coverage: {
