@@ -233,7 +233,6 @@ exports[`VerificationInputScreen renders correctly 1`] = `
                 "flex": 1,
                 "fontFamily": "Hind-Regular",
                 "padding": 8,
-                "textAlignVertical": "top",
               }
             }
             underlineColorAndroid="transparent"
