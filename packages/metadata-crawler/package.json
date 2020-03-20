@@ -1,0 +1,23 @@
+{
+  "name": "@celo/metadata-crawler",
+  "version": "0.0.1",
+  "description": "Celo metadata crawler",
+  "main": "index.js",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@celo/contractkit": "0.3.1-dev",
+    "@types/pg": "^7.11.2",
+    "google-spreadsheet": "^2.0.8",
+    "pg": "^7.12.1",
+    "googleapis": "^39.2.0",
+    "ts-node": "^8.5.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "ts-node src/crawler.ts",
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean"
+  },
+  "private": true
+}
