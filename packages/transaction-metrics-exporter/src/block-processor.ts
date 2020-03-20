@@ -3,7 +3,7 @@ import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block
 import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { labelValues } from 'prom-client'
 import { Transaction } from 'web3-core'
-import { Block, BlockHeader } from 'web3-eth'
+import { Block } from 'web3-eth'
 
 import { Counters } from './metrics'
 import { Contracts, stateGetters } from './states'
@@ -22,15 +22,26 @@ export class BlockProcessor {
   private contracts: Contracts = {} as any
   private initialized = false
 
-  constructor(private kit: ContractKit, private blockInterval = 1) {}
+  constructor(
+    private kit: ContractKit,
+    private blockInterval = 1,
+    private fromBlock: number = 0,
+    private toBlock: number = fromBlock
+  ) {}
 
   async init() {
     if (this.initialized) {
       throw new Error('BlockProcessor is running')
     }
+    this.initialized = true
 
     await this.loadContracts()
-    await this.initSubscription()
+
+    if (this.fromBlock?.toFixed?.() && this.toBlock) {
+      this.initBatch()
+    } else {
+      await this.initSubscription()
+    }
   }
 
   async loadContracts() {
@@ -46,29 +57,35 @@ export class BlockProcessor {
 
     // Prevent same block multiples times
     let lastBlocks: number[] = []
-    subscription.on('data', async (header) => {
+    subscription.on('data', (header) => {
       if (!lastBlocks.includes(header.number)) {
         // tslint:disable-next-line: no-floating-promises
-        this.onNewBlock(header)
+        this.onNewBlock(header.number)
       }
       lastBlocks.push(header.number)
       lastBlocks = lastBlocks.slice(-10)
     })
   }
 
-  async onNewBlock(header: BlockHeader) {
-    if (header.number % this.blockInterval === 0) {
-      // tslint:disable-next-line: no-floating-promises
-      this.fetchBlockState(header.number)
-      // tslint:disable-next-line: no-floating-promises
-      this.processBlockHeader(header)
+  async initBatch() {
+    let block = this.fromBlock - 1
+    while (++block <= this.toBlock) {
+      await this.onNewBlock(block)
     }
   }
 
-  fetchBlockState(blockNumber: number) {
-    stateGetters.forEach(({ contract, method, args, transformValues }) => {
-      ;(this.contracts as any)[contract][method](...args)
-        .then((returnData: any) =>
+  async onNewBlock(blockNumber: number) {
+    if (blockNumber % this.blockInterval === 0) {
+      await Promise.all([this.fetchBlockState(blockNumber), this.processBlockHeader(blockNumber)])
+    }
+  }
+
+  async fetchBlockState(blockNumber: number) {
+    const promises = stateGetters.map(({ contract, method, args, transformValues }) => {
+      this.contracts[contract].setDefaultBlock(blockNumber)
+      return (this.contracts as any)[contract][method](...args)
+        .then((returnData: any) => {
+          this.contracts[contract].setDefaultBlock('latest')
           this.logEvent(LoggingCategory.State, {
             contract,
             function: method,
@@ -76,21 +93,22 @@ export class BlockProcessor {
             blockNumber,
             values: transformValues(returnData),
           })
-        )
-        .catch()
+        })
+        .catch() as Promise<any>
     })
+    await Promise.all(promises)
   }
 
-  async processBlockHeader(header: BlockHeader) {
+  async processBlockHeader(blockNumber: number) {
     const NOT_WHITELISTED_ADDRESS = 'not_whitelisted_address'
 
     const blockExplorer = await newBlockExplorer(this.kit)
     const logExplorer = await newLogExplorer(this.kit)
 
-    Counters.blockheader.inc({ miner: header.miner })
+    const block = await blockExplorer.fetchBlock(blockNumber)
+    const previousBlock: Block = await blockExplorer.fetchBlock(blockNumber - 1)
 
-    const block = await blockExplorer.fetchBlock(header.number)
-    const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
+    Counters.blockheader.inc({ miner: block.miner })
 
     const blockTime = Number(block.timestamp) - Number(previousBlock.timestamp)
     this.logEvent(LoggingCategory.Block, { ...block, blockTime })

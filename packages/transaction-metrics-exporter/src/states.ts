@@ -16,7 +16,7 @@ export interface Contracts {
 }
 
 export interface StateGetter {
-  contract: string
+  contract: keyof Contracts
   method: string
   args: any[]
   transformValues: Function
