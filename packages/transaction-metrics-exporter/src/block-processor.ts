@@ -182,7 +182,7 @@ export class BlockProcessor {
   ) {
     const argsKey = args.join('_')
     Object.keys(values).forEach((valueKey) => {
-      const key = `state_metric_${contract}_${functionName}:${argsKey}:${valueKey}`
+      const key = `state_metric_${contract}_${functionName}_${argsKey}_${valueKey}`
 
       if (!this.histograms[key]) {
         let buckets: number[] = [0]
