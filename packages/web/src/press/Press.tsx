@@ -35,7 +35,6 @@ class Press extends React.PureComponent<I18nProps> {
             ))}
           </View>
           <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
-            {/* <Button text={t('recentNews')} kind={BTN.NAKED} href={'https://medium.com/celoOrg'} /> */}
             <Button
               text={t('recentNews')}
               kind={BTN.NAKED}
@@ -92,12 +91,6 @@ const logos: Logo[] = [
     url:
       'https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600',
   },
-  // {
-  //   source: ventureBeat,
-  //   size: {},
-  //   url:
-  //     'https://venturebeat.com/2018/09/05/googles-launchpad-studio-introduces-class-of-financial-ai-startups/',
-  // },
   {
     source: fortune,
     size: {},
