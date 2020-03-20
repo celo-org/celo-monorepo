@@ -119,7 +119,6 @@ exports[`About renders 1`] = `
             }
 
             .ReactModal__Overlay {
-              transform: translateY(-100vh);
               transition: transform 1000ms ease-in-out;
             }
             
