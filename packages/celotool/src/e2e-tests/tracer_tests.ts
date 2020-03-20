@@ -1,6 +1,6 @@
 import { CeloContract } from '@celo/contractkit'
 import { ContractKit, newKit } from '@celo/contractkit'
-import { Address } from '@celo/contractkit/lib/base'
+import { Address, AllContracts } from '@celo/contractkit/lib/base'
 import { AccountAssets, trackTransfers } from '@celo/contractkit/lib/explorer/assets'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -55,6 +55,11 @@ describe('tracer tests', () => {
         rpcport: 8549,
       },
     ],
+    migrationOverrides: {
+      lockedGold: {
+        unlockingPeriod: 1,
+      },
+    },
   }
 
   const context: any = getContext(gethConfig)
@@ -69,7 +74,7 @@ describe('tracer tests', () => {
   after(async function(this: any) {
     this.timeout(0)
     //await context.hooks.after()
-    await sleep(10000000000)
+    await sleep(1000000)
   })
 
   const restart = async () => {
@@ -77,6 +82,16 @@ describe('tracer tests', () => {
     kit = newKit('http://localhost:8545')
     kit.defaultAccount = validatorAddress
     goldToken = await kit.contracts.getGoldToken()
+
+    console.info('AllContracts')
+    for (const contract of AllContracts) {
+      try {
+        const addr = await kit.registry.addressFor(contract)
+        console.info(`${contract} = ${addr}`)
+      } catch (error) {
+        console.info(error)
+      }
+    }
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
@@ -209,5 +224,69 @@ describe('tracer tests', () => {
       },
       false
     )
+
+    describe(`Locking gold`, () => {
+      let trackBalances: Record<Address, AccountAssets>
+      let receipt: TransactionReceipt
+
+      before(async function(this: any) {
+        this.timeout(0)
+        const lockedGold = await kit.contracts.getLockedGold()
+        const tx = await lockedGold.lock()
+        const txResult = await tx.send({ value: TransferAmount.toFixed() })
+        receipt = await txResult.waitReceipt()
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+      })
+
+      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].gold,
+          new BigNumber(-TransferAmount)
+        ))
+    })
+
+    describe(`Unlocking gold`, () => {
+      let trackBalances: Record<Address, AccountAssets>
+      let receipt: TransactionReceipt
+
+      before(async function(this: any) {
+        this.timeout(0)
+        const lockedGold = await kit.contracts.getLockedGold()
+        const tx = await lockedGold.unlock(TransferAmount)
+        const txResult = await tx.send()
+        receipt = await txResult.waitReceipt()
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+      })
+
+      it(`cGLD tracer should increment the sender's pending withdrawls by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].lockedGoldPendingWithdrawl,
+          new BigNumber(TransferAmount)
+        ))
+    })
+
+    describe(`Withdrawing unlocked gold`, () => {
+      let trackBalances: Record<Address, AccountAssets>
+      let receipt: TransactionReceipt
+
+      before(async function(this: any) {
+        this.timeout(0)
+        // wait for 1 second unlocking period to elapse
+        await sleep(3)
+        const lockedGold = await kit.contracts.getLockedGold()
+        const tx = await lockedGold.withdraw(0)
+        const txResult = await tx.send()
+        receipt = await txResult.waitReceipt()
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        console.info(`Withdraw receipt`)
+        console.info(receipt)
+      })
+
+      it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].gold,
+          new BigNumber(TransferAmount)
+        ))
+    })
   })
 })
