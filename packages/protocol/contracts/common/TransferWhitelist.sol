@@ -11,11 +11,12 @@ import "./UsingRegistry.sol";
 contract TransferWhitelist is Ownable, UsingRegistry {
   using SafeMath for uint256;
 
-  address[] public whitelist;
+  address[] private whitelist;
   bytes32[] public registeredContracts;
 
-  event WhitelistedAddress(address addr);
-  event WhitelistedRegistryId(bytes32 registryId);
+  event WhitelistedAddress(address indexed addr);
+  event WhitelistedAddressRemoved(address indexed addr);
+  event WhitelistedRegistryId(bytes32 indexed registryId);
 
   constructor(address registryAddress) public {
     _transferOwnership(msg.sender);
@@ -26,9 +27,24 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @notice Add an address to the whitelist.
    * @param newAddress The address to add.
    */
-  function addAddress(address newAddress) external onlyOwner {
+  function addAddress(address newAddress) public onlyOwner {
     whitelist.push(newAddress);
     emit WhitelistedAddress(newAddress);
+  }
+
+  /**
+   * @notice Remove an address from the whitelist.
+   * @param removedAddress The address to add.
+   * @param index Index of address in the whitelist.
+   */
+  function removeAddress(address removedAddress, uint256 index) external onlyOwner {
+    require(index < whitelist.length, "Whitelist index out of range");
+    require(whitelist[index] == removedAddress, "Bad whitelist index");
+    if (index != whitelist.length.sub(1)) {
+      whitelist[index] = whitelist[whitelist.length.sub(1)];
+    }
+    whitelist.length = whitelist.length.sub(1);
+    emit WhitelistedAddressRemoved(removedAddress);
   }
 
   /**
@@ -57,7 +73,13 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @param  _whitelist The new whitelist of addresses.
    */
   function setWhitelist(address[] calldata _whitelist) external onlyOwner {
-    whitelist = _whitelist;
+    for (uint256 i = 0; i < whitelist.length; i = i.add(1)) {
+      emit WhitelistedAddressRemoved(whitelist[i]);
+    }
+    whitelist.length = 0;
+    for (uint256 i = 0; i < _whitelist.length; i = i.add(1)) {
+      addAddress(_whitelist[i]);
+    }
   }
 
   /**
