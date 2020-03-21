@@ -549,7 +549,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              stayConnected
+              Stay Connected
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -576,7 +576,7 @@ exports[`HomePage renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="common:email*"
+                placeholder="Email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}
@@ -827,7 +827,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            hero3
+            Celo is an open platform that makes financial tools accessible to anyone with a mobile phone
           </h2>
         </div>
       </div>
@@ -1438,7 +1438,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              recentNews
+              Recent News
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -1558,7 +1558,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              systemsApproach
+              We embrace a full-stack approach, reimagining technology at each layer
             </h2>
             <h2
               aria-level="2"
@@ -1577,7 +1577,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              designedWithCommunities
+              Our innovations are designed with communities around the world
             </h2>
           </div>
         </div>
@@ -1854,7 +1854,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              buildOnCelo
+              Build on Celo
             </div>
             <div
               className="css-text-901oao"
@@ -1869,7 +1869,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              buildOnCeloCopy
+              Celo is a platform that is open and open-source, allowing for an ecosystem of powerful applications built on top, including easier cash transfer programs, peer-to-peer lending, collaborative small-scale insurance, and other digital assets and wallets.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1942,7 +1942,7 @@ exports[`HomePage renders 1`] = `
                       }
                     }
                   >
-                    learnMore
+                    Learn More
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -2119,7 +2119,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              mobileFirstPlatform
+              Mobile-First Platform
             </div>
             <div
               className="css-text-901oao"
@@ -2134,7 +2134,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              mobileFirstPlatformCopy
+              To create a truly inclusive financial system, we started by building an infrastructure to serve those excluded from the current system. Celo’s protocol includes unique features that create a seamless user experience on mobile phones.
             </div>
           </div>
           <div
@@ -2280,7 +2280,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              poweredByCommunity
+              Powered by our community
             </div>
             <div
               className="css-text-901oao"
@@ -2295,7 +2295,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              poweredByCommunityCopy
+              Celo's platform is powered by the community. Users can earn currency by hosting software that forwards mobile devices' requests or validates their transactions.
             </div>
           </div>
           <div
@@ -2419,7 +2419,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              whitePaper
+              White Paper
             </div>
             <div
               className="css-text-901oao"
@@ -2435,7 +2435,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              whitepaperCopy
+              Celo is a proof-of-stake based blockchain with smart contracts. The technology uses a phone number-based identity system with address-based encryption and eigentrust-based reputation.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2525,7 +2525,7 @@ exports[`HomePage renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadPDF
+                  Download .PDF
                 </a>
               </div>
             </div>
@@ -2597,7 +2597,7 @@ exports[`HomePage renders 1`] = `
                   }
                 }
               >
-                stabilityAnalysis
+                Stability Analysis
               </div>
               <div
                 className="css-text-901oao"
@@ -2613,7 +2613,7 @@ exports[`HomePage renders 1`] = `
                   }
                 }
               >
-                stabilityAnalysisCopy
+                Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, tracks the value of the US Dollar.
               </div>
             </div>
             <div
@@ -2704,7 +2704,7 @@ exports[`HomePage renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadPDF
+                  Download .PDF
                 </a>
               </div>
             </div>
@@ -2813,7 +2813,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.subtitle
+        Milestones
       </h3>
       <h2
         aria-level="2"
@@ -2832,7 +2832,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.title
+        Celo's Journey
       </h2>
       <div
         className="css-text-901oao"
@@ -2847,7 +2847,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.intro
+        The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.
       </div>
     </div>
   </div>
@@ -2910,7 +2910,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.pastTitle
+        Previous Milestones
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -3057,7 +3057,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.SDK_Release.title
+              SDK Release
             </div>
           </div>
           <div
@@ -3081,7 +3081,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.SDK_Release.text
+              ContractKit and DAppKit simplify development of dApps
             </div>
           </div>
         </div>
@@ -3231,7 +3231,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Baklava_Testnet.title
+              Baklava Testnet – The Great Celo Stake Off
             </div>
           </div>
           <div
@@ -3255,7 +3255,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Baklava_Testnet.text
+              Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened
             </div>
           </div>
         </div>
@@ -3405,7 +3405,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.100_Community.title
+              100th Community Event
             </div>
           </div>
           <div
@@ -3429,7 +3429,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.100_Community.text
+              100 events hosted in 100 days in more than 35 countries
             </div>
           </div>
         </div>
@@ -3579,7 +3579,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Alfajores_Testnet.title
+              Alfajores Testnet Release
             </div>
           </div>
           <div
@@ -3603,7 +3603,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Alfajores_Testnet.text
+              First full network release for protocol and app developers
             </div>
           </div>
         </div>
@@ -3753,7 +3753,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.MIT_Stability_Challenge.title
+              MIT Stability Challenge
             </div>
           </div>
           <div
@@ -3777,7 +3777,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.MIT_Stability_Challenge.text
+              Stability Protocol tested and improved
             </div>
           </div>
         </div>
@@ -3927,7 +3927,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Wallet_in_market_testing_begins.title
+              Mobile Wallet in Market Testing Begins
             </div>
           </div>
           <div
@@ -3951,7 +3951,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Wallet_in_market_testing_begins.text
+              Ongoing research in emerging markets
             </div>
           </div>
         </div>
@@ -4092,7 +4092,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.First_user_research_trip.title
+              First User Research Trip
             </div>
           </div>
           <div
@@ -4116,7 +4116,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.First_user_research_trip.text
+              Field research on mobile money adoption in Kenya
             </div>
           </div>
         </div>
@@ -4157,7 +4157,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.legendTitle
+        Milestone Key
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -4221,7 +4221,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            timeline.legend.half
+            In Progress
           </div>
         </div>
         <div
@@ -4275,7 +4275,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            timeline.legend.empty
+            Pending
           </div>
         </div>
       </div>
@@ -4295,7 +4295,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.upcomingTitle
+        Upcoming Milestones
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -4424,7 +4424,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.New_Baklava_Testnet.title
+              New Baklava Testnet
             </div>
           </div>
           <div
@@ -4448,7 +4448,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.New_Baklava_Testnet.text
+              Validators stand up new testnet with feature complete software
             </div>
           </div>
         </div>
@@ -4580,7 +4580,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Security_audits_complete.title
+              Security Audits Complete
             </div>
           </div>
           <div
@@ -4604,7 +4604,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Security_audits_complete.text
+              Resolve any outstanding issues to harden codebase
             </div>
           </div>
         </div>
@@ -4741,7 +4741,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_1.title
+              Mainnet Release Candidate 1
             </div>
           </div>
           <div
@@ -4765,7 +4765,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_1.text
+              Validators stand up release candidate network with production-ready software
             </div>
           </div>
         </div>
@@ -4902,7 +4902,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Validator_Elections_Start.title
+              Validator Elections Start
             </div>
           </div>
           <div
@@ -4926,7 +4926,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Validator_Elections_Start.text
+              When sufficient validators and groups are registered and staked, validator elections and epoch rewards can be enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5063,7 +5063,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_X.title
+              Mainnet Release Candidate X
             </div>
           </div>
           <div
@@ -5087,7 +5087,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_X.text
+              Possible additional release candidates in the event critical issues are discovered
             </div>
           </div>
         </div>
@@ -5224,7 +5224,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Gold_is_live.title
+              Celo Gold Live
             </div>
           </div>
           <div
@@ -5248,7 +5248,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Gold_is_live.text
+              When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5385,7 +5385,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Dollar_is_live.title
+              Celo Dollars Live
             </div>
           </div>
           <div
@@ -5409,7 +5409,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Dollar_is_live.text
+              When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5546,7 +5546,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Mobile_Wallet_Release.title
+              Mainnet Mobile Wallet Release
             </div>
           </div>
           <div
@@ -5570,7 +5570,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Mobile_Wallet_Release.text
+              The Mainnet Mobile Wallet will be fully available for download on iOS and Android
             </div>
           </div>
         </div>
@@ -5657,7 +5657,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            workOnCelo
+            Work on Celo in Berlin, Buenos Aires, San Francisco, and around the world
           </h2>
         </div>
       </div>
@@ -5748,7 +5748,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              viewRoles
+              View Open Roles
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -6340,7 +6340,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              hero.backers
+              See More Backers
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -6444,7 +6444,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        startConversation
+        Start A Conversation
       </div>
       <div
         className="css-text-901oao"
@@ -6459,7 +6459,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        reachOut
+        Reach out to participate in Celo’s ecosystem
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -6486,7 +6486,7 @@ exports[`HomePage renders 1`] = `
           onKeyDown={[Function]}
           onKeyPress={[Function]}
           onSelect={[Function]}
-          placeholder="common:email*"
+          placeholder="Email*"
           readOnly={false}
           required={true}
           spellCheck={true}
@@ -6591,7 +6591,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            submit
+            Submit
           </a>
         </div>
         <div
@@ -6658,7 +6658,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        stayConnected
+        Stay Connected
       </div>
       <div
         className="css-text-901oao"
@@ -6673,7 +6673,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        receiveUpdates
+        Receive the latest updates to your inbox
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -6700,7 +6700,7 @@ exports[`HomePage renders 1`] = `
           onKeyDown={[Function]}
           onKeyPress={[Function]}
           onSelect={[Function]}
-          placeholder="common:email*"
+          placeholder="Email*"
           readOnly={false}
           required={true}
           spellCheck={true}
@@ -6805,7 +6805,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            signUp
+            Sign Up
           </a>
         </div>
         <div
