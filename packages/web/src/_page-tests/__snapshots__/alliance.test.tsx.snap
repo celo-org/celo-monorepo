@@ -2456,13 +2456,13 @@ exports[`Alliance renders 1`] = `
                       style={
                         Object {
                           "MozTransitionProperty": "max-height",
-                          "WebkitTransitionDuration": "500ms",
+                          "WebkitTransitionDuration": "600ms",
                           "WebkitTransitionProperty": "max-height",
                           "height": "auto",
                           "marginBottom": "5px",
                           "marginTop": "5px",
                           "maxHeight": "0px",
-                          "transitionDuration": "500ms",
+                          "transitionDuration": "600ms",
                           "transitionProperty": "max-height",
                         }
                       }
@@ -2473,7 +2473,7 @@ exports[`Alliance renders 1`] = `
                         style={
                           Object {
                             "MozTransitionProperty": "opacity",
-                            "WebkitTransitionDuration": "600ms",
+                            "WebkitTransitionDuration": "700ms",
                             "WebkitTransitionProperty": "opacity",
                             "color": "rgba(255,127,109,1.00)",
                             "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -2482,7 +2482,7 @@ exports[`Alliance renders 1`] = `
                             "lineHeight": "18px",
                             "opacity": 0,
                             "textRendering": "geometricPrecision",
-                            "transitionDuration": "600ms",
+                            "transitionDuration": "700ms",
                             "transitionProperty": "opacity",
                           }
                         }
@@ -2603,13 +2603,13 @@ exports[`Alliance renders 1`] = `
                       style={
                         Object {
                           "MozTransitionProperty": "max-height",
-                          "WebkitTransitionDuration": "500ms",
+                          "WebkitTransitionDuration": "600ms",
                           "WebkitTransitionProperty": "max-height",
                           "height": "auto",
                           "marginBottom": "5px",
                           "marginTop": "5px",
                           "maxHeight": "0px",
-                          "transitionDuration": "500ms",
+                          "transitionDuration": "600ms",
                           "transitionProperty": "max-height",
                         }
                       }
@@ -2620,7 +2620,7 @@ exports[`Alliance renders 1`] = `
                         style={
                           Object {
                             "MozTransitionProperty": "opacity",
-                            "WebkitTransitionDuration": "600ms",
+                            "WebkitTransitionDuration": "700ms",
                             "WebkitTransitionProperty": "opacity",
                             "color": "rgba(255,127,109,1.00)",
                             "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -2629,7 +2629,7 @@ exports[`Alliance renders 1`] = `
                             "lineHeight": "18px",
                             "opacity": 0,
                             "textRendering": "geometricPrecision",
-                            "transitionDuration": "600ms",
+                            "transitionDuration": "700ms",
                             "transitionProperty": "opacity",
                           }
                         }
@@ -2746,45 +2746,6 @@ exports[`Alliance renders 1`] = `
                     type="text"
                     value=""
                   />
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "MozTransitionProperty": "max-height",
-                        "WebkitTransitionDuration": "500ms",
-                        "WebkitTransitionProperty": "max-height",
-                        "height": "auto",
-                        "marginBottom": "5px",
-                        "marginTop": "5px",
-                        "maxHeight": "0px",
-                        "transitionDuration": "500ms",
-                        "transitionProperty": "max-height",
-                      }
-                    }
-                  >
-                    <div
-                      className="css-text-901oao"
-                      dir="auto"
-                      style={
-                        Object {
-                          "MozTransitionProperty": "opacity",
-                          "WebkitTransitionDuration": "600ms",
-                          "WebkitTransitionProperty": "opacity",
-                          "color": "rgba(255,127,109,1.00)",
-                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                          "fontSize": "16px",
-                          "fontWeight": "500",
-                          "lineHeight": "18px",
-                          "opacity": 0,
-                          "textRendering": "geometricPrecision",
-                          "transitionDuration": "600ms",
-                          "transitionProperty": "opacity",
-                        }
-                      }
-                    >
-                      common:validationErrors.generic
-                    </div>
-                  </div>
                 </div>
               </div>
               <div
@@ -7419,13 +7380,13 @@ exports[`Alliance renders 1`] = `
                     style={
                       Object {
                         "MozTransitionProperty": "max-height",
-                        "WebkitTransitionDuration": "500ms",
+                        "WebkitTransitionDuration": "600ms",
                         "WebkitTransitionProperty": "max-height",
                         "height": "auto",
                         "marginBottom": "5px",
                         "marginTop": "5px",
                         "maxHeight": "0px",
-                        "transitionDuration": "500ms",
+                        "transitionDuration": "600ms",
                         "transitionProperty": "max-height",
                       }
                     }
@@ -7436,7 +7397,7 @@ exports[`Alliance renders 1`] = `
                       style={
                         Object {
                           "MozTransitionProperty": "opacity",
-                          "WebkitTransitionDuration": "600ms",
+                          "WebkitTransitionDuration": "700ms",
                           "WebkitTransitionProperty": "opacity",
                           "color": "rgba(255,127,109,1.00)",
                           "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -7445,7 +7406,7 @@ exports[`Alliance renders 1`] = `
                           "lineHeight": "18px",
                           "opacity": 0,
                           "textRendering": "geometricPrecision",
-                          "transitionDuration": "600ms",
+                          "transitionDuration": "700ms",
                           "transitionProperty": "opacity",
                         }
                       }
@@ -7566,13 +7527,13 @@ exports[`Alliance renders 1`] = `
                     style={
                       Object {
                         "MozTransitionProperty": "max-height",
-                        "WebkitTransitionDuration": "500ms",
+                        "WebkitTransitionDuration": "600ms",
                         "WebkitTransitionProperty": "max-height",
                         "height": "auto",
                         "marginBottom": "5px",
                         "marginTop": "5px",
                         "maxHeight": "0px",
-                        "transitionDuration": "500ms",
+                        "transitionDuration": "600ms",
                         "transitionProperty": "max-height",
                       }
                     }
@@ -7583,7 +7544,7 @@ exports[`Alliance renders 1`] = `
                       style={
                         Object {
                           "MozTransitionProperty": "opacity",
-                          "WebkitTransitionDuration": "600ms",
+                          "WebkitTransitionDuration": "700ms",
                           "WebkitTransitionProperty": "opacity",
                           "color": "rgba(255,127,109,1.00)",
                           "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -7592,7 +7553,7 @@ exports[`Alliance renders 1`] = `
                           "lineHeight": "18px",
                           "opacity": 0,
                           "textRendering": "geometricPrecision",
-                          "transitionDuration": "600ms",
+                          "transitionDuration": "700ms",
                           "transitionProperty": "opacity",
                         }
                       }
@@ -7709,45 +7670,6 @@ exports[`Alliance renders 1`] = `
                   type="text"
                   value=""
                 />
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "MozTransitionProperty": "max-height",
-                      "WebkitTransitionDuration": "500ms",
-                      "WebkitTransitionProperty": "max-height",
-                      "height": "auto",
-                      "marginBottom": "5px",
-                      "marginTop": "5px",
-                      "maxHeight": "0px",
-                      "transitionDuration": "500ms",
-                      "transitionProperty": "max-height",
-                    }
-                  }
-                >
-                  <div
-                    className="css-text-901oao"
-                    dir="auto"
-                    style={
-                      Object {
-                        "MozTransitionProperty": "opacity",
-                        "WebkitTransitionDuration": "600ms",
-                        "WebkitTransitionProperty": "opacity",
-                        "color": "rgba(255,127,109,1.00)",
-                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                        "fontSize": "16px",
-                        "fontWeight": "500",
-                        "lineHeight": "18px",
-                        "opacity": 0,
-                        "textRendering": "geometricPrecision",
-                        "transitionDuration": "600ms",
-                        "transitionProperty": "opacity",
-                      }
-                    }
-                  >
-                    common:validationErrors.generic
-                  </div>
-                </div>
               </div>
             </div>
             <div

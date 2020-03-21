@@ -4124,13 +4124,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -4141,7 +4141,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4150,7 +4150,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -4251,13 +4251,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -4268,7 +4268,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4277,7 +4277,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -4378,13 +4378,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -4395,7 +4395,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4404,7 +4404,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -4505,13 +4505,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -4522,7 +4522,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4531,7 +4531,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -4632,13 +4632,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -4649,7 +4649,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4658,7 +4658,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -4759,13 +4759,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -4776,7 +4776,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4785,7 +4785,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -4886,13 +4886,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -4903,7 +4903,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4912,7 +4912,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -5006,13 +5006,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -5023,7 +5023,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5032,7 +5032,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -5146,13 +5146,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -5163,7 +5163,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5172,7 +5172,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -5273,13 +5273,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -5290,7 +5290,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5299,7 +5299,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -5400,13 +5400,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -5417,7 +5417,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5426,7 +5426,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -5527,13 +5527,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -5544,7 +5544,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5553,7 +5553,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -5654,13 +5654,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -5671,7 +5671,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5680,7 +5680,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -5774,13 +5774,13 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "500ms",
+                    "WebkitTransitionDuration": "600ms",
                     "WebkitTransitionProperty": "max-height",
                     "height": "auto",
                     "marginBottom": "5px",
                     "marginTop": "5px",
                     "maxHeight": "0px",
-                    "transitionDuration": "500ms",
+                    "transitionDuration": "600ms",
                     "transitionProperty": "max-height",
                   }
                 }
@@ -5791,7 +5791,7 @@ exports[`Community renders 1`] = `
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionDuration": "700ms",
                       "WebkitTransitionProperty": "opacity",
                       "color": "rgba(255,127,109,1.00)",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5800,7 +5800,7 @@ exports[`Community renders 1`] = `
                       "lineHeight": "18px",
                       "opacity": 0,
                       "textRendering": "geometricPrecision",
-                      "transitionDuration": "600ms",
+                      "transitionDuration": "700ms",
                       "transitionProperty": "opacity",
                     }
                   }
@@ -6707,13 +6707,13 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "MozTransitionProperty": "max-height",
-                  "WebkitTransitionDuration": "500ms",
+                  "WebkitTransitionDuration": "600ms",
                   "WebkitTransitionProperty": "max-height",
                   "height": "auto",
                   "marginBottom": "5px",
                   "marginTop": "5px",
                   "maxHeight": "0px",
-                  "transitionDuration": "500ms",
+                  "transitionDuration": "600ms",
                   "transitionProperty": "max-height",
                 }
               }
@@ -6724,7 +6724,7 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
-                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionDuration": "700ms",
                     "WebkitTransitionProperty": "opacity",
                     "color": "rgba(255,127,109,1.00)",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -6733,7 +6733,7 @@ exports[`Community renders 1`] = `
                     "lineHeight": "18px",
                     "opacity": 0,
                     "textRendering": "geometricPrecision",
-                    "transitionDuration": "600ms",
+                    "transitionDuration": "700ms",
                     "transitionProperty": "opacity",
                   }
                 }
@@ -6920,13 +6920,13 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "MozTransitionProperty": "max-height",
-                  "WebkitTransitionDuration": "500ms",
+                  "WebkitTransitionDuration": "600ms",
                   "WebkitTransitionProperty": "max-height",
                   "height": "auto",
                   "marginBottom": "5px",
                   "marginTop": "5px",
                   "maxHeight": "0px",
-                  "transitionDuration": "500ms",
+                  "transitionDuration": "600ms",
                   "transitionProperty": "max-height",
                 }
               }
@@ -6937,7 +6937,7 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
-                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionDuration": "700ms",
                     "WebkitTransitionProperty": "opacity",
                     "color": "rgba(255,127,109,1.00)",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -6946,7 +6946,7 @@ exports[`Community renders 1`] = `
                     "lineHeight": "18px",
                     "opacity": 0,
                     "textRendering": "geometricPrecision",
-                    "transitionDuration": "600ms",
+                    "transitionDuration": "700ms",
                     "transitionProperty": "opacity",
                   }
                 }
@@ -7003,13 +7003,13 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "MozTransitionProperty": "max-height",
-                  "WebkitTransitionDuration": "500ms",
+                  "WebkitTransitionDuration": "600ms",
                   "WebkitTransitionProperty": "max-height",
                   "height": "auto",
                   "marginBottom": "5px",
                   "marginTop": "5px",
                   "maxHeight": "0px",
-                  "transitionDuration": "500ms",
+                  "transitionDuration": "600ms",
                   "transitionProperty": "max-height",
                 }
               }
@@ -7020,7 +7020,7 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
-                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionDuration": "700ms",
                     "WebkitTransitionProperty": "opacity",
                     "color": "rgba(255,127,109,1.00)",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -7029,7 +7029,7 @@ exports[`Community renders 1`] = `
                     "lineHeight": "18px",
                     "opacity": 0,
                     "textRendering": "geometricPrecision",
-                    "transitionDuration": "600ms",
+                    "transitionDuration": "700ms",
                     "transitionProperty": "opacity",
                   }
                 }
@@ -7161,13 +7161,13 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "MozTransitionProperty": "max-height",
-                  "WebkitTransitionDuration": "500ms",
+                  "WebkitTransitionDuration": "600ms",
                   "WebkitTransitionProperty": "max-height",
                   "height": "auto",
                   "marginBottom": "5px",
                   "marginTop": "5px",
                   "maxHeight": "0px",
-                  "transitionDuration": "500ms",
+                  "transitionDuration": "600ms",
                   "transitionProperty": "max-height",
                 }
               }
@@ -7178,7 +7178,7 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
-                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionDuration": "700ms",
                     "WebkitTransitionProperty": "opacity",
                     "color": "rgba(255,127,109,1.00)",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -7187,7 +7187,7 @@ exports[`Community renders 1`] = `
                     "lineHeight": "18px",
                     "opacity": 0,
                     "textRendering": "geometricPrecision",
-                    "transitionDuration": "600ms",
+                    "transitionDuration": "700ms",
                     "transitionProperty": "opacity",
                   }
                 }
@@ -7319,13 +7319,13 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "MozTransitionProperty": "max-height",
-                  "WebkitTransitionDuration": "500ms",
+                  "WebkitTransitionDuration": "600ms",
                   "WebkitTransitionProperty": "max-height",
                   "height": "auto",
                   "marginBottom": "5px",
                   "marginTop": "5px",
                   "maxHeight": "0px",
-                  "transitionDuration": "500ms",
+                  "transitionDuration": "600ms",
                   "transitionProperty": "max-height",
                 }
               }
@@ -7336,7 +7336,7 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
-                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionDuration": "700ms",
                     "WebkitTransitionProperty": "opacity",
                     "color": "rgba(255,127,109,1.00)",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -7345,7 +7345,7 @@ exports[`Community renders 1`] = `
                     "lineHeight": "18px",
                     "opacity": 0,
                     "textRendering": "geometricPrecision",
-                    "transitionDuration": "600ms",
+                    "transitionDuration": "700ms",
                     "transitionProperty": "opacity",
                   }
                 }
@@ -7477,13 +7477,13 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "MozTransitionProperty": "max-height",
-                  "WebkitTransitionDuration": "500ms",
+                  "WebkitTransitionDuration": "600ms",
                   "WebkitTransitionProperty": "max-height",
                   "height": "auto",
                   "marginBottom": "5px",
                   "marginTop": "5px",
                   "maxHeight": "0px",
-                  "transitionDuration": "500ms",
+                  "transitionDuration": "600ms",
                   "transitionProperty": "max-height",
                 }
               }
@@ -7494,7 +7494,7 @@ exports[`Community renders 1`] = `
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
-                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionDuration": "700ms",
                     "WebkitTransitionProperty": "opacity",
                     "color": "rgba(255,127,109,1.00)",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -7503,7 +7503,7 @@ exports[`Community renders 1`] = `
                     "lineHeight": "18px",
                     "opacity": 0,
                     "textRendering": "geometricPrecision",
-                    "transitionDuration": "600ms",
+                    "transitionDuration": "700ms",
                     "transitionProperty": "opacity",
                   }
                 }

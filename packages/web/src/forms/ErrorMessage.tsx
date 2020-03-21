@@ -5,11 +5,6 @@ import { fonts, textStyles } from 'src/styles'
 
 type Field = string
 
-interface Props {
-  allErrors: Field[]
-  field: Field
-}
-
 function getErrorTransKey(field: string) {
   let key = 'generic'
 
@@ -19,10 +14,14 @@ function getErrorTransKey(field: string) {
   return key
 }
 
-export const ErrorMessage = React.memo(function _ErrorMessage({ allErrors, field }: Props) {
+interface ErrorProps {
+  field: Field
+  isShowing: boolean
+}
+
+export const ErrorDisplay = React.memo(({ field, isShowing }: ErrorProps) => {
   const { t } = useTranslation(NameSpaces.common)
   const key = getErrorTransKey(field)
-  const isShowing = allErrors.includes(field)
   return (
     <View style={[styles.container, !isShowing && styles.containerCollapsed]}>
       <Text
@@ -37,6 +36,17 @@ export const ErrorMessage = React.memo(function _ErrorMessage({ allErrors, field
       </Text>
     </View>
   )
+})
+
+interface Props {
+  allErrors: Field[]
+  field: Field
+}
+
+// Deprecated
+export const ErrorMessage = React.memo(function _ErrorMessage({ allErrors, field }: Props) {
+  const isShowing = allErrors.includes(field)
+  return <ErrorDisplay field={field} isShowing={isShowing} />
 })
 
 const styles = StyleSheet.create({

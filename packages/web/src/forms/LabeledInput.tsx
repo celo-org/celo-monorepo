@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { ErrorMessage } from 'src/forms/ErrorMessage'
+import { ErrorDisplay } from 'src/forms/ErrorMessage'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { TextInput } from './FormComponents'
 
 interface LabelProps {
   name: string
   multiline?: boolean
-  allErrors: string[]
+  allErrors?: string[]
   value: string
   label: string
   onInput: (x?: unknown) => void
@@ -23,8 +23,7 @@ export function LabeledInput({
   label,
   isDarkMode,
 }: LabelProps) {
-  const hasError = allErrors.includes(name)
-
+  const hasError = React.useMemo(() => allErrors && allErrors.includes(name), [allErrors, name])
   return (
     <View style={styles.container}>
       <View style={styles.labelBox}>
@@ -48,7 +47,7 @@ export function LabeledInput({
         value={value}
         onChange={onInput}
       />
-      <ErrorMessage allErrors={allErrors} field={name} />
+      {allErrors && <ErrorDisplay isShowing={hasError} field={name} />}
     </View>
   )
 }

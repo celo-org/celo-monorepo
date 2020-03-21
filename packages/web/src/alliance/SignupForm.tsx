@@ -64,7 +64,6 @@ export default function SignupForm() {
                 isDarkMode={true}
                 label={t('form.contribution')}
                 onInput={onInput}
-                allErrors={formState.errors}
                 name="contribution"
                 value={formState.form.contribution}
               />
