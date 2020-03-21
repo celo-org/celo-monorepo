@@ -104,9 +104,9 @@ contract Election is
 
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
 
-  event ValidatorGroupMarkedEligible(address group);
+  event ValidatorGroupMarkedEligible(address indexed group);
 
-  event ValidatorGroupMarkedIneligible(address group);
+  event ValidatorGroupMarkedIneligible(address indexed group);
 
   event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
 
