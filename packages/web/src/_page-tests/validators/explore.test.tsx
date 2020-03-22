@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
 import ValidatorsList from 'src/dev/ValidatorsList'
+import { TestProvider } from 'src/_page-tests/test-utils'
 
 const mock = {
   data: {
@@ -134,7 +135,13 @@ const mock = {
 
 describe('ValidatorsList', () => {
   it('renders', () => {
-    const tree = renderer.create(<ValidatorsList data={mock.data} />).toJSON()
+    const tree = renderer
+      .create(
+        <TestProvider>
+          <ValidatorsList data={mock.data} />
+        </TestProvider>
+      )
+      .toJSON()
     expect(tree).toMatchSnapshot()
   })
 })
