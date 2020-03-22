@@ -4,7 +4,16 @@
 import 'bignumber.js'
 import { Address } from '../base'
 import { GoldToken } from '../generated/GoldToken'
-import { BaseWrapper, proxyCall, proxySend, valueToBigNumber, valueToInt } from './BaseWrapper'
+import {
+  BaseWrapper,
+  proxyCall,
+  proxySend,
+  stringIdentity,
+  tupleParser,
+  valueToBigNumber,
+  valueToInt,
+  valueToString,
+} from './BaseWrapper'
 
 /**
  * ERC-20 contract for Celo native currency.
@@ -54,7 +63,11 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param value The increment of the amount of Celo Gold approved to the spender.
    * @returns true if success.
    */
-  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  increaseAllowance = proxySend(
+    this.kit,
+    this.contract.methods.increaseAllowance,
+    tupleParser(stringIdentity, valueToString)
+  )
   /**
    * Decreases the allowance of another user.
    * @param spender The address which is being approved to spend Celo Gold.

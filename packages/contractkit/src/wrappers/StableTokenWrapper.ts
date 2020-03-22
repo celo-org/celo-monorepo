@@ -6,6 +6,7 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  stringIdentity,
   tupleParser,
   valueToBigNumber,
   valueToInt,
@@ -102,7 +103,11 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @param value The increment of the amount of StableToken approved to the spender.
    * @returns true if success.
    */
-  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  increaseAllowance = proxySend(
+    this.kit,
+    this.contract.methods.increaseAllowance,
+    tupleParser(stringIdentity, valueToString)
+  )
   /**
    * Decreases the allowance of another user.
    * @param spender The address which is being approved to spend StableToken.

@@ -253,6 +253,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     return rates[token].contains(oracle) && timestamps[token].contains(oracle);
   }
 
+  function getOracles(address token) external returns (address[] memory) {
+    return oracles[token];
+  }
+
   /**
    * @notice Removes an oracle value and updates the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.

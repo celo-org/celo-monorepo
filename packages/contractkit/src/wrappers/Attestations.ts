@@ -10,6 +10,7 @@ import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
   proxyCall,
+  stringIdentity,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -82,7 +83,6 @@ function parseGetCompletableAttestations(response: GetCompletableAttestationsRes
   ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
 }
 
-const stringIdentity = (x: string) => x
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired

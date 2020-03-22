@@ -64,6 +64,7 @@ type Parser<A, B> = (input: A) => B
 
 /** Identity Parser */
 export const identity = <A>(a: A) => a
+export const stringIdentity = (x: string) => x
 
 /**
  * Tuple parser
