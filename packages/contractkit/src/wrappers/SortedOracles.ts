@@ -192,7 +192,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       const medRelIndex = parseInt(response[2][i], 10)
       timestamps.push({
         address: response[0][i],
-        timestamp: fromFixed(valueToBigNumber(response[1][i])),
+        timestamp: valueToBigNumber(response[1][i]),
         medianRelation: medRelIndex,
       })
     }
