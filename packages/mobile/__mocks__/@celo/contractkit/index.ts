@@ -30,6 +30,12 @@ const Attestations = {
 
 const Accounts = {}
 
+const TOBIN_TAX = { '0': '5000000000000000000000', '1': '1000000000000000000000000' } // Contract returns tuple representing fraction
+
+const Reserve = {
+  getOrComputeTobinTax: jest.fn(async () => TOBIN_TAX),
+}
+
 const web3 = new Web3()
 
 const kit = {
@@ -39,6 +45,7 @@ const kit = {
     getGoldToken: jest.fn(async () => GoldToken),
     getAttestations: jest.fn(async () => Attestations),
     getAccounts: jest.fn(async () => Accounts),
+    getReserve: jest.fn(async () => Reserve),
   },
   registry: {
     addressFor: async (address: string) => 1000,

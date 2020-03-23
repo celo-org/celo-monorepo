@@ -1,5 +1,6 @@
 import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
@@ -45,15 +46,12 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
       yield call(getConnectedAccount)
 
       const contractKit = getContractKit()
-
-      // Using native web3 contract wrapper since contractkit
-      // hasn't yet implemented tobin tax interface
-      const reserve = yield call([
-        contractKit._web3Contracts,
-        contractKit._web3Contracts.getReserve,
+      const reserve: ReserveWrapper = yield call([
+        contractKit.contracts,
+        contractKit.contracts.getReserve,
       ])
 
-      const tobinTaxFraction = yield call(reserve.methods.getOrComputeTobinTax().call)
+      const tobinTaxFraction = yield call(reserve.getOrComputeTobinTax)
 
       if (!tobinTaxFraction) {
         Logger.error(TAG, 'Unable to fetch tobin tax')
