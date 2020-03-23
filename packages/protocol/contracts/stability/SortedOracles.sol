@@ -253,6 +253,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     return rates[token].contains(oracle) && timestamps[token].contains(oracle);
   }
 
+  /**
+   * @notice Returns the list of oracles for a particular token.
+   * @param token The address of the token whose oracles should be returned.
+   * @return The list of oracles for a particular token.
+   */
   function getOracles(address token) external view returns (address[] memory) {
     return oracles[token];
   }
