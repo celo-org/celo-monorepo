@@ -51,7 +51,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldMultiSigProxy,
     'ReleaseGoldMultiSig',
     argv.from,
-    0,
+    null,
     [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
     2,
     2
@@ -210,7 +210,9 @@ module.exports = async (callback: (error?: any) => number) => {
     argv = require('minimist')(process.argv.slice(5), {
       string: ['network', 'from', 'grants', 'start_gold', 'output_file', 'really'],
     })
-    web3.eth.defaultAccount = argv.from
+    if (argv.from === '' || argv.from == null) {
+      argv.from = (await web3.eth.getAccounts())[0]
+    }
     registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
