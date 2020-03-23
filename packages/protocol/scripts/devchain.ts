@@ -216,6 +216,9 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push('--network')
   // TODO(lucas): investigate if this can be found dynamically
   cmdArgs.push('development')
+  cmdArgs.push('--from')
+  // Defaults to accounts[0] in truffle script
+  cmdArgs.push('""')
   cmdArgs.push('--grants')
   cmdArgs.push(releaseGoldContracts)
   cmdArgs.push('--start_gold')
