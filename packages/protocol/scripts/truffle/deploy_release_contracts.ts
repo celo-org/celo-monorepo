@@ -1,9 +1,10 @@
 import {
-  getDeployedProxiedContract,
   _setInitialProxyImplementation,
+  getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
+import fs = require('fs')
 import * as prompts from 'prompts'
 import {
   RegistryInstance,
