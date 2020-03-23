@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Tx } from 'web3-core'
 import { RpcCaller } from './rpc-caller'
@@ -42,7 +43,7 @@ export class TxParamsNormalizer {
     }
 
     if (!isEmpty(txParams.gatewayFeeRecipient) && isEmpty(txParams.gatewayFee)) {
-      txParams.gatewayFee = '0x' + DefaultGatewayFee.toString(16)
+      txParams.gatewayFee = ensureLeading0x(DefaultGatewayFee.toString(16))
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
