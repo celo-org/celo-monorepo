@@ -36,7 +36,8 @@ export const builder = (argv: yargs.Argv) => {
     })
     .option('threads', {
       type: 'number',
-      description: 'Number of threads for each client',
+      description:
+        'Number of threads for each client, defaults to LOAD_TEST_THREADS in the .env file',
       default: -1,
     })
 }

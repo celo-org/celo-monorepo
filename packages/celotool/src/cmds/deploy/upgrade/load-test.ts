@@ -55,6 +55,7 @@ async function resetAndUpgrade(argv: LoadTestUpgradeArgv) {
 
   await sleep(3000)
 
+  setArgvDefaults(argv)
   await upgrade(argv)
 
   await sleep(3000)
