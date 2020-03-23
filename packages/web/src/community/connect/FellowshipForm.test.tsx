@@ -13,10 +13,10 @@ describe('FellowshipForm', () => {
 
       fireEvent.click(submitButton)
 
-      expect(getComputedStyle(emailErrorEl).opacity).toEqual('100')
+      expect(emailErrorEl).toBeVisible()
 
       queryAllByText('common:validationErrors:generic').forEach((element) =>
-        expect(getComputedStyle(element).opacity).toEqual('100')
+        expect(element).toBeVisible()
       )
     })
   })
@@ -27,10 +27,10 @@ describe('FellowshipForm', () => {
 
       const emailErrorEl = getByText('common:validationErrors.email')
 
-      expect(getComputedStyle(emailErrorEl).opacity).toEqual('0')
+      expect(emailErrorEl).not.toBeVisible()
 
       queryAllByText('common:validationErrors:generic').forEach((element) =>
-        expect(getComputedStyle(element).opacity).toEqual('2')
+        expect(element).not.toBeVisible()
       )
     })
   })
@@ -60,9 +60,9 @@ describe('FellowshipForm', () => {
 
       // expectations
       const emailErrorEl = getByText('common:validationErrors.email')
-      expect(getComputedStyle(emailErrorEl).opacity).toEqual('0')
+      expect(emailErrorEl).not.toBeVisible()
       queryAllByText('common:validationErrors:generic').forEach((element) =>
-        expect(getComputedStyle(element).opacity).toEqual('0')
+        expect(element).not.toBeVisible()
       )
       await waitForElement(() => getByText('form.fellowshipSubmitted'))
 
