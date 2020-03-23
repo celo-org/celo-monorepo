@@ -69,7 +69,7 @@ describe('tracer tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    //await context.hooks.before()
+    // await context.hooks.before()
   })
 
   after(async function(this: any) {
@@ -290,23 +290,72 @@ describe('tracer tests', () => {
         ))
     })
 
+    describe(`Exchanging gold for tokens`, () => {
+      let trackBalances: Record<Address, AccountAssets>
+      let receipt: TransactionReceipt
+
+      before(async function(this: any) {
+        const exchange = await kit.contracts.getExchange()
+        const tx = await exchange.exchange(TransferAmount, 1, true)
+        const txResult = await tx.send()
+        receipt = await txResult.waitReceipt()
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        console.info(`Exchange gold receipt`)
+        console.info(receipt)
+      })
+
+      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].gold,
+          new BigNumber(-TransferAmount)
+        ))
+    })
+
+    describe(`Exchanging tokens for gold`, () => {
+      let trackBalances: Record<Address, AccountAssets>
+      let receipt: TransactionReceipt
+
+      before(async function(this: any) {
+        const exchange = await kit.contracts.getExchange()
+        const quote = await exchange.quoteGoldBuy(TransferAmount)
+        const tx = await exchange.exchange(quote, TransferAmount, false)
+        const txResult = await tx.send()
+        receipt = await txResult.waitReceipt()
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        console.info(`Exchange token receipt`)
+        console.info(receipt)
+      })
+
+      it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].gold,
+          new BigNumber(TransferAmount)
+        ))
+    })
+
     describe(`Deploying release gold`, () => {
       before(async function(this: any) {
         this.timeout(0)
-        const startBlockNumber = await this.web3.eth.getBlockNumber()
+        //const startBlockNumber = await this.web3.eth.getBlockNumber()
         const args = [
           '--cwd',
           `${MonorepoRoot}/packages/protocol`,
-          'init-network',
-          '-n',
+          'run',
+          'truffle',
+          'exec',
+          `${MonorepoRoot}/packages/protocol/scripts/truffle/deploy_release_contracts.js`,
+          '--network',
           'testing',
-          '-m',
-          //JSON.stringify(migrationOverrides),
-          //'-t',
-          //to.toString(),
+          '--start_gold',
+          '50',
+          '--grants',
+          `${MonorepoRoot}/packages/protocol/scripts/truffle/releaseGoldContracts.json`,
+          '--output_file',
+          '/tmp/e2e/releaseGold.txt',
+          '--yesreally',
         ]
         await spawnCmdWithExitOnFailure('yarn', args)
-        const endBlockNumber = await this.web3.eth.getBlockNumber()
+        //const endBlockNumber = await this.web3.eth.getBlockNumber()
       })
     })
   })
