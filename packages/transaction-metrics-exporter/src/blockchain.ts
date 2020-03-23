@@ -50,7 +50,7 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   const fromBLock = Number.parseInt(process.env.FROM_BLOCK || '', 10)
   const toBlock = Number.parseInt(process.env.TO_BLOCK || '', 10)
 
-  new BlockProcessor(kit, 1, fromBLock, toBlock).init()
+  new BlockProcessor(kit, BLOCK_INTERVAL, fromBLock, toBlock).init()
 
   const provider = kit.web3.currentProvider as WebsocketProvider
   const subscription = await kit.web3.eth.subscribe('newBlockHeaders')
