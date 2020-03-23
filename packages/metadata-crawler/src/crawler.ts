@@ -32,13 +32,12 @@ async function jsonQuery(query: string) {
 
 async function addUrl(address: string, domain: string, verified: boolean) {
   try {
-    client.query(
-      `INSERT INTO celo_claims (address, type, element, verified, timestamp, inserted_at, updated_at) VALUES ` +
-        `($1, 'domain', $2, $3, now(), now(), now()) ` +
-        `ON CONFLICT (celo_claims_address_type_element_index) DO ` +
-        `UPDATE celo_claims SET celo_verified=$3, timestamp=now(), updated_at=now() WHERE address=$1 AND domain=$2 and type='domain' `,
-      [Buffer.from(address, 'hex'), domain, verified]
-    )
+    const query = `INSERT INTO celo_claims (address, type, element, verified, timestamp, inserted_at, updated_at) VALUES 
+        (decode('${address}', 'hex'), 'domain', '${domain}', ${verified}, now(), now(), now()) 
+        ON CONFLICT (address, type, element) DO 
+        UPDATE SET verified=${verified}, timestamp=now(), updated_at=now() `
+    console.log(query)
+    await client.query(query)
     console.log(`Verification flag added to domain ${domain} and address ${address}`)
   } catch (err) {
     console.error('Error updating the database', err)
@@ -50,11 +49,6 @@ async function handleItem(item: { url: string; address: string }) {
     let metadata = await IdentityMetadataWrapper.fetchFromURL(item.url)
     let claims = metadata.filterClaims(ClaimTypes.DOMAIN)
     console.log('claims', claims)
-    //     if (claims.length === 0) {
-    //       return
-    //     }
-    //
-    //     let claim = claims[0]
     console.log(item.address)
     claims.map((claim) => {
       //const alreadyVerified =
@@ -108,7 +102,7 @@ async function main() {
   items = items.map((a) => ({ ...a, address: normalizeAddress(a.address.substr(2)) }))
   console.log(items)
   for (let i of items) {
-    await handleItem(i)
+    await handleItem(i).catch(() => console.error(i, ' fails'))
   }
   await client.end()
 }
