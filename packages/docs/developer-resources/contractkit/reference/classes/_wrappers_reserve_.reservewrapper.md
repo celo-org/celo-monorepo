@@ -17,6 +17,7 @@ Contract for handling reserve for stable currencies
 ### Properties
 
 * [getOrComputeTobinTax](_wrappers_reserve_.reservewrapper.md#getorcomputetobintax)
+* [isOtherReserveAddress](_wrappers_reserve_.reservewrapper.md#isotherreserveaddress)
 * [isSpender](_wrappers_reserve_.reservewrapper.md#isspender)
 * [tobinTaxStalenessThreshold](_wrappers_reserve_.reservewrapper.md#tobintaxstalenessthreshold)
 * [transferGold](_wrappers_reserve_.reservewrapper.md#transfergold)
@@ -60,6 +61,24 @@ Name | Type |
 #### Type declaration:
 
 ▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  isOtherReserveAddress
+
+• **isOtherReserveAddress**: *function* = proxyCall(this.contract.methods.isOtherReserveAddress)
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L37)*
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
 
 **Parameters:**
 
@@ -161,6 +180,6 @@ ___
 
 ▸ **getSpenders**(): *Promise‹[Address](../modules/_base_.md#address)[]›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L37)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L39)*
 
 **Returns:** *Promise‹[Address](../modules/_base_.md#address)[]›*
