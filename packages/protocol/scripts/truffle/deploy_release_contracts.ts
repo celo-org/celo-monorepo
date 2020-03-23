@@ -210,7 +210,7 @@ module.exports = async (callback: (error?: any) => number) => {
     argv = require('minimist')(process.argv.slice(5), {
       string: ['network', 'from', 'grants', 'start_gold', 'output_file', 'really'],
     })
-    if (argv.from === '') {
+    if (argv.from === '' || argv.from == null) {
       argv.from = (await web3.eth.getAccounts())[0]
     }
     registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
