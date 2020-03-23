@@ -13,16 +13,11 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
-import { getReclaimableEscrowPayments } from 'src/escrow/saga'
+import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { setEducationCompleted as setGoldEducationCompleted } from 'src/goldToken/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import {
-  backupIcon,
-  getVerifiedIcon,
-  homeIcon,
-  inviteFriendsIcon,
-  rewardsAppIcon,
-} from 'src/images/Images'
+import BackupKeyIcon from 'src/icons/BackupKeyIcon'
+import { getVerifiedIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SimpleNotification from 'src/notifications/SimpleNotification'
@@ -42,7 +37,7 @@ interface StateProps {
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
-  sentEscrowPayments: EscrowedPayment[]
+  reclaimableEscrowPayments: EscrowedPayment[]
 }
 
 interface DispatchProps {
@@ -64,7 +59,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
   backupTooLate: isBackupTooLate(state),
-  sentEscrowPayments: state.escrow.sentEscrowedPayments,
+  reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
 })
 
 const mapDispatchToProps = {
@@ -84,9 +79,11 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   escrowedPaymentReminderNotification = () => {
-    const escrowPayments = getReclaimableEscrowPayments(this.props.sentEscrowPayments)
-    if (escrowPayments && escrowPayments.length) {
-      return [<EscrowedPaymentReminderSummaryNotification key={1} payments={escrowPayments} />]
+    const { reclaimableEscrowPayments } = this.props
+    if (reclaimableEscrowPayments && reclaimableEscrowPayments.length) {
+      return [
+        <EscrowedPaymentReminderSummaryNotification key={1} payments={reclaimableEscrowPayments} />,
+      ]
     }
     return []
   }
@@ -127,7 +124,7 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('backupKeyFlow6:yourBackupKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
-        image: backupIcon,
+        image: <BackupKeyIcon height={40} width={40} />,
         ctaList: [
           {
             text: t('backupKeyFlow6:getBackupKey'),
@@ -282,7 +279,6 @@ export class NotificationBox extends React.Component<Props, State> {
           horizontal={true}
           pagingEnabled={true}
           showsHorizontalScrollIndicator={false}
-          // @ts-ignore TODO(cmcewen): should be fixed with new RN types
           onScroll={this.handleScroll}
         >
           {notifications.map((notification, i) => (

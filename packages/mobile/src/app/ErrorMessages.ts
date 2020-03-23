@@ -1,5 +1,6 @@
 export enum ErrorMessages {
   TRANSACTION_FAILED = 'transactionFailed',
+  TRANSACTION_TIMEOUT = 'transactionTimeout',
   EXCHANGE_FAILED = 'exchangeFailed',
   INVALID_INVITATION = 'invalidInvite',
   INCORRECT_PIN = 'incorrectPin',
@@ -26,6 +27,7 @@ export enum ErrorMessages {
   CAN_NOT_REQUEST_FROM_UNVERIFIED = 'canNotRequestFromUnverified',
   REFRESH_FAILED = 'refreshFailedUnexpectedly',
   INVITE_FAILED = 'inviteFailed',
+  INVITE_OPEN_APP_FAILED = 'inviteOpenAppFailed',
   SEND_PAYMENT_FAILED = 'sendPaymentFailed',
   PAYMENT_REQUEST_FAILED = 'paymentRequestFailed',
   ESCROW_TRANSFER_FAILED = 'escrowTransferFailed',

@@ -1,0 +1,181 @@
+{
+   "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+   "handler": "Microsoft.Azure.CreateUIDef",
+   "version": "0.1.2-preview",
+   "parameters": {
+     "basics": [
+       {}
+     ],
+     "steps": [
+       {
+         "name": "clusterSettings",
+         "label": "Cluster settings",
+         "subLabel": {
+           "preValidation": "Configure cluster",
+           "postValidation": "Done"
+         },
+         "bladeTitle": "Cluster settings",
+         "elements": [
+           {
+             "name": "adminUsername",
+             "type": "Microsoft.Common.TextBox",
+             "label": "adminUsername",
+             "visible": true
+           },
+           {
+             "name": "adminPublicKey",
+             "type": "Microsoft.Common.TextBox",
+             "label": "adminPublicKey",
+             "visible": true
+           }
+         ]
+       },
+       {
+         "name": "validatorSettings",
+         "label": "Validator settings",
+         "bladeTitle": "Validator settings",
+         "subLabel": {
+           "preValidation": "Configure Validator",
+           "postValidation": "Done"
+         },
+         "elements": [
+           {
+             "name": "validatorName",
+             "type": "Microsoft.Common.TextBox",
+             "label": "validatorName",
+             "visible": true
+           },
+           {
+             "name": "validatorAccountAddress",
+             "type": "Microsoft.Common.TextBox",
+             "label": "validatorAccountAddress",
+             "visible": true
+           },
+           {
+             "name": "validatorPrivateKey",
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "Validator private key"
+             },
+             "visible": true,
+             "options": {
+               "hideConfirmation": true
+             }
+           }
+         ]
+       },
+       {
+         "name": "proxySettings",
+         "label": "Proxy settings",
+         "bladeTitle": "Proxy settings",
+         "subLabel": {
+           "preValidation": "Configure Proxy",
+           "postValidation": "Done"
+         },
+         "elements": [
+           {
+             "name": "proxyName",
+             "type": "Microsoft.Common.TextBox",
+             "label": "proxyName",
+             "visible": true
+           },
+           {
+             "name": "proxyPublicKey",
+             "type": "Microsoft.Common.TextBox",
+             "label": "proxyPublicKey",
+             "visible": true
+           },
+           {
+             "name": "proxyPrivateKey",
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "Proxy private key"
+             },
+             "visible": true,
+             "options": {
+               "hideConfirmation": true
+             }
+           }
+         ]
+       },
+       {
+         "name": "attesterSettings",
+         "label": "Attestation service settings",
+         "bladeTitle": "Attestation service settings",
+         "subLabel": {
+           "preValidation": "Configure Attestation service",
+           "postValidation": "Done"
+         },
+         "elements": [
+           {
+             "name": "attesterPostgreSQLUsername",
+             "type": "Microsoft.Common.TextBox",
+             "label": "DB admin username",
+             "visible": true
+           },
+           {
+             "name": "attesterPostgreSQLPassword",
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "DB admin password",
+               "confirmPassword": "Confirm DB admin password"
+             },
+             "visible": true
+           },
+           {
+             "name": "attesterAccountAddress",
+             "type": "Microsoft.Common.TextBox",
+             "label": "attesterAccountAddress",
+             "visible": true
+           },
+           {
+             "name": "attesterPrivateKey",
+             "type": "Microsoft.Common.PasswordBox",
+             "label": {
+               "password": "Attester private key"
+             },
+             "visible": true,
+             "options": {
+               "hideConfirmation": true
+             }
+           },
+           {
+             "name": "attesterTwilioAccountSID",
+             "type": "Microsoft.Common.TextBox",
+             "label": "attesterTwilioAccountSID",
+             "visible": true
+           },
+           {
+             "name": "attesterTwilioAuthToken",
+             "type": "Microsoft.Common.TextBox",
+             "label": "attesterTwilioAuthToken",
+             "visible": true
+           },
+           {
+             "name": "attesterTwilioMessageServiceSID",
+             "type": "Microsoft.Common.TextBox",
+             "label": "attesterTwilioMessageServiceSID",
+             "visible": true
+           }
+         ]
+       }
+     ],
+     "outputs": {
+       "proxyName": "[steps('allSettings').proxyName]",
+       "validatorName": "[steps('allSettings').validatorName]",
+       "adminUsername": "[steps('allSettings').adminUsername]",
+       "adminPublicKey": "[steps('allSettings').adminPublicKey]",
+       "attesterPostgreSQLUsername": "[steps('allSettings').attesterPostgreSQLUsername]",
+       "attesterPostgreSQLPassword": "[steps('allSettings').attesterPostgreSQLPassword]",
+       "validatorAccountAddress": "[steps('allSettings').validatorAccountAddress]",
+       "proxyPublicKey": "[steps('allSettings').proxyPublicKey]",
+       "proxyPrivateKey": "[steps('allSettings').proxyPrivateKey]",
+       "validatorPrivateKey": "[steps('allSettings').validatorPrivateKey]",
+       "attesterAccountAddress": "[steps('allSettings').attesterAccountAddress]",
+       "attesterPrivateKey": "[steps('allSettings').attesterPrivateKey]",
+       "attesterTwilioAccountSID": "[steps('allSettings').attesterTwilioAccountSID]",
+       "attesterTwilioAuthToken": "[steps('allSettings').attesterTwilioAuthToken]",
+       "attesterTwilioMessageServiceSID": "[steps('allSettings').attesterTwilioMessageServiceSID]"
+     }
+   }
+}

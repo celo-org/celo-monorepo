@@ -64,6 +64,10 @@
   "reclaim": "Reclaim",
   "celoGold": "Celo Oro",
   "celoDollars": "{{CeloDollars}}",
+  "balanceAvailable": "<0></0> disponibles",
+  "subtotal": "Total parcial",
+  "total": "Total",
+  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
   "oops": "¡Uy!",
   "somethingWrong": "Había un problema",
   "verifyFailed": "Falla durante la verificación",
@@ -72,6 +76,7 @@
   "quitApp": "Dejar",
   "loading": "Cargando…",
   "inviteFailed": "Falló el envío de la invitación",
+  "inviteOpenAppFailed": "No se pudo abrir la aplicación de mensajería, el código de invitación se copió al portapapeles",
   "importContactsFailed": "Error al importar contactos",
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
@@ -84,7 +89,7 @@
     "1": "algunas funciones no disponible"
   },
   "networkConnectionFailed": "No se pudo conectar a la red, por favor verifica tu conexión",
-  "firebaseFailed": "No se pudo conectar al servicio de notificaciones",
+  "firebaseFailed": "No se pudo conectar al Firebase",
   "gasPriceUpdateFailed": "No se pudo actualizar la comisión",
   "appHasToBeUpdated": "La aplicación tiene que ser actualizada",
   "thisVersionIsInsecure": "Esta versión es insegura.",
@@ -106,5 +111,6 @@
   "emptyList": "Lista vacía",
   "timeframes": {
     "30d": "30 dias"
-  }
+  },
+  "message": "Mensaje"
 }

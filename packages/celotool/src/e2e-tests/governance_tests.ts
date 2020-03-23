@@ -1,9 +1,12 @@
 // tslint:disable: no-console
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3.d.ts" />
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { eqAddress } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
@@ -11,7 +14,13 @@ import Web3 from 'web3'
 import { connectPeers, connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { assertAlmostEqual, getHooks, sleep, waitToFinishInstanceSyncing } from './utils'
+import {
+  assertAlmostEqual,
+  getHooks,
+  sleep,
+  waitForEpochTransition,
+  waitToFinishInstanceSyncing,
+} from './utils'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -19,6 +28,7 @@ interface MemberSwapper {
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
+const carbonOffsettingPartnerAddress = '0x1234567812345678123456781234567812345678'
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -71,25 +81,23 @@ async function newKeyRotator(
   const validator = (await kit.web3.eth.getAccounts())[0]
   const accountsWrapper = await kit.contracts.getAccounts()
 
-  async function authorizeValidatorSigner(signer: string, signerWeb3: any) {
+  async function authorizeValidatorSigner(
+    signer: string,
+    signerWeb3: any,
+    signerPrivateKey: string
+  ) {
     const signerKit = newKitFromWeb3(signerWeb3)
-    const pop = await (await signerKit.contracts.getAccounts()).generateProofOfSigningKeyPossession(
+    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
+    const blsPop = getBlsPoP(validator, signerPrivateKey)
+    const pop = await (await signerKit.contracts.getAccounts()).generateProofOfKeyPossession(
       validator,
       signer
     )
-    return (await accountsWrapper.authorizeValidatorSigner(signer, pop)).sendAndWaitForReceipt({
+    return (
+      await accountsWrapper.authorizeValidatorSignerAndBls(signer, pop, blsPublicKey, blsPop)
+    ).sendAndWaitForReceipt({
       from: validator,
     })
-  }
-
-  async function updateValidatorBlsKey(signerPrivateKey: string) {
-    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
-    const blsPop = getBlsPoP(validator, signerPrivateKey)
-    // TODO(asa): Send this from the signer instead.
-    const validatorsWrapper = await kit.contracts.getValidators()
-    return validatorsWrapper
-      .updateBlsPublicKey(blsPublicKey, blsPop)
-      .sendAndWaitForReceipt({ from: validator })
   }
 
   return {
@@ -98,15 +106,56 @@ async function newKeyRotator(
         const signerWeb3 = web3s[index]
         const signer: string = (await signerWeb3.eth.getAccounts())[0]
         const signerPrivateKey = privateKeys[index]
-        await Promise.all([
-          authorizeValidatorSigner(signer, signerWeb3),
-          updateValidatorBlsKey(signerPrivateKey),
-        ])
+        await authorizeValidatorSigner(signer, signerWeb3, signerPrivateKey)
         index += 1
         assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
       }
     },
   }
+}
+
+async function calculateUptime(
+  kit: ContractKit,
+  validatorSetSize: number,
+  lastBlockNumberOfEpoch: number,
+  epochSize: number,
+  lookbackWindow: number
+): Promise<BigNumber[]> {
+  // The parentAggregateSeal is not counted for the first or last blocks of the epoch
+  const blocks = await concurrentMap(10, [...Array(epochSize - 2).keys()], (i) =>
+    kit.web3.eth.getBlock(lastBlockNumberOfEpoch - epochSize + 2 + i)
+  )
+  const lastSignedBlock: number[] = new Array(validatorSetSize).fill(0)
+  const tally: number[] = new Array(validatorSetSize).fill(0)
+
+  // Follows updateUptime() in core/blockchain.go
+  let windowBlocks = 1
+  for (const block of blocks) {
+    const bitmap = parseBlockExtraData(block.extraData).parentAggregatedSeal.bitmap
+
+    for (let signerIndex = 0; signerIndex < validatorSetSize; signerIndex++) {
+      if (bitIsSet(bitmap, signerIndex)) {
+        lastSignedBlock[signerIndex] = block.number - 1
+      }
+      if (windowBlocks < lookbackWindow) {
+        continue
+      }
+      const signedBlockWindowLastBlockNum = block.number - 1
+      const signedBlockWindowFirstBlockNum = signedBlockWindowLastBlockNum - (lookbackWindow - 1)
+      if (
+        signedBlockWindowFirstBlockNum <= lastSignedBlock[signerIndex] &&
+        lastSignedBlock[signerIndex] <= signedBlockWindowLastBlockNum
+      ) {
+        tally[signerIndex]++
+      }
+    }
+
+    if (windowBlocks < lookbackWindow) {
+      windowBlocks++
+    }
+  }
+  const denominator = epochSize - lookbackWindow - 1
+  return tally.map((signerTally) => new BigNumber(signerTally / denominator))
 }
 
 // TODO(asa): Test independent rotation of ecdsa, bls keys.
@@ -156,6 +205,11 @@ describe('governance tests', () => {
         rpcport: 8553,
       },
     ],
+    migrationOverrides: {
+      epochRewards: {
+        carbonOffsettingPartner: carbonOffsettingPartnerAddress,
+      },
+    },
   }
 
   const hooks: any = getHooks(gethConfig)
@@ -174,10 +228,14 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
+    // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
-  after(hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const restart = async () => {
     await hooks.restart()
@@ -250,24 +308,6 @@ describe('governance tests', () => {
     assert.isFalse(currentBalance.isNaN())
     assert.isFalse(previousBalance.isNaN())
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
-  }
-
-  const waitForBlock = async (blockNumber: number) => {
-    // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-    let currentBlock: number
-    do {
-      currentBlock = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (currentBlock < blockNumber)
-  }
-
-  const waitForEpochTransition = async (epoch: number) => {
-    // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-    let blockNumber: number
-    do {
-      blockNumber = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (blockNumber % epoch !== 1)
   }
 
   const assertTargetVotingYieldChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -395,10 +435,10 @@ describe('governance tests', () => {
       assert.equal(epoch, 10)
 
       // Wait for an epoch transition so we can activate our vote.
-      await waitForEpochTransition(epoch)
+      await waitForEpochTransition(web3, epoch)
       await sleep(5.5)
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
-      await waitForEpochTransition(epoch)
+      await waitForEpochTransition(web3, epoch)
 
       const groupWeb3Url = 'ws://localhost:8555'
 
@@ -525,10 +565,9 @@ describe('governance tests', () => {
 
     it('should update the validator scores at the end of each epoch', async function(this: any) {
       this.timeout(0)
-      const adjustmentSpeed = fromFixed(
-        new BigNumber((await validators.methods.getValidatorScoreParameters().call())[1])
-      )
-      const uptime = 1
+      const scoreParams = await validators.methods.getValidatorScoreParameters().call()
+      const exponent = new BigNumber(scoreParams[0])
+      const adjustmentSpeed = fromFixed(new BigNumber(scoreParams[1]))
 
       const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
         const score = new BigNumber(
@@ -542,7 +581,11 @@ describe('governance tests', () => {
         assert.equal(score.toFixed(), previousScore.toFixed())
       }
 
-      const assertScoreChanged = async (validator: string, blockNumber: number) => {
+      const assertScoreChanged = async (
+        validator: string,
+        blockNumber: number,
+        uptime: BigNumber
+      ) => {
         const score = new BigNumber(
           (await validators.methods.getValidator(validator).call({}, blockNumber)).score
         )
@@ -551,21 +594,32 @@ describe('governance tests', () => {
         )
         assert.isFalse(score.isNaN())
         assert.isFalse(previousScore.isNaN())
-        const expectedScore = adjustmentSpeed
-          .times(uptime)
-          .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
+
+        const epochScore = uptime.exponentiatedBy(exponent)
+        const expectedScore = BigNumber.minimum(
+          epochScore,
+          adjustmentSpeed
+            .times(epochScore)
+            .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
+        )
         assertAlmostEqual(score, toFixed(expectedScore))
       }
 
       for (const blockNumber of blockNumbers) {
         let expectUnchangedScores: string[]
         let expectChangedScores: string[]
+        let electedValidators: string[]
+        let uptime: BigNumber[]
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
           expectChangedScores = await getValidatorSetAccountsAtBlock(blockNumber)
           expectUnchangedScores = validatorAccounts.filter((x) => !expectChangedScores.includes(x))
+          electedValidators = await getValidatorSetAccountsAtBlock(blockNumber)
+          uptime = await calculateUptime(kit, electedValidators.length, blockNumber, epoch, 2)
         } else {
           expectUnchangedScores = validatorAccounts
           expectChangedScores = []
+          electedValidators = []
+          uptime = []
         }
 
         for (const validator of expectUnchangedScores) {
@@ -573,7 +627,8 @@ describe('governance tests', () => {
         }
 
         for (const validator of expectChangedScores) {
-          await assertScoreChanged(validator, blockNumber)
+          const signerIndex = electedValidators.map(eqAddress.bind(null, validator)).indexOf(true)
+          await assertScoreChanged(validator, blockNumber, uptime[signerIndex])
         }
       }
     })
@@ -675,6 +730,13 @@ describe('governance tests', () => {
         await assertBalanceChanged(reserve.options.address, blockNumber, expected, goldToken)
       }
 
+      const assertCarbonOffsettingBalanceChanged = async (
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        await assertBalanceChanged(carbonOffsettingPartnerAddress, blockNumber, expected, goldToken)
+      }
+
       const assertVotesUnchanged = async (blockNumber: number) => {
         await assertVotesChanged(blockNumber, new BigNumber(0))
       }
@@ -685,6 +747,10 @@ describe('governance tests', () => {
 
       const assertReserveBalanceUnchanged = async (blockNumber: number) => {
         await assertReserveBalanceChanged(blockNumber, new BigNumber(0))
+      }
+
+      const assertCarbonOffsettingBalanceUnchanged = async (blockNumber: number) => {
+        await assertCarbonOffsettingBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const getStableTokenSupplyChange = async (blockNumber: number) => {
@@ -713,39 +779,85 @@ describe('governance tests', () => {
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
           )
           assert.isFalse(activeVotes.isZero())
-          const targetVotingYield = new BigNumber(
-            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
-          )
-          assert.isFalse(targetVotingYield.isZero())
+
           // We need to calculate the rewards multiplier for the previous block, before
           // the rewards actually are awarded.
           const rewardsMultiplier = new BigNumber(
             await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
           )
           assert.isFalse(rewardsMultiplier.isZero())
-          const expectedEpochReward = activeVotes
+
+          // This is the array of rewards that should have been distributed
+          const targetRewards = await epochRewards.methods
+            .calculateTargetEpochRewards()
+            .call({}, blockNumber - 1)
+          // This is with reward multiplier
+          const perValidatorReward = new BigNumber(targetRewards[0])
+          const validatorSetSize = await election.methods
+            .numberValidatorsInCurrentSet()
+            .call({}, blockNumber - 1)
+          const exchangeRate = await getStableTokenExchangeRate(blockNumber)
+          // Calculate total validator reward in gold to calc infra reward
+          const maxPotentialValidatorReward = perValidatorReward
+            .times(validatorSetSize)
+            .div(exchangeRate)
+          // Calculate the expected voting reward
+          const targetVotingYield = new BigNumber(
+            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
+          )
+          assert.isFalse(targetVotingYield.isZero())
+          const expectedVoterRewards = activeVotes
             .times(fromFixed(targetVotingYield))
             .times(fromFixed(rewardsMultiplier))
-          const expectedInfraReward = new BigNumber(10).pow(18)
+
+          // infra: (x / (1 - x)) * predicted supply increase * rewards mult
+          const communityRewardFrac = new BigNumber(
+            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber)
+          )
+          const expectedCommunityReward = expectedVoterRewards
+            .plus(maxPotentialValidatorReward)
+            .times(fromFixed(communityRewardFrac))
+            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+
+          const carbonOffsettingFrac = new BigNumber(
+            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber)
+          )
+          const expectedCarbonOffsettingPartnerAward = expectedVoterRewards
+            .plus(maxPotentialValidatorReward)
+            .times(fromFixed(carbonOffsettingFrac))
+            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
-          const exchangeRate = await getStableTokenExchangeRate(blockNumber)
-          const expectedGoldTotalSupplyChange = expectedInfraReward
-            .plus(expectedEpochReward)
+          const expectedGoldTotalSupplyChange = expectedCommunityReward
+            .plus(expectedVoterRewards)
             .plus(stableTokenSupplyChange.div(exchangeRate))
-          await assertVotesChanged(blockNumber, expectedEpochReward)
-          await assertLockedGoldBalanceChanged(blockNumber, expectedEpochReward)
+          // Check TS calc'd rewards against solidity calc'd rewards
+          const totalVoterRewards = new BigNumber(targetRewards[1])
+          const totalCommunityReward = new BigNumber(targetRewards[2])
+          const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
+          assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
+          assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
+          assertAlmostEqual(expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
+          // Check TS calc'd rewards against what happened
+          await assertVotesChanged(blockNumber, expectedVoterRewards)
+          await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
           await assertGovernanceBalanceChanged(
             blockNumber,
-            expectedInfraReward.plus(await blockBaseGasFee(blockNumber))
+            expectedCommunityReward.plus(await blockBaseGasFee(blockNumber))
           )
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
+          await assertCarbonOffsettingBalanceChanged(
+            blockNumber,
+            expectedCarbonOffsettingPartnerAward
+          )
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
           await assertReserveBalanceUnchanged(blockNumber)
           await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
+          await assertCarbonOffsettingBalanceUnchanged(blockNumber)
         }
       }
     })
@@ -808,6 +920,7 @@ describe('governance tests', () => {
     })
   })
 
+  /*
   describe('when rewards distribution is frozen', () => {
     let epoch: number
     let blockFrozen: number
@@ -837,6 +950,7 @@ describe('governance tests', () => {
       }
     })
   })
+  */
 
   describe('after the gold token smart contract is registered', () => {
     let goldGenesisSupply = new BigNumber(0)

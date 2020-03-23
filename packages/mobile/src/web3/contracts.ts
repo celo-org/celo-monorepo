@@ -7,7 +7,7 @@ import { IPC_PATH } from 'src/geth/geth'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import Web3 from 'web3'
-import { Provider } from 'web3/providers'
+import { provider } from 'web3-core'
 
 // Logging tag
 const tag = 'web3/contracts'
@@ -16,8 +16,8 @@ export const web3: Web3 = getWeb3()
 // @ts-ignore - need to align web3 versions in contractkit
 export const contractKit = newKitFromWeb3(web3)
 
-export function isInitiallyZeroSyncMode() {
-  return networkConfig.initiallyZeroSync
+export function isInitiallyFornoMode() {
+  return networkConfig.initiallyForno
 }
 
 function getIpcProvider() {
@@ -57,25 +57,24 @@ function getIpcProvider() {
   return ipcProvider
 }
 
-function getHttpProvider(url: string): Provider {
+function getHttpProvider(url: string): provider {
   Logger.debug(tag, 'creating HttpProvider...')
-  const provider = new Web3.providers.HttpProvider(url)
+  const httpProvider = new Web3.providers.HttpProvider(url)
   Logger.debug(tag, 'created HttpProvider')
   // In the future, we might decide to over-ride the error handler via the following code.
   // provider.on('error', () => {
   //   Logger.showError('Error occurred')
   // })
-  return provider as Provider
+  return httpProvider
 }
 
 function getWeb3(): Web3 {
   Logger.info(
     `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
+    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
   )
 
-  if (isInitiallyZeroSyncMode()) {
-    // Geth free mode
+  if (isInitiallyFornoMode()) {
     const url = DEFAULT_FORNO_URL
     Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
     return new Web3(getHttpProvider(url))
@@ -85,8 +84,8 @@ function getWeb3(): Web3 {
 }
 
 // Mutates web3 with new provider
-export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
-  if (zeroSync) {
+export function switchWeb3ProviderForSyncMode(forno: boolean) {
+  if (forno) {
     web3.setProvider(getHttpProvider(DEFAULT_FORNO_URL))
     Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
   } else {

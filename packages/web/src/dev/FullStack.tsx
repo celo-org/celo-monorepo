@@ -136,11 +136,11 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
   modeStyle = () => {
     switch (this.state.mode) {
       case StickyMode.fixed:
-        return [styles.sticky, styles.base]
+        return styles.sticky
       case StickyMode.attachToBottom:
-        return [styles.attachToBottom, styles.base]
+        return styles.attachToBottom
       default:
-        return styles.base
+        return false
     }
   }
 
@@ -193,6 +193,7 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
               <Li style={textStyles.invert}>{t('mobile.mobileUltra')}</Li>
               <Li style={textStyles.invert}>{t('mobile.exchange')}</Li>
               <Li style={textStyles.invert}>{t('mobile.qr')}</Li>
+              <Li style={textStyles.invert}>{t('mobile.sdk')}</Li>
             </StackSection>
             <StackSection
               onPress={this.setL2}
@@ -223,14 +224,19 @@ class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
             <View
               style={[
                 standardStyles.centered,
-                isDesktop ? standardStyles.sectionMargin : {},
-                isBrowseCodeFaded && styles.faded,
                 styles.browseCodeArea,
+                isDesktop && standardStyles.blockMargin,
+                isBrowseCodeFaded && styles.faded,
               ]}
             >
               <H4 style={[textStyles.invert, textStyles.center]}>{t('stackBrowseTitle')}</H4>
               <Text
-                style={[standardStyles.elementalMarginBottom, textStyles.invert, textStyles.center]}
+                style={[
+                  standardStyles.elementalMarginBottom,
+                  fonts.legal,
+                  textStyles.invert,
+                  textStyles.center,
+                ]}
               >
                 {t('stackBrowseCopy')}{' '}
               </Text>
@@ -271,9 +277,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   browseCodeArea: {
-    paddingVertical: 100,
-    transitionProperty: 'opacity',
+    transitionProperty: 'opacity' as 'opacity',
     transitionDuration: '100ms',
+    zIndex: 1,
   },
-  base: {},
 })

@@ -26,7 +26,7 @@ export default function OpenGraph({ description, image, title, path }: Props) {
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={metaImage} />
-      <meta name="twitter:site" content={'@celoHQ'} />
+      <meta name="twitter:site" content={'@celoOrg'} />
       <meta name="twitter:card" content="summary_large_image" />
     </Head>
   )

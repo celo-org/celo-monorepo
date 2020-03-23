@@ -13,8 +13,10 @@ export enum Stacks {
 }
 
 export enum Screens {
+  AppLoading = 'AppLoading',
   Account = 'Account',
   Analytics = 'Analytics',
+  Background = 'Background',
   BackupIntroduction = 'BackupIntroduction',
   BackupPhrase = 'BackupPhrase',
   BackupQuiz = 'BackupQuiz',
@@ -35,6 +37,7 @@ export enum Screens {
   ExchangeTradeScreen = 'ExchangeTradeScreen',
   FeeEducation = 'FeeEducation',
   FeeExchangeEducation = 'FeeExchangeEducation',
+  FiatExchange = 'FiatExchange',
   GoldEducation = 'GoldEducation',
   ImportWallet = 'ImportWallet',
   ImportWalletSocial = 'ImportWalletSocial',
@@ -44,6 +47,8 @@ export enum Screens {
   JoinCelo = 'JoinCelo',
   Language = 'Language',
   Licenses = 'Licenses',
+  Support = 'Support',
+  SupportContact = 'SupportContact',
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
   OutgoingPaymentRequestListScreen = 'OutgoingPaymentRequestListScreen',
   EscrowedPaymentListScreen = 'EscrowedPaymentListScreen',
@@ -58,6 +63,7 @@ export enum Screens {
   ReclaimPaymentConfirmationScreen = 'ReclaimPaymentConfirmationScreen',
   PaymentRequestConfirmation = 'PaymentRequestConfirmation',
   SelectLocalCurrency = 'SelectLocalCurrency',
+  Security = 'Security',
   Send = 'Send',
   SendAmount = 'SendAmount',
   SendConfirmation = 'SendConfirmation',

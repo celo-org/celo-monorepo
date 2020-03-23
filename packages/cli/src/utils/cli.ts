@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import Table from 'cli-table'
 import { cli } from 'cli-ux'
-import { Tx } from 'web3/eth/types'
+import { EventLog, Tx } from 'web3-core'
 
 export async function displaySendTx<A>(
   name: string,
@@ -28,7 +28,7 @@ export async function displaySendTx<A>(
     Object.entries(txReceipt.events)
       .filter(([eventName]) => eventName === displayEventName)
       .forEach(([eventName, log]) => {
-        const { params } = parseDecodedParams(log.returnValues)
+        const { params } = parseDecodedParams((log as EventLog).returnValues)
         console.log(chalk.magenta.bold(`${eventName}:`))
         printValueMap(params, chalk.magenta)
       })
@@ -76,7 +76,10 @@ export function failWith(msg: string): never {
   throw new CLIError(msg)
 }
 
-export async function binaryPrompt(promptMessage: string) {
-  const resp = await cli.prompt(promptMessage + ' [y/yes, n/no]')
-  return ['y', 'yes'].includes(resp)
+export async function binaryPrompt(promptMessage: string, defaultToNo?: boolean) {
+  const resp: string = await cli.prompt(
+    promptMessage + ` [y/yes, n/no${defaultToNo ? ' (default)' : ''}]`,
+    { required: !defaultToNo }
+  )
+  return ['y', 'yes'].includes(resp.toLowerCase())
 }

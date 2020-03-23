@@ -1,3 +1,6 @@
 **/GoogleService-Info*.plist
 sentry.properties
 Pods
+
+# react-native-config codegen
+env.xcconfig

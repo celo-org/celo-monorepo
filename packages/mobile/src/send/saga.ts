@@ -10,13 +10,11 @@ import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
-import i18n from 'src/i18n'
 import { encryptComment } from 'src/identity/commentKey'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
@@ -42,7 +40,8 @@ export async function getSendTxGas(
   Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
   const tx = await createTransaction(contractGetter, params)
   const tokenContract = await contractGetter(web3)
-  const txParams = { from: account, feeCurrency: tokenContract._address }
+  // TODO fix types
+  const txParams = { from: account, feeCurrency: (tokenContract as any)._address }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
   return gas
@@ -124,7 +123,7 @@ function* sendPayment(
   }
 }
 
-export function* sendPaymentOrInviteSaga({
+function* sendPaymentOrInviteSaga({
   amount,
   reason,
   recipient,
@@ -151,7 +150,6 @@ export function* sendPaymentOrInviteSaga({
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,
-        recipient.displayName,
         recipient.e164PhoneNumber,
         inviteMethod || InviteBy.SMS,
         amount,
@@ -162,8 +160,7 @@ export function* sendPaymentOrInviteSaga({
     if (firebasePendingRequestUid) {
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
-    Logger.showMessage(i18n.t('paymentRequestFlow:requestPaid'))
-    yield call(navigate, Screens.WalletHome)
+    navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))

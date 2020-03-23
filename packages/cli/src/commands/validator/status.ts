@@ -3,7 +3,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
-import { Block } from 'web3/eth/types'
+import { Block } from 'web3-eth'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
@@ -53,10 +53,6 @@ export default class ValidatorStatus extends BaseCommand {
     lookback: flags.integer({
       description: 'how many blocks to look back for signer activity',
       default: 100,
-    }),
-    'no-truncate': flags.boolean({
-      description: "Don't truncate fields to fit line",
-      required: false,
     }),
   }
 
@@ -117,7 +113,7 @@ export default class ValidatorStatus extends BaseCommand {
     )
     cli.action.stop()
 
-    cli.table(validatorStatuses, statusTable, { 'no-truncate': res.flags['no-truncate'] })
+    cli.table(validatorStatuses, statusTable, { 'no-truncate': !res.flags.truncate })
   }
 
   private async getStatus(
@@ -129,7 +125,7 @@ export default class ValidatorStatus extends BaseCommand {
     const accounts = await this.kit.contracts.getAccounts()
     const validator = await accounts.signerToAccount(signer)
     const name = (await accounts.getName(validator)) || ''
-    const proposedCount = blocks.filter((b) => b.miner === signer).length
+    const proposedCount = blocks.filter((b) => eqAddress(b.miner, signer)).length
     let signatures = 0
     let eligible = 0
     for (const block of blocks) {

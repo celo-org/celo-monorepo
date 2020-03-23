@@ -32,7 +32,7 @@ export const builder = (argv: yargs.Argv) => {
       default: '1101',
     })
     .option('sync-mode', {
-      choices: ['full', 'fast', 'light', 'ultralight'],
+      choices: ['full', 'fast', 'light', 'lightest'],
       demandOption: true,
     })
     .option('mining', {
@@ -147,7 +147,8 @@ export const handler = async (argv: RunArgv) => {
       `--miner.gasprice=${minerGasPrice}`,
       '--password=/dev/null',
       `--unlock=${minerAddress}`,
-      '--lightserv=90'
+      '--light.serve=90',
+      '--allow-insecure-unlock' // geth1.9 to use http w/unlocking
     )
   }
 

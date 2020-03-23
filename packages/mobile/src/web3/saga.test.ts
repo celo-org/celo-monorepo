@@ -1,12 +1,10 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, delay, select } from 'redux-saga/effects'
-import { pincodeTypeSelector } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/selectors'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { completeWeb3Sync, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
   checkWeb3SyncProgress,
-  getDecryptedData,
-  getEncryptedData,
   getOrCreateAccount,
   SYNC_TIMEOUT,
   waitForWeb3Sync,
@@ -36,7 +34,7 @@ jest.mock('src/web3/contracts', () => ({
       getBlock: jest.fn(() => ({ number: 1000 })),
     },
   },
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+  isFornoMode: jest.fn().mockReturnValueOnce(false),
 }))
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
@@ -97,17 +95,5 @@ describe(checkWeb3SyncProgress, () => {
       .put(completeWeb3Sync(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)
       .run()
-  })
-})
-
-describe(getEncryptedData, () => {
-  it('encrypts and decrypts correctly', () => {
-    const data = 'testing data'
-    const password = 'a random password'
-    const encryptedBuffer: Buffer = getEncryptedData(data, password)
-    console.debug(`Encrypted data is ${encryptedBuffer.toString('hex')}`)
-    const decryptedData: string = getDecryptedData(encryptedBuffer, password)
-    console.debug(`Decrypted data is \"${decryptedData}\"`)
-    expect(decryptedData).toBe(data)
   })
 })

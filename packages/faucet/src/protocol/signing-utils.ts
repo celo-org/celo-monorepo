@@ -1,10 +1,9 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
 import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
+import Web3 from 'web3'
 // @ts-ignore
 import * as helpers from 'web3-core-helpers'
-
-import Web3 = require('web3')
 
 function isNot(value: any) {
   return value == null

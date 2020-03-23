@@ -6,7 +6,7 @@ import { chunk } from 'lodash'
 import { MinimalContact } from 'react-native-contacts'
 import { all, call, put, select } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
-import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
+import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -176,7 +176,8 @@ async function getAddresses(e164Numbers: string[], attestationsWrapper: Attestat
   for (const hash of phoneHashes) {
     if (results[hash]) {
       // TODO(Rossy) Add support for handling multiple addresses per number
-      const address = Object.keys(results[hash])[0]
+      const addressArray = Object.keys(results[hash])
+      const address = addressArray[addressArray.length - 1]
       addresses.push(address.toLowerCase())
     } else {
       addresses.push(null)
