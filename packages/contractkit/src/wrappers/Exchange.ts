@@ -125,7 +125,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
         valueToString(minBuyAmount),
         sellGold
       ),
-      { from: this.kit.defaultAccount }
+      { from: this.kit.defaultAccount, gas: 1000000 }
     )
   }
 
