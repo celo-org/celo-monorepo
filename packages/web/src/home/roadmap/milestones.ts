@@ -38,6 +38,10 @@ const stones: Milestone[] = [
     status: Status.unstarted,
   },
   {
+    key: 'Rewards_Activated',
+    status: Status.unstarted,
+  },
+  {
     key: 'Mainnet_Release_Candidate_X',
     status: Status.unstarted,
   },
