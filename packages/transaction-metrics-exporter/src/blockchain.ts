@@ -47,7 +47,9 @@ interface EndReason {
 
 export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   // Start exporting metrics
-  const [fromBLock, toBlock] = process.argv.slice(2).map((_) => +_)
+  const fromBLock = Number.parseInt(process.env.FROM_BLOCK || '', 10)
+  const toBlock = Number.parseInt(process.env.TO_BLOCK || '', 10)
+
   new BlockProcessor(kit, 1, fromBLock, toBlock).init()
 
   const provider = kit.web3.currentProvider as WebsocketProvider
