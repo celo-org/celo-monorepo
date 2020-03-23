@@ -15,7 +15,7 @@ describe(LabeledInput, () => {
         />
       )
 
-      expect(getComputedStyle(getByText('common:validationErrors.generic')).opacity).toEqual('100')
+      expect(getByText('common:validationErrors.generic')).toBeVisible()
     })
   })
   describe('when there is no error', () => {
@@ -30,7 +30,7 @@ describe(LabeledInput, () => {
         />
       )
 
-      expect(getComputedStyle(queryByText('common:validationErrors.generic')).opacity).toEqual('0')
+      expect(queryByText('common:validationErrors.generic')).not.toBeVisible()
     })
   })
   describe('when typing', () => {
