@@ -125,6 +125,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
         valueToString(minBuyAmount),
         sellGold
       ),
+      // Don't estimate gas as the increaseAllowance may not be mined yet.
       { from: this.kit.defaultAccount, gas: 1000000 }
     )
   }

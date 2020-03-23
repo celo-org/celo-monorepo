@@ -29,6 +29,8 @@ export abstract class BaseWrapper<T extends Contract> {
   protected getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
     return this.contract.getPastEvents(event, options)
   }
+
+  events = this.contract.events
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
