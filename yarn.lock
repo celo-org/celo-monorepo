@@ -3225,9 +3225,9 @@
     qqjs "^0.3.10"
     tslib "^1.9.3"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#9d77e02":
-  version "6.6.0"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#9d77e022286739c3a453d90b85f15d1efe8cd089"
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#d5ff1f1":
+  version "6.6.1"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#d5ff1f10dfe9dbfff81ec227e70712ede52b59a0"
   dependencies:
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
@@ -29832,9 +29832,9 @@ react-native-tab-view@^2.9.0:
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-2.10.0.tgz#5e249e5650502010013449ffd4e5edc18a95364b"
   integrity sha512-qgexVz5eO4yaFjdkmn/sURXgVvaBo6pZD/q1eoca96SbPVbaH3WzVhF3bRUfeTHwZkXwznFTpS3JURqIFU8vQA==
 
-"react-native-tcp@https://github.com/cmcewen/react-native-tcp#65a1e45":
+"react-native-tcp@https://github.com/celo-org/react-native-tcp#96cdfeb":
   version "3.3.0"
-  resolved "https://github.com/cmcewen/react-native-tcp#65a1e4586b651f370b724c77a71bb9fba04dc712"
+  resolved "https://github.com/celo-org/react-native-tcp#96cdfeb967fd7dd7401f27ac2cebee770f044a94"
   dependencies:
     base64-js "0.0.8"
     buffer "^5.0.0"

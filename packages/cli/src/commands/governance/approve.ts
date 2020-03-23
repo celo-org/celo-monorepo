@@ -21,6 +21,9 @@ export default class Approve extends BaseCommand {
     const id = res.flags.proposalID
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
+    const governanceApproverMultiSig = await this.kit.contracts.getMultiSig(
+      await governance.getApprover()
+    )
 
     // in case target is queued
     if (await governance.isQueued(id)) {
@@ -34,6 +37,11 @@ export default class Approve extends BaseCommand {
       .proposalInStage(id, 'Approval')
       .runChecks()
 
-    await displaySendTx('approveTx', await governance.approve(id), {}, 'ProposalApproved')
+    const tx = await governance.approve(id)
+    const multiSigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
+      governance.address,
+      tx.txo
+    )
+    await displaySendTx<any>('approveTx', multiSigTx, {}, 'ProposalApproved')
   }
 }
