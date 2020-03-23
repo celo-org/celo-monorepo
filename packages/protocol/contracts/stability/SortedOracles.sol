@@ -253,7 +253,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     return rates[token].contains(oracle) && timestamps[token].contains(oracle);
   }
 
-  function getOracles(address token) external returns (address[] memory) {
+  function getOracles(address token) external view returns (address[] memory) {
     return oracles[token];
   }
 
