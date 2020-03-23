@@ -104,9 +104,9 @@ contract Election is
 
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
 
-  event ValidatorGroupMarkedEligible(address group);
+  event ValidatorGroupMarkedEligible(address indexed group);
 
-  event ValidatorGroupMarkedIneligible(address group);
+  event ValidatorGroupMarkedIneligible(address indexed group);
 
   event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
 
@@ -854,13 +854,11 @@ contract Election is
     uint256 totalNumMembersElected = 0;
 
     uint256[] memory keys = new uint256[](electionGroups.length);
-    for (uint256 i = 0; i < electionGroups.length; i++) {
-      keys[i] = i;
-    }
     FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
       electionGroups.length
     );
     for (uint256 i = 0; i < electionGroups.length; i++) {
+      keys[i] = i;
       votesForNextMember[i] = FixidityLib.newFixed(
         votes.total.eligible.getValue(electionGroups[i])
       );

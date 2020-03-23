@@ -275,7 +275,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
-   * @notice Removes the currently authorized vote signer for the account
+   * @notice Removes the currently authorized vote signer for the account.
+   * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeVoteSigner() public {
     Account storage account = accounts[msg.sender];
@@ -285,6 +286,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   /**
    * @notice Removes the currently authorized validator signer for the account
+   * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeValidatorSigner() public {
     Account storage account = accounts[msg.sender];
@@ -294,6 +296,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   /**
    * @notice Removes the currently authorized attestation signer for the account
+   * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeAttestationSigner() public {
     Account storage account = accounts[msg.sender];

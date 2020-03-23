@@ -8,7 +8,6 @@ import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IRandom.sol";
 import "../common/interfaces/IAccounts.sol";
-import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";

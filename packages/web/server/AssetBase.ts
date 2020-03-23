@@ -18,7 +18,7 @@ interface Fields extends FieldSet {
   Order: number
 }
 
-enum AssetSheet {
+export enum AssetSheet {
   Icons = 'Icons',
   Illustrations = 'Illustrations',
   AbstractGraphics = 'Abstract Graphics',
@@ -28,16 +28,21 @@ export default async function getAssets(sheet: AssetSheet) {
   return cache(`brand-assets-${sheet}`, fetchAssets, { args: sheet, minutes: 10 })
 }
 
-function fetchAssets(sheet: AssetSheet) {
-  return getAirtable(sheet)
+async function fetchAssets(sheet: AssetSheet) {
+  const assets = []
+
+  await getAirtable(sheet)
     .select({
+      pageSize: 100,
       filterByFormula: `AND(${IS_APROVED}, ${TERMS_SIGNED})`,
       sort: [{ field: 'Order', direction: 'asc' }],
     })
-    .all()
-    .then((records) => {
-      return records.map((r) => normalize(r.fields))
+    .eachPage((records, fetchNextPage) => {
+      records.forEach((r) => assets.push(normalize(r.fields)))
+      fetchNextPage()
     })
+
+  return assets
 }
 
 function getAirtable(sheet: AssetSheet): Table<Fields> {

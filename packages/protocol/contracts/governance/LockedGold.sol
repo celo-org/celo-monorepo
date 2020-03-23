@@ -296,6 +296,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
     require(slashingMap[keyBytes], "Cannot remove slasher ID not yet added.");
     require(index < slashingWhitelist.length, "Provided index exceeds whitelist bounds.");
+    require(slashingWhitelist[index] == keyBytes, "Index doesn't match identifier");
     slashingWhitelist[index] = slashingWhitelist[slashingWhitelist.length - 1];
     slashingWhitelist.pop();
     slashingMap[keyBytes] = false;
