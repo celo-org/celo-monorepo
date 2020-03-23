@@ -81,4 +81,13 @@ contract MockLockedGold is ILockedGold {
   function isSlasher(address slasher) external view returns (bool) {
     return slashingWhitelist[slasher];
   }
+
+  function getPendingWithdrawals(address)
+    external
+    view
+    returns (uint256[] memory, uint256[] memory)
+  {
+    uint256[] memory empty = new uint256[](0);
+    return (empty, empty);
+  }
 }
