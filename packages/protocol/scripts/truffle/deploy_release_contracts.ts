@@ -1,9 +1,10 @@
 import {
-  getDeployedProxiedContract,
   _setInitialProxyImplementation,
+  getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
+import fs = require('fs')
 import * as prompts from 'prompts'
 import {
   RegistryInstance,
@@ -12,7 +13,6 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
-import fs = require('fs')
 
 let argv: any
 let registry: any
@@ -43,12 +43,8 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
-  console.log('Pre new')
-  console.log(argv.from)
   const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new({ from: argv.from })
-  console.log('Post new')
   const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new({ from: argv.from })
-  console.log('Post new2')
   const multiSigTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldMultiSigInstance,
@@ -60,19 +56,14 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     2,
     2
   )
-  console.log('Post init')
   await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address, {
     from: argv.from,
   })
-  console.log('Post transfer')
   const releaseGoldProxy = await ReleaseGoldProxy.new({ from: argv.from })
-  console.log('post new3')
   const releaseGoldInstance = await ReleaseGold.new({ from: argv.from })
-  console.log('post new4')
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  console.log('Post transfer')
   let releaseStartTime: number
   // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
   // This is to account for the dynamic start date for mainnet,
@@ -85,7 +76,6 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
   }
-  console.log('Pre RG INIT')
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,
@@ -108,19 +98,15 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.canVote,
     registry.address
   )
-  console.log('Ppost RG INIT')
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
-  console.log('Post proxy transfer')
   await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
-  console.log('Post proxy transfer 2')
   // Send starting gold amount to the beneficiary so they can perform transactions.
   await web3.eth.sendTransaction({
     from: argv.from,
     to: releaseGoldConfig.beneficiary,
     value: startGold,
   })
-  console.log('Post small transfer')
 
   releases.push({
     Beneficiary: releaseGoldConfig.beneficiary,

@@ -147,7 +147,7 @@ export async function setInitialProxyImplementation<
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
-  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, web3.eth.defaultAccount, 0, ...args)
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, null, 0, ...args)
   return Contract.at(proxy.address) as ContractInstance
 }
 
@@ -165,7 +165,18 @@ export async function _setInitialProxyImplementation<
     console.log(`  Setting initial ${contractName} implementation on proxy`)
     receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, from, value, ...args)
   } else {
-    receipt = await proxy._setImplementation(implementation.address, { from, value })
+    if (from != null) {
+      receipt = await proxy._setImplementation(implementation.address, { from })
+      if (value > 0) {
+        await web3.eth.sendTransaction({
+          from,
+          to: proxy.address,
+          value,
+        })
+      }
+    } else {
+      receipt = await proxy._setImplementation(implementation.address)
+    }
   }
   return receipt.tx
 }
