@@ -1,32 +1,52 @@
 import BigNumber from 'bignumber.js'
+import Web3 from 'web3'
 
 const txo = {
   send: jest.fn(),
   sendAndWaitForReceipt: jest.fn(),
 }
 
-export const newKitFromWeb3 = () => ({
+const GasPriceMinimum = {
+  getGasPriceMinimum: jest.fn(async (address: string) => new BigNumber(10000)),
+}
+
+const StableToken = {
+  balanceOf: jest.fn(async () => {
+    return new BigNumber(10000000000)
+  }),
+  decimals: jest.fn(async () => '10'),
+  transferWithComment: jest.fn(async () => ({ txo })),
+}
+
+const GoldToken = {
+  balanceOf: jest.fn(async () => new BigNumber(10000000000)),
+  decimals: jest.fn(async () => '10'),
+  transferWithComment: jest.fn(async () => ({ txo })),
+}
+
+const Attestations = {
+  getAttestationStat: jest.fn(),
+}
+
+const Accounts = {}
+
+const web3 = new Web3()
+
+const kit = {
   contracts: {
-    getGasPriceMinimum: async () => ({
-      getGasPriceMinimum: jest.fn(async (address: string) => new BigNumber(10000)),
-    }),
-    getStableToken: jest.fn(async () => ({
-      balanceOf: jest.fn(async () => {
-        return new BigNumber(10000000000)
-      }),
-      decimals: jest.fn(async () => '10'),
-      transferWithComment: jest.fn(async () => ({ txo })),
-    })),
-    getGoldToken: async () => ({
-      balanceOf: jest.fn(async () => new BigNumber(10000000000)),
-      decimals: jest.fn(async () => '10'),
-      transferWithComment: jest.fn(async () => ({ txo })),
-    }),
+    getGasPriceMinimum: jest.fn(async () => GasPriceMinimum),
+    getStableToken: jest.fn(async () => StableToken),
+    getGoldToken: jest.fn(async () => GoldToken),
+    getAttestations: jest.fn(async () => Attestations),
+    getAccounts: jest.fn(async () => Accounts),
   },
   registry: {
     addressFor: async (address: string) => 1000,
   },
-})
+  web3,
+}
+
+export const newKitFromWeb3 = () => kit
 
 export enum CeloContract {
   Accounts = 'Accounts',

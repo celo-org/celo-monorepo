@@ -23,16 +23,6 @@ import {
   mockE164Number2,
 } from 'test/values'
 
-// TODO implement a smarter way to have contract kit mocked well across the whole project
-jest.mock('src/web3/contracts', () => ({
-  getContractKit: () => ({
-    contracts: {
-      getAttestations: jest.fn(),
-      getAccounts: jest.fn(),
-    },
-  }),
-}))
-
 const mockPhoneNumberLookup = {
   [getPhoneHash(mockE164Number)]: { [mockAccount]: { complete: 3, total: 3 } },
   [getPhoneHash(mockE164Number2)]: { [mockAccount2]: { complete: 3, total: 4 } },

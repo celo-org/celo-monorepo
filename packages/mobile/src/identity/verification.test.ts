@@ -55,15 +55,6 @@ jest.mock('@celo/utils', () => {
   }
 })
 
-jest.mock('src/web3/contracts', () => ({
-  getContractKit: () => ({
-    contracts: {
-      getAttestations: jest.fn(),
-      getAccounts: jest.fn(),
-    },
-  }),
-}))
-
 const attestationCode0: AttestationCode = {
   code:
     'ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501',
@@ -209,16 +200,17 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for partly verified users', async () => {
-    const contractKit = getContractKit()
+    // @ts-ignore Jest mock
+    getContractKit().contracts.getAttestations.mockReturnValue(
+      mockAttestationsWrapperPartlyVerified
+    )
+    // @ts-ignore Jest mock
+    getContractKit().contracts.getAccounts.mockReturnValue(mockAccountsWrapper)
+
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
-        [
-          call([contractKit.contracts, contractKit.contracts.getAttestations]),
-          mockAttestationsWrapperPartlyVerified,
-        ],
-        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
         [select(e164NumberSelector), mockE164Number],
         [select(attestationCodesSelector), attestationCodes],
       ])

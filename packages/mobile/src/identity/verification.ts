@@ -145,6 +145,7 @@ export function* doVerificationFlow() {
 
     // Get all relevant info about the account's verification status
     yield put(setVerificationStatus(VerificationStatus.GettingStatus))
+
     const status: AttestationsStatus = yield call(
       getAttestationsStatus,
       attestationsWrapper,

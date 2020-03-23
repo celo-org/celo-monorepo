@@ -50,35 +50,7 @@ jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
 
-jest.mock('src/web3/contracts', () => {
-  const ck = require('@celo/contractkit').newKitFromWeb3
-  return {
-    contractKit: ck(),
-    web3: {
-      eth: {
-        accounts: {
-          privateKeyToAccount: () => mockAccount,
-          wallet: {
-            add: () => null,
-          },
-          create: () => ({
-            address: mockAccount,
-            privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-          }),
-        },
-        personal: {
-          importRawKey: () => mockAccount,
-          unlockAccount: async () => true,
-        },
-      },
-      utils: {
-        fromWei: (x: any) => x / 1e18,
-        sha3: () => `a sha3 hash`,
-      },
-    },
-    isFornoMode: () => false,
-  }
-})
+jest.mock('@celo/contractkit')
 
 SendIntentAndroid.sendSms = jest.fn()
 
@@ -157,16 +129,10 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but no money on key', async () => {
-    // @ts-ignore
-    getContractKit().contracts.getStableToken.mockImplementation(async () => ({
-      balanceOf: async () => {
-        return new BigNumber(0)
-      },
-      decimals: async () => '10',
-      transferWithComment: async () => ({
-        txo: {},
-      }),
-    }))
+    const stableToken = await getContractKit().contracts.getStableToken()
+
+    // @ts-ignore Jest Mock
+    stableToken.balanceOf.mockResolvedValue(new BigNumber(0))
 
     await expectSaga(watchRedeemInvite)
       .provide([
@@ -178,20 +144,12 @@ describe(watchRedeemInvite, () => {
       .put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       .put(redeemInviteFailure())
       .run()
+
+    // @ts-ignore Jest Mock
+    stableToken.balanceOf.mockReset()
   })
 
   it('fails with error creating account', async () => {
-    // @ts-ignore
-    getContractKit().contracts.getStableToken.mockImplementation(async () => ({
-      balanceOf: async () => {
-        return new BigNumber(10)
-      },
-      decimals: async () => '10',
-      transferWithComment: async () => ({
-        txo: {},
-      }),
-    }))
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
