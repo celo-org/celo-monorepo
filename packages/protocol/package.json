@@ -76,7 +76,7 @@
     "web3-provider-engine": "^15.0.0"
   },
   "devDependencies": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#9d77e02",
+    "@celo/ganache-cli": "/home/sami/ganache-cli",
     "@celo/typechain-target-web3-v1-celo": "0.0.2",
     "@celo/typescript": "0.0.1",
     "@types/bignumber.js": "^5.0.0",
