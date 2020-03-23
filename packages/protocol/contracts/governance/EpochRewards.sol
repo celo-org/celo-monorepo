@@ -70,7 +70,7 @@ contract EpochRewards is
 
   event TargetVotingGoldFractionSet(uint256 fraction);
   event CommunityRewardFractionSet(uint256 fraction);
-  event CarbonOffsettingFundSet(address partner, uint256 fraction);
+  event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event RewardsMultiplierParametersSet(
