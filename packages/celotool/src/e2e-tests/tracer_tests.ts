@@ -4,6 +4,7 @@ import { Address, AllContracts } from '@celo/contractkit/lib/base'
 import { AccountAssets, trackTransfers } from '@celo/contractkit/lib/explorer/assets'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
 import { normalizeAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -60,6 +61,10 @@ describe('tracer tests', () => {
       lockedGold: {
         unlockingPeriod: 1,
       },
+      exchange: {
+        minimumReports: 0,
+        frozen: false,
+      },
     },
   }
 
@@ -69,13 +74,13 @@ describe('tracer tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    // await context.hooks.before()
+    //await context.hooks.before()
   })
 
   after(async function(this: any) {
     this.timeout(0)
-    //await context.hooks.after()
-    await sleep(1000000)
+    await context.hooks.after()
+    //await sleep(1000000)
   })
 
   const restart = async () => {
@@ -171,16 +176,15 @@ describe('tracer tests', () => {
         const txResult = await transferFn()
         receipt = await txResult.waitReceipt()
         txn = await kit.web3.eth.getTransaction(receipt.transactionHash)
-        console.info('TXN')
-        console.info(txn)
-
         fromFinalBalance = await goldToken.balanceOf(FromAddress)
         toFinalBalance = await goldToken.balanceOf(ToAddress)
         trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        console.info(`${name} receipt`)
-        console.info(receipt)
-        console.info(`${name} trackBalances`)
-        console.info(trackBalances)
+        //console.info(`${name} receipt`)
+        //console.info(receipt)
+        //console.info(`${name} trackBalances`)
+        //console.info(trackBalances)
+        //console.info('${name} txn')
+        //console.info(txn)
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
@@ -279,8 +283,8 @@ describe('tracer tests', () => {
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
         trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        console.info(`Withdraw receipt`)
-        console.info(receipt)
+        //console.info(`Withdraw receipt`)
+        //console.info(receipt)
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
@@ -293,21 +297,34 @@ describe('tracer tests', () => {
     describe(`Exchanging gold for tokens`, () => {
       let trackBalances: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
+      let reserve: ReserveWrapper
 
       before(async function(this: any) {
+        this.timeout(0)
+        reserve = await kit.contracts.getReserve()
         const exchange = await kit.contracts.getExchange()
+        const approveTx = await goldToken.approve(exchange.address, TransferAmount.toFixed())
+        const approveTxRes = await approveTx.send()
+        await approveTxRes.waitReceipt()
+
         const tx = await exchange.exchange(TransferAmount, 1, true)
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
         trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        console.info(`Exchange gold receipt`)
-        console.info(receipt)
+        //console.info(`Exchange gold receipt`)
+        //console.info(receipt)
       })
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
           trackBalances[normalizeAddress(FromAddress)].gold,
           new BigNumber(-TransferAmount)
+        ))
+
+      it(`cGLD tracer should increment the reserve's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(reserve.address)].gold,
+          new BigNumber(TransferAmount)
         ))
     })
 
@@ -316,14 +333,21 @@ describe('tracer tests', () => {
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
+        this.timeout(0)
         const exchange = await kit.contracts.getExchange()
         const quote = await exchange.quoteGoldBuy(TransferAmount)
-        const tx = await exchange.exchange(quote, TransferAmount, false)
+
+        const stableToken = await kit.contracts.getStableToken()
+        const approveTx = await stableToken.approve(exchange.address, quote.toFixed())
+        const approveTxRes = await approveTx.send()
+        await approveTxRes.waitReceipt()
+
+        const tx = await exchange.exchange(quote, 1, false)
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
         trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        console.info(`Exchange token receipt`)
-        console.info(receipt)
+        //console.info(`Exchange token receipt`)
+        //console.info(receipt)
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>

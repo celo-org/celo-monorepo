@@ -63,7 +63,7 @@ export async function trackTransfers(
     'cgldTransferTracer'
   )
   for (const transaction of goldTransfers) {
-    for (const transfer of transaction) {
+    for (const transfer of transaction.transfers) {
       const from = getAccount(ret, transfer.from, filter)
       const to = getAccount(ret, transfer.to, filter)
       if (from) from.gold = from.gold.minus(transfer.value)
@@ -75,7 +75,7 @@ export async function trackTransfers(
   const goldLocked = await lockedGold.getGoldLockedEvents(blockNumber)
   for (const locked of goldLocked) {
     const account = getAccount(ret, locked.account, filter)
-    // For lock() the gold was debited from account.gold by cgld_transfer_tracer
+    // For lock() the gold was debited from account.gold by cgldTransferTracer
     if (account) account.lockedGold = account.lockedGold.plus(locked.value)
     // Can't distuinguish LockedGold lock() and relock() only from logs
     // await pendingWithdrawls = lockedGold.getPendingWithdrawls(account)
@@ -91,8 +91,10 @@ export async function trackTransfers(
 
   const goldWithdrawn = await lockedGold.getGoldWithdrawnEvents(blockNumber)
   for (const withdrawn of goldWithdrawn) {
+    // Gold has already been credited by cgldTransferTracer
     const account = getAccount(ret, withdrawn.account, filter)
-    if (account) account.gold = account.gold.plus(withdrawn.value)
+    if (account)
+      account.lockedGoldPendingWithdrawl = account.lockedGoldPendingWithdrawl.minus(withdrawn.value)
   }
 
   const election = await kit.contracts.getElection()
