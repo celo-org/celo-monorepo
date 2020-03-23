@@ -1,4 +1,4 @@
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import {
   RegistryContract,
   RegistryInstance,
@@ -34,8 +34,40 @@ contract('TransferWhitelist', (accounts: string[]) => {
       assert.sameMembers(whitelist, [anAddress])
     })
 
+    it('should emit the corresponding event', async () => {
+      const resp = await transferWhitelist.addAddress(anAddress)
+      assertLogMatches2(resp.logs[0], {
+        event: 'WhitelistedAddress',
+        args: { addr: anAddress },
+      })
+    })
+
     it('should not allow a non-owner to add a token', async () => {
       await assertRevert(transferWhitelist.addAddress(anAddress, { from: nonOwner }))
+    })
+  })
+
+  describe('#removeAddress()', () => {
+    beforeEach(async () => {
+      await transferWhitelist.addAddress(anAddress)
+    })
+
+    it('should allow the owner to remove an address', async () => {
+      await transferWhitelist.removeAddress(anAddress, 0)
+      const whitelist = await transferWhitelist.getWhitelist()
+      assert.equal(whitelist.length, 0)
+    })
+
+    it('should emit the corresponding event', async () => {
+      const resp = await transferWhitelist.removeAddress(anAddress, 0)
+      assertLogMatches2(resp.logs[0], {
+        event: 'WhitelistedAddressRemoved',
+        args: { addr: anAddress },
+      })
+    })
+
+    it('should not allow a non-owner to remove an address', async () => {
+      await assertRevert(transferWhitelist.removeAddress(anAddress, 0, { from: nonOwner }))
     })
   })
 
@@ -62,6 +94,18 @@ contract('TransferWhitelist', (accounts: string[]) => {
       await transferWhitelist.setWhitelist([anAddress, anotherAddress])
       const whitelist = await transferWhitelist.getWhitelist()
       assert.sameMembers(whitelist, [anAddress, anotherAddress])
+    })
+
+    it('should emit the corresponding events', async () => {
+      const resp = await transferWhitelist.setWhitelist([anAddress, anotherAddress])
+      assertLogMatches2(resp.logs[0], {
+        event: 'WhitelistedAddress',
+        args: { addr: anAddress },
+      })
+      assertLogMatches2(resp.logs[1], {
+        event: 'WhitelistedAddress',
+        args: { addr: anotherAddress },
+      })
     })
 
     it('should not allow a non-owner to set the whitelist', async () => {

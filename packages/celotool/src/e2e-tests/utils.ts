@@ -21,6 +21,7 @@ import {
   getEnodeAddress,
   getLogFilename,
   initAndStartGeth,
+  migrateContracts,
   resetDataDir,
   restoreDatadir,
   snapshotDatadir,
@@ -30,7 +31,7 @@ import {
 } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
+import { spawnCmd } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
@@ -151,64 +152,6 @@ export function sleep(seconds: number, verbose = false) {
     console.log(`Sleeping for ${seconds} seconds. Stay tuned!`)
   }
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
-}
-
-export async function migrateContracts(
-  validatorPrivateKeys: string[],
-  attestationKeys: string[],
-  validators: string[],
-  to: number = 1000,
-  overrides: any = {}
-) {
-  const migrationOverrides = _.merge(
-    {
-      downtimeSlasher: {
-        slashableDowntime: 6,
-      },
-      election: {
-        minElectableValidators: '1',
-      },
-      epochRewards: {
-        frozen: false,
-      },
-      exchange: {
-        frozen: false,
-      },
-      goldToken: {
-        frozen: false,
-      },
-      reserve: {
-        initialBalance: 100000000,
-      },
-      stableToken: {
-        initialBalances: {
-          addresses: validators.map(ensure0x),
-          values: validators.map(() => '10000000000000000000000'),
-        },
-        oracles: validators.map(ensure0x),
-        goldPrice: 10,
-        frozen: false,
-      },
-      validators: {
-        validatorKeys: validatorPrivateKeys.map(ensure0x),
-        attestationKeys: attestationKeys.map(ensure0x),
-      },
-    },
-    overrides
-  )
-
-  const args = [
-    '--cwd',
-    `${MonorepoRoot}/packages/protocol`,
-    'init-network',
-    '-n',
-    'testing',
-    '-m',
-    JSON.stringify(migrationOverrides),
-    '-t',
-    to.toString(),
-  ]
-  await spawnCmdWithExitOnFailure('yarn', args)
 }
 
 export async function startBootnode(
@@ -358,6 +301,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
+        MonorepoRoot,
         validatorPrivateKeys,
         attestationKeys,
         validators.map((x) => x.address),
