@@ -38,7 +38,7 @@ async function verifyLocalSigning(web3: Web3, celoTransaction: Tx): Promise<void
       signedCeloTransaction.nonce,
       parseInt(celoTransaction.nonce.toString(), 16)
     )
-    expect(signedCeloTransaction.nonce).toEqual(parseInt(celoTransaction.nonce.toString(), 16))
+    expect(signedCeloTransaction.nonce).toEqual(parseInt(celoTransaction.nonce.toString()))
   }
   if (celoTransaction.gas != null) {
     debug(
@@ -46,7 +46,7 @@ async function verifyLocalSigning(web3: Web3, celoTransaction: Tx): Promise<void
       signedCeloTransaction.gas,
       parseInt(celoTransaction.gas.toString(), 16)
     )
-    expect(signedCeloTransaction.gas).toEqual(parseInt(celoTransaction.gas.toString(), 16))
+    expect(signedCeloTransaction.gas).toEqual(parseInt(celoTransaction.gas.toString()))
   }
   if (celoTransaction.gasPrice != null) {
     debug(
