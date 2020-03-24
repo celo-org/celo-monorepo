@@ -7,6 +7,7 @@ import celoHero from 'src/home/celo-hero.png'
 import HomeBackers from 'src/home/HomeBackers'
 import HomeCarousel from 'src/home/HomeCarousel'
 import HomeSystems from 'src/home/HomeSystems'
+import Timeline from 'src/home/roadmap/Timeline'
 import HomeCover from 'src/home/version3/HomeCover'
 import HomeEmail from 'src/home/version3/HomeEmail'
 import HomeHero from 'src/home/version3/HomeHero'
@@ -70,6 +71,7 @@ export class Home extends React.Component<Props & I18nProps, State> {
         <Press />
         {!this.props.isRestricted && <CoinList />}
         <HomeSystems />
+        <Timeline />
         <HomeWork />
         <HomeCarousel />
         <HomeBackers />

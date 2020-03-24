@@ -11,19 +11,28 @@ export default class Approve extends BaseCommand {
     ...BaseCommand.flags,
     proposalID: flags.string({ required: true, description: 'UUID of proposal to approve' }),
     from: Flags.address({ required: true, description: "Approver's address" }),
+    useMultiSig: flags.boolean({
+      description: 'True means the request will be sent through multisig.',
+    }),
   }
 
-  static examples = ['approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
+  static examples = [
+    'approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+    'approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig',
+  ]
 
   async run() {
     const res = this.parse(Approve)
     const account = res.flags.from
+    const useMultiSig = res.flags.useMultiSig
     const id = res.flags.proposalID
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
-    const governanceApproverMultiSig = await this.kit.contracts.getMultiSig(
-      await governance.getApprover()
-    )
+    const multiSigAddress = useMultiSig ? await governance.getApprover() : ''
+    const governanceApproverMultiSig = useMultiSig
+      ? await this.kit.contracts.getMultiSig(multiSigAddress)
+      : undefined
+    const approver = useMultiSig ? multiSigAddress : account
 
     // in case target is queued
     if (await governance.isQueued(id)) {
@@ -31,17 +40,25 @@ export default class Approve extends BaseCommand {
     }
 
     await newCheckBuilder(this)
-      .isApprover(account)
+      .isApprover(approver)
+      .addConditionalCheck(`${account} is multisig signatory`, useMultiSig, async () =>
+        governanceApproverMultiSig !== undefined
+          ? governanceApproverMultiSig.isowner(account)
+          : new Promise<boolean>(() => false)
+      )
       .proposalExists(id)
       .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
       .proposalInStage(id, 'Approval')
       .runChecks()
 
-    const tx = await governance.approve(id)
-    const multiSigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
-      governance.address,
-      tx.txo
-    )
-    await displaySendTx<any>('approveTx', multiSigTx, {}, 'ProposalApproved')
+    const governanceTx = await governance.approve(id)
+    const tx =
+      governanceApproverMultiSig === undefined
+        ? governanceTx
+        : await governanceApproverMultiSig.submitOrConfirmTransaction(
+            governance.address,
+            governanceTx.txo
+          )
+    await displaySendTx<string | void | boolean>('approveTx', tx, {}, 'ProposalApproved')
   }
 }
