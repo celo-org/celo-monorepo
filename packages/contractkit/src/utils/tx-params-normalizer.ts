@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Tx } from 'web3-core'
 import { RpcCaller } from './rpc-caller'
@@ -48,7 +49,7 @@ export class TxParamsNormalizer {
     */
 
     if (!isEmpty(txParams.gatewayFeeRecipient) && isEmpty(txParams.gatewayFee)) {
-      txParams.gatewayFee = DefaultGatewayFee.toString(16)
+      txParams.gatewayFee = ensureLeading0x(DefaultGatewayFee.toString(16))
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
@@ -70,7 +71,8 @@ export class TxParamsNormalizer {
   private async getNonce(address: string): Promise<number> {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gettransactioncount
     const result = await this.rpcCaller.call('eth_getTransactionCount', [address, 'pending'])
-    const nonce = parseInt(result.result.toString(), 10)
+
+    const nonce = parseInt(result.result.toString(), 16)
     return nonce
   }
 
