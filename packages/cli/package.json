@@ -63,7 +63,7 @@
     "@types/debug": "^4.1.4",
     "@types/elliptic": "^6.4.9",
     "@types/fs-extra": "^8.0.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.2",
     "@types/node": "^10",
     "@types/humanize-duration": "^3.18.0",
     "globby": "^8",

@@ -141,7 +141,7 @@
     "@graphql-codegen/fragment-matcher": "1.10.0",
     "@graphql-codegen/typescript": "1.10.0",
     "@graphql-codegen/typescript-operations": "1.10.0",
-    "@react-native-community/eslint-config": "^0.0.5",
+    "@react-native-community/eslint-config": "^0.0.7",
     "@types/enzyme": "3.1.10",
     "@types/enzyme-adapter-react-16": "1.0.4",
     "@types/ethereumjs-util": "^5.2.0",
