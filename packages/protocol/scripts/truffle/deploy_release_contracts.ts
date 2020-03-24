@@ -64,18 +64,21 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  let releaseStartTime: number
   // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
   // This is to account for the dynamic start date for mainnet,
   // and some grants rely on x months post mainnet launch.
+  let releaseStartTime: any
   if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    const addedMonths = releaseGoldConfig.releaseStartTime.split('+')[1]
+    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
     const date = new Date()
-    date.setDate(date.getDate() + Number(addedMonths) * 30)
+    if (addedMonths > 0) {
+      date.setDate(date.getDate() + addedMonths * 30)
+    }
     releaseStartTime = date.getTime() / 1000
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
   }
+  console.info('ReleaseSTart time', releaseStartTime)
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,
@@ -108,13 +111,16 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     value: startGold,
   })
 
-  releases.push({
+  const record = {
+    GrantNumber: currGrant,
     Beneficiary: releaseGoldConfig.beneficiary,
     ProxyAddress: releaseGoldProxy.address,
     MultiSigProxyAddress: releaseGoldMultiSigProxy.address,
     MultiSigTxHash: multiSigTxHash,
     ReleaseGoldTxHash: releaseGoldTxHash,
-  })
+  }
+  console.info(record)
+  releases.push(record)
 }
 
 async function handleJSONFile(err, data) {
