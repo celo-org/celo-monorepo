@@ -484,7 +484,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   function fundSigner(address payable signer) private {
     // Fund signer account with 1 cGLD.
     uint256 value = 1 ether;
-    totalWithdrawn = totalWithdrawn.add(value);
     signer.transfer(value);
     require(getRemainingTotalBalance() > 0);
   }
