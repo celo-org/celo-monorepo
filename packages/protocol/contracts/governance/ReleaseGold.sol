@@ -480,6 +480,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   /**
    * @notice Funds a signer address so that transaction fees can be paid.
    * @param signer The signer address to fund.
+   * @dev Note that this effectively decreases the total balance by 1 cGLD.
    */
   function fundSigner(address payable signer) private {
     // Fund signer account with 1 cGLD.
