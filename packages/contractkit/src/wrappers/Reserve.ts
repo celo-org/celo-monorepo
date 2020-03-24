@@ -33,6 +33,8 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     }
   }
 
+  isOtherReserveAddress = proxyCall(this.contract.methods.isOtherReserveAddress)
+
   async getSpenders(): Promise<Address[]> {
     const spendersAdded = (
       await this.getPastEvents('SpenderAdded', {
