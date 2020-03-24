@@ -42,8 +42,6 @@ rule totalPreserved( address a,  method f)
 	uint256 _ercBalance = sinvoke ercBalanceOf(a); 
 	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
-	// we limit the amount of pending records due to loop handling 
-	require sinvoke getPendingWithdrawalsLength(a) <= 1;
 	env eF;
 	require eF.msg.sender==a;
 	//this two function breaks the rule 
@@ -51,9 +49,6 @@ rule totalPreserved( address a,  method f)
 	&& f.selector != slash(address,uint256,address,uint256,address[],address[],uint256[]).selector;
 	calldataarg arg;
 	sinvoke f(eF,arg);
-	// we limit the amount of pending records due to loop handling 
-	uint length = sinvoke getPendingWithdrawalsLength(a);
-	require length <= 1;
 	uint256 ercBalance_ = sinvoke ercBalanceOf(a); 
 	uint256 accoutNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
@@ -73,9 +68,6 @@ rule noChangeByOther( address a, address b, method f )
 	uint256 _ercBalance = sinvoke ercBalanceOf(a); 
 	uint256 _accoutNonVoting = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 _accountTotalPendingWithdrawals =  sinvoke getTotalPendingWithdrawals(a);
-	// we limit the amount of pending records due to loop handling 
-	uint length = sinvoke getPendingWithdrawalsLength(a);
-	require length <= 1;
 	env eF;
 	require eF.msg.sender==b;
 	calldataarg arg;
@@ -99,6 +91,7 @@ rule withdraw(uint256 index)
 	
 	uint256 _balance = sinvoke ercBalanceOf(e.msg.sender);
 	uint256 val = sinvoke getPendingWithdrawalsIndex(e.msg.sender,index);	
+	require (e.msg.sender != currentContract);
 	sinvoke withdraw(e,index);
 	uint256 balance_ = sinvoke ercBalanceOf(e.msg.sender);
 	assert balance_ ==_balance+val;

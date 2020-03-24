@@ -558,7 +558,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @dev Note that once an address is authorized, it may never be authorized again.
    * @dev v, r, s constitute `current`'s signature on `msg.sender`.
    */
-  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private {
+  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) internal {
     require(isAccount(msg.sender), "Unknown account");
     require(
       isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
