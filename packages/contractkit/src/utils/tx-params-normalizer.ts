@@ -66,8 +66,7 @@ export class TxParamsNormalizer {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gettransactioncount
     const result = await this.rpcCaller.call('eth_getTransactionCount', [address, 'pending'])
 
-    // tslint:disable-next-line: radix
-    const nonce = parseInt(result.result.toString())
+    const nonce = parseInt(result.result.toString(), 16)
     return nonce
   }
 
