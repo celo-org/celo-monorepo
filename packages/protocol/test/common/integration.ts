@@ -224,11 +224,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
         lockedGold,
         election
       )
-      const resp = await governanceSlasher.slash(slashedAccount, lessers, greaters, indices, {
-        gas: 1000000,
-        from: accounts[0],
-      })
-      console.log(resp.receipt.rawLogs)
+      await governanceSlasher.slash(slashedAccount, lessers, greaters, indices)
     })
 
     it('should set approved slashing to zero', async () => {

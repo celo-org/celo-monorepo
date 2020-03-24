@@ -29,31 +29,17 @@ contract Proxy {
     _;
   }
 
-  event GasLeft2(uint256 gasLeft, address indexed addr);
-  event GasLeft(uint256 indexed gasLeft, uint256 indexed id);
-  event Weird();
-
   /**
    * @notice Delegates calls to the implementation contract.
    */
   function() external payable {
-    /*
-    if (msg.data.length == 0) {
-      emit GasLeft(gasleft(), 222);
-      // emit Weird();
-      return;
-    } */
-
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
 
     address implementationAddress;
 
-    uint256 newCallDataPosition;
-
     // Load the address of the implementation contract from an explicit storage slot.
     assembly {
       implementationAddress := sload(implementationPosition)
-      newCallDataPosition := mload(0x40)
     }
 
     // Avoid checking if address is a contract or executing delegated call when
@@ -61,27 +47,15 @@ contract Proxy {
     require(implementationAddress != address(0), "No Implementation set");
     require(Address.isContract(implementationAddress), "Invalid contract address");
 
-    if (msg.data.length > 0) {
-      assembly {
-        // Extract the position of the transaction data (i.e. function ID and arguments).
-        mstore(0x40, add(newCallDataPosition, calldatasize))
-        calldatacopy(newCallDataPosition, 0, calldatasize)
-      }
-    }
-
-    /*
-    if (msg.data.length == 0) {
-      // emit GasLeft(gasleft(), implementationAddress);
-      emit Weird();
-      return;
-    }
-*/
-    uint256 delegatecallSuccess;
-
     assembly {
+      // Extract the position of the transaction data (i.e. function ID and arguments).
+      let newCallDataPosition := mload(0x40)
+      mstore(0x40, add(newCallDataPosition, calldatasize))
+      calldatacopy(newCallDataPosition, 0, calldatasize)
+
       // Call the smart contract at `implementationAddress` in the context of the proxy contract,
       // with the same msg.sender and value.
-      delegatecallSuccess := delegatecall(
+      let delegatecallSuccess := delegatecall(
         gas,
         implementationAddress,
         newCallDataPosition,
@@ -89,9 +63,7 @@ contract Proxy {
         0,
         0
       )
-    }
 
-    assembly {
       // Copy the return value of the call so it can be returned.
       let returnDataSize := returndatasize
       let returnDataPosition := mload(0x40)
