@@ -24,7 +24,7 @@ export function usePageTurner() {
         setRoute(url)
       },
       [RouterEvents.routeChangeComplete]: () => {
-        setPageTurning(false)
+        setTimeout(() => setPageTurning(false), 300)
         setError(false)
       },
       [RouterEvents.routeChangeError]: (error: { cancelled: boolean }, url: string) => {
