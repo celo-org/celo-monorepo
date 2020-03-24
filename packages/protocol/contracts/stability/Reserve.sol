@@ -258,7 +258,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Transfer gold.
+   * @notice Transfer gold to a whitelisted address subject to reserve spending limits.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
    * @return Returns true if the transaction succeeds.
@@ -266,11 +266,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function transferGold(address payable to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
-    return _transferGold(to, value);
-  }
-
-  function _transferGold(address payable to, uint256 value) internal returns (bool) {
-    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
       uint256 balance = getUnfrozenReserveGoldBalance();
@@ -279,11 +274,28 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     }
     require(spendingLimit >= value, "Exceeding spending limit");
     spendingLimit = spendingLimit.sub(value);
+    return _transferGold(to, value);
+  }
+
+  /**
+   * @notice Transfer unfrozen gold to any address.
+   * @param to The address that will receive the gold.
+   * @param value The amount of gold to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function _transferGold(address payable to, uint256 value) internal returns (bool) {
+    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
     to.transfer(value);
     emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
 
+  /**
+   * @notice Transfer unfrozen gold to any address, used for one side of CP-DOTO.
+   * @param to The address that will receive the gold.
+   * @param value The amount of gold to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
   function transferExchangeGold(address payable to, uint256 value)
     external
     onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
