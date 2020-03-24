@@ -10,7 +10,7 @@ import { unlockAccount } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
 import fs from 'fs'
-import { range } from 'lodash'
+import { merge, range } from 'lodash'
 import fetch from 'node-fetch'
 import path from 'path'
 import sleep from 'sleep-promise'
@@ -28,7 +28,7 @@ import {
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { spawnCmd, spawnCmdWithExitOnFailure } from './utils'
+import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
@@ -1146,4 +1146,65 @@ export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   await connectPeers(
     instances.filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
   )
+}
+
+export async function migrateContracts(
+  monorepoRoot: string,
+  validatorPrivateKeys: string[],
+  attestationKeys: string[],
+  validators: string[],
+  to: number = 1000,
+  overrides: any = {},
+  verbose: boolean = true
+) {
+  const migrationOverrides = merge(
+    {
+      downtimeSlasher: {
+        slashableDowntime: 6,
+      },
+      election: {
+        minElectableValidators: '1',
+      },
+      epochRewards: {
+        frozen: false,
+      },
+      exchange: {
+        frozen: false,
+      },
+      goldToken: {
+        frozen: false,
+      },
+      reserve: {
+        initialBalance: 100000000,
+      },
+      stableToken: {
+        initialBalances: {
+          addresses: validators.map(ensure0x),
+          values: validators.map(() => '10000000000000000000000'),
+        },
+        oracles: validators.map(ensure0x),
+        goldPrice: 10,
+        frozen: false,
+      },
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
+      },
+    },
+    overrides
+  )
+
+  const args = [
+    '--cwd',
+    `${monorepoRoot}/packages/protocol`,
+    'init-network',
+    '-n',
+    'testing',
+    '-m',
+    JSON.stringify(migrationOverrides),
+    '-t',
+    to.toString(),
+  ]
+
+  await spawnCmdWithExitOnFailure('yarn', args, { silent: !verbose })
 }

@@ -23,6 +23,9 @@ library Heap {
     uint256 start,
     uint256 length
   ) internal pure {
+    require(keys.length == values.length, "key and value array length mismatch");
+    require(start < keys.length, "heap start index out of range");
+    require(length <= keys.length, "heap length out of range");
     uint256 i = start;
     while (true) {
       uint256 leftChild = i.mul(2).add(1);

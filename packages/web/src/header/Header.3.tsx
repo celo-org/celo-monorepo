@@ -178,7 +178,6 @@ export class Header extends React.PureComponent<Props, State> {
   render() {
     const { t, screen } = this.props
     const isDesktop = screen === ScreenSizes.DESKTOP
-
     const foreground = this.getForegroundColor()
     const background = this.state.menuFaded && isDesktop ? 'transparent' : this.getBackgroundColor()
     const hamburger = this.state.mobileMenuActive ? colors.dark : foreground
@@ -297,7 +296,13 @@ export class Header extends React.PureComponent<Props, State> {
 
         {this.willShowHamburger() && (
           <View
-            style={[styles.hamburger, { transform: [{ translateY: this.state.bannerHeight }] }]}
+            style={[
+              styles.hamburger,
+              isHomePage &&
+                !this.state.mobileMenuActive && {
+                  transform: [{ translateY: this.state.bannerHeight }],
+                },
+            ]}
           >
             <div
               className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${

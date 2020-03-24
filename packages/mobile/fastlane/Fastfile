@@ -104,4 +104,41 @@ platform :android do
   end
 end
 
+platform :ios do
+
+  desc 'Build the iOS application - requires environment param'
+  lane :build do |options|
+    sh "yarn run build:sdk #{options[:sdkEnv]}"
+    gym(
+      workspace: 'ios/celo.xcworkspace',
+      scheme: "celo-#{options[:environment]}",
+      configuration: "Release",
+      xcargs: "-allowProvisioningUpdates",
+      output_directory: "build",
+      # verbose: true
+     ) 
+  end
+
+  desc 'Ship Alfajores to TestFlight'
+  lane :alfajores do
+    env = 'alfajores'
+    sdkEnv = 'alfajores'
+    build(environment: env, sdkEnv: sdkEnv)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc 'Ship Pilot to TestFlight'
+  lane :pilotapp do
+    env = 'pilot'
+    sdkEnv = 'pilot'
+    build(environment: env, sdkEnv: sdkEnv)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+end
+
 

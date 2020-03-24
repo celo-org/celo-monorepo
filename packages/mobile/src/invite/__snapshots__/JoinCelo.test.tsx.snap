@@ -140,7 +140,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
               "flex": 1,
               "fontFamily": "Hind-Regular",
               "padding": 8,
-              "textAlignVertical": "top",
             }
           }
           testID="NameEntry"
@@ -286,7 +285,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                     "flex": 1,
                     "fontFamily": "Hind-Regular",
                     "padding": 8,
-                    "textAlignVertical": "top",
                   }
                 }
                 testID="CountryNameField"
@@ -384,7 +382,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                   "flex": 1,
                   "fontFamily": "Hind-Regular",
                   "padding": 8,
-                  "textAlignVertical": "top",
                 }
               }
               testID="PhoneNumberField"
@@ -653,7 +650,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
               "flex": 1,
               "fontFamily": "Hind-Regular",
               "padding": 8,
-              "textAlignVertical": "top",
             }
           }
           testID="NameEntry"
@@ -799,7 +795,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                     "flex": 1,
                     "fontFamily": "Hind-Regular",
                     "padding": 8,
-                    "textAlignVertical": "top",
                   }
                 }
                 testID="CountryNameField"
@@ -897,7 +892,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                   "flex": 1,
                   "fontFamily": "Hind-Regular",
                   "padding": 8,
-                  "textAlignVertical": "top",
                 }
               }
               testID="PhoneNumberField"
