@@ -7,7 +7,7 @@ import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_de
 import { ensure0x } from 'src/lib/utils'
 import Web3 from 'web3'
 
-let web3 = new Web3()
+const web3 = new Web3()
 
 const helmChartPath = '../helm-charts/voting-bot'
 
