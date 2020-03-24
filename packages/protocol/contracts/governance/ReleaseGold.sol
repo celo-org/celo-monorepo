@@ -478,6 +478,18 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice Funds a signer address so that transaction fees can be paid.
+   * @param signer The signer address to fund.
+   */
+  function fundSigner(address payable signer) private {
+    // Fund signer account with 1 cGLD.
+    uint256 value = 1 ether;
+    totalWithdrawn = totalWithdrawn.add(value);
+    signer.transfer(value);
+    require(getRemainingTotalBalance() > 0);
+  }
+
+  /**
    * @notice A wrapper function for the authorize vote signer account method.
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -486,12 +498,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeVoteSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanVote
     onlyWhenInProperState
   {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getVoteSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeVoteSigner(signer, v, r, s);
   }
 
@@ -504,12 +520,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanValidate
     onlyWhenInProperState
   {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeValidatorSigner(signer, v, r, s);
   }
 
@@ -524,12 +544,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *      encrypting the authorized address.
    */
   function authorizeValidatorSignerWithPublicKey(
-    address signer,
+    address payable signer,
     uint8 v,
     bytes32 r,
     bytes32 s,
     bytes calldata ecdsaPublicKey
   ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
   }
 
@@ -548,7 +572,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *      encrypting the authorized address.
    */
   function authorizeValidatorSignerWithKeys(
-    address signer,
+    address payable signer,
     uint8 v,
     bytes32 r,
     bytes32 s,
@@ -556,6 +580,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeValidatorSignerWithKeys(
       signer,
       v,
@@ -576,12 +604,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeAttestationSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanValidate
     onlyWhenInProperState
   {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getAttestationSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeAttestationSigner(signer, v, r, s);
   }
 

@@ -850,6 +850,13 @@ contract('ReleaseGold', (accounts: string[]) => {
           )
         })
 
+        it(`should transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+          const balance1 = await web3.eth.getBalance(authorized)
+          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+          const balance2 = await web3.eth.getBalance(authorized)
+          assertEqualBN(new BigNumber(balance2).minus(balance1), web3.utils.toWei('1'))
+        })
+
         it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(
@@ -888,6 +895,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         describe('when a previous authorization has been made', () => {
           const newAuthorized = accounts[6]
+          let balance1: string
           let newSig: any
           beforeEach(async () => {
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
@@ -896,6 +904,7 @@ contract('ReleaseGold', (accounts: string[]) => {
               releaseGoldInstance.address,
               newAuthorized
             )
+            balance1 = await web3.eth.getBalance(newAuthorized)
             await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s, {
               from: beneficiary,
             })
@@ -914,6 +923,11 @@ contract('ReleaseGold', (accounts: string[]) => {
               await authorizationTest.authorizedSignerToAccount(newAuthorized),
               releaseGoldInstance.address
             )
+          })
+
+          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance2 = await web3.eth.getBalance(newAuthorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
           })
 
           it('should preserve the previous authorization', async () => {

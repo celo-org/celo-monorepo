@@ -9,7 +9,7 @@ interface IReleaseGold {
   function unlockGold(uint256) external;
   function relockGold(uint256, uint256) external;
   function withdrawLockedGold(uint256) external;
-  function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
+  function authorizeVoteSigner(address payable, uint8, bytes32, bytes32) external;
   function createAccount() external;
   function setAccount(string calldata, bytes calldata, address, uint8, bytes32, bytes32) external;
   function setAccountName(string calldata) external;
