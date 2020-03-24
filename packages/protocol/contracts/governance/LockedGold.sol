@@ -302,6 +302,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit SlasherWhitelistRemoved(slasherIdentifier);
   }
 
+  event GasLeft(uint256 indexed gasLeft, uint256 indexed id);
+
   /**
    * @notice Slashes `account` by reducing its nonvoting locked gold by `penalty`.
    *         If there is not enough nonvoting locked gold to slash, calls into
@@ -348,7 +350,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       _incrementNonvotingAccountBalance(reporter, reward);
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    // getGoldToken().transfer(communityFund, maxSlash.sub(reward));
     address payable communityFundPayable = address(uint160(communityFund));
+    emit GasLeft(gasleft(), 111);
     communityFundPayable.transfer(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }

@@ -43,6 +43,9 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
     return slashed[account];
   }
 
+  event Weird();
+  event GasLeft(uint256 indexed gasLeft, uint256 indexed id);
+
   /**
    * @notice Calls `LockedGold.slash` on `account` if `account` has an entry in `slashed`.
    * @param account Account to slash
@@ -59,6 +62,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
     uint256 penalty = slashed[account];
     require(penalty > 0, "No penalty given by governance");
     slashed[account] = 0;
+    emit GasLeft(gasleft(), 1);
     getLockedGold().slash(
       account,
       penalty,
@@ -68,6 +72,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
       electionGreaters,
       electionIndices
     );
+    emit GasLeft(gasleft(), 123);
     return true;
   }
 }

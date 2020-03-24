@@ -175,8 +175,11 @@ contract Governance is
     _;
   }
 
+  event Bumbpbp(bytes data);
+
   function() external payable {
-    require(msg.data.length == 0, "unknown method");
+    // require(msg.data.length == 0, "unknown method");
+    // emit Bumbpbp(msg.data);
   }
 
   /**
