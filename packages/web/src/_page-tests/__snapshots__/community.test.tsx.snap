@@ -4663,7 +4663,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  common:validationErrors.generic
+                  common:validationErrors.email
                 </div>
               </div>
             </div>
@@ -4790,7 +4790,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  common:validationErrors.generic
+                  common:validationErrors.email
                 </div>
               </div>
             </div>
@@ -5431,7 +5431,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  common:validationErrors.generic
+                  common:validationErrors.email
                 </div>
               </div>
             </div>

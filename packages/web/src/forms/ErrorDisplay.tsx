@@ -43,7 +43,6 @@ interface Props {
   field: Field
 }
 
-// Deprecated
 export const ErrorMessage = React.memo(function _ErrorMessage({ allErrors, field }: Props) {
   const isShowing = allErrors.includes(field)
   return <ErrorDisplay field={field} isShowing={isShowing} />

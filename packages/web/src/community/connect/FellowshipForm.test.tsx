@@ -39,10 +39,8 @@ describe('FellowshipForm', () => {
     it('does not show errors', async () => {
       const { getByText, queryAllByText, getByPlaceholderText } = render(<FellowshipForm />)
 
-      // enter name
       fireEvent.change(getByPlaceholderText('form.name'), { target: { value: 'xu' } })
 
-      // enter name
       fireEvent.change(getByPlaceholderText('form.ideas'), { target: { value: 'what if' } })
 
       fireEvent.change(getByPlaceholderText('form.email'), {

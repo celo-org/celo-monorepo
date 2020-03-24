@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import ah from 'src/community/ah-logo.png'
 import polychain from 'src/community/polychain-logo.png'
 import { H2 } from 'src/fonts/Fonts'
-import { ErrorMessage } from 'src/forms/ErrorMessage'
+import { ErrorMessage } from 'src/forms/ErrorDisplay'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
@@ -125,6 +125,9 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                     {ApplicationKeys.map((key) => (
                       <LabeledInput
                         key={key}
+                        displayErrorAs={
+                          key === 'founderEmail' || key === 'coFounderEmail' ? 'email' : undefined
+                        }
                         label={ApplicationFields[key]}
                         value={formState.form[key]}
                         name={key}
@@ -168,6 +171,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                     {RecommendationKeys.map((key) => (
                       <LabeledInput
                         key={key}
+                        displayErrorAs={key === 'founderEmail' ? 'email' : undefined}
                         label={RecommendationFields[key]}
                         value={formState.form[key]}
                         name={key}

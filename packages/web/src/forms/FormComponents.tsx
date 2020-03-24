@@ -14,7 +14,7 @@ import {
 } from 'react-native'
 import { Cell, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { ErrorMessage } from './ErrorMessage'
+import { ErrorMessage } from './ErrorDisplay'
 
 export function NameErrorArea({ formState, isMobile }) {
   return (
