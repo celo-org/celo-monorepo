@@ -8,11 +8,6 @@ package.json
 packages/*/dist
 packages/*/lib
 
-
-packages/walletkit/.artifacts/
-packages/walletkit/contracts/
-packages/walletkit/types/
-
 packages/docs/_book
 packages/mobile/src/geth/*.json
 

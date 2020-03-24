@@ -37,7 +37,6 @@ platform :android do
   desc 'Build the Android application - requires environment param'
   lane :build do |options|
     clean
-    sh('yarn', 'run', 'build:sdk', options[:sdkEnv])
     environment = options[:environment].capitalize
     ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx256m -XX:+HeapDumpOnOutOfMemoryError"'
     gradle(task: 'bundle' + environment + 'JsAndAssets', project_dir: 'android/')
@@ -108,7 +107,6 @@ platform :ios do
 
   desc 'Build the iOS application - requires environment param'
   lane :build do |options|
-    sh "yarn run build:sdk #{options[:sdkEnv]}"
     gym(
       workspace: 'ios/celo.xcworkspace',
       scheme: "celo-#{options[:environment]}",

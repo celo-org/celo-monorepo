@@ -6,11 +6,6 @@ jest.mock('src/web3/actions', () => ({
   unlockAccount: jest.fn(async () => true),
 }))
 
-jest.mock('@celo/walletkit', () => ({
-  ...jest.requireActual('@celo/walletkit'),
-  sendTransaction: jest.fn(async () => null),
-}))
-
 describe('Encrypt Comment', () => {
   it('Empty comment', async () => {
     expect(await encryptComment('', 'toAddr', 'fromAddr')).toBe('')
