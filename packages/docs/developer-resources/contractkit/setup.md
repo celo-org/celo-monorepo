@@ -5,9 +5,9 @@
 To install, run the following:
 
 ```bash
-npm install @celo/contractkit
+npm install @celo/contractkit@baklava
 // or
-yarn add @celo/contractkit
+yarn add @celo/contractkit@baklava
 ```
 
 You will need node version `10.0.0` or higher.
