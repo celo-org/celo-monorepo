@@ -79,12 +79,12 @@ export class BlockProcessor {
   async initBatch() {
     let block = this.fromBlock - 1
     while (++block <= this.toBlock) {
-      await this.onNewBlock(block)
+      await this.onNewBlock(block, block - this.fromBlock)
     }
   }
 
-  async onNewBlock(blockNumber: number) {
-    if (blockNumber % this.blockInterval === 0) {
+  async onNewBlock(blockNumber: number, blockIntervalNumber?: number) {
+    if ((blockIntervalNumber ?? blockNumber) % this.blockInterval === 0) {
       await Promise.all([this.fetchBlockState(blockNumber), this.processBlockHeader(blockNumber)])
     }
   }
