@@ -147,13 +147,23 @@ export async function setInitialProxyImplementation<
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
-  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, null, null, ...args)
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
   return Contract.at(proxy.address) as ContractInstance
 }
 
 export async function _setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, implementation: ContractInstance, proxy: ProxyInstance, contractName: string, from: Address, value: string, ...args: any[]) {
+>(
+  web3: Web3,
+  implementation: ContractInstance,
+  proxy: ProxyInstance,
+  contractName: string,
+  txOptions: {
+    from: Address,
+    value: string,
+  },
+  ...args: any[]
+) {
   const initializerAbi = (implementation as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
@@ -163,15 +173,15 @@ export async function _setInitialProxyImplementation<
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
     console.log(`  Setting initial ${contractName} implementation on proxy`)
-    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, from, value, ...args)
+    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   } else {
-    if (from != null) {
-      receipt = await proxy._setImplementation(implementation.address, { from })
-      if (value != null) {
+    if (txOptions.from != null) {
+      receipt = await proxy._setImplementation(implementation.address, { from: txOptions.from })
+      if (txOptions.value != null) {
         await web3.eth.sendTransaction({
-          from,
+          from: txOptions.from,
           to: proxy.address,
-          value,
+          value: txOptions.value,
         })
       }
     } else {

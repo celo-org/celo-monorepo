@@ -417,12 +417,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   function getRemainingLockedBalance() public view returns (uint256) {
     uint256 pendingWithdrawalSum = 0;
     if (getAccounts().isAccount(address(this))) {
-      (uint256[] memory pendingWithdrawalValues, ) = getLockedGold().getPendingWithdrawals(
-        address(this)
-      );
-      for (uint256 i = 0; i < pendingWithdrawalValues.length; i = i.add(1)) {
-        pendingWithdrawalSum = pendingWithdrawalSum.add(pendingWithdrawalValues[i]);
-      }
+      pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
     }
     return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
   }

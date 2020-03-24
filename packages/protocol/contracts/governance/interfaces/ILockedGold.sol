@@ -9,6 +9,7 @@ interface ILockedGold {
     external
     view
     returns (uint256[] memory, uint256[] memory);
+  function getTotalPendingWithdrawals(address) external view returns (uint256);
   function lock() external payable;
   function unlock(uint256) external;
   function relock(uint256, uint256) external;

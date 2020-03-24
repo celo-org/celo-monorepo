@@ -34,7 +34,7 @@ while getopts 'n:f:g:s:o:r:' flag; do
 done
 
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
-[ -z "$FROM" ] && echo "No from address specified via the -f flag: defaulting to truffle default";
+[ -z "$FROM" ] && echo "Need to set the FROM address vai the -f flag" && exit 1;
 [ -z "$GRANTS_FILE" ] && echo "Need to set the GRANTS_FILE via the -g flag" && exit;
 [ -z "$START_GOLD" ] && echo "No starting gold provided via -s flag: defaulting to 10cGld" && START_GOLD=10;
 [ -z "$OUTPUT_FILE" ] && echo "No output file provided, will print output to console."

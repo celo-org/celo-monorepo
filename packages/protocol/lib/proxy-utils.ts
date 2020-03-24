@@ -8,24 +8,26 @@ export async function setAndInitializeImplementation(
   proxy: ProxyInstance,
   implementationAddress: string,
   initializerAbi: any,
-  from: Address,
-  value: string,
+  txOptions: {
+    from?: Address
+    value?: string
+  },
   ...args: any[]
 ) {
   const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
-  if (from != null) {
+  if (txOptions.from != null) {
     // The proxied contract needs to be funded prior to initialization
-    if (value != null) {
+    if (txOptions.value != null) {
       // Proxy's fallback fn expects the contract's implementation to be set already
       // So we set the implementation first, send the funding, and then set and initialize again.
-      await proxy._setImplementation(implementationAddress, { from })
+      await proxy._setImplementation(implementationAddress, { from: txOptions.from })
       await web3.eth.sendTransaction({
-        from,
+        from: txOptions.from,
         to: proxy.address,
-        value,
+        value: txOptions.value,
       })
     }
-    return proxy._setAndInitializeImplementation(implementationAddress, callData as any, { from })
+    return proxy._setAndInitializeImplementation(implementationAddress, callData as any, { from: txOptions.from })
   } else {
     return proxy._setAndInitializeImplementation(implementationAddress, callData as any)
   }
