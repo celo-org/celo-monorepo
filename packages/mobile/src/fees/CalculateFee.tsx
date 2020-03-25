@@ -1,4 +1,4 @@
-import { getStableTokenContract } from '@celo/walletkit'
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import React, { FunctionComponent, useEffect } from 'react'
 import { useAsync, UseAsyncReturn } from 'react-async-hook'
@@ -77,7 +77,7 @@ function useAsyncShowError<R, Args extends any[]>(
 const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   const asyncResult = useAsyncShowError(
     (account: string, amount: BigNumber, comment: string) =>
-      getInviteFee(account, getStableTokenContract, amount.valueOf(), comment),
+      getInviteFee(account, CURRENCY_ENUM.DOLLAR, amount.valueOf(), comment),
     [props.account, props.amount, props.comment]
   )
   return props.children(asyncResult) as React.ReactElement
@@ -86,7 +86,7 @@ const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
 const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
   const asyncResult = useAsyncShowError(
     (account: string, recipientAddress: string, amount: BigNumber, comment: string) =>
-      getSendFee(account, getStableTokenContract, {
+      getSendFee(account, CURRENCY_ENUM.DOLLAR, {
         recipientAddress,
         amount: amount.valueOf(),
         comment,

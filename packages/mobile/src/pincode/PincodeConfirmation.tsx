@@ -24,7 +24,7 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import PincodeTextbox from 'src/pincode/PincodeTextbox'
 import { RootState } from 'src/redux/reducers'
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
 interface State {
@@ -118,8 +118,8 @@ class PincodeConfirmation extends React.Component<Props, State> {
     const { pin } = this.state
     const fornoMode = this.props
     if (this.props.currentAccount && !fornoMode) {
-      web3.eth.personal
-        .unlockAccount(this.props.currentAccount, pin, UNLOCK_DURATION)
+      getContractKit()
+        .web3.eth.personal.unlockAccount(this.props.currentAccount, pin, UNLOCK_DURATION)
         .then((result: boolean) => (result ? this.onCorrectPin(pin) : this.onWrongPin()))
         .catch(this.onWrongPin)
     } else {

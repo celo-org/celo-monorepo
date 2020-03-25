@@ -7,8 +7,6 @@ import { TransactionObject, TransactionReceipt } from 'web3-eth'
 import { Contract } from 'web3-eth-contract'
 import * as ContractList from '../contracts/index'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
-import { GoldToken } from '../types/GoldToken'
-import { StableToken } from '../types/StableToken'
 import { getGasPriceMinimumContract } from './contracts'
 import { Logger } from './logger'
 
@@ -248,7 +246,7 @@ async function getGasPrice(
 export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyContract: StableToken | GoldToken,
+  feeCurrencyAddress: string,
   nonce: number,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
@@ -284,8 +282,8 @@ export async function sendTransactionAsync<T>(
     logger(Started)
     const txParams: Tx = {
       from: account,
-      // web3 doesn't know about this Celo-specific prop
-      feeCurrency: (feeCurrencyContract as any)._address,
+      // @ts-ignore web3 doesn't know about this Celo-specific prop
+      feeCurrency: feeCurrencyAddress,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
       // the suggested price in the selected feeCurrency.
       gasPrice: '0',
@@ -359,7 +357,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
   web3: Web3,
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyContract: StableToken | GoldToken,
+  feeCurrencyAddress: string,
   nonce: number,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
@@ -394,8 +392,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
 
   try {
     logger(Started)
-    // web3 doesn't know about this Celo-specific prop
-    const feeCurrency = (feeCurrencyContract as any)._address
+    const feeCurrency = feeCurrencyAddress
     Logger.debug(tag, `Using nonce ${nonce} for account ${account} and fee currency ${feeCurrency}`)
 
     const txParams: Tx = {

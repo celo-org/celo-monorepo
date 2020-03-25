@@ -68,4 +68,6 @@ CIP template:
 
 **Finding Us and Other Contributors**
 
+A list of active contributors can be found at [celo.org/about](https://celo.org/about#contributors)
+
 For code-related questions, comments, and discussions please use the [Celo Forum](https://forum.celo.org)
