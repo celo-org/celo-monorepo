@@ -36,7 +36,7 @@ done
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 [ -z "$FROM" ] && echo "No from address specified via the -f flag: defaulting to truffle default"; 
 [ -z "$GRANTS_FILE" ] && echo "Need to set the GRANTS_FILE via the -g flag" && exit;
-[ -z "$START_GOLD" ] && echo "No starting gold provided via -s flag: defaulting to 10cGld" && START_GOLD=10;
+[ -z "$START_GOLD" ] && echo "No starting gold provided via -s flag: defaulting to 1cGld" && START_GOLD=1;
 [ -z "$OUTPUT_FILE" ] && echo "No output file provided, will print output to console."
 
 if ! nc -z 127.0.0.1 8545 ; then

@@ -1,10 +1,9 @@
 import {
-  _setInitialProxyImplementation,
   getDeployedProxiedContract,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs = require('fs')
 import * as prompts from 'prompts'
 import {
   RegistryInstance,
@@ -13,6 +12,7 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 let argv: any
 let registry: any
@@ -170,7 +170,22 @@ async function handleJSONFile(err, data) {
     return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
   const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
-  const totalValue = Number(totalTransferFees) + Number(totalGoldGrant)
+  const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
+  const fromBalance = new BigNumber(await web3.eth.getBalance(argv.from))
+  if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
+    console.error(
+      chalk.red(
+        '\nError: The `from` address ' +
+          argv.from +
+          "'s balance is not sufficient to cover all of the grants specified in " +
+          argv.grants +
+          '.\
+      \nIf you would only like to deploy a subset of grants, please modify the json file and try again.\
+      \nExiting.'
+      )
+    )
+    process.exit(0)
+  }
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
