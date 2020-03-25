@@ -74,7 +74,7 @@ describe('tracer tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    //await context.hooks.before()
+    await context.hooks.before()
   })
 
   after(async function(this: any) {
@@ -230,6 +230,25 @@ describe('tracer tests', () => {
       false
     )
 
+    describe(`GoldToken.transfer`, () => {
+      let trackBalances: Record<Address, AccountAssets>
+      let receipt: TransactionReceipt
+
+      before(async function(this: any) {
+        this.timeout(0)
+        const tx = await goldToken.transfer(ToAddress, TransferAmount.toFixed())
+        const txResult = await tx.send()
+        receipt = await txResult.waitReceipt()
+        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+      })
+
+      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+        assertEqualBN(
+          trackBalances[normalizeAddress(FromAddress)].gold,
+          new BigNumber(-TransferAmount)
+        ))
+    })
+
     describe(`Locking gold`, () => {
       let trackBalances: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
@@ -350,6 +369,11 @@ describe('tracer tests', () => {
         //console.info(receipt)
       })
 
+      /* AssertionError: expected '10000008160002562' to equal '1000000000000000000'
+         + expected - actual
+         
+         -10000008160002562
+         +1000000000000000000 */
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
         assertEqualBN(
           trackBalances[normalizeAddress(FromAddress)].gold,
