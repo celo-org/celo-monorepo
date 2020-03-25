@@ -3,7 +3,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
-import { Block } from 'web3/eth/types'
+import { Block } from 'web3-eth'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
@@ -125,7 +125,7 @@ export default class ValidatorStatus extends BaseCommand {
     const accounts = await this.kit.contracts.getAccounts()
     const validator = await accounts.signerToAccount(signer)
     const name = (await accounts.getName(validator)) || ''
-    const proposedCount = blocks.filter((b) => b.miner === signer).length
+    const proposedCount = blocks.filter((b) => eqAddress(b.miner, signer)).length
     let signatures = 0
     let eligible = 0
     for (const block of blocks) {

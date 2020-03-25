@@ -1,4 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
+import colors from '@celo/react-components/styles/colors'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
@@ -8,10 +9,14 @@ import { Screens } from 'src/navigator/Screens'
 
 interface Props {
   isExchange?: boolean
-  tintColor?: string
+  tintColor: string
 }
 
 export default class FeeIcon extends React.Component<Props> {
+  static defaultProps = {
+    tintColor: colors.lightGray,
+  }
+
   navigateToEducate() {
     navigate(Screens.FeeEducation, {})
   }

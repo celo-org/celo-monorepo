@@ -61,17 +61,52 @@
     - [Payments and Exchanging](celo-codebase/wallet/how-the-wallet-works/sending-and-requesting-payments.md)
     - [Ultralight Node Sync](celo-codebase/wallet/how-the-wallet-works/ultralight-node-sync.md)
 
-## Celo SDK
-
-- [Introduction](developer-resources/introduction.md)
-- [DAppKit](developer-resources/dappkit/README.md)
-  - [Getting Started](developer-resources/dappkit/setup.md)
-  - [Usage](developer-resources/dappkit/usage.md)
-- [ContractKit](developer-resources/contractkit/README.md)
-  - [Getting Started](developer-resources/contractkit/setup.md)
-  - [Examples](developer-resources/contractkit/examples.md)
-  - [Reference]()
-<!--contractkit-reference-start-->
+## Developer Guide
+- [Quick Start](developer-resources/start.md)
+  - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
+  - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
+  <!-- - [Building a dApp with Contracts on Celo]() -->
+- [Overview]()
+  <!-- - [The Celo Protocol]()
+    - [Architecture]()
+    - [Similarities with Ethereum]()
+    - [Difference between Ethereum and Celo]()
+      - [Mobile First]()
+      - [Architectural Differences]()
+        - [Validators, full node, light node]()
+      - [Protocol Differences]()
+        - [TX object - link to transactions]()
+        - [fees in dollars- link to Paying for Gas in Tokens]()
+      - [Development Differences]()
+    - [dApps on Celo]()
+      - [What is a dApp?]() -->
+  - [The Celo SDK](developer-resources/introduction.md)
+    <!-- - [Architecture]() -->
+    - [ContractKit](developer-resources/contractkit/README.md)
+      - [Setup](developer-resources/contractkit/setup.md)
+      - [Using the kit](developer-resources/contractkit/usage.md)
+      - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
+      - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
+    - [Forno](developer-resources/forno/README.md)
+      <!-- - [Example of querying (web3, kit)]()
+      - [Example of sending tx (kit)]() -->
+    <!-- - [Using Truffle]()
+      - [Setting up a Local node]()
+      - [Option: Using CeloProvider with Truffle]() -->
+    - [DAppKit](developer-resources/dappkit/README.md)
+      <!-- - [Going mobile first (true decentralization)]()
+      - [dApps and Wallets - Signing Transactions]() -->
+      - [Setup](developer-resources/dappkit/setup.md)
+        <!-- - [React Native]()
+        - [Expo]() -->
+      - [Usage](developer-resources/dappkit/usage.md)
+    <!-- - [Guide to Asset Custody]() -->
+  - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+  - [Integrations](developer-resources/integrations/integrations.md)
+    - [General](developer-resources/integrations/general.md)
+    - [Custody](developer-resources/integrations/custody.md)
+  - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
+    <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
     - [External Modules]()
       - [address-registry](developer-resources/contractkit/reference/modules/_address_registry_.md)
@@ -145,6 +180,7 @@
       - [wrappers/BaseWrapper](developer-resources/contractkit/reference/modules/_wrappers_basewrapper_.md)
       - [BaseWrapper](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.basewrapper.md)
       - [CeloTransactionObject](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.celotransactionobject.md)
+      - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
       - [wrappers/BlockchainParameters](developer-resources/contractkit/reference/modules/_wrappers_blockchainparameters_.md)
       - [BlockchainParametersWrapper](developer-resources/contractkit/reference/classes/_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
       - [wrappers/DoubleSigningSlasher](developer-resources/contractkit/reference/modules/_wrappers_doublesigningslasher_.md)
@@ -185,7 +221,14 @@
       - [LockedGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_lockedgold_.lockedgoldwrapper.md)
       - [AccountSlashed](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.accountslashed.md)
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
+      - [PendingWithdrawal](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)
       - [VotingDetails](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.votingdetails.md)
+      - [wrappers/MultiSig](developer-resources/contractkit/reference/modules/_wrappers_multisig_.md)
+      - [MultiSigWrapper](developer-resources/contractkit/reference/classes/_wrappers_multisig_.multisigwrapper.md)
+      - [wrappers/ReleaseGold](developer-resources/contractkit/reference/modules/_wrappers_releasegold_.md)
+      - [ReleaseGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_releasegold_.releasegoldwrapper.md)
+      - [BalanceState](developer-resources/contractkit/reference/interfaces/_wrappers_releasegold_.balancestate.md)
+      - [ReleaseGoldInfo](developer-resources/contractkit/reference/interfaces/_wrappers_releasegold_.releasegoldinfo.md)
       - [wrappers/Reserve](developer-resources/contractkit/reference/modules/_wrappers_reserve_.md)
       - [ReserveWrapper](developer-resources/contractkit/reference/classes/_wrappers_reserve_.reservewrapper.md)
       - [ReserveConfig](developer-resources/contractkit/reference/interfaces/_wrappers_reserve_.reserveconfig.md)
@@ -236,6 +279,8 @@
       - [GoldTokenWrapper](developer-resources/contractkit/reference/classes/_wrappers_goldtokenwrapper_.goldtokenwrapper.md)
       - [GovernanceWrapper](developer-resources/contractkit/reference/classes/_wrappers_governance_.governancewrapper.md)
       - [LockedGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_lockedgold_.lockedgoldwrapper.md)
+      - [MultiSigWrapper](developer-resources/contractkit/reference/classes/_wrappers_multisig_.multisigwrapper.md)
+      - [ReleaseGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_releasegold_.releasegoldwrapper.md)
       - [ReserveWrapper](developer-resources/contractkit/reference/classes/_wrappers_reserve_.reservewrapper.md)
       - [SortedOraclesWrapper](developer-resources/contractkit/reference/classes/_wrappers_sortedoracles_.sortedoracleswrapper.md)
       - [StableTokenWrapper](developer-resources/contractkit/reference/classes/_wrappers_stabletokenwrapper_.stabletokenwrapper.md)
@@ -267,6 +312,7 @@
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsconfig.md)
       - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
+      - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
       - [ElectableValidators](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electablevalidators.md)
       - [ElectionConfig](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electionconfig.md)
       - [GroupVote](developer-resources/contractkit/reference/interfaces/_wrappers_election_.groupvote.md)
@@ -285,7 +331,10 @@
       - [Votes](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.votes.md)
       - [AccountSlashed](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.accountslashed.md)
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
+      - [PendingWithdrawal](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)
       - [VotingDetails](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.votingdetails.md)
+      - [BalanceState](developer-resources/contractkit/reference/interfaces/_wrappers_releasegold_.balancestate.md)
+      - [ReleaseGoldInfo](developer-resources/contractkit/reference/interfaces/_wrappers_releasegold_.releasegoldinfo.md)
       - [ReserveConfig](developer-resources/contractkit/reference/interfaces/_wrappers_reserve_.reserveconfig.md)
       - [MedianRate](developer-resources/contractkit/reference/interfaces/_wrappers_sortedoracles_.medianrate.md)
       - [OracleRate](developer-resources/contractkit/reference/interfaces/_wrappers_sortedoracles_.oraclerate.md)
@@ -299,8 +348,7 @@
       - [ValidatorGroup](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorgroup.md)
       - [ValidatorReward](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorreward.md)
       - [ValidatorsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_validators_.validatorsconfig.md)
-<!--contractkit-reference-end-->
-- [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+    <!-- contractkit-reference-end -->
 
 ## Command Line Interface
 

@@ -2,10 +2,15 @@ pragma solidity ^0.5.8;
 import "contracts/governance/Election.sol";
 import "contracts/common/Accounts.sol";
 import "specs/harnesses/LockedGoldHarness.sol";
+
 contract ElectionHarness is Election {
   LockedGoldHarness lockedGold;
   Accounts accounts;
 
+// for using invariants - must have this function that simulates the constructure  
+  function init_state() public {}
+
+/*** override the getters for the other contracts so we can link to the contract ****/
   function getLockedGold() internal view returns (ILockedGold) {
     return lockedGold;
   }
@@ -13,34 +18,26 @@ contract ElectionHarness is Election {
   function getAccounts() internal view returns (IAccounts) {
 	return accounts;
   }
-
-  function init_state() public {}
-
-  function ercBalanceOf(address a) public returns (uint256) {
-    return a.balance;
+  
+  //wrapper for account functionality 
+  function isAccount(address account) public view returns (bool) {
+    return accounts.isAccount(account);
   }
 
-  function getAccountNonvotingLockedGold(address account) public returns (uint256) {
-    return lockedGold.getAccountNonvotingLockedGold(account);
-  }
+  
 
-  function getTotalPendingWithdrawals(address account) public returns (uint256) {
-    return lockedGold.getTotalPendingWithdrawals(account);
-  }
-
-  function getPendingWithdrawalsLength(address account) external view returns (uint256) {
-    return lockedGold.getPendingWithdrawalsLength(account);
-  }
-
-  /*function getElectableValidators() public view returns (uint256, uint256) {
-    return (electableValidators.min, electableValidators.max);
-  }*/
-
+/*** getters for the voting structures ****/
   function getPendingVotes(address group, address account) public returns (uint256) {
     PendingVotes storage pending = votes.pending;
     GroupPendingVotes storage groupPending = pending.forGroup[group];
     PendingVote storage pendingVote = groupPending.byAccount[account];
     return pendingVote.value;
+  }
+  
+  function getActiveVotesForGroupByAccountRAW(address group, address account ) public returns (uint256) {
+    ActiveVotes storage active = votes.active;
+    GroupActiveVotes storage groupActive = active.forGroup[group];
+    return groupActive.unitsByAccount[account];
   }
 
   function getTotalElectionPendingVotes(address account) public returns (uint256) {
@@ -56,9 +53,13 @@ contract ElectionHarness is Election {
     return votes.pending.forGroup[group].total;
   }
   
-  
+    
   function getTotalElectionActiveVotesForGroup(address group) public view returns (uint256) {
     return votes.active.forGroup[group].total;
+  }
+  
+  function getTotalUnitsVotingForGroup(address group) public view returns (uint256) {
+    return votes.active.forGroup[group].totalUnits;
   }
   
 
@@ -99,7 +100,10 @@ contract ElectionHarness is Election {
     return false;
 
   }
-
+  
+  /* a wrapper for dHondt algorithm
+  need to use global arrays and also access them for assuming certain properties 
+  */
   address[] internal electionGroups;
   uint256[] internal numMembers;
   uint256[] internal numMembersElected;
@@ -139,7 +143,9 @@ contract ElectionHarness is Election {
   function getGroupFromGroupId(uint256 groupId) public returns (address) {
     return electionGroups[groupId];
   }
-
+  
+  
+	// access to the eligible groups  link list 
   function groupInElectionGroups(address groupId) public returns (bool) {
     return votes.total.eligible.contains(groupId);
   }

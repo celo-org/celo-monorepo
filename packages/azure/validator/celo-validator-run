@@ -1,0 +1,67 @@
+#!/bin/bash
+
+set -e
+
+. /etc/default/celo
+
+SECRET_DIR=$(mktemp --directory --tmpdir=/dev/shm)
+cleanup () {
+    rm -rf ${SECRET_DIR}
+}
+trap cleanup EXIT
+
+get_secret $VALIDATOR_KEY_VAULT 'validatorPrivateKey' > ${SECRET_DIR}/validatorPrivateKey
+generate_password > ${SECRET_DIR}/accountPassword
+
+set -x
+
+docker run \
+  --rm \
+  -v $DATA_DIR:$DATA_DIR \
+  -v $SECRET_DIR:$SECRET_DIR \
+  $GETH_NODE_DOCKER_IMAGE \
+    account import \
+    --keystore=${SECRET_DIR} \
+    --password=${SECRET_DIR}/accountPassword \
+    ${SECRET_DIR}/validatorPrivateKey
+
+docker run \
+  --name $1 \
+  --restart=always \
+  --net=host \
+  -v $DATA_DIR:$DATA_DIR \
+  -v $SECRET_DIR:$SECRET_DIR \
+  --entrypoint /bin/sh \
+  $GETH_NODE_DOCKER_IMAGE -c "\
+    geth \
+      --bootnodes=${BOOTNODES} \
+      --keystore=${SECRET_DIR} \
+      --password=${SECRET_DIR}/accountPassword \
+      --unlock=$VALIDATOR_ACCOUNT_ADDRESS \
+      --mine \
+      --rpc \
+      --rpcaddr 0.0.0.0 \
+      --rpcapi=eth,net,web3 \
+      --rpccorsdomain='*' \
+      --rpcvhosts=* \
+      --ws \
+      --wsaddr 0.0.0.0 \
+      --wsorigins=* \
+      --wsapi=eth,net,web3 \
+      --nodekey=$SECRET_DIR/validatorPrivateKey \
+      --etherbase=$VALIDATOR_ACCOUNT_ADDRESS \
+      --networkid=${NETWORK_ID} \
+      --syncmode=full \
+      --consoleformat=json \
+      --consoleoutput=stdout \
+      --verbosity=${GETH_VERBOSITY} \
+      --ethstats=${VALIDATOR_NAME}@${ETHSTATS_HOST} \
+      --istanbul.blockperiod=${BLOCK_TIME} \
+      --istanbul.requesttimeout=${ISTANBUL_REQUEST_TIMEOUT_MS} \
+      --maxpeers=${VALIDATOR_MAX_PEERS} \
+      --nat=extip:${VALIDATOR_INTERNAL_IP_ADDRESS} \
+      --metrics \
+      --nodiscover \
+      --proxy.proxied \
+      --proxy.proxyenodeurlpair=\"$PROXY_URL\" \
+"

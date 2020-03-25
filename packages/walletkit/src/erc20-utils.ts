@@ -95,5 +95,6 @@ export async function transferTokenWithComment(
 // exported for testing
 export async function getGoldTokenAddress(web3: any): Promise<string> {
   const goldToken: GoldTokenType = await getGoldTokenContract(web3)
-  return goldToken._address
+  // TODO fix types
+  return (goldToken as any)._address
 }

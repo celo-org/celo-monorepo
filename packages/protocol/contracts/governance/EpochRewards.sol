@@ -3,8 +3,9 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "../baklava/Freezable.sol";
+import "../common/CalledByVm.sol";
 import "../common/FixidityLib.sol";
+import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
@@ -12,7 +13,14 @@ import "../common/UsingPrecompiles.sol";
 /**
  * @title Contract for calculating epoch rewards.
  */
-contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry, Freezable {
+contract EpochRewards is
+  Ownable,
+  Initializable,
+  UsingPrecompiles,
+  UsingRegistry,
+  Freezable,
+  CalledByVm
+{
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -56,10 +64,13 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   TargetVotingYieldParameters private targetVotingYieldParams;
   FixidityLib.Fraction private targetVotingGoldFraction;
   FixidityLib.Fraction private communityRewardFraction;
+  FixidityLib.Fraction private carbonOffsettingFraction;
+  address public carbonOffsettingPartner;
   uint256 public targetValidatorEpochPayment;
 
   event TargetVotingGoldFractionSet(uint256 fraction);
   event CommunityRewardFractionSet(uint256 fraction);
+  event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event RewardsMultiplierParametersSet(
@@ -71,7 +82,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
   event TargetVotingYieldUpdated(uint256 fraction);
 
   /**
-   * @notice Initializes critical variables.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param targetVotingYieldInitial The initial relative target block reward for voters.
    * @param targetVotingYieldMax The max relative target block reward for voters.
@@ -84,11 +95,12 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @param _targetVotingGoldFraction The percentage of floating Gold voting to target.
    * @param _targetValidatorEpochPayment The target validator epoch payment.
    * @param _communityRewardFraction The percentage of rewards that go the community funds.
+   * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
+   * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
    * @dev Should be called only once.
    */
   function initialize(
     address registryAddress,
-    address _freezer,
     uint256 targetVotingYieldInitial,
     uint256 targetVotingYieldMax,
     uint256 targetVotingYieldAdjustmentFactor,
@@ -97,10 +109,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     uint256 rewardsMultiplierOverspendAdjustmentFactor,
     uint256 _targetVotingGoldFraction,
     uint256 _targetValidatorEpochPayment,
-    uint256 _communityRewardFraction
+    uint256 _communityRewardFraction,
+    address _carbonOffsettingPartner,
+    uint256 _carbonOffsettingFraction
   ) external initializer {
     _transferOwnership(msg.sender);
-    setFreezer(_freezer);
     setRegistry(registryAddress);
     setTargetVotingYieldParameters(targetVotingYieldMax, targetVotingYieldAdjustmentFactor);
     setRewardsMultiplierParameters(
@@ -111,6 +124,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     setTargetVotingGoldFraction(_targetVotingGoldFraction);
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
     setCommunityRewardFraction(_communityRewardFraction);
+    setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
     targetVotingYieldParams.target = FixidityLib.wrap(targetVotingYieldInitial);
     startTime = now;
   }
@@ -137,10 +151,6 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     );
   }
 
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
-  }
-
   /**
    * @notice Sets the community reward percentage
    * @param value The percentage of the total reward to be sent to the community funds.
@@ -159,6 +169,29 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    */
   function getCommunityRewardFraction() external view returns (uint256) {
     return communityRewardFraction.unwrap();
+  }
+
+  /**
+   * @notice Sets the carbon offsetting fund.
+   * @param partner The address of the carbon offsetting partner.
+   * @param value The percentage of the total reward to be sent to the carbon offsetting partner.
+   * @return True upon success.
+   */
+  function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
+    require(partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap());
+    require(value < FixidityLib.fixed1().unwrap());
+    carbonOffsettingPartner = partner;
+    carbonOffsettingFraction = FixidityLib.wrap(value);
+    emit CarbonOffsettingFundSet(partner, value);
+    return true;
+  }
+
+  /**
+   * @notice Returns the carbon offsetting partner reward fraction.
+   * @return The percentage of total reward which goes to the carbon offsetting partner.
+   */
+  function getCarbonOffsettingFraction() external view returns (uint256) {
+    return carbonOffsettingFraction.unwrap();
   }
 
   /**
@@ -350,7 +383,9 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
     // increase /= (1 - fraction) st the final community reward is fraction * increase
     targetGoldSupplyIncrease = FixidityLib
       .newFixed(targetGoldSupplyIncrease)
-      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
+      .divide(
+      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
+    )
       .fromFixed();
     return targetGoldSupplyIncrease;
   }
@@ -377,7 +412,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    * @notice Updates the target voting yield based on the difference between the target and current
    *   voting Gold fraction.
    */
-  function _updateTargetVotingYield() internal {
+  function _updateTargetVotingYield() internal onlyWhenNotFrozen {
     FixidityLib.Fraction memory votingGoldFraction = FixidityLib.wrap(getVotingGoldFraction());
     if (votingGoldFraction.gt(targetVotingGoldFraction)) {
       FixidityLib.Fraction memory votingGoldFractionDelta = votingGoldFraction.subtract(
@@ -413,8 +448,7 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
    *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
-  function updateTargetVotingYield() external onlyWhenNotFrozen {
-    require(msg.sender == address(0), "Only VM can call");
+  function updateTargetVotingYield() external onlyVm onlyWhenNotFrozen {
     _updateTargetVotingYield();
   }
 
@@ -441,14 +475,15 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
 
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch reward, the total rewards to voters, and the total community
-   * reward
+   * @return The per validator epoch reward, the total rewards to voters, the total community
+   * reward, and the total carbon offsetting partner reward.
    */
-  function calculateTargetEpochRewards() external view returns (uint256, uint256, uint256) {
-    if (frozen) {
-      return (0, 0, 0);
-    }
-
+  function calculateTargetEpochRewards()
+    external
+    view
+    onlyWhenNotFrozen
+    returns (uint256, uint256, uint256, uint256)
+  {
     uint256 targetVoterReward = getTargetVoterRewards();
     uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
     FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
@@ -458,6 +493,11 @@ contract EpochRewards is Ownable, Initializable, UsingPrecompiles, UsingRegistry
       FixidityLib
         .newFixed(targetGoldSupplyIncrease)
         .multiply(communityRewardFraction)
+        .multiply(rewardsMultiplier)
+        .fromFixed(),
+      FixidityLib
+        .newFixed(targetGoldSupplyIncrease)
+        .multiply(carbonOffsettingFraction)
         .multiply(rewardsMultiplier)
         .fromFixed()
     );

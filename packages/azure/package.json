@@ -1,0 +1,20 @@
+{
+  "name": "celo-azure-build",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build-sh": "rm -rf build && mkdir -p build && ./build-sh validator && ./build-sh proxy && ./build-sh attester",
+    "build-json": "npm run build-sh && node build-json.js components/ > mainTemplate.json",
+    "build-docs": "node build-docs.js > README.md",
+    "build-app": "zip app.zip createUiDefinition.json mainTemplate.json",
+    "test": "exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "deepmerge": "^4.2.2",
+    "mustache": "^4.0.0"
+  }
+}

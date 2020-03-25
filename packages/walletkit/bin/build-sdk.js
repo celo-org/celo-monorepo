@@ -22,8 +22,13 @@ function getEnvFile(celoEnv) {
 }
 
 function isProduction(env) {
-  const envConfig = config({ path: getEnvFile(env) })
-  return envConfig.parsed['TESTNET_PROJECT_NAME'] === 'celo-testnet-production'
+  try {
+    const envConfig = config({ path: getEnvFile(env) })
+    return envConfig.parsed['TESTNET_PROJECT_NAME'] === 'celo-testnet-production'
+  } catch (e) {
+    console.log(`Error: `, e, `, setting isProduction = false`)
+    return false
+  }
 }
 
 // TODO(asa): Use @google-cloud/storage, tar-stream to do all of this directly in node
@@ -138,7 +143,7 @@ function buildSdk() {
       'contracts/*.json'
     )
     execCmd(
-      `yarn run --cwd="${modulePath}" typechain --target="web3-1.0.0" --outDir=types "${contractArtifactsPattern}"`
+      `yarn run --cwd="${modulePath}" typechain --target="web3-v1" --outDir=types "${contractArtifactsPattern}"`
     )
 
     // Necessary to copy types to the lib folder so the contracts have the same path to them.

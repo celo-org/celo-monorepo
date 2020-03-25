@@ -30,7 +30,7 @@ ___
 
 Ƭ **CeloToken**: *[GoldToken](../enums/_base_.celocontract.md#goldtoken) | [StableToken](../enums/_base_.celocontract.md#stabletoken)*
 
-*Defined in [contractkit/src/base.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L26)*
+*Defined in [contractkit/src/base.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L29)*
 
 ## Variables
 
@@ -40,7 +40,7 @@ ___
   (k) => (CeloContract as any)[k as any]
 ) as CeloContract[]
 
-*Defined in [contractkit/src/base.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L28)*
+*Defined in [contractkit/src/base.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L31)*
 
 ___
 
@@ -48,4 +48,4 @@ ___
 
 • **NULL_ADDRESS**: *string* = '0x0000000000000000000000000000000000000000' as Address
 
-*Defined in [contractkit/src/base.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L32)*
+*Defined in [contractkit/src/base.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L35)*

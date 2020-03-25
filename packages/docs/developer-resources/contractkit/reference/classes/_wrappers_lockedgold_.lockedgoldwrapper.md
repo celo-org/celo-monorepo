@@ -29,6 +29,7 @@ Contract for handling deposits needed for voting.
 
 ### Methods
 
+* [computeInitialParametersForSlashing](_wrappers_lockedgold_.lockedgoldwrapper.md#computeinitialparametersforslashing)
 * [computeParametersForSlashing](_wrappers_lockedgold_.lockedgoldwrapper.md#computeparametersforslashing)
 * [getAccountSummary](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountsummary)
 * [getAccountsSlashed](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountsslashed)
@@ -45,7 +46,7 @@ Contract for handling deposits needed for voting.
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L14)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
 
 **Parameters:**
 
@@ -221,7 +222,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L18)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
 
 Contract address
 
@@ -229,9 +230,9 @@ Contract address
 
 ## Methods
 
-###  computeParametersForSlashing
+###  computeInitialParametersForSlashing
 
-▸ **computeParametersForSlashing**(`account`: string, `penalty`: BigNumber): *Promise‹object›*
+▸ **computeInitialParametersForSlashing**(`account`: string, `penalty`: BigNumber): *Promise‹object›*
 
 *Defined in [contractkit/src/wrappers/LockedGold.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L226)*
 
@@ -247,6 +248,24 @@ Name | Type | Description |
 **Returns:** *Promise‹object›*
 
 List of (group, voting gold) to decrement from `account`.
+
+___
+
+###  computeParametersForSlashing
+
+▸ **computeParametersForSlashing**(`account`: string, `penalty`: BigNumber, `groups`: AddressListItem[]): *Promise‹object›*
+
+*Defined in [contractkit/src/wrappers/LockedGold.ts:233](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L233)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`account` | string |
+`penalty` | BigNumber |
+`groups` | AddressListItem[] |
+
+**Returns:** *Promise‹object›*
 
 ___
 
@@ -298,7 +317,7 @@ ___
 
 ###  getPendingWithdrawals
 
-▸ **getPendingWithdrawals**(`account`: string): *Promise‹PendingWithdrawal[]›*
+▸ **getPendingWithdrawals**(`account`: string): *Promise‹[PendingWithdrawal](../interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)[]›*
 
 *Defined in [contractkit/src/wrappers/LockedGold.ts:188](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L188)*
 
@@ -310,7 +329,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `account` | string | The address of the account. |
 
-**Returns:** *Promise‹PendingWithdrawal[]›*
+**Returns:** *Promise‹[PendingWithdrawal](../interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)[]›*
 
 The value and timestamp for each pending withdrawal.
 

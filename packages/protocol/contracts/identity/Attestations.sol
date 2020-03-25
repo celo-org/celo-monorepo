@@ -1,20 +1,19 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IRandom.sol";
-import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/IAccounts.sol";
-import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
-import "../common/SafeCast.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -82,6 +81,9 @@ contract Attestations is
   // The duration to wait until selectIssuers can be called for an attestation request.
   uint256 public selectIssuersWaitBlocks;
 
+  // Limit the maximum number of attestations that can be requested
+  uint256 public maxAttestations;
+
   // The fees that are associated with attestations for a particular token.
   mapping(address => uint256) public attestationRequestFees;
 
@@ -112,11 +114,23 @@ contract Attestations is
   event AttestationExpiryBlocksSet(uint256 value);
   event AttestationRequestFeeSet(address indexed token, uint256 value);
   event SelectIssuersWaitBlocksSet(uint256 value);
+  event MaxAttestationsSet(uint256 value);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   * @param _attestationExpiryBlocks The new limit on blocks allowed to come between requesting
+   * an attestation and completing it.
+   * @param _selectIssuersWaitBlocks The wait period in blocks to call selectIssuers on attestation
+   * requests.
+   * @param attestationRequestFeeTokens The address of tokens that fees should be payable in.
+   * @param attestationRequestFeeValues The corresponding fee values.
+   */
   function initialize(
     address registryAddress,
     uint256 _attestationExpiryBlocks,
     uint256 _selectIssuersWaitBlocks,
+    uint256 _maxAttestations,
     address[] calldata attestationRequestFeeTokens,
     uint256[] calldata attestationRequestFeeValues
   ) external initializer {
@@ -124,6 +138,7 @@ contract Attestations is
     setRegistry(registryAddress);
     setAttestationExpiryBlocks(_attestationExpiryBlocks);
     setSelectIssuersWaitBlocks(_selectIssuersWaitBlocks);
+    setMaxAttestations(_maxAttestations);
 
     require(
       attestationRequestFeeTokens.length > 0 &&
@@ -152,7 +167,7 @@ contract Attestations is
       "Invalid attestationRequestFeeToken"
     );
     require(
-      IERC20Token(attestationRequestFeeToken).transferFrom(
+      IERC20(attestationRequestFeeToken).transferFrom(
         msg.sender,
         address(this),
         attestationRequestFees[attestationRequestFeeToken].mul(attestationsRequested)
@@ -161,6 +176,7 @@ contract Attestations is
     );
 
     require(attestationsRequested > 0, "You have to request at least 1 attestation");
+    require(attestationsRequested <= maxAttestations, "Too many attestations requested");
 
     IdentifierState storage state = identifiers[identifier];
 
@@ -229,7 +245,12 @@ contract Attestations is
     attestation.blockNumber = block.number.toUint32();
     attestation.status = AttestationStatus.Complete;
     delete attestation.attestationRequestFeeToken;
-    identifiers[identifier].attestations[msg.sender].completed++;
+    AttestedAddress storage attestedAddress = identifiers[identifier].attestations[msg.sender];
+    require(
+      attestedAddress.completed < attestedAddress.completed + 1,
+      "SafeMath32 integer overflow"
+    );
+    attestedAddress.completed = attestedAddress.completed + 1;
 
     pendingWithdrawals[token][issuer] = pendingWithdrawals[token][issuer].add(
       attestationRequestFees[token]
@@ -261,7 +282,7 @@ contract Attestations is
       identifiers[identifier].accounts[index] = identifiers[identifier].accounts[newNumAccounts];
     }
     identifiers[identifier].accounts[newNumAccounts] = address(0x0);
-    identifiers[identifier].accounts.length--;
+    identifiers[identifier].accounts.length = identifiers[identifier].accounts.length.sub(1);
   }
 
   /**
@@ -273,7 +294,7 @@ contract Attestations is
     uint256 value = pendingWithdrawals[token][msg.sender];
     require(value > 0, "value was negative/zero");
     pendingWithdrawals[token][msg.sender] = 0;
-    require(IERC20Token(token).transfer(msg.sender, value), "token transfer failed");
+    require(IERC20(token).transfer(msg.sender, value), "token transfer failed");
     emit Withdrawal(msg.sender, token, value);
   }
 
@@ -355,17 +376,16 @@ contract Attestations is
     uint64[] memory total = new uint64[](addresses.length);
 
     uint256 currentIndex = 0;
-    for (uint256 i = 0; i < identifiersToLookup.length; i++) {
+    for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
       address[] memory addrs = identifiers[identifiersToLookup[i]].accounts;
-      for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex++) {
+      for (uint256 matchIndex = 0; matchIndex < matches[i]; matchIndex = matchIndex.add(1)) {
         addresses[currentIndex] = getAccounts().getWalletAddress(addrs[matchIndex]);
         completed[currentIndex] = identifiers[identifiersToLookup[i]]
           .attestations[addrs[matchIndex]]
           .completed;
         total[currentIndex] = identifiers[identifiersToLookup[i]].attestations[addrs[matchIndex]]
           .requested;
-
-        currentIndex++;
+        currentIndex = currentIndex.add(1);
       }
     }
 
@@ -484,6 +504,24 @@ contract Attestations is
   }
 
   /**
+   * @notice Updates 'maxAttestations'.
+   * @param _maxAttestations Maximum number of attestations that can be requested.
+   */
+  function setMaxAttestations(uint256 _maxAttestations) public onlyOwner {
+    require(_maxAttestations > 0, "maxAttestations has to be greater than 0");
+    maxAttestations = _maxAttestations;
+    emit MaxAttestationsSet(_maxAttestations);
+  }
+
+  /**
+   * @notice Query 'maxAttestations'
+   * @return Maximum number of attestations that can be requested.
+   */
+  function getMaxAttestations() external view returns (uint256) {
+    return maxAttestations;
+  }
+
+  /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -540,7 +578,7 @@ contract Attestations is
     uint256 totalAddresses = 0;
     uint256[] memory matches = new uint256[](identifiersToLookup.length);
 
-    for (uint256 i = 0; i < identifiersToLookup.length; i++) {
+    for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
       uint256 count = identifiers[identifiersToLookup[i]].accounts.length;
 
       totalAddresses = totalAddresses + count;
@@ -562,41 +600,48 @@ contract Attestations is
     bytes32 seed = getRandom().getBlockRandomness(
       uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)
     );
-    uint256 numberValidators = numberValidatorsInCurrentSet();
+    IAccounts accounts = getAccounts();
+    uint256 issuersLength = numberValidatorsInCurrentSet();
+    uint256[] memory issuers = new uint256[](issuersLength);
+    for (uint256 i = 0; i < issuersLength; i++) issuers[i] = i;
+
+    require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
 
     uint256 currentIndex = 0;
-    address validator;
-    address issuer;
-    IAccounts accounts = getAccounts();
 
+    // The length of the list (variable issuersLength) is decremented in each round,
+    // so the loop always terminates
     while (currentIndex < unselectedRequest.attestationsRequested) {
+      require(issuersLength > 0, "not enough issuers");
       seed = keccak256(abi.encodePacked(seed));
-      validator = validatorSignerAddressFromCurrentSet(uint256(seed) % numberValidators);
-      issuer = accounts.signerToAccount(validator);
-
-      if (!accounts.hasAuthorizedAttestationSigner(issuer)) {
-        continue;
-      }
+      uint256 idx = uint256(seed) % issuersLength;
+      address signer = validatorSignerAddressFromCurrentSet(issuers[idx]);
+      address issuer = accounts.signerToAccount(signer);
 
       Attestation storage attestation = state.issuedAttestations[issuer];
 
-      // Attestation issuers can only be added if they haven't been already.
-      if (attestation.status != AttestationStatus.None) {
-        continue;
+      if (
+        attestation.status == AttestationStatus.None &&
+        accounts.hasAuthorizedAttestationSigner(issuer)
+      ) {
+        currentIndex = currentIndex.add(1);
+        attestation.status = AttestationStatus.Incomplete;
+        attestation.blockNumber = unselectedRequest.blockNumber;
+        attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
+        state.selectedIssuers.push(issuer);
+
+        emit AttestationIssuerSelected(
+          identifier,
+          msg.sender,
+          issuer,
+          unselectedRequest.attestationRequestFeeToken
+        );
       }
 
-      currentIndex = currentIndex.add(1);
-      attestation.status = AttestationStatus.Incomplete;
-      attestation.blockNumber = unselectedRequest.blockNumber;
-      attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
-      state.selectedIssuers.push(issuer);
-
-      emit AttestationIssuerSelected(
-        identifier,
-        msg.sender,
-        issuer,
-        unselectedRequest.attestationRequestFeeToken
-      );
+      // Remove the validator that was selected from the list,
+      // by replacing it by the last element in the list
+      issuersLength = issuersLength.sub(1);
+      issuers[idx] = issuers[issuersLength];
     }
   }
 

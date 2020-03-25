@@ -110,21 +110,41 @@ Array [
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
                   "fontSize": 14,
                   "lineHeight": 18,
                 }
               }
+              testID="OutgoingPaymentRequestNotification/1/Title"
             >
-              outgoingPaymentRequestNotificationTitle
+              Requested
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                31.92
+              </Text>
+               
+              from 
+              5126608970
             </Text>
             <View
               style={
                 Object {
                   "justifyContent": "space-between",
                   "minHeight": 60,
-                  "paddingTop": 8,
+                  "paddingTop": 2,
                 }
               }
             >
@@ -144,7 +164,7 @@ Array [
                 style={
                   Object {
                     "flexDirection": "row",
-                    "marginTop": 5,
+                    "marginTop": 12,
                   }
                 }
               >

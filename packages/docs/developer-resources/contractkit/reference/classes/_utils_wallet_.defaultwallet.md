@@ -25,7 +25,7 @@
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [contractkit/src/utils/wallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L27)*
+*Defined in [contractkit/src/utils/wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L26)*
 
 **Parameters:**
 
@@ -41,7 +41,7 @@ ___
 
 ▸ **getAccounts**(): *[Address](../modules/_base_.md#address)[]*
 
-*Defined in [contractkit/src/utils/wallet.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L37)*
+*Defined in [contractkit/src/utils/wallet.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L36)*
 
 **Returns:** *[Address](../modules/_base_.md#address)[]*
 
@@ -51,7 +51,7 @@ ___
 
 ▸ **hasAccount**(`address?`: undefined | string): *boolean*
 
-*Defined in [contractkit/src/utils/wallet.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L41)*
+*Defined in [contractkit/src/utils/wallet.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L40)*
 
 **Parameters:**
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **signPersonalMessage**(`address`: string, `data`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/utils/wallet.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L62)*
+*Defined in [contractkit/src/utils/wallet.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L61)*
 
 Sign a personal Ethereum signed message.
 The address must be provided it must match the address calculated from the private key.
@@ -89,7 +89,7 @@ ___
 
 ▸ **signTransaction**(`txParams`: Tx): *Promise‹EncodedTransaction›*
 
-*Defined in [contractkit/src/utils/wallet.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L49)*
+*Defined in [contractkit/src/utils/wallet.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L48)*
 
 **Parameters:**
 
@@ -105,7 +105,7 @@ ___
 
 ▸ **signTypedData**(`address`: [Address](../modules/_base_.md#address), `typedData`: [EIP712TypedData](../interfaces/_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
 
-*Defined in [contractkit/src/utils/wallet.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L87)*
+*Defined in [contractkit/src/utils/wallet.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L86)*
 
 Sign an EIP712 Typed Data message. The signing address will be calculated from the private key.
 The address must be provided it must match the address calculated from the private key.
