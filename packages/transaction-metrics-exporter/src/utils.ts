@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import { ParsedBlock, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
 
 const EMPTY_INPUT = 'empty_input'
@@ -23,4 +24,47 @@ export function toTxMap(parsedBlock: ParsedBlock): Map<string, ParsedTx> {
     parsedTxMap.set(ptx.tx.hash, ptx)
   })
   return parsedTxMap
+}
+
+export function getInternalTransactions(hash: string) {
+  return fetch('https://baklavastaging-blockscout.celo-testnet.org/graphiql', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: `
+      {
+        transaction(hash: "${hash}") {
+          internalTransactions(first: 6) {
+            edges {
+              node {
+                blockNumber
+                callType
+                createdContractAddressHash
+                error
+                fromAddressHash
+                gas
+                gasUsed
+                id
+                index
+                input
+                output
+                toAddressHash
+                traceAddress
+                transactionHash
+                transactionIndex
+                type
+                value
+              } 
+            }
+          }
+        }
+      }
+    `,
+    }),
+  })
+    .then((res: any) => res.json())
+    .then(
+      ({ data }: any) =>
+        data.transaction.internalTransactions.edges.map(({ node }: any) => node) as any[]
+    )
 }

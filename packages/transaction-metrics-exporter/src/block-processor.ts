@@ -7,7 +7,7 @@ import { Block } from 'web3-eth'
 
 import { Counters } from './metrics'
 import { Contracts, stateGetters } from './states'
-import { toMethodId, toTxMap } from './utils'
+import { toMethodId, toTxMap, getInternalTransactions } from './utils'
 
 enum LoggingCategory {
   Block = 'RECEIVED_BLOCK',
@@ -16,6 +16,7 @@ enum LoggingCategory {
   State = 'RECEIVED_STATE',
   Transaction = 'RECEIVED_TRANSACTION',
   TransactionReceipt = 'RECEIVED_TRANSACTION_RECEIPT',
+  InternalTransaction = 'INTERNAL_TRANSACTION',
 }
 
 interface DataResult {
@@ -135,6 +136,9 @@ export class BlockProcessor {
       this.logEvent(LoggingCategory.Transaction, tx)
       const receipt = await this.kit.web3.eth.getTransactionReceipt(tx.hash)
       this.logEvent(LoggingCategory.TransactionReceipt, receipt)
+      ;(await getInternalTransactions(tx.hash)).forEach((data: any) =>
+        this.logEvent(LoggingCategory.InternalTransaction, data)
+      )
 
       // tslint:disable-next-line
       const labels = {

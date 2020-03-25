@@ -9,7 +9,9 @@
   "dependencies": {
     "@celo/contractkit": "0.3.1-dev",
     "@celo/utils": "0.1.9-dev",
+    "@types/node-fetch": "^2.5.5",
     "express": "4.16.4",
+    "node-fetch": "^2.6.0",
     "prom-client": "11.2.0"
   },
   "devDependencies": {

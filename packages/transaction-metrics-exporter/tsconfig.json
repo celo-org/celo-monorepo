@@ -2,7 +2,9 @@
   "extends": "../typescript/tsconfig.library.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": ["src"],
   "references": [{ "path": "../utils" }]
