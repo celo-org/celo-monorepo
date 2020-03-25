@@ -1,18 +1,19 @@
-import {
-  getStableTokenContract,
-  sendTransactionAsync,
-  sendTransactionAsyncWithWeb3Signing,
-  SendTransactionLogEvent,
-  SendTransactionLogEventType,
-} from '@celo/walletkit'
+import { CURRENCY_ENUM } from '@celo/utils/src'
+import { BigNumber } from 'bignumber.js'
 import { call, delay, race, select, take } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
+import { getCurrencyAddress } from 'src/tokens/saga'
+import {
+  sendTransactionAsync,
+  SendTransactionLogEvent,
+  SendTransactionLogEventType,
+} from 'src/transactions/contract-utils'
 import Logger from 'src/utils/Logger'
 import { assertNever } from 'src/utils/typescript'
-import { web3 } from 'src/web3/contracts'
+import { getGasPrice } from 'src/web3/gas'
 import { fornoSelector } from 'src/web3/selectors'
 import { getLatestNonce } from 'src/web3/utils'
 import { TransactionObject } from 'web3-eth'
@@ -75,14 +76,14 @@ export function* sendTransactionPromises(
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
   // Use stabletoken to pay for gas by default
-  const stableToken = yield call(getStableTokenContract, web3)
+  const stableTokenAddress: string = yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
   const fornoMode: boolean = yield select(fornoSelector)
+  let gasPrice: BigNumber | undefined
 
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
     `Sending tx ${txId} in ${fornoMode ? 'forno' : 'geth'} mode`
   )
-  // This if-else case is temporary and will disappear once we move from `walletkit` to `contractkit`.
   if (fornoMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
     // ensures that we get a more meaningful error if the forno server is down, which
@@ -90,29 +91,20 @@ export function* sendTransactionPromises(
     if (__DEV__) {
       yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
-    const transactionPromises = yield call(
-      sendTransactionAsyncWithWeb3Signing,
-      web3,
-      tx,
-      account,
-      stableToken,
-      nonce,
-      getLogger(tag, txId),
-      staticGas
-    )
-    return transactionPromises
-  } else {
-    const transactionPromises = yield call(
-      sendTransactionAsync,
-      tx,
-      account,
-      stableToken,
-      nonce,
-      getLogger(tag, txId),
-      staticGas
-    )
-    return transactionPromises
+
+    gasPrice = yield getGasPrice(CURRENCY_ENUM.DOLLAR)
   }
+  const transactionPromises = yield call(
+    sendTransactionAsync,
+    tx,
+    account,
+    stableTokenAddress,
+    nonce,
+    getLogger(tag, txId),
+    staticGas,
+    gasPrice ? gasPrice.toString() : gasPrice
+  )
+  return transactionPromises
 }
 
 // Send a transaction and await for its confirmation
