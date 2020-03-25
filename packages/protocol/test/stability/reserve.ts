@@ -7,16 +7,18 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import BN = require('bn.js')
 import {
+  MockGoldTokenInstance,
   MockSortedOraclesInstance,
   MockStableTokenInstance,
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
+const MockGoldToken: Truffle.Contract<MockGoldTokenInstance> = artifacts.require('MockGoldToken')
 const MockStableToken: Truffle.Contract<MockStableTokenInstance> = artifacts.require(
   'MockStableToken'
 )
@@ -31,6 +33,7 @@ contract('Reserve', (accounts: string[]) => {
   let reserve: ReserveInstance
   let registry: RegistryInstance
   let mockSortedOracles: MockSortedOraclesInstance
+  let mockGoldToken: MockGoldTokenInstance
   const anAddress: string = '0x00000000000000000000000000000000deadbeef'
   const nonOwner: string = accounts[1]
   const spender: string = accounts[2]
@@ -44,8 +47,10 @@ contract('Reserve', (accounts: string[]) => {
     reserve = await Reserve.new()
     registry = await Registry.new()
     mockSortedOracles = await MockSortedOracles.new()
+    mockGoldToken = await MockGoldToken.new()
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchangeAddress)
+    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await reserve.initialize(
       registry.address,
       aTobinTaxStalenessThreshold,

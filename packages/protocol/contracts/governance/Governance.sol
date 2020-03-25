@@ -744,7 +744,7 @@ contract Governance is
     require(value > 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
-    msg.sender.transfer(value);
+    getGoldToken().transfer(msg.sender, value);
     return true;
   }
 

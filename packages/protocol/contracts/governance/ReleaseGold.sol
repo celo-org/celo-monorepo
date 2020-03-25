@@ -335,7 +335,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "Insufficient unlocked balance to withdraw amount"
     );
     totalWithdrawn = totalWithdrawn.add(amount);
-    beneficiary.transfer(amount);
+    getGoldToken().transfer(beneficiary, amount);
     if (getRemainingTotalBalance() == 0) {
       selfdestruct(refundAddress);
     }
@@ -347,9 +347,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   function refundAndFinalize() external nonReentrant onlyReleaseOwnerAndRevoked {
     require(getRemainingLockedBalance() == 0, "Total gold balance must be unlocked");
     uint256 beneficiaryAmount = revocationInfo.releasedBalanceAtRevoke.sub(totalWithdrawn);
-    beneficiary.transfer(beneficiaryAmount);
+    getGoldToken().transfer(beneficiary, beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
-    refundAddress.transfer(revokerAmount);
+    getGoldToken().transfer(refundAddress, revokerAmount);
     selfdestruct(refundAddress);
   }
 

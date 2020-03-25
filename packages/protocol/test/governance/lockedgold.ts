@@ -529,7 +529,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it("should increase the community fund's gold", async () => {
-        assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
+        assertEqualBN(await mockGoldToken.balanceOf(mockGovernance.address), penalty - reward)
       })
     })
 
@@ -597,7 +597,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it("should increase the community fund's gold", async () => {
-          assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
+          assertEqualBN(await mockGoldToken.balanceOf(mockGovernance.address), penalty - reward)
         })
       })
 
@@ -633,7 +633,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it("should increase the community fund's gold", async () => {
-          assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
+          assertEqualBN(await mockGoldToken.balanceOf(mockGovernance.address), penalty - reward)
         })
       })
 
@@ -666,7 +666,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it("should only send the community fund value based on `account`'s total balance", async () => {
-          assert.equal(await web3.eth.getBalance(mockGovernance.address), value - reward)
+          assertEqualBN(await mockGoldToken.balanceOf(mockGovernance.address), value - reward)
         })
       })
     })

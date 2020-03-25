@@ -279,7 +279,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     }
     require(spendingLimit >= value, "Exceeding spending limit");
     spendingLimit = spendingLimit.sub(value);
-    to.transfer(value);
+    getGoldToken().transfer(to, value);
     emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
