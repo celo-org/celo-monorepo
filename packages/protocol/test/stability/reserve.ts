@@ -14,6 +14,7 @@ import {
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+
 import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
