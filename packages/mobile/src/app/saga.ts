@@ -94,7 +94,6 @@ export function* navigateToProperScreen() {
 
   const deepLink = yield call(Linking.getInitialURL)
   const inSync = yield call(clockInSync)
-  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
 
   if (language) {
     yield put(setLanguage(language))
@@ -105,25 +104,20 @@ export function* navigateToProperScreen() {
     return
   }
 
-  const appLockedAwareNavigate =
-    account && lockWithPinEnabled
-      ? (routeName: string, params?: NavigationParams) => navigateProtected(routeName, params, true)
-      : navigate
-
   if (!language) {
-    appLockedAwareNavigate(Stacks.NuxStack)
+    navigate(Stacks.NuxStack)
   } else if (!inSync) {
-    appLockedAwareNavigate(Screens.SetClock)
+    navigate(Screens.SetClock)
   } else if (!e164Number) {
-    appLockedAwareNavigate(Screens.JoinCelo)
+    navigate(Screens.JoinCelo)
   } else if (pincodeType === PincodeType.Unset) {
-    appLockedAwareNavigate(Screens.PincodeEducation)
+    navigate(Screens.PincodeEducation)
   } else if (!redeemComplete && !account) {
-    appLockedAwareNavigate(Screens.EnterInviteCode)
+    navigate(Screens.EnterInviteCode)
   } else if (!hasSeenVerificationNux) {
-    appLockedAwareNavigate(Screens.VerificationEducationScreen)
+    navigate(Screens.VerificationEducationScreen)
   } else {
-    appLockedAwareNavigate(Stacks.AppStack)
+    navigate(Stacks.AppStack)
   }
 }
 

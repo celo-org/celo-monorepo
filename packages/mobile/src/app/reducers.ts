@@ -36,12 +36,13 @@ export const appReducer = (
   switch (action.type) {
     case REHYDRATE: {
       // Ignore some persisted properties
+      const rehydratePayload = getRehydratePayload(action, 'app')
       return {
         ...state,
-        ...getRehydratePayload(action, 'app'),
+        ...rehydratePayload,
         requestingAndroidPermission: false,
         appState: initialState.appState,
-        locked: initialState.locked,
+        locked: rehydratePayload.lockWithPinEnabled,
       }
     }
     case Actions.SET_REQUESTING_ANDROID_PERMISSION:

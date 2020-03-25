@@ -13,6 +13,7 @@ exports[`PincodeEnter renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
+        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "justifyContent": "space-between",
         "padding": 20,

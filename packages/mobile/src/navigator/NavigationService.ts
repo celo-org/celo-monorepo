@@ -53,7 +53,7 @@ export function navigate(routeName: string, params?: NavigationParams) {
     })
 }
 
-export async function ensurePincode(disableGoingBack: boolean): Promise<boolean> {
+export async function ensurePincode(): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 
   if (pincodeType === PincodeType.Unset) {
@@ -69,7 +69,6 @@ export async function ensurePincode(disableGoingBack: boolean): Promise<boolean>
         navigate(Screens.PincodeEnter, {
           onSuccess: resolve,
           withVerification: true,
-          disableGoingBack,
         })
       })
     } catch (error) {
@@ -85,12 +84,8 @@ export async function ensurePincode(disableGoingBack: boolean): Promise<boolean>
   return true
 }
 
-export function navigateProtected(
-  routeName: string,
-  params?: NavigationParams,
-  disableGoingBack = false
-) {
-  ensurePincode(disableGoingBack)
+export function navigateProtected(routeName: string, params?: NavigationParams) {
+  ensurePincode()
     .then((ensured) => {
       if (ensured) {
         navigate(routeName, params)

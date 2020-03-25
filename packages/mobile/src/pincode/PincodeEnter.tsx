@@ -1,8 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { BackHandler, NativeEventSubscription, StyleSheet } from 'react-native'
-import RNExitApp from 'react-native-exit-app'
+import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -28,45 +27,13 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-interface NavProps {
-  onSuccess: (pin: string) => void
-  disableGoingBack: null | boolean
-  withVerification: boolean
-}
-
 type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 class PincodeEnter extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    let options
-    if (navigation.getParam('disableGoingBack')) {
-      options = {
-        headerLeft: null,
-      }
-    } else {
-      options = nuxNavigationOptions
-    }
-    return { gesturesEnabled: false, ...options }
-  }
-  backHandler: null | NativeEventSubscription = null
+  static navigationOptions = { gesturesEnabled: false, ...nuxNavigationOptions }
 
   state = {
     pin: '',
-  }
-
-  componentDidMount() {
-    if (this.props.navigation.getParam('disableGoingBack')) {
-      this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-        RNExitApp.exitApp()
-        return true
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.backHandler) {
-      this.backHandler.remove()
-    }
   }
 
   onChangePin = (pin: string) => {

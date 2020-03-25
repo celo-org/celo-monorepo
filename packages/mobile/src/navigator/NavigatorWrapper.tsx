@@ -67,14 +67,12 @@ export class NavigatorWrapper extends React.Component<Props> {
     const { appLocked } = this.props
     return (
       <View style={styles.container}>
-        {(appLocked && false && <PincodeLock />) || (
-          <AppContainer
-            ref={this.setNavigator}
-            onNavigationStateChange={handleNavigationStateChange}
-            {...getPersistenceFunctions()}
-          />
-        )}
-
+        <AppContainer
+          ref={this.setNavigator}
+          onNavigationStateChange={handleNavigationStateChange}
+          {...getPersistenceFunctions()}
+        />
+        <View style={styles.locked}>{appLocked && <PincodeLock />}</View>
         <View style={styles.floating}>
           {!appLocked && <BackupPrompt />}
           <AlertBanner />
@@ -96,6 +94,14 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     right: 0,
+  },
+  locked: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    flex: 1,
   },
 })
 
