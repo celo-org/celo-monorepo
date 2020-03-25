@@ -41,7 +41,7 @@ export function getNetworkConfig(net: string): NetworkConfig {
     inviteGoldAmount: config[net].invite_gold_amount,
     inviteDollarAmount: config[net].invite_dollar_amount,
     escrowDollarAmount: config[net].escrow_dollar_amount,
-    expirySeconds: Number(config[net].expirary_seconds),
+    expirySeconds: Number(config[net].expiry_seconds),
     minAttestations: Number(config[net].min_attestations),
     twilioPhoneNumber: config[net].twilio_phone_number,
     twilioClient: getTwilioClient(config[net].twilio_sid, config[net].twilio_auth_token),

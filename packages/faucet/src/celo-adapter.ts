@@ -34,7 +34,7 @@ export class CeloAdapter {
     phoneHash: string,
     tempWallet: string,
     amount: string,
-    expirarySeconds: number,
+    expirySeconds: number,
     minAttestations: number
   ) {
     const escrow = await this.kit.contracts.getEscrow()
@@ -45,7 +45,7 @@ export class CeloAdapter {
       phoneHash,
       stableToken.address,
       amount,
-      expirarySeconds,
+      expirySeconds,
       tempWallet,
       minAttestations
     )

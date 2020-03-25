@@ -142,7 +142,7 @@ yargs
           type: 'string',
           description: 'Address for escrow contract',
         })
-        .option('expirarySeconds', {
+        .option('expirySeconds', {
           type: 'number',
           description: 'Seconds before the escrow expires',
         })
@@ -175,7 +175,7 @@ yargs
         escrowDollarAmount: args.escrowDollarAmount,
         nodeUrl: args.nodeUrl,
         minAttestations: args.minAttestations,
-        expirySeconds: args.expirarySeconds,
+        expirySeconds: args.expirySeconds,
         twilioPhoneNumber: args.twilioPhoneNumber,
         twilioAuthToken: args.twilioAuthToken,
         twilioSID: args.twilioSID,
@@ -203,7 +203,7 @@ function setConfig(network: string, config: Partial<NetworkConfig & TwilioParams
     setIfPresent('invite_gold_amount', config.inviteGoldAmount),
     setIfPresent('invite_dollar_amount', config.inviteDollarAmount),
     setIfPresent('escrow_dollar_amount', config.escrowDollarAmount),
-    setIfPresent('expirary_seconds', config.expirySeconds),
+    setIfPresent('expiry_seconds', config.expirySeconds),
     setIfPresent('min_attestations', config.minAttestations),
     setIfPresent('twilio_phone_number', config.twilioPhoneNumber),
     setIfPresent('twilio_auth_token', config.twilioAuthToken),
