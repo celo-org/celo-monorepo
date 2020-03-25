@@ -55,7 +55,7 @@ contract TransferWhitelist is Ownable, UsingRegistry {
   function whitelistRegisteredContract(bytes32 contractIdentifier) external onlyOwner {
     require(
       registry.getAddressFor(contractIdentifier) != address(0),
-      "contractIdentifier does not corespond to a registered address"
+      "contractIdentifier does not correspond to a registered address"
     );
     whitelistedContractIdentifiers.push(contractIdentifier);
     emit WhitelistedContractIdentifier(contractIdentifier);
