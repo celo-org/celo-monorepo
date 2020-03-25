@@ -102,6 +102,18 @@ class CheckBuilder {
     return this
   }
 
+  addConditionalCheck(
+    name: string,
+    runCondition: boolean,
+    predicate: () => Promise<boolean> | boolean,
+    errorMessage?: string
+  ) {
+    if (runCondition) {
+      return this.addCheck(name, predicate, errorMessage)
+    }
+    return this
+  }
+
   isApprover = (account: Address) =>
     this.addCheck(
       `${account} is approver address`,
