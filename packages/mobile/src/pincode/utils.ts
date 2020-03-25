@@ -1,4 +1,4 @@
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { readPrivateKeyFromLocalDisk } from 'src/web3/privateKey'
 
 export const PIN_LENGTH = 6
@@ -12,15 +12,14 @@ export function isPinCorrect(
   fornoMode: boolean,
   currentAccount: string
 ): Promise<typeof pin> {
-  console.log(currentAccount, pin)
   return new Promise((resolve, reject) => {
     if (fornoMode) {
       readPrivateKeyFromLocalDisk(currentAccount, pin)
         .then(() => resolve(pin))
         .catch(reject)
     } else {
-      web3.eth.personal
-        .unlockAccount(currentAccount, pin, 1)
+      getContractKit()
+        .web3.eth.personal.unlockAccount(currentAccount, pin, 1)
         .then((result: boolean) => (result ? resolve(pin) : reject()))
         .catch(reject)
     }
