@@ -40,12 +40,11 @@ contract TransferWhitelist is Ownable, UsingRegistry {
   function removeAddress(address removedAddress, uint256 index) external onlyOwner {
     require(index < directlyWhitelistedAddresses.length, "Whitelist index out of range");
     require(directlyWhitelistedAddresses[index] == removedAddress, "Bad whitelist index");
-    if (index != directlyWhitelistedAddresses.length.sub(1)) {
-      directlyWhitelistedAddresses[index] = directlyWhitelistedAddresses[directlyWhitelistedAddresses
-        .length
-        .sub(1)];
+    uint256 tailIndex = directlyWhitelistedAddresses.length.sub(1);
+    if (index != tailIndex) {
+      directlyWhitelistedAddresses[index] = directlyWhitelistedAddresses[tailIndex];
     }
-    directlyWhitelistedAddresses.length = directlyWhitelistedAddresses.length.sub(1);
+    directlyWhitelistedAddresses.length = tailIndex;
     emit WhitelistedAddressRemoved(removedAddress);
   }
 
