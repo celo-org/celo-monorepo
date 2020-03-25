@@ -119,7 +119,8 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-const stableTokenTransferGasCost = 29391
+const stableTokenTransferGasCost = 34131
+const gasPunishment = 4200
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -741,7 +742,7 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
+              expectedGas: stableTokenTransferGasCost + gasPunishment + INTRINSIC_TX_GAS_COST,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
