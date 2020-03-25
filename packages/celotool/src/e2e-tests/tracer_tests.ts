@@ -2,12 +2,12 @@ import { CeloContract } from '@celo/contractkit'
 import { ContractKit, newKit } from '@celo/contractkit'
 import { Address, AllContracts } from '@celo/contractkit/lib/base'
 import { AccountAssets, trackTransfers } from '@celo/contractkit/lib/explorer/assets'
-import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
 import { normalizeAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
+import fs from 'fs'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
@@ -15,6 +15,32 @@ import { MonorepoRoot, getContext, sleep } from './utils'
 import { spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const TMP_PATH = '/tmp/e2e'
+
+const testContractSource = `
+pragma solidity ^0.5.8;
+
+contract TestContract {
+  function transfer(address payable to) external payable returns (bool) {
+    to.transfer(msg.value);
+    return true;
+  }
+
+  function transferThenIgnoreRevert(address payable to) external payable returns (bool) {
+    to.transfer(msg.value);
+    bool success;
+    (success,) = address(this).call(abi.encodeWithSignature("alwaysRevert()"));
+    return success;
+  }
+
+  function alwaysRevert() public pure {
+    revert('always revert!');
+  }
+
+  function selfDestruct(address payable to) external payable {
+    selfdestruct(to);
+  }
+}
+`
 
 function assertEqualBN(value: BigNumber, expected: BigNumber) {
   assert.equal(value.toString(), expected.toString())
@@ -157,7 +183,7 @@ describe('tracer tests', () => {
 
   const testTransferGold = (
     name: string,
-    transferFn: () => Promise<TransactionResult>,
+    transferFn: () => Promise<TransactionReceipt>,
     goldGasCurrency: boolean = true
   ) => {
     let trackBalances: Record<Address, AccountAssets>
@@ -173,8 +199,8 @@ describe('tracer tests', () => {
         this.timeout(0)
         fromInitialBalance = await goldToken.balanceOf(FromAddress)
         toInitialBalance = await goldToken.balanceOf(ToAddress)
-        const txResult = await transferFn()
-        receipt = await txResult.waitReceipt()
+        receipt = await transferFn()
+        receipt = await kit.web3.eth.getTransactionReceipt(receipt.transactionHash)
         txn = await kit.web3.eth.getTransaction(receipt.transactionHash)
         fromFinalBalance = await goldToken.balanceOf(FromAddress)
         toFinalBalance = await goldToken.balanceOf(ToAddress)
@@ -189,7 +215,8 @@ describe('tracer tests', () => {
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
         assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(TransferAmount)))
-      it(`balanceOf should decrement the sender's balance by the transfer amount`, () =>
+      it(`balanceOf should decrement the sender's balance by the transfer amount`, () => {
+        console.info(`gasUsed=${receipt.gasUsed}, gasPrice=${txn.gasPrice}`)
         assertEqualBN(
           fromFinalBalance.minus(fromInitialBalance),
           new BigNumber(-TransferAmount).minus(
@@ -197,7 +224,8 @@ describe('tracer tests', () => {
               ? new BigNumber(receipt.gasUsed).times(new BigNumber(txn.gasPrice))
               : new BigNumber(0)
           )
-        ))
+        )
+      })
       it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
         assertEqualBN(
           trackBalances[normalizeAddress(ToAddress)].gold,
@@ -217,15 +245,19 @@ describe('tracer tests', () => {
       await restart()
     })
 
-    testTransferGold('normal', () => transferCeloGold(FromAddress, ToAddress, TransferAmount))
+    testTransferGold('normal', async () => {
+      const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount)
+      return txResult.waitReceipt()
+    })
 
     testTransferGold(
       'with feeCurrency cUSD',
       async () => {
         const feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-        return transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+        const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
           feeCurrency,
         })
+        return txResult.waitReceipt()
       },
       false
     )
@@ -354,7 +386,7 @@ describe('tracer tests', () => {
       before(async function(this: any) {
         this.timeout(0)
         const exchange = await kit.contracts.getExchange()
-        const quote = await exchange.quoteGoldBuy(TransferAmount)
+        const quote = (await exchange.quoteGoldBuy(TransferAmount)).plus(1)
 
         const stableToken = await kit.contracts.getStableToken()
         const approveTx = await stableToken.approve(exchange.address, quote.toFixed())
@@ -369,11 +401,6 @@ describe('tracer tests', () => {
         //console.info(receipt)
       })
 
-      /* AssertionError: expected '10000008160002562' to equal '1000000000000000000'
-         + expected - actual
-         
-         -10000008160002562
-         +1000000000000000000 */
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
         assertEqualBN(
           trackBalances[normalizeAddress(FromAddress)].gold,
@@ -399,11 +426,60 @@ describe('tracer tests', () => {
           '--grants',
           `${MonorepoRoot}/packages/protocol/scripts/truffle/releaseGoldContracts.json`,
           '--output_file',
-          '/tmp/e2e/releaseGold.txt',
+          '${TMP_PATH}/releaseGold.txt',
           '--yesreally',
         ]
         await spawnCmdWithExitOnFailure('yarn', args)
         //const endBlockNumber = await this.web3.eth.getBlockNumber()
+      })
+    })
+
+    describe.only(`Deploying TestContract`, () => {
+      let testContract: any
+      const txOptions = {
+        from: FromAddress,
+        gas: 1500000,
+      }
+
+      before(async function(this: any) {
+        this.timeout(0)
+        const contractFile = `${TMP_PATH}/testContract.sol`
+        const outDir = `${TMP_PATH}/testContract.out`
+        fs.writeFileSync(contractFile, testContractSource)
+        await spawnCmdWithExitOnFailure('../../node_modules/solc/solcjs', [
+          '--bin',
+          contractFile,
+          '-o',
+          outDir,
+        ])
+        await spawnCmdWithExitOnFailure('../../node_modules/solc/solcjs', [
+          '--abi',
+          contractFile,
+          '-o',
+          outDir,
+        ])
+        const bytecode = fs.readFileSync(`${outDir}/_tmp_e2e_testContract_sol_TestContract.bin`)
+        const abi = JSON.parse(
+          fs.readFileSync(`${outDir}/_tmp_e2e_testContract_sol_TestContract.abi`).toString()
+        )
+        const contract = new kit.web3.eth.Contract(abi)
+        const testContractTx = await contract.deploy({ data: '0x' + bytecode })
+        testContract = await testContractTx.send(txOptions)
+      })
+
+      testTransferGold('with TestContract.transfer', async () => {
+        const tx = await testContract.methods.transfer(ToAddress)
+        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+      })
+
+      testTransferGold('with TestContract.transferThenIgnoreRevert', async () => {
+        const tx = await testContract.methods.transferThenIgnoreRevert(ToAddress)
+        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+      })
+
+      testTransferGold('with TestContract.selfDestruct', async () => {
+        const tx = await testContract.methods.selfDestruct(ToAddress)
+        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
       })
     })
   })

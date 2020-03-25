@@ -151,7 +151,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param buyAmount The amount of cUsd the user would like to purchase.
    * @return The corresponding cGLD amount.
    */
-  quoteUsdBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
+  quoteUsdBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, true)
 
   /**
    * Returns the amount of cUsd a user would need to exchange to receive buyAmount of
@@ -159,7 +159,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param buyAmount The amount of cGLD the user would like to purchase.
    * @return The corresponding cUsd amount.
    */
-  quoteGoldBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, true)
+  quoteGoldBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
 
   /**
    * @dev Returns the current configuration of the exchange contract
