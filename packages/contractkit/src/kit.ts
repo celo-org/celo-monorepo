@@ -64,6 +64,7 @@ export interface NetworkConfig {
 
 export interface KitOptions {
   gasInflationFactor: number
+  gasPrice: string
   feeCurrency?: Address
   from?: Address
 }
@@ -88,6 +89,8 @@ export class ContractKit {
   constructor(readonly web3: Web3) {
     this.config = {
       gasInflationFactor: 1.3,
+      // gasPrice:0 means the node will compute gasPrice on its own
+      gasPrice: '0',
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider)
@@ -205,6 +208,14 @@ export class ContractKit {
     return this.config.gasInflationFactor
   }
 
+  set gasPrice(price: number) {
+    this.config.gasPrice = price.toString(10)
+  }
+
+  get gasPrice() {
+    return parseInt(this.config.gasPrice, 10)
+  }
+
   /**
    * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
@@ -292,8 +303,7 @@ export class ContractKit {
     const defaultTx: Tx = {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
-      // gasPrice:0 means the node will compute gasPrice on it's own
-      gasPrice: '0',
+      gasPrice: this.config.gasPrice,
     }
 
     if (this.config.feeCurrency) {
