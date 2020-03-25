@@ -11,14 +11,7 @@ describe('EmailForm', () => {
         <EmailForm submitText={submitBTNText} whenComplete={<View />} />
       )
 
-      // IE it looks like button
-      expect(getByText(submitBTNText)).toHaveStyle({
-        'background-color': 'rgb(53, 208, 127)',
-        'border-top-left-radius': '3px',
-        'border-top-right-radius': '3px',
-        'border-bottom-right-radius': '3px',
-        'border-bottom-left-radius': '3px',
-      })
+      expect(getByText(submitBTNText)).toBeVisible()
 
       expect(queryByText('common:validationErrors.email')).not.toBeInTheDocument()
     })
