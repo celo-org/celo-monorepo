@@ -90,7 +90,7 @@ const whitelistAddress = async (
 ) => {
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods.addAddress(address).send({ from: validatorAddress })
+  await whitelistContract.methods.whitelistAddress(address).send({ from: validatorAddress })
 }
 
 const setAddressWhitelist = async (
@@ -101,7 +101,7 @@ const setAddressWhitelist = async (
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
   await whitelistContract.methods
-    .setWhitelist(whitelist)
+    .setDirectlyWhitelistedAddresses(whitelist)
     .send({ from: validatorAddress, gas: 500000 })
 }
 
