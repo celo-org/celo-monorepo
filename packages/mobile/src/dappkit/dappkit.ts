@@ -14,7 +14,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -62,6 +62,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
 
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
+      const contractKit = getContractKit()
       // TODO offload this logic to walletkit or contractkit, otherwise they
       // could diverge again and create another bug
       // See https://github.com/celo-org/celo-monorepo/issues/3045
@@ -87,7 +88,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         params.to = tx.to
       }
       Logger.debug(TAG, 'Signing tx with params', JSON.stringify(params))
-      const signedTx = await web3.eth.signTransaction(params)
+      const signedTx = await contractKit.web3.eth.signTransaction(params)
       return signedTx.raw
     })
   )
