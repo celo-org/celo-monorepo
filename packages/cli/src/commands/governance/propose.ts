@@ -55,6 +55,8 @@ export default class Propose extends BaseCommand {
 
     const proposal = await builder.build()
 
+    console.log(proposal)
+
     printValueMapRecursive(proposalToJSON(this.kit, proposal))
 
     const governance = await this.kit.contracts.getGovernance()
