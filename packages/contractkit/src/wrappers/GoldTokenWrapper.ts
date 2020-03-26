@@ -1,17 +1,10 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
-import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3-core'
+import 'bignumber.js'
 import { Address } from '../base'
 import { GoldToken } from '../generated/GoldToken'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber, valueToInt } from './BaseWrapper'
-
-export interface Transfer {
-  from: Address
-  to: Address
-  value: BigNumber
-}
 
 /**
  * ERC-20 contract for Celo native currency.
@@ -102,18 +95,4 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @return The balance of the specified address.
    */
   balanceOf = (account: Address) => this.kit.web3.eth.getBalance(account).then(valueToBigNumber)
-
-  async getTransferEvents(blockNumber: number): Promise<Transfer[]> {
-    const events = await this.getPastEvents('Transfer', {
-      fromBlock: blockNumber,
-      toBlock: blockNumber,
-    })
-    return events.map(
-      (e: EventLog): Transfer => ({
-        from: e.returnValues.from,
-        to: e.returnValues.to,
-        value: valueToBigNumber(e.returnValues.value),
-      })
-    )
-  }
 }

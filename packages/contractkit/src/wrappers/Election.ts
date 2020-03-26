@@ -27,24 +27,6 @@ export interface ValidatorGroupVote {
   eligible: boolean
 }
 
-export interface ValidatorGroupVoteCast {
-  account: Address
-  group: Address
-  value: BigNumber
-}
-
-export interface ValidatorGroupVoteActivated {
-  account: Address
-  group: Address
-  value: BigNumber
-}
-
-export interface ValidatorGroupVoteRevoked {
-  account: Address
-  group: Address
-  value: BigNumber
-}
-
 export interface Voter {
   address: Address
   votes: GroupVote[]
@@ -521,52 +503,6 @@ export class ElectionWrapper extends BaseWrapper<Election> {
           epochNumber: e.epochNumber,
         }
       }
-    )
-  }
-
-  async getValidatorGroupVoteCastEvents(blockNumber: number): Promise<ValidatorGroupVoteCast[]> {
-    const events = await this.getPastEvents('ValidatorGroupVoteCast', {
-      fromBlock: blockNumber,
-      toBlock: blockNumber,
-    })
-    return events.map(
-      (e: EventLog): ValidatorGroupVoteCast => ({
-        account: e.returnValues.account,
-        group: e.returnValues.group,
-        value: valueToBigNumber(e.returnValues.value),
-      })
-    )
-  }
-
-  async getValidatorGroupVoteActivatedEvents(
-    blockNumber: number
-  ): Promise<ValidatorGroupVoteActivated[]> {
-    const events = await this.getPastEvents('ValidatorGroupVoteActivated', {
-      fromBlock: blockNumber,
-      toBlock: blockNumber,
-    })
-    return events.map(
-      (e: EventLog): ValidatorGroupVoteActivated => ({
-        account: e.returnValues.account,
-        group: e.returnValues.group,
-        value: valueToBigNumber(e.returnValues.value),
-      })
-    )
-  }
-
-  async getValidatorGroupVoteRevokedEvents(
-    blockNumber: number
-  ): Promise<ValidatorGroupVoteRevoked[]> {
-    const events = await this.getPastEvents('ValidatorGroupVoteRevoked', {
-      fromBlock: blockNumber,
-      toBlock: blockNumber,
-    })
-    return events.map(
-      (e: EventLog): ValidatorGroupVoteRevoked => ({
-        account: e.returnValues.account,
-        group: e.returnValues.group,
-        value: valueToBigNumber(e.returnValues.value),
-      })
     )
   }
 }

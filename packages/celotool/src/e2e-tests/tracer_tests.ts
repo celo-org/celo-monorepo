@@ -434,7 +434,7 @@ describe('tracer tests', () => {
       })
     })
 
-    describe.only(`Deploying TestContract`, () => {
+    describe(`Deploying TestContract`, () => {
       let testContract: any
       const txOptions = {
         from: FromAddress,

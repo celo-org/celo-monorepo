@@ -1,7 +1,5 @@
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3-core'
-import { Address } from '../base'
 import { StableToken } from '../generated/StableToken'
 import {
   BaseWrapper,
@@ -26,12 +24,6 @@ export interface StableTokenConfig {
   name: string
   symbol: string
   inflationParameters: InflationParameters
-}
-
-export interface Transfer {
-  from: Address
-  to: Address
-  value: BigNumber
 }
 
 /**
@@ -205,18 +197,4 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
     to: string,
     value: string | number
   ) => CeloTransactionObject<boolean> = proxySend(this.kit, this.contract.methods.transferFrom)
-
-  async getTransferEvents(blockNumber: number): Promise<Transfer[]> {
-    const events = await this.getPastEvents('Transfer', {
-      fromBlock: blockNumber,
-      toBlock: blockNumber,
-    })
-    return events.map(
-      (e: EventLog): Transfer => ({
-        from: e.returnValues.from,
-        to: e.returnValues.to,
-        value: valueToBigNumber(e.returnValues.value),
-      })
-    )
-  }
 }
