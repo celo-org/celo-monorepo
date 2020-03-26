@@ -4,10 +4,13 @@ import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { labelValues, Histogram, linearBuckets } from 'prom-client'
 import { Transaction } from 'web3-core'
 import { Block } from 'web3-eth'
+import fs from 'fs'
 
 import { Counters } from './metrics'
 import { Contracts, stateGetters } from './states'
 import { toMethodId, toTxMap, getInternalTransactions } from './utils'
+
+const tracerAsText = fs.readFileSync(__dirname + '/tracer.js.txt', 'utf8')
 
 enum LoggingCategory {
   Block = 'RECEIVED_BLOCK',
@@ -138,6 +141,41 @@ export class BlockProcessor {
       this.logEvent(LoggingCategory.TransactionReceipt, receipt)
       ;(await getInternalTransactions(tx.hash)).forEach((data: any) =>
         this.logEvent(LoggingCategory.InternalTransaction, data)
+      )
+
+      await new Promise((resolve) =>
+        (this.kit.web3.currentProvider as any).existingProvider.send(
+          {
+            method: 'debug_traceTransaction',
+            params: [
+              tx.hash,
+              {
+                tracer: tracerAsText,
+                disableStack: true,
+                disableMemory: true,
+                disableStorage: true,
+              },
+            ],
+            jsonrpc: '2.0',
+            id: '2',
+          },
+          (err: any, result: any) => {
+            if (!err) {
+              result.result
+                .filter(
+                  ({ type, callType }: any) => type === 'create' || callType === 'delegatecall'
+                )
+                .forEach((data: any) =>
+                  this.logEvent(LoggingCategory.InternalTransaction, {
+                    ...data,
+                    createdContractCode: undefined,
+                    init: undefined,
+                  })
+                )
+            }
+            resolve()
+          }
+        )
       )
 
       // tslint:disable-next-line
