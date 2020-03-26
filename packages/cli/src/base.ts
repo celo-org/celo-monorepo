@@ -1,5 +1,7 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
+import { newLedgerWalletWithSetup } from '@celo/contractkit/lib/wallets/ledger-wallet'
+import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import Web3 from 'web3'
@@ -35,6 +37,10 @@ export abstract class BaseCommand extends LocalCommand {
     ...LocalCommand.flags,
     privateKey: flags.string({ hidden: true }),
     node: flags.string({ char: 'n', hidden: true }),
+    useLedger: flags.boolean({
+      default: false,
+      description: 'Set it to use a ledger wallet',
+    }),
   }
 
   // This specifies whether the node needs to be synced before the command
@@ -46,6 +52,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
+  private _wallet?: Wallet
 
   // This is required since we wrap the provider with a debug provider and
   // there is no way to unwrap the provider afterwards.
@@ -64,11 +71,11 @@ export abstract class BaseCommand extends LocalCommand {
 
   get kit() {
     if (!this._kit) {
-      this._kit = newKitFromWeb3(this.web3)
+      this._kit = newKitFromWeb3(this.web3, this._wallet)
     }
 
     const res: ParserOutput<any, any> = this.parse()
-    if (res.flags && res.flags.privateKey) {
+    if (res.flags && res.flags.privateKey && !res.flags.useLedger) {
       this._kit.addAccount(res.flags.privateKey)
     }
     return this._kit
@@ -77,6 +84,10 @@ export abstract class BaseCommand extends LocalCommand {
   async init() {
     if (this.requireSynced) {
       await requireNodeIsSynced(this.web3)
+    }
+    const res: ParserOutput<any, any> = this.parse()
+    if (res.flags.useLedger) {
+      this._wallet = await newLedgerWalletWithSetup([0, 1])
     }
   }
 

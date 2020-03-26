@@ -14,7 +14,12 @@ import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
 import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data-utils'
-import { encodeTransaction, rlpEncodedTx } from '../utils/signing-utils'
+import {
+  chainIdTransformationForSigning,
+  encodeTransaction,
+  makeEven,
+  rlpEncodedTx,
+} from '../utils/signing-utils'
 import { Wallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
@@ -132,7 +137,16 @@ export class LedgerWallet implements Wallet {
         this.getDerivationPathFor(txParams.from!.toString()),
         trimLeading0x(rlpEncoded.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
       )
-      signature.v = ensureLeading0x(signature.v)
+
+      // EIP155 support. check/recalc signature v value.
+      const rv = parseInt(signature.v, 16)
+      let cv = chainIdTransformationForSigning(rlpEncoded.transaction.chainId!)
+      // tslint:disable-next-line: no-bitwise
+      if (rv !== cv && (rv & cv) !== rv) {
+        cv += 1 // add signature v bit.
+      }
+
+      signature.v = makeEven(ensureLeading0x(cv.toString(16)))
       signature.r = ensureLeading0x(signature.r)
       signature.s = ensureLeading0x(signature.s)
 
@@ -214,7 +228,7 @@ export class LedgerWallet implements Wallet {
   private transportErrorFriendlyMessage(error: any) {
     debug('Possible connection lost with the ledger')
     debug(`Error message: ${error.message}`)
-    if (error.statusCode === 26368 || error.message === 'NoDevice') {
+    if (error.statusCode === 26368 || error.statusCode === 26628 || error.message === 'NoDevice') {
       throw new Error(
         `Possible connection lost with the ledger. Check if still on and connected. ${error.message}`
       )

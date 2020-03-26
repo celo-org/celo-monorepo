@@ -21,7 +21,7 @@ function trimLeadingZero(hex: string) {
   return hex
 }
 
-function makeEven(hex: string) {
+export function makeEven(hex: string) {
   if (hex.length % 2 === 1) {
     hex = hex.replace('0x', '0x0')
   }
@@ -79,6 +79,7 @@ export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
   transaction.gatewayFee = stringNumberToHex(tx.gatewayFee)
   transaction.gasPrice = stringNumberToHex(tx.gasPrice?.toString())
   transaction.gas = stringNumberToHex(tx.gas)
+  transaction.chainId = tx.chainId || 1
 
   // This order should match the order in Geth.
   // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
@@ -92,7 +93,7 @@ export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
     transaction.to,
     transaction.value,
     transaction.data,
-    stringNumberToHex(transaction.chainId || 1),
+    stringNumberToHex(transaction.chainId),
     '0x',
     '0x',
   ])
