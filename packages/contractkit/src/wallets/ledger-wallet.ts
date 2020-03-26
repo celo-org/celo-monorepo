@@ -54,8 +54,10 @@ export class LedgerWallet implements Wallet {
     transport?: Transport
   ) {
     this.transport = transport
-    const validDPs = derivationPathIndexes.some((value) => !(Number.isInteger(value) && value >= 0))
-    if (!validDPs) {
+    const invalidDPs = derivationPathIndexes.some(
+      (value) => !(Number.isInteger(value) && value >= 0)
+    )
+    if (invalidDPs) {
       throw new Error('ledger-wallet: Invalid address index')
     }
   }
