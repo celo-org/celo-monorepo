@@ -4,7 +4,7 @@ This is the Celo website, which is deployed to https://celo.org/
 
 ## Developing
 
-### Setps to get running
+### Steps to get running
 
 1. ensuring you have installed the latest dependencies:
 
@@ -16,7 +16,7 @@ This is the Celo website, which is deployed to https://celo.org/
 
   * from root of monorepo run `yarn run keys:decrypt`  
 
-3. `yarn run dev`
+3. from web directory run `yarn run dev`
 
 which will start a server accessible at [http://localhost:3000](http://localhost:3000)
 
@@ -57,11 +57,13 @@ You may need to log in and be granted additional permissions.
 
 `gcloud auth login`
 
-Make sure your dependencies are up to date. in this directory, run:
+ Make sure your dependencies are up to date. root of monorepo, run:
 
 `yarn`
 
-Now you can run
+> Deploying will upload files on local machine to gcloud, make sure you are on the intended branch and it is up to date
+
+Now from web package directory deploy to dev.celo.org with: 
 
 `yarn run deploy:dev`
 
@@ -70,7 +72,7 @@ to deploy to the `dev` environment, with similar commands for `staging` and `pro
 
 #### dev vs staging
 
-While not enforced, the norms for using the different non production environments are like so: 
+While not enforced, the norms for using the different non-production environments are like so: 
 
 Use Staging for checking a commit works as expected before deploying to production 
 
