@@ -1255,11 +1255,9 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
-      // lock the entire releaseGold amount
       await releaseGoldInstance.lockGold(lockAmount, {
         from: beneficiary,
       })
-      // unlock the latter
       await releaseGoldInstance.unlockGold(lockAmount, {
         from: beneficiary,
       })

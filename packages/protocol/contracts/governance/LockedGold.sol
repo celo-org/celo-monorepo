@@ -261,9 +261,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   function getTotalPendingWithdrawals(address account) external view returns (uint256) {
     uint256 pendingWithdrawalSum = 0;
-    PendingWithdrawal[] memory pendingWithdrawals = balances[account].pendingWithdrawals;
-    for (uint256 i = 0; i < pendingWithdrawals.length; i.add(1)) {
-      pendingWithdrawalSum = pendingWithdrawalSum.add(pendingWithdrawals[i].value);
+    PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
+    for (uint256 i = 0; i < withdrawals.length; i = i.add(1)) {
+      pendingWithdrawalSum = pendingWithdrawalSum.add(withdrawals[i].value);
     }
     return pendingWithdrawalSum;
   }

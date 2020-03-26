@@ -66,14 +66,16 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  let releaseStartTime: number
   // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
   // This is to account for the dynamic start date for mainnet,
   // and some grants rely on x months post mainnet launch.
+  let releaseStartTime: any
   if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    const addedMonths = releaseGoldConfig.releaseStartTime.split('+')[1]
+    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
     const date = new Date()
-    date.setDate(date.getDate() + Number(addedMonths) * 30)
+    if (addedMonths > 0) {
+      date.setDate(date.getDate() + addedMonths * 30)
+    }
     releaseStartTime = date.getTime() / 1000
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
@@ -112,13 +114,16 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     value: startGold,
   })
 
-  releases.push({
+  const record = {
+    GrantNumber: currGrant,
     Beneficiary: releaseGoldConfig.beneficiary,
     ProxyAddress: releaseGoldProxy.address,
     MultiSigProxyAddress: releaseGoldMultiSigProxy.address,
     MultiSigTxHash: multiSigTxHash,
     ReleaseGoldTxHash: releaseGoldTxHash,
-  })
+  }
+  console.info(record)
+  releases.push(record)
 }
 
 async function handleJSONFile(err, data) {
@@ -168,7 +173,22 @@ async function handleJSONFile(err, data) {
     return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
   const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
-  const totalValue = Number(totalTransferFees) + Number(totalGoldGrant)
+  const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
+  const fromBalance = new BigNumber(await web3.eth.getBalance(argv.from))
+  if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
+    console.error(
+      chalk.red(
+        '\nError: The `from` address ' +
+          argv.from +
+          "'s balance is not sufficient to cover all of the grants specified in " +
+          argv.grants +
+          '.\
+      \nIf you would only like to deploy a subset of grants, please modify the json file and try again.\
+      \nExiting.'
+      )
+    )
+    process.exit(0)
+  }
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
