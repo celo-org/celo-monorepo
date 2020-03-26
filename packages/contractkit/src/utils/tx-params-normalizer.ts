@@ -38,9 +38,15 @@ export class TxParamsNormalizer {
       txParams.gas = await this.getEstimateGas(txParams)
     }
 
+    /*
+    Right now, Forno does not expose a node's coinbase so we can't
+    set the gatewayFeeRecipient. Once that is fixed, we can reenable
+    this.
+
     if (isEmpty(txParams.gatewayFeeRecipient)) {
       txParams.gatewayFeeRecipient = await this.getCoinbase()
     }
+    */
 
     if (!isEmpty(txParams.gatewayFeeRecipient) && isEmpty(txParams.gatewayFee)) {
       txParams.gatewayFee = ensureLeading0x(DefaultGatewayFee.toString(16))
@@ -77,6 +83,7 @@ export class TxParamsNormalizer {
     return gas
   }
 
+  // @ts-ignore - see comment above
   private async getCoinbase(): Promise<string> {
     if (this.gatewayFeeRecipient === null) {
       // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_coinbase

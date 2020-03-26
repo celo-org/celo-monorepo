@@ -47,13 +47,13 @@ async function isFast(speed: number | EffectiveTypes) {
   return false
 }
 
-function getEffectiveConnection(navigator): EffectiveTypes {
+export function getEffectiveConnection(navigator): EffectiveTypes {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
   return (connection && connection.effectiveType) || 'unknown'
 }
 
 // from http://wicg.github.io/netinfo/#dom-effectiveconnectiontype-slow-2g
-enum EffectiveTypes {
+export enum EffectiveTypes {
   '2g' = '2g',
   '3g' = '3g',
   '4g' = '4g',

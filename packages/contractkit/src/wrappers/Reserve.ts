@@ -23,6 +23,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   )
   isSpender: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isSpender)
   transferGold = proxySend(this.kit, this.contract.methods.transferGold)
+  getOrComputeTobinTax = proxySend(this.kit, this.contract.methods.getOrComputeTobinTax)
 
   /**
    * Returns current configuration parameters.
