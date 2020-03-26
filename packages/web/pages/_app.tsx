@@ -8,11 +8,13 @@ import { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer'
+import Progress from 'src/shared/Progress'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
 
 config({ ssrReveal: true })
+
 class MyApp extends App {
   async componentDidMount() {
     if (window.location.hash) {
@@ -52,6 +54,7 @@ class MyApp extends App {
     const { Component, pageProps } = this.props
     return (
       <ScreenSizeProvider>
+        <Progress />
         {this.skipHeader() || <Header />}
         <Component {...pageProps} />
         {this.skipHeader() || (
