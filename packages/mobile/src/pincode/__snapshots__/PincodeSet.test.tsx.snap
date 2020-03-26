@@ -41,7 +41,6 @@ exports[`Pincode renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "justifyContent": "space-between",
         "padding": 20,
@@ -727,7 +726,6 @@ exports[`Pincode renders correctly 2`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "justifyContent": "space-between",
         "padding": 20,

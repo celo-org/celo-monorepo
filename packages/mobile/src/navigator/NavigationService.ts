@@ -97,7 +97,7 @@ export function navigateProtected(routeName: string, params?: NavigationParams) 
 }
 
 export function lockCurrentScreen() {
-  ensurePincode(true)
+  ensurePincode()
     .then((ensured) => {
       if (ensured) {
         navigateBack()

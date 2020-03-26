@@ -11,7 +11,7 @@ export interface State {
   lockWithPinEnabled: boolean
   appState: AppState
   locked: boolean
-  requestingAndroidPermission: boolean
+  lastTimeBackgrounded: number
 }
 
 const initialState = {
@@ -24,7 +24,7 @@ const initialState = {
   lockWithPinEnabled: false,
   appState: AppState.Active,
   locked: false,
-  requestingAndroidPermission: false,
+  lastTimeBackgrounded: 0,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -40,21 +40,17 @@ export const appReducer = (
       return {
         ...state,
         ...rehydratePayload,
-        requestingAndroidPermission: false,
         appState: initialState.appState,
         locked: rehydratePayload.lockWithPinEnabled,
       }
     }
-    case Actions.SET_REQUESTING_ANDROID_PERMISSION:
-      return {
-        ...state,
-        requestingAndroidPermission: action.value,
-      }
     case Actions.SET_APP_STATE:
       let appState = state.appState
+      let lastTimeBackgrounded = state.lastTimeBackgrounded
       switch (action.state) {
         case 'background':
           appState = AppState.Background
+          lastTimeBackgrounded = Date.now()
           break
         case 'inactive':
           appState = AppState.Inactive
@@ -66,6 +62,7 @@ export const appReducer = (
       return {
         ...state,
         appState,
+        lastTimeBackgrounded,
       }
     case Actions.SET_LOGGED_IN:
       return {

@@ -1,7 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
-import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import React, { useCallback, useMemo } from 'react'
@@ -38,9 +37,6 @@ function Pincode(props: Props) {
   }, [pin, onChangePin])
 
   const validPin = useMemo(() => isPinValid(pin), [pin, isPinValid])
-
-  // console.log('HWR')
-  // onPress()
 
   return (
     <>
@@ -80,7 +76,6 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 20,
     paddingTop: 0,
-    backgroundColor: colors.background,
   },
   pincodeContainer: {
     marginBottom: 20,

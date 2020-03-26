@@ -1,12 +1,11 @@
 export function isPhoneAuthSupported() {
-  // TODO
-  return true
+  return false
 }
 
 export async function setPinInKeystore() {
-  // TODO
+  throw new Error('Not supported')
 }
 
 export async function getPinFromKeystore() {
-  // TODO
+  throw new Error('Not supported')
 }

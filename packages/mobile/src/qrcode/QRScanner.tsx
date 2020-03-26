@@ -11,7 +11,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { setRequestingAndroidPermission } from 'src/app/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -22,7 +21,6 @@ import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
-  setRequestingAndroidPermission: typeof setRequestingAndroidPermission
 }
 
 interface State {
@@ -63,18 +61,9 @@ class QRScanner extends React.Component<Props, State> {
     navigate(Screens.QRCode)
   }
 
-  componentDidMount() {
-    if (Platform.OS === 'android') {
-      this.props.setRequestingAndroidPermission(true)
-    }
-  }
-
   componentWillUnmount() {
     if (this.timeout) {
       clearTimeout(this.timeout)
-    }
-    if (Platform.OS === 'android') {
-      this.props.setRequestingAndroidPermission(false)
     }
   }
 
@@ -201,7 +190,6 @@ export default componentWithAnalytics(
     // @ts-ignore
     connect(null, {
       handleBarcodeDetected,
-      setRequestingAndroidPermission,
     })(withTranslation(Namespaces.sendFlow7)(QRScanner))
   )
 )

@@ -1,7 +1,9 @@
+import colors from '@celo/react-components/styles/colors'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BackHandler } from 'react-native'
+import { BackHandler, StyleSheet } from 'react-native'
 import RNExitApp from 'react-native-exit-app'
+import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { unlock } from 'src/app/actions'
@@ -49,7 +51,7 @@ function PincodeLock() {
   }, [])
 
   return (
-    <>
+    <SafeAreaView style={style.container}>
       <Pincode
         title={t('confirmPin.title')}
         placeholder={t('createPin.yourPin')}
@@ -60,8 +62,16 @@ function PincodeLock() {
         onChangePin={setPin}
         maxLength={PIN_LENGTH}
       />
-    </>
+    </SafeAreaView>
   )
 }
+
+const style = StyleSheet.create({
+  container: {
+    paddingTop: 20,
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+})
 
 export default PincodeLock

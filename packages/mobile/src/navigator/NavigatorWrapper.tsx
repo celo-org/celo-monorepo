@@ -72,7 +72,11 @@ export class NavigatorWrapper extends React.Component<Props> {
           onNavigationStateChange={handleNavigationStateChange}
           {...getPersistenceFunctions()}
         />
-        <View style={styles.locked}>{appLocked && <PincodeLock />}</View>
+        {appLocked && (
+          <View style={styles.locked}>
+            <PincodeLock />
+          </View>
+        )}
         <View style={styles.floating}>
           {!appLocked && <BackupPrompt />}
           <AlertBanner />

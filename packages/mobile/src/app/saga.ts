@@ -1,16 +1,15 @@
 import { AppState, Linking } from 'react-native'
-import { NavigationParams } from 'react-navigation'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { Actions, lock, OpenDeepLink, SetAppState, setAppState, setLanguage } from 'src/app/actions'
-import { getAppLocked, getLockWithPinEnabled } from 'src/app/selectors'
+import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { NavActions, navigate, navigateProtected } from 'src/navigator/NavigationService'
+import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
@@ -22,6 +21,12 @@ import { fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
+
+// There are cases user would put app in background state, but
+// we do not want to lock it immeditely. Here are some cases:
+// case 1: User switches to SMS app to copy verification text
+// case 2: User receives permission dialog (which will put app in `background` state until dialog disappears).
+const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 
 export function* waitForRehydrate() {
   yield take(REHYDRATE)
@@ -171,10 +176,17 @@ function* watchAppState() {
 
 function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
-  const cachedPin = false // getCachedPincode()
+  const lastTimeBackgrounded = yield select(getLastTimeBackgrounded)
+  const now = Date.now()
+  const cachedPin = getCachedPincode()
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (!cachedPin && lockWithPinEnabled && action.state === 'active' && !appLocked) {
-    console.log('LOCK')
+  if (
+    !cachedPin &&
+    lockWithPinEnabled &&
+    now - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD &&
+    action.state === 'active' &&
+    !appLocked
+  ) {
     yield put(lock())
   }
 }
