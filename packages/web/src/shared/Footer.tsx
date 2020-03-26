@@ -114,15 +114,17 @@ const Navigation = React.memo(function _Navigation({
         {FOOTER_MENU.map((item, index) => {
           const linkIsToCurrentPage = isVertical && currentPage === item.link
           const btnKind = linkIsToCurrentPage ? BTN.TERTIARY : BTN.NAV
+          const verticalItemStyle = linkIsToCurrentPage
+            ? styles.currentMenuItem
+            : styles.verticalMenuItem
+
           return (
             <View
               key={index}
               style={[
                 styles.menuItem,
                 !isVertical && index === 0 && { marginLeft: 0 },
-                isVertical
-                  ? linkIsToCurrentPage && styles.currentMenuItem
-                  : styles.verticalMenuItem,
+                isVertical && verticalItemStyle,
               ]}
             >
               {/*
@@ -229,7 +231,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-around',
   },
-  verticalMenuItem: {},
+  verticalMenuItem: {
+    marginVertical: 20,
+  },
   currentMenuItem: {
     marginVertical: 30,
   },
