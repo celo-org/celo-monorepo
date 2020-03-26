@@ -33,6 +33,8 @@ export interface RLPEncodedTx {
   rlpEncode: any
 }
 
+// Simple replay attack protection
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md
 export function chainIdTransformationForSigning(chainId: number): number {
   return chainId * 2 + 35
 }
@@ -41,9 +43,12 @@ export function getHashFromEncoded(rlpEncode: string): string {
   return Hash.keccak256(rlpEncode)
 }
 
-function stringNumberToHex(num: string | number): string {
-  num = num === '0x' ? '0x0' : num
-  return Bytes.fromNat('0x' + Number(num).toString(16))
+function stringNumberToHex(num?: number | string): string {
+  const auxNumber = Number(num)
+  if (num === '0x' || num === undefined || auxNumber === 0) {
+    return '0x'
+  }
+  return Bytes.fromNumber(auxNumber)
 }
 
 export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
@@ -65,32 +70,29 @@ export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
   if (tx.nonce! < 0 || tx.gas! < 0 || tx.gasPrice! < 0 || tx.chainId! < 0) {
     throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
   }
-
-  tx = helpers.formatters.inputCallFormatter(tx)
-  const transaction = tx
-  transaction.to = tx.to || '0x'
-  transaction.data = tx.data || '0x'
-  transaction.value = stringNumberToHex((tx.value || '0x').toString())
-  transaction.chainId = tx.chainId || 1
-  transaction.feeCurrency = tx.feeCurrency || '0x'
-  transaction.gatewayFeeRecipient = tx.gatewayFeeRecipient || '0x'
-  transaction.gatewayFee = stringNumberToHex((tx.gatewayFee || '0x').toString())
-  transaction.gasPrice = stringNumberToHex(transaction.gasPrice!.toString())
-  transaction.gas = stringNumberToHex(transaction.gas!.toString())
+  const transaction: Tx = helpers.formatters.inputCallFormatter(tx)
+  transaction.to = Bytes.fromNat(tx.to || '0x').toLowerCase()
+  transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()
+  transaction.value = stringNumberToHex(tx.value?.toString())
+  transaction.feeCurrency = Bytes.fromNat(tx.feeCurrency || '0x').toLowerCase()
+  transaction.gatewayFeeRecipient = Bytes.fromNat(tx.gatewayFeeRecipient || '0x').toLowerCase()
+  transaction.gatewayFee = stringNumberToHex(tx.gatewayFee)
+  transaction.gasPrice = stringNumberToHex(tx.gasPrice?.toString())
+  transaction.gas = stringNumberToHex(tx.gas)
 
   // This order should match the order in Geth.
   // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
   const rlpEncode = RLP.encode([
-    Bytes.fromNat(transaction.nonce),
+    stringNumberToHex(transaction.nonce),
     transaction.gasPrice,
     transaction.gas,
-    transaction.feeCurrency.toLowerCase(),
-    transaction.gatewayFeeRecipient.toLowerCase(),
+    transaction.feeCurrency,
+    transaction.gatewayFeeRecipient,
     transaction.gatewayFee,
-    transaction.to.toLowerCase(),
+    transaction.to,
     transaction.value,
     transaction.data,
-    stringNumberToHex(transaction.chainId),
+    stringNumberToHex(transaction.chainId || 1),
     '0x',
     '0x',
   ])
@@ -138,7 +140,7 @@ export async function encodeTransaction(
       gas: rlpEncoded.transaction.gas!.toString(),
       to: rlpEncoded.transaction.to!.toString(),
       value: rlpEncoded.transaction.value!.toString(),
-      input: (rlpEncoded.transaction as any).input,
+      input: rlpEncoded.transaction.data!,
       v: signature.v,
       r: signature.r,
       s: signature.s,
