@@ -23,7 +23,7 @@ export const retryAsync = async <T extends any[], U>(
     } catch (error) {
       await sleep(delay)
       saveError = error
-      console.info(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
+      console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
     }
   }
 
@@ -47,7 +47,7 @@ export const retryAsyncWithBackOff = async <T extends any[], U>(
     } catch (error) {
       await sleep(Math.pow(factor, i) * delay)
       saveError = error
-      console.info(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
+      console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
     }
   }
 

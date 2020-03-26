@@ -1997,6 +1997,8 @@ exports[`Community renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/code-of-conduct"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2480,6 +2482,8 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -2664,6 +2668,8 @@ exports[`Community renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/past-events"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -3101,6 +3107,8 @@ exports[`Community renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://medium.com/celoOrg"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -3307,6 +3315,8 @@ exports[`Community renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoOrg/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3734,6 +3744,8 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="/validators"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -5615,6 +5627,8 @@ exports[`Community renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://en.wikipedia.org/wiki/EigenTrust"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -5654,6 +5668,8 @@ exports[`Community renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://en.wikipedia.org/wiki/Sepandar_Kamvar"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -7029,6 +7045,8 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="/code-of-conduct"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -7471,6 +7489,8 @@ exports[`Community renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://twitter.com/@celoDevs"
+                    onClick={[Function]}
+                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -7514,6 +7534,8 @@ exports[`Community renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://twitter.com/CeloOrg"
+                    onClick={[Function]}
+                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {

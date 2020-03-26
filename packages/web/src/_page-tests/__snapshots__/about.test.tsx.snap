@@ -1726,6 +1726,8 @@ exports[`About renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="http://sacred-economics.com/film/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1757,6 +1759,8 @@ exports[`About renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="http://sacred-economics.com/film/"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -1917,6 +1921,8 @@ exports[`About renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -4034,6 +4040,8 @@ exports[`About renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:press@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
