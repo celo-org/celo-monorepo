@@ -36,14 +36,6 @@ export default class Trace extends BaseCommand {
       printValueMapRecursive(
         await traceBlock(this.kit.web3.currentProvider, res.flags.blockNumber, tracer)
       )
-
-      const stableToken = await this.kit.contracts.getStableToken()
-      const tokenTransfers = await stableToken.getTransferEvents(res.flags.blockNumber)
-      printValueMapRecursive(tokenTransfers)
-
-      const goldToken = await this.kit.contracts.getGoldToken()
-      const goldTokenTransfers = await goldToken.getTransferEvents(res.flags.blockNumber)
-      printValueMapRecursive(goldTokenTransfers)
     }
   }
 }
