@@ -3,6 +3,7 @@ import FadeIn from 'react-lazyload-fadein'
 import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
+import { AssetTypes } from 'src/brandkit/tracking'
 import AspectRatio from 'src/shared/AspectRatio'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
@@ -15,6 +16,7 @@ interface Props {
   ratio: number
   loading: boolean
   size: number | '100%'
+  assetType: AssetTypes
 }
 
 export default React.memo(function Showcase({
@@ -23,6 +25,7 @@ export default React.memo(function Showcase({
   preview,
   loading,
   uri,
+  assetType,
   size,
   ratio,
 }: Props) {
@@ -58,7 +61,7 @@ export default React.memo(function Showcase({
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
         <Text style={fonts.legal}>{description}</Text>
       </View>
-      <DownloadButton uri={uri} />
+      <DownloadButton uri={uri} trackingData={{ name, type: assetType }} />
     </View>
   )
 })
