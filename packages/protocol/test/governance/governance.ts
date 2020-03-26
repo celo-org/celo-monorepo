@@ -1,7 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
-  assertBalance,
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
@@ -21,6 +20,8 @@ import {
   AccountsInstance,
   GovernanceTestContract,
   GovernanceTestInstance,
+  MockGoldTokenContract,
+  MockGoldTokenInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockValidatorsContract,
@@ -33,6 +34,7 @@ import {
 
 const Governance: GovernanceTestContract = artifacts.require('GovernanceTest')
 const Accounts: AccountsContract = artifacts.require('Accounts')
+const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -78,6 +80,7 @@ interface Transaction {
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceTestInstance
   let accountsInstance: AccountsInstance
+  let mockGoldToken: MockGoldTokenInstance
   let mockLockedGold: MockLockedGoldInstance
   let mockValidators: MockValidatorsInstance
   let testTransactions: TestTransactionsInstance
@@ -115,6 +118,7 @@ contract('Governance', (accounts: string[]) => {
     accountsInstance = await Accounts.new()
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
+    mockGoldToken = await MockGoldToken.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
@@ -134,6 +138,7 @@ contract('Governance', (accounts: string[]) => {
       baselineQuorumFactor
     )
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await accountsInstance.initialize(registry.address)
@@ -1346,9 +1351,9 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should withdraw the refunded deposit when the proposal was dequeued', async () => {
-        const startBalance = new BigNumber(await web3.eth.getBalance(account))
+        const startBalance = new BigNumber(await mockGoldToken.balanceOf(account))
         await governance.withdraw()
-        await assertBalance(account, startBalance.plus(minDeposit))
+        assertEqualBN(await mockGoldToken.balanceOf(account), startBalance.plus(minDeposit))
       })
     })
 
