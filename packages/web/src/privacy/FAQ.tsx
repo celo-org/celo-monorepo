@@ -94,27 +94,27 @@ const FAQs = [
     a:
       'If you enable the Celo Wallet app permission to read your contacts’ names and photos, you will see those photos in the Wallet. This enables a more personalized and enhanced experience, and this data will only be available to you on your own device - it is not shared with other users.',
   },
-  {
-    q: 'What is the Celo Rewards app?',
-    a: (
-      <>
-        The Celo Rewards app is a proof of concept for the identity protocol that would allow for any user
-        to earn more Celo Gold in the system by actively participating in the verification process of other
-        users. Users of the app with spare capacity to send text messages, could earn additional value for
-        sending those verification text messages. Read more about the identity protocol{' '}
-        <Button text="here" href="https://docs.celo.org/celo-codebase/protocol/identity" kind={BTN.INLINE} />
-      </>
-    ),
-  },
-  {
-    q: 'How do I get more Celo Gold?',
-    a: (
-      <>
-        Please, go ahead and download the Celo Rewards app{' '}
-        <Button text="here" href="https://celo.org/rewards" kind={BTN.INLINE} />!
-      </>
-    ),
-  },
+  // {
+  //   q: 'What is the Celo Rewards app?',
+  //   a: (
+  //     <>
+  //       The Celo Rewards app is a proof of concept for the identity protocol that would allow for any user
+  //       to earn more Celo Gold in the system by actively participating in the verification process of other
+  //       users. Users of the app with spare capacity to send text messages, could earn additional value for
+  //       sending those verification text messages. Read more about the identity protocol{' '}
+  //       <Button text="here" href="https://docs.celo.org/celo-codebase/protocol/identity" kind={BTN.INLINE} />
+  //     </>
+  //   ),
+  // },
+  // {
+  //   q: 'How do I get more Celo Gold?',
+  //   a: (
+  //     <>
+  //       Please, go ahead and download the Celo Rewards app{' '}
+  //       <Button text="here" href="https://celo.org/rewards" kind={BTN.INLINE} />!
+  //     </>
+  //   ),
+  // },
   {
     q: 'Can I cancel a transaction that’s already happened?',
     a:
