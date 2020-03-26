@@ -3,28 +3,13 @@ import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
-import { getPincode } from 'src/account/saga'
-import { showError } from 'src/alert/actions'
-import {
-  Actions,
-  NavigatePinProtected,
-  OpenDeepLink,
-  SetAppState,
-  setAppState,
-  setLanguage,
-} from 'src/app/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getAppLocked, getLockWithPinEnabled } from 'src/app/selectors'
+import { Actions, lock, OpenDeepLink, SetAppState, setAppState, setLanguage } from 'src/app/actions'
+import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import {
-  NavActions,
-  navigate,
-  navigateAfterPinEntered,
-  navigateBack,
-} from 'src/navigator/NavigationService'
+import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
@@ -36,6 +21,13 @@ import { fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
+
+// There are cases, when user will put the app into `background` state,
+// but we do not want to lock it immeditely. Here are some examples:
+// case 1: User switches to SMS app to copy verification text
+// case 2: User gets a permission request dialog
+//    (which will put an app into `background` state until dialog disappears).
+const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 
 export function* waitForRehydrate() {
   yield take(REHYDRATE)
@@ -108,7 +100,6 @@ export function* navigateToProperScreen() {
 
   const deepLink = yield call(Linking.getInitialURL)
   const inSync = yield call(clockInSync)
-  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
 
   if (language) {
     yield put(setLanguage(language))
@@ -119,22 +110,20 @@ export function* navigateToProperScreen() {
     return
   }
 
-  const appLockedAwareNavigate = account && lockWithPinEnabled ? navigateAfterPinEntered : navigate
-
   if (!language) {
-    appLockedAwareNavigate(Stacks.NuxStack)
+    navigate(Stacks.NuxStack)
   } else if (!inSync) {
-    appLockedAwareNavigate(Screens.SetClock)
+    navigate(Screens.SetClock)
   } else if (!e164Number) {
-    appLockedAwareNavigate(Screens.JoinCelo)
+    navigate(Screens.JoinCelo)
   } else if (pincodeType === PincodeType.Unset) {
-    appLockedAwareNavigate(Screens.PincodeEducation)
+    navigate(Screens.PincodeEducation)
   } else if (!redeemComplete && !account) {
-    appLockedAwareNavigate(Screens.EnterInviteCode)
+    navigate(Screens.EnterInviteCode)
   } else if (!hasSeenVerificationNux) {
-    appLockedAwareNavigate(Screens.VerificationEducationScreen)
+    navigate(Screens.VerificationEducationScreen)
   } else {
-    appLockedAwareNavigate(Stacks.AppStack)
+    navigate(Stacks.AppStack)
   }
 }
 
@@ -151,27 +140,6 @@ export function* handleDeepLink(action: OpenDeepLink) {
       handleDappkitDeepLink(deepLink)
     }
   }
-}
-
-export function* handleNavigatePinProtected(action: NavigatePinProtected) {
-  const fornoMode = yield select(fornoSelector)
-  try {
-    // TODO: Implement PIN protection for forno mode
-    if (!fornoMode) {
-      yield call(getPincode, false, () => {
-        navigate(action.routeName, action.params)
-      })
-    } else {
-      navigate(action.routeName, action.params)
-    }
-  } catch (error) {
-    Logger.error(TAG + '@showBackupAndRecovery', 'Incorrect pincode', error)
-    yield put(showError(ErrorMessages.INCORRECT_PIN))
-  }
-}
-
-export function* watchNavigatePinProtected() {
-  yield takeLatest(Actions.NAVIGATE_PIN_PROTECTED, handleNavigatePinProtected)
 }
 
 export function* watchDeepLinks() {
@@ -207,23 +175,26 @@ function* watchAppState() {
   }
 }
 
-function* handleSetAppState(action: SetAppState) {
+export function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
+  const lastTimeBackgrounded = yield select(getLastTimeBackgrounded)
+  const now = Date.now()
   const cachedPin = getCachedPincode()
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (lockWithPinEnabled && action.state === 'background' && !appLocked && !cachedPin) {
-    navigate(Screens.Background, {
-      onUnlock() {
-        navigateBack({ immediate: true })
-      },
-    })
+  if (
+    !cachedPin &&
+    lockWithPinEnabled &&
+    now - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD &&
+    action.state === 'active' &&
+    !appLocked
+  ) {
+    yield put(lock())
   }
 }
 
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
-  yield spawn(watchNavigatePinProtected)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)

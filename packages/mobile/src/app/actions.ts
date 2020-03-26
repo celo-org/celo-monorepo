@@ -1,4 +1,3 @@
-import { NavigationParams } from 'react-navigation'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -27,7 +26,6 @@ export enum Actions {
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
-  NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
 }
@@ -79,12 +77,6 @@ interface SetLockWithPinEnabled {
   enabled: boolean
 }
 
-export interface NavigatePinProtected {
-  type: Actions.NAVIGATE_PIN_PROTECTED
-  routeName: string
-  params?: NavigationParams
-}
-
 export interface Lock {
   type: Actions.LOCK
 }
@@ -104,7 +96,6 @@ export type ActionTypes =
   | ExitBackupFlow
   | SetAnalyticsEnabled
   | SetLockWithPinEnabled
-  | NavigatePinProtected
   | Lock
   | Unlock
 
@@ -165,15 +156,6 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
 export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
   type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
-})
-
-export const navigatePinProtected = (
-  routeName: string,
-  params?: NavigationParams
-): NavigatePinProtected => ({
-  type: Actions.NAVIGATE_PIN_PROTECTED,
-  routeName,
-  params,
 })
 
 export const lock = (): Lock => ({

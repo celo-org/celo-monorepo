@@ -8,9 +8,12 @@ import {
   NavigationState,
 } from 'react-navigation'
 import sleep from 'sleep-promise'
+import { PincodeType } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { Screens } from 'src/navigator/Screens'
+import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
@@ -50,12 +53,47 @@ export function navigate(routeName: string, params?: NavigationParams) {
     })
 }
 
-export function navigateAfterPinEntered(routeName: string, params?: NavigationParams) {
-  navigate('Background', {
-    onUnlock() {
-      navigate(routeName, params)
-    },
-  })
+export async function ensurePincode(): Promise<boolean> {
+  const pincodeType = pincodeTypeSelector(store.getState())
+
+  if (pincodeType === PincodeType.Unset) {
+    Logger.error(TAG + '@ensurePincode', 'Pin has never been set')
+    return false
+  }
+
+  if (pincodeType === PincodeType.CustomPin) {
+    Logger.debug(TAG + '@ensurePincode', 'Getting custom pin')
+    let pin
+    try {
+      pin = await new Promise((resolve) => {
+        navigate(Screens.PincodeEnter, {
+          onSuccess: resolve,
+          withVerification: true,
+        })
+      })
+    } catch (error) {
+      Logger.error(`${TAG}@ensurePincode`, `PIN entering error`, error)
+      return false
+    }
+
+    if (!pin) {
+      Logger.error(`${TAG}@ensurePincode`, `Empty PIN`)
+      return false
+    }
+  }
+  return true
+}
+
+export function navigateProtected(routeName: string, params?: NavigationParams) {
+  ensurePincode()
+    .then((ensured) => {
+      if (ensured) {
+        navigate(routeName, params)
+      }
+    })
+    .catch((error) => {
+      Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
+    })
 }
 
 // Source: https://v1.reactnavigation.org/docs/screen-tracking.html
