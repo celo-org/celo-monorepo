@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { printValueMapRecursive } from '../../utils/cli'
 
 export default class ReserveStatus extends BaseCommand {
   static description = 'Shows information about reserve'
@@ -11,12 +12,13 @@ export default class ReserveStatus extends BaseCommand {
 
   async run() {
     const reserve = await this.kit.contracts.getReserve()
-    const reserve_ = await this.kit._web3Contracts.getReserve()
-    const whitelist = await this.kit._web3Contracts.getTransferWhitelist()
-    console.log('Reserve address', reserve.address)
-    console.log('Spenders', await reserve.getSpenders())
-    console.log('Other reserves', await reserve_.methods.getOtherReserveAddresses().call())
-    console.log('Whitelist', await whitelist.methods.getWhitelist().call())
-    console.log('Frozen', await reserve_.methods.getFrozenReserveGoldBalance().call())
+    const data = {
+      'Reserve address': reserve.address,
+      Spenders: await reserve.getSpenders(),
+      'Other reserves': await reserve.getOtherReserveAddresses(),
+      Frozen: await reserve.frozenReserveGoldStartBalance(),
+      'Gold balance': await reserve.getReserveGoldBalance(),
+    }
+    printValueMapRecursive(data)
   }
 }

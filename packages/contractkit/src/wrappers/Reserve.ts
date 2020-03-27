@@ -47,6 +47,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     undefined,
     valueToBigNumber
   )
+  getOtherReserveAddresses = proxyCall(this.contract.methods.getOtherReserveAddresses)
 
   /**
    * Returns current configuration parameters.
