@@ -239,6 +239,7 @@ describe('Transfer tests', function(this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
+    gatewayFee: new BigNumber(10000),
     port: 30305,
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
