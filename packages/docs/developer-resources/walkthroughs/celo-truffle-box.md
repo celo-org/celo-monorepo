@@ -152,9 +152,11 @@ You can find more information about running and Android emulator [here.](https:/
 ## Wrapping up
 
 You should now have the necessary skills to get started with developing mobile applications on Celo. In this tutorial we covered:
+ - Creating accounts (private keys)
+ - Basic smart contract development in Solidity
+ - Sending transactions to a Celo network
+ - View transactions with a block explorer
+ - Mobile development using React Native and Expo
 
-
-This is not a comprehensive tutorial for Celo's features and capabilities.  
-
-Please [connect with us on Discord](https://discord.gg/745Qntv) if you need any help!
+This is not a comprehensive tutorial for Celo's features and capabilities, keep exploring the docs to learn more and please [connect with us on Discord](https://discord.gg/745Qntv) if you need any help (or just want to chat)!
 
