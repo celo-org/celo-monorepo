@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Terms from '../../../pages/stake-off/terms'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import Terms from '../../../pages/stake-off/terms'
 
 describe('Terms', () => {
   it('renders', () => {

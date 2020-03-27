@@ -1,8 +1,8 @@
 import About from 'pages/about'
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import { Contributor } from 'src/about/Contributor'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import { Contributor } from 'src/about/Contributor'
 
 const CONTRIBUTORS: Contributor[] = [
   {

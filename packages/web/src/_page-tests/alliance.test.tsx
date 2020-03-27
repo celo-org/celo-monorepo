@@ -1,8 +1,8 @@
 import Alliance from 'pages/alliance'
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import { Category } from 'src/alliance/CategoryEnum'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import { Category } from 'src/alliance/CategoryEnum'
 
 jest.mock('cross-fetch', () => {
   return async () => ({

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import Faucet from '../../../pages/developers/faucet'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import Faucet from '../../../pages/developers/faucet'
 
 describe('Faucet', () => {
   it('renders', () => {
