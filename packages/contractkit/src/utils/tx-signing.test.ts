@@ -21,7 +21,7 @@ debug(`Account Address 2: ${ACCOUNT_ADDRESS2}`)
 
 async function verifyLocalSigning(web3: Web3, celoTransaction: Tx): Promise<void> {
   debug('Signer Testing using Account: %s', celoTransaction.from)
-  const signedTransaction = await web3.eth.signTransaction(celoTransaction as any)
+  const signedTransaction = await web3.eth.signTransaction(celoTransaction)
   debug('Singer Testing: Signed transaction %o', signedTransaction)
   const rawTransaction: string = signedTransaction.raw
   const [signedCeloTransaction, recoveredSigner] = recoverTransaction(rawTransaction)
