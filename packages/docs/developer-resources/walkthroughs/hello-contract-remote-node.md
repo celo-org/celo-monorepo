@@ -24,7 +24,7 @@ As you may know, Truffle is built for Ethereum developers. Because Celo has a si
 
 {% page-ref page="../../overview.md" %}
 
-[Clone this Truffle project from GitHub to get started](https://github.com/critesjosh/hello_contract-truffle). This is a basic truffle project, with some additional files to help us with account management and deploying to a remote Celo test net node.
+[Clone this Truffle project from GitHub to get started](https://github.com/critesjosh/hello_contract-truffle). This is a basic truffle project, with some additional files to help us with account management and deploying to a remote Celo test net node. Run `$ npm install` to install of the project dependencies.
 
 ## Hello World!
 
@@ -56,7 +56,7 @@ contract HelloWorld {
 
 ## Deploy locally
 
-Let's create a migration to deploy the contract. For that, we need to create a file in the `migrations` folder named `2_deploy_helloworld.js`:
+Let's create a migration to deploy the contract. For that, we need to create a file in the `./migrations/` folder named `2_deploy_helloworld.js`:
 
 {% hint style="info" %}
 [Learn more about Truffle migrations here.](https://www.trufflesuite.com/docs/truffle/getting-started/running-migrations)
@@ -70,7 +70,7 @@ module.exports = function(deployer) {
 }
 ```
 
-To be able to actually deploy it though, we need a blockchain. For local development and testing, you can use our fork of ganache. You can [learn more about Ganache-CLI here.](https://github.com/celo-org/ganache-cli)
+To be able to actually deploy it though, we need a blockchain. For local development and testing, you can use the Celo fork of ganache. You can [learn more about Ganache-CLI here.](https://github.com/celo-org/ganache-cli)
 
 ```text
 $ npm install -g @celo/ganache-cli
@@ -127,7 +127,7 @@ truffle(test)> contract.getName()
 'MyName'
 ```
 
-Deploying the contract locally is great for testing purposes, but let's deploy to a public test network so other developers can easily access our contract as well.
+Deploying the contract locally is great for testing purposes, but let's deploy to a public test network so other developers can easily access the contract as well.
 
 ## Deploy to Alfajores \(Remotely\)
 
@@ -178,7 +178,7 @@ $ node celo_deploy.js
 
 The provided code will import the contract kit and connect to the remote node. It will look for a private key in the `./.secret` file, and if it doesn't find one, it will generate a new one. Once it gets the key, it will print the associated account. This is the account that we will fund with the faucet.
 
-If you go to our [Alfajores Faucet Page](https://celo.org/build/faucet), you can faucet your account some Celo Gold and see your balance increase.
+If you go to the [Alfajores Faucet Page](https://celo.org/build/faucet), you can faucet your account some Celo Gold and see your balance increase.
 
 Then add your account to the `kit` with the private key:
 
@@ -243,18 +243,26 @@ $ truffle compile
 
 This command will generate a `HelloWorld.json` file in the `./build/contracts/` directory. `HelloWorld.json` contains a lot of data about the contract, compiler and low level details. Import this file into the deployment script with:
 
+{% tabs %}
+{% tab title="celo_deploy.js" %}
 ```javascript
 const HelloWorld = require('./build/contracts/HelloWorld.json')
 ```
+{% endtab %}
+{% endtabs %}
 
 We are finally ready to deploy the contract. Use the `kit`to create a custom transaction that includes the contract bytecode.
 
+{% tabs %}
+{% tab title="celo_deploy.js" %}
 ```javascript
     let tx = await kit.sendTransaction({
         from: account.address,
         data: HelloWorld.bytecode // from ./build/contracts/HelloWorld.json
     })
 ```
+{% endtab %}
+{% endtabs %}
 
 {% hint style="info" %}
 To deploy a contract on Celo, use the `kit.sendTransaction()` function with no `to:` field and the contract bytecode in the `data` field. The account that you are sending the transaction from must have enough cGLD to pay the transaction fee, unless you specify another currency as the `feeCurrency`, then you need enough of that currency to pay the transaction fee.
@@ -262,6 +270,8 @@ To deploy a contract on Celo, use the `kit.sendTransaction()` function with no `
 
 The entire deployment script is less than 20 lines of code.
 
+{% tabs %}
+{% tab title="celo_deploy.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 const HelloWorld = require('./build/contracts/HelloWorld.json')
@@ -284,6 +294,8 @@ async function awaitWrapper(){
 
 awaitWrapper()
 ```
+{% endtab %}
+{% endtabs %}
 
 Congratulations! You have deployed your first contract onto Celo! You can verify your contract deployment on [Blockscout](https://alfajores-blockscout.celo-testnet.org/). You can get the transaction hash from the receipt and look it up on the block explorer. 
 
