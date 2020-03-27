@@ -8,7 +8,6 @@ import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import { byContractAddress } from '@ledgerhq/hw-app-eth/erc20'
 import Transport from '@ledgerhq/hw-transport'
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -26,12 +25,12 @@ export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5
 
 export async function newLedgerWalletWithSetup(
+  transport: Transport,
   derivationPathIndexes?: number[],
-  baseDerivationPath?: string,
-  transport?: any
+  baseDerivationPath?: string
 ): Promise<LedgerWallet> {
-  const wallet = new LedgerWallet(derivationPathIndexes, baseDerivationPath, transport)
-  await wallet.init()
+  const wallet = new LedgerWallet(derivationPathIndexes, baseDerivationPath)
+  await wallet.init(transport)
   return wallet
 }
 
@@ -43,7 +42,6 @@ export class LedgerWallet implements Wallet {
   private addressesRetrieved = false
   private setupFinished = false
   private ledger: any
-  private transport: Transport | undefined
 
   /**
    * @param derivationPathIndexes number array of "address_index" for the base derivation path.
@@ -55,10 +53,8 @@ export class LedgerWallet implements Wallet {
    */
   constructor(
     readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
-    readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
-    transport?: Transport
+    readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH
   ) {
-    this.transport = transport
     const invalidDPs = derivationPathIndexes.some(
       (value) => !(Number.isInteger(value) && value >= 0)
     )
@@ -67,17 +63,13 @@ export class LedgerWallet implements Wallet {
     }
   }
 
-  async init() {
+  async init(transport: Transport) {
     try {
       if (this.setupFinished) {
         return
       }
       if (!this.ledger) {
-        if (!this.transport) {
-          debug('Opening Transport for the ledger')
-          this.transport = await TransportNodeHid.open('')
-        }
-        this.ledger = new Ledger(this.transport)
+        this.ledger = new Ledger(transport)
       }
       if (!this.addressesRetrieved) {
         debug('Fetching addresses from the ledger')

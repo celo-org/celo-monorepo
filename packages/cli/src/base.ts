@@ -2,6 +2,7 @@ import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
 import { newLedgerWalletWithSetup } from '@celo/contractkit/lib/wallets/ledger-wallet'
 import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import Web3 from 'web3'
@@ -39,6 +40,7 @@ export abstract class BaseCommand extends LocalCommand {
     node: flags.string({ char: 'n', hidden: true }),
     useLedger: flags.boolean({
       default: false,
+      hidden: true,
       description: 'Set it to use a ledger wallet',
     }),
   }
@@ -87,7 +89,8 @@ export abstract class BaseCommand extends LocalCommand {
     }
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags.useLedger) {
-      this._wallet = await newLedgerWalletWithSetup([0, 1])
+      const transport = await TransportNodeHid.open('')
+      this._wallet = await newLedgerWalletWithSetup(transport, [0, 1])
     }
   }
 
