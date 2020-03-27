@@ -73,6 +73,7 @@ contract EpochRewards is
   event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
+  event TargetVotingYieldSet(uint256 target);
   event RewardsMultiplierParametersSet(
     uint256 max,
     uint256 underspendAdjustmentFactor,
@@ -125,7 +126,7 @@ contract EpochRewards is
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
-    targetVotingYieldParams.target = FixidityLib.wrap(targetVotingYieldInitial);
+    setTargetVotingYield(targetVotingYieldInitial);
     startTime = now;
   }
 
@@ -287,13 +288,20 @@ contract EpochRewards is
     return true;
   }
 
-  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner {
+  /**
+   * @notice Sets the target voting yield.
+   * @param targetVotingYield The relative target block reward for voters.
+   * @return True upon success.
+   */
+  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner returns (bool) {
     FixidityLib.Fraction memory target = FixidityLib.wrap(targetVotingYield);
     require(
       target.lte(targetVotingYieldParams.max),
       "Target voting yield must be less than or equal to max"
     );
     targetVotingYieldParams.target = target;
+    emit TargetVotingYieldSet(targetVotingYield);
+    return true;
   }
 
   /**
