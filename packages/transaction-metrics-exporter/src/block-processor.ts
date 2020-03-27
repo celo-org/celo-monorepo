@@ -162,11 +162,11 @@ export class BlockProcessor {
           },
           (err: any, result: any) => {
             if (!err) {
-              result.result
-                .filter(
+              result?.result
+                ?.filter?.(
                   ({ type, callType }: any) => type === 'create' || callType === 'delegatecall'
                 )
-                .forEach((data: any) =>
+                ?.forEach?.((data: any) =>
                   this.logEvent(LoggingCategory.InternalTransaction, {
                     ...data,
                     createdContractCode: undefined,
