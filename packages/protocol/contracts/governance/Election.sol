@@ -465,6 +465,18 @@ contract Election is
     return numerator.div(denominator);
   }
 
+  function getActiveUnitsForGroupByAccount(address group, address account)
+    public
+    view
+    returns (uint256)
+  {
+    return votes.active.forGroup[group].unitsByAccount[account];
+  }
+
+  function getActiveUnitsForGroup(address group) public view returns (uint256) {
+    return votes.active.forGroup[group].totalUnits;
+  }
+
   /**
    * @notice Returns the total votes for `group` made by `account`.
    * @param group The address of the validator group.

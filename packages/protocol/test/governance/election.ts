@@ -740,7 +740,9 @@ contract('Election', (accounts: string[]) => {
           await election.getPendingVotesForGroupByAccount(group, account.address)
         ).toFixed()}\n\tactive: ${(
           await election.getActiveVotesForGroupByAccount(group, account.address)
-        ).toFixed()}`
+        ).toFixed()}\n\tunits: ${(
+          await election.getActiveUnitsForGroupByAccount(group, account.address)
+        ).toFixed()}\n\ttotalunits: ${(await election.getActiveUnitsForGroup(group)).toFixed()}`
       )
     }
 
@@ -761,72 +763,74 @@ contract('Election', (accounts: string[]) => {
       ]
     }
 
-    const randomInteger = (max: BigNumber): BigNumber => {
+    const randomInteger = (max: BigNumber, min: BigNumber = new BigNumber(1)): BigNumber => {
       return BigNumber.random()
-        .times(max)
+        .times(max.minus(min))
+        .plus(min)
         .dp(0)
     }
 
     const makeRandomAction = async (account: Account) => {
       await printAccount(account)
-      const action = randomElement([
-        VoteActionType.Vote,
-        VoteActionType.Activate,
-        VoteActionType.RevokePending,
-        VoteActionType.RevokeActive,
-      ])
-      let value: BigNumber
+      const actions = []
+      if (account.nonvoting.gt(0)) {
+        actions.push(VoteActionType.Vote)
+      }
+      if (await election.hasActivatablePendingVotes(account.address, group)) {
+        actions.push(VoteActionType.Activate)
+      }
+      if (account.pending.gt(0)) {
+        actions.push(VoteActionType.RevokePending)
+      }
+      if (account.active.gt(0)) {
+        actions.push(VoteActionType.RevokeActive)
+      }
+      const action = randomElement(actions)
+      console.log(`Selected action ${action}`)
+      let value: string
       switch (action) {
         case VoteActionType.Vote:
-          value = randomInteger(account.nonvoting)
-          if (!value.isZero()) {
-            console.log(`${account.address} voting with value ${value.toFixed()}`)
-            await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS, { from: account.address })
-            account.nonvoting = account.nonvoting.minus(value)
-            account.pending = account.pending.plus(value)
-          }
+          value = randomInteger(account.nonvoting).toFixed()
+          console.log(`${account.address} voting with value ${value}`)
+          await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS, { from: account.address })
+          account.nonvoting = account.nonvoting.minus(value)
+          account.pending = account.pending.plus(value)
           break
         case VoteActionType.Activate:
-          if (await election.hasActivatablePendingVotes(account.address, group)) {
-            // The actual value activated may be less due to rounding errors.
-            value = await election.activate.call(group, { from: account.address })
-            console.log(`${account.address} activating with value ${value.toFixed()}`)
-            await election.activate(group, { from: account.address })
-            account.active = account.active.plus(value)
-            account.pending = account.pending.minus(value)
-          }
+          // The actual value activated may be less due to rounding errors.
+          value = (await election.activate.call(group, { from: account.address })).toFixed()
+          console.log(`${account.address} activating with value ${value}`)
+          await election.activate(group, { from: account.address })
+          account.active = account.active.plus(value)
+          account.pending = account.pending.minus(value)
           break
         case VoteActionType.RevokePending:
-          value = randomInteger(account.pending)
-          if (!value.isZero()) {
-            console.log(`${account.address} revoking pending with value ${value.toFixed()}`)
-            await election.revokePending(group, value, NULL_ADDRESS, NULL_ADDRESS, 0, {
-              from: account.address,
-            })
-            account.pending = account.pending.minus(value)
-            account.nonvoting = account.nonvoting.plus(value)
-          }
+          value = randomInteger(account.pending).toFixed()
+          console.log(`${account.address} revoking pending with value ${value}`)
+          await election.revokePending(group, value, NULL_ADDRESS, NULL_ADDRESS, 0, {
+            from: account.address,
+          })
+          account.pending = account.pending.minus(value)
+          account.nonvoting = account.nonvoting.plus(value)
           break
         case VoteActionType.RevokeActive:
-          value = randomInteger(account.active)
-          if (!value.isZero()) {
-            console.log(`${account.address} revoking active with value ${value.toFixed()}`)
-            // The actual value activated may be less due to rounding errors.
-            const actualValue = await election.revokeActive.call(
-              group,
-              value,
-              NULL_ADDRESS,
-              NULL_ADDRESS,
-              0,
-              { from: account.address }
-            )
-            console.log(`${account.address} revoking active with value ${actualValue.toFixed()}`)
-            await election.revokeActive(group, value, NULL_ADDRESS, NULL_ADDRESS, 0, {
-              from: account.address,
-            })
-            account.active = account.active.minus(actualValue)
-            account.nonvoting = account.nonvoting.plus(actualValue)
-          }
+          value = randomInteger(account.active).toFixed()
+          console.log(`${account.address} revoking active with value ${value}`)
+          // The actual value activated may be less due to rounding errors.
+          const actualValue = await election.revokeActive.call(
+            group,
+            value,
+            NULL_ADDRESS,
+            NULL_ADDRESS,
+            0,
+            { from: account.address }
+          )
+          console.log(`${account.address} revoking active with value ${actualValue.toFixed()}`)
+          await election.revokeActive(group, value, NULL_ADDRESS, NULL_ADDRESS, 0, {
+            from: account.address,
+          })
+          account.active = account.active.minus(actualValue)
+          account.nonvoting = account.nonvoting.plus(actualValue)
           break
       }
       return account
@@ -849,7 +853,8 @@ contract('Election', (accounts: string[]) => {
       )
     })
 
-    describe('when placing, activating, and revoking votes randomly', () => {
+    describe('when placing, activating, and revoking votes randomly', function(this: any) {
+      this.timeout(0)
       describe('when no epoch rewards are distributed', () => {
         it('actual and expected should always match exactly', async () => {
           const checkVoterInvariants = async (account: Account) => {
@@ -899,7 +904,7 @@ contract('Election', (accounts: string[]) => {
       })
 
       describe.only('when epoch rewards are distributed', () => {
-        it('actual and expected should always match within 1 wei', async () => {
+        it('actual and expected should always match within 100 wei', async () => {
           const checkVoterInvariants = async (account: Account) => {
             assertEqualBN(
               await election.getPendingVotesForGroupByAccount(group, account.address),
@@ -935,11 +940,71 @@ contract('Election', (accounts: string[]) => {
             assertAlmostEqualBN(await election.getTotalVotes(), activeTotal.plus(pendingTotal), 1)
           }
 
+          const revokeAll = async (voterAccounts: Account[]) => {
+            for (let i = 0; i < voterAccounts.length; i++) {
+              // const nonvoting = await mockLockedGold.nonvotingAccountBalance(voterAccounts[i].address)
+              const address = voterAccounts[i].address
+              const active = await election.getActiveVotesForGroupByAccount(group, address)
+              if (active.gt(0)) {
+                const revoked = await election.revokeActive.call(
+                  group,
+                  active.toFixed(),
+                  NULL_ADDRESS,
+                  NULL_ADDRESS,
+                  0,
+                  {
+                    from: address,
+                  }
+                )
+                await election.revokeActive(
+                  group,
+                  active.toFixed(),
+                  NULL_ADDRESS,
+                  NULL_ADDRESS,
+                  0,
+                  {
+                    from: address,
+                  }
+                )
+                voterAccounts[i].active = new BigNumber(0)
+                voterAccounts[i].nonvoting = voterAccounts[i].nonvoting.plus(revoked)
+              }
+              const pending = await election.getPendingVotesForGroupByAccount(group, address)
+              if (pending.gt(0)) {
+                await election.revokePending(
+                  group,
+                  pending.toFixed(),
+                  NULL_ADDRESS,
+                  NULL_ADDRESS,
+                  0,
+                  {
+                    from: address,
+                  }
+                )
+                voterAccounts[i].pending = new BigNumber(0)
+                voterAccounts[i].nonvoting = voterAccounts[i].nonvoting.plus(pending)
+              }
+              assertEqualBN(await election.getActiveVotesForGroupByAccount(group, address), 0)
+              assertEqualBN(await election.getPendingVotesForGroupByAccount(group, address), 0)
+              assertAlmostEqualBN(
+                await mockLockedGold.nonvotingAccountBalance(address),
+                voterAccounts[i].nonvoting,
+                100
+              )
+            }
+          }
+
           const distributeEpochRewards = async (voterAccounts: Account[]) => {
             const reward = randomInteger((await election.getTotalVotes()).times(0.00016).dp(0))
             const activeTotal = voterAccounts.reduce((a, b) => a.plus(b.active), new BigNumber(0))
             if (!reward.isZero() && !activeTotal.isZero()) {
-              await election.distributeEpochRewards(group, reward, NULL_ADDRESS, NULL_ADDRESS)
+              console.log(`Distributing ${reward.toFixed()} in rewards to voters`)
+              await election.distributeEpochRewards(
+                group,
+                reward.toFixed(),
+                NULL_ADDRESS,
+                NULL_ADDRESS
+              )
               for (let i = 0; i < voterAccounts.length; i++) {
                 voterAccounts[i].active = activeTotal
                   .plus(reward)
@@ -963,6 +1028,7 @@ contract('Election', (accounts: string[]) => {
             })
           )
           for (let i = 0; i < 100; i++) {
+            console.log(`Starting iteration ${i}`)
             for (let j = 0; j < voterAccounts.length; j++) {
               voterAccounts[j] = await makeRandomAction(voterAccounts[j])
             }
@@ -977,6 +1043,7 @@ contract('Election', (accounts: string[]) => {
               await checkGroupInvariants(voterAccounts)
             }
           }
+          await revokeAll(voterAccounts)
         })
       })
     })
