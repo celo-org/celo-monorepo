@@ -18,9 +18,5 @@ export default class Dequeue extends BaseCommand {
     const governance = await this.kit.contracts.getGovernance()
 
     await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
-    /*
-    console.log("participation", await governance_.methods.getParticipationParameters().call())
-    console.log("locked gold", await lgold.methods.getTotalLockedGold().call())
-    */
   }
 }
