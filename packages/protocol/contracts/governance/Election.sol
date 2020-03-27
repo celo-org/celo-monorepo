@@ -741,13 +741,12 @@ contract Election is
    * @param group The address of the validator group.
    * @param value The number of votes being added.
    * @return The delta in units for `group`.
-   * @dev Preserves unitsDelta / totalUnits = value / totalActiveVotes
    */
   function getActiveVoteIncrementDeltas(address group, address account, uint256 value)
     private
     returns (uint256, uint256)
   {
-    // (votesBefore + value) = (unitsBefore + unitsDelta) * (totalVotesBefore + value) / (totalUnitsBefore + unitsDelta)
+    // (activeVotes + votesDelta) = (activeUnits + unitsDelta) * (totalVotes + votesDelta) / (totalUnits + unitsDelta)
     uint256 unitsDelta = 0;
     uint256 valueDelta = 0;
     GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
@@ -764,7 +763,6 @@ contract Election is
         activeVotes.total,
         activeVotes.totalUnits
       );
-      // The ratio of total value : total units must not decrease...
       valueDelta = getActiveVoteIncrementValueDelta(group, account, unitsDelta);
       emit Debug(
         getActiveVotesForGroupByAccount(group, account),
@@ -811,14 +809,13 @@ contract Election is
    * @param group The address of the validator group.
    * @param value The number of votes being added.
    * @return The delta in units for `group`.
-   * @dev Preserves unitsDelta / totalUnits = value / totalActiveVotes
    */
   function getActiveVoteDecrementDeltas(address group, address account, uint256 value)
     private
     view
     returns (uint256, uint256)
   {
-    // (votesBefore - votesDelta) = (unitsBefore - unitsDelta) * (totalVotesBefore - votesDelta) / (totalUnitsBefore - unitsDelta)
+    // (activeVotes - votesDelta) = (activeUnits - unitsDelta) * (totalVotes - votesDelta) / (totalUnits - unitsDelta)
     uint256 unitsDelta = 0;
     uint256 valueDelta = 0;
     GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
@@ -834,7 +831,6 @@ contract Election is
       valueDelta = value;
     } else {
       unitsDelta = getActiveVoteDecrementUnitsDelta(group, account, value);
-      // The ratio of total value : total units must not decrease...
       valueDelta = getActiveVoteDecrementValueDelta(group, account, unitsDelta);
     }
     return (unitsDelta, valueDelta);
