@@ -70,7 +70,7 @@ contract EpochRewards is
 
   event TargetVotingGoldFractionSet(uint256 fraction);
   event CommunityRewardFractionSet(uint256 fraction);
-  event CarbonOffsettingFundSet(address partner, uint256 fraction);
+  event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event RewardsMultiplierParametersSet(
@@ -383,7 +383,9 @@ contract EpochRewards is
     // increase /= (1 - fraction) st the final community reward is fraction * increase
     targetGoldSupplyIncrease = FixidityLib
       .newFixed(targetGoldSupplyIncrease)
-      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
+      .divide(
+      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
+    )
       .fromFixed();
     return targetGoldSupplyIncrease;
   }

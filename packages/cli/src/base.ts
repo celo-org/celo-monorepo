@@ -4,7 +4,6 @@ import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
-import { injectDebugProvider } from './utils/eth-debug-provider'
 import { requireNodeIsSynced } from './utils/helpers'
 
 // Base for commands that do not need web3.
@@ -59,7 +58,6 @@ export abstract class BaseCommand extends LocalCommand {
       const nodeUrl = (res.flags && res.flags.node) || getNodeUrl(this.config.configDir)
       this._web3 = new Web3(nodeUrl)
       this._originalProvider = this._web3.currentProvider
-      injectDebugProvider(this._web3)
     }
     return this._web3
   }

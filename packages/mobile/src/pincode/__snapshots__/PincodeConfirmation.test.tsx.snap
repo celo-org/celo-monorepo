@@ -89,6 +89,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
               "borderStyle": "solid",
               "borderTopColor": "#EEEEEE",
               "borderTopWidth": 1,
+              "marginBottom": 15,
               "marginTop": 10,
               "width": "100%",
             }
@@ -97,7 +98,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
         <View
           style={
             Object {
-              "marginVertical": 15,
+              "marginBottom": 15,
               "paddingHorizontal": 20,
             }
           }

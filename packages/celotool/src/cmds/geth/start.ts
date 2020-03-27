@@ -1,13 +1,13 @@
-import yargs from 'yargs'
-
+/* tslint:disable: no-console */
 import { addCeloGethMiddleware } from 'src/lib/utils'
+import yargs from 'yargs'
 import {
   AccountType,
   getPrivateKeysFor,
   getValidatorsInformation,
   privateKeyToPublicKey,
 } from '../../lib/generate_utils'
-import { getEnodeAddress, runGethNodes } from '../../lib/geth'
+import { getEnodeAddress, migrateContracts, runGethNodes } from '../../lib/geth'
 import { GethInstanceConfig } from '../../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../../lib/interfaces/geth-run-config'
 import { GethArgv } from '../geth'
@@ -26,6 +26,9 @@ interface StartArgv extends GethArgv {
   verbosity: number
   verbose: boolean
   instances: number
+  migrate: boolean
+  migrateTo: number
+  monorepoDir: string
   purge: boolean
   withProxy: boolean
   ethstats: string
@@ -103,6 +106,21 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Block Time',
       default: 1,
     })
+    .option('migrate', {
+      type: 'boolean',
+      description: 'Migrate contracts',
+      default: false,
+      implies: 'monorepo-dir',
+    })
+    .option('migrateTo', {
+      type: 'number',
+      description: 'Migrate contracts to level x',
+      implies: 'monorepo-dir',
+    })
+    .option('monorepo-dir', {
+      type: 'string',
+      description: 'Directory of the mono repo',
+    })
 }
 
 export const handler = async (argv: StartArgv) => {
@@ -123,6 +141,9 @@ export const handler = async (argv: StartArgv) => {
   const network = 'local'
   const instances = argv.instances
   const mnemonic = argv.mnemonic
+  const migrate = argv.migrate
+  const migrateTo = argv.migrateTo
+  const monorepoDir = argv.monorepoDir
 
   const purge = argv.purge
   const withProxy = argv.withProxy
@@ -135,6 +156,8 @@ export const handler = async (argv: StartArgv) => {
     gethRepoPath: gethDir,
     verbosity,
     networkId,
+    migrate,
+    migrateTo,
     network,
     instances: [],
     genesisConfig: {
@@ -199,4 +222,22 @@ export const handler = async (argv: StartArgv) => {
     validators,
     verbose,
   })
+
+  if (gethConfig.migrate || gethConfig.migrateTo) {
+    const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, instances)
+
+    console.log('Migrating contracts (this will take a long time) ...')
+
+    await migrateContracts(
+      monorepoDir,
+      validatorPrivateKeys,
+      attestationKeys,
+      validators.map((x) => x.address),
+      gethConfig.migrateTo,
+      gethConfig.migrationOverrides,
+      verbose
+    )
+
+    console.log('... done migrating contracts!')
+  }
 }

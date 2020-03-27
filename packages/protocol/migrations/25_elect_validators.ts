@@ -11,9 +11,8 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
-
-import Web3 = require('web3')
-import { TransactionObject } from 'web3/eth/types'
+import Web3, * as Web3Class from 'web3'
+import { TransactionObject } from 'web3-eth'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 const bip39 = require('bip39')
@@ -102,7 +101,7 @@ async function registerValidatorGroup(
 
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.
-  const encryptionWeb3 = new Web3('http://localhost:8545')
+  const encryptionWeb3 = new (Web3Class as any)('http://localhost:8545')
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 

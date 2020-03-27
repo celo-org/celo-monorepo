@@ -69,7 +69,10 @@ export class CTextInput extends React.Component<Props, State> {
       <View style={[style.container, propsStyle]}>
         <RNTextInput
           ref={forwardedRef}
-          style={style.borderedText}
+          style={{
+            ...style.borderedText,
+            ...(passThroughProps.multiline && { textAlignVertical: 'top' }),
+          }}
           value={value}
           {...passThroughProps}
           onFocus={this.handleInputFocus}
@@ -112,7 +115,6 @@ const style = StyleSheet.create({
     borderRadius: 3,
     padding: 8,
     backgroundColor: '#FFFFFF',
-    textAlignVertical: 'top',
   },
   iconStyle: {
     marginRight: 8,

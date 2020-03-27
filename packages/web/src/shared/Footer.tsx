@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
+import InstagramLogo from 'src/icons/instagram.png'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import TwiterLogo from 'src/icons/TwitterLogo'
@@ -86,6 +87,11 @@ const Social = React.memo(function _Social() {
             <YouTube color={colors.dark} size={height} />
           </a>
         </View>
+        <View style={styles.socialIcon}>
+          <a target="_blank" rel="noopener" href={CeloLinks.instagram}>
+            <Image source={InstagramLogo} style={styles.imageIcon} />
+          </a>
+        </View>
       </View>
     </Responsive>
   )
@@ -108,15 +114,17 @@ const Navigation = React.memo(function _Navigation({
         {FOOTER_MENU.map((item, index) => {
           const linkIsToCurrentPage = isVertical && currentPage === item.link
           const btnKind = linkIsToCurrentPage ? BTN.TERTIARY : BTN.NAV
+          const verticalItemStyle = linkIsToCurrentPage
+            ? styles.currentMenuItem
+            : styles.verticalMenuItem
+
           return (
             <View
               key={index}
               style={[
                 styles.menuItem,
                 !isVertical && index === 0 && { marginLeft: 0 },
-                isVertical
-                  ? linkIsToCurrentPage && styles.currentMenuItem
-                  : styles.verticalMenuItem,
+                isVertical && verticalItemStyle,
               ]}
             >
               {/*
@@ -163,12 +171,17 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
 const styles = StyleSheet.create({
   social: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     width: '100%',
     marginTop: 30,
   },
   socialMobile: { alignSelf: 'center', justifyContent: 'center' },
   socialDesktop: { marginTop: 10 },
+  imageIcon: {
+    height: 25,
+    width: 25,
+  },
   socialIcon: {
     paddingRight: 25,
   },
@@ -218,7 +231,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-around',
   },
-  verticalMenuItem: {},
+  verticalMenuItem: {
+    marginVertical: 20,
+  },
   currentMenuItem: {
     marginVertical: 30,
   },

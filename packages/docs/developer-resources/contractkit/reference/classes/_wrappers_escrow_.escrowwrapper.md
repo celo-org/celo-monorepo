@@ -18,7 +18,7 @@ Contract for handling reserve for stable currencies
 
 * [escrowedPayments](_wrappers_escrow_.escrowwrapper.md#escrowedpayments)
 * [getReceivedPaymentIds](_wrappers_escrow_.escrowwrapper.md#getreceivedpaymentids)
-* [getSentPaymentId](_wrappers_escrow_.escrowwrapper.md#getsentpaymentid)
+* [getSentPaymentIds](_wrappers_escrow_.escrowwrapper.md#getsentpaymentids)
 * [receivedPaymentIds](_wrappers_escrow_.escrowwrapper.md#receivedpaymentids)
 * [revoke](_wrappers_escrow_.escrowwrapper.md#revoke)
 * [sentPaymentIds](_wrappers_escrow_.escrowwrapper.md#sentpaymentids)
@@ -37,7 +37,7 @@ Contract for handling reserve for stable currencies
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L15)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
 
 **Parameters:**
 
@@ -70,7 +70,7 @@ ___
 
 ###  getReceivedPaymentIds
 
-• **getReceivedPaymentIds**: *function* = proxyCall(this.contract.methods.sentPaymentIds)
+• **getReceivedPaymentIds**: *function* = proxyCall(this.contract.methods.getReceivedPaymentIds)
 
 *Defined in [contractkit/src/wrappers/Escrow.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Escrow.ts#L14)*
 
@@ -86,9 +86,9 @@ Name | Type |
 
 ___
 
-###  getSentPaymentId
+###  getSentPaymentIds
 
-• **getSentPaymentId**: *function* = proxyCall(this.contract.methods.sentPaymentIds)
+• **getSentPaymentIds**: *function* = proxyCall(this.contract.methods.getSentPaymentIds)
 
 *Defined in [contractkit/src/wrappers/Escrow.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Escrow.ts#L16)*
 
@@ -200,7 +200,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
 
 Contract address
 

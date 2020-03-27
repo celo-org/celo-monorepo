@@ -5,15 +5,7 @@ import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import {
-  Clipboard,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -249,9 +241,10 @@ export class Account extends React.Component<Props, State> {
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
           <View style={style.accountProfile}>
-            <TouchableWithoutFeedback onPress={this.onPressAvatar}>
+            {/* TouchableNoFeedback doesn't work here for some reason */}
+            <TouchableOpacity onPress={this.onPressAvatar}>
               <AvatarSelf />
-            </TouchableWithoutFeedback>
+            </TouchableOpacity>
             <View>
               <TouchableOpacity onPress={this.onPressAddress}>
                 <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>

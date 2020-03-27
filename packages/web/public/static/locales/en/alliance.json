@@ -1,7 +1,7 @@
 {
   "title": "Alliance for Prosperity",
   "thematicStatement": "Money can be beautiful",
-  "mission": "Create a more prosperous world with mission-aligned organiztions",
+  "mission": "Create a more prosperous world with mission-aligned organizations",
   "filterLabel": "Refine By",
   "mediumArticlesTitle": "Stories from the Alliance",
   "form": {
@@ -28,7 +28,7 @@
     "subtitle": "Member contributions, <0>in no particular order</0>",
     "categoryTitle": {
       "all": "Show All",
-      "acquire": "Aquire",
+      "acquire": "Acquire",
       "accept": "Accept",
       "send": "Send",
       "lend": "Lend",
@@ -50,7 +50,7 @@
       "earn": "Allow communities to earn stable, digital assets for lending their talents for various tasks",
       "save": "Help your communities overcome inflation and build for their future by saving in cUSD",
       "give": "Increase transparency, reduce fraud, and increase mobility by giving cUSD",
-      "educate": "IIncentivize communities to learn about Celo and actively engage with the Celo platform",
+      "educate": "Incentivize communities to learn about Celo and actively engage with the Celo platform",
       "grow": "Grow the Celo platform through the purchase of the native token, cGLD",
       "secure": "Keep identity, assets, and the network secure",
       "build": "Deliver innovative solutions for your customers by building on the Celo platform"

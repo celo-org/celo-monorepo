@@ -2,14 +2,18 @@ import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import Contract from 'web3/eth/contract'
-import { BlockType, TransactionObject, Tx } from 'web3/eth/types'
-import { EventLog, TransactionReceipt } from 'web3/types'
+import { EventLog, TransactionReceipt, Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
+import { Contract, PastEventOptions } from 'web3-eth-contract'
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
+
+export interface Filter {
+  [key: string]: number | string | string[] | number[]
+}
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
@@ -22,15 +26,7 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 
   /** Contract getPastEvents */
-  protected getPastEvents(
-    event: string,
-    options?: {
-      filter?: object
-      fromBlock?: BlockType
-      toBlock?: BlockType
-      topics?: string[]
-    }
-  ): Promise<EventLog[]> {
+  protected getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
     return this.contract.getPastEvents(event, options)
   }
 }
@@ -54,7 +50,7 @@ export const stringToBuffer = hexToBuffer
 
 export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
-type SolBytes = Array<string | number[]>
+type SolBytes = string | number[]
 const toBytes = (input: any): SolBytes => input
 const fromBytes = (input: SolBytes): any => input as any
 

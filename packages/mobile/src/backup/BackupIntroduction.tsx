@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
@@ -12,7 +12,9 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow, navigatePinProtected } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
-import backupIcon from 'src/images/backup-icon.png'
+import BackupIntroIcon from 'src/icons/BackupIntroIcon'
+import BackupKeyIcon from 'src/icons/BackupKeyIcon'
+import SafeguardsIcon from 'src/icons/SafeguardsIcon'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -97,16 +99,19 @@ class BackupIntroduction extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Image source={backupIcon} style={styles.logo} />
-          <Text style={styles.h1}>{t('backupAndRecovery')}</Text>
           {!backupCompleted && (
             <>
+              <BackupIntroIcon style={styles.logo} width={180} height={138} />
+              <Text style={styles.h1}>{t('setUpBackupKey')}</Text>
               <Text style={styles.body}>{t('backupKeyIntro.0')}</Text>
               <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.1')}</Text>
+              <Text style={styles.body}>{t('backupKeyIntro.7')}</Text>
             </>
           )}
           {backupCompleted && !socialBackupCompleted && (
             <>
+              <SafeguardsIcon style={styles.logo} width={210} height={90} />
+              <Text style={styles.h1}>{t('setUpSocialBackup')}</Text>
               <Text style={styles.body}>
                 {t('backupKeyIntro.2')}
                 <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
@@ -116,6 +121,8 @@ class BackupIntroduction extends React.Component<Props> {
           )}
           {backupCompleted && socialBackupCompleted && (
             <>
+              <BackupKeyIcon style={styles.logo} width={170} height={125} />
+              <Text style={styles.h1}>{t('backupComplete.header')}</Text>
               <Text style={styles.body}>
                 {t('backupKeyIntro.2')}
                 <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
@@ -198,17 +205,15 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     paddingHorizontal: 30,
-    paddingBottom: 20,
+    paddingBottom: 30,
     justifyContent: 'center',
   },
   logo: {
     alignSelf: 'center',
-    height: 75,
-    width: 75,
+    marginBottom: 30,
   },
   h1: {
     ...fontStyles.h1,
-    marginTop: 15,
   },
   body: {
     ...fontStyles.body,

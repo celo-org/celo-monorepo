@@ -1,6 +1,5 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
-import { eqAddress } from '@celo/utils/lib/address'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
@@ -60,38 +59,33 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
       argv.exchange ? kit._web3Contracts.getExchange() : null,
       argv.rewards ? kit._web3Contracts.getEpochRewards() : null,
     ])
+    const freezerContract = await kit._web3Contracts.getFreezer()
 
     for (const [name, contract] of Object.entries({ exchange, epochRewards })) {
       if (contract === null) {
         continue
       }
 
+      const address = (contract as any)._address
       if (argv.precheck) {
-        const frozen = await contract.methods.frozen().call()
+        const frozen = await freezerContract.methods.isFrozen(address).call()
         // console.debug(`${name}.frozen = ${frozen}`)
         if (argv.freeze === frozen) {
           console.error(`${name} is already ${argv.freeze ? 'frozen' : 'unfrozen'}. Skipping.`)
-          continue
-        }
-
-        const freezer = await contract.methods.freezer().call()
-        // console.debug(`${name}.freezer = ${freezer}`)
-        if (!eqAddress(freezer, account)) {
-          console.error(`${account} cannot freeze or unfreeze ${name}. Skipping.`)
           continue
         }
       }
 
       if (argv.freeze) {
         console.info(`Sending freeze transaction to ${name} ...`)
-        await contract.methods.freeze().send({ from: account })
+        await freezerContract.methods.freeze(address).send({ from: account })
       } else {
         console.info(`Sending unfreeze transaction to ${name} ...`)
-        await contract.methods.unfreeze().send({ from: account })
+        await freezerContract.methods.unfreeze(address).send({ from: account })
       }
 
       if (argv.verify) {
-        const frozen = await contract.methods.frozen().call()
+        const frozen = await freezerContract.methods.isFrozen(address).call()
         // console.debug(`${name}.frozen = ${frozen}`)
         if (argv.freeze !== frozen) {
           console.error(

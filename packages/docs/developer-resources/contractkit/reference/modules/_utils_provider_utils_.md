@@ -10,7 +10,7 @@
 
 ###  stopProvider
 
-▸ **stopProvider**(`provider`: Provider): *void*
+▸ **stopProvider**(`defaultProvider`: provider): *void*
 
 *Defined in [contractkit/src/utils/provider-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/provider-utils.ts#L7)*
 
@@ -18,6 +18,6 @@
 
 Name | Type |
 ------ | ------ |
-`provider` | Provider |
+`defaultProvider` | provider |
 
 **Returns:** *void*

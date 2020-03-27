@@ -11,7 +11,6 @@ import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
-  useBalanceInNavigationParam,
 } from 'src/notifications/NotificationList'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -44,8 +43,6 @@ export const listItemRenderer = (payment: EscrowedPayment, key: number | undefin
 }
 
 const EscrowedPaymentListScreen = (props: Props) => {
-  const { dollarBalance, navigation } = props
-  useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList
       items={props.sentEscrowedPayments}

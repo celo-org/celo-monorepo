@@ -410,7 +410,7 @@ jobs:
             set -euo pipefail
             cd packages/mobile
             # Create dummy Google services plist
-            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
+            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.dev.plist
             yarn run test:e2e:ios
       - store_artifacts:
           path: packages/mobile/e2e/artifacts

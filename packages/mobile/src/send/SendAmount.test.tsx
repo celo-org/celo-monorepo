@@ -124,29 +124,49 @@ describe('SendAmount', () => {
     })
   })
 
-  describe('enter amount ', () => {
-    const store = createMockStore(storeData)
-    const getWrapper = () =>
-      render(
+  describe('enter amount', () => {
+    it('shows an error when tapping the send button with not enough balance', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
         <Provider store={store}>
-          {/*
-          // @ts-ignore */}
           <SendAmount navigation={mockNavigation} />
         </Provider>
       )
 
-    it('is disabled with not enough balance', () => {
-      const wrapper = getWrapper()
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_TOO_MUCH)
-      expect(wrapper.queryAllByProps({ disabled: true }).length).toBeGreaterThan(0)
+
+      const sendButton = wrapper.getByTestId('Send')
+      expect(sendButton.props.disabled).toBe(false)
+
+      store.clearActions()
+      fireEvent.press(sendButton)
+      expect(store.getActions()).toEqual([
+        {
+          alertType: 'error',
+          buttonMessage: null,
+          dismissAfter: 5000,
+          message: 'needMoreFundsToSend',
+          title: null,
+          type: 'ALERT/SHOW',
+          underlyingError: 'needMoreFundsToSend',
+        },
+      ])
     })
 
-    it('is disabled with 0 as amount', () => {
-      const wrapper = getWrapper()
+    it('disables the send button with 0 as amount', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
+        <Provider store={store}>
+          <SendAmount navigation={mockNavigation} />
+        </Provider>
+      )
+
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_ZERO)
-      expect(wrapper.queryAllByProps({ disabled: true }).length).toBeGreaterThan(0)
+
+      const sendButton = wrapper.getByTestId('Send')
+      expect(sendButton.props.disabled).toBe(true)
     })
   })
 

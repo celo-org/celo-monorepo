@@ -34,6 +34,7 @@ import { toggleFornoMode } from 'src/web3/actions'
 import { isInitiallyFornoMode } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
+
 const TAG = 'app/saga'
 
 export function* waitForRehydrate() {

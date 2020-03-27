@@ -172,6 +172,8 @@ exports[`Experience/Brandkit renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://github.com/celo-org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             rel=" noopener noreferrer"
             role="link"
             style={
@@ -337,6 +339,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -399,6 +403,23 @@ exports[`Experience/Brandkit renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "MozTransitionProperty": "transform,",
+              "WebkitTransform": "scaleY(0)",
+              "WebkitTransformOrigin": "top",
+              "WebkitTransitionDuration": "500ms",
+              "WebkitTransitionProperty": "-webkit-transform,transform,",
+              "marginLeft": "20px",
+              "transform": "scaleY(0)",
+              "transformOrigin": "top",
+              "transitionDuration": "500ms",
+              "transitionProperty": "-webkit-transform,transform,",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitFlexDirection": "row",
@@ -430,6 +451,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/logo"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -540,6 +563,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/color"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -650,6 +675,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/typography"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -760,6 +787,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/composition"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -870,6 +899,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/icons"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -963,6 +994,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/key-imagery"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1147,6 +1180,7 @@ exports[`Experience/Brandkit renders 1`] = `
                   "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                   "fontSize": "20px",
                   "lineHeight": "28px",
+                  "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                 }
               }
@@ -1171,6 +1205,8 @@ exports[`Experience/Brandkit renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="/code-of-conduct"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1185,6 +1221,180 @@ exports[`Experience/Brandkit renders 1`] = `
                 >
                   Code Of Conduct
                 </a>
+              </div>
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "20px",
+                  "fontWeight": "500",
+                  "lineHeight": "24px",
+                  "marginBottom": "20px",
+                  "marginTop": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              home.importantRemember
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              home.celoOwner
+              <ul
+                className="css-reset-4rbku5 css-view-1dbjc4n"
+                role="list"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "marginTop": "20px",
+                    "paddingLeft": "20px",
+                  }
+                }
+              >
+                <li
+                  className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  role="listitem"
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "display": "list-item",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "listStyle": "disc",
+                      "marginBottom": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                />
+                <li
+                  className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  role="listitem"
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "display": "list-item",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "listStyle": "disc",
+                      "marginBottom": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                />
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          id="brand-voice"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginLeft": "10px",
+                "marginRight": "10px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "20px",
+                  "marginTop": "60px",
+                  "paddingBottom": "10px",
+                }
+              }
+            >
+              <h2
+                aria-level="2"
+                className="css-reset-4rbku5 css-text-901oao"
+                dir="auto"
+                role="heading"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "28px",
+                    "lineHeight": "32px",
+                    "textRendering": "geometricPrecision",
+                    "textTransform": "none",
+                  }
+                }
+              >
+                home.brandVoice
+              </h2>
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://docs.google.com/document/d/1Y1mfpBGad_8ZxSuIqwX52MWGEMfoWGt5HXc7sZp9h70/edit?usp=sharing"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "opacity": 1,
+                      "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
+                    }
+                  }
+                  target="_blank"
+                />
               </div>
             </div>
           </div>
@@ -1258,19 +1468,23 @@ exports[`Experience/Brandkit renders 1`] = `
               "WebkitAlignSelf": "center",
               "WebkitBoxAlign": "center",
               "WebkitBoxDirection": "normal",
+              "WebkitBoxLines": "multiple",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "center",
               "WebkitFlexDirection": "row",
+              "WebkitFlexWrap": "wrap",
               "WebkitJustifyContent": "center",
               "alignItems": "center",
               "alignSelf": "center",
               "flexDirection": "row",
+              "flexWrap": "wrap",
               "justifyContent": "center",
               "marginTop": "30px",
               "msFlexAlign": "center",
               "msFlexDirection": "row",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msFlexWrap": "wrap",
               "width": "100%",
             }
           }
@@ -1465,6 +1679,63 @@ exports[`Experience/Brandkit renders 1`] = `
               </svg>
             </a>
           </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "paddingRight": "25px",
+              }
+            }
+          >
+            <a
+              href="https://www.instagram.com/celoorg/"
+              rel="noopener"
+              target="_blank"
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitFlexBasis": "auto",
+                    "flexBasis": "auto",
+                    "height": "25px",
+                    "msFlexPreferredSize": "auto",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                    "width": "25px",
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "backgroundImage": "url(\\"image.png\\")",
+                      "backgroundPosition": "center",
+                      "backgroundRepeat": "no-repeat",
+                      "backgroundSize": "cover",
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "right": "0px",
+                      "top": "0px",
+                      "width": "100%",
+                      "zIndex": -1,
+                    }
+                  }
+                />
+                <img
+                  alt=""
+                  className="css-accessibilityImage-9pa8cd"
+                  draggable={false}
+                  src="image.png"
+                />
+              </div>
+            </a>
+          </div>
         </div>
       </div>
       <div
@@ -1543,6 +1814,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1616,6 +1889,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/about"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1689,6 +1964,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/jobs"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1762,6 +2039,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/validators"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1835,6 +2114,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1908,6 +2189,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/alliance"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1981,6 +2264,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/community"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2218,6 +2503,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/terms"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
