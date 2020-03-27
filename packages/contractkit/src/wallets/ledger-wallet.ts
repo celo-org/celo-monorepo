@@ -1,9 +1,4 @@
-import {
-  ensureLeading0x,
-  isHexString,
-  normalizeAddressWith0x,
-  trimLeading0x,
-} from '@celo/utils/lib/address'
+import { isHexString, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import { byContractAddress } from '@ledgerhq/hw-app-eth/erc20'
@@ -15,8 +10,8 @@ import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data
 import {
   chainIdTransformationForSigning,
   encodeTransaction,
-  makeEven,
   rlpEncodedTx,
+  signatureFormatter,
 } from '../utils/signing-utils'
 import { Wallet } from './wallet'
 
@@ -138,12 +133,8 @@ export class LedgerWallet implements Wallet {
       if (rv !== cv && (rv & cv) !== rv) {
         cv += 1 // add signature v bit.
       }
-
-      signature.v = makeEven(ensureLeading0x(cv.toString(16)))
-      signature.r = ensureLeading0x(signature.r)
-      signature.s = ensureLeading0x(signature.s)
-
-      return encodeTransaction(rlpEncoded, signature)
+      signature.v = cv.toString(16)
+      return encodeTransaction(rlpEncoded, signatureFormatter(signature))
     } catch (error) {
       if (error instanceof TransportStatusError) {
         this.transportErrorFriendlyMessage(error)

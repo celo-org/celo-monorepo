@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
@@ -21,7 +22,7 @@ function trimLeadingZero(hex: string) {
   return hex
 }
 
-export function makeEven(hex: string) {
+function makeEven(hex: string) {
   if (hex.length % 2 === 1) {
     hex = hex.replace('0x', '0x0')
   }
@@ -116,10 +117,18 @@ export function signEncodedTransaction(
   )(hash, privateKey)
   const [v, r, s] = Account.decodeSignature(signature)
 
+  return signatureFormatter({ v, r, s })
+}
+
+export function signatureFormatter(signature: {
+  v: string
+  r: string
+  s: string
+}): { v: string; r: string; s: string } {
   return {
-    v: makeEven(trimLeadingZero(v)),
-    r: makeEven(trimLeadingZero(r)),
-    s: makeEven(trimLeadingZero(s)),
+    v: makeEven(trimLeadingZero(ensureLeading0x(signature.v))),
+    r: makeEven(trimLeadingZero(ensureLeading0x(signature.r))),
+    s: makeEven(trimLeadingZero(ensureLeading0x(signature.s))),
   }
 }
 
