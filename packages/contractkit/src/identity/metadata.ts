@@ -8,6 +8,7 @@ import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { Claim, ClaimPayload, ClaimType, hashOfClaims, isOfType } from './claims/claim'
 import { ClaimTypes, SINGULAR_CLAIM_TYPES } from './claims/types'
+
 export { ClaimTypes } from './claims/types'
 
 const MetaType = t.type({
@@ -105,7 +106,11 @@ export class IdentityMetadataWrapper {
           throw new Error("Can't claim self")
         }
         break
-
+      case ClaimTypes.DOMAIN:
+        const existingClaims = this.data.claims.filter((el: any) => el.domain == claim.domain)
+        if (existingClaims.length > 0) {
+          return existingClaims[0]
+        }
       default:
         break
     }
@@ -119,6 +124,7 @@ export class IdentityMetadataWrapper {
 
     this.data.claims.push(claim)
     this.data.meta.signature = await signer.sign(this.hashOfClaims())
+    return claim
   }
 
   findClaim<K extends ClaimTypes>(type: K): ClaimPayload<K> | undefined {

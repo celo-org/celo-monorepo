@@ -62,8 +62,7 @@ async function handleItem(item: { url: string; address: string }) {
         const verified = await verifyDomainRecord(
           JSON.parse(metadata.toString()).meta.signature,
           item.address,
-          claim.domain,
-          metadata
+          claim
         ).catch((error) => console.error(`Error in verifyDomainRecord ${error}`))
         console.debug(`Claim = ${claim.domain}`)
         if (verified === undefined)

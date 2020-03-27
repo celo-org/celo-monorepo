@@ -48,11 +48,12 @@ export abstract class ClaimCommand extends BaseCommand {
     return NativeSigner(this.kit.web3.eth.sign, address)
   }
 
-  protected async addClaim(metadata: IdentityMetadataWrapper, claim: Claim) {
+  protected async addClaim(metadata: IdentityMetadataWrapper, claim: Claim): Promise<Claim> {
     try {
       cli.action.start(`Add claim`)
-      await metadata.addClaim(claim, this.signer)
+      const addedClaim = await metadata.addClaim(claim, this.signer)
       cli.action.stop()
+      return addedClaim
     } catch (error) {
       cli.action.stop(`Error: ${error}`)
       throw error

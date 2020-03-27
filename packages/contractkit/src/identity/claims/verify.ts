@@ -1,11 +1,11 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import { resolveTxt } from 'dns'
 import { Address } from '../../base'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
-import { Claim, DomainClaim, hashOfClaims } from './claim'
+import { Claim, DomainClaim, hashOfClaim, serializeClaim } from './claim'
 import { verifyKeybaseClaim } from './keybase'
 import { ClaimTypes } from './types'
 
@@ -20,7 +20,8 @@ import { ClaimTypes } from './types'
 export async function verifyClaim(
   claim: Claim,
   address: string,
-  metadataURLGetter: MetadataURLGetter
+  metadataURLGetter: MetadataURLGetter,
+  signer?: Signer
 ) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
@@ -28,7 +29,7 @@ export async function verifyClaim(
     case ClaimTypes.ACCOUNT:
       return verifyAccountClaim(claim, address, metadataURLGetter)
     case ClaimTypes.DOMAIN:
-      return verifyDomainClaim(claim, address, metadataURLGetter)
+      return verifyDomainClaim(claim, address, signer as any, metadataURLGetter)
     default:
       break
   }
@@ -82,11 +83,13 @@ type dnsResolverFunction = (
  */
 export const verifyDomainClaim = async (
   claim: DomainClaim,
-  _signer: string,
+  address: string,
+  signer: Signer,
   metadataURLGetter: MetadataURLGetter,
   dnsResolver: dnsResolverFunction = resolveTxt
 ) => {
   const metadataURL = await metadataURLGetter(claim.domain)
+  const domain = claim.domain
 
   console.info('metadataURL ' + JSON.stringify(metadataURL))
   if (!isValidUrl(metadataURL)) {
@@ -94,56 +97,64 @@ export const verifyDomainClaim = async (
   }
 
   let metadata: IdentityMetadataWrapper
+  let claimFound
   try {
     metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+    const existingClaims = metadata
+      .filterClaims(ClaimTypes.DOMAIN)
+      .filter((el: DomainClaim) => el.domain == domain)
+
+    if (existingClaims.length < 1) {
+      return `The domain ${domain} is not part of your metadata`
+    }
+    claimFound = existingClaims[0]
   } catch (error) {
     return `Metadata could not be fetched for ${claim.domain} at 
       ${metadataURL}: ${error.toString()}`
   }
 
-  const signature = JSON.parse(metadata.toString()).meta.signature
-  const address = JSON.parse(metadata.toString()).meta.address
+  const signature = await signer.sign(serializeClaim(claimFound))
 
-  return verifyDomainRecord(signature, address, claim.domain, metadata, dnsResolver)
+  return verifyDomainRecord(signature, address, claimFound, dnsResolver)
 }
 
 export const verifyDomainRecord = async (
   signature: string,
   address: string,
-  domain: string,
-  metadata: IdentityMetadataWrapper,
+  claim: DomainClaim,
   dnsResolver: dnsResolverFunction = resolveTxt
 ) => {
   const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
-  const domainClaims = metadata.filterClaims(ClaimTypes.DOMAIN)
 
   let found = false
-  const domainPromises = domainClaims.map((domainClaim) => {
-    return new Promise((resolve) => {
-      if (domain === domainClaim.domain) {
-        dnsResolver(domainClaim.domain, (_error, domainRecords) => {
-          if (_error) {
-            console.log(`Unable to fetch domain TXT records: ${_error.toString()}`)
-          } else {
-            domainRecords.forEach((record) => {
-              record.forEach((entry) => {
-                if (entry === 'celo-site-verification=' + signatureBase64) {
-                  console.debug(`TXT Record celo-site-verification found in ${domainClaim.domain}`)
-                  found = verifySignature(hashOfClaims(metadata.claims), signature, address)
-                }
-              })
-            })
-          }
-          resolve()
+  const domainPromise = new Promise((resolve) => {
+    dnsResolver(claim.domain, (error, domainRecords) => {
+      if (error) {
+        console.log(`Unable to fetch domain TXT records: ${error.toString()}`)
+      } else {
+        domainRecords.forEach((record) => {
+          console.log(`Domain record ${record}`)
+          record.forEach((entry) => {
+            console.log(`Entry ${entry}`)
+            if (entry === 'celo-site-verification=' + signatureBase64) {
+              console.debug(`TXT Record celo-site-verification found`)
+              found = verifySignature(hashOfClaim(claim), signature, address)
+            }
+          })
         })
       }
+      resolve()
     })
   })
 
-  await Promise.all(domainPromises)
+  domainPromise.then(() => console.log(`Promise resolved`))
+  // await Promise.resolve(domainPromise)
+  // await Promise.all(domainPromise)
 
   if (found) {
+    console.log(`TXT record found`)
     return
   }
+  console.log(`NOT found`)
   return `Unable to verify domain claim`
 }
