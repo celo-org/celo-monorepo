@@ -6,4 +6,4 @@ set -euo pipefail
 # Flags:
 # -n: Name of the network to migrate to
 
-yarn run migrate -r "$@"
+yarn run migrate -f 25 "$@"

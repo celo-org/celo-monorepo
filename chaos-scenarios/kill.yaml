@@ -2,14 +2,14 @@ apiVersion: pingcap.com/v1alpha1
 kind: PodChaos
 metadata:
   name: pod-kill
-  namespace: scenario1
+  namespace: scenario2
 spec:
   action: pod-kill
   mode: fixed
-  value: "9"
+  value: "1"
   selector:
     namespaces:
-      - scenario1
+      - scenario2
     labelSelectors:
       "component": "validators"
       #"component": "proxy"

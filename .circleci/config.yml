@@ -105,7 +105,7 @@ commands:
       - run:
           name: Create cached node_modules (if necessary)
           command: |
-            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then
               tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
@@ -256,7 +256,7 @@ jobs:
             #   echo "Cache found, just run post-script."
             #   yarn postinstall
             # fi
-            yarn || yarn 
+            yarn || yarn
             yarn build || yarn build
             yarn run jetify
       - save_cache:
@@ -844,7 +844,7 @@ jobs:
       - run:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
-  
+
   integration-celotool-install:
     <<: *defaults
     environment:

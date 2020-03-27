@@ -2,21 +2,21 @@ apiVersion: pingcap.com/v1alpha1
 kind: NetworkChaos
 metadata:
   name: network-loss
-  namespace: scenario1
+  namespace: scenario2
 spec:
   action: loss
   mode: fixed
   #mode: fixed-percent
-  value: "1"
+  value: "2"
   selector:
     namespaces:
-      - scenario1
+      - scenario2
     labelSelectors:
       "component": "validators"
   loss:
     loss: "100"
     correlation: "25"
-  duration: "250s"
+  duration: "120s"
   scheduler:
     cron: "@every 100h"
     #cron: "52 * * * *"

@@ -63,6 +63,7 @@ async function lockGold(
 ) {
   // @ts-ignore
   const createAccountTx = accounts.contract.methods.createAccount()
+  console.log(`jcortejosolog --> from: ${privateKeyToAddress(privateKey)}, to: ${accounts.address}`)
   await sendTransaction(web3, createAccountTx, privateKey, {
     to: accounts.address,
   })
@@ -172,6 +173,10 @@ async function registerValidator(
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(publicKey, blsPublicKey, blsPoP)
+
+  console.log(
+    `jcortejosolog --> from: ${privateKeyToAddress(validatorPrivateKey)}, to: ${validators.address}`
+  )
 
   await sendTransaction(web3, registerTx, validatorPrivateKey, {
     to: validators.address,
@@ -335,21 +340,36 @@ module.exports = async (_deployer: any, networkName: string) => {
     )
 
     console.info(`  * Registering ${group.valKeys.length} validators ...`)
-    await Promise.all(
-      group.valKeys.map((key, i) => {
-        const index = idx * config.validators.maxGroupSize + i
-        return registerValidator(
-          accounts,
-          lockedGold,
-          validators,
-          key,
-          attestationKeys[index],
-          group.account.address,
-          index,
-          networkName
-        )
-      })
-    )
+    // await Promise.all(
+    //   group.valKeys.map((key, i) => {
+    //     const index = idx * config.validators.maxGroupSize + i
+    //     return registerValidator(
+    //       accounts,
+    //       lockedGold,
+    //       validators,
+    //       key,
+    //       attestationKeys[index],
+    //       group.account.address,
+    //       index,
+    //       networkName
+    //     )
+    //   })
+    // )
+
+    for (const i of Object.keys(group.valKeys)) {
+      const key = group.valKeys[i]
+      const index = parseInt(idx * config.validators.maxGroupSize + i, 10)
+      await registerValidator(
+        accounts,
+        lockedGold,
+        validators,
+        key,
+        attestationKeys[index],
+        group.account.address,
+        index,
+        networkName
+      )
+    }
 
     console.info(`  * Adding Validators to ${group.name} ...`)
     for (const [i, key] of group.valKeys.entries()) {

@@ -1,3 +1,4 @@
+/* tslint:disable:no-console */
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
@@ -38,9 +39,17 @@ function getAttestationKeys() {
 
 export function migrationOverrides() {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
   const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 10)
   const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
+  const validatorAddresses = getAddressesFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const transferWhitelistAddresses = [
+    ...validatorAddresses.map(ensure0x),
+    ...initialAddresses.map(ensure0x),
+  ]
+
+  console.info(`jcortejosologs --> whiteListAddresses: ${transferWhitelistAddresses}`)
 
   const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
@@ -70,6 +79,9 @@ export function migrationOverrides() {
       },
       oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1), minerForEnv()],
     },
+    // transferWhitelist: {
+    //   addresses: validatorAddresses,
+    // },
     validators: {
       validatorKeys: validatorKeys(),
       attestationKeys: getAttestationKeys(),
