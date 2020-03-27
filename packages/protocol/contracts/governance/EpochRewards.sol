@@ -289,7 +289,8 @@ contract EpochRewards is
   }
 
   /**
-   * @notice Sets the target voting yield.
+   * @notice Sets the target voting yield.  Uses fixed point arithmetic
+   * for protection against overflow.
    * @param targetVotingYield The relative target block reward for voters.
    * @return True upon success.
    */
