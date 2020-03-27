@@ -1,4 +1,4 @@
-import { CeloContract } from '@celo/contractkit'
+//import { CeloContract } from '@celo/contractkit'
 import { ContractKit, newKit } from '@celo/contractkit'
 //import { AllContracts } from '@celo/contractkit/lib/base'
 import { traceBlock } from '@celo/contractkit/lib/utils/web3-utils'
@@ -17,6 +17,7 @@ import { MonorepoRoot, getContext, sleep } from './utils'
 import { spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const TMP_PATH = '/tmp/e2e'
+const ROSETTA_PATH = '../../../rosetta'
 
 const testContractSource = `
 pragma solidity ^0.5.8;
@@ -436,8 +437,8 @@ describe('tracer tests', () => {
         fromFinalBalance = new BigNumber(await kit.web3.eth.getBalance(FromAddress))
         toFinalBalance = await goldToken.balanceOf(ToAddress)
         trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        //console.info(`${name} receipt`)
-        //console.info(receipt)
+        console.info(`${name} receipt`)
+        console.info(receipt)
         //console.info(`${name} trackBalances`)
         //console.info(trackBalances)
         //console.info(`${name} txn`)
@@ -485,7 +486,8 @@ describe('tracer tests', () => {
       return txResult.waitReceipt()
     })
 
-    testTransferGold(
+    // Needs https://github.com/celo-org/celo-blockchain/pull/938
+    /*testTransferGold(
       'with feeCurrency cUSD',
       async () => {
         const feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
@@ -495,7 +497,7 @@ describe('tracer tests', () => {
         return txResult.waitReceipt()
       },
       false
-    )
+    )*/
 
     describe(`GoldToken.transfer`, () => {
       let trackBalances: Record<Address, AccountAssets>
@@ -722,5 +724,16 @@ describe('tracer tests', () => {
         return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
       })
     })
+
+    if (ROSETTA_PATH) {
+      describe(`Rossetta tracer`, () => {
+        it('Tracer driver should succeed', async function(this: any) {
+          this.timeout(0)
+          await spawnCmdWithExitOnFailure('go', ['run', './drivers/tracer/tracer.go'], {
+            cwd: ROSETTA_PATH,
+          })
+        })
+      })
+    }
   })
 })
