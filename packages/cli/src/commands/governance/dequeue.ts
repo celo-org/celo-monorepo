@@ -19,10 +19,7 @@ export default class Dequeue extends BaseCommand {
 
     await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
     /*
-    console.log("tx", await multisig.methods.isConfirmed(2).call())
-    console.log(await governance_.getPastEvents("ProposalApproved", {fromBlock: 0}))
     console.log("participation", await governance_.methods.getParticipationParameters().call())
-    console.log("is passing?", await governance.isProposalPassing(4))
     console.log("locked gold", await lgold.methods.getTotalLockedGold().call())
     */
   }
