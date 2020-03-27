@@ -287,6 +287,15 @@ contract EpochRewards is
     return true;
   }
 
+  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner {
+    FixidityLib.Fraction memory target = FixidityLib.wrap(targetVotingYield);
+    require(
+      target.lte(targetVotingYieldParams.max),
+      "Target voting yield must be less than or equal to max"
+    );
+    targetVotingYieldParams.target = target;
+  }
+
   /**
    * @notice Returns the target Gold supply according to the epoch rewards target schedule.
    * @return The target Gold supply according to the epoch rewards target schedule.
