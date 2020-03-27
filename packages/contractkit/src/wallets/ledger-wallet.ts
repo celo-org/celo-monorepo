@@ -7,7 +7,6 @@ import {
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import { byContractAddress } from '@ledgerhq/hw-app-eth/erc20'
-import Transport from '@ledgerhq/hw-transport'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -25,7 +24,7 @@ export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5
 
 export async function newLedgerWalletWithSetup(
-  transport: Transport,
+  transport: any,
   derivationPathIndexes?: number[],
   baseDerivationPath?: string
 ): Promise<LedgerWallet> {
@@ -49,7 +48,6 @@ export class LedgerWallet implements Wallet {
    * Example: [3, 99, 53] will retrieve the derivation paths of
    * [`${baseDerivationPath}/3`, `${baseDerivationPath}/99`, `${baseDerivationPath}/53`]
    * @param baseDerivationPath base derivation path. Default: "44'/52752'/0'/0"
-   * @param transport transport to connect the ledger device, otherwise will use TransportNodeHid for the first device it finds
    */
   constructor(
     readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
@@ -63,7 +61,10 @@ export class LedgerWallet implements Wallet {
     }
   }
 
-  async init(transport: Transport) {
+  /**
+   * @param transport Transport to connect the ledger device
+   */
+  async init(transport: any) {
     try {
       if (this.setupFinished) {
         return
