@@ -26,7 +26,7 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24 --release_gold_contracts scripts/truffle/releaseGoldDefaultContracts.json",
+    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
     "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz", 
     "test": "TZ=UTC jest --runInBand"
   },
