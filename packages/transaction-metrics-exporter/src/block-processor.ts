@@ -140,9 +140,6 @@ export class BlockProcessor {
       this.logEvent(LoggingCategory.Transaction, tx)
       const receipt = await this.kit.web3.eth.getTransactionReceipt(tx.hash)
       this.logEvent(LoggingCategory.TransactionReceipt, receipt)
-      ;(await getInternalTransactions(tx.hash)).forEach((data: any) =>
-        this.logEvent(LoggingCategory.InternalTransaction, data)
-      )
 
       await new Promise((resolve) =>
         (this.kit.web3.currentProvider as any).existingProvider.send(
