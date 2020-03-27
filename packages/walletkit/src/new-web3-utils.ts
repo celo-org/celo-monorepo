@@ -7,7 +7,8 @@ import {
 } from '@0x/subproviders'
 import * as util from 'util'
 import Web3 from 'web3'
-import { JsonRPCResponse, Provider } from 'web3/providers'
+import { provider as Provider } from 'web3-core'
+import { JsonRpcResponse } from 'web3-core-helpers'
 import { Logger } from './logger'
 import { CeloProvider } from './transaction-utils'
 
@@ -34,7 +35,8 @@ export function addLocalAccount(web3: Web3, privateKey: string) {
     )
   } else {
     providerEngine = createNewProviderWithLocalAccount(existingProvider as Provider, celoProvider)
-    web3.setProvider(providerEngine)
+    // TODO fix types
+    web3.setProvider(providerEngine as any)
   }
 
   providerEngine.start()
@@ -129,33 +131,37 @@ class SubproviderWithLogging extends Subprovider {
       'new-web3-utils/addLocalAccount',
       `SubproviderWithLogging@handleRequest: ${util.inspect(payload)}`
     )
+    // TODO fix types
     // Inspired from https://github.com/MetaMask/web3-provider-engine/pull/19/
-    return this._provider.send(payload, (err: null | Error, response?: JsonRPCResponse) => {
-      if (err != null) {
-        Logger.verbose(
+    return (this._provider! as any).send(
+      payload,
+      (err: null | Error, response?: JsonRpcResponse) => {
+        if (err != null) {
+          Logger.verbose(
+            'new-web3-utils/addLocalAccount',
+            `SubproviderWithLogging@response is error: ${err}`
+          )
+          end(err)
+          return
+        }
+        if (response == null) {
+          end(new Error(`Response is null for ${JSON.stringify(payload)}`))
+          return
+        }
+        if (response.error != null) {
+          Logger.verbose(
+            'new-web3-utils/addLocalAccount',
+            `SubproviderWithLogging@response includes error: ${response}`
+          )
+          end(new Error(response.error))
+          return
+        }
+        Logger.debug(
           'new-web3-utils/addLocalAccount',
-          `SubproviderWithLogging@response is error: ${err}`
+          `SubproviderWithLogging@response: ${util.inspect(response)}`
         )
-        end(err)
-        return
+        end(null, response.result)
       }
-      if (response == null) {
-        end(new Error(`Response is null for ${JSON.stringify(payload)}`))
-        return
-      }
-      if (response.error != null) {
-        Logger.verbose(
-          'new-web3-utils/addLocalAccount',
-          `SubproviderWithLogging@response includes error: ${response}`
-        )
-        end(new Error(response.error))
-        return
-      }
-      Logger.debug(
-        'new-web3-utils/addLocalAccount',
-        `SubproviderWithLogging@response: ${util.inspect(response)}`
-      )
-      end(null, response.result)
-    })
+    )
   }
 }

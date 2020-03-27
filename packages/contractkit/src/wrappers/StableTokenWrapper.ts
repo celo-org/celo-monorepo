@@ -1,6 +1,6 @@
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { StableToken } from '../generated/types/StableToken'
+import { StableToken } from '../generated/StableToken'
 import {
   BaseWrapper,
   CeloTransactionObject,

@@ -25,7 +25,7 @@
 
 • **addAccount**: *function*
 
-*Defined in [contractkit/src/utils/wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L15)*
+*Defined in [contractkit/src/utils/wallet.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L14)*
 
 #### Type declaration:
 
@@ -43,7 +43,7 @@ ___
 
 • **getAccounts**: *function*
 
-*Defined in [contractkit/src/utils/wallet.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L16)*
+*Defined in [contractkit/src/utils/wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L15)*
 
 #### Type declaration:
 
@@ -55,7 +55,7 @@ ___
 
 • **hasAccount**: *function*
 
-*Defined in [contractkit/src/utils/wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L17)*
+*Defined in [contractkit/src/utils/wallet.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L16)*
 
 #### Type declaration:
 
@@ -73,7 +73,7 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [contractkit/src/utils/wallet.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L20)*
+*Defined in [contractkit/src/utils/wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L19)*
 
 #### Type declaration:
 
@@ -92,7 +92,7 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [contractkit/src/utils/wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L18)*
+*Defined in [contractkit/src/utils/wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L17)*
 
 #### Type declaration:
 
@@ -110,7 +110,7 @@ ___
 
 • **signTypedData**: *function*
 
-*Defined in [contractkit/src/utils/wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L19)*
+*Defined in [contractkit/src/utils/wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/wallet.ts#L18)*
 
 #### Type declaration:
 

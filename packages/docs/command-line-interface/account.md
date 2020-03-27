@@ -228,8 +228,8 @@ USAGE
   $ celocli account:proof-of-possession
 
 OPTIONS
-  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to proove
-                                                        possession of the signer key.
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
+                                                        of the signer key.
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
 

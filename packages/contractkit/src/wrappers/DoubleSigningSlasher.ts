@@ -1,12 +1,11 @@
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
-import { DoubleSigningSlasher } from '../generated/types/DoubleSigningSlasher'
+import { DoubleSigningSlasher } from '../generated/DoubleSigningSlasher'
 import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
-  stringToBytes,
   toTransactionObject,
   valueToBigNumber,
   valueToInt,
@@ -34,7 +33,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
    * @return Block number.
    */
   async getBlockNumberFromHeader(header: string): Promise<number> {
-    const res = await this.contract.methods.getBlockNumberFromHeader(stringToBytes(header)).call()
+    const res = await this.contract.methods.getBlockNumberFromHeader(header).call()
     return valueToInt(res)
   }
 
@@ -114,8 +113,8 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
       this.contract.methods.slash(
         signer,
         signerIndex,
-        stringToBytes(headerA),
-        stringToBytes(headerB),
+        headerA,
+        headerB,
         membership.historyIndex,
         slashValidator.lessers,
         slashValidator.greaters,

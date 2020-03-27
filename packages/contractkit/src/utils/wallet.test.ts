@@ -1,7 +1,6 @@
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
-import { Tx } from 'web3/eth/types'
-import { EncodedTransaction } from 'web3/types'
+import { EncodedTransaction, Tx } from 'web3-core'
 import { EIP712TypedData } from './sign-typed-data-utils'
 import { recoverTransaction } from './signing-utils'
 import { DefaultWallet, Wallet } from './wallet'
@@ -57,11 +56,11 @@ describe('Wallet class', () => {
         const unknownAddress: string = ACCOUNT_ADDRESS2
         test('fails calling signTransaction', async () => {
           const tsParams: Tx = {
-            nonce: 'test',
+            nonce: 1,
             gas: 'test',
             to: 'test',
             from: unknownAddress,
-            chainId: '1',
+            chainId: 1,
           }
           await expect(wallet.signTransaction(tsParams)).rejects.toThrowError()
         })
@@ -90,9 +89,9 @@ describe('Wallet class', () => {
             celoTransaction = {
               from: knownAddress,
               to: otherAddress,
-              chainId: '2',
+              chainId: 2,
               value: Web3.utils.toWei('1', 'ether'),
-              nonce: '0',
+              nonce: 0,
               gas: '10',
               gasPrice: '99',
               feeCurrency: '0x124356',

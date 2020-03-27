@@ -14,7 +14,6 @@ import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
 import { create } from './Alliance'
 import latestAnnouncements from './Announcement'
-import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
@@ -174,15 +173,6 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     try {
       await create(req.body)
       res.sendStatus(CREATED)
-    } catch (e) {
-      respondError(res, e)
-    }
-  })
-
-  server.get('/brand/api/assets/:asset', async (req, res) => {
-    try {
-      const assets = await getAssets(req.params.asset)
-      res.json(assets)
     } catch (e) {
       respondError(res, e)
     }

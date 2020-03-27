@@ -138,6 +138,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                          for 
                       </Text>
                       <Text
+                        numberOfLines={1}
                         style={
                           Array [
                             Object {
@@ -147,12 +148,14 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                               "lineHeight": 20,
                             },
                             Object {
-                              "fontFamily": "Hind-SemiBold",
+                              "color": "#81868B",
                             },
                           ]
                         }
                       >
-                        12.34
+                        
+                        $
+                        16.41
                       </Text>
                     </Text>
                     <Text
@@ -178,6 +181,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                          for 
                       </Text>
                       <Text
+                        numberOfLines={1}
                         style={
                           Array [
                             Object {
@@ -187,12 +191,14 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                               "lineHeight": 20,
                             },
                             Object {
-                              "fontFamily": "Hind-SemiBold",
+                              "color": "#81868B",
                             },
                           ]
                         }
                       >
-                        12.34
+                        
+                        $
+                        16.41
                       </Text>
                     </Text>
                   </View>

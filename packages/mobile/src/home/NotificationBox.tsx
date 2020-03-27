@@ -279,7 +279,6 @@ export class NotificationBox extends React.Component<Props, State> {
           horizontal={true}
           pagingEnabled={true}
           showsHorizontalScrollIndicator={false}
-          // @ts-ignore TODO(cmcewen): should be fixed with new RN types
           onScroll={this.handleScroll}
         >
           {notifications.map((notification, i) => (

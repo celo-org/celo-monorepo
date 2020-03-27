@@ -1,3 +1,4 @@
+import { CeloTransactionObject } from '@celo/contractkit'
 import { call, put, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -12,9 +13,9 @@ import {
   removeStandbyTransaction,
   transactionConfirmed,
 } from 'src/transactions/actions'
+import { TxPromises } from 'src/transactions/contract-utils'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { TransactionObject } from 'web3/eth/types'
 
 const TAG = 'transactions/saga'
 
@@ -27,9 +28,9 @@ export function* waitForTransactionWithId(txId: string) {
   }
 }
 
-export function* sendAndMonitorTransaction(
+export function* sendAndMonitorTransaction<T>(
   txId: string,
-  tx: TransactionObject<any>,
+  tx: CeloTransactionObject<T>,
   account: string,
   currency?: CURRENCY_ENUM
 ) {
@@ -37,9 +38,9 @@ export function* sendAndMonitorTransaction(
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
     const sendTxMethod = function*(nonce: number) {
-      const { transactionHash, confirmation } = yield call(
+      const { transactionHash, confirmation }: TxPromises = yield call(
         sendTransactionPromises,
-        tx,
+        tx.txo,
         account,
         TAG,
         txId,
@@ -51,7 +52,6 @@ export function* sendAndMonitorTransaction(
       return result
     }
     yield call(wrapSendTransactionWithRetry, txId, account, sendTxMethod)
-
     yield put(transactionConfirmed(txId))
 
     if (currency === CURRENCY_ENUM.GOLD) {

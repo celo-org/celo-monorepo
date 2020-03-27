@@ -39,8 +39,8 @@ export const getCentAwareMoneyDisplay = (value: BigNumber.Value): string => {
   return numeral(roundDown(value).toNumber()).format('0,0[.]00')
 }
 
-export const getExchangeRateDisplayValue = (value: BigNumber): string => {
-  return numeral(value.toNumber()).format('0[.][0000]')
+export const getExchangeRateDisplayValue = (value: BigNumber.Value): string => {
+  return numeral(new BigNumber(value).toNumber()).format('0[.][0000]')
 }
 
 export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): string => {

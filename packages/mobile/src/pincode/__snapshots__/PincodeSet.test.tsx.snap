@@ -117,6 +117,7 @@ exports[`Pincode renders correctly 1`] = `
               "borderStyle": "solid",
               "borderTopColor": "#EEEEEE",
               "borderTopWidth": 1,
+              "marginBottom": 15,
               "marginTop": 10,
               "width": "100%",
             }
@@ -801,6 +802,7 @@ exports[`Pincode renders correctly 2`] = `
               "borderStyle": "solid",
               "borderTopColor": "#EEEEEE",
               "borderTopWidth": 1,
+              "marginBottom": 15,
               "marginTop": 10,
               "width": "100%",
             }

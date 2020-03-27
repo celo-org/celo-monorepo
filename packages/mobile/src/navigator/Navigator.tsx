@@ -316,12 +316,12 @@ const AppStack = createStackNavigator(
 
 const AppNavigator = createSwitchNavigator(
   {
-    AppLoading,
+    [Screens.AppLoading]: AppLoading,
     [Stacks.NuxStack]: NuxStack,
     [Stacks.AppStack]: AppStack,
   },
   {
-    initialRouteName: 'AppLoading',
+    initialRouteName: Screens.AppLoading,
   }
 )
 

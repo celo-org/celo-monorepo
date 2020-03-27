@@ -5,7 +5,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
-import "./interfaces/IStableToken.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
@@ -121,7 +120,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param frozenDays The number of days the frozen cGLD thaws over.
    */
   function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
-    require(frozenGold <= address(this).balance);
+    require(frozenGold <= address(this).balance, "Cannot freeze more than balance");
     frozenReserveGoldStartBalance = frozenGold;
     frozenReserveGoldStartDay = now / 1 days;
     frozenReserveGoldDays = frozenDays;
@@ -430,7 +429,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
-    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 2.
+    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio <= 2.
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
     if (ratio.gte(FixidityLib.newFixed(2))) {
       return FixidityLib.wrap(0);

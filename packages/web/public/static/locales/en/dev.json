@@ -150,7 +150,7 @@
   },
   "protocol": {
     "title": "Core Contracts",
-    "text": "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, is pegged to the US Dollar.",
+    "text": "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, tracks the value of the US Dollar.",
     "algoReserve": "Algorithmic reserve-backed stabilization mechanism",
     "cryptoCollat": "Crypto-asset collateralized",
     "native": "Native support for multiple stablecoins"

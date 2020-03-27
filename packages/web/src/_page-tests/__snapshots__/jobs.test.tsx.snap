@@ -4137,7 +4137,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             }
 
             .ReactModal__Overlay {
-              transform: translateY(-100vh);
               transition: transform 1000ms ease-in-out;
             }
             
@@ -6409,6 +6408,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           data-focusable={true}
                           dir="auto"
                           href="example.com"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
                           role="link"
                           style={
                             Object {
@@ -6753,6 +6754,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           data-focusable={true}
                           dir="auto"
                           href="example.com"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
                           role="link"
                           style={
                             Object {
@@ -7259,6 +7262,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://storage.googleapis.com/celo_whitepapers/celo-perks-benefits.pdf"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           rel=" noopener noreferrer"
           role="link"
           style={
@@ -11453,7 +11458,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
 
             .ReactModal__Overlay {
-              transform: translateY(-100vh);
               transition: transform 1000ms ease-in-out;
             }
             
@@ -13874,6 +13878,8 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://storage.googleapis.com/celo_whitepapers/celo-perks-benefits.pdf"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           rel=" noopener noreferrer"
           role="link"
           style={

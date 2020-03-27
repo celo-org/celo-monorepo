@@ -1,10 +1,9 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
-import _ from 'bignumber.js'
-
+import 'bignumber.js'
 import { Address } from '../base'
-import { GoldToken } from '../generated/types/GoldToken'
+import { GoldToken } from '../generated/GoldToken'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber, valueToInt } from './BaseWrapper'
 
 /**
