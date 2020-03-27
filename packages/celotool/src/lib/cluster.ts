@@ -71,18 +71,22 @@ export async function createClusterIfNotExists() {
   return false
 }
 
-export async function setupCluster(celoEnv: string, createdCluster: boolean) {
-  const envType = fetchEnv(envVar.ENV_TYPE)
-
+export async function createNamespaceIfNotExists(namespace: string) {
   const namespaceExists = await outputIncludes(
-    `kubectl get namespaces ${celoEnv} || true`,
-    celoEnv,
-    `Namespace ${celoEnv} exists, skipping creation`
+    `kubectl get namespaces ${namespace} || true`,
+    namespace,
+    `Namespace ${namespace} exists, skipping creation`
   )
   if (!namespaceExists) {
     console.info('Creating kubernetes namespace')
-    await execCmdWithExitOnFailure(`kubectl create namespace ${celoEnv}`)
+    await execCmdWithExitOnFailure(`kubectl create namespace ${namespace}`)
   }
+}
+
+export async function setupCluster(celoEnv: string, createdCluster: boolean) {
+  const envType = fetchEnv(envVar.ENV_TYPE)
+
+  await createNamespaceIfNotExists(celoEnv)
 
   const blockchainBackupServiceAccountName = getServiceAccountName('blockchain-backup-for')
   console.info(`Service account for blockchain backup is \"${blockchainBackupServiceAccountName}\"`)
