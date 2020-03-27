@@ -72,6 +72,7 @@ export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
   }
   const transaction: Tx = helpers.formatters.inputCallFormatter(tx)
   transaction.to = Bytes.fromNat(tx.to || '0x').toLowerCase()
+  transaction.nonce = stringNumberToHex(tx.nonce || '0x')
   transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()
   transaction.value = stringNumberToHex(tx.value?.toString())
   transaction.feeCurrency = Bytes.fromNat(tx.feeCurrency || '0x').toLowerCase()

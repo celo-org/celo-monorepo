@@ -12,6 +12,7 @@ declare module 'web3-core' {
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
+    nonce?: number | string
   }
 
   export interface EncodedTransaction {
