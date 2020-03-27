@@ -1,6 +1,6 @@
 import { CeloContract } from '@celo/contractkit'
 import { ContractKit, newKit } from '@celo/contractkit'
-import { AllContracts } from '@celo/contractkit/lib/base'
+//import { AllContracts } from '@celo/contractkit/lib/base'
 import { traceBlock } from '@celo/contractkit/lib/utils/web3-utils'
 import { valueToBigNumber } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -22,9 +22,28 @@ const testContractSource = `
 pragma solidity ^0.5.8;
 
 contract TestContract {
+  event Constructed(address from);
+  event Destructed(address to);
+  event Reverted();
+
+  constructor() public payable {
+    emit Constructed(msg.sender);
+  }
+
   function transfer(address payable to) external payable returns (bool) {
     to.transfer(msg.value);
     return true;
+  }
+
+  function transferThenRevert(address payable to) external payable returns (bool) {
+    to.transfer(msg.value);
+    revert('transferThenRevert');
+  }
+  
+  function nestedTransferThenRevert(address payable to) external payable returns (bool) {
+    bool success;
+    (success,) = address(this).call.value(msg.value)(abi.encodeWithSignature("transferThenRevert(address)", to));
+    return success;
   }
 
   function transferThenIgnoreRevert(address payable to) external payable returns (bool) {
@@ -34,11 +53,13 @@ contract TestContract {
     return success;
   }
 
-  function alwaysRevert() public pure {
-    revert('always revert!');
+  function alwaysRevert() public {
+    emit Reverted();
+    revert('alwaysRevert');
   }
 
   function selfDestruct(address payable to) external payable {
+    emit Destructed(msg.sender);
     selfdestruct(to);
   }
 }
@@ -225,22 +246,72 @@ async function trackTransfers(
       )
   }
 
-  // ReleaseGold
+  /*const epochNumber = await kit.getEpochNumberOfBlock(blockNumber)
+  const prevBlockEpochNumber = await kit.getEpochNumberOfBlock(blockNumber - 1
+  if (epochNumber !== prevBlockEpochNumber) {
+    const validatorRewards = await validators.getValidatorRewards(epochNumber - 1)
+    for (const reward of validatorRewards) {
+      const voterReward = await election.getVoterRewards(addr, epochNumber - 1)
+    }
+  }*/
 
-  // Epoch rewards
+  // ReleaseGold
 
   // Slashing
 
   return ret
 }
 
+const transferCeloGold = async (
+  kit: ContractKit,
+  fromAddress: string,
+  toAddress: string,
+  amount: BigNumber,
+  txOptions: {
+    gas?: number
+    gasPrice?: string
+    feeCurrency?: string
+    gatewayFeeRecipient?: string
+    gatewayFee?: string
+  } = {}
+) => {
+  const res = await kit.sendTransaction({
+    from: fromAddress,
+    to: toAddress,
+    value: amount.toString(),
+    ...txOptions,
+  })
+  return res
+}
+
+const transferCeloDollars = async (
+  kit: ContractKit,
+  fromAddress: string,
+  toAddress: string,
+  amount: BigNumber,
+  txOptions: {
+    gas?: number
+    gasPrice?: string
+    feeCurrency?: string
+    gatewayFeeRecipient?: string
+    gatewayFee?: string
+  } = {}
+) => {
+  const kitStableToken = await kit.contracts.getStableToken()
+  const res = await kitStableToken.transfer(toAddress, amount.toString()).send({
+    from: fromAddress,
+    ...txOptions,
+  })
+
+  return res
+}
+
 describe('tracer tests', () => {
   const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
-  const FromAddress = validatorAddress
+  //let FromAddress = validatorAddress
+  let FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
-  /*const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
   const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
-  const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'*/
   const TransferAmount: BigNumber = new BigNumber(Web3.utils.toWei('1', 'ether'))
 
   const gethConfig: GethRunConfig = {
@@ -248,6 +319,7 @@ describe('tracer tests', () => {
     networkId: 1101,
     network: 'local',
     migrate: true,
+    //verbosity: 5,
     instances: [
       {
         name: 'validator0',
@@ -303,7 +375,7 @@ describe('tracer tests', () => {
     kit.defaultAccount = validatorAddress
     goldToken = await kit.contracts.getGoldToken()
 
-    console.info('AllContracts')
+    /*console.info('AllContracts')
     for (const contract of AllContracts) {
       try {
         const addr = await kit.registry.addressFor(contract)
@@ -311,62 +383,31 @@ describe('tracer tests', () => {
       } catch (error) {
         console.info(error)
       }
-    }
+    }*/
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
-    // Give the account we will send transfers as sufficient gold and dollars.
-    if (FromAddress != validatorAddress) {
+    if (FromAddress !== validatorAddress) {
+      // Give the account we will send transfers as sufficient gold and dollars.
       const startBalance = TransferAmount.times(500)
-      const resDollars = await transferCeloDollars(validatorAddress, FromAddress, startBalance)
-      const resGold = await transferCeloGold(validatorAddress, FromAddress, startBalance)
+      const resDollars = await transferCeloDollars(kit, validatorAddress, FromAddress, startBalance)
+      const resGold = await transferCeloGold(kit, validatorAddress, FromAddress, startBalance)
       await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
+
+      // Unlock FromAddress account
+      await kit.web3.eth.personal.importRawKey(DEF_FROM_PK, '')
+      await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+      kit.defaultAccount = FromAddress
+
+      // Create account for FromAddress
+      const accounts = await kit.contracts.getAccounts()
+      const createAccountTx = await accounts.createAccount()
+      const txResult = await createAccountTx.send()
+      await txResult.waitReceipt()
     }
-  }
-
-  const transferCeloGold = async (
-    fromAddress: string,
-    toAddress: string,
-    amount: BigNumber,
-    txOptions: {
-      gas?: number
-      gasPrice?: string
-      feeCurrency?: string
-      gatewayFeeRecipient?: string
-      gatewayFee?: string
-    } = {}
-  ) => {
-    const res = await kit.sendTransaction({
-      from: fromAddress,
-      to: toAddress,
-      value: amount.toString(),
-      ...txOptions,
-    })
-    return res
-  }
-
-  const transferCeloDollars = async (
-    fromAddress: string,
-    toAddress: string,
-    amount: BigNumber,
-    txOptions: {
-      gas?: number
-      gasPrice?: string
-      feeCurrency?: string
-      gatewayFeeRecipient?: string
-      gatewayFee?: string
-    } = {}
-  ) => {
-    const kitStableToken = await kit.contracts.getStableToken()
-    const res = await kitStableToken.transfer(toAddress, amount.toString()).send({
-      from: fromAddress,
-      ...txOptions,
-    })
-
-    return res
   }
 
   const testTransferGold = (
@@ -385,24 +426,28 @@ describe('tracer tests', () => {
     describe(`transfer cGLD: ${name}`, () => {
       before(async function(this: any) {
         this.timeout(0)
-        fromInitialBalance = await goldToken.balanceOf(FromAddress)
+        fromInitialBalance = new BigNumber(await kit.web3.eth.getBalance(FromAddress))
+        //fromInitialBalance = await goldToken.balanceOf(FromAddress)
         toInitialBalance = await goldToken.balanceOf(ToAddress)
         receipt = await transferFn()
         receipt = await kit.web3.eth.getTransactionReceipt(receipt.transactionHash)
         txn = await kit.web3.eth.getTransaction(receipt.transactionHash)
-        fromFinalBalance = await goldToken.balanceOf(FromAddress)
+        //fromFinalBalance = await goldToken.balanceOf(FromAddress)
+        fromFinalBalance = new BigNumber(await kit.web3.eth.getBalance(FromAddress))
         toFinalBalance = await goldToken.balanceOf(ToAddress)
         trackBalances = await trackTransfers(kit, receipt.blockNumber)
         //console.info(`${name} receipt`)
         //console.info(receipt)
         //console.info(`${name} trackBalances`)
         //console.info(trackBalances)
-        //console.info('${name} txn')
+        //console.info(`${name} txn`)
         //console.info(txn)
+        //console.info(`${name} from balance delta: ` + fromFinalBalance.minus(fromInitialBalance).toFixed())
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
         assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(TransferAmount)))
+
       it(`balanceOf should decrement the sender's balance by the transfer amount`, () => {
         console.info(`gasUsed=${receipt.gasUsed}, gasPrice=${txn.gasPrice}`)
         assertEqualBN(
@@ -414,11 +459,13 @@ describe('tracer tests', () => {
           )
         )
       })
+
       it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
         assertEqualBN(
           trackBalances[normalizeAddress(ToAddress)].gold,
           new BigNumber(TransferAmount)
         ))
+
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
           trackBalances[normalizeAddress(FromAddress)].gold,
@@ -434,7 +481,7 @@ describe('tracer tests', () => {
     })
 
     testTransferGold('normal', async () => {
-      const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount)
+      const txResult = await transferCeloGold(kit, FromAddress, ToAddress, TransferAmount)
       return txResult.waitReceipt()
     })
 
@@ -442,7 +489,7 @@ describe('tracer tests', () => {
       'with feeCurrency cUSD',
       async () => {
         const feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-        const txResult = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+        const txResult = await transferCeloGold(kit, FromAddress, ToAddress, TransferAmount, {
           feeCurrency,
         })
         return txResult.waitReceipt()
@@ -652,13 +699,18 @@ describe('tracer tests', () => {
         )
         const contract = new kit.web3.eth.Contract(abi)
         const testContractTx = await contract.deploy({ data: '0x' + bytecode })
-        testContract = await testContractTx.send(txOptions)
+        testContract = await testContractTx.send({ ...txOptions }) // value: TransferAmount.toFixed() })
       })
 
       testTransferGold('with TestContract.transfer', async () => {
         const tx = await testContract.methods.transfer(ToAddress)
         return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
       })
+
+      /*testTransferGold('with TestContract.nestedTransferThenRevert', async () => {
+        const tx = await testContract.methods.nestedTransferThenRevert(ToAddress)
+        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+      })*/
 
       testTransferGold('with TestContract.transferThenIgnoreRevert', async () => {
         const tx = await testContract.methods.transferThenIgnoreRevert(ToAddress)
