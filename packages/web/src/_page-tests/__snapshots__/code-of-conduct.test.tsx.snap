@@ -416,6 +416,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1254,6 +1256,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1386,6 +1390,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1519,6 +1525,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://creativecommons.org/licenses/by-sa/3.0/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1558,6 +1566,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="http://citizencodeofconduct.org/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1597,6 +1607,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://www.djangoproject.com/conduct/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1635,6 +1647,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="http://geekfeminism.wikia.com/wiki/Community_anti-harassment"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1673,6 +1687,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://www.contributor-covenant.org/version/1/4/code-of-conduct.html"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

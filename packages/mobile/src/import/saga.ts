@@ -22,7 +22,7 @@ import { Screens } from 'src/navigator/Screens'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'import/saga'
@@ -45,8 +45,9 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
 
     if (!useEmptyWallet) {
       Logger.debug(TAG + '@importBackupPhraseSaga', 'Checking account balance')
-      const backupAccount = web3.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey))
-        .address
+      const backupAccount = getContractKit().web3.eth.accounts.privateKeyToAccount(
+        ensureLeading0x(privateKey)
+      ).address
 
       const dollarBalance: BigNumber = yield call(
         fetchTokenBalanceInWeiWithRetry,
