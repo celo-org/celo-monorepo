@@ -99,22 +99,31 @@ contract Election is
   FixidityLib.Fraction public electabilityThreshold;
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
-
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
-
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
-
   event ValidatorGroupMarkedEligible(address indexed group);
-
   event ValidatorGroupMarkedIneligible(address indexed group);
-
   event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
-
   event ValidatorGroupVoteActivated(address indexed account, address indexed group, uint256 value);
-
-  event ValidatorGroupVoteRevoked(address indexed account, address indexed group, uint256 value);
-
+  event ValidatorGroupActiveVoteRevoked(
+    address indexed account,
+    address indexed group,
+    uint256 value
+  );
+  event ValidatorGroupPendingVoteRevoked(
+    address indexed account,
+    address indexed group,
+    uint256 value
+  );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
+  event Debug(
+    uint256 votesBefore,
+    uint256 valueDelta,
+    uint256 unitsBefore,
+    uint256 unitsDelta,
+    uint256 totalVotes,
+    uint256 totalUnits
+  );
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -245,16 +254,16 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activate(address group) external nonReentrant returns (bool) {
+  function activate(address group) external nonReentrant returns (uint256) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
-    uint256 value = pendingVote.value;
-    require(value > 0, "Vote value cannot be zero");
+    require(pendingVote.value > 0, "Not enough pending votes to activate 1.");
+    uint256 value = incrementActiveVotes(group, account, pendingVote.value);
+    require(value > 0, "Not enough pending votes to activate 2.");
     decrementPendingVotes(group, account, value);
-    incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
-    return true;
+    return value;
   }
 
   /**
@@ -266,7 +275,25 @@ contract Election is
    */
   function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
+    // There must be pending votes cast in the last epoch.
+    if (pendingVote.value == 0 || pendingVote.epoch >= getEpochNumber()) {
+      return false;
+    }
+    // Those pending votes must, when activated, result in at least one unit.
+    GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
+    if (activeVotes.unitsByAccount[account] == activeVotes.totalUnits) {
+      return true;
+    } else {
+      // IFCHANGE
+      // (a + b) = (c + d) * (e + b) / (f + d) solve for d
+      uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
+      uint256 fab = activeVotes.totalUnits.mul(votesBefore.add(pendingVote.value));
+      uint256 ceb = activeVotes.unitsByAccount[account].mul(
+        activeVotes.total.add(pendingVote.value)
+      );
+      return (fab > ceb && fab.sub(ceb) >= activeVotes.total.sub(votesBefore));
+      // THENCHANGE: getActiveVoteIncrementUnitsDelta
+    }
   }
 
   /**
@@ -287,7 +314,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) external nonReentrant returns (bool) {
+  ) external nonReentrant returns (uint256) {
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
     require(0 < value, "Vote value cannot be zero");
@@ -301,8 +328,8 @@ contract Election is
     if (getTotalVotesForGroupByAccount(group, account) == 0) {
       deleteElement(votes.groupsVotedFor[account], group, index);
     }
-    emit ValidatorGroupVoteRevoked(account, group, value);
-    return true;
+    emit ValidatorGroupPendingVoteRevoked(account, group, value);
+    return value;
   }
 
   /**
@@ -323,7 +350,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) external nonReentrant returns (bool) {
+  ) external nonReentrant returns (uint256) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
@@ -332,14 +359,14 @@ contract Election is
       value <= getActiveVotesForGroupByAccount(group, account),
       "Vote value larger than active votes"
     );
-    decrementActiveVotes(group, account, value);
-    decrementTotalVotes(group, value, lesser, greater);
-    getLockedGold().incrementNonvotingAccountBalance(account, value);
+    uint256 votesDelta = decrementActiveVotes(group, account, value);
+    decrementTotalVotes(group, votesDelta, lesser, greater);
+    getLockedGold().incrementNonvotingAccountBalance(account, votesDelta);
     if (getTotalVotesForGroupByAccount(group, account) == 0) {
       deleteElement(votes.groupsVotedFor[account], group, index);
     }
-    emit ValidatorGroupVoteRevoked(account, group, value);
-    return true;
+    emit ValidatorGroupActiveVoteRevoked(account, group, votesDelta);
+    return votesDelta;
   }
 
   /**
@@ -370,18 +397,19 @@ contract Election is
     if (pendingVotes > 0) {
       uint256 decrementValue = Math.min(remainingValue, pendingVotes);
       decrementPendingVotes(group, account, decrementValue);
+      emit ValidatorGroupPendingVoteRevoked(account, group, decrementValue);
       remainingValue = remainingValue.sub(decrementValue);
     }
     uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
     if (activeVotes > 0 && remainingValue > 0) {
       uint256 decrementValue = Math.min(remainingValue, activeVotes);
-      decrementActiveVotes(group, account, decrementValue);
-      remainingValue = remainingValue.sub(decrementValue);
+      uint256 votesDelta = decrementActiveVotes(group, account, decrementValue);
+      emit ValidatorGroupPendingVoteRevoked(account, group, votesDelta);
+      remainingValue = remainingValue.sub(votesDelta);
     }
     uint256 decrementedValue = maxValue.sub(remainingValue);
     if (decrementedValue > 0) {
       decrementTotalVotes(group, decrementedValue, lesser, greater);
-      emit ValidatorGroupVoteRevoked(account, group, decrementedValue);
       if (getTotalVotesForGroupByAccount(group, account) == 0) {
         deleteElement(votes.groupsVotedFor[account], group, index);
       }
@@ -469,6 +497,15 @@ contract Election is
    */
   function getActiveVotesForGroup(address group) public view returns (uint256) {
     return votes.active.forGroup[group].total;
+  }
+
+  /**
+   * @notice Returns the pending votes made for `group`.
+   * @param group The address of the validator group.
+   * @return The pending votes made for `group`.
+   */
+  function getPendingVotesForGroup(address group) public view returns (uint256) {
+    return votes.pending.forGroup[group].total;
   }
 
   /**
@@ -659,17 +696,21 @@ contract Election is
    * @param account The address of the voting account.
    * @param value The number of votes.
    */
-  function incrementActiveVotes(address group, address account, uint256 value) private {
-    ActiveVotes storage active = votes.active;
-    active.total = active.total.add(value);
+  function incrementActiveVotes(address group, address account, uint256 value)
+    private
+    returns (uint256)
+  {
+    (uint256 unitsDelta, uint256 valueDelta) = getActiveVoteIncrementDeltas(group, account, value);
 
-    uint256 unitsDelta = getActiveVotesUnitsDelta(group, value);
+    ActiveVotes storage active = votes.active;
+    active.total = active.total.add(valueDelta);
 
     GroupActiveVotes storage groupActive = active.forGroup[group];
-    groupActive.total = groupActive.total.add(value);
+    groupActive.total = groupActive.total.add(valueDelta);
 
     groupActive.totalUnits = groupActive.totalUnits.add(unitsDelta);
     groupActive.unitsByAccount[account] = groupActive.unitsByAccount[account].add(unitsDelta);
+    return valueDelta;
   }
 
   /**
@@ -678,41 +719,151 @@ contract Election is
    * @param account The address of the voting account.
    * @param value The number of votes.
    */
-  function decrementActiveVotes(address group, address account, uint256 value) private {
+  function decrementActiveVotes(address group, address account, uint256 value)
+    private
+    returns (uint256)
+  {
+    (uint256 unitsDelta, uint256 valueDelta) = getActiveVoteDecrementDeltas(group, account, value);
+
     ActiveVotes storage active = votes.active;
-    active.total = active.total.sub(value);
+    active.total = active.total.sub(valueDelta);
 
-    // Rounding may cause getActiveVotesUnitsDelta to return 0 for value != 0, preventing users
-    // from revoking the last of their votes. The case where value == activeVotes is special cased
-    // to prevent this.
-    uint256 unitsDelta = 0;
-    uint256 activeVotes = getActiveVotesForGroupByAccount(group, account);
     GroupActiveVotes storage groupActive = active.forGroup[group];
-    if (activeVotes == value) {
-      unitsDelta = groupActive.unitsByAccount[account];
-    } else {
-      unitsDelta = getActiveVotesUnitsDelta(group, value);
-    }
+    groupActive.total = groupActive.total.sub(valueDelta);
 
-    groupActive.total = groupActive.total.sub(value);
     groupActive.totalUnits = groupActive.totalUnits.sub(unitsDelta);
     groupActive.unitsByAccount[account] = groupActive.unitsByAccount[account].sub(unitsDelta);
+    return valueDelta;
   }
 
   /**
-   * @notice Returns the delta in active vote denominator for `group`.
+   * @notice Returns the number of units that need to be added to add `value` active votes.
    * @param group The address of the validator group.
-   * @param value The number of active votes being added.
-   * @return The delta in active vote denominator for `group`.
-   * @dev Preserves unitsDelta / totalUnits = value / total
+   * @param value The number of votes being added.
+   * @return The delta in units for `group`.
+   * @dev Preserves unitsDelta / totalUnits = value / totalActiveVotes
    */
-  function getActiveVotesUnitsDelta(address group, uint256 value) private view returns (uint256) {
-    if (votes.active.forGroup[group].total == 0) {
-      return value;
+  function getActiveVoteIncrementDeltas(address group, address account, uint256 value)
+    private
+    returns (uint256, uint256)
+  {
+    // (votesBefore + value) = (unitsBefore + unitsDelta) * (totalVotesBefore + value) / (totalUnitsBefore + unitsDelta)
+    uint256 unitsDelta = 0;
+    uint256 valueDelta = 0;
+    GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
+    if (activeVotes.unitsByAccount[account] == activeVotes.totalUnits) {
+      unitsDelta = value;
+      valueDelta = value;
     } else {
-      return
-        value.mul(votes.active.forGroup[group].totalUnits).div(votes.active.forGroup[group].total);
+      unitsDelta = getActiveVoteIncrementUnitsDelta(group, account, value);
+      emit Debug(
+        getActiveVotesForGroupByAccount(group, account),
+        value,
+        activeVotes.unitsByAccount[account],
+        unitsDelta,
+        activeVotes.total,
+        activeVotes.totalUnits
+      );
+      // The ratio of total value : total units must not decrease...
+      valueDelta = getActiveVoteIncrementValueDelta(group, account, unitsDelta);
+      emit Debug(
+        getActiveVotesForGroupByAccount(group, account),
+        valueDelta,
+        activeVotes.unitsByAccount[account],
+        unitsDelta,
+        activeVotes.total,
+        activeVotes.totalUnits
+      );
     }
+    return (unitsDelta, valueDelta);
+  }
+
+  function getActiveVoteIncrementUnitsDelta(address group, address account, uint256 value)
+    private
+    view
+    returns (uint256)
+  {
+    // IFCHANGE
+    // (a + b) = (c + d) * (e + b) / (f + d) solve for d
+    GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
+    uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
+    uint256 fab = activeVotes.totalUnits.mul(votesBefore.add(value));
+    uint256 ceb = activeVotes.unitsByAccount[account].mul(activeVotes.total.add(value));
+    return fab.sub(ceb).div(activeVotes.total.sub(votesBefore));
+    // THENCHANGE: hasActivatablePendingVotes
+  }
+
+  function getActiveVoteIncrementValueDelta(address group, address account, uint256 unitsDelta)
+    private
+    view
+    returns (uint256)
+  {
+    // (a + b) = (c + d) * (e + b) / (f + d) solve for b
+    GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
+    uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
+    uint256 afd = votesBefore.mul(activeVotes.totalUnits.add(unitsDelta));
+    uint256 ecd = activeVotes.total.mul(activeVotes.unitsByAccount[account].add(unitsDelta));
+    return ecd.sub(afd).div(activeVotes.totalUnits.sub(activeVotes.unitsByAccount[account]));
+  }
+
+  /**
+   * @notice Returns the number of units that need to be added to add `value` active votes.
+   * @param group The address of the validator group.
+   * @param value The number of votes being added.
+   * @return The delta in units for `group`.
+   * @dev Preserves unitsDelta / totalUnits = value / totalActiveVotes
+   */
+  function getActiveVoteDecrementDeltas(address group, address account, uint256 value)
+    private
+    view
+    returns (uint256, uint256)
+  {
+    // (votesBefore - votesDelta) = (unitsBefore - unitsDelta) * (totalVotesBefore - votesDelta) / (totalUnitsBefore - unitsDelta)
+    uint256 unitsDelta = 0;
+    uint256 valueDelta = 0;
+    GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
+    uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
+    if (value == votesBefore) {
+      // Revoke all active votes for `group` by `account`.
+      unitsDelta = activeVotes.unitsByAccount[account];
+      valueDelta = value;
+    } else if (activeVotes.unitsByAccount[account] == activeVotes.totalUnits) {
+      // Subtracting `value` from the total active votes for `group` will reduce the number of
+      // active votes for `group` by `account` by `value` because `account` has 100% of the active
+      // votes for `group`.
+      valueDelta = value;
+    } else {
+      unitsDelta = getActiveVoteDecrementUnitsDelta(group, account, value);
+      // The ratio of total value : total units must not decrease...
+      valueDelta = getActiveVoteDecrementValueDelta(group, account, unitsDelta);
+    }
+    return (unitsDelta, valueDelta);
+  }
+
+  function getActiveVoteDecrementUnitsDelta(address group, address account, uint256 value)
+    private
+    view
+    returns (uint256)
+  {
+    // (a - b) = (c - d) * (e - b) / (f - d) solve for d
+    GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
+    uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
+    uint256 fab = activeVotes.totalUnits.mul(votesBefore.sub(value));
+    uint256 ceb = activeVotes.unitsByAccount[account].mul(activeVotes.total.sub(value));
+    return ceb.sub(fab).div(activeVotes.total.sub(votesBefore));
+  }
+
+  function getActiveVoteDecrementValueDelta(address group, address account, uint256 unitsDelta)
+    private
+    view
+    returns (uint256)
+  {
+    // (a - b) = (c - d) * (e - b) / (f - d) solve for b
+    GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
+    uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
+    uint256 afd = votesBefore.mul(activeVotes.totalUnits.sub(unitsDelta));
+    uint256 ecd = activeVotes.total.mul(activeVotes.unitsByAccount[account].sub(unitsDelta));
+    return afd.sub(ecd).div(activeVotes.totalUnits.sub(activeVotes.unitsByAccount[account]));
   }
 
   /**

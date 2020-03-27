@@ -8,9 +8,9 @@ interface IElection {
   function markGroupEligible(address, address, address) external;
   function electValidatorSigners() external view returns (address[] memory);
   function vote(address, uint256, address, address) external returns (bool);
-  function activate(address) external returns (bool);
-  function revokeActive(address, uint256, address, address, uint256) external returns (bool);
-  function revokePending(address, uint256, address, address, uint256) external returns (bool);
+  function activate(address) external returns (uint256);
+  function revokeActive(address, uint256, address, address, uint256) external returns (uint256);
+  function revokePending(address, uint256, address, address, uint256) external returns (uint256);
   function forceDecrementVotes(
     address,
     uint256,

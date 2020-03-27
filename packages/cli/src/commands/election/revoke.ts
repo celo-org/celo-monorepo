@@ -33,6 +33,7 @@ export default class ElectionRevoke extends BaseCommand {
     const election = await this.kit.contracts.getElection()
     const accounts = await this.kit.contracts.getAccounts()
     const account = await accounts.voteSignerToAccount(res.flags.from)
+    // TODO(asa): Make sure this works too...
     const txos = await election.revoke(account, res.flags.for, new BigNumber(res.flags.value))
     for (const txo of txos) {
       await displaySendTx('revoke', txo, { from: res.flags.from })
