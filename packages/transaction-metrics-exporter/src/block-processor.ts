@@ -39,7 +39,8 @@ export class BlockProcessor {
     private kit: ContractKit,
     private blockInterval = 1,
     private fromBlock: number = 0,
-    private toBlock: number = fromBlock
+    private toBlock: number = fromBlock,
+    private filterAddress?: string
   ) {}
 
   async init() {
@@ -215,7 +216,11 @@ export class BlockProcessor {
   }
 
   private logEvent(name: string, details: object) {
-    console.log(JSON.stringify({ event: name, ...details }))
+    const log = JSON.stringify({ event: name, ...details })
+    if (this.filterAddress && !log.includes(this.filterAddress)) {
+      return
+    }
+    console.log(log)
   }
 
   private logHistogram(
