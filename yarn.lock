@@ -3150,25 +3150,6 @@
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
-"@celo/contractkit@0.2.10":
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.10.tgz#d9b61df6529f21ccb57d6ba05290fb9d80b4427c"
-  integrity sha512-fMnaX85Tb/TFtnq50qAd6GTpNzRezuVQNHbY08BZIagt8hzmhXxmraQjD1Xzqb/GI74WBnMDvtcXEhXYlrZM6w==
-  dependencies:
-    "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "0.1.6"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^7.2.0"
-    cross-fetch "3.0.4"
-    debug "^4.1.1"
-    eth-lib "^0.2.8"
-    fp-ts "2.1.1"
-    io-ts "2.0.1"
-    web3 "1.0.0-beta.37"
-    web3-core-helpers "1.0.0-beta.37"
-    web3-eth-abi "1.0.0-beta.37"
-    web3-utils "1.0.0-beta.37"
-
 "@celo/contractkit@0.2.9":
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.9.tgz#98c61e2f6a7f5d47dab43d1cf6b04c48d05acc13"
@@ -3187,6 +3168,27 @@
     web3-core-helpers "1.0.0-beta.37"
     web3-eth-abi "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
+
+"@celo/contractkit@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.3.1.tgz#52415183a8d2711081b827c4f17777df3765b760"
+  integrity sha512-grWglmTB+AwqhXneichmh5RNnaUrX/xDiDazFiqD9TiH3v6nZYlx3fpA3z9QAZwZB/w7QZ69qhz/mWJ3nsfJmA==
+  dependencies:
+    "@celo/utils" "0.1.8"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    ethereumjs-util "^5.2.0"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    web3 "1.2.4"
+    web3-core "1.2.4"
+    web3-core-helpers "1.2.4"
+    web3-eth-abi "1.2.4"
+    web3-eth-contract "1.2.4"
+    web3-utils "1.2.4"
 
 "@celo/contractkit@^0.1.5", "@celo/contractkit@^0.1.6":
   version "0.1.6"
@@ -3225,9 +3227,9 @@
     qqjs "^0.3.10"
     tslib "^1.9.3"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#9d77e02":
-  version "6.6.0"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#9d77e022286739c3a453d90b85f15d1efe8cd089"
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#d5ff1f1":
+  version "6.6.1"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#d5ff1f10dfe9dbfff81ec227e70712ede52b59a0"
   dependencies:
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
@@ -3288,15 +3290,15 @@
     numeral "^2.0.6"
     web3-utils "1.0.0-beta.37"
 
-"@celo/utils@0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.6.tgz#a3d30ba7f2a8556669f7517791f75b0767d13122"
-  integrity sha512-uQqFEyYBTNioS5OZpjZwJHxoSETZrsrOa8EPcRDPRdwHDn+aN2dlVxYiNdDYy4oOxMVU7vuoollB0dXCKjmYag==
+"@celo/utils@0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.8.tgz#a9259f6f9a915da0f50c7f884cf2931f68627076"
+  integrity sha512-Zgr/N7wHTdMsc+C519JkZCqe6rfrNW8LSnscTISi5NfMTPbvDs/TvWrcuKi36JLVU5SYAPx55JGrSVOhQ1mmeg==
   dependencies:
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^7.2.0"
-    bls12377js "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
+    bls12377js "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac"
     bn.js "4.11.8"
     buffer-reverse "^1.0.1"
     country-data "^0.0.31"
@@ -3308,7 +3310,7 @@
     keccak256 "^1.0.0"
     lodash "^4.17.14"
     numeral "^2.0.6"
-    web3-utils "1.0.0-beta.37"
+    web3-utils "1.2.4"
 
 "@celo/utils@^0.1.0":
   version "0.1.4"
@@ -31269,7 +31271,7 @@ rlp@2.1.0, rlp@^2.0.0:
   dependencies:
     safe-buffer "^5.1.1"
 
-rlp@^2.2.1, rlp@^2.2.3:
+rlp@^2.2.1:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/rlp/-/rlp-2.2.3.tgz#7f94aef86cec412df87d5ea1d8cb116a47d45f0e"
   integrity sha512-l6YVrI7+d2vpW6D6rS05x2Xrmq8oW7v3pieZOJKBEdjuTF4Kz/iwk55Zyh1Zaz+KOB2kC8+2jZlp2u9L4tTzCQ==

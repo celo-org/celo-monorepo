@@ -11,12 +11,12 @@ import "./UsingRegistry.sol";
 contract TransferWhitelist is Ownable, UsingRegistry {
   using SafeMath for uint256;
 
-  address[] private whitelist;
-  bytes32[] public registeredContracts;
+  address[] private directlyWhitelistedAddresses;
+  bytes32[] public whitelistedContractIdentifiers;
 
   event WhitelistedAddress(address indexed addr);
   event WhitelistedAddressRemoved(address indexed addr);
-  event WhitelistedRegistryId(bytes32 indexed registryId);
+  event WhitelistedContractIdentifier(bytes32 indexed contractIdentifier);
 
   constructor(address registryAddress) public {
     _transferOwnership(msg.sender);
@@ -27,8 +27,8 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @notice Add an address to the whitelist.
    * @param newAddress The address to add.
    */
-  function addAddress(address newAddress) public onlyOwner {
-    whitelist.push(newAddress);
+  function whitelistAddress(address newAddress) public onlyOwner {
+    directlyWhitelistedAddresses.push(newAddress);
     emit WhitelistedAddress(newAddress);
   }
 
@@ -38,47 +38,48 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @param index Index of address in the whitelist.
    */
   function removeAddress(address removedAddress, uint256 index) external onlyOwner {
-    require(index < whitelist.length, "Whitelist index out of range");
-    require(whitelist[index] == removedAddress, "Bad whitelist index");
-    if (index != whitelist.length.sub(1)) {
-      whitelist[index] = whitelist[whitelist.length.sub(1)];
+    require(index < directlyWhitelistedAddresses.length, "Whitelist index out of range");
+    require(directlyWhitelistedAddresses[index] == removedAddress, "Bad whitelist index");
+    uint256 tailIndex = directlyWhitelistedAddresses.length.sub(1);
+    if (index != tailIndex) {
+      directlyWhitelistedAddresses[index] = directlyWhitelistedAddresses[tailIndex];
     }
-    whitelist.length = whitelist.length.sub(1);
+    directlyWhitelistedAddresses.length = tailIndex;
     emit WhitelistedAddressRemoved(removedAddress);
   }
 
   /**
    * @notice Adds the registry id of a whitelisted contract.
-   * @param registryId The id of the contract to be added.
+   * @param contractIdentifier The id of the contract to be added.
    */
-  function addRegisteredContract(bytes32 registryId) external onlyOwner {
+  function whitelistRegisteredContract(bytes32 contractIdentifier) external onlyOwner {
     require(
-      registry.getAddressFor(registryId) != address(0),
-      "registryId does not corespond to a registered address"
+      registry.getAddressFor(contractIdentifier) != address(0),
+      "contractIdentifier does not correspond to a registered address"
     );
-    registeredContracts.push(registryId);
-    emit WhitelistedRegistryId(registryId);
+    whitelistedContractIdentifiers.push(contractIdentifier);
+    emit WhitelistedContractIdentifier(contractIdentifier);
   }
 
   /**
    * @notice Gets the number of registered contracts
-   * @return The length of registeredContracts
+   * @return The length of whitelistedContractIdentifiers
    */
-  function getRegisteredContractsLength() external view returns (uint256 length) {
-    return registeredContracts.length;
+  function getNumberOfWhitelistedContractIdentifiers() external view returns (uint256 length) {
+    return whitelistedContractIdentifiers.length;
   }
 
   /**
    * @notice Set the whitelist of addresses.
    * @param  _whitelist The new whitelist of addresses.
    */
-  function setWhitelist(address[] calldata _whitelist) external onlyOwner {
-    for (uint256 i = 0; i < whitelist.length; i = i.add(1)) {
-      emit WhitelistedAddressRemoved(whitelist[i]);
+  function setDirectlyWhitelistedAddresses(address[] calldata _whitelist) external onlyOwner {
+    for (uint256 i = 0; i < directlyWhitelistedAddresses.length; i = i.add(1)) {
+      emit WhitelistedAddressRemoved(directlyWhitelistedAddresses[i]);
     }
-    whitelist.length = 0;
+    directlyWhitelistedAddresses.length = 0;
     for (uint256 i = 0; i < _whitelist.length; i = i.add(1)) {
-      addAddress(_whitelist[i]);
+      whitelistAddress(_whitelist[i]);
     }
   }
 
@@ -86,8 +87,11 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @notice Set the whitelist of registered contracts.
    * @param  _registeredContracts The new whitelist of registered contract ids.
    */
-  function setRegisteredContracts(bytes32[] calldata _registeredContracts) external onlyOwner {
-    registeredContracts = _registeredContracts;
+  function setWhitelistedContractIdentifiers(bytes32[] calldata _registeredContracts)
+    external
+    onlyOwner
+  {
+    whitelistedContractIdentifiers = _registeredContracts;
   }
 
   /**
@@ -98,15 +102,15 @@ contract TransferWhitelist is Ownable, UsingRegistry {
    * @return  The full whitelist of addresses.
    */
   function getWhitelist() external view returns (address[] memory) {
-    uint256 len = whitelist.length.add(registeredContracts.length);
+    uint256 len = directlyWhitelistedAddresses.length.add(whitelistedContractIdentifiers.length);
     address[] memory _whitelist = new address[](len);
     uint256 i = 0;
-    while (i < whitelist.length) {
-      _whitelist[i] = whitelist[i];
+    while (i < directlyWhitelistedAddresses.length) {
+      _whitelist[i] = directlyWhitelistedAddresses[i];
       i = i.add(1);
     }
-    for (uint256 j = 0; j < registeredContracts.length; j = j.add(1)) {
-      _whitelist[i] = registry.getAddressFor(registeredContracts[j]);
+    for (uint256 j = 0; j < whitelistedContractIdentifiers.length; j = j.add(1)) {
+      _whitelist[i] = registry.getAddressFor(whitelistedContractIdentifiers[j]);
       i = i.add(1);
     }
     return _whitelist;

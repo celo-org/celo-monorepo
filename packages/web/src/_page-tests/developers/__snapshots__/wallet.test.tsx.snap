@@ -992,6 +992,8 @@ Array [
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1690,6 +1692,8 @@ for your Android or Apple mobile phone
                   data-focusable={true}
                   dir="auto"
                   href="https://docs.celo.org/getting-started/alfajores-testnet"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {

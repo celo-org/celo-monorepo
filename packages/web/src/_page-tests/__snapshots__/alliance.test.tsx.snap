@@ -3484,6 +3484,8 @@ exports[`Alliance renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoorg/how-to-design-for-all-stories-from-tanzania-refugees-8b34594d64ae"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3927,6 +3929,8 @@ exports[`Alliance renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoorg/a-cryptocurrency-for-every-juan-144144e62d5"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4720,7 +4724,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  Aquire
+                  Acquire
                 </div>
                 <div
                   className="css-text-901oao"
@@ -5176,7 +5180,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            Aquire
+            Acquire
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -6436,6 +6440,8 @@ exports[`Alliance renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://medium.com/celoOrg"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -8427,6 +8433,8 @@ exports[`Alliance renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="/code-of-conduct"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -8869,6 +8877,8 @@ exports[`Alliance renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoDevs"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -8912,6 +8922,8 @@ exports[`Alliance renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/CeloOrg"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {

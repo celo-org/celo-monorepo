@@ -757,6 +757,8 @@ Stake Off
               data-focusable={true}
               dir="auto"
               href="/stake-off/terms"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1500,6 +1502,8 @@ Leaderboard
                     data-focusable={true}
                     dir="auto"
                     href="/stake-off/terms"
+                    onClick={[Function]}
+                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -1888,6 +1892,8 @@ Leaderboard
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1991,6 +1997,8 @@ Leaderboard
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2218,6 +2226,8 @@ Leaderboard
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2321,6 +2331,8 @@ Leaderboard
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2548,6 +2560,8 @@ Leaderboard
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2651,6 +2665,8 @@ Leaderboard
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2765,6 +2781,8 @@ Leaderboard
               data-focusable={true}
               dir="auto"
               href="https://github.com/celo-org"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -4301,6 +4319,8 @@ Build dApps for the Celo platform.
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4580,6 +4600,8 @@ Build dApps for the Celo platform.
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4835,6 +4857,8 @@ Build dApps for the Celo platform.
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5131,6 +5155,8 @@ Deploy a Full Node or Validator and win prizes.
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoOrg/announcing-the-great-celo-stake-off-12eb15dd5eb0"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5410,6 +5436,8 @@ Deploy a Full Node or Validator and win prizes.
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/getting-started/running-a-validator"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5665,6 +5693,8 @@ Deploy a Full Node or Validator and win prizes.
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5818,6 +5848,8 @@ Deploy a Full Node or Validator and win prizes.
           data-focusable={true}
           dir="auto"
           href="https://c-labs.typeform.com/to/gj9aUp"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -6098,6 +6130,8 @@ Deploy a Full Node or Validator and win prizes.
           data-focusable={true}
           dir="auto"
           href="/code-of-conduct"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -6540,6 +6574,8 @@ Deploy a Full Node or Validator and win prizes.
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoDevs"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6583,6 +6619,8 @@ Deploy a Full Node or Validator and win prizes.
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/CeloOrg"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {

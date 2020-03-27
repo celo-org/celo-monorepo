@@ -115,6 +115,10 @@
       "title": "Validator Elections Start",
       "text": "When sufficient validators and groups are registered and staked, validator elections and epoch rewards can be enabled via on-chain governance proposal"
     },
+    "Rewards_Activated": {
+      "title": "Celo Gold Voter Rewards Activate",
+      "text": "Voter rewards can be enabled via on-chain governance proposal"
+    },
     "Mainnet_Release_Candidate_X": {
       "title": "Mainnet Release Candidate X",
       "text": "Possible additional release candidates in the event critical issues are discovered"
@@ -159,11 +163,11 @@
       "title": "Mobile Wallet in Market Testing Begins",
       "text": "Ongoing research in emerging markets"     
     }
+  }
   },
   "coinlist": {
     "title": "Become a Backer of Celo",
     "text": "Celo Gold will be available for purchase via CoinList. Everyone participating pays the same fair price and the minimum contribution is $100 USD. Available to non-US persons only, other restrictions apply.",
     "btn": "Participate"
   }
-}
 }

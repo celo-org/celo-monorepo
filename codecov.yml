@@ -3,13 +3,17 @@ coverage:
     project:
       default: off
       mobile:
-        paths: 'packages/mobile/'
-        flags: mobile
+        paths:
+          - packages/mobile/
+        flags:
+          - mobile
         threshold: 5%
         target: 70%
       web:
-        paths: 'packages/web/'
-        flags: web
+        paths:
+          - packages/web/
+        flags:
+          - web
         threshold: 2%
         target: 75%
       # Protocol codecov disabled until coverage tests are fixed.
@@ -21,8 +25,7 @@ coverage:
         #if_no_uploads: error
         #if_not_found: success
         #if_ci_failed: error
-    patch:
-      default: off
+    patch: off
 
 flags:
   mobile:

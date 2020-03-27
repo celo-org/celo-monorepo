@@ -418,6 +418,8 @@ Communities mirror the societies in which they exist and positive action is esse
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1262,6 +1264,8 @@ If a community member engages in unacceptable behavior, the community organizers
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1394,6 +1398,8 @@ If a community member engages in unacceptable behavior, the community organizers
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1526,6 +1532,8 @@ If a community member engages in unacceptable behavior, the community organizers
             data-focusable={true}
             dir="auto"
             href="https://creativecommons.org/licenses/by-sa/3.0/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1563,6 +1571,8 @@ If a community member engages in unacceptable behavior, the community organizers
             data-focusable={true}
             dir="auto"
             href="http://citizencodeofconduct.org/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1600,6 +1610,8 @@ If a community member engages in unacceptable behavior, the community organizers
             data-focusable={true}
             dir="auto"
             href="https://www.djangoproject.com/conduct/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1637,6 +1649,8 @@ If a community member engages in unacceptable behavior, the community organizers
             data-focusable={true}
             dir="auto"
             href="http://geekfeminism.wikia.com/wiki/Community_anti-harassment"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1674,6 +1688,8 @@ If a community member engages in unacceptable behavior, the community organizers
             data-focusable={true}
             dir="auto"
             href="https://www.contributor-covenant.org/version/1/4/code-of-conduct.html"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
