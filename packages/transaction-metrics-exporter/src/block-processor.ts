@@ -8,7 +8,7 @@ import fs from 'fs'
 
 import { Counters } from './metrics'
 import { Contracts, stateGetters } from './states'
-import { toMethodId, toTxMap, getInternalTransactions } from './utils'
+import { toMethodId, toTxMap } from './utils'
 
 const tracerAsText = fs.readFileSync(__dirname + '/tracer.js.txt', 'utf8')
 

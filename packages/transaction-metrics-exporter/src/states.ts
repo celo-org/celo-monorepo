@@ -40,37 +40,54 @@ export function getter<
 }
 
 export const stateGetters: StateGetter[] = [
-  getter(
-    'Exchange',
-    'getBuyAndSellBuckets',
-    ([currentStableBucket, currentGoldBucket]) => ({
-      currentStableBucket: +currentStableBucket,
-      currentGoldBucket: +currentGoldBucket,
-    }),
-    [true],
-    { currentStableBucket: 10 ** 26, currentGoldBucket: 10 ** 26 }
-  ),
-  getter('SortedOracles', 'medianRate', ({ rate }) => ({ medianRate: +rate }), [
-    CeloContract.StableToken,
-  ]),
-  // getter(
-  //   'Reserve',
-  //   'getReserveGoldBalance',
-  //   (goldBalance) => ({goldBalance: +goldBalance}),
-  // ),
-  getter(
-    'GoldToken',
-    'totalSupply',
-    (goldTokenTotalSupply) => ({
-      goldTokenTotalSupply: +goldTokenTotalSupply,
-    }),
-    undefined,
-    { goldTokenTotalSupply: 10 ** 27 }
-  ),
-  getter('EpochRewards', 'getTargetGoldTotalSupply', (rewardsAmount) => ({
-    rewardsAmount: +rewardsAmount,
-  })),
-  getter('EpochRewards', 'getRewardsMultiplier', (rewardsMultiplier) => ({
-    rewardsMultiplier: +rewardsMultiplier,
-  })),
-]
+    getter(
+      'Exchange',
+      'getBuyAndSellBuckets',
+      ([currentStableBucket, currentGoldBucket]) => ({
+        currentStableBucket: +currentStableBucket,
+        currentGoldBucket: +currentGoldBucket,
+      }),
+      [true],
+      { currentStableBucket: 10 ** 26, currentGoldBucket: 10 ** 26 }
+    ),
+    getter('SortedOracles', 'medianRate', ({ rate }) => ({ medianRate: +rate }), [
+      CeloContract.StableToken,
+    ]),
+    // getter(
+    //   'Reserve',
+    //   'getReserveGoldBalance',
+    //   (goldBalance) => ({goldBalance: +goldBalance}),
+    // ),
+    getter(
+      'GoldToken',
+      'totalSupply',
+      (goldTokenTotalSupply) => ({
+        goldTokenTotalSupply: +goldTokenTotalSupply,
+      }),
+      undefined,
+      { goldTokenTotalSupply: 10 ** 27 }
+    ),
+    getter('EpochRewards', 'getTargetGoldTotalSupply', (rewardsAmount) => ({
+      rewardsAmount: +rewardsAmount,
+    })),
+    getter('EpochRewards', 'getRewardsMultiplier', (rewardsMultiplier) => ({
+      rewardsMultiplier: +rewardsMultiplier,
+    })),
+  ]
+
+  // Include getters for accounts
+;(process.env.WATCH_ADDRESS || '')
+  .split(/,\s?/)
+  .filter((address) => address.match(/^0x[a-f0-9]{40}$/g))
+  .forEach((address) => {
+    stateGetters.push(
+      getter(
+        'GoldToken',
+        'balanceOf',
+        (balance) => ({
+          balance: +balance,
+        }),
+        [address]
+      )
+    )
+  })
