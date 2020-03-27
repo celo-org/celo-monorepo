@@ -20,7 +20,9 @@ describe('when isRestricted is false', () => {
 
     await waitForElement(() => queryByText('coinlist.btn'))
 
-    expect(queryByText('coinlist.btn').getAttribute('href')).toEqual('https://coinlist.co/celo')
+    expect(queryByText('coinlist.btn').getAttribute('href')).toEqual(
+      'https://coinlist.co/celo?utm_source=celo%20website&utm_medium=website%20widget&utm_campaign=celowebsite_20200318'
+    )
 
     expect(queryByAltText('coinlist logo')).toBeTruthy()
   })

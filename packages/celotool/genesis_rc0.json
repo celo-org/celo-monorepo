@@ -8,7 +8,7 @@
     "byzantiumBlock": 0,
     "constantinopleBlock": 0,
     "petersburgBlock": 0,
-    "chainId": 20200312,
+    "chainId": 200312,
     "istanbul": {
       "policy": 2,
       "blockperiod": 5,

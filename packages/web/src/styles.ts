@@ -11,6 +11,7 @@ export enum colors {
   dark = '#2E3338',
   darkTransparent = 'rgba(46, 51, 56, 0.5)',
   gold = '#FBCC5C',
+  goldDark = '#D8A11F',
   goldSelect = 'rgba(251, 204, 92, 0.4)',
   goldSubtle = 'rgba(251, 204, 92, 0.2)',
   primary = '#35D07F',

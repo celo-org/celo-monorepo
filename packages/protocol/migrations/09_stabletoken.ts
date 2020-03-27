@@ -60,10 +60,12 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     if (goldPrice) {
       const fromAddress = truffle.networks[networkName].from
       const isOracle = config.stableToken.oracles.some((o) => eqAddress(o, fromAddress))
-      console.assert(
-        isOracle,
-        `Gold price specified in migration but ${fromAddress} not authorized as oracle`
-      )
+      if (!isOracle) {
+        console.warn(
+          `Gold price specified in migration but ${fromAddress} not explicitly authorized as oracle, authorizing...`
+        )
+        await sortedOracles.addOracle(stableToken.address, ensureLeading0x(fromAddress))
+      }
       console.info('Reporting price of StableToken to oracle')
       await sortedOracles.report(
         stableToken.address,
