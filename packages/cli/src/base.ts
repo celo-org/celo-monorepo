@@ -89,8 +89,14 @@ export abstract class BaseCommand extends LocalCommand {
     }
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags.useLedger) {
-      const transport = await TransportNodeHid.open('')
-      this._wallet = await newLedgerWalletWithSetup(transport, [0, 1])
+      let transport: Transport
+      try {
+        transport = await TransportNodeHid.open('')
+        this._wallet = await newLedgerWalletWithSetup(transport)
+      } catch (err) {
+        console.log('Check if the ledger is connected and logged.')
+        throw err
+      }
     }
   }
 
