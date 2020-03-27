@@ -11,7 +11,7 @@ import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import LogoExample, { Logos } from 'src/brandkit/logo/LogoExample'
 import LogoWithBackground from 'src/brandkit/logo/LogoWithBackground'
 import { Digital, Print } from 'src/brandkit/logo/Minimums'
-import { AssetTypes, GLYPH_TRACKING, trackDownloads } from 'src/brandkit/tracking'
+import { GLYPH_TRACKING, LOGO_PKG_TRACKING, trackDownload } from 'src/brandkit/tracking'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -45,7 +45,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
     const glyphAreaStyle = screen === ScreenSizes.DESKTOP ? styles.pilar : styles.square
 
     const onPressDownload = React.useCallback(async () => {
-      await trackDownloads({ name: 'logo package', type: AssetTypes.logo })
+      await trackDownload(LOGO_PKG_TRACKING)
     }, [])
 
     return (

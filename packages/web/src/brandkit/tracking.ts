@@ -13,6 +13,10 @@ export const JOST_TRACKING = { name: 'Jost', type: AssetTypes.font }
 
 export const GARMOND_TRACKING = { name: 'Garmond', type: AssetTypes.font }
 
-export async function trackDownloads({ name, type }) {
+export const LOGO_PKG_TRACKING = { name: 'Logo Package', type: AssetTypes.logo }
+
+export const VOICE_DOC_TRACKING = { name: 'Celo Voice Doc', type: AssetTypes.logo }
+
+export async function trackDownload({ name, type }) {
   await analytics.track(`${name} Downloaded`, { assetType: type, scope: 'brand-kit' })
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { brandStyles } from 'src/brandkit/common/constants'
-import { AssetTypes, trackDownloads } from 'src/brandkit/tracking'
+import { AssetTypes, trackDownload } from 'src/brandkit/tracking'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Download from 'src/icons/Download'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -16,7 +16,7 @@ export default withNamespaces(NameSpaces.brand)(function DownloadButton({
   trackingData,
 }: Props & I18nProps) {
   const onPress = React.useCallback(async () => {
-    await trackDownloads(trackingData)
+    await trackDownload(trackingData)
   }, [trackingData])
 
   return (

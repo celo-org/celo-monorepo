@@ -61,7 +61,7 @@ export default React.memo(function Showcase({
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
         <Text style={fonts.legal}>{description}</Text>
       </View>
-      <DownloadButton uri={uri} trackingData={{ name, type: assetType }} />
+      <DownloadButton uri={uri} trackingData={{ name: `${name} ${assetType}`, type: assetType }} />
     </View>
   )
 })
