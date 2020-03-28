@@ -568,11 +568,11 @@ describe('governance tests', () => {
 
     it('should block propose in a round robin fashion', async () => {
       let roundRobinOrder: string[] = []
-      let goodEpoch = true
+      let goodEpoch = false
       let lastEpoch = 0
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
-        if (lastEpochBlock !== 0 && goodEpoch && lastEpochBlock > lastEpoch) {
+        if (lastEpoch !== 0 && goodEpoch && lastEpochBlock > lastEpoch) {
           return
         }
         if (lastEpochBlock > lastEpoch) {
@@ -832,7 +832,11 @@ describe('governance tests', () => {
           const activeVotes = new BigNumber(
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
           )
-          console.log('active votes', activeVotes)
+          console.log(
+            'active votes',
+            activeVotes,
+            await election.methods.getActiveVotes().call({}, blockNumber)
+          )
           assert.isFalse(activeVotes.isZero())
 
           // We need to calculate the rewards multiplier for the previous block, before
