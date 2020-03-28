@@ -18,7 +18,6 @@ import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
-import { getFormattedMediumArticles } from './mediumAPI'
 import respondError from './respondError'
 
 const CREATED = 201
@@ -189,15 +188,6 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       text: email,
     })
     res.status(NO_CONTENT).send('ok')
-  })
-
-  server.get('/proxy/medium', async (_, res) => {
-    try {
-      const articlesdata = await getFormattedMediumArticles()
-      res.json(articlesdata)
-    } catch (e) {
-      respondError(res, e)
-    }
   })
 
   server.get('/proxy/events/', async (_, res) => {

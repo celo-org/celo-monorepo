@@ -1,10 +1,11 @@
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
 import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
-import { stopProvider } from '../utils/provider-utils'
+import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
-import { DefaultWallet, Wallet } from '../utils/wallet'
+import { DefaultWallet } from '../wallets/default-wallet'
+import { Wallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
@@ -20,15 +21,14 @@ enum InterceptedMethods {
 }
 
 export class CeloProvider {
-  private readonly wallet: Wallet
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
+  wallet: Wallet
 
-  constructor(readonly existingProvider: provider) {
+  constructor(readonly existingProvider: provider, wallet: Wallet = new DefaultWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
-    this.wallet = new DefaultWallet()
     // @ts-ignore
     if (existingProvider.on !== undefined) {
       // @ts-ignore
@@ -37,10 +37,15 @@ export class CeloProvider {
         existingProvider.on(type, callback)
       }
     }
+    this.wallet = wallet
   }
 
   addAccount(privateKey: string) {
-    this.wallet.addAccount(privateKey)
+    if (hasProperty<{ addAccount: (privateKey: string) => void }>(this.wallet, 'addAccount')) {
+      this.wallet.addAccount(privateKey)
+    } else {
+      throw new Error("The wallet used, can't add accounts")
+    }
   }
 
   async getAccounts(): Promise<string[]> {

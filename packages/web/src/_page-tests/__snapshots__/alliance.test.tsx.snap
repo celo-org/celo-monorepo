@@ -2163,7 +2163,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              thematicStatement
+              Money can be beautiful
             </h4>
           </div>
         </div>
@@ -2299,7 +2299,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              title
+              Alliance for Prosperity
             </h1>
             <h4
               aria-level="4"
@@ -2318,7 +2318,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              mission
+              Create a more prosperous world with mission-aligned organizations
             </h4>
           </div>
         </div>
@@ -2394,7 +2394,7 @@ exports[`Alliance renders 1`] = `
                         }
                       }
                     >
-                      form.name
+                      Name
                     </label>
                   </div>
                   <input
@@ -2500,7 +2500,7 @@ exports[`Alliance renders 1`] = `
                         }
                       }
                     >
-                      form.email
+                      Email
                     </label>
                   </div>
                   <input
@@ -2599,7 +2599,7 @@ exports[`Alliance renders 1`] = `
                       }
                     }
                   >
-                    form.contribution
+                    How might you contribute to the Alliance?
                   </label>
                 </div>
                 <input
@@ -2766,7 +2766,7 @@ exports[`Alliance renders 1`] = `
                         }
                       }
                     >
-                      form.subscribe
+                      Join the Celo Newsletter
                     </label>
                   </div>
                 </div>
@@ -2851,7 +2851,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  form.btn
+                  Apply
                 </a>
               </div>
             </div>
@@ -2923,7 +2923,7 @@ exports[`Alliance renders 1`] = `
             }
           }
         >
-          affirmations.smallTitle
+          Take action to solve real-world problems
         </h3>
         <h2
           aria-level="2"
@@ -2943,7 +2943,7 @@ exports[`Alliance renders 1`] = `
             }
           }
         >
-          affirmations.title
+          What the Alliance stands for
         </h2>
       </div>
     </div>
@@ -3012,6 +3012,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
+            We believe we have a lot to learn from 
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
               dir="auto"
@@ -3021,7 +3022,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              ""
+              one another.
             </span>
           </h4>
           <div
@@ -3089,7 +3090,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            affirmations.laboratoriaCopy
+            Hosting a design-a-thon with young female coding students in Mexico exploring ideas for blockchain technology.
           </div>
         </div>
       </div>
@@ -3359,6 +3360,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
+            We believe in designing 
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
               dir="auto"
@@ -3368,8 +3370,9 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              ""
+              with communities
             </span>
+            , not for them.
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -3436,7 +3439,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            affirmations.wfpCopy
+            Collaborating to bring financial tools to refugees.
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -3481,6 +3484,8 @@ exports[`Alliance renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoorg/how-to-design-for-all-stories-from-tanzania-refugees-8b34594d64ae"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3501,7 +3506,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                affirmations.wfpButton
+                Tanzania Research Report
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -3801,6 +3806,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
+            We believe systems are complex and require 
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
               dir="auto"
@@ -3810,7 +3816,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              ""
+              collaboration.
             </span>
           </h4>
           <div
@@ -3878,7 +3884,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            affirmations.cLabsCopy
+            Exploring how to bring more Filipino merchants & consumers  into the formal economy.
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -3923,6 +3929,8 @@ exports[`Alliance renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoorg/a-cryptocurrency-for-every-juan-144144e62d5"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3943,7 +3951,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                affirmations.cLabsButton
+                Phillippines Pilot Report
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -4354,7 +4362,7 @@ exports[`Alliance renders 1`] = `
             }
           }
         >
-          members.title
+          Meet the Alliance
         </h2>
         <h4
           aria-level="4"
@@ -4373,6 +4381,7 @@ exports[`Alliance renders 1`] = `
             }
           }
         >
+          Member contributions, 
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
             dir="auto"
@@ -4381,7 +4390,9 @@ exports[`Alliance renders 1`] = `
                 "fontStyle": "italic",
               }
             }
-          />
+          >
+            in no particular order
+          </span>
         </h4>
       </div>
     </div>
@@ -4448,7 +4459,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            filterLabel
+            Refine By
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -4560,7 +4571,7 @@ exports[`Alliance renders 1`] = `
                       }
                     }
                   >
-                    members.categoryTitle.all
+                    Show All
                   </label>
                   <svg
                     aria-label="[title]"
@@ -4645,7 +4656,7 @@ exports[`Alliance renders 1`] = `
                   }
                   tabIndex="0"
                 >
-                  members.categoryTitle.all
+                  Show All
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4679,7 +4690,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.accept
+                  Accept
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4713,7 +4724,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.acquire
+                  Acquire
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4747,7 +4758,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.build
+                  Build
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4781,7 +4792,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.earn
+                  Earn
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4815,7 +4826,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.educate
+                  Educate
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4849,7 +4860,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.give
+                  Give
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4883,7 +4894,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.grow
+                  Grow
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4917,7 +4928,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.lend
+                  Lend
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4951,7 +4962,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.preserve
+                  Preserve
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4985,7 +4996,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.save
+                  Save
                 </div>
                 <div
                   className="css-text-901oao"
@@ -5019,7 +5030,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.secure
+                  Secure
                 </div>
                 <div
                   className="css-text-901oao"
@@ -5053,7 +5064,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  members.categoryTitle.send
+                  Send
                 </div>
               </div>
             </div>
@@ -5098,7 +5109,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.accept
+            Accept
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5124,7 +5135,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.accept
+            Enable your communities to easily pay for mobile top ups, utilities, and shopping online with cUSD
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5169,7 +5180,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.acquire
+            Acquire
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5195,7 +5206,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.acquire
+            Make it easy to acquire cUSD in digital wallets
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5240,7 +5251,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.build
+            Build
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5266,7 +5277,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.build
+            Deliver innovative solutions for your customers by building on the Celo platform
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5311,7 +5322,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.earn
+            Earn
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5337,7 +5348,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.earn
+            Allow communities to earn stable, digital assets for lending their talents for various tasks
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5382,7 +5393,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.educate
+            Educate
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5408,7 +5419,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.educate
+            Incentivize communities to learn about Celo and actively engage with the Celo platform
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5453,7 +5464,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.give
+            Give
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5479,7 +5490,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.give
+            Increase transparency, reduce fraud, and increase mobility by giving cUSD
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5524,7 +5535,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.grow
+            Grow
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5550,7 +5561,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.grow
+            Grow the Celo platform through the purchase of the native token, cGLD
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5595,7 +5606,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.lend
+            Lend
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5621,7 +5632,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.lend
+            Accelerate speed of delivery and reduce costs by lending cUSD
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5666,7 +5677,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.preserve
+            Preserve
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5692,7 +5703,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.preserve
+            Preserve natural resources by supporting projects through Celo rewards
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5737,7 +5748,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.send
+            Send
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5763,7 +5774,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.send
+            Send remittances almost anywhere, instantly for as little as $.01
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5808,7 +5819,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.save
+            Save
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5834,7 +5845,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.save
+            Help your communities overcome inflation and build for their future by saving in cUSD
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5879,7 +5890,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryTitle.secure
+            Secure
           </h4>
           <div
             className="css-view-1dbjc4n"
@@ -5905,7 +5916,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            members.categoryText.secure
+            Keep identity, assets, and the network secure
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -6124,7 +6135,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            mediumArticlesTitle
+            Stories from the Alliance
           </h2>
         </div>
       </div>
@@ -6429,6 +6440,8 @@ exports[`Alliance renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://medium.com/celoOrg"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -6450,7 +6463,7 @@ exports[`Alliance renders 1`] = `
               }
               target="_blog"
             >
-              common:readMoreFromOurBlog
+              Read more on our blog
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -6564,7 +6577,7 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
-        benefits.headline
+        Benefits of collaborating on a mission-driven blockchain
       </div>
       <h2
         aria-level="2"
@@ -6584,7 +6597,7 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
-        benefits.title
+        What the Alliance offers
       </h2>
       <div
         className="css-view-1dbjc4n"
@@ -6687,7 +6700,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            benefits.offerings.0
+            Connect with like-minded members
           </div>
         </div>
         <div
@@ -6766,7 +6779,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            benefits.offerings.1
+            Build and shape improvements to the Celo platform
           </div>
         </div>
         <div
@@ -6845,7 +6858,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            benefits.offerings.2
+            Attend special programs and events
           </div>
         </div>
         <div
@@ -6924,7 +6937,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            benefits.offerings.3
+            Access to education and support
           </div>
         </div>
         <div
@@ -7003,7 +7016,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            benefits.offerings.4
+            Expand your reach to help more communities
           </div>
         </div>
       </div>
@@ -7140,7 +7153,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            title
+            Alliance for Prosperity
           </h1>
           <h4
             aria-level="4"
@@ -7159,7 +7172,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            mission
+            Create a more prosperous world with mission-aligned organizations
           </h4>
         </div>
         <form>
@@ -7226,7 +7239,7 @@ exports[`Alliance renders 1`] = `
                       }
                     }
                   >
-                    form.name
+                    Name
                   </label>
                 </div>
                 <input
@@ -7332,7 +7345,7 @@ exports[`Alliance renders 1`] = `
                       }
                     }
                   >
-                    form.email
+                    Email
                   </label>
                 </div>
                 <input
@@ -7431,7 +7444,7 @@ exports[`Alliance renders 1`] = `
                     }
                   }
                 >
-                  form.contribution
+                  How might you contribute to the Alliance?
                 </label>
               </div>
               <input
@@ -7598,7 +7611,7 @@ exports[`Alliance renders 1`] = `
                       }
                     }
                   >
-                    form.subscribe
+                    Join the Celo Newsletter
                   </label>
                 </div>
               </div>
@@ -7683,7 +7696,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                form.btn
+                Apply
               </a>
             </div>
           </div>
@@ -8367,7 +8380,7 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
-        conductLabel
+        Code of Conduct
       </h3>
     </div>
     <div
@@ -8403,7 +8416,7 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
-        conductText
+        Shared norms and behaviors are the foundation of a beautiful community. Please read and respect our code of conduct.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -8420,6 +8433,8 @@ exports[`Alliance renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="/code-of-conduct"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -8467,7 +8482,7 @@ exports[`Alliance renders 1`] = `
             }
           }
         >
-          conductBtn
+          Read Document
         </a>
       </div>
     </div>
@@ -8527,7 +8542,7 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
-        experienceLabel
+        Experience
       </h3>
     </div>
     <div
@@ -8646,7 +8661,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                channels.brand.name
+                Brand Toolkit
               </div>
             </a>
             <div
@@ -8662,7 +8677,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              channels.brand.text
+              Design with Celo
             </div>
           </div>
         </div>
@@ -8723,7 +8738,7 @@ exports[`Alliance renders 1`] = `
           }
         }
       >
-        socialLabel
+        Engage
       </h3>
     </div>
     <div
@@ -8862,6 +8877,8 @@ exports[`Alliance renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoDevs"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -8905,6 +8922,8 @@ exports[`Alliance renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/CeloOrg"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -8990,7 +9009,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                channels.github.name
+                GitHub
               </div>
             </a>
             <div
@@ -9006,7 +9025,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              channels.github.text
+              Contribute to the codebase
             </div>
           </div>
         </div>
@@ -9072,7 +9091,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                channels.discord.name
+                Discord
               </div>
             </a>
             <div
@@ -9088,7 +9107,8 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              channels.discord.text
+              Collaborate and get
+developer support
             </div>
           </div>
         </div>
@@ -9152,7 +9172,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                channels.forum.name
+                Forum
               </div>
             </a>
             <div
@@ -9168,7 +9188,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              channels.forum.text
+              Ask technical questions
             </div>
           </div>
         </div>
@@ -9253,7 +9273,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                channels.events.name
+                Events
               </div>
             </a>
             <div
@@ -9269,7 +9289,7 @@ exports[`Alliance renders 1`] = `
                 }
               }
             >
-              channels.events.text
+              Connect in Person
             </div>
           </div>
         </div>
@@ -9346,7 +9366,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            stayConnected
+            Stay connected
           </h3>
           <div
             className="css-text-901oao"
@@ -9362,7 +9382,7 @@ exports[`Alliance renders 1`] = `
               }
             }
           >
-            receiveUpdates
+            Receive the latest updates to your inbox
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -9389,7 +9409,7 @@ exports[`Alliance renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="common:email*"
+              placeholder="Email*"
               readOnly={false}
               required={true}
               spellCheck={true}
@@ -9494,7 +9514,7 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               >
-                signUp
+                Sign Up
               </a>
             </div>
             <div
