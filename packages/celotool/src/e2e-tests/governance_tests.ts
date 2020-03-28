@@ -112,7 +112,7 @@ async function newKeyRotator(
         const signer: string = (await signerWeb3.eth.getAccounts())[0]
         const signerPrivateKey = privateKeys[index - 1]
         await authorizeValidatorSigner(signer, signerWeb3, signerPrivateKey)
-        console.log('rotated key', signer, index, signerPrivateKey)
+        console.log('rotated key', validator, signer, index, signerPrivateKey)
         assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
       }
     },
@@ -517,8 +517,7 @@ describe('governance tests', () => {
         // Prepare for member swapping.
         await sleep(epoch)
       }
-      // await sleep(1000)
-
+      await sleep(10000)
       ;(subscription as any).unsubscribe()
 
       // Wait for the current epoch to complete.
@@ -570,10 +569,11 @@ describe('governance tests', () => {
       let roundRobinOrder: string[] = []
       let goodEpoch = false
       let lastEpoch = 0
+      let numGoodEpochs = 0
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
         if (lastEpoch !== 0 && goodEpoch && lastEpochBlock > lastEpoch) {
-          return
+          numGoodEpochs += 1
         }
         if (lastEpochBlock > lastEpoch) {
           lastEpoch = lastEpochBlock
@@ -597,7 +597,10 @@ describe('governance tests', () => {
               )
             )
           )
-          if (JSON.stringify(roundRobinOrder.sort()) !== JSON.stringify(validatorSet.sort())) {
+          if (
+            JSON.stringify(roundRobinOrder.concat().sort()) !==
+            JSON.stringify(validatorSet.concat().sort())
+          ) {
             console.log('problem with members')
             goodEpoch = false
           }
@@ -605,12 +608,21 @@ describe('governance tests', () => {
         const indexInEpoch = blockNumber - lastEpochBlock - 1
         const expectedProposer = roundRobinOrder[indexInEpoch % roundRobinOrder.length]
         const block = await web3.eth.getBlock(blockNumber)
+        console.log(
+          'proposer',
+          block.miner,
+          expectedProposer,
+          indexInEpoch,
+          indexInEpoch % roundRobinOrder.length,
+          roundRobinOrder.length,
+          blockNumber
+        )
         if (!eqAddress(block.miner, expectedProposer)) {
-          console.log('unexpected proposer', block.miner, expectedProposer, indexInEpoch)
+          // console.log(' ---- unexpected proposer', block.miner, expectedProposer, indexInEpoch)
           goodEpoch = false
         }
       }
-      assert(false)
+      assert(numGoodEpochs > 2)
     })
 
     it('should update the validator scores at the end of each epoch', async function(this: any) {
@@ -878,20 +890,18 @@ describe('governance tests', () => {
           // Calculate the expected voting reward
           console.log(
             'target gold fraction',
-            await epochRewards.methods.getTargetVotingGoldFraction().call({}, blockNumber - 1)
+            await epochRewards.methods.getTargetVotingGoldFraction().call({}, blockNumber)
           )
           console.log(
             'gold fraction',
-            await epochRewards.methods.getVotingGoldFraction().call({}, blockNumber - 1)
+            await epochRewards.methods.getVotingGoldFraction().call({}, blockNumber)
           )
           const targetVotingYield = new BigNumber(
-            (
-              await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber - 1)
-            )[0]
+            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
           )
           console.log(
             'target voting',
-            await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber - 1)
+            await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber)
           )
           assert.isFalse(targetVotingYield.isZero())
           const expectedVoterRewards = activeVotes
@@ -900,10 +910,10 @@ describe('governance tests', () => {
 
           // infra: (x / (1 - x)) * predicted supply increase * rewards mult
           const communityRewardFrac = new BigNumber(
-            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber - 1)
+            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber)
           )
           const carbonOffsettingFrac = new BigNumber(
-            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber - 1)
+            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber)
           )
 
           const fundFactor = new BigNumber(1)
@@ -915,12 +925,14 @@ describe('governance tests', () => {
             .times(fromFixed(communityRewardFrac))
             .div(fundFactor)
 
+          /*
           const targetGoldSupplyIncrease = new BigNumber(
             await epochRewards.methods.getTargetGoldSupplyIncrease().call({}, blockNumber - 1)
           )
           const expected2 = targetGoldSupplyIncrease
             .times(fromFixed(communityRewardFrac))
             .times(fromFixed(rewardsMultiplier))
+          */
 
           const expectedCarbonOffsettingPartnerAward = expectedVoterRewards
             .plus(maxPotentialValidatorReward)
@@ -936,14 +948,14 @@ describe('governance tests', () => {
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
           const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
-          console.log('voter rewards')
-          assertAlmostEqual(expectedVoterRewards, expected2, totalVoterRewards)
+          console.log('voter rewards', expectedVoterRewards, totalVoterRewards)
+          assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
           console.log('community rewards')
           assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
           console.log('carbon rewards')
           assertAlmostEqual(expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
           // Check TS calc'd rewards against what happened
-          console.log('votes changed')
+          console.log('votes changed', expectedVoterRewards)
           await assertVotesChanged(blockNumber, expectedVoterRewards)
           console.log('locked gold balance')
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
