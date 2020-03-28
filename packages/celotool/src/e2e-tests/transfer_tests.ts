@@ -286,14 +286,16 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
+
+    const light = syncmode === 'light' || syncmode === 'lightest'
     currentGethInstance = {
       name: syncmode,
       validating: false,
       syncmode,
       port: 30307,
-      rpcport: 8549,
-      lightserv: syncmode !== 'light' && syncmode !== 'lightest',
-      privateKey: DEF_FROM_PK,
+      lightserv: !light,
+      // TODO(nategraf): Remove this when light clients can query for gateway fee.
+      gatewayFee: light ? new BigNumber(10000) : undefined,
     }
 
     // Spin up the node to run transfers as.
