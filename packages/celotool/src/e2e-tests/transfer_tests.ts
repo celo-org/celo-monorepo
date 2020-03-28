@@ -296,6 +296,7 @@ describe('Transfer tests', function(this: any) {
       lightserv: !light,
       // TODO(nategraf): Remove this when light clients can query for gateway fee.
       gatewayFee: light ? new BigNumber(10000) : undefined,
+      privateKey: DEF_FROM_PK,
     }
 
     // Spin up the node to run transfers as.
