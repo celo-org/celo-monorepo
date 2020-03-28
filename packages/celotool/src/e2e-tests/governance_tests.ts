@@ -578,6 +578,7 @@ describe('governance tests', () => {
         if (lastEpochBlock > lastEpoch) {
           lastEpoch = lastEpochBlock
           goodEpoch = true
+          console.log('starting new epoch')
         }
         // Fetch the round robin order if it hasn't already been set for this epoch.
         if (roundRobinOrder.length === 0 || blockNumber === lastEpochBlock + 1) {
@@ -588,9 +589,6 @@ describe('governance tests', () => {
             )
           )
           console.log('epoch', lastEpochBlock, 'validators', validatorSet, 'order', roundRobinOrder)
-          if (roundRobinOrder[0] === roundRobinOrder[roundRobinOrder.length - 1]) {
-            roundRobinOrder = roundRobinOrder.slice(0, roundRobinOrder.length - 1)
-          }
           console.log(
             'lst',
             await Promise.all(
@@ -600,6 +598,7 @@ describe('governance tests', () => {
             )
           )
           if (JSON.stringify(roundRobinOrder.sort()) !== JSON.stringify(validatorSet.sort())) {
+            console.log('problem with members')
             goodEpoch = false
           }
         }
@@ -607,9 +606,11 @@ describe('governance tests', () => {
         const expectedProposer = roundRobinOrder[indexInEpoch % roundRobinOrder.length]
         const block = await web3.eth.getBlock(blockNumber)
         if (!eqAddress(block.miner, expectedProposer)) {
+          console.log('unexpected proposer', block.miner, expectedProposer, indexInEpoch)
           goodEpoch = false
         }
       }
+      assert(false)
     })
 
     it('should update the validator scores at the end of each epoch', async function(this: any) {
@@ -861,21 +862,36 @@ describe('governance tests', () => {
           const maxPotentialValidatorReward = perValidatorReward
             .times(validatorSetSize)
             .div(exchangeRate)
+          const targetValidatorEpochPayment = new BigNumber(
+            await epochRewards.methods.targetValidatorEpochPayment().call()
+          )
+          const maxPotentialValidatorReward2 = targetValidatorEpochPayment.div(exchangeRate)
+          console.log('max potential', maxPotentialValidatorReward, maxPotentialValidatorReward2)
+          console.log(
+            'exchange rate',
+            exchangeRate,
+            'validators',
+            validatorSetSize,
+            'pervalidator',
+            perValidatorReward
+          )
           // Calculate the expected voting reward
           console.log(
             'target gold fraction',
-            await epochRewards.methods.getTargetVotingGoldFraction().call({}, blockNumber)
+            await epochRewards.methods.getTargetVotingGoldFraction().call({}, blockNumber - 1)
           )
           console.log(
             'gold fraction',
-            await epochRewards.methods.getVotingGoldFraction().call({}, blockNumber)
+            await epochRewards.methods.getVotingGoldFraction().call({}, blockNumber - 1)
           )
           const targetVotingYield = new BigNumber(
-            (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
+            (
+              await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber - 1)
+            )[0]
           )
           console.log(
             'target voting',
-            await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber)
+            await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber - 1)
           )
           assert.isFalse(targetVotingYield.isZero())
           const expectedVoterRewards = activeVotes
@@ -884,31 +900,44 @@ describe('governance tests', () => {
 
           // infra: (x / (1 - x)) * predicted supply increase * rewards mult
           const communityRewardFrac = new BigNumber(
-            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber)
+            await epochRewards.methods.getCommunityRewardFraction().call({}, blockNumber - 1)
           )
+          const carbonOffsettingFrac = new BigNumber(
+            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber - 1)
+          )
+
+          const fundFactor = new BigNumber(1)
+            .minus(fromFixed(communityRewardFrac))
+            .minus(fromFixed(carbonOffsettingFrac))
+
           const expectedCommunityReward = expectedVoterRewards
             .plus(maxPotentialValidatorReward)
             .times(fromFixed(communityRewardFrac))
-            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+            .div(fundFactor)
 
-          const carbonOffsettingFrac = new BigNumber(
-            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber)
+          const targetGoldSupplyIncrease = new BigNumber(
+            await epochRewards.methods.getTargetGoldSupplyIncrease().call({}, blockNumber - 1)
           )
+          const expected2 = targetGoldSupplyIncrease
+            .times(fromFixed(communityRewardFrac))
+            .times(fromFixed(rewardsMultiplier))
+
           const expectedCarbonOffsettingPartnerAward = expectedVoterRewards
             .plus(maxPotentialValidatorReward)
             .times(fromFixed(carbonOffsettingFrac))
-            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+            .div(fundFactor)
 
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const expectedGoldTotalSupplyChange = expectedCommunityReward
             .plus(expectedVoterRewards)
+            .plus(expectedCarbonOffsettingPartnerAward)
             .plus(stableTokenSupplyChange.div(exchangeRate))
           // Check TS calc'd rewards against solidity calc'd rewards
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
           const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
           console.log('voter rewards')
-          assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
+          assertAlmostEqual(expectedVoterRewards, expected2, totalVoterRewards)
           console.log('community rewards')
           assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
           console.log('carbon rewards')
@@ -925,9 +954,9 @@ describe('governance tests', () => {
           )
           console.log('reserve changed')
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
-          console.log('total supply changed')
+          console.log('total supply changed', expectedGoldTotalSupplyChange)
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
-          console.log('carbon changed')
+          console.log('carbon changed', expectedCarbonOffsettingPartnerAward)
           await assertCarbonOffsettingBalanceChanged(
             blockNumber,
             expectedCarbonOffsettingPartnerAward
