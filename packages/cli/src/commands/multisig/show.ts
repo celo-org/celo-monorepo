@@ -20,7 +20,11 @@ export default class ShowMultiSig extends BaseCommand {
 
   static args = [Args.address('address')]
 
-  static examples = ['show 0x5409ed021d9299bf6814279a6a1411a7e866a631']
+  static examples = [
+    'show 0x5409ed021d9299bf6814279a6a1411a7e866a631',
+    'show 0x5409ed021d9299bf6814279a6a1411a7e866a631 --tx 3',
+    'show 0x5409ed021d9299bf6814279a6a1411a7e866a631 --all --raw',
+  ]
 
   async run() {
     const {
