@@ -101,7 +101,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        gameOfStakesTermsTitle
+        The Great Celo Stake Off
       </h1>
       <h3
         aria-level="3"
@@ -120,7 +120,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        termsAndConditions
+        Terms and Conditions
       </h3>
     </div>
   </div>
