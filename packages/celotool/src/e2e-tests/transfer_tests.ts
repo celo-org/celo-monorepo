@@ -293,6 +293,7 @@ describe('Transfer tests', function(this: any) {
       validating: false,
       syncmode,
       port: 30307,
+      rpcport: 8549,
       lightserv: !light,
       // TODO(nategraf): Remove this when light clients can query for gateway fee.
       gatewayFee: light ? new BigNumber(10000) : undefined,
