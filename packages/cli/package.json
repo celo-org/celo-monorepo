@@ -50,7 +50,6 @@
     "firebase": "^7.2.2",
     "fs-extra": "^8.1.0",
     "moment": "2.24.0",
-    "node-hid": "^1.2.0",
     "humanize-duration": "^3.21.0",
     "path": "^0.12.7",
     "tslib": "^1",
