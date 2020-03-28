@@ -1167,6 +1167,11 @@ export async function migrateContracts(
       },
       epochRewards: {
         frozen: false,
+        targetVotingYieldParameters: {
+          initial: 0,
+          max: 0.0005,
+          adjustmentFactor: 0.1,
+        },
       },
       exchange: {
         frozen: false,

@@ -29,6 +29,14 @@ export class CeloProvider {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = new DefaultWallet()
+    // @ts-ignore
+    if (existingProvider.on !== undefined) {
+      // @ts-ignore
+      this.on = (type: string, callback: any) => {
+        // @ts-ignore
+        existingProvider.on(type, callback)
+      }
+    }
   }
 
   addAccount(privateKey: string) {
