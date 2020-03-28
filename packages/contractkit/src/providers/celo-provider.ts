@@ -131,6 +131,22 @@ export class CeloProvider {
     }
   }
 
+  on(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).on(type, callback)
+  }
+
+  once(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).once(type, callback)
+  }
+
+  removeListener(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).removeListerner(type, callback)
+  }
+
+  removeAllListeners(type: string): void {
+    ;(this.existingProvider as any).removeAllListeners(type)
+  }
+
   stop() {
     if (this.alreadyStopped) {
       return
