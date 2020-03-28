@@ -205,7 +205,7 @@ describe('Transfer tests', function(this: any) {
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
-  const syncModes = ['full' /*, 'fast', 'light', 'lightest' */]
+  const syncModes = ['full', 'fast', 'light', 'lightest']
   const gethConfig: GethRunConfig = {
     migrateTo: 20,
     networkId: 1101,
