@@ -101,7 +101,8 @@ exports[`UserAgreement renders 1`] = `
           }
         }
       >
-        agreementTitle
+        User Agreement and Terms:
+ Celo Alfajores Testnet
       </h1>
     </div>
   </div>
