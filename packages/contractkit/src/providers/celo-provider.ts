@@ -132,19 +132,44 @@ export class CeloProvider {
   }
 
   on(type: string, callback: () => void): void {
-    ;(this.existingProvider as any).on(type, callback)
+    if (
+      hasProperty<{ on: (type: string, callback: () => void) => void }>(this.existingProvider, 'on')
+    ) {
+      this.existingProvider.on(type, callback)
+    }
   }
 
   once(type: string, callback: () => void): void {
-    ;(this.existingProvider as any).once(type, callback)
+    if (
+      hasProperty<{ once: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'once'
+      )
+    ) {
+      this.existingProvider.once(type, callback)
+    }
   }
 
   removeListener(type: string, callback: () => void): void {
-    ;(this.existingProvider as any).removeListerner(type, callback)
+    if (
+      hasProperty<{ removeListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeListener'
+      )
+    ) {
+      this.existingProvider.removeListener(type, callback)
+    }
   }
 
   removeAllListeners(type: string): void {
-    ;(this.existingProvider as any).removeAllListeners(type)
+    if (
+      hasProperty<{ removeAllListeners: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeAllListeners'
+      )
+    ) {
+      this.existingProvider.removeAllListeners(type)
+    }
   }
 
   stop() {
