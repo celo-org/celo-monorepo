@@ -1,4 +1,6 @@
+import BigNumber from 'bignumber.js'
 import { AppState, Linking } from 'react-native'
+import * as RNLocalize from 'react-native-localize'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
@@ -35,6 +37,7 @@ const TAG = 'app/saga'
 // case 2: User gets a permission request dialog
 //    (which will put an app into `background` state until dialog disappears).
 const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
+const { decimalSeparator, groupingSeparator } = RNLocalize.getNumberFormatSettings()
 
 export function* waitForRehydrate() {
   yield take(REHYDRATE)
@@ -78,6 +81,14 @@ export function* toggleToProperSyncMode() {
 
 export function* navigateToProperScreen() {
   yield all([take(REHYDRATE), take(NavActions.SET_NAVIGATOR)])
+
+  console.log('============================her')
+  BigNumber.config({
+    FORMAT: {
+      decimalSeparator,
+      groupSeparator: groupingSeparator,
+    },
+  })
 
   const isDeprecated: boolean = yield call(isAppVersionDeprecated)
 
