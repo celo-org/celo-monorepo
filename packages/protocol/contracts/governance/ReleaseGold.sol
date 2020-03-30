@@ -618,10 +618,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     onlyCanValidate
     onlyWhenInProperState
   {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getAttestationSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
     getAccounts().authorizeAttestationSigner(signer, v, r, s);
   }
 
