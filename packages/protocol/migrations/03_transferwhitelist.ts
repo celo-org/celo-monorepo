@@ -10,8 +10,8 @@ module.exports = (deployer: any) => {
   deployer.deploy(Contract, config.registry.predeployedProxyAddress)
   deployer.then(async () => {
     const contract: TransferWhitelistInstance = await Contract.deployed()
-    await contract.setWhitelist(config.transferWhitelist.addresses)
-    await contract.setRegisteredContracts(config.transferWhitelist.registryIds)
+    await contract.setDirectlyWhitelistedAddresses(config.transferWhitelist.addresses)
+    await contract.setWhitelistedContractIdentifiers(config.transferWhitelist.registryIds)
     const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
     await registry.setAddressFor(name, contract.address)
   })
