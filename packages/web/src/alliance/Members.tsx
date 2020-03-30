@@ -4,6 +4,7 @@ import LazyFade from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Ally from 'src/alliance/AllianceMember'
 import { Category as CategoryEnum } from 'src/alliance/CategoryEnum'
+import gatherAllies from 'src/alliance/gatherAllies'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, Trans, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -12,14 +13,6 @@ import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
 import Outbound, { externalizeURL } from 'src/shared/Outbound'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-
-async function gatherAllies(persistFunc: (data: []) => void, signal: { aborted: boolean }) {
-  const response = await fetch('api/alliance')
-  const alliesByCategory = await response.json()
-  if (!signal.aborted) {
-    persistFunc(alliesByCategory)
-  }
-}
 
 function buildDropDownProps(t: TFunction, currentFilter: string): ListItem[] {
   return Object.keys(CategoryEnum).map((key) => {
