@@ -713,6 +713,7 @@ contract Election is
    */
   function incrementActiveVotes(address group, address account, uint256 value)
     private
+    view
     returns (uint256)
   {
     (uint256 unitsDelta, uint256 valueDelta) = getActiveVoteIncrementDeltas(group, account, value);

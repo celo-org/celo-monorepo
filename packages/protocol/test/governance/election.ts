@@ -717,7 +717,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#revokeActive', () => {
+  describe.only('#revokeActive', () => {
     const voter0 = accounts[0]
     const voter1 = accounts[1]
     const group = accounts[2]
@@ -729,17 +729,14 @@ contract('Election', (accounts: string[]) => {
         const active0 = await election.getActiveVotesForGroupByAccount(group, voter0)
         const active1 = await election.getActiveVotesForGroupByAccount(group, voter1)
         const activeTotal = await election.getActiveVotesForGroup(group)
-        debugLog('active', active0.toFixed(), active1.toFixed(), activeTotal.toFixed())
-        // assertEqualBN(activeTotal, active0.plus(active1))
+        assertEqualBN(activeTotal, active0.plus(active1))
         const pending0 = await election.getPendingVotesForGroupByAccount(group, voter0)
         const pending1 = await election.getPendingVotesForGroupByAccount(group, voter1)
         const pendingTotal = pending0.plus(pending1)
         const totalGroup = await election.getTotalVotesForGroup(group)
-        debugLog('totalgroup', activeTotal.toFixed(), pendingTotal.toFixed(), totalGroup.toFixed())
-        // assertEqualBN(totalGroup, activeTotal.plus(pendingTotal))
+        assertEqualBN(totalGroup, activeTotal.plus(pendingTotal))
         const total = await election.getTotalVotes()
-        debugLog('total', total.toFixed(), totalGroup.toFixed())
-        // assertEqualBN(total, totalGroup)
+        assertEqualBN(total, totalGroup)
       }
 
       beforeEach(async () => {
