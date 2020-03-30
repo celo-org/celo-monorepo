@@ -5,7 +5,7 @@ import { resolveTxt } from 'dns'
 import { Address } from '../../base'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
-import { Claim, Domain_Txt_Header, DomainClaim, serializeClaim } from './claim'
+import { Claim, DomainClaim, domainTxtHeader, serializeClaim } from './claim'
 import { verifyKeybaseClaim } from './keybase'
 import { ClaimTypes } from './types'
 
@@ -100,7 +100,7 @@ export const verifyDomainClaim = async (
     metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
     const existingClaims = metadata
       .filterClaims(ClaimTypes.DOMAIN)
-      .filter((el: DomainClaim) => el.domain == domain)
+      .filter((el: DomainClaim) => el.domain === domain)
 
     if (existingClaims.length < 1) {
       return `The domain ${domain} is not part of your metadata`
@@ -126,9 +126,9 @@ export const verifyDomainRecord = async (
       } else {
         domainRecords.forEach((record) => {
           record.forEach((entry) => {
-            if (entry.startsWith(Domain_Txt_Header)) {
+            if (entry.startsWith(domainTxtHeader)) {
               console.log(`TXT Record celo-site-verification found`)
-              const signatureBase64 = entry.substring(Domain_Txt_Header.length + 1)
+              const signatureBase64 = entry.substring(domainTxtHeader.length + 1)
               const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
               // console.log(`Record: ${record}`)
               // console.log(`Signature: ${signature}`)

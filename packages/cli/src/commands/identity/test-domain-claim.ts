@@ -1,8 +1,8 @@
+import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { verifyDomainRecord } from '@celo/contractkit/lib/identity/claims/verify'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import { ClaimCommand } from '../../utils/identity'
-import { ClaimTypes } from '@celo/contractkit/lib/identity'
 
 export default class TestDomainClaim extends ClaimCommand {
   static description =
@@ -25,7 +25,7 @@ export default class TestDomainClaim extends ClaimCommand {
 
     const existingClaims = metadata
       .filterClaims(ClaimTypes.DOMAIN)
-      .filter((el: any) => el.domain == res.flags.domain)
+      .filter((el: any) => el.domain === res.flags.domain)
 
     if (existingClaims.length < 1) {
       console.error(`The domain ${res.flags.domain} is not part of your metadata`)

@@ -67,7 +67,7 @@ testWithGanache('Domain claims', (web3) => {
       })
 
       it('indicates a fixed signature is correct', async () => {
-        let newClaim = createDomainClaim('orco.dev')
+        const newClaim = createDomainClaim('orco.dev')
         newClaim.timestamp = 1584618795
 
         const newSignature = await NativeSigner(kit.web3.eth.sign, secondAddress).sign(
@@ -79,16 +79,7 @@ testWithGanache('Domain claims', (web3) => {
           newSignature,
           secondAddress
         )
-        // const base64 = 'MHgxYWRhODcyYmJiNDhkM2Q3NzE0YWFmMWNkOGY1NmRlNWIxMDgzYTM5ZjBhOTllZTFhNTc3MWZjZjJkMTIwMjAxM2ZmNTdjMzliMTAwZGIxNThmOWUzZTBmZDk1ZWZjYWVjZDI3Y2NhYzcyZjc2NWU5OTFiNTkxYTI5NzEwYzc3ZjFi'
-        // const signature = Buffer.from(base64, 'base64').toString('binary')
-        //
-        // console.log('serializedClaim: ' + serializeClaim(claim))
-        // console.log('signature: ' + signature)
 
-        // const verifiedSignature = await verifySignature(
-        //     '{"domain":"orco.dev","timestamp":1584618795,"type":"DOMAIN"}',
-        //     '0x1ada872bbb48d3d7714aaf1cd8f56de5b1083a39f0a99ee1a5771fcf2d1202013ff57c39b100db158f9e3e0fd95efcaecd27ccac72f765e991b591a29710c77f1b',
-        //     '0xa1ab940594c0f5d66fdd282fe7b62f0aa08d5741')
         expect(verifiedSignature).toBeTruthy()
       })
     })

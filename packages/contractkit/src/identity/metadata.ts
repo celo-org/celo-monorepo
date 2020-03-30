@@ -107,7 +107,7 @@ export class IdentityMetadataWrapper {
         }
         break
       case ClaimTypes.DOMAIN:
-        const existingClaims = this.data.claims.filter((el: any) => el.domain == claim.domain)
+        const existingClaims = this.data.claims.filter((el: any) => el.domain === claim.domain)
         if (existingClaims.length > 0) {
           return existingClaims[0]
         }
