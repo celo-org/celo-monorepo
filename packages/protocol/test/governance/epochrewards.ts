@@ -419,44 +419,6 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
-  describe('#setTargetVotingYield()', () => {
-    const newTarget = targetVotingYieldParams.initial.plus(1)
-
-    describe('when called by the owner', () => {
-      let resp: any
-
-      beforeEach(async () => {
-        resp = await epochRewards.setTargetVotingYield(newTarget)
-      })
-
-      it('should set the new target voting yield', async () => {
-        const [target, ,] = await epochRewards.getTargetVotingYieldParameters()
-        assertEqualBN(target, newTarget)
-      })
-
-      it('should emit the TargetVotingYieldSet event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertContainSubset(log, {
-          event: 'TargetVotingYieldSet',
-          args: {
-            target: newTarget,
-          },
-        })
-      })
-    })
-
-    describe('when called by a non-owner', () => {
-      it('should revert', async () => {
-        await assertRevert(
-          epochRewards.setTargetVotingYield(newTarget, {
-            from: nonOwner,
-          })
-        )
-      })
-    })
-  })
-
   describe('#getTargetGoldTotalSupply()', () => {
     describe('when it has been fewer than 15 years since genesis', () => {
       const timeDelta: BigNumber = YEAR.times(10)
