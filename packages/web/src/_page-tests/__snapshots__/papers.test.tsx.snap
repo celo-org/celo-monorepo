@@ -82,7 +82,7 @@ exports[`Papers renders 1`] = `
           }
         }
       >
-        title
+        Celo Whitepapers
       </h1>
     </div>
   </div>
@@ -142,7 +142,7 @@ exports[`Papers renders 1`] = `
           }
         }
       >
-        protocol
+        Protocol
       </h3>
     </div>
     <div
@@ -191,7 +191,7 @@ exports[`Papers renders 1`] = `
           }
         }
       >
-        whitepaperTitle
+        Celo Whitepaper: A Multi-Asset Cryptographic Protocol for Decentralized Social Payments
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -259,7 +259,7 @@ exports[`Papers renders 1`] = `
             }
             target="_blank"
           >
-            download
+            Read Paper
             <div
               className="css-view-1dbjc4n"
               style={
@@ -349,7 +349,7 @@ exports[`Papers renders 1`] = `
           }
         }
       >
-        economics
+        Economics
       </h3>
     </div>
     <div
@@ -398,7 +398,7 @@ exports[`Papers renders 1`] = `
           }
         }
       >
-        stabilityTitle
+        An Analysis of the Stability Characteristics of Celo
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -466,7 +466,7 @@ exports[`Papers renders 1`] = `
             }
             target="_blank"
           >
-            download
+            Read Paper
             <div
               className="css-view-1dbjc4n"
               style={
@@ -605,7 +605,7 @@ exports[`Papers renders 1`] = `
           }
         }
       >
-        velocityTitle
+        Influencing the Velocity of Central Bank Digital Currencies
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -673,7 +673,7 @@ exports[`Papers renders 1`] = `
             }
             target="_blank"
           >
-            download
+            Read Paper
             <div
               className="css-view-1dbjc4n"
               style={
