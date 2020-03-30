@@ -13,6 +13,7 @@ export interface Contracts {
   Reserve: ContractWrapperType<'getReserve'>
   GoldToken: ContractWrapperType<'getGoldToken'>
   EpochRewards: ContractWrapperType<'getEpochRewards'>
+  StableToken: ContractWrapperType<'getStableToken'>
 }
 
 export interface StateGetter {
@@ -83,6 +84,16 @@ export const stateGetters: StateGetter[] = [
     stateGetters.push(
       getter(
         'GoldToken',
+        'balanceOf',
+        (balance) => ({
+          balance: +balance,
+        }),
+        [address]
+      )
+    )
+    stateGetters.push(
+      getter(
+        'StableToken',
         'balanceOf',
         (balance) => ({
           balance: +balance,
