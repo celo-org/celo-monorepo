@@ -1,5 +1,5 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { DEFAULT_FORNO_URL } from 'src/config'
@@ -12,9 +12,12 @@ import { provider } from 'web3-core'
 // Logging tag
 const tag = 'web3/contracts'
 
-export const web3: Web3 = getWeb3()
-// @ts-ignore - need to align web3 versions in contractkit
-export const contractKit = newKitFromWeb3(web3)
+const web3: Web3 = getWeb3()
+let contractKit = newKitFromWeb3(web3)
+
+export function getContractKit() {
+  return contractKit
+}
 
 export function isInitiallyFornoMode() {
   return networkConfig.initiallyForno
@@ -86,20 +89,23 @@ function getWeb3(): Web3 {
 // Mutates web3 with new provider
 export function switchWeb3ProviderForSyncMode(forno: boolean) {
   if (forno) {
-    web3.setProvider(getHttpProvider(DEFAULT_FORNO_URL))
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
+    contractKit = newKitFromWeb3(new Web3(getHttpProvider(DEFAULT_FORNO_URL)))
+    Logger.info(
+      `${tag}@switchWeb3ProviderForSyncMode`,
+      `Switch contractKit provider to ${DEFAULT_FORNO_URL}`
+    )
   } else {
-    web3.setProvider(getIpcProvider())
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to IPC provider`)
+    contractKit = newKitFromWeb3(new Web3(getIpcProvider()))
+    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set contractKit provider to IPC provider`)
   }
 }
 
-export function addLocalAccount(web3Instance: Web3, privateKey: string) {
-  if (!web3Instance) {
-    throw new Error(`web3 instance is ${web3Instance}`)
-  }
+export function addLocalAccount(privateKey: string, isDefault: boolean = false) {
   if (!privateKey) {
     throw new Error(`privateKey is ${privateKey}`)
   }
-  web3utilsAddLocalAccount(web3Instance, privateKey)
+  contractKit.addAccount(privateKey)
+  if (isDefault) {
+    contractKit.defaultAccount = privateKeyToAddress(privateKey)
+  }
 }
