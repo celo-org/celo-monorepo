@@ -53,7 +53,7 @@ export function navigate(routeName: string, params?: NavigationParams) {
     })
 }
 
-export async function ensurePincode(): Promise<boolean> {
+async function ensurePincode(): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 
   if (pincodeType === PincodeType.Unset) {

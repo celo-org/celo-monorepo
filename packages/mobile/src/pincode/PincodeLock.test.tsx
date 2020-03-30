@@ -3,7 +3,7 @@ import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { showError } from 'src/alert/actions'
-import { unlock } from 'src/app/actions'
+import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import PincodeLock from 'src/pincode/PincodeLock'
 import { isPinCorrect } from 'src/pincode/utils'
@@ -34,7 +34,7 @@ describe('PincodeLock', () => {
 
     jest.useRealTimers()
     setTimeout(() => {
-      expect(store.getActions()).toEqual([unlock()])
+      expect(store.getActions()).toEqual([appUnlock()])
       done()
     })
     jest.useFakeTimers()

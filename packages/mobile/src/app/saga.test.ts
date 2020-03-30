@@ -2,7 +2,7 @@ import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { lock, openDeepLink, setAppState } from 'src/app/actions'
+import { appLock, openDeepLink, setAppState } from 'src/app/actions'
 import { handleDeepLink, handleSetAppState, navigateToProperScreen } from 'src/app/saga'
 import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
@@ -82,7 +82,7 @@ describe('App saga', () => {
         [select(getLastTimeBackgrounded), 0],
         [select(getLockWithPinEnabled), true],
       ])
-      .put(lock())
+      .put(appLock())
       .run()
 
     await expectSaga(handleSetAppState, setAppState('active'))

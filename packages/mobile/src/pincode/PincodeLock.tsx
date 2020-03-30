@@ -1,3 +1,7 @@
+/**
+ * This is a VIEW, which we use as an overlay, when we need
+ * to lock the app with a PIN code.
+ */
 import colors from '@celo/react-components/styles/colors'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -6,7 +10,7 @@ import RNExitApp from 'react-native-exit-app'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
-import { unlock } from 'src/app/actions'
+import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces } from 'src/i18n'
 import Pincode from 'src/pincode/Pincode'
@@ -26,8 +30,8 @@ function PincodeLock() {
   }, [dispatch, showError, setPin])
 
   const onCorrectPin = useCallback(() => {
-    dispatch(unlock())
-  }, [dispatch, unlock])
+    dispatch(appUnlock())
+  }, [dispatch, appUnlock])
 
   const onPress = () => {
     if (currentAccount) {

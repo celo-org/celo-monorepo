@@ -3,7 +3,14 @@ import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
-import { Actions, lock, OpenDeepLink, SetAppState, setAppState, setLanguage } from 'src/app/actions'
+import {
+  Actions,
+  appLock,
+  OpenDeepLink,
+  SetAppState,
+  setAppState,
+  setLanguage,
+} from 'src/app/actions'
 import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
@@ -188,7 +195,7 @@ export function* handleSetAppState(action: SetAppState) {
     action.state === 'active' &&
     !appLocked
   ) {
-    yield put(lock())
+    yield put(appLock())
   }
 }
 

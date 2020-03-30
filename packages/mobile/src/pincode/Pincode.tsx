@@ -1,3 +1,7 @@
+/**
+ * This is a VIEW. We use it everwhere we need to show PIN pad
+ * with an input, e.g. get/ensure/set pincode.
+ */
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'

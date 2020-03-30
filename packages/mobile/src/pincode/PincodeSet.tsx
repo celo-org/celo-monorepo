@@ -1,3 +1,6 @@
+/**
+ * This is a reactnavigation SCREEN, which we use to set a PIN.
+ */
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'

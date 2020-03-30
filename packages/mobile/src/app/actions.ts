@@ -158,10 +158,10 @@ export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled =
   enabled,
 })
 
-export const lock = (): Lock => ({
+export const appLock = (): Lock => ({
   type: Actions.LOCK,
 })
 
-export const unlock = (): Unlock => ({
+export const appUnlock = (): Unlock => ({
   type: Actions.UNLOCK,
 })

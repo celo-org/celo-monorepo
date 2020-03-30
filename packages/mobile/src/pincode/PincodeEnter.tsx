@@ -1,3 +1,7 @@
+/**
+ * This is a reactnavigation SCREEN to which we navigate,
+ * when we need to fetch a PIN from a user.
+ */
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
