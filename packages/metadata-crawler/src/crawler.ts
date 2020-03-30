@@ -3,6 +3,7 @@ import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/ident
 import { verifyDomainRecord } from '@celo/contractkit/lib/identity/claims/verify'
 import { normalizeAddress } from '@celo/utils/lib/address'
 import { serializeClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { logger } from './logger'
 
 const PGUSER = process.env['PGUSER'] || 'postgres'
 const PGPASSWORD = process.env['PGPASSWORD'] || ''
@@ -33,10 +34,10 @@ async function addVerificationClaimToDatabase(address: string, domain: string, v
 
     await client
       .query(query, values)
-      .catch((error) => console.error(`Database error ${error}\n query: ${query}`))
-      .then(() => console.log(`Verification flag added to domain ${domain} and address ${address}`))
+      .catch((error) => logger.error(`Database error ${error}\n query: ${query}`))
+      .then(() => logger.info(`Verification flag added to domain ${domain} and address ${address}`))
   } catch (err) {
-    console.error('Error updating the database', err)
+    logger.error('Error updating the database', err)
   }
 }
 
@@ -45,27 +46,26 @@ async function handleItem(item: { url: string; address: string }) {
     let metadata = await IdentityMetadataWrapper.fetchFromURL(item.url)
     let claims = metadata.filterClaims(ClaimTypes.DOMAIN)
 
-    // console.log(`\n\n--- New Entry ---\n\n`)
     const numClaims = claims.length
     for (let i = 0; i < numClaims; i++) {
       const claim = claims[i]
       const addressWith0x = '0x' + item.address
-      console.log('Claim: ' + serializeClaim(claim))
+      logger.debug('Claim: ' + serializeClaim(claim))
       const alreadyVerified = await isClaimAlreadyVerified(item.address, claim.domain)
-      console.log(`Is already verified? ${alreadyVerified}`)
+      logger.debug(`Is already verified? ${alreadyVerified}`)
       if (!alreadyVerified) {
-        console.log(`Verifying ${claim.domain} for address ${addressWith0x}`)
+        logger.debug(`Verifying ${claim.domain} for address ${addressWith0x}`)
 
         const verified = await verifyDomainRecord(addressWith0x, claim).catch((error) =>
-          console.error(`Error in verifyDomainClaim ${error}`)
+          logger.error(`Error in verifyDomainClaim ${error}`)
         )
         if (verified === undefined)
           await addVerificationClaimToDatabase(item.address, claim.domain, true)
-        else console.error(verified)
+        else logger.debug(verified)
       }
     }
   } catch (err) {
-    console.error('Cannot read metadata', err)
+    logger.error('Cannot read metadata', err)
   }
 }
 
@@ -81,11 +81,11 @@ async function isClaimAlreadyVerified(address: string, domain: string): Promise<
 }
 
 async function main() {
-  console.debug('Connecting DB: ' + PGHOST)
+  logger.info('Connecting DB: ' + PGHOST)
   await client.connect()
 
   client.on('error', (e) => {
-    console.log(`Reconnecting after ${e}`)
+    logger.debug(`Reconnecting after ${e}`)
     client.connect()
   })
 
@@ -94,12 +94,29 @@ async function main() {
   )
 
   items = items || []
-  items = items.map((a) => ({ ...a, address: normalizeAddress(a.address.substr(2)) }))
-  // console.log(items)
-  for (let i of items) {
-    await handleItem(i).catch(() => console.error(i, ' fails'))
-  }
-  await client.end()
+  items = items.map((a) => ({
+    ...a,
+    address: normalizeAddress(a.address.substr(2)),
+  }))
+
+  await Promise.all(
+    items.map(async (item) => {
+      await handleItem(item)
+    })
+  )
+    .then(() => {
+      logger.info('Closing DB connecting and finishing')
+      client.end()
+      process.exit(0)
+    })
+    .catch((error) => {
+      logger.error(`Error: ${error}`)
+      client.end()
+      process.exit(1)
+    })
 }
 
-main()
+main().catch((err) => {
+  logger.error({ err })
+  process.exit(1)
+})
