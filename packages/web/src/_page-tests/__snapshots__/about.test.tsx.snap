@@ -181,7 +181,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          prosperityForAll
+          Prosperity for All
         </h1>
         <div
           className="css-view-1dbjc4n"
@@ -238,7 +238,7 @@ exports[`About renders 1`] = `
               }
             }
           >
-            whatIfMoney
+            What if money were beautiful?
           </h3>
         </div>
       </div>
@@ -369,7 +369,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MissionTitle
+        Mission
       </h3>
     </div>
     <div
@@ -407,7 +407,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MissionText
+        Our mission is to build a financial system that creates the conditions for prosperity—for everyone.
       </h1>
     </div>
   </div>
@@ -467,7 +467,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MeaningTile
+        Meaning
       </h3>
     </div>
     <div
@@ -506,6 +506,7 @@ exports[`About renders 1`] = `
           }
         }
       >
+        Celo, pronounced 
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
           dir="auto"
@@ -515,8 +516,9 @@ exports[`About renders 1`] = `
             }
           }
         >
-          "/ˈtselo/"
+          /ˈtselo/
         </span>
+         
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
@@ -592,6 +594,8 @@ exports[`About renders 1`] = `
             />
           </audio>
         </div>
+        
+means ‘purpose’ in Esperanto.
       </h1>
       <div
         className="css-text-901oao"
@@ -608,7 +612,11 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MeaningCopy
+        The spirit of Esperanto and auxiliary languages, is to equip speakers with a means to connect, engage, and build trust with someone who speaks a different native tongue.
+
+In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today.
+
+More importantly, we are driven by purpose – to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty.
       </div>
     </div>
   </div>
@@ -709,7 +717,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        ValuesTitle
+        Celo Values
       </h3>
     </div>
     <div
@@ -745,6 +753,7 @@ exports[`About renders 1`] = `
           }
         }
       >
+        Celo is founded on two core values: 
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
           dir="auto"
@@ -754,8 +763,21 @@ exports[`About renders 1`] = `
             }
           }
         >
-          M
+          unique purpose
         </span>
+         and 
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "fontWeight": "bold",
+            }
+          }
+        >
+          connectedness
+        </span>
+        . These, in turn, lead to practices that foster personal growth and community.
       </div>
     </div>
   </div>
@@ -924,7 +946,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value1Title
+        Unique Purpose
       </h4>
       <div
         className="css-text-901oao"
@@ -941,7 +963,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value1Text
+        We believe that everyone has their own unique path of growth, and that personal fulfilment depends in large part on being able to reach one’s potential along that path. We embrace values that enable people to grow towards their full potential.
       </div>
     </div>
   </div>
@@ -1490,7 +1512,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value2Title
+        Connectedness
       </h4>
       <div
         className="css-text-901oao"
@@ -1507,7 +1529,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value2Text
+        We believe that people live primarily in connection to one another. We recognize that individuals are healthier and happier when they are members of a strong social community with meaningful relationships – that is, when they are living within a healthy and happy whole. We embrace values that strengthen community.
       </div>
     </div>
   </div>
@@ -1594,7 +1616,8 @@ exports[`About renders 1`] = `
       }
     >
       “
-      beautifulLifeQuote
+      How do we change the world?
+Change the story.
       ”
     </div>
     <div
@@ -1612,7 +1635,7 @@ exports[`About renders 1`] = `
         }
       }
     >
-      – beautifulLifeSource
+      – Charles Eisenstein
     </div>
   </div>
   <div
@@ -1670,7 +1693,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        SacredEconTitle
+        Sacred Economics
       </h3>
     </div>
     <div
@@ -1706,6 +1729,7 @@ exports[`About renders 1`] = `
           }
         }
       >
+        Celo’s philosophy is grounded in the work of Charles Eisenstein’s 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -1726,6 +1750,8 @@ exports[`About renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="http://sacred-economics.com/film/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1738,9 +1764,10 @@ exports[`About renders 1`] = `
               }
             }
           >
-            Sacred Econ
+            Sacred Economics
           </a>
         </div>
+        .
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -1757,6 +1784,8 @@ exports[`About renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="http://sacred-economics.com/film/"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -1804,7 +1833,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          learnMore
+          Learn More
         </a>
       </div>
     </div>
@@ -1864,7 +1893,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        theoryOfChangeTitle
+        Theory Of Change
       </h3>
     </div>
     <div
@@ -1900,7 +1929,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        theoryOfChangeText
+        A theory of change is a framework that describes how short-term actions will lead to long-term social impact. Celo’s aim is to create the conditions for prosperity, defined as: people fulfilling basic needs, growing along their own unique paths, and supporting each other. All of Celo’s projects have a specific hypothesis that tie our activities to one or more of these indicators of prosperity.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -1917,6 +1946,8 @@ exports[`About renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -1964,7 +1995,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          learnMore
+          Learn More
         </a>
       </div>
     </div>
@@ -2028,7 +2059,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          teamTitle
+          Contributors
         </h3>
       </div>
       <div
@@ -2064,7 +2095,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          teamCopy
+          Meet the contributors working on Celo from around the world. Our collective experience ranges from public and private sector, technology, nonprofits, and NGOs.
            
         </div>
       </div>
@@ -2476,7 +2507,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        celoBackers
+        Backers
       </h3>
     </div>
     <div
@@ -2511,7 +2542,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        celoBackersText
+        Celo is supported by over 80 companies and individuals, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order
       </div>
     </div>
   </div>
@@ -4012,7 +4043,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        pressText
+        For media inquiries, please contact us at
          
         <div
           className="css-view-1dbjc4n"
@@ -4034,6 +4065,8 @@ exports[`About renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:press@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
