@@ -116,14 +116,6 @@ contract Election is
     uint256 value
   );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
-  event Debug(
-    uint256 votesBefore,
-    uint256 valueDelta,
-    uint256 unitsBefore,
-    uint256 unitsDelta,
-    uint256 totalVotes,
-    uint256 totalUnits
-  );
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -251,16 +243,16 @@ contract Election is
   /**
    * @notice Converts `account`'s pending votes for `group` to active votes.
    * @param group The validator group to vote for.
-   * @return True upon success.
+   * @return The number of votes activated.
    * @dev Pending votes cannot be activated until an election has been held.
    */
   function activate(address group) external nonReentrant returns (uint256) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
-    require(pendingVote.value > 0, "Not enough pending votes to activate 1.");
+    require(pendingVote.value > 0, "Not enough pending votes to activate.");
     uint256 value = incrementActiveVotes(group, account, pendingVote.value);
-    require(value > 0, "Not enough pending votes to activate 2.");
+    require(value > 0, "Could not activate pending votes.");
     decrementPendingVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
     return value;
@@ -305,7 +297,7 @@ contract Election is
    * @param greater The group receiving more votes than the group for which the vote was revoked,
    *   or 0 if that group has the most votes of any validator group.
    * @param index The index of the group in the account's voting list.
-   * @return True upon success.
+   * @return The number of pending votes revoked.
    * @dev Fails if the account has not voted on a validator group.
    */
   function revokePending(
@@ -341,7 +333,7 @@ contract Election is
    * @param greater The group receiving more votes than the group for which the vote was revoked,
    *   or 0 if that group has the most votes of any validator group.
    * @param index The index of the group in the account's voting list.
-   * @return True upon success.
+   * @return The number of active votes revoked.
    * @dev Fails if the account has not voted on a validator group.
    */
   function revokeActive(
@@ -465,15 +457,26 @@ contract Election is
     return numerator.div(denominator);
   }
 
-  function getActiveUnitsForGroupByAccount(address group, address account)
-    public
+  /**
+   * @notice Returns the active vote units for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The active vote units for `group` made by `account`.
+   */
+  function getActiveVoteUnitsForGroupByAccount(address group, address account)
+    external
     view
     returns (uint256)
   {
     return votes.active.forGroup[group].unitsByAccount[account];
   }
 
-  function getActiveUnitsForGroup(address group) public view returns (uint256) {
+  /**
+   * @notice Returns the total active vote units made for `group`.
+   * @param group The address of the validator group.
+   * @return The total active vote units made for `group`.
+   */
+  function getActiveVoteUnitsForGroup(address group) external view returns (uint256) {
     return votes.active.forGroup[group].totalUnits;
   }
 
@@ -749,16 +752,32 @@ contract Election is
   }
 
   /**
-   * @notice Returns the number of units that need to be added to add `value` active votes.
+   * @notice Returns the number of units and votes that should be added when activating `value`
+   *  votes for `group` by `account`.
    * @param group The address of the validator group.
-   * @param value The number of votes being added.
-   * @return The delta in units for `group`.
+   * @param account The address of the account activating votes.
+   * @param value The desired number of votes to activate.
+   * @return The number of units and votes that should be added.
+   * @dev Note that `valueDelta` is derived from `unitsDelta` to protect against attacks where a
+   *      value that rounds down to zero units is provided.
    */
   function getActiveVoteIncrementDeltas(address group, address account, uint256 value)
     private
     returns (uint256, uint256)
   {
+    // This function is based around solving for the following equation:
     // (activeVotes + votesDelta) = (activeUnits + unitsDelta) * (totalVotes + votesDelta) / (totalUnits + unitsDelta)
+    // Note that activeVotes/Units refers to the number of votes/units for `account`, whereas
+    // totalVotes/Units refers to the totals for `group`.
+    // Which can written as:
+    // (a + b) = (c + d) * (e + b) / (f + d)
+    // First, we want to first solve for d (unitsDelta) given the rest of the values.
+    // Then, we solve for b (votesDelta) given d (unitsDelta).
+    // Note that there are not solutions for d when:
+    //   a (activeVotes) == e (totalVotes)
+    //   c (activeUnits) == f (totalUnits)
+    // Both of these conditions correspond to the case where `account` is the only account with
+    // active votes for `group`, and we handle that case separately.
     uint256 unitsDelta = 0;
     uint256 valueDelta = 0;
     GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
@@ -766,28 +785,23 @@ contract Election is
       unitsDelta = value;
       valueDelta = value;
     } else {
+      // (a + b) = (c + d) * (e + b) / (f + d) solve for d
       unitsDelta = getActiveVoteIncrementUnitsDelta(group, account, value);
-      emit Debug(
-        getActiveVotesForGroupByAccount(group, account),
-        value,
-        activeVotes.unitsByAccount[account],
-        unitsDelta,
-        activeVotes.total,
-        activeVotes.totalUnits
-      );
+      // (a + b) = (c + d) * (e + b) / (f + d) solve for b
       valueDelta = getActiveVoteIncrementValueDelta(group, account, unitsDelta);
-      emit Debug(
-        getActiveVotesForGroupByAccount(group, account),
-        valueDelta,
-        activeVotes.unitsByAccount[account],
-        unitsDelta,
-        activeVotes.total,
-        activeVotes.totalUnits
-      );
     }
     return (unitsDelta, valueDelta);
   }
 
+  /**
+   * @notice Returns the number of active vote units that should be added to `account` given the
+   *   activation of `value` votes for `group`.
+   * @param group The address of the validator group.
+   * @param account The address of the account activating votes.
+   * @param value The number of votes being activated.
+   * @return The number of active vote units that should be added.
+   * @dev Refer to `getActiveVoteIncrementDeltas()` for more documentation.
+   */
   function getActiveVoteIncrementUnitsDelta(address group, address account, uint256 value)
     private
     view
@@ -803,7 +817,16 @@ contract Election is
     // THENCHANGE: hasActivatablePendingVotes
   }
 
-  function getActiveVoteIncrementValueDelta(address group, address account, uint256 unitsDelta)
+  /**
+   * @notice Returns the number of active votes that should be added to `account` given the
+   *   activation of `units` active vote units for `group`.
+   * @param group The address of the validator group.
+   * @param account The address of the account activating votes.
+   * @param units The number of active vote units being activated.
+   * @return The number of active votes that should be added.
+   * @dev Refer to `getActiveVoteIncrementDeltas()` for more documentation.
+   */
+  function getActiveVoteIncrementValueDelta(address group, address account, uint256 units)
     private
     view
     returns (uint256)
@@ -811,23 +834,44 @@ contract Election is
     // (a + b) = (c + d) * (e + b) / (f + d) solve for b
     GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
     uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
-    uint256 afd = votesBefore.mul(activeVotes.totalUnits.add(unitsDelta));
-    uint256 ecd = activeVotes.total.mul(activeVotes.unitsByAccount[account].add(unitsDelta));
+    uint256 afd = votesBefore.mul(activeVotes.totalUnits.add(units));
+    uint256 ecd = activeVotes.total.mul(activeVotes.unitsByAccount[account].add(units));
     return ecd.sub(afd).div(activeVotes.totalUnits.sub(activeVotes.unitsByAccount[account]));
   }
 
   /**
-   * @notice Returns the number of units that need to be added to add `value` active votes.
+   * @notice Returns the number of units and votes that should be subtracted when revoking  `value`
+   *  votes for `group` by `account`.
    * @param group The address of the validator group.
-   * @param value The number of votes being added.
-   * @return The delta in units for `group`.
+   * @param account The address of the account revoking active votes.
+   * @param value The desired number of votes to revoke.
+   * @return The number of units and votes that should be subtracteed.
+   * @dev Note that `valueDelta` is derived from `unitsDelta` to protect against attacks where a
+   *      value that rounds down to zero units is provided.
    */
   function getActiveVoteDecrementDeltas(address group, address account, uint256 value)
     private
     view
     returns (uint256, uint256)
   {
+    // This function is based around solving for the following equation:
     // (activeVotes - votesDelta) = (activeUnits - unitsDelta) * (totalVotes - votesDelta) / (totalUnits - unitsDelta)
+    // Note that activeVotes/Units refers to the number of votes/units for `account`, whereas
+    // totalVotes/Units refers to the totals for `group`.
+    // Which can written as:
+    // (a - b) = (c - d) * (e - b) / (f - d)
+    // First, we want to first solve for d (unitsDelta) given the rest of the values.
+    // Then, we solve for b (votesDelta) given d (unitsDelta).
+    // Note that there are not solutions for d when:
+    //   a (activeVotes) == e (totalVotes)
+    //   c (activeUnits) == f (totalUnits)
+    //   b (votesDelta) == e (totalVotes)
+    //   d (unitsDelta) == f (totalUnits)
+    // The first two conditions correspond to the case where `account` is the only account with
+    // active votes for `group`.
+    // The second two conditions correspond to the case where `account` is revoking all their
+    // active votes for `group`.
+    // Both of these cases are handled separately.
     uint256 unitsDelta = 0;
     uint256 valueDelta = 0;
     GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
@@ -842,12 +886,23 @@ contract Election is
       // votes for `group`.
       valueDelta = value;
     } else {
+      // (a - b) = (c - d) * (e - b) / (f - d) solve for d
       unitsDelta = getActiveVoteDecrementUnitsDelta(group, account, value);
+      // (a - b) = (c - d) * (e - b) / (f - d) solve for b
       valueDelta = getActiveVoteDecrementValueDelta(group, account, unitsDelta);
     }
     return (unitsDelta, valueDelta);
   }
 
+  /**
+   * @notice Returns the number of active vote units that should be subtracted from `account` given
+   *   the revokation of `value` active votes for `group`.
+   * @param group The address of the validator group.
+   * @param account The address of the account revoking active votes.
+   * @param value The number of active votes being revoked.
+   * @return The number of active vote units that should be subtracted.
+   * @dev Refer to `getActiveVoteDecrementDeltas()` for more documentation.
+   */
   function getActiveVoteDecrementUnitsDelta(address group, address account, uint256 value)
     private
     view
@@ -861,6 +916,15 @@ contract Election is
     return ceb.sub(fab).div(activeVotes.total.sub(votesBefore));
   }
 
+  /**
+   * @notice Returns the number of active votes that should be subtracted from `account` given the
+   *   revokation of `units` active vote units for `group`.
+   * @param group The address of the validator group.
+   * @param account The address of the account revoking votes.
+   * @param units The number of active vote units being revoked.
+   * @return The number of active votes that should be subtracted.
+   * @dev Refer to `getActiveVoteDecrementDeltas()` for more documentation.
+   */
   function getActiveVoteDecrementValueDelta(address group, address account, uint256 unitsDelta)
     private
     view

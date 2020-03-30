@@ -741,8 +741,8 @@ contract('Election', (accounts: string[]) => {
         ).toFixed()}\n\tactive: ${(
           await election.getActiveVotesForGroupByAccount(group, account.address)
         ).toFixed()}\n\tunits: ${(
-          await election.getActiveUnitsForGroupByAccount(group, account.address)
-        ).toFixed()}\n\ttotalunits: ${(await election.getActiveUnitsForGroup(group)).toFixed()}`
+          await election.getActiveVoteUnitsForGroupByAccount(group, account.address)
+        ).toFixed()}\n\ttotalunits: ${(await election.getActiveVoteUnitsForGroup(group)).toFixed()}`
       )
     }
 
