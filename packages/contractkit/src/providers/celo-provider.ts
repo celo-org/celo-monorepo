@@ -30,6 +30,40 @@ export class CeloProvider {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = wallet
+
+    if (
+      hasProperty<{ on: (type: string, callback: () => void) => void }>(this.existingProvider, 'on')
+    ) {
+      // @ts-ignore
+      this.on = this.defaultOn
+    }
+    if (
+      hasProperty<{ once: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'once'
+      )
+    ) {
+      // @ts-ignore
+      this.once = this.defaultOnce
+    }
+    if (
+      hasProperty<{ removeListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeListener = this.defaultRemoveListener
+    }
+    if (
+      hasProperty<{ removeAllListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeAllListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeAllListener = this.defaultRemoveAllListeners
+    }
   }
 
   addAccount(privateKey: string) {
@@ -129,6 +163,22 @@ export class CeloProvider {
         return
       }
     }
+  }
+
+  private defaultOn(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).on(type, callback)
+  }
+
+  private defaultOnce(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).once(type, callback)
+  }
+
+  private defaultRemoveListener(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).removeListener(type, callback)
+  }
+
+  private defaultRemoveAllListeners(type: string): void {
+    ;(this.existingProvider as any).removeAllListeners(type)
   }
 
   stop() {
