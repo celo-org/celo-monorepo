@@ -1269,11 +1269,9 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
-      // lock the entire releaseGold amount
       await releaseGoldInstance.lockGold(lockAmount, {
         from: beneficiary,
       })
-      // unlock the latter
       await releaseGoldInstance.unlockGold(lockAmount, {
         from: beneficiary,
       })
@@ -1290,6 +1288,8 @@ contract('ReleaseGold', (accounts: string[]) => {
         await lockedGoldInstance.getAccountTotalLockedGold(releaseGoldInstance.address),
         0
       )
+      // ReleaseGold locked balance should still reflect pending withdrawals
+      assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), lockAmount)
       assertEqualBN(
         await lockedGoldInstance.getAccountNonvotingLockedGold(releaseGoldInstance.address),
         0
@@ -1361,6 +1361,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           )
           assert.equal(values.length, 0)
           assert.equal(timestamps.length, 0)
+          assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), 0)
         })
       })
 

@@ -216,6 +216,8 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push('--network')
   // TODO(lucas): investigate if this can be found dynamically
   cmdArgs.push('development')
+  cmdArgs.push('--from')
+  cmdArgs.push('0x5409ED021D9299bf6814279A6A1411A7e866A631')
   cmdArgs.push('--grants')
   cmdArgs.push(releaseGoldContracts)
   cmdArgs.push('--start_gold')
