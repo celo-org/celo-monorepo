@@ -717,7 +717,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe.only('#revokeActive', () => {
+  describe('#revokeActive', () => {
     const voter0 = accounts[0]
     const voter1 = accounts[1]
     const group = accounts[2]
