@@ -7,16 +7,21 @@ export enum AssetTypes {
   graphic = 'graphic',
 }
 
-export const GLYPH_TRACKING = { name: 'Celo Glyphs', type: AssetTypes.logo }
+interface Tracker {
+  name: string
+  type: AssetTypes
+}
 
-export const JOST_TRACKING = { name: 'Jost', type: AssetTypes.font }
+export const GLYPH_TRACKING: Tracker = { name: 'Celo Glyphs', type: AssetTypes.logo }
 
-export const GARMOND_TRACKING = { name: 'Garmond', type: AssetTypes.font }
+export const JOST_TRACKING: Tracker = { name: 'Jost', type: AssetTypes.font }
 
-export const LOGO_PKG_TRACKING = { name: 'Logo Package', type: AssetTypes.logo }
+export const GARMOND_TRACKING: Tracker = { name: 'Garmond', type: AssetTypes.font }
 
-export const VOICE_DOC_TRACKING = { name: 'Celo Voice Doc', type: AssetTypes.logo }
+export const LOGO_PKG_TRACKING: Tracker = { name: 'Logo Package', type: AssetTypes.logo }
 
-export async function trackDownload({ name, type }) {
+export const VOICE_DOC_TRACKING: Tracker = { name: 'Celo Voice Doc', type: AssetTypes.logo }
+
+export async function trackDownload({ name, type }: Tracker) {
   await analytics.track(`${name} Downloaded`, { assetType: type, scope: 'brand-kit' })
 }
