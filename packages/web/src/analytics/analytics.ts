@@ -4,6 +4,7 @@ import { isBrowser } from 'src/utils/utils'
 
 let analytics: {
   track: (key: string, properties?: object, options?: object) => void
+  page: () => void
 }
 
 let segmentPromise
@@ -23,6 +24,7 @@ export async function initializeAnalytics() {
   if (!isBrowser() || !(await canTrack())) {
     return {
       track: noTrack,
+      page: noTrack,
     }
   }
 
@@ -54,6 +56,10 @@ export default {
   track: async function track(key: string, properties?: object, options?: object) {
     const segment = await initializeAnalytics()
     return segment.track(key, properties, options)
+  },
+  page: async function page() {
+    const segment = await initializeAnalytics()
+    return segment.page()
   },
 }
 
