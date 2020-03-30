@@ -29,19 +29,19 @@ class Papers extends React.PureComponent<I18nProps> {
               <H1 style={textStyles.center}>{t('title')}</H1>
             </Cell>
           </GridRow>
-          <SideTitledSection title={t('protocol')}>
+          <SideTitledSection span={Spans.three4th} title={t('protocol')}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('whitepaperTitle')}
             </Text>
             <HelpfullLink text={t('download')} href={'/papers/whitepaper'} />
           </SideTitledSection>
-          <SideTitledSection title={t('economics')}>
+          <SideTitledSection span={Spans.three4th} title={t('economics')}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('stabilityTitle')}
             </Text>
             <HelpfullLink text={t('download')} href={'/papers/stability'} />
           </SideTitledSection>
-          <SideTitledSection title={''}>
+          <SideTitledSection span={Spans.three4th} title={''}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('velocityTitle')}
             </Text>
