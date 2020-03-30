@@ -4,6 +4,7 @@ import { verifyDomainRecord } from '@celo/contractkit/lib/identity/claims/verify
 import { normalizeAddress } from '@celo/utils/lib/address'
 import { serializeClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { logger } from './logger'
+import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 
 const PGUSER = process.env['PGUSER'] || 'postgres'
 const PGPASSWORD = process.env['PGPASSWORD'] || ''
@@ -24,7 +25,21 @@ async function jsonQuery(query: string) {
   return res.rows[0].json_agg
 }
 
-async function addVerificationClaimToDatabase(address: string, domain: string, verified: boolean) {
+async function createVerificationClaims(
+  address: string,
+  domain: string,
+  verified: boolean,
+  accounts: Array<AccountClaim>
+) {
+  await addDatabaseVerificationClaims(address, domain, verified)
+  await Promise.all(
+    accounts.map(async (account) => {
+      await addDatabaseVerificationClaims(account.address.replace('0x', ''), domain, verified)
+    })
+  )
+}
+
+async function addDatabaseVerificationClaims(address: string, domain: string, verified: boolean) {
   try {
     const query = `INSERT INTO celo_claims (address, type, element, verified, timestamp, inserted_at, updated_at) VALUES 
         (decode($1, 'hex'), 'domain', $2, $3, now(), now(), now()) 
@@ -45,40 +60,42 @@ async function handleItem(item: { url: string; address: string }) {
   try {
     let metadata = await IdentityMetadataWrapper.fetchFromURL(item.url)
     let claims = metadata.filterClaims(ClaimTypes.DOMAIN)
+    const accounts = metadata.filterClaims(ClaimTypes.ACCOUNT)
 
     const numClaims = claims.length
     for (let i = 0; i < numClaims; i++) {
       const claim = claims[i]
       const addressWith0x = '0x' + item.address
       logger.debug('Claim: ' + serializeClaim(claim))
-      const alreadyVerified = await isClaimAlreadyVerified(item.address, claim.domain)
-      logger.debug(`Is already verified? ${alreadyVerified}`)
-      if (!alreadyVerified) {
-        logger.debug(`Verifying ${claim.domain} for address ${addressWith0x}`)
+      logger.debug('Accounts: ' + JSON.stringify(accounts))
+      // const alreadyVerified = await isClaimAlreadyVerified(item.address, claim.domain)
+      // logger.debug(`Is already verified? ${alreadyVerified}`)
+      // if (!alreadyVerified) {
+      logger.debug(`Verifying ${claim.domain} for address ${addressWith0x}`)
 
-        const verified = await verifyDomainRecord(addressWith0x, claim).catch((error) =>
-          logger.error(`Error in verifyDomainClaim ${error}`)
-        )
-        if (verified === undefined)
-          await addVerificationClaimToDatabase(item.address, claim.domain, true)
-        else logger.debug(verified)
-      }
+      const verified = await verifyDomainRecord(addressWith0x, claim).catch((error) =>
+        logger.error(`Error in verifyDomainClaim ${error}`)
+      )
+      if (verified === undefined)
+        await createVerificationClaims(item.address, claim.domain, true, accounts)
+      else logger.debug(verified)
+      // }
     }
   } catch (err) {
     logger.error('Cannot read metadata', err)
   }
 }
 
-async function isClaimAlreadyVerified(address: string, domain: string): Promise<boolean> {
-  const query = `SELECT verified FROM celo_claims WHERE  address=decode('${address}', 'hex') AND
-                element='${domain}' AND type='domain' AND timestamp IS NOT NULL AND verified=true`
-
-  let items: { verified: boolean }[] = await jsonQuery(query).catch((_error) => {})
-
-  items = items || []
-  if (items.length > 0) return true
-  return false
-}
+// async function isClaimAlreadyVerified(address: string, domain: string): Promise<boolean> {
+//   const query = `SELECT verified FROM celo_claims WHERE  address=decode('${address}', 'hex') AND
+//                 element='${domain}' AND type='domain' AND timestamp IS NOT NULL AND verified=true`
+//
+//   let items: { verified: boolean }[] = await jsonQuery(query).catch((_error) => {})
+//
+//   items = items || []
+//   if (items.length > 0) return false
+//   return false
+// }
 
 async function main() {
   logger.info('Connecting DB: ' + PGHOST)
