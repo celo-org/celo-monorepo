@@ -201,7 +201,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        Title
+        Celo Community Code of Conduct
       </h1>
     </div>
   </div>
@@ -261,7 +261,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        Purpose
+        1. Purpose
       </h3>
     </div>
     <div
@@ -296,7 +296,9 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        PurposeText
+        The Celo Code of Conduct is one of the ways we bring our value of connectedness into practice. A primary goal of the Celo community is to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible. As such, we are committed to providing a friendly, safe and welcoming environment for all, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+
+We invite all those who participate in the Celo community to help us create safe and positive experiences for everyone.
       </div>
     </div>
   </div>
@@ -356,7 +358,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        OpenSource
+        2. Open Source Citizenship
       </h3>
     </div>
     <div
@@ -393,9 +395,9 @@ exports[`CodeOfConduct renders 1`] = `
       >
         A supplemental goal of this Code of Conduct is to increase open source citizenship by encouraging participants to recognize and strengthen the relationships between our actions and their effects on our community.
 
- Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
+Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
 
- If you see someone who is making an extra effort to ensure our community is welcoming, friendly, and encourages all participants to contribute to the fullest extent, let us know by email 
+ If you see someone who is making an extra effort to ensure our community is welcoming, friendly, and encourages all participants to contribute to the fullest extent, let us know by emailing 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -416,6 +418,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -492,7 +496,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        Scope
+        3. Scope
       </h3>
     </div>
     <div
@@ -527,7 +531,9 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        ScopeText
+        We expect all community participants (contributors, paid or otherwise; sponsors; cLabs employees; and other guests) to abide by this Code of Conduct in all community venues–online and in-person–as well as in all one-on-one communications pertaining to community business.
+
+This Code of Conduct and its related procedures also applies to unacceptable behavior occurring outside the scope of community activities when such behavior has the potential to adversely affect the safety and well-being of community members.
       </div>
     </div>
   </div>
@@ -587,7 +593,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        ExpectedBehavior
+        4. Expected Behavior
       </h3>
     </div>
     <div
@@ -622,7 +628,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        ExpectedBehaviorText
+        The following behaviors are expected and requested of all community members:
       </div>
       <ul
         className="css-reset-4rbku5 css-view-1dbjc4n"
@@ -788,7 +794,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        UnacceptableBehavior
+        5. Unacceptable Behavior
       </h3>
     </div>
     <div
@@ -823,7 +829,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        UnacceptableBehaviorText
+        The following behaviors are considered harassment and are unacceptable within our community. Please note that this is not a comprehensive list, and in general, anything which could reasonably be considered inappropriate in a professional setting is unacceptable.
       </div>
       <ul
         className="css-reset-4rbku5 css-view-1dbjc4n"
@@ -1103,7 +1109,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        Consequences
+        6. Consequences of Unacceptable Behavior
       </h3>
     </div>
     <div
@@ -1138,7 +1144,11 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        ConsequencesText
+        Unacceptable behavior from any community member, including sponsors and those with decision-making authority, will not be tolerated.
+
+Anyone asked to stop unacceptable behavior is expected to comply immediately.
+
+If a community member engages in unacceptable behavior, the community organizers may take any action they deem appropriate, up to and including a temporary ban or permanent expulsion from the community without warning (and without refund in the case of a paid event).
       </div>
     </div>
   </div>
@@ -1198,7 +1208,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        Reporting
+        7. Reporting Guidelines
       </h3>
     </div>
     <div
@@ -1254,6 +1264,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1330,7 +1342,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        Grievances
+        8. Addressing Grievances
       </h3>
     </div>
     <div
@@ -1386,6 +1398,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1462,7 +1476,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        License
+        9. License and attribution
       </h3>
     </div>
     <div
@@ -1497,8 +1511,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        This Code of Conduct is distributed under a
-         
+        This Code of Conduct is distributed under a 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -1519,6 +1532,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://creativecommons.org/licenses/by-sa/3.0/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1535,9 +1550,7 @@ exports[`CodeOfConduct renders 1`] = `
             Creative Commons Attribution-ShareAlike
           </a>
         </div>
-         
-        license. Portions of text derived from the
-         
+         license. Portions of text derived from the 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -1558,6 +1571,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="http://citizencodeofconduct.org/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1574,9 +1589,7 @@ exports[`CodeOfConduct renders 1`] = `
             Citizen Code of Conduct
           </a>
         </div>
-         
-        , the
-         
+         , the 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -1597,6 +1610,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://www.djangoproject.com/conduct/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1613,8 +1628,7 @@ exports[`CodeOfConduct renders 1`] = `
             Django Code of Conduct
           </a>
         </div>
-        , the
-         
+        , the 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -1635,6 +1649,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="http://geekfeminism.wikia.com/wiki/Community_anti-harassment"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1651,8 +1667,7 @@ exports[`CodeOfConduct renders 1`] = `
             Geek Feminism Anti-Harassment Policy
           </a>
         </div>
-        , and the
-         
+        , and the 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -1673,6 +1688,8 @@ exports[`CodeOfConduct renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://www.contributor-covenant.org/version/1/4/code-of-conduct.html"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1784,7 +1801,7 @@ exports[`CodeOfConduct renders 1`] = `
           }
         }
       >
-        LastUpdated
+        Last updated June 12, 2018
       </div>
     </div>
   </div>

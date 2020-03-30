@@ -79,6 +79,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   event ReleaseGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
+  event ReleaseGoldInstanceDestroyed(address indexed beneficiary, address indexed atAddress);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
   event BeneficiarySet(address indexed beneficiary);
@@ -327,7 +328,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "Requested amount is greater than available released funds"
     );
     require(
-      maxDistribution >= totalWithdrawn + amount,
+      maxDistribution >= totalWithdrawn.add(amount),
       "Requested amount exceeds current alloted maximum distribution"
     );
     require(
@@ -337,6 +338,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     totalWithdrawn = totalWithdrawn.add(amount);
     beneficiary.transfer(amount);
     if (getRemainingTotalBalance() == 0) {
+      emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
       selfdestruct(refundAddress);
     }
   }
@@ -350,6 +352,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     beneficiary.transfer(beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
     refundAddress.transfer(revokerAmount);
+    emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
     selfdestruct(refundAddress);
   }
 
@@ -407,11 +410,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   /**
    * @notice Calculates remaining locked gold balance in the release schedule instance.
+   *         The returned amount also includes pending withdrawals to maintain consistent releases.
    * @return The remaining locked gold of the release schedule instance.
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
   function getRemainingLockedBalance() public view returns (uint256) {
-    return getLockedGold().getAccountTotalLockedGold(address(this));
+    uint256 pendingWithdrawalSum = 0;
+    if (getAccounts().isAccount(address(this))) {
+      pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
+    }
+    return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
   }
 
   /**

@@ -1,10 +1,11 @@
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
 import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
-import { stopProvider } from '../utils/provider-utils'
+import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
-import { DefaultWallet, Wallet } from '../utils/wallet'
+import { DefaultWallet } from '../wallets/default-wallet'
+import { Wallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
@@ -20,19 +21,57 @@ enum InterceptedMethods {
 }
 
 export class CeloProvider {
-  private readonly wallet: Wallet
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
+  wallet: Wallet
 
-  constructor(readonly existingProvider: provider) {
+  constructor(readonly existingProvider: provider, wallet: Wallet = new DefaultWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
-    this.wallet = new DefaultWallet()
+    this.wallet = wallet
+
+    if (
+      hasProperty<{ on: (type: string, callback: () => void) => void }>(this.existingProvider, 'on')
+    ) {
+      // @ts-ignore
+      this.on = this.defaultOn
+    }
+    if (
+      hasProperty<{ once: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'once'
+      )
+    ) {
+      // @ts-ignore
+      this.once = this.defaultOnce
+    }
+    if (
+      hasProperty<{ removeListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeListener = this.defaultRemoveListener
+    }
+    if (
+      hasProperty<{ removeAllListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeAllListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeAllListener = this.defaultRemoveAllListeners
+    }
   }
 
   addAccount(privateKey: string) {
-    this.wallet.addAccount(privateKey)
+    if (hasProperty<{ addAccount: (privateKey: string) => void }>(this.wallet, 'addAccount')) {
+      this.wallet.addAccount(privateKey)
+    } else {
+      throw new Error("The wallet used, can't add accounts")
+    }
   }
 
   async getAccounts(): Promise<string[]> {
@@ -124,6 +163,22 @@ export class CeloProvider {
         return
       }
     }
+  }
+
+  private defaultOn(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).on(type, callback)
+  }
+
+  private defaultOnce(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).once(type, callback)
+  }
+
+  private defaultRemoveListener(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).removeListener(type, callback)
+  }
+
+  private defaultRemoveAllListeners(type: string): void {
+    ;(this.existingProvider as any).removeAllListeners(type)
   }
 
   stop() {

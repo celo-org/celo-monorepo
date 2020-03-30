@@ -1,8 +1,7 @@
+import { sleep } from '@celo/utils/lib/async'
 import * as admin from 'firebase-admin'
-import * as rlp from 'rlp'
 import { CeloAdapter } from './celo-adapter'
 import * as fbHelper from './database-helper'
-import { wait } from './utils'
 
 const serviceAccount = require('./serviceAccountKey.json')
 admin.initializeApp({
@@ -49,7 +48,7 @@ async function populatePool(pool: fbHelper.AccountPool) {
 function fakeAction(pool: fbHelper.AccountPool) {
   return pool.doWithAccount(async (account) => {
     console.log('GOT Accounts', account)
-    await wait(5000)
+    await sleep(5000)
   })
 }
 
@@ -84,15 +83,6 @@ async function web3Playground() {
   console.log('After')
   await printBalance(celo.defaultAddress)
   await printBalance(to)
-}
-
-// @ts-ignore
-function convertToCeloRawTx(rawTransaction: string) {
-  const decoded = rlp.decode(rawTransaction)
-  // @ts-ignore
-  decoded.splice(3, 0, new Buffer(0), new Buffer(0))
-  // @ts-ignore
-  return '0x' + rlp.encode(decoded).toString('hex')
 }
 
 async function main() {
