@@ -1,4 +1,3 @@
-import { serializeClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { verifyDomainRecord } from '@celo/contractkit/lib/identity/claims/verify'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
@@ -34,11 +33,9 @@ export default class TestDomainClaim extends ClaimCommand {
     }
 
     const claim = existingClaims[0]
-    const signature = await this.signer.sign(serializeClaim(claim))
     console.info(`Fetching domain ${res.flags.domain} TXT records for verification`)
 
-    // const claim = createDomainClaim(res.flags.domain)
-    const output = await verifyDomainRecord(signature, res.flags.from, claim)
+    const output = await verifyDomainRecord(res.flags.from, claim)
 
     if (output === undefined)
       console.info(

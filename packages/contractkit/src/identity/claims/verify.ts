@@ -1,11 +1,11 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
-import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { resolveTxt } from 'dns'
 import { Address } from '../../base'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
-import { Claim, DomainClaim, hashOfClaim, serializeClaim } from './claim'
+import { Claim, Domain_Txt_Header, DomainClaim, serializeClaim } from './claim'
 import { verifyKeybaseClaim } from './keybase'
 import { ClaimTypes } from './types'
 
@@ -20,8 +20,8 @@ import { ClaimTypes } from './types'
 export async function verifyClaim(
   claim: Claim,
   address: string,
-  metadataURLGetter: MetadataURLGetter,
-  signer?: Signer
+  metadataURLGetter: MetadataURLGetter
+  // signer?: Signer
 ) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
@@ -29,7 +29,7 @@ export async function verifyClaim(
     case ClaimTypes.ACCOUNT:
       return verifyAccountClaim(claim, address, metadataURLGetter)
     case ClaimTypes.DOMAIN:
-      return verifyDomainClaim(claim, address, signer as any, metadataURLGetter)
+      return verifyDomainClaim(claim, address, metadataURLGetter)
     default:
       break
   }
@@ -84,14 +84,12 @@ type dnsResolverFunction = (
 export const verifyDomainClaim = async (
   claim: DomainClaim,
   address: string,
-  signer: Signer,
   metadataURLGetter: MetadataURLGetter,
   dnsResolver: dnsResolverFunction = resolveTxt
 ) => {
   const metadataURL = await metadataURLGetter(claim.domain)
   const domain = claim.domain
 
-  console.info('metadataURL ' + JSON.stringify(metadataURL))
   if (!isValidUrl(metadataURL)) {
     return `Metadata URL of ${claim.domain} could not be retrieved`
   }
@@ -113,46 +111,41 @@ export const verifyDomainClaim = async (
       ${metadataURL}: ${error.toString()}`
   }
 
-  const signature = await signer.sign(serializeClaim(claimFound))
-
-  return verifyDomainRecord(signature, address, claimFound, dnsResolver)
+  return verifyDomainRecord(address, claimFound, dnsResolver)
 }
 
 export const verifyDomainRecord = async (
-  signature: string,
   address: string,
   claim: DomainClaim,
   dnsResolver: dnsResolverFunction = resolveTxt
 ) => {
-  const signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
-
-  let found = false
-  const domainPromise = new Promise((resolve) => {
+  const found = await new Promise((resolve) => {
     dnsResolver(claim.domain, (error, domainRecords) => {
       if (error) {
         console.log(`Unable to fetch domain TXT records: ${error.toString()}`)
       } else {
         domainRecords.forEach((record) => {
-          console.log(`Domain record ${record}`)
           record.forEach((entry) => {
-            console.log(`Entry ${entry}`)
-            if (entry === 'celo-site-verification=' + signatureBase64) {
-              console.debug(`TXT Record celo-site-verification found`)
-              found = verifySignature(hashOfClaim(claim), signature, address)
+            if (entry.startsWith(Domain_Txt_Header)) {
+              console.log(`TXT Record celo-site-verification found`)
+              const signatureBase64 = entry.substring(Domain_Txt_Header.length + 1)
+              const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
+              // console.log(`Record: ${record}`)
+              // console.log(`Signature: ${signature}`)
+              // console.log(`Signature64: ${signatureBase64}`)
+              if (verifySignature(serializeClaim(claim), signature, address)) {
+                console.log(`Signature verified successfully`)
+                resolve(true)
+              }
             }
           })
         })
       }
-      resolve()
+      resolve(false)
     })
   })
 
-  domainPromise.then(() => console.log(`Promise resolved`))
-  // await Promise.resolve(domainPromise)
-  // await Promise.all(domainPromise)
-
   if (found) {
-    console.log(`TXT record found`)
     return
   }
   console.log(`NOT found`)

@@ -3,12 +3,13 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { NativeSigner, Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import { newKitFromWeb3 } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'
-import { createDomainClaim, DomainClaim, hashOfClaim } from './claim'
+import { createDomainClaim, DomainClaim, serializeClaim } from './claim'
 import { MetadataURLGetter, verifyDomainClaim } from './verify'
 
 testWithGanache('Domain claims', (web3) => {
   const kit = newKitFromWeb3(web3)
   const address = ACCOUNT_ADDRESSES[0]
+  const secondAddress = ACCOUNT_ADDRESSES[1]
 
   it('can make a domain claim', async () => {
     const domain = 'test.com'
@@ -48,10 +49,8 @@ testWithGanache('Domain claims', (web3) => {
 
       IdentityMetadataWrapper.fetchFromURL = () => Promise.resolve(metadata)
 
-      signature = await NativeSigner(kit.web3.eth.sign, address).sign(hashOfClaim(claim))
-      signatureBase64 = Buffer.from(signature.toString(), 'binary').toString('base64')
-      console.log(`Signature ${signature}`)
-      console.log(`SignatureBase64 ${signatureBase64}`)
+      signature = await signer.sign(serializeClaim(claim))
+      signatureBase64 = Buffer.from(signature, 'binary').toString('base64')
     })
 
     afterEach(() => {
@@ -60,26 +59,49 @@ testWithGanache('Domain claims', (web3) => {
 
     describe('when we have a signature', () => {
       it('indicates that signature is correct', async () => {
-        const verifiedSignature = await verifySignature(hashOfClaim(claim), signature, address)
+        console.log('serializedClaim: ' + serializeClaim(claim))
+        console.log('signature: ' + signature)
+        console.log('address: ' + address)
+        const verifiedSignature = await verifySignature(serializeClaim(claim), signature, address)
+        expect(verifiedSignature).toBeTruthy()
+      })
+
+      it('indicates a fixed signature is correct', async () => {
+        let newClaim = createDomainClaim('orco.dev')
+        newClaim.timestamp = 1584618795
+
+        const newSignature = await NativeSigner(kit.web3.eth.sign, secondAddress).sign(
+          serializeClaim(newClaim)
+        )
+
+        const verifiedSignature = await verifySignature(
+          serializeClaim(newClaim),
+          newSignature,
+          secondAddress
+        )
+        // const base64 = 'MHgxYWRhODcyYmJiNDhkM2Q3NzE0YWFmMWNkOGY1NmRlNWIxMDgzYTM5ZjBhOTllZTFhNTc3MWZjZjJkMTIwMjAxM2ZmNTdjMzliMTAwZGIxNThmOWUzZTBmZDk1ZWZjYWVjZDI3Y2NhYzcyZjc2NWU5OTFiNTkxYTI5NzEwYzc3ZjFi'
+        // const signature = Buffer.from(base64, 'base64').toString('binary')
+        //
+        // console.log('serializedClaim: ' + serializeClaim(claim))
+        // console.log('signature: ' + signature)
+
+        // const verifiedSignature = await verifySignature(
+        //     '{"domain":"orco.dev","timestamp":1584618795,"type":"DOMAIN"}',
+        //     '0x1ada872bbb48d3d7714aaf1cd8f56de5b1083a39f0a99ee1a5771fcf2d1202013ff57c39b100db158f9e3e0fd95efcaecd27ccac72f765e991b591a29710c77f1b',
+        //     '0xa1ab940594c0f5d66fdd282fe7b62f0aa08d5741')
         expect(verifiedSignature).toBeTruthy()
       })
     })
 
     describe('when the metadata URL is set', () => {
       it('indicates that the metadata contain the right claim', async () => {
-        const output = await verifyDomainClaim(
-          claim,
-          address,
-          signer,
-          metadataUrlGetter,
-          dnsResolver
-        )
+        const output = await verifyDomainClaim(claim, address, metadataUrlGetter, dnsResolver)
         expect(output).toBeUndefined()
       })
 
       it('indicates that the metadata does not contain the proper domain claim', async () => {
-        const error = await verifyDomainClaim(claim, address, signer, metadataUrlGetter)
-        console.log(`The message is ${error}`)
+        const error = await verifyDomainClaim(claim, address, metadataUrlGetter)
+        // console.log(`The message is ${error}`)
         expect(error).toContain('Unable to verify domain claim')
       })
     })
