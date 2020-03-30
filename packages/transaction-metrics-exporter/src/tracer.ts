@@ -1,4 +1,5 @@
-// tracer allows Geth's `debug_traceTransaction` to mimic the output of Parity's `trace_replayTransaction`
+export const tracerAsText = `
+// tracer allows Geth's \`debug_traceTransaction\` to mimic the output of Parity's \`trace_replayTransaction\`
 {
     // The call stack of the EVM execution.
     callStack: [{}],
@@ -112,13 +113,13 @@
     beforeOp(log, db) {
         /**
          * Depths
-         * 0 - `ctx`.  Never shows up in `log.getDepth()`
-         * 1 - first level of `log.getDepth()`
+         * 0 - \`ctx\`.  Never shows up in \`log.getDepth()\`
+         * 1 - first level of \`log.getDepth()\`
          *
          * callStack indexes
          *
-         * 0 - pseudo-call stand-in for `ctx` in initializer (`callStack: [{}]`)
-         * 1 - first callOp inside of `ctx`
+         * 0 - pseudo-call stand-in for \`ctx\` in initializer (\`callStack: [{}]\`)
+         * 1 - first callOp inside of \`ctx\`
          */
         const logDepth = log.getDepth();
         const callStackDepth = this.callStack.length;
@@ -459,3 +460,4 @@
         call.gasUsed = '0x' + gasUsedBigInt.toString(16);
     }
 }
+`

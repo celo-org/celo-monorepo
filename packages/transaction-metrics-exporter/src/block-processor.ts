@@ -4,13 +4,12 @@ import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { labelValues, Histogram, linearBuckets } from 'prom-client'
 import { Transaction } from 'web3-core'
 import { Block } from 'web3-eth'
-import fs from 'fs'
 
 import { Counters } from './metrics'
 import { Contracts, stateGetters } from './states'
 import { toMethodId, toTxMap } from './utils'
 
-const tracerAsText = fs.readFileSync(__dirname + '/tracer.js.txt', 'utf8')
+import { tracerAsText } from './tracer'
 
 enum LoggingCategory {
   Block = 'RECEIVED_BLOCK',
