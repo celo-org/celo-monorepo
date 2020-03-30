@@ -1,9 +1,9 @@
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
-import { EIP712TypedData } from './sign-typed-data-utils'
-import { recoverTransaction } from './signing-utils'
-import { DefaultWallet, Wallet } from './wallet'
+import { EIP712TypedData } from '../utils/sign-typed-data-utils'
+import { recoverTransaction } from '../utils/signing-utils'
+import { DefaultWallet } from './default-wallet'
 
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -11,7 +11,7 @@ const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef12345678
 const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
 
 describe('Wallet class', () => {
-  let wallet: Wallet
+  let wallet: DefaultWallet
 
   beforeEach(() => {
     wallet = new DefaultWallet()
