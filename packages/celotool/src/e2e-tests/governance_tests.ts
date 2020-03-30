@@ -36,17 +36,12 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
   await Promise.all(members.slice(1).map((member) => removeMember(member)))
 
   async function removeMember(member: string) {
-    console.log('removing member', member)
-    const v = await kit.contracts.getValidators()
-    const group1 = (await v.getValidator(member)).affiliation
-    console.log('group', group1, await v.getValidatorGroup(group1!, false))
-    const lst = await v.getValidatorMembershipHistory(member)
-    console.log('history', lst, lst.length, await v.getValidatorMembershipHistoryExtraData(member))
-    return v.removeMember(member).sendAndWaitForReceipt({ from: group, gas: 2000000 })
+    return (await kit.contracts.getValidators())
+      .removeMember(member)
+      .sendAndWaitForReceipt({ from: group })
   }
 
   async function addMember(member: string) {
-    console.log('adding member', member)
     return (
       await (await kit.contracts.getValidators()).addMember(group, member)
     ).sendAndWaitForReceipt({ from: group })
@@ -66,7 +61,6 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
       index = index + 1
       const addedMember = members[index % members.length]
       await addMember(members[index % members.length])
-      console.log('added succesfully')
       const groupMembers = await getGroupMembers()
       assert.include(groupMembers, addedMember)
       assert.notInclude(groupMembers, removedMember)
@@ -99,7 +93,6 @@ async function newKeyRotator(
       validator,
       signer
     )
-    console.log('rotating key', signer, pop, blsPublicKey, blsPop)
     return (
       await accountsWrapper.authorizeValidatorSignerAndBls(signer, pop, blsPublicKey, blsPop)
     ).sendAndWaitForReceipt({
@@ -110,12 +103,11 @@ async function newKeyRotator(
   return {
     async rotate() {
       if (index < web3s.length) {
-        index += 1
-        const signerWeb3 = web3s[index - 1]
+        const signerWeb3 = web3s[index]
         const signer: string = (await signerWeb3.eth.getAccounts())[0]
-        const signerPrivateKey = privateKeys[index - 1]
+        const signerPrivateKey = privateKeys[index]
         await authorizeValidatorSigner(signer, signerWeb3, signerPrivateKey)
-        console.log('rotated key', validator, signer, index, signerPrivateKey)
+        index += 1
         assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
       }
     },
@@ -171,7 +163,7 @@ describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
     migrate: true,
     runPath: TMP_PATH,
-    verbosity: 5,
+    verbosity: 0,
     networkId: 1101,
     network: 'local',
     instances: [
@@ -494,7 +486,6 @@ describe('governance tests', () => {
             return
           }
           handled[header.number] = true
-          console.log('at block', header.number, header.miner)
           blockNumbers.push(header.number)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
           // Note that all of these actions MUST complete within the epoch.
@@ -502,15 +493,12 @@ describe('governance tests', () => {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             await Promise.all([memberSwapper.swap(), keyRotator.rotate()])
-            console.log('commands were successful')
           }
         } catch (e) {
           console.error(e)
           errorWhileChangingValidatorSet = e
         }
       }
-
-      console.log('getting blocks?')
 
       const subscription = groupWeb3.eth.subscribe('newBlockHeaders')
       subscription.on('data', changeValidatorSet)
@@ -525,7 +513,6 @@ describe('governance tests', () => {
 
       // Wait for the current epoch to complete.
       await sleep(epoch)
-      console.log('got blocks', blockNumbers)
       assert.equal(errorWhileChangingValidatorSet, '')
     })
 
@@ -570,19 +557,8 @@ describe('governance tests', () => {
 
     it('should block propose in a round robin fashion', async () => {
       let roundRobinOrder: string[] = []
-      let goodEpoch = false
-      let lastEpoch = 0
-      let numGoodEpochs = 0
       for (const blockNumber of blockNumbers) {
         const lastEpochBlock = getLastEpochBlock(blockNumber, epoch)
-        if (lastEpoch !== 0 && goodEpoch && lastEpochBlock > lastEpoch) {
-          numGoodEpochs += 1
-        }
-        if (lastEpochBlock > lastEpoch) {
-          lastEpoch = lastEpochBlock
-          goodEpoch = true
-          console.log('starting new epoch')
-        }
         // Fetch the round robin order if it hasn't already been set for this epoch.
         if (roundRobinOrder.length === 0 || blockNumber === lastEpochBlock + 1) {
           const validatorSet = await getValidatorSetSignersAtBlock(blockNumber)
@@ -591,41 +567,13 @@ describe('governance tests', () => {
               async (_, i) => (await web3.eth.getBlock(lastEpochBlock + i + 1)).miner
             )
           )
-          console.log('epoch', lastEpochBlock, 'validators', validatorSet, 'order', roundRobinOrder)
-          console.log(
-            'lst',
-            await Promise.all(
-              [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-                async (i) => (await web3.eth.getBlock(lastEpochBlock + i)).miner
-              )
-            )
-          )
-          if (
-            JSON.stringify(roundRobinOrder.concat().sort()) !==
-            JSON.stringify(validatorSet.concat().sort())
-          ) {
-            console.log('problem with members')
-            goodEpoch = false
-          }
+          assert.sameMembers(roundRobinOrder, validatorSet)
         }
         const indexInEpoch = blockNumber - lastEpochBlock - 1
         const expectedProposer = roundRobinOrder[indexInEpoch % roundRobinOrder.length]
         const block = await web3.eth.getBlock(blockNumber)
-        console.log(
-          'proposer',
-          block.miner,
-          expectedProposer,
-          indexInEpoch,
-          indexInEpoch % roundRobinOrder.length,
-          roundRobinOrder.length,
-          blockNumber
-        )
-        if (!eqAddress(block.miner, expectedProposer)) {
-          // console.log(' ---- unexpected proposer', block.miner, expectedProposer, indexInEpoch)
-          goodEpoch = false
-        }
+        assert(eqAddress(block.miner, expectedProposer))
       }
-      assert(numGoodEpochs > 2)
     })
 
     it('should update the validator scores at the end of each epoch', async function(this: any) {
@@ -714,7 +662,6 @@ describe('governance tests', () => {
         const score = new BigNumber(
           (await validators.methods.getValidator(validator).call({}, blockNumber)).score
         )
-        console.log('score of', validator, 'at', blockNumber, score)
         assert.isFalse(score.isNaN())
         // We need to calculate the rewards multiplier for the previous block, before
         // the rewards actually are awarded.
@@ -838,20 +785,11 @@ describe('governance tests', () => {
 
       for (const blockNumber of blockNumbers) {
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
-          const block = await web3.eth.getBlock(blockNumber)
-          console.log(block.hash)
-          console.log(await web3.eth.getTransactionReceipt(block.hash))
-
           // We use the number of active votes from the previous block to calculate the expected
           // epoch reward as the number of active votes for the current block will include the
           // epoch reward.
           const activeVotes = new BigNumber(
             await election.methods.getActiveVotes().call({}, blockNumber - 1)
-          )
-          console.log(
-            'active votes',
-            activeVotes,
-            await election.methods.getActiveVotes().call({}, blockNumber)
           )
           assert.isFalse(activeVotes.isZero())
 
@@ -860,7 +798,6 @@ describe('governance tests', () => {
           const rewardsMultiplier = new BigNumber(
             await epochRewards.methods.getRewardsMultiplier().call({}, blockNumber - 1)
           )
-          console.log('rewards multi', rewardsMultiplier)
           assert.isFalse(rewardsMultiplier.isZero())
 
           // This is the array of rewards that should have been distributed
@@ -877,34 +814,9 @@ describe('governance tests', () => {
           const maxPotentialValidatorReward = perValidatorReward
             .times(validatorSetSize)
             .div(exchangeRate)
-          const targetValidatorEpochPayment = new BigNumber(
-            await epochRewards.methods.targetValidatorEpochPayment().call()
-          )
-          const maxPotentialValidatorReward2 = targetValidatorEpochPayment.div(exchangeRate)
-          console.log('max potential', maxPotentialValidatorReward, maxPotentialValidatorReward2)
-          console.log(
-            'exchange rate',
-            exchangeRate,
-            'validators',
-            validatorSetSize,
-            'pervalidator',
-            perValidatorReward
-          )
           // Calculate the expected voting reward
-          console.log(
-            'target gold fraction',
-            await epochRewards.methods.getTargetVotingGoldFraction().call({}, blockNumber)
-          )
-          console.log(
-            'gold fraction',
-            await epochRewards.methods.getVotingGoldFraction().call({}, blockNumber)
-          )
           const targetVotingYield = new BigNumber(
             (await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber))[0]
-          )
-          console.log(
-            'target voting',
-            await epochRewards.methods.getTargetVotingYieldParameters().call({}, blockNumber)
           )
           assert.isFalse(targetVotingYield.isZero())
           const expectedVoterRewards = activeVotes
@@ -928,15 +840,6 @@ describe('governance tests', () => {
             .times(fromFixed(communityRewardFrac))
             .div(fundFactor)
 
-          /*
-          const targetGoldSupplyIncrease = new BigNumber(
-            await epochRewards.methods.getTargetGoldSupplyIncrease().call({}, blockNumber - 1)
-          )
-          const expected2 = targetGoldSupplyIncrease
-            .times(fromFixed(communityRewardFrac))
-            .times(fromFixed(rewardsMultiplier))
-          */
-
           const expectedCarbonOffsettingPartnerAward = expectedVoterRewards
             .plus(maxPotentialValidatorReward)
             .times(fromFixed(carbonOffsettingFrac))
@@ -951,33 +854,23 @@ describe('governance tests', () => {
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
           const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
-          console.log('voter rewards', expectedVoterRewards, totalVoterRewards)
           assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
-          console.log('community rewards')
           assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
-          console.log('carbon rewards')
           assertAlmostEqual(expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
           // Check TS calc'd rewards against what happened
-          console.log('votes changed', expectedVoterRewards)
           await assertVotesChanged(blockNumber, expectedVoterRewards)
-          console.log('locked gold balance')
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
-          console.log('governance balance')
           await assertGovernanceBalanceChanged(
             blockNumber,
             expectedCommunityReward.plus(await blockBaseGasFee(blockNumber))
           )
-          console.log('reserve changed')
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
-          console.log('total supply changed', expectedGoldTotalSupplyChange)
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
-          console.log('carbon changed', expectedCarbonOffsettingPartnerAward)
           await assertCarbonOffsettingBalanceChanged(
             blockNumber,
             expectedCarbonOffsettingPartnerAward
           )
         } else {
-          console.log('unchanged')
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)

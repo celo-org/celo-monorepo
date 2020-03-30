@@ -29,14 +29,6 @@ export class CeloProvider {
   constructor(readonly existingProvider: provider, wallet: Wallet = new DefaultWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
-    // @ts-ignore
-    if (existingProvider.on !== undefined) {
-      // @ts-ignore
-      this.on = (type: string, callback: any) => {
-        // @ts-ignore
-        existingProvider.on(type, callback)
-      }
-    }
     this.wallet = wallet
 
     if (

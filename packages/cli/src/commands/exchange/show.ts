@@ -22,52 +22,6 @@ export default class ExchangeShow extends BaseCommand {
 
     cli.action.start('Fetching exchange rates...')
     const exchange = await this.kit.contracts.getExchange()
-    const exchange_ = await this.kit._web3Contracts.getExchange()
-    const reserve = await this.kit.contracts.getReserve()
-    const reserve_ = await this.kit._web3Contracts.getReserve()
-    // reserve_.options.address = '0xad60834e131599b58b151b4791374436e5cbba96'
-    console.log('exchange', exchange.address)
-    console.log('spenders', await reserve.getSpenders())
-    // @ts-ignore
-    console.log('update', await exchange_.methods.lastBucketUpdate().call({}, 130782), 1579356015)
-    // @ts-ignore
-    console.log(
-      'update freq',
-      await exchange_.methods.updateFrequency().call({}, 130782),
-      1579356015
-    )
-    // @ts-ignore
-    console.log(
-      'reserve fraction',
-      await exchange_.methods.reserveFraction().call({}, 130782),
-      1579356015
-    )
-    // @ts-ignore
-    console.log('others', await reserve_.methods.getOtherReserveAddresses().call({}, 130781))
-    for (let i = 130700; i < 130782; i++) {
-      // @ts-ignore
-      console.log('reserve gold', i, await reserve_.methods.getReserveGoldBalance().call({}, i))
-      // @ts-ignore
-      console.log('bucket', i, (await exchange_.methods.getBuyAndSellBuckets(true).call({}, i))[1])
-      // @ts-ignore
-      console.log('last update', await exchange_.methods.lastBucketUpdate().call({}, i))
-    }
-    // @ts-ignore
-    console.log('bocket', await reserve_.methods.getReserveGoldBalance().call({}, 130780))
-    // @ts-ignore
-    console.log('bocket', await reserve_.methods.getReserveGoldBalance().call({}, 130781))
-    // @ts-ignore
-    console.log('bocket', await reserve_.methods.getReserveGoldBalance().call({}, 130782))
-    // @ts-ignore
-    console.log('bocket', await reserve_.methods.getReserveGoldBalance().call({}, 130783))
-    // @ts-ignore
-    console.log('buckets', await exchange_.methods.getBuyAndSellBuckets(true).call({}, 130780))
-    // @ts-ignore
-    console.log('buckets', await exchange_.methods.getBuyAndSellBuckets(true).call({}, 130781))
-    // @ts-ignore
-    console.log('buckets', await exchange_.methods.getBuyAndSellBuckets(true).call({}, 130782))
-    // @ts-ignore
-    console.log('buckets', await exchange_.methods.getBuyAndSellBuckets(true).call({}, 130783))
     const dollarForGold = await exchange.getBuyTokenAmount(parsedFlags.amount as string, true)
     const goldForDollar = await exchange.getBuyTokenAmount(parsedFlags.amount as string, false)
     cli.action.stop()

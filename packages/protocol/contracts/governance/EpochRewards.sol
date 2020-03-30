@@ -372,10 +372,6 @@ contract EpochRewards is
       );
   }
 
-  function getTargetGoldSupplyIncrease() public view returns (uint256) {
-    return _getTargetGoldSupplyIncrease();
-  }
-
   /**
    * @notice Returns the target gold supply increase used in calculating the rewards multiplier.
    * @return The target increase in gold w/out the rewards multiplier.
