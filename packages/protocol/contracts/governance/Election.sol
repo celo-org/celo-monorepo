@@ -925,7 +925,7 @@ contract Election is
    * @return The number of active votes that should be subtracted.
    * @dev Refer to `getActiveVoteDecrementDeltas()` for more documentation.
    */
-  function getActiveVoteDecrementValueDelta(address group, address account, uint256 unitsDelta)
+  function getActiveVoteDecrementValueDelta(address group, address account, uint256 units)
     private
     view
     returns (uint256)
@@ -933,8 +933,8 @@ contract Election is
     // (a - b) = (c - d) * (e - b) / (f - d) solve for b
     GroupActiveVotes storage activeVotes = votes.active.forGroup[group];
     uint256 votesBefore = getActiveVotesForGroupByAccount(group, account);
-    uint256 afd = votesBefore.mul(activeVotes.totalUnits.sub(unitsDelta));
-    uint256 ecd = activeVotes.total.mul(activeVotes.unitsByAccount[account].sub(unitsDelta));
+    uint256 afd = votesBefore.mul(activeVotes.totalUnits.sub(units));
+    uint256 ecd = activeVotes.total.mul(activeVotes.unitsByAccount[account].sub(units));
     return afd.sub(ecd).div(activeVotes.totalUnits.sub(activeVotes.unitsByAccount[account]));
   }
 
