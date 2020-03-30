@@ -1,4 +1,9 @@
-import { isHexString, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  isHexString,
+  normalizeAddressWith0x,
+  trimLeading0x,
+} from '@celo/utils/lib/address'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import { byContractAddress } from '@ledgerhq/hw-app-eth/erc20'
@@ -125,7 +130,6 @@ export class LedgerWallet implements Wallet {
         this.getDerivationPathFor(txParams.from!.toString()),
         trimLeading0x(rlpEncoded.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
       )
-
       // EIP155 support. check/recalc signature v value.
       const rv = parseInt(signature.v, 16)
       let cv = chainIdTransformationForSigning(rlpEncoded.transaction.chainId!)
@@ -156,8 +160,11 @@ export class LedgerWallet implements Wallet {
       }
       const path = this.getDerivationPathFor(address)
       const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(data))
-
-      const rpcSig = ethUtil.toRpcSig(sig.v, ethUtil.toBuffer(sig.r), ethUtil.toBuffer(sig.s))
+      const rpcSig = ethUtil.toRpcSig(
+        sig.v,
+        ethUtil.toBuffer(ensureLeading0x(sig.r)),
+        ethUtil.toBuffer(ensureLeading0x(sig.s))
+      )
       return rpcSig
     } catch (error) {
       if (error instanceof TransportStatusError) {
@@ -183,7 +190,11 @@ export class LedgerWallet implements Wallet {
       const path = this.getDerivationPathFor(address)
       const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(dataBuff.toString()))
 
-      const rpcSig = ethUtil.toRpcSig(sig.v, ethUtil.toBuffer(sig.r), ethUtil.toBuffer(sig.s))
+      const rpcSig = ethUtil.toRpcSig(
+        sig.v,
+        ethUtil.toBuffer(ensureLeading0x(sig.r)),
+        ethUtil.toBuffer(ensureLeading0x(sig.s))
+      )
       return rpcSig
     } catch (error) {
       if (error instanceof TransportStatusError) {
