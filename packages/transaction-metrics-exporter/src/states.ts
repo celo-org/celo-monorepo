@@ -54,11 +54,10 @@ export const stateGetters: StateGetter[] = [
     getter('SortedOracles', 'medianRate', ({ rate }) => ({ medianRate: +rate }), [
       CeloContract.StableToken,
     ]),
-    // getter(
-    //   'Reserve',
-    //   'getReserveGoldBalance',
-    //   (goldBalance) => ({goldBalance: +goldBalance}),
-    // ),
+    getter('Reserve', 'getReserveGoldBalance', (goldBalance) => ({ goldBalance: +goldBalance })),
+    getter('Exchange', 'reserveFraction', (reserveFraction) => ({
+      reserveFraction: +reserveFraction,
+    })),
     getter(
       'GoldToken',
       'totalSupply',
@@ -79,7 +78,7 @@ export const stateGetters: StateGetter[] = [
   // Include getters for accounts
 ;(process.env.WATCH_ADDRESS || '')
   .split(/,\s?/)
-  .filter((address) => address.match(/^0x[a-f0-9]{40}$/g))
+  .filter((address) => address.match(/^0x[a-f0-9]{40}$/i))
   .forEach((address) => {
     stateGetters.push(
       getter(

@@ -60,7 +60,7 @@ export class BlockProcessor {
   async loadContracts() {
     this.contracts.Exchange = await this.kit.contracts.getExchange()
     this.contracts.SortedOracles = await this.kit.contracts.getSortedOracles()
-    // this.contracts.Reserve = await this.kit.contracts.getReserve()
+    this.contracts.Reserve = await this.kit.contracts.getReserve()
     this.contracts.GoldToken = await this.kit.contracts.getGoldToken()
     this.contracts.EpochRewards = await this.kit.contracts.getEpochRewards()
     this.contracts.StableToken = await this.kit.contracts.getStableToken()
