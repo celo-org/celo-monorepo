@@ -37,9 +37,12 @@ async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<Me
 
   async function removeMember(member: string) {
     console.log('removing member', member)
-    return (await kit.contracts.getValidators())
-      .removeMember(member)
-      .sendAndWaitForReceipt({ from: group })
+    const v = await kit.contracts.getValidators()
+    const group1 = (await v.getValidator(member)).affiliation
+    console.log('group', group1, await v.getValidatorGroup(group1!, false))
+    const lst = await v.getValidatorMembershipHistory(member)
+    console.log('history', lst, lst.length, await v.getValidatorMembershipHistoryExtraData(member))
+    return v.removeMember(member).sendAndWaitForReceipt({ from: group, gas: 2000000 })
   }
 
   async function addMember(member: string) {
@@ -491,7 +494,7 @@ describe('governance tests', () => {
             return
           }
           handled[header.number] = true
-          console.log('at block', header.number)
+          console.log('at block', header.number, header.miner)
           blockNumbers.push(header.number)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
           // Note that all of these actions MUST complete within the epoch.
@@ -517,7 +520,7 @@ describe('governance tests', () => {
         // Prepare for member swapping.
         await sleep(epoch)
       }
-      await sleep(10000)
+      // await sleep(10000)
       ;(subscription as any).unsubscribe()
 
       // Wait for the current epoch to complete.

@@ -2041,19 +2041,36 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe('when changing groups more times than membership history length', () => {
+    describe.only('when changing groups more times than membership history length', () => {
       it('should always store the most recent memberships', async () => {
         // We store an entry upon registering the validator.
         const expectedMembershipHistoryGroups = [NULL_ADDRESS]
         const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
-        for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
+        for (let i = 0; i < membershipHistoryLength.plus(100).toNumber(); i++) {
           await mineToNextEpoch(web3)
           const epochNumber = await currentEpochNumber(web3)
-          await validators.affiliate(groups[i])
+          console.log('epoch', epochNumber)
+          if (i % 2 === 1) {
+            await validators.removeMember(validator, { from: groups[0] })
+          } else {
+            await validators.affiliate(groups[0])
+            await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+              from: groups[0],
+            })
+          }
+        }
+        for (let i = 0; i < membershipHistoryLength.plus(100).toNumber(); i++) {
+          await mineToNextEpoch(web3)
+          const epochNumber = await currentEpochNumber(web3)
+          console.log('epoch', epochNumber)
+          if (i > 0) {
+            await validators.removeMember(validator, { from: groups[(i - 1) % 2] })
+          }
+          await validators.affiliate(groups[i % 2])
           await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-            from: groups[i],
+            from: groups[i % 2],
           })
-          expectedMembershipHistoryGroups.push(groups[i])
+          expectedMembershipHistoryGroups.push(groups[i % 2])
           expectedMembershipHistoryEpochs.push(new BigNumber(epochNumber))
           if (expectedMembershipHistoryGroups.length > membershipHistoryLength.toNumber()) {
             expectedMembershipHistoryGroups.shift()
