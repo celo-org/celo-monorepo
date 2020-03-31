@@ -3,6 +3,7 @@ import { Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import Page, { ROOT } from 'src/brandkit/common/Page'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
+import { trackDownload, VOICE_DOC_TRACKING } from 'src/brandkit/tracking'
 import { H1, H4, Li, Ul } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, useTranslation, withNamespaces } from 'src/i18n'
 import InlineAnchor from 'src/shared/InlineAnchor'
@@ -56,6 +57,10 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
 function BrandVoice() {
   const { t } = useTranslation(NameSpaces.brand)
 
+  const onPressVoice = React.useCallback(async () => {
+    await trackDownload(VOICE_DOC_TRACKING)
+  }, [])
+
   return (
     <View style={brandStyles.gap}>
       <SectionTitle>{t('home.brandVoice')}</SectionTitle>
@@ -63,6 +68,7 @@ function BrandVoice() {
         <Trans ns={NameSpaces.brand} i18nKey="home.brandVoiceText">
           <InlineAnchor
             target="_blank"
+            onPress={onPressVoice}
             href={
               'https://docs.google.com/document/d/1Y1mfpBGad_8ZxSuIqwX52MWGEMfoWGt5HXc7sZp9h70/edit?usp=sharing'
             }
