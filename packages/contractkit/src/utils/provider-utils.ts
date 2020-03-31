@@ -1,7 +1,7 @@
 import { provider } from 'web3-core'
 
-function hasProperty<T>(object: any, property: string): object is T {
-  return object.hasOwnProperty(property)
+export function hasProperty<T>(object: any, property: string): object is T {
+  return property in object
 }
 
 export function getProviderUrl(defaultProvider: any): any {
