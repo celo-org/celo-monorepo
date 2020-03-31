@@ -1,6 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import { switchToClusterFromEnv } from 'src/lib/azure'
 import { installPrometheus } from 'src/lib/aks-prometheus'
+import { switchToClusterFromEnv } from 'src/lib/azure'
 import yargs from 'yargs'
 
 export const command = 'aks-prometheus'

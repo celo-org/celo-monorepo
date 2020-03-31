@@ -1,6 +1,6 @@
 import { DestroyArgv } from 'src/cmds/deploy/destroy'
-import { switchToClusterFromEnv } from 'src/lib/azure'
 import { removeHelmRelease } from 'src/lib/aks-prometheus'
+import { switchToClusterFromEnv } from 'src/lib/azure'
 import yargs from 'yargs'
 
 export const command = 'aks-prometheus'

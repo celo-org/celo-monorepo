@@ -1,7 +1,7 @@
 import { createNamespaceIfNotExists } from './cluster'
 import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-utils'
-import { execCmd, execCmdWithExitOnFailure } from './utils'
 import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
+import { execCmd, execCmdWithExitOnFailure } from './utils'
 
 // switchToClusterFromEnv configures kubectl to connect to the AKS cluster
 // TODO(trevor): add project switching as well
