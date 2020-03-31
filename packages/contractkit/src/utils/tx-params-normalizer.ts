@@ -1,11 +1,5 @@
-import { ensureLeading0x } from '@celo/utils/lib/address'
-import BigNumber from 'bignumber.js'
 import { Tx } from 'web3-core'
 import { RpcCaller } from './rpc-caller'
-
-// Default gateway fee to send the serving full-node on each transaction.
-// TODO(nategraf): Provide a method of fecthing the gateway fee value from the full-node peer.
-const DefaultGatewayFee = new BigNumber(10000)
 
 function isEmpty(value: string | undefined) {
   return (
@@ -36,14 +30,6 @@ export class TxParamsNormalizer {
 
     if (!txParams.gas || isEmpty(txParams.gas.toString())) {
       txParams.gas = await this.getEstimateGas(txParams)
-    }
-
-    if (isEmpty(txParams.gatewayFeeRecipient)) {
-      txParams.gatewayFeeRecipient = await this.getCoinbase()
-    }
-
-    if (!isEmpty(txParams.gatewayFeeRecipient) && isEmpty(txParams.gatewayFee)) {
-      txParams.gatewayFee = ensureLeading0x(DefaultGatewayFee.toString(16))
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
@@ -77,6 +63,7 @@ export class TxParamsNormalizer {
     return gas
   }
 
+  // @ts-ignore - see comment above
   private async getCoinbase(): Promise<string> {
     if (this.gatewayFeeRecipient === null) {
       // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_coinbase
