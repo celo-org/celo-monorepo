@@ -17,13 +17,13 @@ The setup of the Baklava network will differ from previous Stake Off deployments
 
 The deployment timeline is as follows (all dates are subject to change):
 
-* 3/31: Blockchain client and genesis block distributed
+* 3/31: Docker image with genesis block distributed
 * 3/31 - 4/6: Infrastructure setup
 * 4/6 16:00 UTC: Block production begins
-* 4/6: Celo Core Contracts are deployed; `ReleaseGold` instances are deployed containing validator Testnet Celo Gold
+* 4/6: Celo Core Contracts and `ReleaseGold` contracts are deployed
 * 4/7: Governance proposal to start validator rewards
 * 4/8: Governance proposal to unfreeze Celo Gold voter rewards
-* 4/9: Mock Oracles deployed; governance proposal to unfreeze Celo Dollar exchange
+* 4/9: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
 * 4/10: Faucet requests for non-genesis validators accepted
 
 {% hint style="info" %}
@@ -32,7 +32,7 @@ A [timeline](https://celo.org/#timeline) of the Celo project is available to pro
 
 ## Setup for Genesis Validators (Before 4/6)
 
-**If your address is in the genesis block, the community is relying on your validator to get the network started!**
+**If you provided your validator signer address and BLS public key for genesis, the community is relying on your validator to get the network started!**
 
 This section outlines the steps needed to configure your proxy and validator nodes before block production begins.
 
@@ -59,6 +59,8 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 ```bash
 docker pull $CELO_IMAGE
 ```
+
+The `us.gcr.io/celo-testnet/celo-node:baklava` image is built from commit [`c82411259ac7a0b44a4705b7c5f6289f6e8292b2`](https://github.com/celo-org/celo-blockchain/commit/c82411259ac7a0b44a4705b7c5f6289f6e8292b2) and contains the [genesis block](https://storage.cloud.google.com/genesis_blocks/baklava) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Geth binary.
 
 ### Networking requirements
 
@@ -153,7 +155,7 @@ Note that if you are running the validator and the proxy on the same machine, th
 
 ## After Block Production Begins
 
-Once block production starts, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of Governance Proposals in a process which will be a preview of the deployment process for the Celo Mainnet.
+Once block production starts on April 6th at 1600 UTC, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of Governance Proposals in a process which will be a preview of the deployment process for the Celo Mainnet.
 
 `ReleaseGold` contracts will be used to provide the required testnet units of Celo Gold required to register a validator and vote. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process.
 
