@@ -11,7 +11,6 @@
 * [feeCurrency](_kit_.kitoptions.md#optional-feecurrency)
 * [from](_kit_.kitoptions.md#optional-from)
 * [gasInflationFactor](_kit_.kitoptions.md#gasinflationfactor)
-* [gasPrice](_kit_.kitoptions.md#gasprice)
 
 ## Properties
 
@@ -19,7 +18,7 @@
 
 • **feeCurrency**? : *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/kit.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L68)*
+*Defined in [contractkit/src/kit.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L70)*
 
 ___
 
@@ -27,7 +26,7 @@ ___
 
 • **from**? : *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/kit.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L69)*
+*Defined in [contractkit/src/kit.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L71)*
 
 ___
 
@@ -35,12 +34,4 @@ ___
 
 • **gasInflationFactor**: *number*
 
-*Defined in [contractkit/src/kit.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L66)*
-
-___
-
-###  gasPrice
-
-• **gasPrice**: *string*
-
-*Defined in [contractkit/src/kit.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L67)*
+*Defined in [contractkit/src/kit.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L69)*

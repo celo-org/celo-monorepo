@@ -68,16 +68,4 @@ describe('BackupIntroduction', () => {
     )
     expect(tree).toMatchSnapshot()
   })
-  it('renders correctly when pin verification is in-progress', () => {
-    const tree = renderer.create(
-      <Provider
-        store={createMockStore({
-          app: { doingPinVerification: true },
-        })}
-      >
-        <BackupIntroduction />
-      </Provider>
-    )
-    expect(tree).toMatchSnapshot()
-  })
 })

@@ -46,8 +46,10 @@ export default class List extends BaseCommand {
     console.log(chalk.red.bold('Expired Proposals:'))
     const expiredQueue = queue
       .filter((_, idx) => expiredQueueMap[idx])
-      .map((elem) => elem.proposalID)
-    const expiredDequeue = dequeue.filter((_, idx) => expiredDequeueMap[idx])
+      .map((_, idx) => queue[idx].proposalID)
+    const expiredDequeue = dequeue
+      .filter((_, idx) => expiredDequeueMap[idx])
+      .map((_, idx) => dequeue[idx])
     cli.table(expiredQueue.concat(expiredDequeue), {
       ID: { get: (id) => valueToString(id) },
     })
