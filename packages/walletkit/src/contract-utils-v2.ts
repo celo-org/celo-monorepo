@@ -18,9 +18,6 @@ import { Logger } from './logger'
 import { CeloTransaction } from './transaction-utils'
 
 export default class ContractUtils {
-  // TODO(nategraf): Allow this paramter to be fetched from the full-node peer.
-  static readonly defaultGatewayFee = new BigNumber(10000)
-
   static async getGoldBalance(web3: Web3, accountNumber: string): Promise<BigNumber> {
     const goldToken: GoldTokenType = await getGoldTokenContract(web3)
     const balance = await getErc20Balance(goldToken, accountNumber, web3)
