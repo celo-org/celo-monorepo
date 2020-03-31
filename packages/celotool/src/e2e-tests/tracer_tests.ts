@@ -421,8 +421,8 @@ describe('tracer tests', () => {
     let toAddress: string
     let sendAmount: BigNumber
     let receiveAmount: BigNumber
-    let sendBalanceDelta: BigNumber
-    let receiveBalanceDelta: BigNumber
+    let sentBalance: BigNumber
+    let receivedBalance: BigNumber
     let goldGasCurrency: boolean
     let fromInitialBalance: BigNumber
     let fromFinalBalance: BigNumber
@@ -442,8 +442,8 @@ describe('tracer tests', () => {
         toAddress = transferResult.toAddress || ToAddress
         sendAmount = transferResult.sendAmount || TransferAmount
         receiveAmount = transferResult.receiveAmount || TransferAmount
-        sendBalanceDelta = transferResult.sendBalanceDelta || sendAmount
-        receiveBalanceDelta = transferResult.receiveBalanceDelta || receiveAmount
+        sentBalance = transferResult.sentBalance || sendAmount
+        receivedBalance = transferResult.receivedBalance || receiveAmount
         goldGasCurrency =
           transferResult.goldGasCurrency != undefined ? transferResult.goldGasCurrency : true
         filterTracerStatus = transferResult.filterTracerStatus || 'success'
@@ -477,13 +477,13 @@ describe('tracer tests', () => {
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receiveBalanceDelta)))
+        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receivedBalance)))
 
       it(`balanceOf should decrement the sender's balance by the transfer amount`, () => {
         console.info(`gasUsed=${receipt.gasUsed}, gasPrice=${txn.gasPrice}`)
         assertEqualBN(
           fromFinalBalance.minus(fromInitialBalance),
-          new BigNumber(-sendBalanceDelta).minus(
+          new BigNumber(-sentBalance).minus(
             goldGasCurrency
               ? new BigNumber(receipt.gasUsed).times(new BigNumber(txn.gasPrice))
               : new BigNumber(0)
@@ -504,8 +504,8 @@ describe('tracer tests', () => {
     let toAddress: string
     let sendAmount: BigNumber
     let receiveAmount: BigNumber
-    let sendBalanceDelta: BigNumber
-    let receiveBalanceDelta: BigNumber
+    let sentBalance: BigNumber
+    let receivedBalance: BigNumber
     let goldGasCurrency: boolean
     let fromInitialBalance: BigNumber
     let fromFinalBalance: BigNumber
@@ -524,8 +524,8 @@ describe('tracer tests', () => {
         toAddress = transferResult.toAddress || ToAddress
         sendAmount = transferResult.sendAmount || TransferAmount
         receiveAmount = transferResult.receiveAmount || TransferAmount
-        sendBalanceDelta = transferResult.sendBalanceDelta || sendAmount
-        receiveBalanceDelta = transferResult.receiveBalanceDelta || receiveAmount
+        sentBalance = transferResult.sentBalance || sendAmount
+        receivedBalance = transferResult.receivedBalance || receiveAmount
         goldGasCurrency =
           transferResult.goldGasCurrency != undefined ? transferResult.goldGasCurrency : true
 
@@ -550,12 +550,12 @@ describe('tracer tests', () => {
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receiveBalanceDelta)))
+        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receivedBalance)))
 
       it(`balanceOf should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
           fromFinalBalance.minus(fromInitialBalance),
-          new BigNumber(-sendBalanceDelta).minus(
+          new BigNumber(-sentBalance).minus(
             goldGasCurrency
               ? new BigNumber(0)
               : new BigNumber(receipt.gasUsed).times(new BigNumber(txn.gasPrice))
@@ -571,7 +571,7 @@ describe('tracer tests', () => {
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
           trackAssets[normalizeAddress(fromAddress)].tokenUnits['cUSD'],
-          new BigNumber(-sendBalanceDelta).minus(
+          new BigNumber(-sentBalance).minus(
             goldGasCurrency
               ? new BigNumber(0)
               : new BigNumber(receipt.gasUsed).times(new BigNumber(txn.gasPrice))
@@ -841,6 +841,24 @@ describe('tracer tests', () => {
         const tx = await testContract.methods.transfer(ToAddress)
         const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
         return { transactionHash: receipt.transactionHash }
+      })
+
+      testTransferGold('with TestContract.transferThenRevert', async () => {
+        const tx = await testContract.methods.transferThenRevert(ToAddress)
+        try {
+          await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+          throw new Error('Expected transaction to revert')
+        } catch (e) {
+          const text = e.toString()
+          assert.equal(true, text.startsWith('Error: Transaction has been reverted by the EVM'))
+          const txn = JSON.parse(text.substring(text.indexOf('{')))
+          return {
+            filterTracerStatus: 'revert',
+            transactionHash: txn.transactionHash,
+            sentBalance: new BigNumber(0),
+            receivedBalance: new BigNumber(0),
+          }
+        }
       })
 
       /*testTransferGold('with TestContract.nestedTransferThenRevert', async () => {
