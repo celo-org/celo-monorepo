@@ -7,7 +7,10 @@ import {
   getServiceAccountEmail,
   getServiceAccountKey,
 } from './service-account-utils'
-import { execCmdWithExitOnFailure } from './utils'
+import {
+  execCmdWithExitOnFailure,
+  switchToProjectFromEnv as switchToGCPProjectFromEnv,
+} from './utils'
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
@@ -44,6 +47,8 @@ async function helmParameters() {
 }
 
 async function getPrometheusGcloudServiceAccountKeyBase64(kubeClusterName: string) {
+  await switchToGCPProjectFromEnv()
+
   const serviceAccountName = getServiceAccountName(kubeClusterName)
   await createPrometheusGcloudServiceAccount(serviceAccountName)
 
