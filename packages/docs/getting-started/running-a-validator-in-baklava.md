@@ -155,7 +155,7 @@ The `networkid` parameter value of `33120` indicates we are connecting to the ne
 If you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. (e.g. Use the Docker flags `-p 30313:30303` and `-p 30313:30303/udp` to export the node on port 30313 on the host).
 {% endhint %}
 
-At this point your proxy should be peering with the bootnode and other nodes that come online. Your validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a "Mining too far in the future" log message from the validator, which indicates it is waiting for the genesis timestamp to pass. This is the expected state until block production starts on April 6th at 1600 UTC.
+At this point your proxy should be peering with the bootnode and other nodes that come online. Your validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the validator, which indicates it is waiting for the genesis timestamp to pass. This is the expected state until block production starts on April 6th at 1600 UTC.
 
 ## After Block Production Begins
 
