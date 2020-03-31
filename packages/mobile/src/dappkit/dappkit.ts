@@ -7,7 +7,6 @@ import {
   SignTxRequest,
   SignTxResponseSuccess,
 } from '@celo/utils/src/dappkit'
-import BigNumber from 'bignumber.js'
 import { call, select, takeLeading } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { navigate } from 'src/navigator/NavigationService'
@@ -70,7 +69,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
       // In walletKit we use web3.eth.getCoinbase() to get gateway fee recipient
       // but that's throwing errors here. Not sure why, but txs work without it.
       const gatewayFeeRecipient = undefined
-      const gatewayFee = '0x' + new BigNumber(10000).toString(16)
+      const gatewayFee = undefined
       const gas = Math.round(tx.estimatedGas * 1.5)
 
       const params: any = {
