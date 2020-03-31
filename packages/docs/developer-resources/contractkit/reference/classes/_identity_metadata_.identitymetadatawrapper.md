@@ -36,7 +36,7 @@
 
 \+ **new IdentityMetadataWrapper**(`data`: [IdentityMetadata](../modules/_identity_metadata_.md#identitymetadata)): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)*
 
-*Defined in [contractkit/src/identity/metadata.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L80)*
+*Defined in [contractkit/src/identity/metadata.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L81)*
 
 **Parameters:**
 
@@ -52,7 +52,7 @@ Name | Type |
 
 • **data**: *[IdentityMetadata](../modules/_identity_metadata_.md#identitymetadata)*
 
-*Defined in [contractkit/src/identity/metadata.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L25)*
+*Defined in [contractkit/src/identity/metadata.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L26)*
 
 ## Accessors
 
@@ -60,7 +60,7 @@ Name | Type |
 
 • **get claims**(): *object | object | object | object | object[]*
 
-*Defined in [contractkit/src/identity/metadata.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L86)*
+*Defined in [contractkit/src/identity/metadata.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L87)*
 
 **Returns:** *object | object | object | object | object[]*
 
@@ -68,9 +68,9 @@ Name | Type |
 
 ###  addClaim
 
-▸ **addClaim**(`claim`: [Claim](../modules/_identity_claims_claim_.md#claim), `signer`: Signer): *Promise‹void›*
+▸ **addClaim**(`claim`: [Claim](../modules/_identity_claims_claim_.md#claim), `signer`: Signer): *Promise‹object | object | object | object | object›*
 
-*Defined in [contractkit/src/identity/metadata.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L101)*
+*Defined in [contractkit/src/identity/metadata.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L102)*
 
 **Parameters:**
 
@@ -79,7 +79,7 @@ Name | Type |
 `claim` | [Claim](../modules/_identity_claims_claim_.md#claim) |
 `signer` | Signer |
 
-**Returns:** *Promise‹void›*
+**Returns:** *Promise‹object | object | object | object | object›*
 
 ___
 
@@ -87,7 +87,7 @@ ___
 
 ▸ **filterClaims**<**K**>(`type`: K): *Array‹[ClaimPayload](../modules/_identity_claims_claim_.md#claimpayload)‹K››*
 
-*Defined in [contractkit/src/identity/metadata.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L128)*
+*Defined in [contractkit/src/identity/metadata.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L134)*
 
 **Type parameters:**
 
@@ -107,7 +107,7 @@ ___
 
 ▸ **findClaim**<**K**>(`type`: K): *[ClaimPayload](../modules/_identity_claims_claim_.md#claimpayload)‹K› | undefined*
 
-*Defined in [contractkit/src/identity/metadata.ts:124](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L124)*
+*Defined in [contractkit/src/identity/metadata.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L130)*
 
 **Type parameters:**
 
@@ -127,7 +127,7 @@ ___
 
 ▸ **hashOfClaims**(): *string*
 
-*Defined in [contractkit/src/identity/metadata.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L90)*
+*Defined in [contractkit/src/identity/metadata.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L91)*
 
 **Returns:** *string*
 
@@ -137,7 +137,7 @@ ___
 
 ▸ **toString**(): *string*
 
-*Defined in [contractkit/src/identity/metadata.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L94)*
+*Defined in [contractkit/src/identity/metadata.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L95)*
 
 **Returns:** *string*
 
@@ -147,7 +147,7 @@ ___
 
 ▸ **fetchFromURL**(`url`: string): *Promise‹[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹››*
 
-*Defined in [contractkit/src/identity/metadata.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L37)*
+*Defined in [contractkit/src/identity/metadata.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L38)*
 
 **Parameters:**
 
@@ -163,7 +163,7 @@ ___
 
 ▸ **fromEmpty**(`address`: string): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹›*
 
-*Defined in [contractkit/src/identity/metadata.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L27)*
+*Defined in [contractkit/src/identity/metadata.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L28)*
 
 **Parameters:**
 
@@ -179,7 +179,7 @@ ___
 
 ▸ **fromFile**(`path`: string): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹›*
 
-*Defined in [contractkit/src/identity/metadata.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L45)*
+*Defined in [contractkit/src/identity/metadata.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L46)*
 
 **Parameters:**
 
@@ -195,7 +195,7 @@ ___
 
 ▸ **fromRawString**(`rawData`: string): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹›*
 
-*Defined in [contractkit/src/identity/metadata.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L49)*
+*Defined in [contractkit/src/identity/metadata.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L50)*
 
 **Parameters:**
 

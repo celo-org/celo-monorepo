@@ -19,7 +19,7 @@
 
 Ƭ **MetadataURLGetter**: *function*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L42)*
+*Defined in [contractkit/src/identity/claims/verify.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L43)*
 
 A function that can asynchronously fetch the metadata URL for an account address
 Should virtually always be Accounts#getMetadataURL
@@ -40,7 +40,7 @@ Name | Type |
 
 ▸ **verifyAccountClaim**(`claim`: [AccountClaim](_identity_claims_account_.md#accountclaim), `address`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter)): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L44)*
+*Defined in [contractkit/src/identity/claims/verify.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L45)*
 
 **Parameters:**
 
@@ -78,9 +78,9 @@ ___
 
 ### `Const` verifyDomainClaim
 
-▸ **verifyDomainClaim**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `_signer`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter), `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
+▸ **verifyDomainClaim**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter), `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L83)*
+*Defined in [contractkit/src/identity/claims/verify.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L84)*
 
 It verifies if a DNS domain includes in the TXT records an entry with name
 `celo-site-verification` and a valid signature in base64
@@ -90,7 +90,7 @@ It verifies if a DNS domain includes in the TXT records an entry with name
 Name | Type | Default |
 ------ | ------ | ------ |
 `claim` | [DomainClaim](_identity_claims_claim_.md#domainclaim) | - |
-`_signer` | string | - |
+`address` | string | - |
 `metadataURLGetter` | [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter) | - |
 `dnsResolver` | dnsResolverFunction | resolveTxt |
 
@@ -100,18 +100,16 @@ ___
 
 ### `Const` verifyDomainRecord
 
-▸ **verifyDomainRecord**(`signature`: string, `address`: string, `domain`: string, `metadata`: [IdentityMetadataWrapper](../classes/_identity_metadata_.identitymetadatawrapper.md), `dnsResolver`: dnsResolverFunction): *Promise‹undefined | "Unable to verify domain claim"›*
+▸ **verifyDomainRecord**(`address`: string, `claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `dnsResolver`: dnsResolverFunction): *Promise‹undefined | "Unable to verify domain claim"›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L110)*
+*Defined in [contractkit/src/identity/claims/verify.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L117)*
 
 **Parameters:**
 
 Name | Type | Default |
 ------ | ------ | ------ |
-`signature` | string | - |
 `address` | string | - |
-`domain` | string | - |
-`metadata` | [IdentityMetadataWrapper](../classes/_identity_metadata_.identitymetadatawrapper.md) | - |
+`claim` | [DomainClaim](_identity_claims_claim_.md#domainclaim) | - |
 `dnsResolver` | dnsResolverFunction | resolveTxt |
 
 **Returns:** *Promise‹undefined | "Unable to verify domain claim"›*
