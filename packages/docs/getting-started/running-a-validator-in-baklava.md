@@ -151,11 +151,15 @@ docker run --name celo-validator -it --restart always -p 30303:30303 -p 30303:30
 
 The `networkid` parameter value of `33120` indicates we are connecting to the new Baklava network.
 
-Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. (e.g. Use the Docker flags `-p 30313:30303` and `-p 30313:30303/udp` to export the node on port 30313 on the host).
+{% hint style="info" %}
+If you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. (e.g. Use the Docker flags `-p 30313:30303` and `-p 30313:30303/udp` to export the node on port 30313 on the host).
+{% endhint %}
+
+At this point your proxy should be peering with the bootnode and other nodes that come online. Your validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a "Mining too far in the future" log message from the validator, which indicates it is waiting for the genesis timestamp to pass. This is the expected state until block production starts on April 6th at 1600 UTC.
 
 ## After Block Production Begins
 
-Once block production starts on April 6th at 1600 UTC, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of Governance Proposals in a process which will be a preview of the deployment process for the Celo Mainnet.
+Once block production starts, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of Governance Proposals in a process which will be a preview of the deployment process for the Celo Mainnet.
 
 `ReleaseGold` contracts will be used to provide the required testnet units of Celo Gold required to register a validator and vote. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process.
 
@@ -194,7 +198,7 @@ screen -r -S celo-validator
 ### Stopping containers
 
 You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop providing service.
-The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-*-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
+The data directory of the validator and the proxy are Docker volumes mounted in the containers from the `celo-*-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
 
 It is recommended to use the Docker stop timeout parameter `-t` when stopping the containers. This allows time, in this case 60 seconds, for the Celo nodes to flush recent chain data it keeps in memory into the data directories. Omitting this may cause your blockchain data to corrupt, requiring the node to start syncing from scratch.
 
@@ -204,7 +208,7 @@ You can stop the `celo-validator` and `celo-proxy` containers running:
 docker stop celo-validator celo-proxy -t 60
 ```
 
-And you can remove the containers (not the data dir) by running:
+And you can remove the containers (not the data directory) by running:
 
 ```bash
 docker rm -f celo-validator celo-proxy
