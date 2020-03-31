@@ -6,7 +6,7 @@ import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -149,21 +149,6 @@ export async function createAndUploadCloudSQLSecretIfNotExists(serviceAccountNam
 
 export async function createAndUploadBackupSecretIfNotExists(serviceAccountName: string) {
   return createAndUploadKubernetesSecretIfNotExists(BACKUP_GCS_SECRET_NAME, serviceAccountName)
-}
-
-export async function createServiceAccountIfNotExists(name: string) {
-  await switchToProjectFromEnv()
-  // TODO: add permissions for cloudsql editor to service account
-  const serviceAccountExists = await outputIncludes(
-    `gcloud iam service-accounts list`,
-    name,
-    `Service account ${name} exists, skipping creation`
-  )
-  if (!serviceAccountExists) {
-    await execCmdWithExitOnFailure(
-      `gcloud iam service-accounts create ${name} --display-name="${name}"`
-    )
-  }
 }
 
 export function getServiceAccountName(prefix: string) {

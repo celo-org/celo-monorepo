@@ -2,7 +2,6 @@ import sleep from 'sleep-promise'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   createAndUploadBackupSecretIfNotExists,
-  createServiceAccountIfNotExists,
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
@@ -10,6 +9,7 @@ import {
   redeployTiller,
   uploadStorageClass,
 } from './helm_deploy'
+import { createServiceAccountIfNotExists } from './service-account-utils'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
