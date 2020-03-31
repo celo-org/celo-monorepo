@@ -79,7 +79,7 @@ On the Proxy machine, port 30503 should accept TCP connections from the IP addre
 mkdir celo-proxy-node
 cd celo-proxy-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-export BOOTNODE_ENODES=`docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes`
+export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 ```
 
 You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to appear on Celostats.
