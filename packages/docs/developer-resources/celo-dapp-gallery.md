@@ -2,6 +2,12 @@
 
 Welcome to the DApp Gallery! Here are some featured examples to help you get started building on Celo.
 
+## Celo Toolkit
+
+Celo Toolkit is the open source interface for managing Celo accounts on Web. Start with Celo now in 1 minutes. Phone number or app downloads are not necessary.
+
+Github: https://github.com/MugglePay/celo-toolkit
+
 ## Savings Circle
 
 Savings Circles let you pool funds with your friends to save for large purchases. They are known by a variety of names around the world and are a common way to get liquidity and access to loans without access to formal financial institutions.
