@@ -17,20 +17,20 @@ The setup of the Baklava network will differ from previous Stake Off deployments
 
 The deployment timeline is as follows (all dates are subject to change):
 
-* 3/31: Docs updated, and Docker image released
-* 3/31 - 4/6: infrastructure setup
-* 4/6 16:00 UTC: genesis validators begin to produce blocks
+* 3/31: Blockchain client and genesis block distributed
+* 3/31 - 4/6: Infrastructure setup
+* 4/6 16:00 UTC: Block production begins
 * 4/6: Celo Core Contracts are deployed; `ReleaseGold` instances are deployed containing validator Testnet Celo Gold
-* 4/7: Governance proposal to start Validator Elections and validator/group rewards
+* 4/7: Governance proposal to start validator rewards
 * 4/8: Governance proposal to unfreeze Celo Gold voter rewards
 * 4/9: Mock Oracles deployed; governance proposal to unfreeze Celo Dollar exchange
 * 4/10: Faucet requests for non-genesis validators accepted
 
 {% hint style="info" %}
-Note: A [timeline](https://celo.org/#timeline) of the Celo project is available to provide further context.
+A [timeline](https://celo.org/#timeline) of the Celo project is available to provide further context.
 {% endhint %}
 
-## Setup for Genesis Validators (before 4/6)
+## Setup for Genesis Validators (Before 4/6)
 
 **If your address is in the genesis block, the community is relying on your validator to get the network started!**
 
@@ -38,7 +38,7 @@ This section outlines the steps needed to configure your proxy and validator nod
 
 Please follow these steps if you ranked on The Great Celo Stake Off leaderboard and have provided details of your validator signer and BLS addresses as explained in this [FAQ](https://forum.celo.org/t/faq-for-stake-off-validators-on-release-candidate-and-new-baklava-networks/372/2).
 
-If this doesn't apply to you, but you are interested in trying out the Baklava testnet, please check back for additional instructions on how to get fauceted (to receive Testnet units of Celo Gold and Celo Dollars) and how to get set up.
+If this doesn't apply to you, but you are interested in trying out the Baklava testnet, please check back later for additional instructions on how to get testnet units of Celo Gold set up your validator.
 
 ### Environment Variables
 
@@ -50,11 +50,11 @@ export NETWORK_ID=33120
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
 
-Please use the validator signer address that you submitted through your gist file.
+Please use the validator signer address that you submitted through your Gist file. It is included in the genesis validator set.
 
 ### Pull the Celo Docker image
 
-In all the commands we are going to see the `CELO_IMAGE` variable to refer to the right Docker image to use. Now we can get the Docker image on your validator and proxy machines:
+In all the commands we are going to see the `CELO_IMAGE` variable to refer to the Docker image to use. Now we can get the Docker image on your validator and proxy machines:
 
 ```bash
 docker pull $CELO_IMAGE
@@ -74,14 +74,13 @@ On the Proxy machine, port 30503 should accept TCP connections from the IP addre
 
 ```bash
 # On the proxy machine
-# Note that you have to export $CELO_IMAGE on this machine
 mkdir celo-proxy-node
 cd celo-proxy-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 export BOOTNODE_ENODES=`docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes`
 ```
 
-You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to use for your Validator account. Your proxy should start syncing after a few seconds.
+You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to appear on Celostats.
 
 ```bash
 # On the proxy machine
@@ -132,32 +131,33 @@ Test that your network is configured correctly by running the following commands
 ```bash
 # On your local machine, test that your Proxy is accepting TCP connections over port 30303.
 # Note that it will also need to be accepting UDP connections over this port.
-telnet $PROXY_EXTERNAL_IP 30303
+nc -vz $PROXY_EXTERNAL_IP 30303
 ```
 
 ```bash
 # On your Validator machine, test that your Proxy is accepting TCP connections over port 30503.
-telnet $PROXY_INTERNAL_IP 30503
+nc -vz $PROXY_INTERNAL_IP 30503
 ```
 
-Once that is completed, go ahead and run the validator. Be sure to replace `<VALIDATOR-SIGNER-PASSWORD>` with the password for your Validator signer. You should see the validator begin syncing via the Proxy within a few seconds.
+Once that is completed, go ahead and run the validator. Be write your validator signer password to `./.password` for the following command to work, or provide your password another way.
 
 ```bash
 # On the validator machine
-echo <VALIDATOR-SIGNER-PASSWORD> > .password
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 docker run --name celo-validator -it --restart always -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-ethstats.celo-testnet.org
 ```
 
-The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
-
 The `networkid` parameter value of `33120` indicates we are connecting to the new Baklava network.
 
-Note that if you are running the validator and the proxy on` the same machine, then you should set the validator's listening port to something other than `30303`. E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
+Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. (e.g. Use the Docker flags `-p 30313:30303` and `-p 30313:30303/udp` to export the node on port 30313 on the host).
 
 ## After Block Production Begins
 
-This will be updated in the coming days with additional instructions. Once block production starts, core contracts and  `ReleaseGold` contracts will be deployed, and the community will step through a series of Governance Proposals in a process similar to deployment of the Celo Mainnet.
+Once block production starts, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of Governance Proposals in a process which will be a preview of the deployment process for the Celo Mainnet.
+
+`ReleaseGold` contracts will be used to provide the required testnet units of Celo Gold required to register a validator and vote. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process.
+
+We will provide more complete instructions later this week.
 
 ## Deployment Tips
 
@@ -202,7 +202,7 @@ You can stop the `celo-validator` and `celo-proxy` containers running:
 docker stop celo-validator celo-proxy -t 60
 ```
 
-And you can remove the containers (not the data dir) running:
+And you can remove the containers (not the data dir) by running:
 
 ```bash
 docker rm -f celo-validator celo-proxy
