@@ -16,6 +16,7 @@ Network parameters that are configurable by governance.
 
 ### Properties
 
+* [getBlockGasLimit](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getblockgaslimit)
 * [setBlockGasLimit](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setblockgaslimit)
 * [setIntrinsicGasForAlternativeFeeCurrency](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setintrinsicgasforalternativefeecurrency)
 * [setMinimumClientVersion](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setminimumclientversion)
@@ -45,11 +46,31 @@ Name | Type |
 
 ## Properties
 
+###  getBlockGasLimit
+
+• **getBlockGasLimit**: *function* = proxyCall(this.contract.methods.blockGasLimit)
+
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L19)*
+
+Getting the block gas limit.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
 ###  setBlockGasLimit
 
 • **setBlockGasLimit**: *function* = proxySend(this.kit, this.contract.methods.setBlockGasLimit)
 
-*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L18)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L23)*
 
 Setting the block gas limit.
 
@@ -92,7 +113,7 @@ ___
 
 • **setMinimumClientVersion**: *function* = proxySend(this.kit, this.contract.methods.setMinimumClientVersion)
 
-*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L22)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L27)*
 
 Set minimum client version.
 
