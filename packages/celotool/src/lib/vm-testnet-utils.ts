@@ -326,6 +326,13 @@ export async function generateAndUploadSecrets(celoEnv: string) {
     const secrets = generateNodeSecretEnvVars(AccountType.TX_NODE, i)
     await uploadSecrets(celoEnv, secrets, `tx-node-${i}`)
   }
+  // Private tx Nodes
+  const privateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  for (let i = 0; i < privateTxNodeCount; i++) {
+    // Ensure there is no overlap with tx node keys
+    const secrets = generateNodeSecretEnvVars(AccountType.TX_NODE, i, 1000 + i)
+    await uploadSecrets(celoEnv, secrets, `tx-node-private-${i}`)
+  }
   // Validators
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   for (let i = 0; i < validatorCount; i++) {
@@ -359,9 +366,13 @@ function generateBootnodeSecretEnvVars() {
   })
 }
 
-function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
+function generateNodeSecretEnvVars(
+  accountType: AccountType,
+  index: number,
+  keyIndex: number = index
+) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const privateKey = generatePrivateKey(mnemonic, accountType, index)
+  const privateKey = generatePrivateKey(mnemonic, accountType, keyIndex)
   const secrets: NodeSecrets = {
     ACCOUNT_ADDRESS: privateKeyToAddress(privateKey),
     BOOTNODE_ENODE_ADDRESS: generatePublicKey(mnemonic, AccountType.BOOTNODE, 0),
