@@ -10,9 +10,7 @@
   - [Getting an Account and Funds](getting-started/faucet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
-  - [Running a Validator](getting-started/running-a-validator.md)
-  - [Running a Validator in New Baklava](getting-started/running-a-validator-in-new-baklava.md)
-  - [Reconnecting to a Network](getting-started/reconnecting-to-network.md)
+  - [Running a Validator](getting-started/running-a-validator-in-new-baklava.md)
 - [Glossary](getting-started/glossary.md)
 
 ## Operations Manual

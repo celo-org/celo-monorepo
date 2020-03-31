@@ -2,9 +2,9 @@
 
 The new Baklava Testnet is the final testnet before Mainnet Release Candidate 1 (RC1). Its genesis block is only composed of community validators. The new Baklava serves 3 main purposes:
 
-- **Operational excellence**: it helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
-- **Detecting vulnerabilities**: it helps the Celo community discover any remaining bugs before RC1
-- **Future testnet**: if all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched
+- **Operational excellence**: It helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
+- **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
+- **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
 
 ## Key Differences vs. Baklava Testnet
 
@@ -17,7 +17,7 @@ The following [timeline](https://celo.org/#timeline) illustrates where we are in
 
 * Alfajores Testnet Release
 * Baklava Testnet -- The Great Celo Stake Off
-* New Baklava Testnet
+* **New Baklava Testnet**
     - [3/31] image released
     - [3/31 - 4/6] infrastructure setup
     - [4/6 16:00 UTC] genesis block; mining begins
@@ -136,9 +136,9 @@ docker run --name celo-validator -it --restart always -p 30303:30303 -p 30303:30
 
 The `mine` flag does not mean the node starts mining blocks, but rather starts trying to participate in the BFT consensus protocol. It cannot do this until it gets elected -- so next we need to stand for election.
 
-The `networkid` parameter value of `200110` indicates we are connecting to the Baklava network, Stake Off Phase 1.
+The `networkid` parameter value of `33120` indicates we are connecting to the new Baklava network.
 
-Note that if you are running the validator and the proxy on the same machine, then you should set the validator's listening port to something other than `30303`. E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
+Note that if you are running the validator and the proxy on` the same machine, then you should set the validator's listening port to something other than `30303`. E.g. you could use the flag `--port 30313` and set the docker port forwarding rules accordingly (e.g. use the flags `-p 30313:30313` and `-p 30313:30313/udp`).
 
 ## After Block Production Begins
 
@@ -191,18 +191,4 @@ And you can remove the containers (not the data dir) running:
 
 ```bash
 docker rm -f celo-validator celo-proxy
-```
-
-## Stop Validating
-
-If for some reason you need to stop running your Validator, and it is currently elected, you first need to stop it getting re-elected at the end of the current epoch. After that you can stop the validator, proxy and Attestation Service processes, containers or machines.
-
-{% hint style="danger" %}
-**Validated Uptime and Network Stability**: If you stop your validator while it is still elected, you will receive fewer rewards on account of downtime, may be slashed, and also potentially affect the stability and performance of the network.
-{% endhint %}
-
-Please remove your validator from its group so that at the end of the current epoch it will not be re-elected:
-
-```bash
-celocli validatorgroup:member --from $CELO_VALIDATOR_GROUP_ADDRESS --remove $CELO_VALIDATOR_ADDRESS
 ```
