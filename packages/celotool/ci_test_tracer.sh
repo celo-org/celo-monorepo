@@ -17,7 +17,7 @@ if [ "${1}" == "checkout" ]; then
     ../../node_modules/.bin/mocha -r ts-node/register src/e2e-tests/tracer_tests.ts --branch ${GETH_BRANCH_TO_TEST} --rosettabranch ${ROSETTA_BRANCH_TO_TEST}
 elif [ "${1}" == "local" ]; then
     export GETH_DIR="${2}"
-    export ROSETTA_DIR="${2}"
+    export ROSETTA_DIR="${3:-""}"
     echo "Testing using local geth dir ${GETH_DIR}..."
     ../../node_modules/.bin/mocha -r ts-node/register src/e2e-tests/tracer_tests.ts --localgeth ${GETH_DIR} --localrosetta ${ROSETTA_DIR}
 fi

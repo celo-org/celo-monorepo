@@ -120,7 +120,8 @@ async function trackAssetTransfers(
   kit: ContractKit,
   blockNumber: number,
   assets: Record<Address, AccountAssets> | undefined = undefined,
-  filter: boolean = false
+  filter: boolean = false,
+  filterTracerStatus: string = 'success'
 ): Promise<Record<Address, AccountAssets>> {
   const ret = assets || {}
 
@@ -131,6 +132,7 @@ async function trackAssetTransfers(
   )
   for (const transaction of goldTransfers) {
     for (const transfer of transaction.transfers) {
+      if (filterTracerStatus && transfer.status != filterTracerStatus) continue
       const from = getAccountAssets(ret, transfer.from, filter)
       const to = getAccountAssets(ret, transfer.to, filter)
       if (from) from.gold = from.gold.minus(transfer.value)
@@ -361,7 +363,7 @@ describe('tracer tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await context.hooks.before()
+    //await context.hooks.before()
   })
 
   after(async function(this: any) {
@@ -416,6 +418,8 @@ describe('tracer tests', () => {
     let toAddress: string
     let sendAmount: BigNumber
     let receiveAmount: BigNumber
+    let sendBalanceDelta: BigNumber
+    let receiveBalanceDelta: BigNumber
     let goldGasCurrency: boolean
     let fromInitialBalance: BigNumber
     let fromFinalBalance: BigNumber
@@ -424,6 +428,7 @@ describe('tracer tests', () => {
     let receipt: TransactionReceipt
     let txn: any
     let trackAssets: Record<Address, AccountAssets>
+    let filterTracerStatus: string
 
     describe(`transfer cGLD: ${name}`, () => {
       before(async function(this: any) {
@@ -434,7 +439,10 @@ describe('tracer tests', () => {
         toAddress = transferResult.toAddress || ToAddress
         sendAmount = transferResult.sendAmount || TransferAmount
         receiveAmount = transferResult.receiveAmount || TransferAmount
+        sendBalanceDelta = transferResult.sendBalanceDelta || sendAmount
+        receiveBalanceDelta = transferResult.receiveBalanceDelta || receiveAmount
         goldGasCurrency = transferResult.goldGasCurrency || true
+        filterTracerStatus = transferResult.filterTracerStatus || 'success'
 
         receipt = await kit.web3.eth.getTransactionReceipt(transferResult.transactionHash)
         txn = await kit.web3.eth.getTransaction(receipt.transactionHash)
@@ -448,7 +456,13 @@ describe('tracer tests', () => {
           await kit.web3.eth.getBalance(fromAddress, txn.blockNumber)
         )
         toFinalBalance = new BigNumber(await kit.web3.eth.getBalance(toAddress, txn.blockNumber))
-        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
+        trackAssets = await trackAssetTransfers(
+          kit,
+          receipt.blockNumber,
+          undefined,
+          false,
+          filterTracerStatus
+        )
         //console.info(`${name} receipt`)
         //console.info(receipt)
         //console.info(`${name} trackAssets`)
@@ -459,13 +473,13 @@ describe('tracer tests', () => {
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receiveAmount)))
+        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receiveBalanceDelta)))
 
       it(`balanceOf should decrement the sender's balance by the transfer amount`, () => {
         console.info(`gasUsed=${receipt.gasUsed}, gasPrice=${txn.gasPrice}`)
         assertEqualBN(
           fromFinalBalance.minus(fromInitialBalance),
-          new BigNumber(-sendAmount).minus(
+          new BigNumber(-sendBalanceDelta).minus(
             goldGasCurrency
               ? new BigNumber(receipt.gasUsed).times(new BigNumber(txn.gasPrice))
               : new BigNumber(0)
@@ -736,7 +750,8 @@ describe('tracer tests', () => {
 
       /*testTransferGold('with TestContract.nestedTransferThenRevert', async () => {
         const tx = await testContract.methods.nestedTransferThenRevert(ToAddress)
-        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        const receipt = tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        return { transactionHash: receipt.transactionHash }
       })*/
 
       testTransferGold('with TestContract.transferThenIgnoreRevert', async () => {
@@ -756,7 +771,7 @@ describe('tracer tests', () => {
     })
 
     const argv = require('minimist')(process.argv.slice(2))
-    if (argv.localrosetta) {
+    if (argv.localrosetta && typeof argv.localrosetta === 'string') {
       describe(`Rossetta tracer`, () => {
         it('Tracer driver should succeed', async function(this: any) {
           this.timeout(0)
