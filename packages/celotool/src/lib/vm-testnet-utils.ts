@@ -446,7 +446,7 @@ export function getVmSshCommand(instanceName: string) {
 }
 
 export async function getNodeVmName(celoEnv: string, nodeType: string, index?: number) {
-  const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
+  const nodeTypesWithRandomSuffixes = ['tx-node', 'tx-node-private', 'proxy']
   const nodeTypesWithNoIndex = ['bootnode']
 
   let instanceName
