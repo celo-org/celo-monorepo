@@ -66,11 +66,13 @@ ___
 
 ###  getInternalRequired
 
-• **getInternalRequired**: *function* = proxyCall(this.contract.methods.internalRequired, undefined, (a: string) =>
-    parseInt(a, 10)
+• **getInternalRequired**: *function* = proxyCall(
+    this.contract.methods.internalRequired,
+    undefined,
+    valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L51)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L58)*
 
 #### Type declaration:
 
@@ -88,7 +90,7 @@ ___
 
 • **getOwners**: *function* = proxyCall(this.contract.methods.getOwners)
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L49)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L56)*
 
 #### Type declaration:
 
@@ -104,9 +106,9 @@ ___
 
 ###  getRequired
 
-• **getRequired**: *function* = proxyCall(this.contract.methods.required, undefined, (a: string) => parseInt(a, 10))
+• **getRequired**: *function* = proxyCall(this.contract.methods.required, undefined, valueToBigNumber)
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L50)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L57)*
 
 #### Type declaration:
 
@@ -122,11 +124,9 @@ ___
 
 ###  getTransactionCount
 
-• **getTransactionCount**: *function* = proxyCall(this.contract.methods.transactionCount, undefined, (a: string) =>
-    parseInt(a, 10)
-  )
+• **getTransactionCount**: *function* = proxyCall(this.contract.methods.transactionCount, undefined, valueToInt)
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L54)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L63)*
 
 #### Type declaration:
 
@@ -144,7 +144,7 @@ ___
 
 • **isowner**: *function* = proxyCall(this.contract.methods.isOwner)
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L48)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L55)*
 
 #### Type declaration:
 
@@ -176,7 +176,7 @@ Contract address
 
 ▸ **getTransaction**(`i`: number): *Promise‹[TransactionData](../interfaces/_wrappers_multisig_.transactiondata.md)›*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L58)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L65)*
 
 **Parameters:**
 
@@ -192,7 +192,7 @@ ___
 
 ▸ **getTransactions**(): *Promise‹[TransactionData](../interfaces/_wrappers_multisig_.transactiondata.md)[]›*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L77)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L84)*
 
 **Returns:** *Promise‹[TransactionData](../interfaces/_wrappers_multisig_.transactiondata.md)[]›*
 
@@ -202,7 +202,7 @@ ___
 
 ▸ **submitOrConfirmTransaction**(`destination`: string, `txObject`: TransactionObject‹any›): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L25)*
+*Defined in [contractkit/src/wrappers/MultiSig.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L32)*
 
 Allows an owner to submit and confirm a transaction.
 If an unexecuted transaction matching `txObject` exists on the multisig, adds a confirmation to that tx ID.

@@ -11,6 +11,7 @@
 * [frozenReserveGoldDays](_wrappers_reserve_.reserveconfig.md#frozenreservegolddays)
 * [frozenReserveGoldStartBalance](_wrappers_reserve_.reserveconfig.md#frozenreservegoldstartbalance)
 * [frozenReserveGoldStartDay](_wrappers_reserve_.reserveconfig.md#frozenreservegoldstartday)
+* [otherReserveAddresses](_wrappers_reserve_.reserveconfig.md#otherreserveaddresses)
 * [tobinTaxStalenessThreshold](_wrappers_reserve_.reserveconfig.md#tobintaxstalenessthreshold)
 
 ## Properties
@@ -36,6 +37,14 @@ ___
 • **frozenReserveGoldStartDay**: *BigNumber*
 
 *Defined in [contractkit/src/wrappers/Reserve.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L10)*
+
+___
+
+###  otherReserveAddresses
+
+• **otherReserveAddresses**: *string[]*
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L12)*
 
 ___
 
