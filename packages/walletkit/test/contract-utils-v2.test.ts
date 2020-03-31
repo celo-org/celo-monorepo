@@ -258,7 +258,7 @@ async function transferGold(
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, to)
   const gatewayFeeRecipient: string = await web3.eth.getCoinbase()
-  const gatewayFee = ContractUtils.defaultGatewayFee
+  const gatewayFee = new BigNumber(0)
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
@@ -329,7 +329,7 @@ async function transferDollar(
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, to)
   const gatewayFeeRecipient: string = await web3.eth.getCoinbase()
-  const gatewayFee = ContractUtils.defaultGatewayFee
+  const gatewayFee = new BigNumber(0)
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
