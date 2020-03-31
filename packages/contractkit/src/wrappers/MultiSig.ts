@@ -2,7 +2,14 @@ import BigNumber from 'bignumber.js'
 import { TransactionObject } from 'web3-eth'
 import { Address } from '../base'
 import { MultiSig } from '../generated/MultiSig'
-import { BaseWrapper, proxyCall, stringToBytes, toTransactionObject } from './BaseWrapper'
+import {
+  BaseWrapper,
+  proxyCall,
+  stringToBytes,
+  toTransactionObject,
+  valueToBigNumber,
+  valueToInt,
+} from './BaseWrapper'
 
 export interface TransactionData {
   destination: string
@@ -47,13 +54,13 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
 
   isowner: (owner: Address) => Promise<boolean> = proxyCall(this.contract.methods.isOwner)
   getOwners = proxyCall(this.contract.methods.getOwners)
-  getRequired = proxyCall(this.contract.methods.required, undefined, (a: string) => parseInt(a, 10))
-  getInternalRequired = proxyCall(this.contract.methods.internalRequired, undefined, (a: string) =>
-    parseInt(a, 10)
+  getRequired = proxyCall(this.contract.methods.required, undefined, valueToBigNumber)
+  getInternalRequired = proxyCall(
+    this.contract.methods.internalRequired,
+    undefined,
+    valueToBigNumber
   )
-  getTransactionCount = proxyCall(this.contract.methods.transactionCount, undefined, (a: string) =>
-    parseInt(a, 10)
-  )
+  getTransactionCount = proxyCall(this.contract.methods.transactionCount, undefined, valueToInt)
 
   async getTransaction(i: number): Promise<TransactionData> {
     const { destination, value, data, executed } = await this.contract.methods

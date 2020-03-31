@@ -9,6 +9,7 @@ export interface ReserveConfig {
   frozenReserveGoldStartBalance: BigNumber
   frozenReserveGoldStartDay: BigNumber
   frozenReserveGoldDays: BigNumber
+  otherReserveAddresses: string[]
 }
 
 /**
@@ -58,6 +59,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
       frozenReserveGoldStartBalance: await this.frozenReserveGoldStartBalance(),
       frozenReserveGoldStartDay: await this.frozenReserveGoldStartDay(),
       frozenReserveGoldDays: await this.frozenReserveGoldDays(),
+      otherReserveAddresses: await this.getOtherReserveAddresses(),
     }
   }
 
