@@ -860,6 +860,7 @@ export async function startGeth(
     isProxied,
     proxyport,
     ethstats,
+    gatewayFee,
   } = instance
 
   const privateKey = instance.privateKey || ''
@@ -925,6 +926,10 @@ export async function startGeth(
     gethArgs.push('--light.maxpeers=10')
   } else if (syncmode === 'full' || syncmode === 'fast') {
     gethArgs.push('--light.serve=0')
+  }
+
+  if (gatewayFee) {
+    gethArgs.push(`--light.gatewayfee=${gatewayFee.toString()}`)
   }
 
   if (validating) {
