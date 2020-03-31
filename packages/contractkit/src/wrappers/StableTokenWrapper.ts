@@ -64,11 +64,11 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @param owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  balanceOf: (owner: string) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.balanceOf,
-    undefined,
-    valueToBigNumber
-  )
+  async balanceOf(owner: string, blockNumber?: number): Promise<BigNumber> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    const res = await this.contract.methods.balanceOf(owner).call({}, blockNumber)
+    return valueToBigNumber(res)
+  }
 
   owner = proxyCall(this.contract.methods.owner)
 
