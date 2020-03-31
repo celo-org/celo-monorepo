@@ -151,7 +151,7 @@ docker run --name celo-validator -it --restart always -p 30303:30303 -p 30303:30
 
 The `networkid` parameter value of `33120` indicates we are connecting to the new Baklava network.
 
-At this point your proxy should be peering with the bootnode and other nodes that come online. Your validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the validator, which indicates it is waiting for the genesis timestamp to pass. This is the expected state until block production starts on April 6th at 1600 UTC.
+At this point your proxy should be peering with other nodes as the come online. Your validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the validator, which indicates it is waiting for the genesis timestamp to pass. On April 6th at 1600 UTC, the validator engine will start up, and after a couple of minutes to establish the validator overlay network, block production will begin.
 
 ## After Block Production Begins
 
