@@ -9,9 +9,8 @@
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
+  - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
-  - [Running a Validator](getting-started/running-a-validator.md)
-  - [Reconnecting to a Network](getting-started/reconnecting-to-network.md)
 - [Glossary](getting-started/glossary.md)
 
 ## Operations Manual
