@@ -39,7 +39,7 @@ First we are going to setup the main environment variables related with the new 
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=200110
+export NETWORK_ID=33120
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
 
