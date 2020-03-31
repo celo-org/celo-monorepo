@@ -19,7 +19,7 @@ export interface Contracts {
 export interface StateGetter {
   contract: keyof Contracts
   method: string
-  args: any[]
+  args: any[] | ((blockNumber: number) => any[])
   transformValues: Function
   maxBucketSize: { [key: string]: number }
 }
@@ -34,7 +34,9 @@ export function getter<
   transformValues: (
     state: PromiseValue<ReturnMethodType<Contracts[T][M] & Function>>
   ) => { [key in RV]: any },
-  args: ArgumentTypes<Contracts[T][M] & Function> = [] as any,
+  args:
+    | ArgumentTypes<Contracts[T][M] & Function>
+    | ((blockNumber: number) => ArgumentTypes<Contracts[T][M] & Function>) = [] as any,
   maxBucketSize: { [key in RV]: any } = {} as any
 ): StateGetter {
   return { contract, method, args, transformValues, maxBucketSize }
@@ -84,10 +86,10 @@ export const stateGetters: StateGetter[] = [
       getter(
         'GoldToken',
         'balanceOf',
-        (balance) => ({
+        (balance: any) => ({
           balance: +balance,
         }),
-        [address]
+        (blockNumber) => [address, blockNumber] as any
       )
     )
     stateGetters.push(

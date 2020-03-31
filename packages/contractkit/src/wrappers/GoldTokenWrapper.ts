@@ -107,5 +107,6 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  balanceOf = (account: Address) => this.kit.web3.eth.getBalance(account).then(valueToBigNumber)
+  balanceOf = (account: Address, blockNumber?: number) =>
+    this.kit.web3.eth.getBalance(account, blockNumber as any).then(valueToBigNumber)
 }

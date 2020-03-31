@@ -97,7 +97,9 @@ export class BlockProcessor {
     const promises = stateGetters.map(
       ({ contract, method, args, transformValues, maxBucketSize }) => {
         this.contracts[contract].setDefaultBlock(blockNumber)
-        return (this.contracts as any)[contract][method](...args)
+        return (this.contracts as any)[contract][method](
+          ...(typeof args === 'function' ? args(blockNumber) : args)
+        )
           .then((returnData: any) => {
             this.contracts[contract].setDefaultBlock('latest')
             const data: DataResult = {
@@ -219,7 +221,7 @@ export class BlockProcessor {
     { contract, function: functionName, args, values }: DataResult,
     maxBucketSize: any
   ) {
-    const argsKey = args.join('_')
+    const argsKey = (typeof args === 'function' ? args('blockNumber' as any) : args).join('_')
     Object.keys(values).forEach((valueKey) => {
       const key = `state_metric_${contract}_${functionName}_${argsKey}_${valueKey}`
 
