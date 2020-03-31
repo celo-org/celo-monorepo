@@ -863,6 +863,7 @@ export async function startGeth(
     isProxied,
     proxyport,
     ethstats,
+    gatewayFee,
   } = instance
 
   const privateKey = instance.privateKey || ''
@@ -932,6 +933,10 @@ export async function startGeth(
 
   if (instance.nodekey) {
     instance.args.push(`--nodekeyhex=${instance.nodekey}`)
+  }
+
+  if (gatewayFee) {
+    gethArgs.push(`--light.gatewayfee=${gatewayFee.toString()}`)
   }
 
   if (validating) {

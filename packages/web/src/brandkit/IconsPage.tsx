@@ -37,7 +37,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
       <PageHeadline title={t('icons.title')} headline={t('icons.headline')} />
       <CCLicense textI18nKey="icons.license" />
       <View style={brandStyles.tiling}>
-        <Fetch query="/brand/api/assets/icons">
+        <Fetch query="/api/experience/assets/icons">
           {({ loading, data }: { loading: boolean; data: IconData[] }) => {
             if (loading) {
               return LOADING.map((_, i) => {

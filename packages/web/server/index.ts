@@ -14,12 +14,10 @@ import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
 import { create } from './Alliance'
 import latestAnnouncements from './Announcement'
-import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
-import { getFormattedMediumArticles } from './mediumAPI'
 import respondError from './respondError'
 
 const CREATED = 201
@@ -180,15 +178,6 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     }
   })
 
-  server.get('/brand/api/assets/:asset', async (req, res) => {
-    try {
-      const assets = await getAssets(req.params.asset)
-      res.json(assets)
-    } catch (e) {
-      respondError(res, e)
-    }
-  })
-
   server.post('/partnerships-email', async (req, res) => {
     const { email } = req.body
     await mailer({
@@ -199,15 +188,6 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       text: email,
     })
     res.status(NO_CONTENT).send('ok')
-  })
-
-  server.get('/proxy/medium', async (_, res) => {
-    try {
-      const articlesdata = await getFormattedMediumArticles()
-      res.json(articlesdata)
-    } catch (e) {
-      respondError(res, e)
-    }
   })
 
   server.get('/proxy/events/', async (_, res) => {

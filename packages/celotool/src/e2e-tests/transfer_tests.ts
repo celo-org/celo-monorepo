@@ -90,7 +90,7 @@ const whitelistAddress = async (
 ) => {
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods.addAddress(address).send({ from: validatorAddress })
+  await whitelistContract.methods.whitelistAddress(address).send({ from: validatorAddress })
 }
 
 const setAddressWhitelist = async (
@@ -101,7 +101,7 @@ const setAddressWhitelist = async (
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
   await whitelistContract.methods
-    .setWhitelist(whitelist)
+    .setDirectlyWhitelistedAddresses(whitelist)
     .send({ from: validatorAddress, gas: 500000 })
 }
 
@@ -239,6 +239,7 @@ describe('Transfer tests', function(this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
+    gatewayFee: new BigNumber(10000),
     port: 30305,
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
@@ -285,13 +286,17 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
+
+    const light = syncmode === 'light' || syncmode === 'lightest'
     currentGethInstance = {
       name: syncmode,
       validating: false,
       syncmode,
       port: 30307,
       rpcport: 8549,
-      lightserv: syncmode !== 'light' && syncmode !== 'lightest',
+      lightserv: !light,
+      // TODO(nategraf): Remove this when light clients can query for gateway fee.
+      gatewayFee: light ? new BigNumber(10000) : undefined,
       privateKey: DEF_FROM_PK,
     }
 
