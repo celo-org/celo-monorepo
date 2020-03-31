@@ -1,17 +1,17 @@
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
-import { getPincode } from 'src/account/saga'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { openDeepLink } from 'src/app/actions'
-import { handleDeepLink, handleNavigatePinProtected, navigateToProperScreen } from 'src/app/saga'
+import { appLock, openDeepLink, setAppState } from 'src/app/actions'
+import { handleDeepLink, handleSetAppState, navigateToProperScreen } from 'src/app/saga'
+import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
-import { fornoSelector } from 'src/web3/selectors'
+import { getCachedPincode } from 'src/pincode/PincodeCache'
 
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
@@ -61,30 +61,6 @@ describe('App saga', () => {
     expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
   })
 
-  it('Navigates after verifying PIN - Forno', async () => {
-    const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(handleNavigatePinProtected, testRoute)
-      .provide([[select(fornoSelector), true]])
-      .run()
-    expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
-  })
-
-  it('Navigates after verifying PIN - Light node', async () => {
-    const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(handleNavigatePinProtected, testRoute)
-      .provide([
-        [select(fornoSelector), false],
-        [
-          call(getPincode, false, () => {
-            navigate(testRoute.routeName, testRoute.params)
-          }),
-          '123456',
-        ],
-      ])
-      .run()
-    expect(navigate).toBeCalledTimes(0)
-  })
-
   it('Handles Dappkit deep link', async () => {
     const deepLink = 'celo://wallet/dappkit?abcdsa'
     await expectSaga(handleDeepLink, openDeepLink(deepLink)).run()
@@ -94,6 +70,52 @@ describe('App saga', () => {
   it('Handles verification deep link', async () => {
     await expectSaga(handleDeepLink, openDeepLink('celo://wallet/v/12345'))
       .put(receiveAttestationMessage('12345', CodeInputType.DEEP_LINK))
+      .run()
+  })
+
+  it('Handles set app state', async () => {
+    const mockedGetCachedPincode = getCachedPincode as jest.Mock
+    mockedGetCachedPincode.mockReturnValue(null)
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getLockWithPinEnabled), true],
+      ])
+      .put(appLock())
+      .run()
+
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), true],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getLockWithPinEnabled), true],
+      ])
+      .run()
+
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), Date.now()],
+        [select(getLockWithPinEnabled), true],
+      ])
+      .run()
+
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getLockWithPinEnabled), false],
+      ])
+      .run()
+
+    mockedGetCachedPincode.mockReturnValue('123456')
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getLockWithPinEnabled), true],
+      ])
       .run()
   })
 })
