@@ -10,21 +10,27 @@ import {
   TextStyle,
   View,
   ViewProps,
+  ViewStyle,
 } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { Cell, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
-export function ErrorMessage({ allErrors, field, t }) {
+function getErrorTransKey(field: string) {
   let key = 'generic'
 
   if (field === 'email' || key === 'unknownError') {
     key = field
   }
+  return key
+}
+
+export function ErrorMessage({ allErrors, field, t }) {
+  const key = getErrorTransKey(field)
 
   return allErrors.includes(field) ? (
     <Fade>
-      <Text style={[fonts.h6, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
+      <Text style={[fonts.h6, textStyles.error]}>{t(`common:validationErrors.${key}`)}</Text>
     </Fade>
   ) : (
     <View style={styles.errorPlaceholder} />
@@ -122,6 +128,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     color: colors.secondary,
+    lineHeight: 20,
   },
   labelBox: {
     marginBottom: 5,
@@ -171,9 +178,18 @@ interface LabelProps {
   value: string
   label: string
   onInput: (x?: unknown) => void
+  isDarkMode?: boolean
 }
 
-export function LabeledInput({ name, multiline, hasError, value, onInput, label }: LabelProps) {
+export function LabeledInput({
+  name,
+  multiline,
+  hasError,
+  value,
+  onInput,
+  label,
+  isDarkMode,
+}: LabelProps) {
   return (
     <>
       <View style={styles.labelBox}>
@@ -189,9 +205,10 @@ export function LabeledInput({ name, multiline, hasError, value, onInput, label 
           fonts.p,
           styles.input,
           standardStyles.elementalMarginBottom,
+          isDarkMode && standardStyles.inputDarkMode,
           hasError && styles.errorBorder,
         ]}
-        focusStyle={standardStyles.inputFocused}
+        focusStyle={isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused}
         name={name}
         value={value}
         onChange={onInput}
@@ -199,3 +216,82 @@ export function LabeledInput({ name, multiline, hasError, value, onInput, label 
     </>
   )
 }
+
+interface CheckboxProps {
+  checked: boolean
+  name: string
+  onPress: (x: any) => void
+}
+
+export function Checkbox({ checked, onPress, name }: CheckboxProps) {
+  return (
+    <View style={checkBoxStyles.border}>
+      <Text
+        style={[
+          checkBoxStyles.checkMark,
+          checked ? checkBoxStyles.checkMarkChecked : checkBoxStyles.hidden,
+        ]}
+      >
+        ✓
+      </Text>
+      {createElement('input', {
+        type: 'checkbox',
+        name,
+        checked,
+        onClick: onPress,
+        style: checkBoxStyles.hidden,
+      })}
+    </View>
+  )
+}
+
+interface NativeLabelProps {
+  children: React.ReactNode
+  for: string
+  onPress: (x: any) => void
+  style?: ViewStyle
+}
+
+export function Label({ children, for: htmlFor, onPress, style }: NativeLabelProps) {
+  return createElement('label', { for: htmlFor, name: htmlFor, children, onClick: onPress, style })
+}
+
+export function CheckboxWithLabel({
+  checked,
+  onPress,
+  name,
+  label,
+}: CheckboxProps & { label: string }) {
+  return (
+    <View style={standardStyles.row}>
+      <Checkbox checked={checked} onPress={onPress} name={name} />
+
+      <Text style={[fonts.a, textStyles.medium, styles.label]}>
+        <Label for={name} onPress={onPress} style={checkBoxStyles.label}>
+          {label}
+        </Label>
+      </Text>
+    </View>
+  )
+}
+
+const checkBoxStyles = StyleSheet.create({
+  border: {
+    paddingHorizontal: 2,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: colors.gray,
+  },
+  checkMark: {
+    color: colors.gray,
+    position: 'absolute',
+    transform: [{ translateY: -2 }, { translateX: 1 }],
+    transitionProperty: 'opacity',
+    transitionDuration: '100ms',
+  },
+  checkMarkChecked: {
+    opacity: 1,
+  },
+  hidden: { opacity: 0 },
+  label: { paddingHorizontal: 10 },
+})

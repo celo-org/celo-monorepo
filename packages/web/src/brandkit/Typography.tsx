@@ -56,7 +56,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <Text style={fonts.h5}>{t('typography.facesTitle')}</Text>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>
             <Trans ns={NameSpaces.brand} i18nKey={'typography.facesText'}>
-              <InlineAnchor href="https://medium.com/celohq/the-why-of-the-celo-coin-part-1-of-3-5e5701805847">
+              <InlineAnchor href="https://medium.com/celoOrg/the-why-of-the-celo-coin-part-1-of-3-5e5701805847">
                 philosophy
               </InlineAnchor>
             </Trans>

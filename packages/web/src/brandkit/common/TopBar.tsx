@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { brandStyles } from 'src/brandkit/common/constants'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Octocat from 'src/icons/Octocat'
 import LogoLightBg from 'src/logos/LogoLightBg'
@@ -17,7 +16,7 @@ export default withNamespaces(NameSpaces.common)(function TopBar({
   isMobile,
 }: I18nProps & Props) {
   return (
-    <View style={[brandStyles.bottomBorder, standardStyles.centered]}>
+    <View style={standardStyles.centered}>
       <View style={[standardStyles.row, styles.container]}>
         <a href={menuItems.BRAND.link}>
           <TouchableOpacity style={standardStyles.row}>

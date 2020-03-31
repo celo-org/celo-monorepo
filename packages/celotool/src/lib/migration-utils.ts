@@ -43,12 +43,17 @@ export function migrationOverrides() {
   const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
 
   const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
+  const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
 
   return {
     election: {
       minElectableValidators: fetchEnvOrFallback(
         envVar.ELECTION_MIN_VALIDATORS,
         DEFAULT_ELECTION_MIN_VALIDATORS
+      ),
+      maxElectableValidators: fetchEnvOrFallback(
+        envVar.ELECTION_MAX_VALIDATORS,
+        fetchEnv(envVar.VALIDATORS)
       ),
     },
     epochRewards: {
@@ -63,11 +68,12 @@ export function migrationOverrides() {
         addresses: initialAddresses,
         values: initialAddresses.map(() => initialBalance),
       },
-      oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
+      oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1), minerForEnv()],
     },
     validators: {
       validatorKeys: validatorKeys(),
       attestationKeys: getAttestationKeys(),
+      commissionUpdateDelay: epoch, // at least an epoch
     },
   }
 }

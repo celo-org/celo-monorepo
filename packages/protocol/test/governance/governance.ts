@@ -2062,8 +2062,8 @@ contract('Governance', (accounts: string[]) => {
 
     const validators = zip(
       (_account, signer) => ({ account: _account, signer }),
-      accounts.slice(2, 6),
-      accounts.slice(6, 10)
+      accounts.slice(2, 5),
+      accounts.slice(5, 8)
     )
 
     beforeEach(async () => {
@@ -2073,7 +2073,6 @@ contract('Governance', (accounts: string[]) => {
         await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
           from: validator.account,
         })
-        await mockValidators.setValidator(validator.account)
         // add signers for mock precompile
         await governance.addValidator(validator.signer)
       })
@@ -2100,6 +2099,16 @@ contract('Governance', (accounts: string[]) => {
     it('should not double count validator account and authorized signer accounts', async () => {
       await whitelistFrom('signer')
       await whitelistFrom('account')
+      await checkTally()
+    })
+
+    it('should return the correct tally after key rotation', async () => {
+      await whitelistFrom('signer')
+      const newSigner = accounts[9]
+      const sig = await getParsedSignatureOfAddress(web3, validators[0].account, newSigner)
+      await accountsInstance.authorizeValidatorSigner(newSigner, sig.v, sig.r, sig.s, {
+        from: validators[0].account,
+      })
       await checkTally()
     })
   })

@@ -143,7 +143,7 @@ function buildSdk() {
       'contracts/*.json'
     )
     execCmd(
-      `yarn run --cwd="${modulePath}" typechain --target="web3-1.0.0" --outDir=types "${contractArtifactsPattern}"`
+      `yarn run --cwd="${modulePath}" typechain --target="web3-v1" --outDir=types "${contractArtifactsPattern}"`
     )
 
     // Necessary to copy types to the lib folder so the contracts have the same path to them.

@@ -141,7 +141,7 @@ echo "Configuring Docker..."
 gcloud auth configure-docker
 
 # use GCP logging for Docker containers
-echo '{"log-driver":"gcplogs"}' > /etc/docker/daemon.json
+echo '{"log-driver":"fluentd","log-opts":{"fluentd-address":"0.0.0.0:24224","tag":"docker_logs"}}' > /etc/docker/daemon.json
 systemctl restart docker
 
 # ---- Set Up and Run Geth ----
@@ -207,8 +207,8 @@ docker run \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
-      --lightserv 90 \
-      --lightpeers 1000 \
+      --light.serve 90 \
+      --light.maxpeers 1000 \
       --maxpeers=${max_peers} \
       --rpc \
       --rpcaddr 0.0.0.0 \

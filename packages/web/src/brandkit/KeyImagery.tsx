@@ -52,7 +52,7 @@ const Overview = React.memo(
 )
 
 function useIlloSize() {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   switch (screen) {
     case ScreenSizes.DESKTOP:
       return 340
@@ -72,7 +72,7 @@ const Illustrations = React.memo(
           {t('keyImagery.illoTitle')}
         </H2>
         <Text style={[brandStyles.gap, fonts.p]}>{t('keyImagery.illoText')}</Text>
-        <Fetch query="/brand/api/assets/Illustrations">
+        <Fetch query="/api/experience/assets/illustrations">
           {({ loading, data, error }) => {
             if (loading) {
               return <Loading />
@@ -113,7 +113,7 @@ const AbstractGraphics = React.memo(
           {t('keyImagery.abstractTitle')}
         </H2>
         <Text style={[brandStyles.gap, fonts.p]}>{t('keyImagery.abstractText')}</Text>
-        <Fetch query="/brand/api/assets/Abstract Graphics">
+        <Fetch query="/api/experience/assets/abstract-graphics">
           {({ loading, data, error }) => {
             if (loading) {
               return <Loading />

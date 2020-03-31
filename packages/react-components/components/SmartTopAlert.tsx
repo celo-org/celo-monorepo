@@ -199,7 +199,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorIcon: {
-    marginHorizontal: 5,
+    marginLeft: 5,
+    marginRight: 8,
   },
   button: {
     marginTop: 8,

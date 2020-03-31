@@ -26,6 +26,6 @@ export default class Unlock extends BaseCommand {
     const password =
       res.flags.password || (await cli.prompt('Password', { type: 'hide', required: false }))
 
-    this.web3.eth.personal.unlockAccount(res.args.account, password, unlockDurationInMs)
+    await this.web3.eth.personal.unlockAccount(res.args.account, password, unlockDurationInMs)
   }
 }

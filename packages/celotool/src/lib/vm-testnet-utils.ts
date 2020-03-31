@@ -19,7 +19,11 @@ import {
   TerraformVars,
   untaintTerraformModuleResource,
 } from './terraform'
-import { uploadDataToGoogleStorage, uploadTestnetInfoToGoogleStorage } from './testnet-utils'
+import {
+  getGenesisBlockFromGoogleStorage,
+  uploadDataToGoogleStorage,
+  uploadTestnetInfoToGoogleStorage,
+} from './testnet-utils'
 import { execCmd } from './utils'
 
 // Keys = gcloud project name
@@ -102,7 +106,8 @@ const testnetResourcesToReset = [
 
 export async function deploy(
   celoEnv: string,
-  generateSecrets: boolean = true,
+  generateSecrets: boolean,
+  useExistingGenesis: boolean,
   onConfirmFailed?: () => Promise<void>
 ) {
   // If we are not using the default network, we want to create/upgrade our network
@@ -113,14 +118,15 @@ export async function deploy(
     await deployModule(celoEnv, testnetNetworkTerraformModule, networkVars, onConfirmFailed)
   }
 
-  const testnetVars: TerraformVars = getTestnetVars(celoEnv)
+  const testnetVars: TerraformVars = await getTestnetVars(celoEnv, useExistingGenesis)
   await deployModule(celoEnv, testnetTerraformModule, testnetVars, onConfirmFailed, async () => {
     if (generateSecrets) {
       console.info('Generating and uploading secrets env files to Google Storage...')
       await generateAndUploadSecrets(celoEnv)
     }
   })
-  await uploadTestnetInfoToGoogleStorage(celoEnv)
+  // TODO change this true value
+  await uploadTestnetInfoToGoogleStorage(celoEnv, !useExistingGenesis)
 }
 
 async function deployModule(
@@ -159,7 +165,7 @@ async function deployModule(
 }
 
 export async function destroy(celoEnv: string) {
-  const testnetVars: TerraformVars = getTestnetVars(celoEnv)
+  const testnetVars: TerraformVars = await getTestnetVars(celoEnv, true)
 
   await destroyModule(celoEnv, testnetTerraformModule, testnetVars)
 
@@ -199,7 +205,7 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
 // force the recreation of various resources upon the next deployment
 export async function taintTestnet(celoEnv: string) {
   console.info('Tainting testnet...')
-  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const vars: TerraformVars = await getTestnetVars(celoEnv, true)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
     testnetTerraformModule
@@ -216,7 +222,7 @@ export async function taintTestnet(celoEnv: string) {
 
 export async function untaintTestnet(celoEnv: string) {
   console.info('Untainting testnet...')
-  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const vars: TerraformVars = await getTestnetVars(celoEnv, true)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
     testnetTerraformModule
@@ -232,7 +238,7 @@ export async function untaintTestnet(celoEnv: string) {
 }
 
 export async function getTestnetOutputs(celoEnv: string) {
-  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const vars: TerraformVars = await getTestnetVars(celoEnv, true)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
     testnetTerraformModule
@@ -268,8 +274,12 @@ function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string)
   }
 }
 
-function getTestnetVars(celoEnv: string) {
-  const genesisBuffer = Buffer.from(generateGenesisFromEnv())
+async function getTestnetVars(celoEnv: string, useExistingGenesis: boolean) {
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+
+  const genesisBuffer = Buffer.from(genesisContent)
   const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   return {
     ...getEnvVarValues(testnetEnvVars),
@@ -291,7 +301,7 @@ function getTestnetVars(celoEnv: string) {
   }
 }
 
-function getTestnetNetworkVars(celoEnv: string) {
+function getTestnetNetworkVars(celoEnv: string): TerraformVars {
   return {
     ...getEnvVarValues(testnetNetworkEnvVars),
     network_name: networkName(celoEnv),

@@ -1,9 +1,5 @@
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
-import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
-
-const TAG = 'web3/actions'
 
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',
@@ -118,17 +114,3 @@ export const updateWeb3SyncProgress = (
   type: Actions.UPDATE_WEB3_SYNC_PROGRESS,
   payload,
 })
-
-export const checkSyncProgress = () => ({ type: Actions.REQUEST_SYNC_PROGRESS })
-
-// Note: This returns Promise<Block>
-export function getLatestBlock() {
-  Logger.debug(TAG, 'Getting latest block')
-  return web3.eth.getBlock('latest')
-}
-
-// Note: This returns Promise<Block>
-export function getBlock(blockNumber: number) {
-  Logger.debug(TAG, 'Getting block ' + blockNumber)
-  return web3.eth.getBlock(blockNumber)
-}

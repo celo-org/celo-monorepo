@@ -4,7 +4,11 @@ import About from 'src/about/About'
 
 describe(About, () => {
   it('includes element with #contributors id', async () => {
-    render(<About randomSeed={10} />)
+    render(<About contributors={[]} />)
     expect(document.getElementById('contributors')).toBeTruthy()
+  })
+  it('includes element with #backers id', async () => {
+    render(<About contributors={[]} />)
+    expect(document.getElementById('backers')).toBeTruthy()
   })
 })

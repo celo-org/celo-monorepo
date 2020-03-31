@@ -16,6 +16,37 @@ const migrationOverrides = {
   downtimeSlasher: {
     slashableDowntime: 60, // epoch length is 100 for unit tests
   },
+  election: {
+    minElectableValidators: '10',
+  },
+  epochRewards: {
+    frozen: false,
+  },
+  exchange: {
+    frozen: false,
+    minimumReports: 1,
+  },
+  goldToken: {
+    frozen: false,
+  },
+  governanceApproverMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+  },
+  reserve: {
+    initialBalance: 100000000,
+    otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+  },
+  reserveSpenderMultiSig: {
+    signatories: [network.from],
+    numRequiredConfirmations: 1,
+    numInternalRequiredConfirmations: 1,
+  },
+  stableToken: {
+    oracles: [network.from],
+    frozen: false,
+  },
 }
 
 async function startGanache() {
@@ -75,16 +106,18 @@ async function test() {
     // Add test specific migration overrides
     testArgs = testArgs.concat(['--migration_override', JSON.stringify(migrationOverrides)])
 
-    if (argv._.length > 0) {
-      const testGlob = argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
-      const testFiles = glob.readdirSync(testGlob)
-      if (testFiles.length === 0) {
-        // tslint:disable-next-line: no-console
-        console.error(`No test files matched with ${testGlob}`)
-        process.exit(1)
-      }
-      testArgs = testArgs.concat(testFiles)
+    const testGlob =
+      argv._.length > 0
+        ? argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
+        : `test/\*\*/*.ts`
+    const testFiles = glob.readdirSync(testGlob)
+    if (testFiles.length === 0) {
+      // tslint:disable-next-line: no-console
+      console.error(`No test files matched with ${testGlob}`)
+      process.exit(1)
     }
+    testArgs = testArgs.concat(testFiles)
+
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {

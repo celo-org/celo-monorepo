@@ -44,7 +44,7 @@ ERC-20 contract for Celo native currency.
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L14)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
 
 **Parameters:**
 
@@ -61,7 +61,7 @@ Name | Type |
 
 • **allowance**: *function* = proxyCall(this.contract.methods.allowance, undefined, valueToBigNumber)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L20)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L19)*
 
 Querying allowance.
 
@@ -87,7 +87,7 @@ ___
 
 • **approve**: *function* = proxySend(this.kit, this.contract.methods.approve)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L51)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L50)*
 
 Approve a user to transfer Celo Gold on behalf of another user.
 
@@ -113,7 +113,7 @@ ___
 
 • **decimals**: *function* = proxyCall(this.contract.methods.decimals, undefined, valueToInt)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L37)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L36)*
 
 Returns the number of decimals used in the token.
 
@@ -135,7 +135,7 @@ ___
 
 • **decreaseAllowance**: *function* = proxySend(this.kit, this.contract.methods.decreaseAllowance)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L65)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L64)*
 
 Decreases the allowance of another user.
 
@@ -161,7 +161,7 @@ ___
 
 • **increaseAllowance**: *function* = proxySend(this.kit, this.contract.methods.increaseAllowance)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L58)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L57)*
 
 Increases the allowance of another user.
 
@@ -187,7 +187,7 @@ ___
 
 • **name**: *function* = proxyCall(this.contract.methods.name, undefined, (a: any) => a.toString())
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L26)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L25)*
 
 Returns the name of the token.
 
@@ -209,7 +209,7 @@ ___
 
 • **symbol**: *function* = proxyCall(this.contract.methods.symbol, undefined, (a: any) => a.toString())
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L32)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L31)*
 
 Returns the three letter symbol of the token.
 
@@ -231,7 +231,7 @@ ___
 
 • **totalSupply**: *function* = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L43)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L42)*
 
 Returns the total supply of the token, that is, the amount of tokens currently minted.
 
@@ -253,7 +253,7 @@ ___
 
 • **transfer**: *function* = proxySend(this.kit, this.contract.methods.transfer)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L82)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L81)*
 
 Transfers Celo Gold from one address to another.
 
@@ -279,7 +279,7 @@ ___
 
 • **transferFrom**: *function* = proxySend(this.kit, this.contract.methods.transferFrom)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L91)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L90)*
 
 Transfers Celo Gold from one address to another on behalf of a user.
 
@@ -307,7 +307,7 @@ ___
 
 • **transferWithComment**: *function* = proxySend(this.kit, this.contract.methods.transferWithComment)
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L74)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L73)*
 
 Transfers Celo Gold from one address to another with a comment.
 
@@ -337,7 +337,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L18)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
 
 Contract address
 
@@ -349,7 +349,7 @@ Contract address
 
 ▸ **balanceOf**(`account`: [Address](../modules/_base_.md#address)): *Promise‹BigNumber‹››*
 
-*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L98)*
+*Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L97)*
 
 Gets the balance of the specified address.
 

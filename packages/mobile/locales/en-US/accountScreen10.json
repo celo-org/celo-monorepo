@@ -4,7 +4,8 @@
   "languageSettings": "Language Settings",
   "localCurrencySetting": "Currency",
   "licenses": "Licenses",
-  "sendIssueReport": "Send an Issue Report",
+  "security": "Security",
+  "requirePinOnAppOpen": "Require PIN on App Open",
   "analytics": "Analytics",
   "shareAnalytics": "Share Analytics",
   "shareAnalytics_detail": "We collect anonymized data about how you use Celo to help improve the application for everyone.",
@@ -38,5 +39,14 @@
   "continue": "Continue",
   "yourName": "Your Name",
   "version": "Version:",
-  "addressCopied": "Address copied to clipboard"
+  "addressCopied": "Address copied to clipboard",
+  "support": "Support",
+  "contact": "Contact",
+  "webFaq": "Web FAQ",
+  "forum": "Forum",
+  "contactText": "Can’t find what you’re looking for?",
+  "contactUs": "Contact Us",
+  "tellUsMore": "Tell us more",
+  "attachLogs": "Attach logs",
+  "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with Celo Support."
 }

@@ -1,8 +1,6 @@
 pragma solidity ^0.5.3;
 
 interface IAttestations {
-  function initialize(address, uint256, uint256, address[] calldata, uint256[] calldata) external;
-
   function setAttestationRequestFee(address, uint256) external;
   function request(bytes32, uint256, address) external;
   function selectIssuers(bytes32) external;
@@ -11,6 +9,8 @@ interface IAttestations {
   function withdraw(address) external;
 
   function setAttestationExpiryBlocks(uint256) external;
+
+  function getMaxAttestations() external view returns (uint256);
 
   function getUnselectedRequest(bytes32, address) external view returns (uint32, uint32, address);
   function getAttestationRequestFee(address) external view returns (uint256);

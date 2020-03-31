@@ -108,6 +108,7 @@ Execute the following (and make sure the lines are in your `~/.bash_profile`):
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
+export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
@@ -294,6 +295,7 @@ Then install packages:
 
 ```bash
 cd celo-monorepo
+npm install lerna
 yarn # install dependencies and run post-install script
 yarn build # build all packages
 ```

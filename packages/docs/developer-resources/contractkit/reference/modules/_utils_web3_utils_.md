@@ -13,7 +13,7 @@
 
 ▸ **getAbiTypes**(`abi`: ABIDefinition[], `methodName`: string): *string[]*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L4)*
+*Defined in [contractkit/src/utils/web3-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L3)*
 
 **Parameters:**
 
@@ -30,7 +30,7 @@ ___
 
 ▸ **parseDecodedParams**(`params`: DecodedParamsObject): *object*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L7)*
+*Defined in [contractkit/src/utils/web3-utils.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L6)*
 
 **Parameters:**
 

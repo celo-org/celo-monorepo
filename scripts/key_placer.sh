@@ -13,7 +13,10 @@ files=(
   "packages/mobile/android/app/src/debug/google-services.json"
   "packages/mobile/android/app/src/pilot/google-services.json"
   "packages/mobile/android/sentry.properties"
-  "packages/mobile/ios/GoogleService-Info.plist"
+  "packages/mobile/ios/GoogleService-Info.dev.plist"
+  "packages/mobile/ios/GoogleService-Info.integration.plist"
+  "packages/mobile/ios/GoogleService-Info.alfajores.plist"
+  "packages/mobile/ios/GoogleService-Info.pilot.plist"
   "packages/mobile/ios/sentry.properties"
   "packages/verifier/android/app/google-services.json"
   "packages/verifier/android/app/src/staging/google-services.json"
@@ -31,6 +34,7 @@ files=(
   ".env.mnemonic.integration"
   ".env.mnemonic.pilot"
   ".env.mnemonic.pilotstaging"
+  ".env.mnemonic.rc0"
 )
 
 if [[ -z "$1" ]]; then

@@ -6,18 +6,20 @@ description: View and manage Validator Groups
 
 ### Commission
 
-Update the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.
+Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.
 
 ```
 USAGE
   $ celocli validatorgroup:commission
 
 OPTIONS
-  --commission=commission                            (required)
+  --apply                                            Applies a previously queued update
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
+  --queue-update=queue-update                        Queues an update to the commission
 
-EXAMPLE
-  commission --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1
+EXAMPLES
+  commission --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --queue-update 0.1
+  commission --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --apply
 ```
 
 _See code: [packages/cli/src/commands/validatorgroup/commission.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/commission.ts)_
@@ -91,6 +93,8 @@ OPTIONS
                                                      Validators that goes to the group.
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
+
+  --yes                                              Answer yes to prompt
 
 EXAMPLE
   register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1

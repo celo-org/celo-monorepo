@@ -5,7 +5,7 @@ import Fade from 'react-reveal/Fade'
 import FullCircle from 'src/community/connect/FullCircle'
 import { H1 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Arrow from 'src/icons/Arrow'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -65,9 +65,9 @@ class CoverArea extends React.PureComponent<Props> {
                   {t('cover.joinMovement')}
                 </Text>
                 <EmailForm
-                  submitText={t('signUp')}
+                  submitText={t('common:signUp')}
                   route={'/contacts'}
-                  whenComplete={<After t={t} />}
+                  whenComplete={<After t={t} isDarkMode={true} />}
                   isDarkMode={true}
                 />
               </View>
@@ -206,4 +206,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('community')(withScreenSize(CoverArea))
+export default withNamespaces(NameSpaces.community)(withScreenSize(CoverArea))

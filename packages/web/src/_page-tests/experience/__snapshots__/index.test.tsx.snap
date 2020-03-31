@@ -8,9 +8,14 @@ exports[`Experience/Brandkit renders 1`] = `
     className="css-view-1dbjc4n"
     style={
       Object {
-        "borderBottomColor": "rgba(221,221,221,1.00)",
-        "marginBottom": "70px",
+        "MozTransitionProperty": "box-shadow",
+        "WebkitTransitionDuration": "400ms",
+        "WebkitTransitionProperty": "box-shadow",
+        "boxShadow": "0px 0px 0px 0px rgba(0,0,0,0)",
+        "marginBottom": "75px",
         "position": "fixed",
+        "transitionDuration": "400ms",
+        "transitionProperty": "box-shadow",
         "width": "100%",
         "zIndex": 10,
       }
@@ -25,8 +30,6 @@ exports[`Experience/Brandkit renders 1`] = `
           "WebkitBoxPack": "center",
           "WebkitJustifyContent": "center",
           "alignItems": "center",
-          "borderBottomColor": "rgba(221,221,221,1.00)",
-          "borderBottomWidth": "1px",
           "justifyContent": "center",
           "msFlexAlign": "center",
           "msFlexPack": "center",
@@ -169,6 +172,8 @@ exports[`Experience/Brandkit renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://github.com/celo-org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             rel=" noopener noreferrer"
             role="link"
             style={
@@ -241,7 +246,7 @@ exports[`Experience/Brandkit renders 1`] = `
     className="css-view-1dbjc4n"
     style={
       Object {
-        "marginTop": "70px",
+        "marginTop": "75px",
       }
     }
   />
@@ -334,6 +339,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -396,6 +403,23 @@ exports[`Experience/Brandkit renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "MozTransitionProperty": "transform,",
+              "WebkitTransform": "scaleY(0)",
+              "WebkitTransformOrigin": "top",
+              "WebkitTransitionDuration": "500ms",
+              "WebkitTransitionProperty": "-webkit-transform,transform,",
+              "marginLeft": "20px",
+              "transform": "scaleY(0)",
+              "transformOrigin": "top",
+              "transitionDuration": "500ms",
+              "transitionProperty": "-webkit-transform,transform,",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitFlexDirection": "row",
@@ -427,6 +451,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/logo"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -537,6 +563,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/color"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -647,6 +675,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/typography"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -757,6 +787,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/composition"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -867,6 +899,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/icons"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -960,6 +994,8 @@ exports[`Experience/Brandkit renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/experience/brand/key-imagery"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1144,6 +1180,7 @@ exports[`Experience/Brandkit renders 1`] = `
                   "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                   "fontSize": "20px",
                   "lineHeight": "28px",
+                  "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                 }
               }
@@ -1168,6 +1205,8 @@ exports[`Experience/Brandkit renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="/code-of-conduct"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1182,6 +1221,180 @@ exports[`Experience/Brandkit renders 1`] = `
                 >
                   Code Of Conduct
                 </a>
+              </div>
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "20px",
+                  "fontWeight": "500",
+                  "lineHeight": "24px",
+                  "marginBottom": "20px",
+                  "marginTop": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              home.importantRemember
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              home.celoOwner
+              <ul
+                className="css-reset-4rbku5 css-view-1dbjc4n"
+                role="list"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "marginTop": "20px",
+                    "paddingLeft": "20px",
+                  }
+                }
+              >
+                <li
+                  className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  role="listitem"
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "display": "list-item",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "listStyle": "disc",
+                      "marginBottom": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                />
+                <li
+                  className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  role="listitem"
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "display": "list-item",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "listStyle": "disc",
+                      "marginBottom": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                />
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          id="brand-voice"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginLeft": "10px",
+                "marginRight": "10px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "20px",
+                  "marginTop": "60px",
+                  "paddingBottom": "10px",
+                }
+              }
+            >
+              <h2
+                aria-level="2"
+                className="css-reset-4rbku5 css-text-901oao"
+                dir="auto"
+                role="heading"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "28px",
+                    "lineHeight": "32px",
+                    "textRendering": "geometricPrecision",
+                    "textTransform": "none",
+                  }
+                }
+              >
+                home.brandVoice
+              </h2>
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://docs.google.com/document/d/1Y1mfpBGad_8ZxSuIqwX52MWGEMfoWGt5HXc7sZp9h70/edit?usp=sharing"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "opacity": 1,
+                      "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
+                    }
+                  }
+                  target="_blank"
+                />
               </div>
             </div>
           </div>
@@ -1255,19 +1468,23 @@ exports[`Experience/Brandkit renders 1`] = `
               "WebkitAlignSelf": "center",
               "WebkitBoxAlign": "center",
               "WebkitBoxDirection": "normal",
+              "WebkitBoxLines": "multiple",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "center",
               "WebkitFlexDirection": "row",
+              "WebkitFlexWrap": "wrap",
               "WebkitJustifyContent": "center",
               "alignItems": "center",
               "alignSelf": "center",
               "flexDirection": "row",
+              "flexWrap": "wrap",
               "justifyContent": "center",
               "marginTop": "30px",
               "msFlexAlign": "center",
               "msFlexDirection": "row",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msFlexWrap": "wrap",
               "width": "100%",
             }
           }
@@ -1281,7 +1498,7 @@ exports[`Experience/Brandkit renders 1`] = `
             }
           >
             <a
-              href="https://medium.com/CeloHQ"
+              href="https://medium.com/celoOrg"
               rel="noopener"
               style={
                 Object {
@@ -1319,8 +1536,8 @@ exports[`Experience/Brandkit renders 1`] = `
           >
             <a
               href="https://github.com/celo-org"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"
@@ -1348,7 +1565,7 @@ exports[`Experience/Brandkit renders 1`] = `
             }
           >
             <a
-              href="https://twitter.com/CeloHQ"
+              href="https://twitter.com/CeloOrg"
               rel="noopener"
               style={
                 Object {
@@ -1386,8 +1603,8 @@ exports[`Experience/Brandkit renders 1`] = `
           >
             <a
               href="https://forum.celo.org/"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"
@@ -1414,8 +1631,8 @@ exports[`Experience/Brandkit renders 1`] = `
           >
             <a
               href="https://discord.gg/6yWMkgM"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"
@@ -1444,8 +1661,8 @@ exports[`Experience/Brandkit renders 1`] = `
           >
             <a
               href="https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
+              rel="noopener"
+              target="_blank"
             >
               <svg
                 fill="none"
@@ -1460,6 +1677,63 @@ exports[`Experience/Brandkit renders 1`] = `
                   style={Object {}}
                 />
               </svg>
+            </a>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "paddingRight": "25px",
+              }
+            }
+          >
+            <a
+              href="https://www.instagram.com/celoorg/"
+              rel="noopener"
+              target="_blank"
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitFlexBasis": "auto",
+                    "flexBasis": "auto",
+                    "height": "25px",
+                    "msFlexPreferredSize": "auto",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                    "width": "25px",
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "backgroundImage": "url(\\"image.png\\")",
+                      "backgroundPosition": "center",
+                      "backgroundRepeat": "no-repeat",
+                      "backgroundSize": "cover",
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "right": "0px",
+                      "top": "0px",
+                      "width": "100%",
+                      "zIndex": -1,
+                    }
+                  }
+                />
+                <img
+                  alt=""
+                  className="css-accessibilityImage-9pa8cd"
+                  draggable={false}
+                  src="image.png"
+                />
+              </div>
             </a>
           </div>
         </div>
@@ -1497,6 +1771,7 @@ exports[`Experience/Brandkit renders 1`] = `
               "flexDirection": "row",
               "flexWrap": "wrap",
               "justifyContent": "center",
+              "marginBottom": "30px",
               "msFlexDirection": "row",
               "msFlexPack": "center",
               "msFlexWrap": "wrap",
@@ -1509,10 +1784,10 @@ exports[`Experience/Brandkit renders 1`] = `
             className="css-view-1dbjc4n"
             style={
               Object {
-                "marginBottom": "30px",
+                "marginBottom": "10px",
                 "marginLeft": "0px",
                 "marginRight": "10px",
-                "marginTop": "30px",
+                "marginTop": "10px",
               }
             }
           >
@@ -1539,6 +1814,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1582,10 +1859,10 @@ exports[`Experience/Brandkit renders 1`] = `
             className="css-view-1dbjc4n"
             style={
               Object {
-                "marginBottom": "30px",
+                "marginBottom": "10px",
                 "marginLeft": "10px",
                 "marginRight": "10px",
-                "marginTop": "30px",
+                "marginTop": "10px",
               }
             }
           >
@@ -1612,6 +1889,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/about"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1655,10 +1934,10 @@ exports[`Experience/Brandkit renders 1`] = `
             className="css-view-1dbjc4n"
             style={
               Object {
-                "marginBottom": "30px",
+                "marginBottom": "10px",
                 "marginLeft": "10px",
                 "marginRight": "10px",
-                "marginTop": "30px",
+                "marginTop": "10px",
               }
             }
           >
@@ -1685,6 +1964,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/jobs"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1728,10 +2009,10 @@ exports[`Experience/Brandkit renders 1`] = `
             className="css-view-1dbjc4n"
             style={
               Object {
-                "marginBottom": "30px",
+                "marginBottom": "10px",
                 "marginLeft": "10px",
                 "marginRight": "10px",
-                "marginTop": "30px",
+                "marginTop": "10px",
               }
             }
           >
@@ -1758,6 +2039,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/validators"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1801,10 +2084,160 @@ exports[`Experience/Brandkit renders 1`] = `
             className="css-view-1dbjc4n"
             style={
               Object {
-                "marginBottom": "30px",
+                "marginBottom": "10px",
                 "marginLeft": "10px",
                 "marginRight": "10px",
-                "marginTop": "30px",
+                "marginTop": "10px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "alignItems": "center",
+                  "msFlexAlign": "center",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/developers"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                role="link"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline-flex",
+                    "flexGrow": 0,
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "justifyContent": "center",
+                    "lineHeight": "16px",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "textAlign": "center",
+                    "textRendering": "geometricPrecision",
+                    "width": "fit-content",
+                  }
+                }
+              >
+                Developers
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "10px",
+                "marginLeft": "10px",
+                "marginRight": "10px",
+                "marginTop": "10px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "alignItems": "center",
+                  "msFlexAlign": "center",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/alliance"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                role="link"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline-flex",
+                    "flexGrow": 0,
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "justifyContent": "center",
+                    "lineHeight": "16px",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "textAlign": "center",
+                    "textRendering": "geometricPrecision",
+                    "width": "fit-content",
+                  }
+                }
+              >
+                Alliance
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "10px",
+                "marginLeft": "10px",
+                "marginRight": "10px",
+                "marginTop": "10px",
               }
             }
           >
@@ -1831,6 +2264,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/community"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1876,40 +2311,145 @@ exports[`Experience/Brandkit renders 1`] = `
           style={
             Object {
               "paddingBottom": "20px",
-              "paddingTop": "40px",
             }
           }
         >
           <div
-            className="css-text-901oao"
-            dir="auto"
+            className="css-view-1dbjc4n"
             style={
               Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "16px",
-                "lineHeight": "20px",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "flexDirection": "row",
                 "marginBottom": "20px",
-                "textAlign": "center",
-                "textRendering": "geometricPrecision",
+                "msFlexDirection": "row",
               }
             }
           >
-            trueGold.0
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitFlexBasis": "auto",
+                  "flexBasis": "auto",
+                  "height": "20px",
+                  "msFlexPreferredSize": "auto",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                  "width": "20px",
+                  "zIndex": 10,
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "backgroundImage": "url(\\"image.png\\")",
+                    "backgroundPosition": "center",
+                    "backgroundRepeat": "no-repeat",
+                    "backgroundSize": "cover",
+                    "bottom": "0px",
+                    "height": "100%",
+                    "left": "0px",
+                    "position": "absolute",
+                    "right": "0px",
+                    "top": "0px",
+                    "width": "100%",
+                    "zIndex": -1,
+                  }
+                }
+              />
+              <img
+                alt=""
+                className="css-accessibilityImage-9pa8cd"
+                draggable={false}
+                src="image.png"
+              />
+            </div>
+            <div
+              className="css-text-901oao"
               dir="auto"
               style={
                 Object {
-                  "color": "rgba(251,204,92,1.00)",
-                  "paddingLeft": "15px",
-                  "paddingRight": "12px",
+                  "marginLeft": "10px",
+                  "marginRight": "10px",
+                  "zIndex": 10,
                 }
               }
             >
               |
-            </span>
-            trueGold.1
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+            >
+              <div
+                className="css-view-1dbjc4n r-animationKeyframes-1uwykpc"
+                style={
+                  Object {
+                    "WebkitAnimationDelay": "3500ms",
+                    "WebkitAnimationDuration": "250ms",
+                    "WebkitAnimationFillMode": "both",
+                    "WebkitAnimationIterationCount": 1,
+                    "WebkitAnimationTimingFunction": "linear",
+                    "animationDelay": "3500ms",
+                    "animationDuration": "250ms",
+                    "animationFillMode": "both",
+                    "animationIterationCount": 1,
+                    "animationTimingFunction": "linear",
+                    "backgroundColor": "rgba(255,255,255,1.00)",
+                    "height": "100%",
+                    "position": "absolute",
+                    "width": "101%",
+                  }
+                }
+              />
+              <div
+                className="css-text-901oao r-animationKeyframes-otx420"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitAnimationDuration": "750ms",
+                    "WebkitAnimationFillMode": "both",
+                    "WebkitAnimationIterationCount": 1,
+                    "animationDuration": "750ms",
+                    "animationFillMode": "both",
+                    "animationIterationCount": 1,
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "fontStyle": "italic",
+                    "lineHeight": "20px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                "
+                Change the Story
+                "
+              </div>
+              <div
+                className="css-view-1dbjc4n r-animationKeyframes-19xm5i6"
+                style={
+                  Object {
+                    "WebkitAnimationDuration": "250ms",
+                    "WebkitAnimationFillMode": "both",
+                    "WebkitAnimationIterationCount": 1,
+                    "WebkitAnimationTimingFunction": "linear",
+                    "animationDuration": "250ms",
+                    "animationFillMode": "both",
+                    "animationIterationCount": 1,
+                    "animationTimingFunction": "linear",
+                    "backgroundColor": "rgba(255,255,255,1.00)",
+                    "height": "100%",
+                    "position": "absolute",
+                    "width": "101%",
+                  }
+                }
+              />
+            </div>
           </div>
           <div
             className="css-text-901oao"
@@ -1963,6 +2503,8 @@ exports[`Experience/Brandkit renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/terms"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {

@@ -1,15 +1,16 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { Clipboard, StyleSheet, Text } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import LogView from 'src/app/LogView'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import { getLatestBlock } from 'src/web3/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { getLatestBlock } from 'src/web3/utils'
 
 interface State {
   reactNativeLogs: string
@@ -54,7 +55,7 @@ export class Debug extends React.Component<RootState, State> {
   }
 
   onClickEmailLogs = async () => {
-    await Logger.emailLogsToSupport(anonymizedPhone(this.props.account.e164PhoneNumber))
+    navigate(Screens.SupportContact)
   }
 
   render() {

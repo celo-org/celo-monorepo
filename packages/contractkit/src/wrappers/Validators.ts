@@ -3,9 +3,9 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3/types'
+import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
-import { Validators } from '../generated/types/Validators'
+import { Validators } from '../generated/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -15,6 +15,7 @@ import {
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
+  valueToFixidityString,
   valueToInt,
 } from './BaseWrapper'
 
@@ -35,6 +36,8 @@ export interface ValidatorGroup {
   membersUpdated: number
   affiliates: Address[]
   commission: BigNumber
+  nextCommission: BigNumber
+  nextCommissionBlock: BigNumber
 }
 
 export interface ValidatorReward {
@@ -72,12 +75,26 @@ export interface MembershipHistoryExtraData {
  */
 // TODO(asa): Support validator signers
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
-  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.updateCommission(toFixed(commission).toFixed())
-    )
-  }
+  /**
+   * Queues an update to a validator group's commission.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members. Must be in the range [0, 1.0].
+   */
+  queueCommissionUpdate: (commission: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.queueCommissionUpdate,
+    tupleParser(valueToFixidityString)
+  )
+
+  /**
+   * Updates a validator group's commission based on the previously queued update
+   */
+
+  updateCommission: () => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.updateCommission
+  )
+
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -252,11 +269,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       name,
       address,
       members: res[0],
-      membersUpdated: res[2].reduce(
+      commission: fromFixed(new BigNumber(res[1])),
+      nextCommission: fromFixed(new BigNumber(res[2])),
+      nextCommissionBlock: new BigNumber(res[3]),
+      membersUpdated: res[4].reduce(
         (a: number, b: BigNumber.Value) => Math.max(a, new BigNumber(b).toNumber()),
         0
       ),
-      commission: fromFixed(new BigNumber(res[1])),
       affiliates: affiliates.map((v) => v.address),
     }
   }
@@ -546,6 +565,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @return Index for epoch or -1.
    */
   findValidatorMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
-    return history.reverse().findIndex((x) => x.epoch <= epoch)
+    const revIndex = history
+      .slice()
+      .reverse()
+      .findIndex((x) => x.epoch <= epoch)
+    return revIndex < 0 ? -1 : history.length - revIndex - 1
   }
 }

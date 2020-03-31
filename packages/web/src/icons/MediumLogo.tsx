@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { CeloLinks } from 'src/shared/menu-items'
 import { colors } from 'src/styles'
 import Svg, { Path } from 'svgs'
 
@@ -20,7 +21,7 @@ export default class MediumLogo extends React.PureComponent<Props> {
     if (wrapWithLink) {
       return (
         <a
-          href={'https://medium.com/CeloHQ'}
+          href={CeloLinks.mediumPublication}
           target="_blank"
           rel="noopener"
           style={{ lineHeight: `${height}px`, height: `${height}px` }}

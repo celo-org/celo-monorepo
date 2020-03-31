@@ -97,7 +97,7 @@ export function TwitterChannel({ alignCenter, isDarkMode }: ExternalChannelProps
             style={[fonts.legal, isDarkMode && textStyles.invert]}
             text={'@celoOrg'}
             kind={BTN.INLINE}
-            href="https://twitter.com/@celoOrg"
+            href={CeloLinks.twitter}
           />
         </>
       }

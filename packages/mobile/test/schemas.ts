@@ -1,4 +1,5 @@
 import { PincodeType } from 'src/account/reducer'
+import { AppState } from 'src/app/actions'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
@@ -14,7 +15,10 @@ export const vNeg1Schema = {
     message: null,
     dismissMessageAfter: null,
     analyticsEnabled: true,
-    doingPinVerification: false,
+    lockWithPinEnabled: false,
+    appState: AppState.Active,
+    locked: false,
+    lastTimeBackgrounded: 0,
   },
   networkInfo: {
     connected: true,

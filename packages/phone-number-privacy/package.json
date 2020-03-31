@@ -1,0 +1,27 @@
+{
+  "name": "celo-phone-number-privacy",
+  "version": "1.0.0",
+  "description": "Generates unique salt for phone numbers.",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "serve": "firebase serve --only functions",
+    "deploy": "firebase deploy --only functions",
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint --project .",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "bls12377js-blind": "https://github.com/celo-org/bls12377js-blind#3a5ac033fbe282d40002639e01db56313124e721",
+    "firebase-admin": "^8.9.2",
+    "firebase-functions": "^3.3.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^0.1.6"
+  },
+  "engines": {
+    "node": "10"
+  }
+}

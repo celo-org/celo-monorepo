@@ -86,4 +86,19 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const sig = await getParsedSignatureOfAddress(account, signer)
     await accountsInstance.authorizeValidatorSignerAndBls(signer, sig, newBlsPublicKey, newBlsPoP)
   })
+
+  test('SBAT set the wallet address to the caller', async () => {
+    await accountsInstance.createAccount()
+    await accountsInstance.setWalletAddress(accounts[0])
+  })
+
+  test('SBAT set the wallet address to a different wallet address', async () => {
+    await accountsInstance.createAccount()
+    const signature = await accountsInstance.generateProofOfKeyPossession(accounts[0], accounts[1])
+    await accountsInstance.setWalletAddress(accounts[1], signature)
+  })
+
+  test('SNBAT to set to a different wallet address without a signature', async () => {
+    await expect(accountsInstance.setWalletAddress(accounts[1])).rejects
+  })
 })

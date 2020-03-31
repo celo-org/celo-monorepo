@@ -1,3 +1,4 @@
+import throttle from 'lodash.throttle'
 import { SingletonRouter, withRouter } from 'next/router'
 import * as React from 'react'
 import { findNodeHandle, StyleSheet, View } from 'react-native'
@@ -11,8 +12,10 @@ import Footer from 'src/shared/Footer'
 import menu, { hashNav } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles } from 'src/styles'
-const FOOTER_ID = 'experience-footer'
 
+const FOOTER_ID = 'experience-footer'
+const DISTANCE_TO_HIDE_AT = 25
+const THROTTLE_SCROLL_MS = 200
 export const ROOT = menu.BRAND.link
 
 export const LOGO_PATH = `${ROOT}/logo`
@@ -29,7 +32,10 @@ const PAGES = [
   {
     title: 'Introduction',
     href: ROOT,
-    sections: [],
+    sections: [
+      { title: 'Overview', href: `${ROOT}#${hashNav.brandIntro.overview}` },
+      { title: 'Brand Voice', href: `${ROOT}#${hashNav.brandIntro.brandVoice}` },
+    ],
   },
   {
     title: 'Logo',
@@ -109,6 +115,7 @@ interface State {
   routeHash: string
   isSidebarFrozen: boolean
   distanceToTop: number
+  isLineVisible: boolean
 }
 
 class Page extends React.Component<Props & ScreenProps, State> {
@@ -116,6 +123,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
     routeHash: '',
     isSidebarFrozen: true,
     distanceToTop: 0,
+    isLineVisible: false,
   }
 
   ratios: Record<string, { id: string; ratio: number; top: number }> = {}
@@ -134,8 +142,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
   }
 
   updateSectionHashWhenInView = (entries: IntersectionObserverEntry[]) => {
-    const filteredEntries = entries.filter((entry) => entry.target.id !== FOOTER_ID)
-
+    const filteredEntries = entries.filter(({ target }) => target.id !== FOOTER_ID)
     this.ratios = filteredEntries
       .map((entry) => ({
         id: entry.target.id,
@@ -163,7 +170,9 @@ class Page extends React.Component<Props & ScreenProps, State> {
       this.setState({ routeHash: top.id })
       window.history.replaceState({}, top.id, `${location.pathname}#${top.id}`)
     }
-
+    if (this.props.screen === ScreenSizes.MOBILE) {
+      return
+    }
     setImmediate(() => {
       const footer = entries.find((entry) => entry.target.id === FOOTER_ID)
       if (footer) {
@@ -193,20 +202,39 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
     Object.keys(this.sectionRefs).forEach((id) => {
       const value = this.sectionRefs[id]
-      // findNodeHandle is typed to return a number but returns an Element
-      const element = (findNodeHandle(value.current) as unknown) as Element
-      this.observer.observe(element)
+      this.observeRef(value)
     })
 
-    const footer = (findNodeHandle(this.footer.current) as unknown) as Element
+    this.observeRef(this.footer)
+  }
 
-    this.observer.observe(footer)
+  observeRef = (ref: React.RefObject<View>) => {
+    // findNodeHandle is typed to return a number but returns an Element
+    const element = (findNodeHandle(ref.current) as unknown) as Element
+
+    this.observer.observe(element)
   }
 
   componentDidMount = () => {
     this.createSectionObservers()
-
+    if (this.props.screen !== ScreenSizes.MOBILE) {
+      this.setLineVisibilityViaScroll()
+    }
     window.addEventListener('hashchange', this.onChangeHash, false)
+  }
+
+  setLineVisibilityViaScroll = () => {
+    window.addEventListener(
+      'scroll',
+      throttle((event) => {
+        const top = event.target.scrollingElement.scrollTop + DISTANCE_TO_HIDE_AT
+        if (top > HEADER_HEIGHT) {
+          this.setState({ isLineVisible: true })
+        } else {
+          this.setState({ isLineVisible: false })
+        }
+      }, THROTTLE_SCROLL_MS)
+    )
   }
 
   componentWillUnmount = () => {
@@ -226,7 +254,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
           image={require('src/brandkit/images/ogimage-brandkit.png')}
         />
         <View style={styles.conatiner}>
-          <View style={styles.topbar}>
+          <View style={[styles.topbar, (this.state.isLineVisible || isMobile) && styles.grayLine]}>
             <Topbar isMobile={isMobile} />
           </View>
           <View style={styles.justNeedSpace} />
@@ -277,14 +305,19 @@ const styles = StyleSheet.create({
   desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)' },
   sidebar: { minWidth: 190, paddingLeft: 0 },
   justNeedSpace: {
-    marginTop: 70,
+    marginTop: HEADER_HEIGHT,
+  },
+  grayLine: {
+    boxShadow: `0px 1px 1px -1px rgba(0,0,0,0.5)`,
   },
   topbar: {
+    transitionProperty: 'box-shadow',
+    transitionDuration: '400ms',
+    boxShadow: `0px 0px 0px 0px rgba(0,0,0,0)`,
     position: 'fixed',
     width: '100%',
-    borderBottomColor: colors.gray,
     zIndex: 10,
-    marginBottom: 70,
+    marginBottom: HEADER_HEIGHT,
   },
   footer: { zIndex: -10, backgroundColor: colors.white },
   childrenArea: {

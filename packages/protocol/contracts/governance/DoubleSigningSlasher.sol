@@ -13,8 +13,8 @@ contract DoubleSigningSlasher is SlasherUtil {
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
 
   /**
-   * @notice Initializer
-   * @param registryAddress Sets the registry address. Useful for testing.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _penalty Penalty for the slashed signer.
    * @param _reward Reward that the observer gets.
    */
@@ -35,8 +35,8 @@ contract DoubleSigningSlasher is SlasherUtil {
   function countSetBits(uint256 v) internal pure returns (uint256) {
     uint256 res = 0;
     uint256 acc = v;
-    for (uint256 i = 0; i < 256; i++) {
-      if (acc & 1 == 1) res++;
+    for (uint256 i = 0; i < 256; i = i.add(1)) {
+      if (acc & 1 == 1) res = res.add(1);
       acc = acc >> 1;
     }
     return res;

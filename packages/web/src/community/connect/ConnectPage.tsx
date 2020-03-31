@@ -11,12 +11,11 @@ import { H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import ConnectionFooter from 'src/shared/ConnectionFooter'
 import { hashNav } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
 import ArticleData from './ArticleData'
 import EventData from './EventsData'
-
-import ConnectionFooter from 'src/shared/ConnectionFooter'
 
 const preview = require('src/community/connect/preview.jpg')
 
@@ -62,7 +61,7 @@ export class ConnectPage extends React.Component<Props> {
             </Cell>
           </GridRow>
           <EventData />
-          <ArticleData />
+          <ArticleData title={t('articles.title')} />
           <Contribute />
           <EcoFund />
           <FellowSection />

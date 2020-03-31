@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { CeloLinks } from 'src/shared/menu-items'
 import { colors } from 'src/styles'
 import Svg, { Path } from 'svgs'
 
@@ -18,7 +19,7 @@ export default class TwitterLogo extends React.PureComponent<Props> {
 
     return (
       <a
-        href={'https://twitter.com/CeloHQ'}
+        href={CeloLinks.twitter}
         target="_blank"
         rel="noopener"
         style={{ lineHeight: `${height}px`, height: `${height}px` }}

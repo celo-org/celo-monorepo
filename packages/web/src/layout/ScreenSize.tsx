@@ -82,7 +82,12 @@ export function withScreenSize<T>(
 
 export function useScreenSize() {
   const { screen } = React.useContext(ScreenSizeContext)
-  return screen
+  return {
+    screen,
+    isMobile: screen === ScreenSizes.MOBILE,
+    isDesktop: screen === ScreenSizes.DESKTOP,
+    isTablet: screen === ScreenSizes.TABLET,
+  }
 }
 
 // by guessing device type we can have our server rendered content likely be the right size

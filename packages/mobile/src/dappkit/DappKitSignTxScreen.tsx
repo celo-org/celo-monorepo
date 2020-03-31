@@ -18,7 +18,7 @@ import Logger from 'src/utils/Logger'
 const TAG = 'dappkit/DappKitSignTxScreen'
 
 interface State {
-  request: SignTxRequest
+  request: SignTxRequest | null
 }
 
 interface OwnProps {
@@ -38,6 +38,9 @@ const mapDispatchToProps = {
 
 class DappKitSignTxScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
+  state = {
+    request: null,
+  }
 
   componentDidMount() {
     if (!this.props.navigation) {
@@ -64,12 +67,22 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
   }
 
   linkBack = () => {
-    navigateHome({ dispatchAfterNavigate: requestTxSignature(this.state.request) })
+    if (!this.state.request) {
+      return
+    }
+
+    navigateHome({ dispatchAfterNavigate: requestTxSignature(this.state.request!) })
   }
 
   showDetails = () => {
+    if (!this.state.request) {
+      return
+    }
+
     // TODO(sallyjyl): figure out which data to pass in for multitx
-    navigate(Screens.DappKitTxDataScreen, { dappKitData: this.state.request.txs[0].txData })
+    navigate(Screens.DappKitTxDataScreen, {
+      dappKitData: (this.state.request! as SignTxRequest).txs[0].txData,
+    })
   }
 
   cancel = () => {
@@ -85,7 +98,9 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
             <DappkitExchangeIcon />
           </View>
           <Text style={styles.header}>
-            {t('connectToWallet', { dappname: this.state.request.dappName })}
+            {t('connectToWallet', {
+              dappname: this.state.request && (this.state.request! as SignTxRequest).dappName,
+            })}
           </Text>
 
           <Text style={styles.share}> {t('shareInfo')} </Text>

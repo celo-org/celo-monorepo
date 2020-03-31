@@ -1,7 +1,7 @@
 import * as ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
-import * as fs from 'fs'
+import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as targz from 'targz'
 import * as tmp from 'tmp'
@@ -85,12 +85,17 @@ yargs
         .option('migration_override', {
           type: 'string',
           description: 'Path to JSON containing config values to use in migrations',
+        })
+        .option('release_gold_contracts', {
+          type: 'string',
+          description: 'JSON list of release gold contracts',
         }),
     (args) =>
       exitOnError(
         generateDevChain(args.filename, {
           upto: args.upto,
           migrationOverride: args.migration_override,
+          releaseGoldContracts: args.release_gold_contracts,
           targz: true,
         })
       )
@@ -206,6 +211,25 @@ function runMigrations(opts: { upto?: number; migrationOverride?: string } = {})
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
+function deployReleaseGold(releaseGoldContracts: string) {
+  const cmdArgs = ['truffle', 'exec', 'scripts/truffle/deploy_release_contracts.js']
+  cmdArgs.push('--network')
+  // TODO(lucas): investigate if this can be found dynamically
+  cmdArgs.push('development')
+  cmdArgs.push('--from')
+  cmdArgs.push('0x5409ED021D9299bf6814279A6A1411A7e866A631')
+  cmdArgs.push('--grants')
+  cmdArgs.push(releaseGoldContracts)
+  cmdArgs.push('--start_gold')
+  cmdArgs.push('10')
+  // --yesreally command to bypass prompts
+  cmdArgs.push('--yesreally')
+  cmdArgs.push('--build_directory')
+  cmdArgs.push(ProtocolRoot + 'build')
+
+  return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
+}
+
 async function runDevChainFromTar(filename: string) {
   const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
   // tslint:disable-next-line: no-console
@@ -242,6 +266,7 @@ async function runDevChain(
     migrationOverride?: string
     targz?: boolean
     runMigrations?: boolean
+    releaseGoldContracts?: string
   } = {}
 ) {
   if (opts.reset) {
@@ -255,6 +280,12 @@ async function runDevChain(
       throw Error('Migrations failed')
     }
   }
+  if (opts.releaseGoldContracts) {
+    const code = await deployReleaseGold(opts.releaseGoldContracts)
+    if (code !== 0) {
+      throw Error('ReleaseGold deployment failed')
+    }
+  }
   return stopGanache
 }
 
@@ -263,6 +294,7 @@ async function generateDevChain(
   opts: {
     upto?: number
     migrationOverride?: string
+    releaseGoldContracts?: string
     targz?: boolean
   } = {}
 ) {
@@ -271,12 +303,15 @@ async function generateDevChain(
   if (opts.targz) {
     chainTmp = tmp.dirSync({ keep: false, unsafeCleanup: true })
     chainPath = chainTmp.name
+  } else {
+    fs.ensureDirSync(chainPath)
   }
   const stopGanache = await runDevChain(chainPath, {
     reset: !opts.targz,
     runMigrations: true,
     upto: opts.upto,
     migrationOverride: opts.migrationOverride,
+    releaseGoldContracts: opts.releaseGoldContracts,
   })
   await stopGanache()
   if (opts.targz && chainTmp) {
@@ -289,6 +324,8 @@ async function compressChain(chainPath: string, filename: string): Promise<void>
   // tslint:disable-next-line: no-console
   console.log('Compressing chain')
   return new Promise((resolve, reject) => {
+    // ensures the path to the file
+    fs.ensureFileSync(filename)
     targz.compress({ src: chainPath, dest: filename }, async (err: Error) => {
       if (err) {
         console.error(err)

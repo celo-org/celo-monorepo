@@ -17,7 +17,7 @@ cat <<'EOF' > '/etc/docker/daemon.json'
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "10m",
-    "max-file": "3" 
+    "max-file": "3"
   }
 }
 EOF
@@ -69,8 +69,8 @@ ExecStart=/usr/bin/docker run \\
   $GETH_NODE_DOCKER_IMAGE -c "\\
     geth \\
       --bootnodes $(cat $DATA_DIR/bootnodes) \\
-      --lightserv 90 \\
-      --lightpeers 1000 \\
+      --light.serve 90 \\
+      --light.maxpeers 1000 \\
       --maxpeers 1100 \\
       --rpc \\
       --rpcaddr 0.0.0.0 \\

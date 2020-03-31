@@ -2,21 +2,15 @@ import BigNumber from 'bignumber.js'
 import { values } from 'lodash'
 import sleep from 'sleep-promise'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3-eth'
-import Contract from 'web3/eth/contract'
-import { TransactionObject } from 'web3/eth/types'
+import { Tx } from 'web3-core'
+import { TransactionObject, TransactionReceipt } from 'web3-eth'
+import { Contract } from 'web3-eth-contract'
 import * as ContractList from '../contracts/index'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
-import { GoldToken } from '../types/GoldToken'
-import { StableToken } from '../types/StableToken'
 import { getGasPriceMinimumContract } from './contracts'
-import { getGoldTokenAddress } from './erc20-utils'
 import { Logger } from './logger'
 
 const gasInflateFactor = 1.5
-
-// TODO(nategraf): Allow this parameter to be fetched from the full-node peer.
-const defaultGatewayFee = new BigNumber(10000)
 
 export function selectContractByAddress(contracts: Contract[], address: string) {
   const addresses = contracts.map((contract) => contract.options.address)
@@ -230,14 +224,9 @@ async function getGasPrice(
   const gasPriceMinimum: GasPriceMinimumType = await getGasPriceMinimumContract(web3)
   const gasPrice: string = await gasPriceMinimum.methods.getGasPriceMinimum(feeCurrency).call()
   Logger.debug('contract-utils@getGasPrice', `Gas price is ${gasPrice}`)
+  // TODO this multiples the gas price by 10. Is this the optimal behavior?
   return String(parseInt(gasPrice, 10) * 10)
 }
-
-// Maps account address to current nonce. This ensures that transactions
-// being sent too close to each other do not end up having the
-// same nonce. This does not have to be persisted across app restarts since
-// nonce calculation will be correct over the order of seconds (restart time).
-const currentNonce = new Map<string, number>()
 
 /**
  * sendTransactionAsync mainly abstracts the sending of a transaction in a promise like
@@ -254,7 +243,8 @@ const currentNonce = new Map<string, number>()
 export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyContract: StableToken | GoldToken,
+  feeCurrencyAddress: string,
+  nonce: number,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
 ): Promise<TxPromises> {
@@ -287,10 +277,14 @@ export async function sendTransactionAsync<T>(
 
   try {
     logger(Started)
-    const txParams: any = {
+    const txParams: Tx = {
       from: account,
-      feeCurrency: feeCurrencyContract._address,
+      // @ts-ignore web3 doesn't know about this Celo-specific prop
+      feeCurrency: feeCurrencyAddress,
+      // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
+      // the suggested price in the selected feeCurrency.
       gasPrice: '0',
+      nonce,
     }
 
     if (estimatedGas === undefined) {
@@ -298,15 +292,7 @@ export async function sendTransactionAsync<T>(
       logger(EstimatedGas(estimatedGas))
     }
 
-    tx.send({
-      from: account,
-      // @ts-ignore
-      feeCurrency: feeCurrencyContract._address,
-      gas: estimatedGas,
-      // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected feeCurrency.
-      gasPrice: '0',
-    })
+    tx.send({ ...txParams, gas: estimatedGas })
       // @ts-ignore
       .on('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
@@ -368,7 +354,8 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
   web3: Web3,
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyContract: StableToken | GoldToken,
+  feeCurrencyAddress: string,
+  nonce: number,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number | undefined
 ): Promise<TxPromises> {
@@ -402,9 +389,15 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
 
   try {
     logger(Started)
-    const txParams: any = {
+    const feeCurrency = feeCurrencyAddress
+    Logger.debug(tag, `Using nonce ${nonce} for account ${account} and fee currency ${feeCurrency}`)
+
+    const txParams: Tx = {
       from: account,
-      feeCurrency: feeCurrencyContract._address,
+      // web3 doesn't know about this Celo-specific prop
+      feeCurrency,
+      // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
+      // the suggested price in the selected feeCurrency.
       gasPrice: '0',
     }
 
@@ -412,18 +405,14 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
       logger(EstimatedGas(estimatedGas))
     }
+
     // Ideally, we should fill these fields in CeloProvider but as of now,
     // we don't have access to web3 inside it, so, in the short-term
     // fill the fields here.
-    let feeCurrency = feeCurrencyContract._address
     const gatewayFeeRecipient = await web3.eth.getCoinbase()
-    const gatewayFee = '0x' + defaultGatewayFee.toString(16)
+    const gatewayFee = '0x0'
     Logger.debug(tag, `Gateway fee is ${gatewayFee} paid to ${gatewayFeeRecipient}`)
     const gasPrice = await getGasPrice(web3, feeCurrency)
-    if (feeCurrency === undefined) {
-      feeCurrency = await getGoldTokenAddress(web3)
-    }
-    Logger.debug(tag, `Fee currency: ${feeCurrency}`)
 
     let recievedTxHash: string | null = null
     let alreadyInformedResolversAboutConfirmation = false
@@ -442,43 +431,19 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
       }
     }
 
-    // Use pending transaction count, so that, multiple transactions can be sent without
-    // waiting for the earlier ones to be confirmed.
-    let nonce: number = await web3.eth.getTransactionCount(account, 'pending')
-    if (!currentNonce.has(account)) {
-      Logger.debug(tag, `Initializing current nonce for ${account} to ${nonce}`)
-      currentNonce.set(account, nonce)
-    } else if (nonce <= currentNonce.get(account)!) {
-      const newNonce = currentNonce.get(account)!
-      Logger.debug(
-        'contract-utils@sendTransactionAsync',
-        `nonce is ${nonce} which is less than existing known nonce (${currentNonce.get(
-          account
-        )}), setting it to ${newNonce}`
-      )
-      nonce = newNonce
-    }
-    Logger.debug(tag, `sendTransactionAsync@nonce is ${nonce}`)
-    Logger.debug(tag, `sendTransactionAsync@sending from ${account}`)
-
     const celoTx = {
-      from: account,
+      ...txParams,
       nonce,
-      // @ts-ignore
-      feeCurrency,
       gas: estimatedGas,
-      // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-      // the suggested price in the selected feeCurrency.
       gasPrice,
       gatewayFeeRecipient,
       gatewayFee,
     }
-    // Increment and store nonce for the next call to sendTransaction.
-    currentNonce.set(account, nonce + 1)
+
     try {
       await tx.send(celoTx)
     } catch (e) {
-      Logger.debug(tag, `Ignoring error with message: ${e.message}`)
+      Logger.debug(tag, `Ignoring error with message: ${JSON.stringify(e)}`)
       // Ideally, I want to only ignore error whose messsage contains
       // "Failed to subscribe to new newBlockHeaders" but seems like another wrapped
       // error (listed below) gets thrown and there is no way to catch that.
@@ -502,8 +467,9 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
         // Ignore this error
         Logger.warn(tag, `Expected error ignored: ${JSON.stringify(e)}`)
       } else {
-        Logger.debug(tag, `Unexpected error ignored: ${e.message}`)
+        Logger.debug(tag, `Unexpected error ignored: ${JSON.stringify(e)}`)
       }
+      // @ts-ignore Web3's types are wrong in many places
       const signedTxn = await web3.eth.signTransaction(celoTx)
       recievedTxHash = web3.utils.sha3(signedTxn.raw) as string
       Logger.info(tag, `Locally calculated recievedTxHash is ${recievedTxHash}`)

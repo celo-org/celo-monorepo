@@ -12,7 +12,7 @@
   "purposeText": "Learn how to run a node on Celo’s peer-to-peer network and take a slice of up to <0>2 million Celo Gold in rewards.</0>*",
   "purposeAsterisk": "* subject to <0>Terms and Conditions</0>",
   "challengeTitle": "The Challenge",
-  "challengeText": "Let the staking season commence! Starting December 4th, all chefs, bakers, and validators are invited to compete for the ultimate glory: honor, food, and Celo Gold.",
+  "challengeText": "Starting December 4th, all chefs, bakers, and validators were invited to compete for the ultimate glory: honor, food, and Celo Gold.",
   "whoTitle": "Who",
   "whoText": "If you have a technical background and you’re interested in open source, security, or building & operating infrastructure, you’d make a perfect Celo validator!",
   "challengeBtnText": "Join the Stake Off",
@@ -150,7 +150,7 @@
   },
   "protocol": {
     "title": "Core Contracts",
-    "text": "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, is pegged to the US Dollar.",
+    "text": "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, tracks the value of the US Dollar.",
     "algoReserve": "Algorithmic reserve-backed stabilization mechanism",
     "cryptoCollat": "Crypto-asset collateralized",
     "native": "Native support for multiple stablecoins"
