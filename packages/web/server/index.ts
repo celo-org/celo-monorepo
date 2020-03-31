@@ -180,14 +180,19 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.post('/partnerships-email', async (req, res) => {
     const { email } = req.body
-    await mailer({
-      toName: 'Team Celo',
-      toEmail: 'partnerships@celo.org',
-      fromEmail: 'partnerships@celo.org',
-      subject: `New Partnership Email: ${email}`,
-      text: email,
-    })
-    res.status(NO_CONTENT).send('ok')
+    try {
+      await mailer({
+        toName: 'Team Celo',
+        toEmail: 'partnerships@celo.org',
+        fromEmail: 'partnerships@celo.org',
+        subject: `New Partnership Email: ${email}`,
+        text: email,
+      })
+
+      res.status(NO_CONTENT).send('ok')
+    } catch (e) {
+      respondError(res, e)
+    }
   })
 
   server.get('/proxy/events/', async (_, res) => {
