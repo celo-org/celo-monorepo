@@ -115,7 +115,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   await installCertManagerAndNginx()
 
   if (envType !== EnvTypes.DEVELOPMENT) {
-    await installAndEnableMetricsDeps()
+    await installAndEnableMetricsDeps(true)
   } else {
     console.info('Skipping metrics installation for this development env.')
   }

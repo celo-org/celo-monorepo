@@ -5,7 +5,10 @@ import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
 
 // switchToClusterFromEnv configures kubectl to connect to the AKS cluster
 // TODO(trevor): add project switching as well
-export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction = true) {
+export async function switchToClusterFromEnv(
+  celoEnv: string,
+  checkOrPromptIfStagingOrProduction = true
+) {
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
@@ -25,13 +28,16 @@ export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction 
       `az aks get-credentials --resource-group ${resourceGroup} --name ${clusterName}`
     )
   }
+  await setupCluster(celoEnv)
 }
 
-export async function setupCluster(celoEnv: string) {
+// setupCluster is idempotent-- it will only make changes that have not been made
+// before. Therefore, it's safe to be called for a cluster that's been fully set up before
+async function setupCluster(celoEnv: string) {
   await createNamespaceIfNotExists(celoEnv)
 
-  console.info('Deploying Tiller and Helm chart...')
+  console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installAndEnableMetricsDeps()
+  await installAndEnableMetricsDeps(false)
 }
