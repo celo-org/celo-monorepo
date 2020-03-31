@@ -2218,7 +2218,7 @@ contract('Validators', (accounts: string[]) => {
         })
       })
 
-      describe.only('when slashing multiplier is halved', () => {
+      describe('when slashing multiplier is halved', () => {
         const halfExpectedTotalPayment = expectedScore
           .times(maxPayment)
           .div(2)
