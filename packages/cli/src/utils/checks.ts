@@ -357,6 +357,17 @@ class CheckBuilder {
     )
   }
 
+  resetSlashingmultiplierPeriodPassed = () => {
+    return this.addCheck(
+      `Enough time has passed since the last halving of the slashing multiplier`,
+      this.withValidators(async (v, _signer, account) => {
+        const { lastSlashed } = await v.getValidatorGroup(account)
+        const duration = await v.getSlashingMultiplierResetPeriod()
+        return duration.toNumber() + lastSlashed.toNumber() < Date.now()
+      })
+    )
+  }
+
   hasACommissionUpdateQueued = () =>
     this.addCheck(
       "There's a commision update queued",
