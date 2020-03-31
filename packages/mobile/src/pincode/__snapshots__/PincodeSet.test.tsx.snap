@@ -126,7 +126,7 @@ exports[`Pincode renders correctly 1`] = `
         <View
           style={
             Object {
-              "marginVertical": 15,
+              "marginBottom": 15,
               "paddingHorizontal": 20,
             }
           }
@@ -648,7 +648,7 @@ exports[`Pincode renders correctly 1`] = `
           },
         ]
       }
-      testID="Pincode-Enter"
+      testID="Pincode-Submit"
     >
       <View
         style={
@@ -811,7 +811,7 @@ exports[`Pincode renders correctly 2`] = `
         <View
           style={
             Object {
-              "marginVertical": 15,
+              "marginBottom": 15,
               "paddingHorizontal": 20,
             }
           }
@@ -1333,7 +1333,7 @@ exports[`Pincode renders correctly 2`] = `
           },
         ]
       }
-      testID="Pincode-ReEnter"
+      testID="Pincode-Submit"
     >
       <View
         style={
