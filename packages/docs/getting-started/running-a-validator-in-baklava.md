@@ -6,7 +6,7 @@ The Baklava Testnet is a non-production Testnet for the validator community. It 
 - **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
 - **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
 
-While the Baklava Testnet was previously used for The Great Celo Stake Off, the Testnet is now available for any potential validators to experiement with.
+While the Baklava Testnet was previously used for The Great Celo Stake Off, the Testnet is now available for any potential validators to experiment with.
 
 ## Network Deployment
 
@@ -19,8 +19,8 @@ The deployment timeline is as follows (all dates are subject to change):
 
 * 3/31: Docs updated, and Docker image released
 * 3/31 - 4/6: infrastructure setup
-* 4/6 16:00: UTC genesis block: genesis validators produce blocks
-* 4/6: Celo Core Contracts are deployed; `ReleaseGold` instances are deployed containing validator funds
+* 4/6 16:00 UTC: genesis validators begin to produce blocks
+* 4/6: Celo Core Contracts are deployed; `ReleaseGold` instances are deployed containing validator Testnet Celo Gold
 * 4/7: Governance proposal to start Validator Elections and validator/group rewards
 * 4/8: Governance proposal to unfreeze Celo Gold voter rewards
 * 4/9: Mock Oracles deployed; governance proposal to unfreeze Celo Dollar exchange
@@ -157,7 +157,7 @@ Note that if you are running the validator and the proxy on` the same machine, t
 
 ## After Block Production Begins
 
-cLabs will update this section closer to April 6. Once the block production starts, core contracts and the `ReleaseGold` contract will be deployed so you will be able to experience this process before Mainnet.
+This will be updated in the coming days with additional instructions. Once block production starts, core contracts and  `ReleaseGold` contracts will be deployed, and the community will step through a series of Governance Proposals in a process similar to deployment of the Celo Mainnet.
 
 ## Deployment Tips
 
