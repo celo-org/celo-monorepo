@@ -20,6 +20,7 @@ export default class ResetSlashingMultiplier extends BaseCommand {
     const address = args.groupAddress
 
     const validators = await this.kit.contracts.getValidators()
+    this.kit.defaultAccount = address
 
     await newCheckBuilder(this, address)
       .isSignerOrAccount()

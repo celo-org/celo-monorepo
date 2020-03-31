@@ -352,7 +352,7 @@ class CheckBuilder {
           account
         )
         const { duration } = await v.getValidatorLockedGoldRequirements()
-        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now()
+        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now() / 1000
       })
     )
   }
@@ -363,7 +363,7 @@ class CheckBuilder {
       this.withValidators(async (v, _signer, account) => {
         const { lastSlashed } = await v.getValidatorGroup(account)
         const duration = await v.getSlashingMultiplierResetPeriod()
-        return duration.toNumber() + lastSlashed.toNumber() < Date.now()
+        return duration.toNumber() + lastSlashed.toNumber() < Date.now() / 1000
       })
     )
   }
