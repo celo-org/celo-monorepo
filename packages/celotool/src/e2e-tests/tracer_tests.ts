@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import fs from 'fs'
 import Web3 from 'web3'
+import { Contract } from 'web3-eth-contract'
 import { EventLog } from 'web3-core'
 import { TransactionReceipt } from 'web3-core'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
@@ -17,7 +18,6 @@ import { MonorepoRoot, getContext, sleep } from './utils'
 import { spawnCmdWithExitOnFailure } from '../lib/utils'
 
 const TMP_PATH = '/tmp/e2e'
-const ROSETTA_PATH = '../../../rosetta'
 
 const testContractSource = `
 pragma solidity ^0.5.8;
@@ -102,7 +102,7 @@ class AccountAssets extends DerivedAccountAssets {
   }
 }
 
-function getAccount(
+function getAccountAssets(
   accounts: Record<Address, AccountAssets>,
   accountAddress: Address,
   filter: boolean
@@ -116,7 +116,7 @@ function assertEqualBN(value: BigNumber, expected: BigNumber) {
   assert.equal(value.toString(), expected.toString())
 }
 
-async function trackTransfers(
+async function trackAssetTransfers(
   kit: ContractKit,
   blockNumber: number,
   assets: Record<Address, AccountAssets> | undefined = undefined,
@@ -131,8 +131,8 @@ async function trackTransfers(
   )
   for (const transaction of goldTransfers) {
     for (const transfer of transaction.transfers) {
-      const from = getAccount(ret, transfer.from, filter)
-      const to = getAccount(ret, transfer.to, filter)
+      const from = getAccountAssets(ret, transfer.from, filter)
+      const to = getAccountAssets(ret, transfer.to, filter)
       if (from) from.gold = from.gold.minus(transfer.value)
       if (to) to.gold = to.gold.plus(transfer.value)
     }
@@ -147,7 +147,7 @@ async function trackTransfers(
     })
   )
   for (const locked of goldLocked) {
-    const account = getAccount(ret, locked.account, filter)
+    const account = getAccountAssets(ret, locked.account, filter)
     // For lock() the gold was debited from account.gold by cgldTransferTracer
     if (account) account.lockedGold = account.lockedGold.plus(locked.value)
     // Can't distuinguish LockedGold lock() and relock() only from logs
@@ -163,7 +163,7 @@ async function trackTransfers(
     })
   )
   for (const unlocked of goldUnlocked) {
-    const account = getAccount(ret, unlocked.account, filter)
+    const account = getAccountAssets(ret, unlocked.account, filter)
     if (account)
       account.lockedGoldPendingWithdrawl = account.lockedGoldPendingWithdrawl.plus(unlocked.value)
   }
@@ -176,7 +176,7 @@ async function trackTransfers(
   )
   for (const withdrawn of goldWithdrawn) {
     // Gold has already been credited by cgldTransferTracer
-    const account = getAccount(ret, withdrawn.account, filter)
+    const account = getAccountAssets(ret, withdrawn.account, filter)
     if (account)
       account.lockedGoldPendingWithdrawl = account.lockedGoldPendingWithdrawl.minus(withdrawn.value)
   }
@@ -190,7 +190,7 @@ async function trackTransfers(
     })
   )
   for (const vote of voteCast) {
-    const account = getAccount(ret, vote.account, filter)
+    const account = getAccountAssets(ret, vote.account, filter)
     if (account) account.pendingVotes = account.pendingVotes.plus(vote.value)
   }
 
@@ -202,7 +202,7 @@ async function trackTransfers(
     value: valueToBigNumber(e.returnValues.value),
   }))
   for (const vote of voteActivated) {
-    const account = getAccount(ret, vote.account, filter)
+    const account = getAccountAssets(ret, vote.account, filter)
     // needs conversion to units
     if (account)
       account.activeVoteUnits[vote.group] = (
@@ -218,7 +218,7 @@ async function trackTransfers(
     })
   )
   for (const vote of voteRevoked) {
-    const account = getAccount(ret, vote.account, filter)
+    const account = getAccountAssets(ret, vote.account, filter)
     if (account) account.lockedGold = account.lockedGold.plus(vote.value)
   }
 
@@ -233,8 +233,8 @@ async function trackTransfers(
     })
   )
   for (const transfer of stableTransfers) {
-    const from = getAccount(ret, transfer.from, filter)
-    const to = getAccount(ret, transfer.to, filter)
+    const from = getAccountAssets(ret, transfer.from, filter)
+    const to = getAccountAssets(ret, transfer.to, filter)
     // needs event change to distuinguish StableToken instances from only logs
     // needs conversion to units
     if (from)
@@ -411,49 +411,61 @@ describe('tracer tests', () => {
     }
   }
 
-  const testTransferGold = (
-    name: string,
-    transferFn: () => Promise<TransactionReceipt>,
-    goldGasCurrency: boolean = true
-  ) => {
-    let trackBalances: Record<Address, AccountAssets>
+  const testTransferGold = (name: string, transferFn: () => Promise<any>) => {
+    let fromAddress: string
+    let toAddress: string
+    let sendAmount: BigNumber
+    let receiveAmount: BigNumber
+    let goldGasCurrency: boolean
     let fromInitialBalance: BigNumber
     let fromFinalBalance: BigNumber
     let toInitialBalance: BigNumber
     let toFinalBalance: BigNumber
     let receipt: TransactionReceipt
     let txn: any
+    let trackAssets: Record<Address, AccountAssets>
 
     describe(`transfer cGLD: ${name}`, () => {
       before(async function(this: any) {
         this.timeout(0)
-        fromInitialBalance = new BigNumber(await kit.web3.eth.getBalance(FromAddress))
-        //fromInitialBalance = await goldToken.balanceOf(FromAddress)
-        toInitialBalance = await goldToken.balanceOf(ToAddress)
-        receipt = await transferFn()
-        receipt = await kit.web3.eth.getTransactionReceipt(receipt.transactionHash)
+
+        const transferResult = await transferFn()
+        fromAddress = transferResult.fromAddress || FromAddress
+        toAddress = transferResult.toAddress || ToAddress
+        sendAmount = transferResult.sendAmount || TransferAmount
+        receiveAmount = transferResult.receiveAmount || TransferAmount
+        goldGasCurrency = transferResult.goldGasCurrency || true
+
+        receipt = await kit.web3.eth.getTransactionReceipt(transferResult.transactionHash)
         txn = await kit.web3.eth.getTransaction(receipt.transactionHash)
-        //fromFinalBalance = await goldToken.balanceOf(FromAddress)
-        fromFinalBalance = new BigNumber(await kit.web3.eth.getBalance(FromAddress))
-        toFinalBalance = await goldToken.balanceOf(ToAddress)
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
-        console.info(`${name} receipt`)
-        console.info(receipt)
-        //console.info(`${name} trackBalances`)
-        //console.info(trackBalances)
+        fromInitialBalance = new BigNumber(
+          await kit.web3.eth.getBalance(fromAddress, txn.blockNumber - 1)
+        )
+        toInitialBalance = new BigNumber(
+          await kit.web3.eth.getBalance(toAddress, txn.blockNumber - 1)
+        )
+        fromFinalBalance = new BigNumber(
+          await kit.web3.eth.getBalance(fromAddress, txn.blockNumber)
+        )
+        toFinalBalance = new BigNumber(await kit.web3.eth.getBalance(toAddress, txn.blockNumber))
+        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
+        //console.info(`${name} receipt`)
+        //console.info(receipt)
+        //console.info(`${name} trackAssets`)
+        //console.info(trackAssets)
         //console.info(`${name} txn`)
         //console.info(txn)
         //console.info(`${name} from balance delta: ` + fromFinalBalance.minus(fromInitialBalance).toFixed())
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(TransferAmount)))
+        assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receiveAmount)))
 
       it(`balanceOf should decrement the sender's balance by the transfer amount`, () => {
         console.info(`gasUsed=${receipt.gasUsed}, gasPrice=${txn.gasPrice}`)
         assertEqualBN(
           fromFinalBalance.minus(fromInitialBalance),
-          new BigNumber(-TransferAmount).minus(
+          new BigNumber(-sendAmount).minus(
             goldGasCurrency
               ? new BigNumber(receipt.gasUsed).times(new BigNumber(txn.gasPrice))
               : new BigNumber(0)
@@ -462,16 +474,10 @@ describe('tracer tests', () => {
       })
 
       it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackBalances[normalizeAddress(ToAddress)].gold,
-          new BigNumber(TransferAmount)
-        ))
+        assertEqualBN(trackAssets[normalizeAddress(toAddress)].gold, new BigNumber(receiveAmount)))
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
-          new BigNumber(-TransferAmount)
-        ))
+        assertEqualBN(trackAssets[normalizeAddress(fromAddress)].gold, new BigNumber(-sendAmount)))
     })
   }
 
@@ -483,7 +489,8 @@ describe('tracer tests', () => {
 
     testTransferGold('normal', async () => {
       const txResult = await transferCeloGold(kit, FromAddress, ToAddress, TransferAmount)
-      return txResult.waitReceipt()
+      const receipt = await txResult.waitReceipt()
+      return { transactionHash: receipt.transactionHash }
     })
 
     // Needs https://github.com/celo-org/celo-blockchain/pull/938
@@ -494,13 +501,15 @@ describe('tracer tests', () => {
         const txResult = await transferCeloGold(kit, FromAddress, ToAddress, TransferAmount, {
           feeCurrency,
         })
-        return txResult.waitReceipt()
-      },
-      false
-    )*/
+        const receipt = txResult.waitReceipt()
+        return { 
+          goldGasCurrency: false,
+          transactionHash: receipt.transactionHash
+        }
+      })*/
 
     describe(`GoldToken.transfer`, () => {
-      let trackBalances: Record<Address, AccountAssets>
+      let trackAssets: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -508,18 +517,18 @@ describe('tracer tests', () => {
         const tx = await goldToken.transfer(ToAddress, TransferAmount.toFixed())
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
       })
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
+          trackAssets[normalizeAddress(FromAddress)].gold,
           new BigNumber(-TransferAmount)
         ))
     })
 
     describe(`Locking gold`, () => {
-      let trackBalances: Record<Address, AccountAssets>
+      let trackAssets: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -528,18 +537,18 @@ describe('tracer tests', () => {
         const tx = await lockedGold.lock()
         const txResult = await tx.send({ value: TransferAmount.toFixed() })
         receipt = await txResult.waitReceipt()
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
       })
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
+          trackAssets[normalizeAddress(FromAddress)].gold,
           new BigNumber(-TransferAmount)
         ))
     })
 
     describe(`Unlocking gold`, () => {
-      let trackBalances: Record<Address, AccountAssets>
+      let trackAssets: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -548,18 +557,18 @@ describe('tracer tests', () => {
         const tx = await lockedGold.unlock(TransferAmount)
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
       })
 
       it(`cGLD tracer should increment the sender's pending withdrawls by the transfer amount`, () =>
         assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].lockedGoldPendingWithdrawl,
+          trackAssets[normalizeAddress(FromAddress)].lockedGoldPendingWithdrawl,
           new BigNumber(TransferAmount)
         ))
     })
 
     describe(`Withdrawing unlocked gold`, () => {
-      let trackBalances: Record<Address, AccountAssets>
+      let trackAssets: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -570,20 +579,20 @@ describe('tracer tests', () => {
         const tx = await lockedGold.withdraw(0)
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
         //console.info(`Withdraw receipt`)
         //console.info(receipt)
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
+          trackAssets[normalizeAddress(FromAddress)].gold,
           new BigNumber(TransferAmount)
         ))
     })
 
     describe(`Exchanging gold for tokens`, () => {
-      let trackBalances: Record<Address, AccountAssets>
+      let trackAssets: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
       let reserve: ReserveWrapper
 
@@ -598,26 +607,26 @@ describe('tracer tests', () => {
         const tx = await exchange.exchange(TransferAmount, 1, true)
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
         //console.info(`Exchange gold receipt`)
         //console.info(receipt)
       })
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
+          trackAssets[normalizeAddress(FromAddress)].gold,
           new BigNumber(-TransferAmount)
         ))
 
       it(`cGLD tracer should increment the reserve's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackBalances[normalizeAddress(reserve.address)].gold,
+          trackAssets[normalizeAddress(reserve.address)].gold,
           new BigNumber(TransferAmount)
         ))
     })
 
     describe(`Exchanging tokens for gold`, () => {
-      let trackBalances: Record<Address, AccountAssets>
+      let trackAssets: Record<Address, AccountAssets>
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -633,14 +642,14 @@ describe('tracer tests', () => {
         const tx = await exchange.exchange(quote, 1, false)
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
-        trackBalances = await trackTransfers(kit, receipt.blockNumber)
+        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
         //console.info(`Exchange token receipt`)
         //console.info(receipt)
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackBalances[normalizeAddress(FromAddress)].gold,
+          trackAssets[normalizeAddress(FromAddress)].gold,
           new BigNumber(TransferAmount)
         ))
     })
@@ -672,7 +681,8 @@ describe('tracer tests', () => {
     })
 
     describe(`Deploying TestContract`, () => {
-      let testContract: any
+      let testContract: Contract
+      let testContractDeployTransactionHash: string
       const txOptions = {
         from: FromAddress,
         gas: 1500000,
@@ -701,12 +711,27 @@ describe('tracer tests', () => {
         )
         const contract = new kit.web3.eth.Contract(abi)
         const testContractTx = await contract.deploy({ data: '0x' + bytecode })
-        testContract = await testContractTx.send({ ...txOptions }) // value: TransferAmount.toFixed() })
+        //let testContractPromise: Promise<Contract>
+        //await new Promise<string>((resolve, _) =>
+
+        await sleep(10)
+        testContract = await testContractTx.send(
+          { ...txOptions, value: TransferAmount.toFixed() },
+          (_: Error, transactionHash: string) =>
+            (testContractDeployTransactionHash = transactionHash)
+        )
+        console.info(`deploy TestContract transaction hash: ${testContractDeployTransactionHash}`)
       })
+
+      testTransferGold('with TestContract constructor', async () => ({
+        transactionHash: testContractDeployTransactionHash,
+        toAddress: testContract.options.address,
+      }))
 
       testTransferGold('with TestContract.transfer', async () => {
         const tx = await testContract.methods.transfer(ToAddress)
-        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        return { transactionHash: receipt.transactionHash }
       })
 
       /*testTransferGold('with TestContract.nestedTransferThenRevert', async () => {
@@ -716,21 +741,27 @@ describe('tracer tests', () => {
 
       testTransferGold('with TestContract.transferThenIgnoreRevert', async () => {
         const tx = await testContract.methods.transferThenIgnoreRevert(ToAddress)
-        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        return { transactionHash: receipt.transactionHash }
       })
 
       testTransferGold('with TestContract.selfDestruct', async () => {
         const tx = await testContract.methods.selfDestruct(ToAddress)
-        return tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        return {
+          receiveAmount: TransferAmount.times(2),
+          transactionHash: receipt.transactionHash,
+        }
       })
     })
 
-    if (ROSETTA_PATH) {
+    const argv = require('minimist')(process.argv.slice(2))
+    if (argv.localrosetta) {
       describe(`Rossetta tracer`, () => {
         it('Tracer driver should succeed', async function(this: any) {
           this.timeout(0)
           await spawnCmdWithExitOnFailure('go', ['run', './drivers/tracer/tracer.go'], {
-            cwd: ROSETTA_PATH,
+            cwd: argv.localrosetta,
           })
         })
       })
