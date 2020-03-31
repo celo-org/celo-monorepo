@@ -1,10 +1,10 @@
+import { readFileSync } from 'fs'
 import { addCeloEnvMiddleware, CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
 import {
   generateIstanbulExtraData,
   getValidatorsInformation,
   Validator,
 } from 'src/lib/generate_utils'
-import { readFileSync } from 'fs'
 import yargs from 'yargs'
 
 export const command = 'istanbul-extra'
