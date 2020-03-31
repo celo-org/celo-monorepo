@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PincodeConfirmation renders correctly 1`] = `
+exports[`PincodeLock renders correctly 1`] = `
 <SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "justifyContent": "space-between",
+      "paddingTop": 20,
     }
   }
 >
@@ -620,7 +620,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
           },
         ]
       }
-      testID="Pincode-Enter"
+      testID="Pincode-Submit"
     >
       <View
         style={
