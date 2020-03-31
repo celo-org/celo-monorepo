@@ -6,6 +6,7 @@
 ## Getting Started
 
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
+  - [Using the Web Wallet](getting-started/using-the-web-wallet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
