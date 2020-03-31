@@ -1,37 +1,44 @@
-# Running a Validator in the New Baklava Testnet
+# Running a Validator in Baklava
 
-The new Baklava Testnet is the final testnet before Mainnet Release Candidate 1 (RC1). Its genesis block is only composed of community validators. The new Baklava serves 3 main purposes:
+The Baklava Testnet is a non-production Testnet for the validator community. It serves several purposes:
 
 - **Operational excellence**: It helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
 - **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
 - **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
 
-## Key Differences vs. Baklava Testnet
+While the Baklava Testnet was previously used for The Great Celo Stake Off, the Testnet is now available for any potential validators to experiement with.
 
-- **No cLabs validators at genesis.** The new Baklava Testnet will be stood up entirely by non-cLabs validators.
-- **Block production will not start right away.** However, validators may start their node now and peer with other nodes. Block production will start automatically at a time encoded in the genesis block (April 6, 16:00 UTC).
+## Network Deployment
 
-## Timeline
+The setup of the Baklava network will differ from previous Stake Off deployments in two main ways:
 
-The following [timeline](https://celo.org/#timeline) illustrates where we are in Celo Validators’ Journey.
+- **No cLabs validators at genesis.** The new Baklava Testnet will be stood up entirely by community validators.
+- **Block production will not start right away.** Validators are encouraged to get set up and configure monitoring and other tooling straight away. Block production will start automatically at a time encoded in the genesis block.
 
-* Alfajores Testnet Release
-* Baklava Testnet -- The Great Celo Stake Off
-* **New Baklava Testnet**
-    - [3/31] image released
-    - [3/31 - 4/6] infrastructure setup
-    - [4/6 16:00 UTC] genesis block; mining begins
-* Mainnet Release Candidate 1
-* Validator Elections Start
-* Celo Gold Voter Rewards Activate
-* Celo Gold Live
-* Celo Dollars Live
+The deployment timeline is as follows (all dates are subject to change):
 
-## Initial Setup
+* 3/31: Docs updated, and Docker image released
+* 3/31 - 4/6: infrastructure setup
+* 4/6 16:00: UTC genesis block: genesis validators produce blocks
+* 4/6: Celo Core Contracts are deployed; `ReleaseGold` instances are deployed containing validator funds
+* 4/7: Governance proposal to start Validator Elections and validator/group rewards
+* 4/8: Governance proposal to unfreeze Celo Gold voter rewards
+* 4/9: Mock Oracles deployed; governance proposal to unfreeze Celo Dollar exchange
+* 4/10: Faucet requests for non-genesis validators accepted
 
-The new Baklava network has a two-part rollout process. This section outlines the steps needed before block production begins.
+{% hint style="info" %}
+Note: A [timeline](https://celo.org/#timeline) of the Celo project is available to provide further context.
+{% endhint %}
 
-Of the four nodes you ran in The Great Celo Stakeoff (validator signer, validator proxy, account node, and attestation node), only the **validator signer** and **validator proxy** are required to initialize the new Baklava network.
+## Setup for Genesis Validators (before 4/6)
+
+**If your address is in the genesis block, the community is relying on your validator to get the network started!**
+
+This section outlines the steps needed to configure your proxy and validator nodes before block production begins.
+
+Please follow these steps if you ranked on The Great Celo Stake Off leaderboard and have provided details of your validator signer and BLS addresses as explained in this [FAQ](https://forum.celo.org/t/faq-for-stake-off-validators-on-release-candidate-and-new-baklava-networks/372/2).
+
+If this doesn't apply to you, but you are interested in trying out the Baklava testnet, please check back for additional instructions on how to get fauceted (to receive Testnet units of Celo Gold and Celo Dollars) and how to get set up.
 
 ### Environment Variables
 
@@ -53,9 +60,17 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-### Deploy a proxy
+### Networking requirements
 
-To avoid exposing the validator to the public internet, we are deploying a proxy node which is responsible to communicate with the network. On our Proxy machine, we'll set up the node and get the bootnode enode URLs to use for discovering other nodes.
+To avoid exposing the validator to the public internet, we first deploy a proxy node which is responsible for communicating with the network. On our proxy machine, we'll set up the node and get the bootnode enode URLs to use for discovering other nodes.
+
+In order for your Validator to participate in consensus and complete attestations, it is critically important to configure your network correctly. Your Proxy nodes must have static, external IP addresses, and your Validator node must be able to communicate with your proxy, preferably via an internal network, or otherwise via the Proxy's external IP address.
+
+On the Proxy machine, port 30303 should accept TCP and UDP connections from all IP addresses. This port is used to communicate with other nodes in the network.
+
+On the Proxy machine, port 30503 should accept TCP connections from the IP address of your Validator machine. This port is used by the Proxy to communicate with the Validator.
+
+### Deploy a proxy
 
 ```bash
 # On the proxy machine
@@ -90,7 +105,7 @@ Now we need to set the proxy enode and proxy IP address in environment variables
 
 If you don't have an internal IP address over which the Validator and Proxy can communicate, feel free to set the internal IP address to the external IP address.
 
-If you don't know your Proxy's external IP address, you can get it by running the following command:
+If you don't know your proxy's external IP address, you can get it by running the following command:
 
 ```bash
 # On the proxy machine
@@ -142,7 +157,7 @@ Note that if you are running the validator and the proxy on` the same machine, t
 
 ## After Block Production Begins
 
-cLabs will update this section closer to April 6. Once the block production starts, core contracts and the ReleaseGold contract will be deployed so you will be able to experience this process before Mainnet.
+cLabs will update this section closer to April 6. Once the block production starts, core contracts and the `ReleaseGold` contract will be deployed so you will be able to experience this process before Mainnet.
 
 ## Deployment Tips
 
