@@ -173,12 +173,6 @@ export async function sendTransactionAsync<T>(
       nonce,
     }
 
-    // This means we are connected to forno
-    // if (gasPrice) {
-    //   txParams.gatewayFeeRecipient = NULL_ADDRESS
-    //   txParams.gatewayFee = '0x' + new BigNumber(10000).toString(16)
-    // }
-
     if (estimatedGas === undefined) {
       estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
       logger(EstimatedGas(estimatedGas))
