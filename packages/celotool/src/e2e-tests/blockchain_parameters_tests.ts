@@ -73,9 +73,6 @@ describe('Blockchain parameters tests', function(this: any) {
       this.timeout(0)
       const res = Number(await parameters.getBlockGasLimit())
       assert.equal(res, 20000000)
-      // const current = await kit.web3.eth.getBlockNumber()
-      // const block = await kit.web3.eth.getBlock(current)
-      // assert.equal(block.gasLimit, 20000000)
     })
     it('changing the block gas limit', async () => {
       this.timeout(0)
