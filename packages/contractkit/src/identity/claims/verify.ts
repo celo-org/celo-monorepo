@@ -5,7 +5,7 @@ import { resolveTxt } from 'dns'
 import { Address } from '../../base'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
-import { Claim, DomainClaim, DOMAIN_TXT_HEADER, serializeClaim } from './claim'
+import { Claim, DOMAIN_TXT_HEADER, DomainClaim, serializeClaim } from './claim'
 import { verifyKeybaseClaim } from './keybase'
 import { ClaimTypes } from './types'
 
