@@ -48,7 +48,7 @@ Name | Type |
 
 ###  getBlockGasLimit
 
-• **getBlockGasLimit**: *function* = proxyCall(this.contract.methods.blockGasLimit)
+• **getBlockGasLimit**: *function* = proxyCall(this.contract.methods.blockGasLimit, undefined, valueToInt)
 
 *Defined in [contractkit/src/wrappers/BlockchainParameters.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L19)*
 

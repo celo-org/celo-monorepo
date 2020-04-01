@@ -1,5 +1,5 @@
 import { BlockchainParameters } from '../generated/BlockchainParameters'
-import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, valueToInt } from './BaseWrapper'
 
 /**
  * Network parameters that are configurable by governance.
@@ -16,7 +16,7 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Getting the block gas limit.
    */
-  getBlockGasLimit = proxyCall(this.contract.methods.blockGasLimit)
+  getBlockGasLimit = proxyCall(this.contract.methods.blockGasLimit, undefined, valueToInt)
   /**
    * Setting the block gas limit.
    */
