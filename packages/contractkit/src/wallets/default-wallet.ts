@@ -8,8 +8,9 @@ import * as ethUtil from 'ethereumjs-util'
 import { Tx } from 'web3/eth/types'
 import { EncodedTransaction } from 'web3/types'
 import { Address } from '../base'
-import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
-import { signTransaction } from './signing-utils'
+import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data-utils'
+import { signTransaction } from '../utils/signing-utils'
+import { LocalSigner } from '../utils/signers'
 
 export interface Wallet {
   addAccount: (privateKey: string) => void
@@ -47,7 +48,9 @@ export class DefaultWallet implements Wallet {
   }
 
   async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
-    return signTransaction(txParams, this.getPrivateKeyFor(txParams.from!))
+    const privateKey = this.getPrivateKeyFor(txParams.from!)
+    const localSigner = new LocalSigner(privateKey)
+    return signTransaction(txParams, localSigner)
   }
 
   // Original code taken from
@@ -61,7 +64,7 @@ export class DefaultWallet implements Wallet {
    */
   async signPersonalMessage(address: string, data: string): Promise<string> {
     if (!isHexString(data)) {
-      throw Error('wallet@signPersonalMessage: Expected data has to be an Hex String ')
+      throw Error('wallet@signPersonalMessage: Expected data has to be a hex string ')
     }
     // ecsign needs a privateKey without 0x
     const pk = trimLeading0x(this.getPrivateKeyFor(address))

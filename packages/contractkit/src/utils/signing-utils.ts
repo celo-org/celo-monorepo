@@ -5,6 +5,7 @@ import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } fro
 import * as helpers from 'web3-core-helpers'
 import { Tx } from 'web3/eth/types'
 import { EncodedTransaction } from 'web3/types'
+import { Signer } from '../utils/signers'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -29,14 +30,14 @@ function makeEven(hex: string) {
   return hex
 }
 
-export async function signTransaction(txn: any, privateKey: string): Promise<EncodedTransaction> {
+export async function signTransaction(txn: any, txSigner: Signer): Promise<EncodedTransaction> {
   let result: EncodedTransaction
 
   if (!txn) {
     throw new Error('No transaction object given!')
   }
 
-  const signed = (tx: any) => {
+  const signed = async (tx: any) => {
     if (!tx.gas && !tx.gasLimit) {
       throw new Error('"gas" is missing')
     }
@@ -75,11 +76,8 @@ export async function signTransaction(txn: any, privateKey: string): Promise<Enc
       ])
 
       const hash = Hash.keccak256(rlpEncoded)
-
-      const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || '0x1') * 2 + 35)(
-        Hash.keccak256(rlpEncoded),
-        privateKey
-      )
+      const addToV = Nat.toNumber(transaction.chainId || '0x1') * 2 + 35
+      const signature = await txSigner.sign(addToV, hash)
 
       const rawTx = RLP.decode(rlpEncoded)
         .slice(0, 9)
@@ -117,7 +115,7 @@ export async function signTransaction(txn: any, privateKey: string): Promise<Enc
 
   // Resolve immediately if nonce, chainId and price are provided
   if (txn.nonce !== undefined && txn.chainId !== undefined && txn.gasPrice !== undefined) {
-    return signed(txn)
+    return await signed(txn)
   }
 
   const chainId = txn.chainId
@@ -133,7 +131,7 @@ export async function signTransaction(txn: any, privateKey: string): Promise<Enc
   txn.chainId = chainId
   txn.gasPrice = gasPrice
   txn.nonce = nonce
-  return signed(txn)
+  return await signed(txn)
 }
 
 // Recover transaction and sender address from a raw transaction.
