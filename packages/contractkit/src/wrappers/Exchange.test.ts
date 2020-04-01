@@ -37,21 +37,13 @@ testWithGanache('Exchange Wrapper', (web3) => {
 
   test('SBAT sellDollar', async () => {
     const goldAmount = await exchange.quoteUsdSell(ONE)
-
-    const stableToken = await kit.contracts.getStableToken()
-    const approveTx = await stableToken.approve(exchange.address, ONE).send()
-    await approveTx.waitReceipt()
-    const sellTx = await exchange.sellDollar(ONE, goldAmount).send()
+    const sellTx = await (await exchange.sellDollar(ONE, goldAmount)).send()
     await sellTx.waitReceipt()
   })
 
   test('SBAT sellGold', async () => {
-    const goldToken = await kit.contracts.getGoldToken()
-    const approveTx = await goldToken.approve(exchange.address, ONE).send()
-    await approveTx.waitReceipt()
-
     const usdAmount = await exchange.quoteGoldSell(ONE)
-    const sellTx = await exchange.sellGold(ONE, usdAmount).send()
+    const sellTx = await (await exchange.sellGold(ONE, usdAmount)).send()
     await sellTx.waitReceipt()
   })
 

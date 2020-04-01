@@ -34,13 +34,13 @@ if (DEV_MODE) {
   const functionConfig = functions.config()
   config = {
     salt: {
-      key: functionConfig.salt_key,
+      key: functionConfig.salt.key,
     },
     db: {
-      user: functionConfig.db_username,
-      password: functionConfig.db_pass,
-      database: functionConfig.db_name,
-      host: `/cloudsql/${functionConfig.db_host}`,
+      user: functionConfig.db.username,
+      password: functionConfig.db.pass,
+      database: functionConfig.db.name,
+      host: `/cloudsql/${functionConfig.db.host}`,
     },
   }
 }
