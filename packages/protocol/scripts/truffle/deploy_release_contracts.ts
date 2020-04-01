@@ -7,7 +7,6 @@ import chalk from 'chalk'
 import fs = require('fs')
 import * as prompts from 'prompts'
 import {
-  GoldTokenInstance,
   RegistryInstance,
   ReleaseGoldContract,
   ReleaseGoldMultiSigContract,
@@ -17,7 +16,6 @@ import {
 
 let argv: any
 let registry: any
-let goldToken: any
 let releases: any
 let startGold: any
 let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
@@ -30,7 +28,8 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   const message =
     'Are you sure you want to deploy this contract?\n Total Grant Value: ' +
-    releaseGoldConfig.numReleasePeriods * releaseGoldConfig.amountReleasedPerPeriod +
+    Number(releaseGoldConfig.numReleasePeriods) *
+      Number(releaseGoldConfig.amountReleasedPerPeriod) +
     '? (y/n)'
   if (!argv.yesreally) {
     const response = await prompts({
@@ -44,45 +43,52 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
-  const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new()
-  const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new()
+  const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new({ from: argv.from })
+  const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new({ from: argv.from })
   const multiSigTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldMultiSigInstance,
     releaseGoldMultiSigProxy,
     'ReleaseGoldMultiSig',
+    {
+      from: argv.from,
+      value: null,
+    },
     [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
     2,
     2
   )
-  await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address)
-  const releaseGoldProxy = await ReleaseGoldProxy.new()
-  const releaseGoldInstance = await ReleaseGold.new()
+  await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address, {
+    from: argv.from,
+  })
+  const releaseGoldProxy = await ReleaseGoldProxy.new({ from: argv.from })
+  const releaseGoldInstance = await ReleaseGold.new({ from: argv.from })
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  await goldToken.transfer(
-    releaseGoldProxy.address,
-    weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
-  )
-  let releaseStartTime: number
   // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
   // This is to account for the dynamic start date for mainnet,
   // and some grants rely on x months post mainnet launch.
+  let releaseStartTime: any
   if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    const addedMonths = releaseGoldConfig.releaseStartTime.split('+')[1]
+    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
     const date = new Date()
-    date.setMonth(date.getMonth() + Number(addedMonths))
+    if (addedMonths > 0) {
+      date.setDate(date.getDate() + addedMonths * 30)
+    }
     releaseStartTime = date.getTime() / 1000
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
   }
-  console.info('ReleaseSTarttime', releaseStartTime)
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,
     releaseGoldProxy,
     'ReleaseGold',
+    {
+      from: argv.from,
+      value: weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods).toFixed(),
+    },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
     releaseGoldConfig.numReleasePeriods,
@@ -99,18 +105,25 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     registry.address
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
-  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address)
-  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address)
+  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
+  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
   // Send starting gold amount to the beneficiary so they can perform transactions.
-  await goldToken.transfer(releaseGoldConfig.beneficiary, startGold)
+  await web3.eth.sendTransaction({
+    from: argv.from,
+    to: releaseGoldConfig.beneficiary,
+    value: startGold,
+  })
 
-  releases.push({
+  const record = {
+    GrantNumber: currGrant,
     Beneficiary: releaseGoldConfig.beneficiary,
     ProxyAddress: releaseGoldProxy.address,
     MultiSigProxyAddress: releaseGoldMultiSigProxy.address,
     MultiSigTxHash: multiSigTxHash,
     ReleaseGoldTxHash: releaseGoldTxHash,
-  })
+  }
+  console.info(record)
+  releases.push(record)
 }
 
 async function handleJSONFile(err, data) {
@@ -157,10 +170,25 @@ async function handleJSONFile(err, data) {
   }
 
   const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
-    return sum + curr.amountReleasedPerPeriod
+    return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
-  const totalTransferFees = argv.start_gold * grants.length
-  const totalValue = totalTransferFees + totalGoldGrant
+  const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
+  const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
+  const fromBalance = new BigNumber(await web3.eth.getBalance(argv.from))
+  if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
+    console.error(
+      chalk.red(
+        '\nError: The `from` address ' +
+          argv.from +
+          "'s balance is not sufficient to cover all of the grants specified in " +
+          argv.grants +
+          '.\
+      \nIf you would only like to deploy a subset of grants, please modify the json file and try again.\
+      \nExiting.'
+      )
+    )
+    process.exit(0)
+  }
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
@@ -204,10 +232,9 @@ async function handleJSONFile(err, data) {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     argv = require('minimist')(process.argv.slice(5), {
-      string: ['network', 'grants', 'start_gold', 'output_file', 'really'],
+      string: ['network', 'from', 'grants', 'start_gold', 'output_file', 'really'],
     })
     registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-    goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
     ReleaseGold = artifacts.require('ReleaseGold')

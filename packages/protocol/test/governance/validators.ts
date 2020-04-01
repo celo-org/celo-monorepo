@@ -2180,6 +2180,7 @@ contract('Validators', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
       // Fast-forward to the next epoch, so that the getMembershipInLastEpoch(validator) == group
       await mineToNextEpoch(web3)
+      await mockLockedGold.addSlasher(accounts[2])
     })
 
     describe('when the validator score is non-zero', () => {
@@ -2214,6 +2215,35 @@ contract('Validators', (accounts: string[]) => {
 
         it('should return the expected total payment', async () => {
           assertEqualBN(ret, expectedTotalPayment)
+        })
+      })
+
+      describe('when slashing multiplier is halved', () => {
+        const halfExpectedTotalPayment = expectedScore
+          .times(maxPayment)
+          .div(2)
+          .dp(0, BigNumber.ROUND_FLOOR)
+        const halfExpectedGroupPayment = halfExpectedTotalPayment
+          .times(fromFixed(commission))
+          .dp(0, BigNumber.ROUND_FLOOR)
+        const halfExpectedValidatorPayment = halfExpectedTotalPayment.minus(
+          halfExpectedGroupPayment
+        )
+        beforeEach(async () => {
+          await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
+          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
+        })
+        it('should pay the validator only half', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(validator), halfExpectedValidatorPayment)
+        })
+
+        it('should pay the group only half', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(group), halfExpectedGroupPayment)
+        })
+
+        it('should return the expected total payment', async () => {
+          assertEqualBN(ret, halfExpectedTotalPayment)
         })
       })
 
@@ -2428,6 +2458,10 @@ contract('Validators', (accounts: string[]) => {
         await validators.halveSlashingMultiplier(group, { from: accounts[2] })
         parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
         assert(parsedGroup.lastSlashed > initialTimestamp)
+      })
+
+      it('should revert when called by non-slasher', async () => {
+        await assertRevert(validators.halveSlashingMultiplier(group, { from: accounts[0] }))
       })
     })
   })

@@ -55,6 +55,7 @@ exports[`renders correctly for input backup phrase 1`] = `
             "minHeight": 125,
             "padding": 14,
             "paddingTop": 16,
+            "textAlignVertical": "top",
           },
           false,
         ]
@@ -121,6 +122,7 @@ exports[`renders correctly for input social backup phrase 1`] = `
             "minHeight": 125,
             "padding": 14,
             "paddingTop": 16,
+            "textAlignVertical": "top",
           },
           Object {
             "minHeight": 90,

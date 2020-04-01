@@ -259,6 +259,15 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (values, timestamps);
   }
 
+  function getTotalPendingWithdrawals(address account) external view returns (uint256) {
+    uint256 pendingWithdrawalSum = 0;
+    PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
+    for (uint256 i = 0; i < withdrawals.length; i = i.add(1)) {
+      pendingWithdrawalSum = pendingWithdrawalSum.add(withdrawals[i].value);
+    }
+    return pendingWithdrawalSum;
+  }
+
   function getSlashingWhitelist() external view returns (bytes32[] memory) {
     return slashingWhitelist;
   }

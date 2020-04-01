@@ -1,20 +1,10 @@
-import FunctionsTest from 'firebase-functions-test'
 import { BLINDBLS } from 'bls12377js-blind'
-
-const functionsTest = FunctionsTest()
-functionsTest.mockConfig({
-  envs: {
-    ['secret_key']: 'fakeSecretKey',
-  },
-})
-
-process.env.SECRET_KEY = 'fakeSecretKey'
-const celoFunctions = require('../src/index')
+import { getSalt } from '../src/index'
 
 describe(`POST /getSalt endpoint`, () => {
   it('provides blinded salt', () => {
     const phoneNumber = '5555555555'
-    //expected value derived by making request unblinded
+    // Expected value derived by making request unblinded
     const expected = new Buffer([
       20,
       170,
@@ -80,6 +70,7 @@ describe(`POST /getSalt endpoint`, () => {
         )
       },
     }
-    celoFunctions.getSalt(req, res)
+    // @ts-ignore TODO fix req type to make it a mock express req
+    getSalt(req, res)
   })
 })
