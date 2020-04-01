@@ -160,6 +160,8 @@ spec:
 
           [[ "$CLEAN_VALIDATOR_ROUNTSTATE_FOLDER" == "true" ]] && rm -rf /root/.celo/Celo/roundstates
 
+          sleep 30
+
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
