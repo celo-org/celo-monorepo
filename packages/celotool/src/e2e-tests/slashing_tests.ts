@@ -11,32 +11,27 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep, waitForBlock } from './utils'
 
 const headerHex =
-  '0xf901f9a07285abd5b24742f184ad676e31f6054663b3529bc35ea2fcad8a3e0f642a46f7a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347948888f1f195afa192cfee860698584c030f4c9db1a0ecc60e00b3fe5ce9f6e1a10e5469764daf51f1fe93c22ec3f9a7583a80357217a0d35d334d87c0cc0a202e3756bf81fae08b1575f286c7ee7a3f8df4f0f3afc55da056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008302000001832fefd8825208845c47775c80a00000000000000000000000000000000000000000000000000000000000000000880000000000000000'
+  '0xf901a6a07285abd5b24742f184ad676e31f6054663b3529bc35ea2fcad8a3e0f642a46f7948888f1f195afa192cfee860698584c030f4c9db1a0ecc60e00b3fe5ce9f6e1a10e5469764daf51f1fe93c22ec3f9a7583a80357217a0d35d334d87c0cc0a202e3756bf81fae08b1575f286c7ee7a3f8df4f0f3afc55da056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001825208845c47775c80'
 
 const TMP_PATH = '/tmp/e2e'
 
-function headerArray(web3: Web3, block: any) {
+function headerArray(block: any) {
   return [
     block.parentHash,
-    block.sha3Uncles,
     block.miner,
     block.stateRoot,
     block.transactionsRoot,
     block.receiptsRoot,
     block.logsBloom,
-    web3.utils.toHex(block.difficulty),
     block.number,
-    block.gasLimit,
     block.gasUsed,
     block.timestamp,
     block.extraData,
-    block.mixHash,
-    block.nonce,
   ]
 }
 
-function headerFromBlock(web3: Web3, block: any) {
-  return ensureLeading0x(rlp.encode(headerArray(web3, block)).toString('hex'))
+function headerFromBlock(block: any) {
+  return ensureLeading0x(rlp.encode(headerArray(block)).toString('hex'))
 }
 
 // Find a validator that double signed. Both blocks will have signatures from exactly 2F+1 validators.
@@ -169,7 +164,7 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const header = headerFromBlock(kit.web3, block)
+      const header = headerFromBlock(block)
       const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
       assert.equal(blockNumber, current.toString())
     })
@@ -178,14 +173,14 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const header = kit.web3.utils.hexToBytes(headerHex)
       const hash = await contract.methods.hashHeader(header).call()
-      assert.equal(hash, '0xf5a450266c77dce47f7698959d8e7019db860ee19a5322b16a853fdf23607100')
+      assert.equal(hash, '0x2e14ef428293e41c5f81a108b5d36f892b2bee3e34aec4223474c4a31618ea69')
     })
 
     it('should hash current header correctly', async () => {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const header = headerFromBlock(kit.web3, block)
+      const header = headerFromBlock(block)
       const blockHash = await contract.methods.hashHeader(header).call()
       assert.equal(blockHash, block.hash)
     })
@@ -280,11 +275,11 @@ describe('slashing tests', function(this: any) {
 
       await waitForBlock(web3, doubleSigningBlock.number)
 
-      const other = headerFromBlock(web3, doubleSigningBlock)
+      const other = headerFromBlock(doubleSigningBlock)
 
       const num = await slasher.methods.getBlockNumberFromHeader(other).call()
 
-      const header = headerFromBlock(web3, await web3.eth.getBlock(num))
+      const header = headerFromBlock(await web3.eth.getBlock(num))
 
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
@@ -330,9 +325,9 @@ describe('slashing tests', function(this: any) {
       const election = await kit.contracts.getElection()
       await waitForBlock(web3, doubleSigningBlock.number)
 
-      const other = headerFromBlock(web3, doubleSigningBlock)
+      const other = headerFromBlock(doubleSigningBlock)
       const num = await slasher.getBlockNumberFromHeader(other)
-      const header = headerFromBlock(web3, await web3.eth.getBlock(num))
+      const header = headerFromBlock(await web3.eth.getBlock(num))
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await election.validatorSignerAddressFromSet(signerIdx, num)
 
