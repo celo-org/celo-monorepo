@@ -2461,7 +2461,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert when called by non-slasher', async () => {
-        await assertRevert(await validators.halveSlashingMultiplier(group, { from: accounts[0] }))
+        await assertRevert(validators.halveSlashingMultiplier(group, { from: accounts[0] }))
       })
     })
   })
