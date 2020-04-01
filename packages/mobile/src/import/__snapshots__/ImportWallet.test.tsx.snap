@@ -136,6 +136,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
                   "minHeight": 125,
                   "padding": 14,
                   "paddingTop": 16,
+                  "textAlignVertical": "top",
                 },
                 false,
               ]

@@ -3,6 +3,7 @@ import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
 import { RecipientKind } from 'src/recipients/recipient'
@@ -17,15 +18,8 @@ jest.mock('src/utils/time', () => ({
 
 jest.mock('src/identity/reducer', () => ({
   ...jest.requireActual('src/identity/reducer'),
-  addressToE164NumberSelector: (state: any) => ({}),
+  addressToE164NumberSelector: () => ({}),
 }))
-
-jest.mock('src/navigator/NavigationService', () => ({
-  ...jest.requireActual('src/navigator/NavigationService'),
-  navigate: jest.fn(),
-}))
-
-const { navigate } = require('src/navigator/NavigationService')
 
 describe(watchQrCodeDetections, () => {
   beforeAll(() => {

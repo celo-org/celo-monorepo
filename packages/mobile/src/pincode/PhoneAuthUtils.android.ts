@@ -4,7 +4,7 @@ import { UNLOCK_DURATION } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'pincode/PincodeUtils'
+const TAG = 'pincode/PhoneAuthUtils'
 const keyName = 'celo_key_name'
 
 export function isPhoneAuthSupported() {
