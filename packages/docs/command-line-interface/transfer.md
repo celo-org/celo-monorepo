@@ -54,7 +54,7 @@ USAGE
 
 OPTIONS
   --blockNumber=blockNumber  Block number to trace
-  --tracer=tracer            Javascript tracer code
+  --tracer=tracer            Tracer name
   --tracerFile=tracerFile    File containing javascript tracer code
   --transaction=transaction  Transaction hash to trace
 ```

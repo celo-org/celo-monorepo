@@ -155,7 +155,7 @@ async function trackAssetTransfers(
   }
 
   const blockRange = { fromBlock: blockNumber, toBlock: blockNumber }
-  const lockedGold = await kit.contracts.getLockedGold()
+  const lockedGold = await kit._web3Contracts.getLockedGold()
   const goldLocked = (await lockedGold.getPastEvents('GoldLocked', blockRange)).map(
     (e: EventLog) => ({
       account: e.returnValues.account,
@@ -201,7 +201,7 @@ async function trackAssetTransfers(
     }
   }
 
-  const election = await kit.contracts.getElection()
+  const election = await kit._web3Contracts.getElection()
   const voteCast = (await election.getPastEvents('ValidatorGroupVoteCast', blockRange)).map(
     (e: EventLog) => ({
       account: e.returnValues.account,
@@ -249,7 +249,7 @@ async function trackAssetTransfers(
 
   // StableToken.creditTo and StableToken.debitFrom should emit a Transfer event like StableToken._mint
   const stableTokenName = 'cUSD'
-  const stableToken = await kit.contracts.getStableToken()
+  const stableToken = await kit._web3Contracts.getStableToken()
   const stableTransfers = (await stableToken.getPastEvents('Transfer', blockRange)).map(
     (e: EventLog) => ({
       from: e.returnValues.from,

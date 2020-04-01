@@ -36,7 +36,6 @@
 * [getActionableAttestations](_wrappers_attestations_.attestationswrapper.md#getactionableattestations)
 * [getConfig](_wrappers_attestations_.attestationswrapper.md#getconfig)
 * [getNonCompliantIssuers](_wrappers_attestations_.attestationswrapper.md#getnoncompliantissuers)
-* [getPastEvents](_wrappers_attestations_.attestationswrapper.md#getpastevents)
 * [lookupPhoneNumbers](_wrappers_attestations_.attestationswrapper.md#lookupphonenumbers)
 * [request](_wrappers_attestations_.attestationswrapper.md#request)
 * [revealPhoneNumberToIssuer](_wrappers_attestations_.attestationswrapper.md#revealphonenumbertoissuer)
@@ -413,27 +412,6 @@ Name | Type | Description |
 `account` | [Address](../modules/_base_.md#address) |   |
 
 **Returns:** *Promise‹[Address](../modules/_base_.md#address)[]›*
-
-___
-
-###  getPastEvents
-
-▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
-
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
-
-Contract getPastEvents
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`event` | string |
-`options` | PastEventOptions |
-
-**Returns:** *Promise‹EventLog[]›*
 
 ___
 

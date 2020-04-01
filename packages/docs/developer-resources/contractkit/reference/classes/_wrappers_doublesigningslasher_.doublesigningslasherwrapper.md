@@ -26,7 +26,6 @@ Contract handling slashing for Validator double-signing
 ### Methods
 
 * [getBlockNumberFromHeader](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#getblocknumberfromheader)
-* [getPastEvents](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#getpastevents)
 * [slashSigner](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#slashsigner)
 * [slashValidator](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#slashvalidator)
 
@@ -120,27 +119,6 @@ Name | Type | Description |
 **Returns:** *Promise‹number›*
 
 Block number.
-
-___
-
-###  getPastEvents
-
-▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
-
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
-
-Contract getPastEvents
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`event` | string |
-`options` | PastEventOptions |
-
-**Returns:** *Promise‹EventLog[]›*
 
 ___
 

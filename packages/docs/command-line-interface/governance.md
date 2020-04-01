@@ -15,9 +15,11 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
   --proposalID=proposalID                            (required) UUID of proposal to approve
+  --useMultiSig                                      True means the request will be sent through multisig.
 
-EXAMPLE
+EXAMPLES
   approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig
 ```
 
 _See code: [packages/cli/src/commands/governance/approve.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/approve.ts)_
@@ -69,11 +71,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executor's address
   --proposalID=proposalID                            (required) UUID of proposal to execute
-  --useMultiSig                                      True means the request will be sent through multisig.
 
-EXAMPLES
+EXAMPLE
   execute --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
-  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig
 ```
 
 _See code: [packages/cli/src/commands/governance/execute.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/execute.ts)_

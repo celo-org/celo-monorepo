@@ -44,7 +44,6 @@ Stable token with variable supply (cUSD)
 * [balanceOf](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#balanceof)
 * [getConfig](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#getconfig)
 * [getInflationParameters](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#getinflationparameters)
-* [getPastEvents](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#getpastevents)
 
 ## Constructors
 
@@ -539,24 +538,3 @@ Querying the inflation parameters.
 **Returns:** *Promise‹[InflationParameters](../interfaces/_wrappers_stabletokenwrapper_.inflationparameters.md)›*
 
 Inflation rate, inflation factor, inflation update period and the last time factor was updated.
-
-___
-
-###  getPastEvents
-
-▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
-
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
-
-Contract getPastEvents
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`event` | string |
-`options` | PastEventOptions |
-
-**Returns:** *Promise‹EventLog[]›*

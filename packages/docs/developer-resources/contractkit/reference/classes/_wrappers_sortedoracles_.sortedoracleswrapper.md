@@ -27,7 +27,6 @@ Currency price oracle contract.
 
 * [getConfig](_wrappers_sortedoracles_.sortedoracleswrapper.md#getconfig)
 * [getOracles](_wrappers_sortedoracles_.sortedoracleswrapper.md#getoracles)
-* [getPastEvents](_wrappers_sortedoracles_.sortedoracleswrapper.md#getpastevents)
 * [getRates](_wrappers_sortedoracles_.sortedoracleswrapper.md#getrates)
 * [getReports](_wrappers_sortedoracles_.sortedoracleswrapper.md#getreports)
 * [getStableTokenRates](_wrappers_sortedoracles_.sortedoracleswrapper.md#getstabletokenrates)
@@ -138,27 +137,6 @@ Name | Type |
 **Returns:** *Promise‹[Address](../modules/_base_.md#address)[]›*
 
 The list of whitelisted oracles for a given token.
-
-___
-
-###  getPastEvents
-
-▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
-
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
-
-Contract getPastEvents
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`event` | string |
-`options` | PastEventOptions |
-
-**Returns:** *Promise‹EventLog[]›*
 
 ___
 

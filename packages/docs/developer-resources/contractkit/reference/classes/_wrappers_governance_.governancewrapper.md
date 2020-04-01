@@ -59,7 +59,6 @@ Contract managing voting for governance proposals.
 * [getDequeue](_wrappers_governance_.governancewrapper.md#getdequeue)
 * [getHotfixRecord](_wrappers_governance_.governancewrapper.md#gethotfixrecord)
 * [getParticipationParameters](_wrappers_governance_.governancewrapper.md#getparticipationparameters)
-* [getPastEvents](_wrappers_governance_.governancewrapper.md#getpastevents)
 * [getProposal](_wrappers_governance_.governancewrapper.md#getproposal)
 * [getProposalRecord](_wrappers_governance_.governancewrapper.md#getproposalrecord)
 * [getVoteValue](_wrappers_governance_.governancewrapper.md#getvotevalue)
@@ -942,27 +941,6 @@ Returns the participation parameters.
 **Returns:** *Promise‹[ParticipationParameters](../interfaces/_wrappers_governance_.participationparameters.md)›*
 
 The participation parameters.
-
-___
-
-###  getPastEvents
-
-▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
-
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
-
-Contract getPastEvents
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`event` | string |
-`options` | PastEventOptions |
-
-**Returns:** *Promise‹EventLog[]›*
 
 ___
 

@@ -29,7 +29,6 @@ Contract for handling multisig actions
 
 ### Methods
 
-* [getPastEvents](_wrappers_multisig_.multisigwrapper.md#getpastevents)
 * [getTransaction](_wrappers_multisig_.multisigwrapper.md#gettransaction)
 * [getTransactions](_wrappers_multisig_.multisigwrapper.md#gettransactions)
 * [submitOrConfirmTransaction](_wrappers_multisig_.multisigwrapper.md#submitorconfirmtransaction)
@@ -172,27 +171,6 @@ Contract address
 **Returns:** *string*
 
 ## Methods
-
-###  getPastEvents
-
-▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
-
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
-
-Contract getPastEvents
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`event` | string |
-`options` | PastEventOptions |
-
-**Returns:** *Promise‹EventLog[]›*
-
-___
 
 ###  getTransaction
 
