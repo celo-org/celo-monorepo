@@ -444,8 +444,11 @@ describe('governance tests', () => {
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
+      const provider = groupWeb3.currentProvider
 
       const groupKit = newKitFromWeb3(groupWeb3)
+      groupWeb3.setProvider(provider)
+
       const group: string = (await groupWeb3.eth.getAccounts())[0]
 
       const txos = await (await groupKit.contracts.getElection()).activate(group)
@@ -471,7 +474,7 @@ describe('governance tests', () => {
       const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
 
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
-      const keyRotator = await newKeyRotator(
+      /* const keyRotator = */ await newKeyRotator(
         newKitFromWeb3(validatorWeb3),
         authorizedWeb3s,
         authorizedPrivateKeys
@@ -492,7 +495,7 @@ describe('governance tests', () => {
           if (header.number % epoch === 0 && errorWhileChangingValidatorSet === '') {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
-            await Promise.all([memberSwapper.swap(), keyRotator.rotate()])
+            await Promise.all([memberSwapper.swap() /* keyRotator.rotate() */])
           }
         } catch (e) {
           console.error(e)
