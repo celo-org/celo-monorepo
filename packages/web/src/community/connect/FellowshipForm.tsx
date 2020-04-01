@@ -19,6 +19,7 @@ export class FellowshipForm extends React.Component<I18nProps> {
           <Form style={styles.form}>
             <GridRow
               allStyle={gridStyle}
+              desktopStyle={styles.desktopEmailNameArea}
               tabletStyle={styles.emailNameArea}
               mobileStyle={styles.emailNameArea}
             >
@@ -130,6 +131,7 @@ const styles = StyleSheet.create({
   emailNameArea: {
     flexDirection: 'column',
   },
+  desktopEmailNameArea: { alignItems: 'flex-start' },
   paddingVertical: {
     paddingVertical: 0,
   },

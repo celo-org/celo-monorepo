@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Form, { emailIsValid } from 'src/forms/Form'
-import { TextInput } from 'src/forms/FormComponents'
+import { TextInput } from 'src/forms/TextInput'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
