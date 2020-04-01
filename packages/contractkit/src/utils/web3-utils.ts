@@ -1,8 +1,7 @@
 import { provider } from 'web3-core'
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
-import { Debug } from 'web3-eth-debug'
 import Web3Utils from 'web3-utils'
-import { getProviderUrl, stopProvider } from '../utils/provider-utils'
 
 export const getAbiTypes = (abi: ABIDefinition[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)
@@ -25,12 +24,14 @@ export async function traceTransaction(
   transaction: string,
   tracer: string
 ): Promise<any[]> {
-  const args: { [key: string]: string } = { tracer }
-  const url = getProviderUrl(defaultProvider)
-  const debug = new Debug(url)
-  const trace: any = await debug.getTransactionTrace(transaction, args)
-  stopProvider(debug.currentProvider as any)
-  return trace
+  const query: JsonRpcPayload = {
+    jsonrpc: '2.0',
+    method: 'debug_traceTransaction',
+    id: new Date().getTime().toString(),
+    params: [Web3Utils.toHex(transaction), { tracer }],
+  }
+  const trace = await providerRPC(defaultProvider, query)
+  return trace.result
 }
 
 export async function traceBlock(
@@ -38,10 +39,30 @@ export async function traceBlock(
   blockNumber: number,
   tracer: string
 ): Promise<any[]> {
-  const args: { [key: string]: string } = { tracer }
-  const url = getProviderUrl(defaultProvider)
-  const debug = new Debug(url)
-  const trace: any = await debug.getBlockTraceByNumber(Web3Utils.toHex(blockNumber), args)
-  stopProvider(debug.currentProvider as any)
-  return trace.map((e: any) => e.result)
+  const query: JsonRpcPayload = {
+    jsonrpc: '2.0',
+    method: 'debug_traceBlockByNumber',
+    id: new Date().getTime().toString(),
+    params: [Web3Utils.toHex(blockNumber), { tracer }],
+  }
+  const trace = await providerRPC(defaultProvider, query)
+  return trace.result.map((e: any) => e.result)
+}
+
+async function providerRPC(
+  defaultProvider: provider,
+  query: JsonRpcPayload
+): Promise<JsonRpcResponse> {
+  if (defaultProvider == null || typeof defaultProvider === 'string') {
+    throw Error('Existing provider is required')
+  }
+  return new Promise((resolve, reject) => {
+    defaultProvider.send(query, (err: Error | null, result: JsonRpcResponse | undefined) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(result)
+      }
+    })
+  })
 }

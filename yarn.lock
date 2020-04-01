@@ -36879,19 +36879,6 @@ web3-eth-contract@1.2.6:
     web3-eth-abi "1.2.6"
     web3-utils "1.2.6"
 
-web3-eth-debug@1.0.0-beta.55:
-  version "1.0.0-beta.55"
-  resolved "https://registry.yarnpkg.com/web3-eth-debug/-/web3-eth-debug-1.0.0-beta.55.tgz#f2addb40a1ec10e369d7e46a3cc9ecf52825597e"
-  integrity sha512-WBMZo0mHJFDIA31KAwgtG1mOzO/nsAKVM2RAK36pRsvhB9n4Hr0QP6C59oqoBH6MWMYvOAwFnDEYFjHWfsoSfA==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
-    web3-core "1.0.0-beta.55"
-    web3-core-helpers "1.0.0-beta.55"
-    web3-core-method "1.0.0-beta.55"
-    web3-net "1.0.0-beta.55"
-    web3-providers "1.0.0-beta.55"
-    web3-utils "1.0.0-beta.55"
-
 web3-eth-ens@1.0.0-beta.37:
   version "1.0.0-beta.37"
   resolved "https://registry.yarnpkg.com/web3-eth-ens/-/web3-eth-ens-1.0.0-beta.37.tgz#714ecb01eb447ee3eb39b2b20a10ae96edb1f01f"

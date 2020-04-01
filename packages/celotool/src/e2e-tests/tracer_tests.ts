@@ -342,6 +342,7 @@ describe('tracer tests', () => {
         syncmode: 'full',
         port: 30303,
         rpcport: 8545,
+        wsport: 8546,
       },
       {
         name: 'validator1',
