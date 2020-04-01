@@ -33,7 +33,10 @@ class Papers extends React.PureComponent<I18nProps> {
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('whitepaperTitle')}
             </Text>
-            <HelpfullLink text={t('download')} href={'/papers/whitepaper'} />
+            <View style={styles.links}>
+              <HelpfullLink text={t('download')} href={'/papers/whitepaper'} />
+              <HelpfullLink text={'读纸'} href={'/papers/celo-wp-simplified-chinese.pdf'} />
+            </View>
           </SideTitledSection>
           <SideTitledSection span={Spans.three4th} title={t('economics')}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
@@ -54,7 +57,16 @@ class Papers extends React.PureComponent<I18nProps> {
 }
 
 function HelpfullLink({ text, href }) {
-  return <Button kind={BTN.NAKED} text={text} href={href} size={SIZE.normal} target="_blank" />
+  return (
+    <Button
+      kind={BTN.NAKED}
+      style={styles.link}
+      text={text}
+      href={href}
+      size={SIZE.normal}
+      target="_blank"
+    />
+  )
 }
 
 export default withNamespaces(NameSpaces.papers)(Papers)
@@ -65,10 +77,10 @@ const styles = StyleSheet.create({
     paddingTop: HEADER_HEIGHT,
   },
   links: {
-    height: 120,
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    flexDirection: 'row',
   },
-  helpfulLink: {
-    marginBottom: 15,
+  link: {
+    marginRight: 30,
   },
 })
