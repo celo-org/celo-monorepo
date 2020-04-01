@@ -6,6 +6,7 @@ import Fetch from 'src/brandkit/common/Fetch'
 import Page, { IMAGERY_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import Showcase from 'src/brandkit/common/Showcase'
+import { AssetTypes } from 'src/brandkit/tracking'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
@@ -87,6 +88,7 @@ const Illustrations = React.memo(
                 {data.map((illo) => (
                   <Showcase
                     ratio={1.3}
+                    assetType={AssetTypes.illustration}
                     key={illo.name}
                     description={illo.description}
                     name={illo.name}
@@ -128,6 +130,7 @@ const AbstractGraphics = React.memo(
                 {data.map((illo) => (
                   <Showcase
                     ratio={344 / 172}
+                    assetType={AssetTypes.graphic}
                     key={illo.name}
                     description={illo.description}
                     name={illo.name}
