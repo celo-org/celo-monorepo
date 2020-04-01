@@ -1,3 +1,4 @@
+import prompts from 'prompts'
 import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
@@ -53,6 +54,17 @@ export default class ValidatorGroupMembers extends BaseCommand {
 
     const validatorGroup = await validators.signerToAccount(res.flags.from)
     if (res.flags.accept) {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message:
+          'Are you sure you want to accept this member?\nValidator Group Locked Gold requirements increase per member. Adding an additional member could result in an increase in Locked Gold requirements of up to 10,000 cGLD for 180 days. (y/n)',
+      })
+
+      if (!response.confirmation) {
+        console.info('Aborting due to user response')
+        process.exit(0)
+      }
       const tx = await validators.addMember(validatorGroup, res.args.validatorAddress)
       await displaySendTx('addMember', tx)
     } else if (res.flags.remove) {
