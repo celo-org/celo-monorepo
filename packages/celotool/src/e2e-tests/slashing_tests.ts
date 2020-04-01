@@ -173,7 +173,7 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const header = kit.web3.utils.hexToBytes(headerHex)
       const hash = await contract.methods.hashHeader(header).call()
-      assert.equal(hash, '0xf5a450266c77dce47f7698959d8e7019db860ee19a5322b16a853fdf23607100')
+      assert.equal(hash, '0x2e14ef428293e41c5f81a108b5d36f892b2bee3e34aec4223474c4a31618ea69')
     })
 
     it('should hash current header correctly', async () => {
