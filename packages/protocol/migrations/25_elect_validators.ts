@@ -356,21 +356,6 @@ module.exports = async (_deployer: any, networkName: string) => {
       })
     )
 
-    // for (const i of Object.keys(group.valKeys)) {
-    //   const key = group.valKeys[i]
-    //   const index = parseInt(idx * config.validators.maxGroupSize + i, 10)
-    //   await registerValidator(
-    //     accounts,
-    //     lockedGold,
-    //     validators,
-    //     key,
-    //     attestationKeys[index],
-    //     group.account.address,
-    //     index,
-    //     networkName
-    //   )
-    // }
-
     console.info(`  * Adding Validators to ${group.name} ...`)
     for (const [i, key] of group.valKeys.entries()) {
       const address = privateKeyToAddress(key)
