@@ -5,7 +5,7 @@ import { resolveTxt } from 'dns'
 import { Address } from '../../base'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
-import { Claim, DomainClaim, domainTxtHeader, serializeClaim } from './claim'
+import { Claim, DomainClaim, DOMAIN_TXT_HEADER, serializeClaim } from './claim'
 import { verifyKeybaseClaim } from './keybase'
 import { ClaimTypes } from './types'
 
@@ -21,7 +21,6 @@ export async function verifyClaim(
   claim: Claim,
   address: string,
   metadataURLGetter: MetadataURLGetter
-  // signer?: Signer
 ) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
@@ -100,7 +99,7 @@ export const verifyDomainClaim = async (
     metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
     const existingClaims = metadata
       .filterClaims(ClaimTypes.DOMAIN)
-      .filter((el: DomainClaim) => el.domain === domain)
+      .filter((el) => el.domain === domain)
 
     if (existingClaims.length < 1) {
       return `The domain ${domain} is not part of your metadata`
@@ -123,16 +122,14 @@ export const verifyDomainRecord = async (
     dnsResolver(claim.domain, (error, domainRecords) => {
       if (error) {
         console.log(`Unable to fetch domain TXT records: ${error.toString()}`)
+        resolve(false)
       } else {
         domainRecords.forEach((record) => {
           record.forEach((entry) => {
-            if (entry.startsWith(domainTxtHeader)) {
+            if (entry.startsWith(DOMAIN_TXT_HEADER)) {
               console.log(`TXT Record celo-site-verification found`)
-              const signatureBase64 = entry.substring(domainTxtHeader.length + 1)
+              const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
               const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
-              // console.log(`Record: ${record}`)
-              // console.log(`Signature: ${signature}`)
-              // console.log(`Signature64: ${signatureBase64}`)
               if (verifySignature(serializeClaim(claim), signature, address)) {
                 console.log(`Signature verified successfully`)
                 resolve(true)

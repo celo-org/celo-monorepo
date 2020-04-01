@@ -59,9 +59,6 @@ testWithGanache('Domain claims', (web3) => {
 
     describe('when we have a signature', () => {
       it('indicates that signature is correct', async () => {
-        console.log('serializedClaim: ' + serializeClaim(claim))
-        console.log('signature: ' + signature)
-        console.log('address: ' + address)
         const verifiedSignature = await verifySignature(serializeClaim(claim), signature, address)
         expect(verifiedSignature).toBeTruthy()
       })
@@ -92,7 +89,6 @@ testWithGanache('Domain claims', (web3) => {
 
       it('indicates that the metadata does not contain the proper domain claim', async () => {
         const error = await verifyDomainClaim(claim, address, metadataUrlGetter)
-        // console.log(`The message is ${error}`)
         expect(error).toContain('Unable to verify domain claim')
       })
     })

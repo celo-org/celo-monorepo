@@ -49,8 +49,10 @@ async function addDatabaseVerificationClaims(address: string, domain: string, ve
 
     await client
       .query(query, values)
-      .catch((error) => logger.error(`Database error ${error}\n query: ${query}`))
-      .then(() => logger.info(`Verification flag added to domain ${domain} and address ${address}`))
+      .catch((error) => logger.error('Database error %s, query: %s', error, query))
+      .then(() =>
+        logger.info('Verification flag added to domain %s and address %s', domain, address)
+      )
   } catch (err) {
     logger.error('Error updating the database', err)
   }
@@ -66,43 +68,29 @@ async function handleItem(item: { url: string; address: string }) {
     for (let i = 0; i < numClaims; i++) {
       const claim = claims[i]
       const addressWith0x = '0x' + item.address
-      logger.debug('Claim: ' + serializeClaim(claim))
-      logger.debug('Accounts: ' + JSON.stringify(accounts))
-      // const alreadyVerified = await isClaimAlreadyVerified(item.address, claim.domain)
-      // logger.debug(`Is already verified? ${alreadyVerified}`)
-      // if (!alreadyVerified) {
-      logger.debug(`Verifying ${claim.domain} for address ${addressWith0x}`)
+      logger.debug('Claim: %s', serializeClaim(claim))
+      logger.debug('Accounts: %s', JSON.stringify(accounts))
+      logger.debug('Verifying %s for address %s', claim.domain, addressWith0x)
 
-      const verified = await verifyDomainRecord(addressWith0x, claim).catch((error) =>
-        logger.error(`Error in verifyDomainClaim ${error}`)
+      const verificationStatus = await verifyDomainRecord(addressWith0x, claim).catch((error) =>
+        logger.error('Error in verifyDomainClaim %s', error)
       )
-      if (verified === undefined)
+      if (verificationStatus === undefined)
+        // If undefined means the claim was verified successfully
         await createVerificationClaims(item.address, claim.domain, true, accounts)
-      else logger.debug(verified)
-      // }
+      else logger.debug(verificationStatus)
     }
   } catch (err) {
-    logger.error('Cannot read metadata', err)
+    logger.error('Cannot read metadata %s', err)
   }
 }
 
-// async function isClaimAlreadyVerified(address: string, domain: string): Promise<boolean> {
-//   const query = `SELECT verified FROM celo_claims WHERE  address=decode('${address}', 'hex') AND
-//                 element='${domain}' AND type='domain' AND timestamp IS NOT NULL AND verified=true`
-//
-//   let items: { verified: boolean }[] = await jsonQuery(query).catch((_error) => {})
-//
-//   items = items || []
-//   if (items.length > 0) return false
-//   return false
-// }
-
 async function main() {
-  logger.info('Connecting DB: ' + PGHOST)
+  logger.info('Connecting DB: %s', PGHOST)
   await client.connect()
 
-  client.on('error', (e) => {
-    logger.debug(`Reconnecting after ${e}`)
+  client.on('error', (error) => {
+    logger.debug('Reconnecting after %s', error)
     client.connect()
   })
 
@@ -127,7 +115,7 @@ async function main() {
       process.exit(0)
     })
     .catch((error) => {
-      logger.error(`Error: ${error}`)
+      logger.error('Error: %s', error)
       client.end()
       process.exit(1)
     })
