@@ -35,6 +35,7 @@ using a Constant Product Market Maker Model
 * [getConfig](_wrappers_exchange_.exchangewrapper.md#getconfig)
 * [getExchangeRate](_wrappers_exchange_.exchangewrapper.md#getexchangerate)
 * [getGoldExchangeRate](_wrappers_exchange_.exchangewrapper.md#getgoldexchangerate)
+* [getPastEvents](_wrappers_exchange_.exchangewrapper.md#getpastevents)
 * [getUsdExchangeRate](_wrappers_exchange_.exchangewrapper.md#getusdexchangerate)
 * [quoteGoldBuy](_wrappers_exchange_.exchangewrapper.md#quotegoldbuy)
 * [quoteGoldSell](_wrappers_exchange_.exchangewrapper.md#quotegoldsell)
@@ -350,6 +351,27 @@ Name | Type | Description |
 **Returns:** *Promise‹BigNumber‹››*
 
 The exchange rate (number of cUsd received for one cGLD)
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
 
 ___
 

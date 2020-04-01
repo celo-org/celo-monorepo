@@ -1,5 +1,4 @@
-import { CeloContract } from '@celo/contractkit'
-import { ContractKit, newKit } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { AllContracts } from '@celo/contractkit/lib/base'
 import { traceBlock } from '@celo/contractkit/lib/utils/web3-utils'
 import { valueToBigNumber } from '@celo/contractkit/lib/wrappers/BaseWrapper'
@@ -11,22 +10,31 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import fs from 'fs'
 import Web3 from 'web3'
+import { EventLog, TransactionReceipt } from 'web3-core'
 import { Contract } from 'web3-eth-contract'
-import { EventLog } from 'web3-core'
-import { TransactionReceipt } from 'web3-core'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { MonorepoRoot, getContext, sleep } from './utils'
 import { spawnCmdWithExitOnFailure } from '../lib/utils'
+import { getContext, MonorepoRoot, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 
 const testContractSource = `
 pragma solidity ^0.5.8;
 
+contract TestContractChild {
+  event Constructed(address from);
+
+  constructor() public payable {
+    emit Constructed(msg.sender);
+  }
+}
+
 contract TestContract {
   event Constructed(address from);
   event Destructed(address to);
   event Reverted();
+
+  TestContractChild public child;
 
   constructor() public payable {
     emit Constructed(msg.sender);
@@ -58,6 +66,10 @@ contract TestContract {
   function alwaysRevert() public {
     emit Reverted();
     revert('alwaysRevert');
+  }
+
+  function createChild() external payable {
+    child = (new TestContractChild).value(msg.value)();
   }
 
   function selfDestruct(address payable to) external payable {
@@ -92,6 +104,7 @@ class ReleaseGoldAssets extends DerivedAccountAssets {
   }
 }
 
+// tslint:disable-next-line:max-classes-per-file
 class AccountAssets extends DerivedAccountAssets {
   gold: BigNumber
   releaseGold: Record<Address, ReleaseGoldAssets>
@@ -108,32 +121,36 @@ function getAccountAssets(
   accountAddress: Address,
   filter: boolean
 ): AccountAssets | undefined {
-  const address = normalizeAddress(accountAddress)
-  if (filter && !(address in accounts)) return undefined
+  const address = normalizeAddress(accountAddress || '')
+  if (filter && !(address in accounts)) {
+    return undefined
+  }
   return accounts[address] || (accounts[address] = new AccountAssets())
 }
 
 async function trackAssetTransfers(
   kit: ContractKit,
   blockNumber: number,
-  assets: Record<Address, AccountAssets> | undefined = undefined,
+  assets?: Record<Address, AccountAssets>,
   filter: boolean = false,
   filterTracerStatus: string = 'success'
 ): Promise<Record<Address, AccountAssets>> {
   const ret = assets || {}
 
-  const goldTransfers = await traceBlock(
-    kit.web3.currentProvider,
-    blockNumber,
-    'cgldTransferTracer'
-  )
+  const goldTransfers = await traceBlock(kit.web3, blockNumber, 'cgldTransferTracer')
   for (const transaction of goldTransfers) {
     for (const transfer of transaction.transfers) {
-      if (filterTracerStatus && transfer.status != filterTracerStatus) continue
+      if (filterTracerStatus && transfer.status !== filterTracerStatus) {
+        continue
+      }
       const from = getAccountAssets(ret, transfer.from, filter)
       const to = getAccountAssets(ret, transfer.to, filter)
-      if (from) from.gold = from.gold.minus(transfer.value)
-      if (to) to.gold = to.gold.plus(transfer.value)
+      if (from) {
+        from.gold = from.gold.minus(transfer.value)
+      }
+      if (to) {
+        to.gold = to.gold.plus(transfer.value)
+      }
     }
   }
 
@@ -148,10 +165,12 @@ async function trackAssetTransfers(
   for (const locked of goldLocked) {
     const account = getAccountAssets(ret, locked.account, filter)
     // For lock() the gold was debited from account.gold by cgldTransferTracer
-    if (account) account.lockedGold = account.lockedGold.plus(locked.value)
-    // Can't distuinguish LockedGold lock() and relock() only from logs
-    // await pendingWithdrawls = lockedGold.getPendingWithdrawls(account)
-    // await sumPendingWithdrals =
+    if (account) {
+      account.lockedGold = account.lockedGold.plus(locked.value)
+      // Can't distuinguish LockedGold lock() and relock() only from logs
+      // await pendingWithdrawls = lockedGold.getPendingWithdrawls(account)
+      // await sumPendingWithdrals =
+    }
   }
 
   const goldUnlocked = (await lockedGold.getPastEvents('GoldUnlocked', blockRange)).map(
@@ -163,8 +182,9 @@ async function trackAssetTransfers(
   )
   for (const unlocked of goldUnlocked) {
     const account = getAccountAssets(ret, unlocked.account, filter)
-    if (account)
+    if (account) {
       account.lockedGoldPendingWithdrawl = account.lockedGoldPendingWithdrawl.plus(unlocked.value)
+    }
   }
 
   const goldWithdrawn = (await lockedGold.getPastEvents('GoldWithdrawn', blockRange)).map(
@@ -176,8 +196,9 @@ async function trackAssetTransfers(
   for (const withdrawn of goldWithdrawn) {
     // Gold has already been credited by cgldTransferTracer
     const account = getAccountAssets(ret, withdrawn.account, filter)
-    if (account)
+    if (account) {
       account.lockedGoldPendingWithdrawl = account.lockedGoldPendingWithdrawl.minus(withdrawn.value)
+    }
   }
 
   const election = await kit.contracts.getElection()
@@ -190,7 +211,9 @@ async function trackAssetTransfers(
   )
   for (const vote of voteCast) {
     const account = getAccountAssets(ret, vote.account, filter)
-    if (account) account.pendingVotes = account.pendingVotes.plus(vote.value)
+    if (account) {
+      account.pendingVotes = account.pendingVotes.plus(vote.value)
+    }
   }
 
   const voteActivated = (
@@ -203,10 +226,11 @@ async function trackAssetTransfers(
   for (const vote of voteActivated) {
     const account = getAccountAssets(ret, vote.account, filter)
     // needs conversion to units
-    if (account)
+    if (account) {
       account.activeVoteUnits[vote.group] = (
         account.activeVoteUnits[vote.group] || new BigNumber(0)
       ).plus(vote.value)
+    }
   }
 
   const voteRevoked = (await election.getPastEvents('ValidatorGroupVoteRevoked', blockRange)).map(
@@ -218,7 +242,9 @@ async function trackAssetTransfers(
   )
   for (const vote of voteRevoked) {
     const account = getAccountAssets(ret, vote.account, filter)
-    if (account) account.lockedGold = account.lockedGold.plus(vote.value)
+    if (account) {
+      account.lockedGold = account.lockedGold.plus(vote.value)
+    }
   }
 
   // StableToken.creditTo and StableToken.debitFrom should emit a Transfer event like StableToken._mint
@@ -236,14 +262,16 @@ async function trackAssetTransfers(
     const to = getAccountAssets(ret, transfer.to, filter)
     // needs event change to distuinguish StableToken instances from only logs
     // needs conversion to units
-    if (from)
+    if (from) {
       from.tokenUnits[stableTokenName] = (
         from.tokenUnits[stableTokenName] || new BigNumber(0)
       ).minus(transfer.value)
-    if (to)
+    }
+    if (to) {
       to.tokenUnits[stableTokenName] = (to.tokenUnits[stableTokenName] || new BigNumber(0)).plus(
         transfer.value
       )
+    }
   }
 
   /*const epochNumber = await kit.getEpochNumberOfBlock(blockNumber)
@@ -324,7 +352,7 @@ export const logAllContracts = async (kit: ContractKit) => {
 
 describe('tracer tests', () => {
   const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
-  let FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
+  const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
   const TransferAmount: BigNumber = new BigNumber(Web3.utils.toWei('1', 'ether'))
@@ -334,7 +362,7 @@ describe('tracer tests', () => {
     networkId: 1101,
     network: 'local',
     migrate: true,
-    //verbosity: 5,
+    // verbosity: 5,
     instances: [
       {
         name: 'validator0',
@@ -383,7 +411,7 @@ describe('tracer tests', () => {
   after(async function(this: any) {
     this.timeout(0)
     await context.hooks.after()
-    //await sleep(1000000)
+    // await sleep(1000000)
   })
 
   const restart = async () => {
@@ -398,24 +426,22 @@ describe('tracer tests', () => {
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
-    if (FromAddress !== validatorAddress) {
-      // Give the account we will send transfers as sufficient gold and dollars.
-      const startBalance = TransferAmount.times(500)
-      const resDollars = await transferCeloDollars(kit, validatorAddress, FromAddress, startBalance)
-      const resGold = await transferCeloGold(kit, validatorAddress, FromAddress, startBalance)
-      await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
+    // Give the account we will send transfers as sufficient gold and dollars.
+    const startBalance = TransferAmount.times(500)
+    const resDollars = await transferCeloDollars(kit, validatorAddress, FromAddress, startBalance)
+    const resGold = await transferCeloGold(kit, validatorAddress, FromAddress, startBalance)
+    await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
 
-      // Unlock FromAddress account
-      await kit.web3.eth.personal.importRawKey(DEF_FROM_PK, '')
-      await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
-      kit.defaultAccount = FromAddress
+    // Unlock FromAddress account
+    await kit.web3.eth.personal.importRawKey(DEF_FROM_PK, '')
+    await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+    kit.defaultAccount = FromAddress
 
-      // Create account for FromAddress
-      const accounts = await kit.contracts.getAccounts()
-      const createAccountTx = await accounts.createAccount()
-      const txResult = await createAccountTx.send()
-      await txResult.waitReceipt()
-    }
+    // Create account for FromAddress
+    const accounts = await kit.contracts.getAccounts()
+    const createAccountTx = await accounts.createAccount()
+    const txResult = await createAccountTx.send()
+    await txResult.waitReceipt()
   }
 
   const testTransferGold = (name: string, transferFn: () => Promise<any>) => {
@@ -447,7 +473,7 @@ describe('tracer tests', () => {
         sentBalance = transferResult.sentBalance || sendAmount
         receivedBalance = transferResult.receivedBalance || receiveAmount
         goldGasCurrency =
-          transferResult.goldGasCurrency != undefined ? transferResult.goldGasCurrency : true
+          transferResult.goldGasCurrency !== undefined ? transferResult.goldGasCurrency : true
         filterTracerStatus = transferResult.filterTracerStatus || 'success'
 
         receipt = await kit.web3.eth.getTransactionReceipt(transferResult.transactionHash)
@@ -469,13 +495,13 @@ describe('tracer tests', () => {
           false,
           filterTracerStatus
         )
-        //console.info(`${name} receipt`)
-        //console.info(receipt)
-        //console.info(`${name} trackAssets`)
-        //console.info(trackAssets)
-        //console.info(`${name} txn`)
-        //console.info(txn)
-        //console.info(`${name} from balance delta: ` + fromFinalBalance.minus(fromInitialBalance).toFixed())
+        // console.info(`${name} receipt`)
+        // console.info(receipt)
+        // console.info(`${name} trackAssets`)
+        // console.info(trackAssets)
+        // console.info(`${name} txn`)
+        // console.info(txn)
+        // console.info(`${name} from balance delta: ` + fromFinalBalance.minus(fromInitialBalance).toFixed())
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
@@ -535,7 +561,7 @@ describe('tracer tests', () => {
         sentBalance = transferResult.sentBalance || sendAmount
         receivedBalance = transferResult.receivedBalance || receiveAmount
         goldGasCurrency =
-          transferResult.goldGasCurrency != undefined ? transferResult.goldGasCurrency : true
+          transferResult.goldGasCurrency !== undefined ? transferResult.goldGasCurrency : true
 
         receipt = await kit.web3.eth.getTransactionReceipt(transferResult.transactionHash)
         txn = await kit.web3.eth.getTransaction(receipt.transactionHash)
@@ -548,13 +574,13 @@ describe('tracer tests', () => {
         fromFinalBalance = new BigNumber(await stableToken.balanceOf(fromAddress, txn.blockNumber))
         toFinalBalance = new BigNumber(await stableToken.balanceOf(toAddress, txn.blockNumber))
         trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
-        //console.info(`${name} receipt`)
-        //console.info(receipt)
-        //console.info(`${name} trackAssets`)
-        //console.info(trackAssets)
-        //console.info(`${name} txn`)
-        //console.info(txn)
-        //console.info(`${name} from balance delta: ` + fromFinalBalance.minus(fromInitialBalance).toFixed())
+        // console.info(`${name} receipt`)
+        // console.info(receipt)
+        // console.info(`${name} trackAssets`)
+        // console.info(trackAssets)
+        // console.info(`${name} txn`)
+        // console.info(txn)
+        // console.info(`${name} from balance delta: ` + fromFinalBalance.minus(fromInitialBalance).toFixed())
       })
 
       it(`balanceOf should increment the receiver's balance by the transfer amount`, () =>
@@ -572,13 +598,13 @@ describe('tracer tests', () => {
 
       it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(toAddress)].tokenUnits['cUSD'],
+          trackAssets[normalizeAddress(toAddress)].tokenUnits.cUSD,
           new BigNumber(receiveAmount)
         ))
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(fromAddress)].tokenUnits['cUSD'],
+          trackAssets[normalizeAddress(fromAddress)].tokenUnits.cUSD,
           new BigNumber(-sentBalance).minus(
             goldGasCurrency
               ? new BigNumber(0)
@@ -684,8 +710,8 @@ describe('tracer tests', () => {
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
         trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
-        //console.info(`Withdraw receipt`)
-        //console.info(receipt)
+        // console.info(`Withdraw receipt`)
+        // console.info(receipt)
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
@@ -712,8 +738,8 @@ describe('tracer tests', () => {
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
         trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
-        //console.info(`Exchange gold receipt`)
-        //console.info(receipt)
+        // console.info(`Exchange gold receipt`)
+        // console.info(receipt)
       })
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
@@ -746,8 +772,8 @@ describe('tracer tests', () => {
         const txResult = await tx.send()
         receipt = await txResult.waitReceipt()
         trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
-        //console.info(`Exchange token receipt`)
-        //console.info(receipt)
+        // console.info(`Exchange token receipt`)
+        // console.info(receipt)
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
@@ -778,7 +804,7 @@ describe('tracer tests', () => {
     describe(`Deploying release gold`, () => {
       before(async function(this: any) {
         this.timeout(0)
-        //const startBlockNumber = await this.web3.eth.getBlockNumber()
+        // const startBlockNumber = await this.web3.eth.getBlockNumber()
         const args = [
           '--cwd',
           `${MonorepoRoot}/packages/protocol`,
@@ -793,11 +819,11 @@ describe('tracer tests', () => {
           '--grants',
           `${MonorepoRoot}/packages/protocol/scripts/truffle/releaseGoldContracts.json`,
           '--output_file',
-          '${TMP_PATH}/releaseGold.txt',
+          `${TMP_PATH}/releaseGold.txt`,
           '--yesreally',
         ]
         await spawnCmdWithExitOnFailure('yarn', args)
-        //const endBlockNumber = await this.web3.eth.getBlockNumber()
+        // const endBlockNumber = await this.web3.eth.getBlockNumber()
       })
     })
 
@@ -901,6 +927,16 @@ describe('tracer tests', () => {
         const tx = await testContract.methods.transferThenIgnoreRevert(ToAddress)
         const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
         return { transactionHash: receipt.transactionHash }
+      })
+
+      testTransferGold('with TestContract.createChild', async () => {
+        const tx = await testContract.methods.createChild()
+        const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+        const testContractChildAddress = await testContract.methods.child().call({})
+        return {
+          toAddress: testContractChildAddress,
+          transactionHash: receipt.transactionHash,
+        }
       })
 
       testTransferGold('with TestContract.selfDestruct', async () => {

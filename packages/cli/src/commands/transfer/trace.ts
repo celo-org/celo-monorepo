@@ -29,13 +29,9 @@ export default class Trace extends BaseCommand {
       (res.flags.tracerFile ? fs.readFileSync(res.flags.tracerFile).toString() : '')
 
     if (res.flags.transaction) {
-      printValueMapRecursive(
-        await traceTransaction(this.kit.web3.currentProvider, res.flags.transaction, tracer)
-      )
+      printValueMapRecursive(await traceTransaction(this.kit.web3, res.flags.transaction, tracer))
     } else if (res.flags.blockNumber) {
-      printValueMapRecursive(
-        await traceBlock(this.kit.web3.currentProvider, res.flags.blockNumber, tracer)
-      )
+      printValueMapRecursive(await traceBlock(this.kit.web3, res.flags.blockNumber, tracer))
     }
   }
 }

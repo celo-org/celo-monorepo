@@ -45,6 +45,7 @@ Contract for handling deposits needed for voting.
 * [generateProofOfKeyPossessionLocally](_wrappers_accounts_.accountswrapper.md#generateproofofkeypossessionlocally)
 * [getAccountSummary](_wrappers_accounts_.accountswrapper.md#getaccountsummary)
 * [getName](_wrappers_accounts_.accountswrapper.md#getname)
+* [getPastEvents](_wrappers_accounts_.accountswrapper.md#getpastevents)
 * [parseSignatureOfAddress](_wrappers_accounts_.accountswrapper.md#parsesignatureofaddress)
 * [setAccount](_wrappers_accounts_.accountswrapper.md#setaccount)
 * [setWalletAddress](_wrappers_accounts_.accountswrapper.md#setwalletaddress)
@@ -573,6 +574,27 @@ Name | Type | Description |
 `blockNumber?` | undefined &#124; number | Height of result, defaults to tip.  |
 
 **Returns:** *Promise‹string›*
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
 
 ___
 

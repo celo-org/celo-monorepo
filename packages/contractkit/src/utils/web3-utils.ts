@@ -1,3 +1,4 @@
+import Web3 from 'web3'
 import { provider } from 'web3-core'
 import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
@@ -20,7 +21,7 @@ export const parseDecodedParams = (params: DecodedParamsObject) => {
 }
 
 export async function traceTransaction(
-  defaultProvider: provider,
+  web3: Web3,
   transaction: string,
   tracer: string
 ): Promise<any[]> {
@@ -30,22 +31,18 @@ export async function traceTransaction(
     id: new Date().getTime().toString(),
     params: [Web3Utils.toHex(transaction), { tracer }],
   }
-  const trace = await providerRPC(defaultProvider, query)
+  const trace = await providerRPC(web3.currentProvider, query)
   return trace.result
 }
 
-export async function traceBlock(
-  defaultProvider: provider,
-  blockNumber: number,
-  tracer: string
-): Promise<any[]> {
+export async function traceBlock(web3: Web3, blockNumber: number, tracer: string): Promise<any[]> {
   const query: JsonRpcPayload = {
     jsonrpc: '2.0',
     method: 'debug_traceBlockByNumber',
     id: new Date().getTime().toString(),
     params: [Web3Utils.toHex(blockNumber), { tracer }],
   }
-  const trace = await providerRPC(defaultProvider, query)
+  const trace = await providerRPC(web3.currentProvider, query)
   return trace.result.map((e: any) => e.result)
 }
 

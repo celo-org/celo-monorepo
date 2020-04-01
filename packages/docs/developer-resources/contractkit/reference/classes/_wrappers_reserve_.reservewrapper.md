@@ -29,6 +29,7 @@ Contract for handling reserve for stable currencies
 ### Methods
 
 * [getConfig](_wrappers_reserve_.reservewrapper.md#getconfig)
+* [getPastEvents](_wrappers_reserve_.reservewrapper.md#getpastevents)
 * [getSpenders](_wrappers_reserve_.reservewrapper.md#getspenders)
 
 ## Constructors
@@ -173,6 +174,27 @@ Contract address
 Returns current configuration parameters.
 
 **Returns:** *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
 
 ___
 

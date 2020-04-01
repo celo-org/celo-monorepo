@@ -24,6 +24,10 @@ Network parameters that are configurable by governance.
 
 * [address](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#address)
 
+### Methods
+
+* [getPastEvents](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getpastevents)
+
 ## Constructors
 
 ###  constructor
@@ -119,3 +123,24 @@ Name | Type |
 Contract address
 
 **Returns:** *string*
+
+## Methods
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

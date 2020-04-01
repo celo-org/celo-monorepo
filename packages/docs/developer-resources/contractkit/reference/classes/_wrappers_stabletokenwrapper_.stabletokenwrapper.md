@@ -18,7 +18,6 @@ Stable token with variable supply (cUSD)
 
 * [allowance](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#allowance)
 * [approve](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#approve)
-* [balanceOf](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#balanceof)
 * [burn](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#burn)
 * [decimals](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#decimals)
 * [decreaseAllowance](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#decreaseallowance)
@@ -41,8 +40,10 @@ Stable token with variable supply (cUSD)
 
 ### Methods
 
+* [balanceOf](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#balanceof)
 * [getConfig](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#getconfig)
 * [getInflationParameters](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#getinflationparameters)
+* [getPastEvents](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#getpastevents)
 
 ## Constructors
 
@@ -118,34 +119,6 @@ Name | Type |
 ------ | ------ |
 `spender` | string |
 `value` | string &#124; number |
-
-___
-
-###  balanceOf
-
-• **balanceOf**: *function* = proxyCall(
-    this.contract.methods.balanceOf,
-    undefined,
-    valueToBigNumber
-  )
-
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L67)*
-
-Gets the balance of the specified address using the presently stored inflation factor.
-
-**`param`** The address to query the balance of.
-
-**`returns`** The balance of the specified address.
-
-#### Type declaration:
-
-▸ (`owner`: string): *Promise‹BigNumber›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`owner` | string |
 
 ___
 
@@ -507,6 +480,27 @@ Contract address
 
 ## Methods
 
+###  balanceOf
+
+▸ **balanceOf**(`owner`: string, `blockNumber?`: undefined | number): *Promise‹BigNumber›*
+
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L67)*
+
+Gets the balance of the specified address using the presently stored inflation factor.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`owner` | string | The address to query the balance of. |
+`blockNumber?` | undefined &#124; number | - |
+
+**Returns:** *Promise‹BigNumber›*
+
+The balance of the specified address.
+
+___
+
 ###  getConfig
 
 ▸ **getConfig**(): *Promise‹[StableTokenConfig](../interfaces/_wrappers_stabletokenwrapper_.stabletokenconfig.md)›*
@@ -530,3 +524,24 @@ Querying the inflation parameters.
 **Returns:** *Promise‹[InflationParameters](../interfaces/_wrappers_stabletokenwrapper_.inflationparameters.md)›*
 
 Inflation rate, inflation factor, inflation update period and the last time factor was updated.
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

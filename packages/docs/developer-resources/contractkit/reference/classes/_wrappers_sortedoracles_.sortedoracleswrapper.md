@@ -25,6 +25,7 @@ Currency price oracle contract.
 ### Methods
 
 * [getConfig](_wrappers_sortedoracles_.sortedoracleswrapper.md#getconfig)
+* [getPastEvents](_wrappers_sortedoracles_.sortedoracleswrapper.md#getpastevents)
 * [getRates](_wrappers_sortedoracles_.sortedoracleswrapper.md#getrates)
 * [getStableTokenRates](_wrappers_sortedoracles_.sortedoracleswrapper.md#getstabletokenrates)
 * [isOracle](_wrappers_sortedoracles_.sortedoracleswrapper.md#isoracle)
@@ -103,6 +104,27 @@ Contract address
 Returns current configuration parameters.
 
 **Returns:** *Promise‹[SortedOraclesConfig](../interfaces/_wrappers_sortedoracles_.sortedoraclesconfig.md)›*
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
 
 ___
 
