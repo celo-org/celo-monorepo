@@ -64,5 +64,5 @@ export default {
 }
 
 function noTrack() {
-  return null
+  return getConfig().publicRuntimeConfig.ENV === 'development' ? console.info(arguments) : null
 }

@@ -6,6 +6,7 @@ import Fetch from 'src/brandkit/common/Fetch'
 import Page, { ICONS_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import IconShowcase from 'src/brandkit/common/Showcase'
+import { AssetTypes } from 'src/brandkit/tracking'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
 
@@ -46,6 +47,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
                     size={160}
                     ratio={1}
                     key={i}
+                    assetType={AssetTypes.icon}
                     loading={true}
                     name={'Celo Icon'}
                     uri={'#'}
@@ -64,6 +66,7 @@ const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18n
                 preview={{ uri: icon.preview }}
                 uri={icon.uri}
                 loading={false}
+                assetType={AssetTypes.icon}
                 size={160}
               />
             ))
