@@ -1,113 +1,80 @@
 import { FellowAppShape } from 'fullstack/Fellowship'
 import * as React from 'react'
 import { StyleSheet, Text } from 'react-native'
-import { ErrorMessage } from 'src/forms/ErrorDisplay'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
-import {
-  Form,
-  HolisticField,
-  NameErrorArea,
-  styles as formStyles,
-  TextInput,
-} from 'src/forms/FormComponents'
+import { Form } from 'src/forms/FormComponents'
+import { LabeledInput } from 'src/forms/LabeledInput'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
+
+export class FellowshipForm extends React.Component<I18nProps> {
   render() {
-    const { t, screen } = this.props
-    const isMobile = screen === ScreenSizes.TABLET || screen === ScreenSizes.MOBILE
-    const inputStyle = [standardStyles.input, fonts.p, formStyles.input]
-    const cellStyle = isMobile ? formStyles.zeroVertical : formStyles.verticalSpace
+    const { t } = this.props
     return (
       <FormContainer route="/fellowship" blankForm={blankForm()} validateWith={validateFields}>
         {({ onAltSubmit, onInput, formState }) => (
           <Form style={styles.form}>
-            <GridRow tabletStyle={styles.emailNameArea} mobileStyle={styles.emailNameArea}>
-              {!isMobile && <NameErrorArea formState={formState} isMobile={isMobile} />}
-              <Cell span={Spans.fourth} tabletSpan={Spans.full} style={cellStyle}>
-                <TextInput
-                  style={[inputStyle, formState.errors.includes('name') && formStyles.errorBorder]}
-                  focusStyle={standardStyles.inputFocused}
-                  placeholder={t('form.name')}
-                  placeholderTextColor={colors.placeholderGray}
+            <GridRow
+              allStyle={gridStyle}
+              tabletStyle={styles.emailNameArea}
+              mobileStyle={styles.emailNameArea}
+            >
+              <Cell span={Spans.fourth} style={styles.paddingVertical} tabletSpan={Spans.full}>
+                <LabeledInput
                   name="name"
+                  label={t('form.name')}
                   value={formState.form.name}
-                  onChange={onInput}
-                  required={true}
+                  onInput={onInput}
+                  allErrors={formState.errors}
                 />
               </Cell>
-              {isMobile && <NameErrorArea formState={formState} isMobile={isMobile} />}
-              <Cell span={Spans.fourth} tabletSpan={Spans.full} style={cellStyle}>
-                <TextInput
-                  focusStyle={standardStyles.inputFocused}
-                  style={[inputStyle, formState.errors.includes('email') && formStyles.errorBorder]}
-                  placeholder={t('form.email')}
-                  placeholderTextColor={colors.placeholderGray}
+              <Cell span={Spans.fourth} style={styles.paddingVertical} tabletSpan={Spans.full}>
+                <LabeledInput
+                  label={t('form.email')}
                   name="email"
-                  type="email"
                   value={formState.form.email}
-                  onChange={onInput}
-                  required={true}
+                  onInput={onInput}
+                  allErrors={formState.errors}
                 />
               </Cell>
-              <Cell
-                span={Spans.fourth}
-                tabletSpan={Spans.three4th}
-                style={[
-                  formStyles.validationMessage,
-                  formStyles.alignStart,
-                  isMobile && formStyles.verticalSpace,
-                ]}
-              >
-                <ErrorMessage allErrors={formState.errors} field={'email'} />
+            </GridRow>
+            <GridRow allStyle={gridStyle}>
+              <Cell span={Spans.half} tabletSpan={Spans.full} style={styles.paddingVertical}>
+                <LabeledInput
+                  multiline={true}
+                  name="ideas"
+                  label={t('form.ideas')}
+                  onInput={onInput}
+                  allErrors={formState.errors}
+                  value={formState.form.ideas}
+                />
+                <LabeledInput
+                  multiline={true}
+                  label={t('form.bio')}
+                  name="bio"
+                  onInput={onInput}
+                  allErrors={formState.errors}
+                  value={formState.form.bio}
+                />
+                <LabeledInput
+                  multiline={true}
+                  label={t('form.deliverables')}
+                  name="deliverables"
+                  onInput={onInput}
+                  allErrors={formState.errors}
+                  value={formState.form.deliverables}
+                />
+                <LabeledInput
+                  name="resume"
+                  label={t('form.resume')}
+                  onInput={onInput}
+                  allErrors={formState.errors}
+                  value={formState.form.resume}
+                />
               </Cell>
-            </GridRow>
-            <GridRow tabletStyle={styles.rowMobile} mobileStyle={styles.rowMobile}>
-              <HolisticField
-                isMobile={isMobile}
-                multiline={true}
-                fieldName="ideas"
-                onChange={onInput}
-                errors={formState.errors}
-                t={t}
-                value={formState.form.ideas}
-              />
-            </GridRow>
-            <GridRow tabletStyle={styles.rowMobile} mobileStyle={styles.rowMobile}>
-              <HolisticField
-                isMobile={isMobile}
-                multiline={true}
-                fieldName="bio"
-                onChange={onInput}
-                errors={formState.errors}
-                t={t}
-                value={formState.form.bio}
-              />
-            </GridRow>
-            <GridRow tabletStyle={styles.rowMobile} mobileStyle={styles.rowMobile}>
-              <HolisticField
-                isMobile={isMobile}
-                multiline={true}
-                fieldName="deliverables"
-                onChange={onInput}
-                errors={formState.errors}
-                t={t}
-                value={formState.form.deliverables}
-              />
-            </GridRow>
-            <GridRow tabletStyle={styles.rowMobile} mobileStyle={styles.rowMobile}>
-              <HolisticField
-                isMobile={isMobile}
-                fieldName="resume"
-                onChange={onInput}
-                errors={formState.errors}
-                t={t}
-                value={formState.form.resume}
-              />
             </GridRow>
 
             <GridRow
@@ -163,6 +130,11 @@ const styles = StyleSheet.create({
   emailNameArea: {
     flexDirection: 'column',
   },
+  paddingVertical: {
+    paddingVertical: 0,
+  },
 })
 
-export default withNamespaces('community')(withScreenSize(FellowshipForm))
+const gridStyle = [standardStyles.centered, styles.paddingVertical]
+
+export default withNamespaces('community')(FellowshipForm)

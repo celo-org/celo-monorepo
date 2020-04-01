@@ -37,21 +37,21 @@ describe('FellowshipForm', () => {
 
   describe('when visitor presses submit after filling out the form', () => {
     it('does not show errors', async () => {
-      const { getByText, queryAllByText, getByPlaceholderText } = render(<FellowshipForm />)
+      const { getByText, queryAllByText, getByLabelText } = render(<FellowshipForm />)
 
-      fireEvent.change(getByPlaceholderText('form.name'), { target: { value: 'xu' } })
+      fireEvent.change(getByLabelText('form.name'), { target: { value: 'xu' } })
 
-      fireEvent.change(getByPlaceholderText('form.ideas'), { target: { value: 'what if' } })
+      fireEvent.change(getByLabelText('form.ideas'), { target: { value: 'what if' } })
 
-      fireEvent.change(getByPlaceholderText('form.email'), {
+      fireEvent.change(getByLabelText('form.email'), {
         target: { value: 'connect@exampel.com' },
       })
 
-      fireEvent.change(getByPlaceholderText('form.bio'), { target: { value: 'logic' } })
+      fireEvent.change(getByLabelText('form.bio'), { target: { value: 'logic' } })
 
-      fireEvent.change(getByPlaceholderText('form.resume'), { target: { value: 'Resume.pdf' } })
+      fireEvent.change(getByLabelText('form.resume'), { target: { value: 'Resume.pdf' } })
 
-      fireEvent.change(getByPlaceholderText('form.deliverables'), { target: { value: 'tests' } })
+      fireEvent.change(getByLabelText('form.deliverables'), { target: { value: 'tests' } })
 
       const submitButton = getByText('submit')
       fireEvent.click(submitButton)
