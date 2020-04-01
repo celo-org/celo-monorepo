@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
+import * as RNLocalize from 'react-native-localize'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import {
+  convertToPeriodDecimalSeparator,
   divideByWei,
   getCentAwareMoneyDisplay,
   getMoneyDisplayValue,
@@ -8,9 +10,7 @@ import {
   multiplyByWei,
   roundDown,
   roundUp,
-  convertToPeriodDecimalSeparator,
 } from 'src/utils/formatting'
-import * as RNLocalize from 'react-native-localize'
 
 describe('utils->formatting', () => {
   describe('getMoneyDisplayValue', () => {
