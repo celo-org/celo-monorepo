@@ -52,16 +52,16 @@ contract MockElection is IElection {
     return true;
   }
 
-  function activate(address) external returns (uint256) {
-    return 0;
+  function activate(address) external returns (bool) {
+    return true;
   }
 
-  function revokeActive(address, uint256, address, address, uint256) external returns (uint256) {
-    return 0;
+  function revokeActive(address, uint256, address, address, uint256) external returns (bool) {
+    return true;
   }
 
-  function revokePending(address, uint256, address, address, uint256) external returns (uint256) {
-    return 0;
+  function revokePending(address, uint256, address, address, uint256) external returns (bool) {
+    return true;
   }
 
   function forceDecrementVotes(
