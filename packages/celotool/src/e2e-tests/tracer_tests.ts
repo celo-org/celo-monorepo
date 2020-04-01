@@ -1,6 +1,6 @@
 import { CeloContract } from '@celo/contractkit'
 import { ContractKit, newKit } from '@celo/contractkit'
-//import { AllContracts } from '@celo/contractkit/lib/base'
+import { AllContracts } from '@celo/contractkit/lib/base'
 import { traceBlock } from '@celo/contractkit/lib/utils/web3-utils'
 import { valueToBigNumber } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -111,10 +111,6 @@ function getAccountAssets(
   const address = normalizeAddress(accountAddress)
   if (filter && !(address in accounts)) return undefined
   return accounts[address] || (accounts[address] = new AccountAssets())
-}
-
-function assertEqualBN(value: BigNumber, expected: BigNumber) {
-  assert.equal(value.toString(), expected.toString())
 }
 
 async function trackAssetTransfers(
@@ -266,6 +262,10 @@ async function trackAssetTransfers(
   return ret
 }
 
+function assertEqualBN(value: BigNumber, expected: BigNumber) {
+  assert.equal(value.toString(), expected.toString())
+}
+
 const transferCeloGold = async (
   kit: ContractKit,
   fromAddress: string,
@@ -310,9 +310,20 @@ const transferCeloDollars = async (
   return res
 }
 
+export const logAllContracts = async (kit: ContractKit) => {
+  console.info('AllContracts')
+  for (const contract of AllContracts) {
+    try {
+      const addr = await kit.registry.addressFor(contract)
+      console.info(`${contract} = ${addr}`)
+    } catch (error) {
+      console.info(error)
+    }
+  }
+}
+
 describe('tracer tests', () => {
   const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
-  //let FromAddress = validatorAddress
   let FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
@@ -380,16 +391,6 @@ describe('tracer tests', () => {
     kit.defaultAccount = validatorAddress
     goldToken = await kit.contracts.getGoldToken()
     stableToken = await kit.contracts.getStableToken()
-
-    /*console.info('AllContracts')
-    for (const contract of AllContracts) {
-      try {
-        const addr = await kit.registry.addressFor(contract)
-        console.info(`${contract} = ${addr}`)
-      } catch (error) {
-        console.info(error)
-      }
-    }*/
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
@@ -492,10 +493,16 @@ describe('tracer tests', () => {
       })
 
       it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
-        assertEqualBN(trackAssets[normalizeAddress(toAddress)].gold, new BigNumber(receiveAmount)))
+        assertEqualBN(
+          trackAssets[normalizeAddress(toAddress)]?.gold || new BigNumber(0),
+          new BigNumber(receiveAmount)
+        ))
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        assertEqualBN(trackAssets[normalizeAddress(fromAddress)].gold, new BigNumber(-sendAmount)))
+        assertEqualBN(
+          trackAssets[normalizeAddress(fromAddress)]?.gold || new BigNumber(0),
+          new BigNumber(-sendAmount)
+        ))
     })
   }
 
@@ -861,11 +868,33 @@ describe('tracer tests', () => {
         }
       })
 
-      /*testTransferGold('with TestContract.nestedTransferThenRevert', async () => {
-        const tx = await testContract.methods.nestedTransferThenRevert(ToAddress)
-        const receipt = tx.send({ ...txOptions, value: TransferAmount.toFixed() })
-        return { transactionHash: receipt.transactionHash }
-      })*/
+      testTransferGold(
+        'with TestContract.nestedTransferThenRevert: check sent to contract',
+        async () => {
+          const tx = await testContract.methods.nestedTransferThenRevert(ToAddress)
+          const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+          return {
+            transactionHash: receipt.transactionHash,
+            receiveAmount: new BigNumber(0),
+          }
+        }
+      )
+
+      testTransferGold(
+        'with TestContract.nestedTransferThenRevert: check receive reverted',
+        async () => {
+          const tx = await testContract.methods.nestedTransferThenRevert(ToAddress)
+          const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
+          return {
+            filterTracerStatus: 'revert',
+            fromAddress: testContract.options.address,
+            transactionHash: receipt.transactionHash,
+            sentBalance: TransferAmount.multipliedBy(-1),
+            receivedBalance: new BigNumber(0),
+            goldGasCurrency: false,
+          }
+        }
+      )
 
       testTransferGold('with TestContract.transferThenIgnoreRevert', async () => {
         const tx = await testContract.methods.transferThenIgnoreRevert(ToAddress)
@@ -877,7 +906,7 @@ describe('tracer tests', () => {
         const tx = await testContract.methods.selfDestruct(ToAddress)
         const receipt = await tx.send({ ...txOptions, value: TransferAmount.toFixed() })
         return {
-          receiveAmount: TransferAmount.times(2),
+          receiveAmount: TransferAmount.times(4),
           transactionHash: receipt.transactionHash,
         }
       })
@@ -888,7 +917,7 @@ describe('tracer tests', () => {
       describe(`Rossetta tracer`, () => {
         it('Tracer driver should succeed', async function(this: any) {
           this.timeout(0)
-          await spawnCmdWithExitOnFailure('go', ['run', './drivers/tracer/tracer.go'], {
+          await spawnCmdWithExitOnFailure('go', ['run', './examples/tracer/tracer.go'], {
             cwd: argv.localrosetta,
           })
         })
