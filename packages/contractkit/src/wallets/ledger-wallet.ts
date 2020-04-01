@@ -1,7 +1,11 @@
-import { isHexString, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  isHexString,
+  normalizeAddressWith0x,
+  trimLeading0x,
+} from '@celo/utils/lib/address'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
-import { byContractAddress } from '@ledgerhq/hw-app-eth/erc20'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -35,6 +39,7 @@ export class LedgerWallet implements Wallet {
   private readonly addressDerivationPath = new Map<Address, string>()
   private addressesRetrieved = false
   private setupFinished = false
+  private setupLocked = false
   private ledger: any
 
   /**
@@ -60,12 +65,16 @@ export class LedgerWallet implements Wallet {
    * @param transport Transport to connect the ledger device
    */
   async init(transport: any) {
+    if (this.setupLocked) {
+      throw new Error('ledger-wallet: initialization already running')
+    }
     try {
       if (this.setupFinished) {
         return
       }
+      this.setupLocked = true
       if (!this.ledger) {
-        this.ledger = new Ledger(transport)
+        this.ledger = this.generateNewLedger(transport)
       }
       if (!this.addressesRetrieved) {
         debug('Fetching addresses from the ledger')
@@ -78,7 +87,14 @@ export class LedgerWallet implements Wallet {
         this.transportErrorFriendlyMessage(error)
       }
       throw error
+    } finally {
+      this.setupLocked = false
     }
+  }
+
+  // Extracted for testing purpose
+  private generateNewLedger(transport: any) {
+    return new Ledger(transport)
   }
 
   private async retrieveAccounts() {
@@ -117,15 +133,10 @@ export class LedgerWallet implements Wallet {
     this.initializationRequired()
     try {
       const rlpEncoded = rlpEncodedTx(txParams)
-      const zrxInfo = await byContractAddress(txParams.to)
-      if (zrxInfo) {
-        await this.ledger!.provideERC20TokenInformation(zrxInfo)
-      }
       const signature = await this.ledger!.signTransaction(
         this.getDerivationPathFor(txParams.from!.toString()),
         trimLeading0x(rlpEncoded.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
       )
-
       // EIP155 support. check/recalc signature v value.
       const rv = parseInt(signature.v, 16)
       let cv = chainIdTransformationForSigning(rlpEncoded.transaction.chainId!)
@@ -156,8 +167,11 @@ export class LedgerWallet implements Wallet {
       }
       const path = this.getDerivationPathFor(address)
       const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(data))
-
-      const rpcSig = ethUtil.toRpcSig(sig.v, ethUtil.toBuffer(sig.r), ethUtil.toBuffer(sig.s))
+      const rpcSig = ethUtil.toRpcSig(
+        sig.v,
+        ethUtil.toBuffer(ensureLeading0x(sig.r)),
+        ethUtil.toBuffer(ensureLeading0x(sig.s))
+      )
       return rpcSig
     } catch (error) {
       if (error instanceof TransportStatusError) {
@@ -183,7 +197,11 @@ export class LedgerWallet implements Wallet {
       const path = this.getDerivationPathFor(address)
       const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(dataBuff.toString()))
 
-      const rpcSig = ethUtil.toRpcSig(sig.v, ethUtil.toBuffer(sig.r), ethUtil.toBuffer(sig.s))
+      const rpcSig = ethUtil.toRpcSig(
+        sig.v,
+        ethUtil.toBuffer(ensureLeading0x(sig.r)),
+        ethUtil.toBuffer(ensureLeading0x(sig.s))
+      )
       return rpcSig
     } catch (error) {
       if (error instanceof TransportStatusError) {
