@@ -4,7 +4,7 @@ import { NativeSigner, Signer, verifySignature } from '@celo/utils/lib/signature
 import { newKitFromWeb3 } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'
 import { createDomainClaim, DomainClaim, serializeClaim } from './claim'
-import { MetadataURLGetter, verifyDomainClaim } from './verify'
+import { MetadataURLGetter, verifyDomainClaimFromMetadata } from './verify'
 
 testWithGanache('Domain claims', (web3) => {
   const kit = newKitFromWeb3(web3)
@@ -83,12 +83,17 @@ testWithGanache('Domain claims', (web3) => {
 
     describe('when the metadata URL is set', () => {
       it('indicates that the metadata contain the right claim', async () => {
-        const output = await verifyDomainClaim(claim, address, metadataUrlGetter, dnsResolver)
+        const output = await verifyDomainClaimFromMetadata(
+          claim,
+          address,
+          metadataUrlGetter,
+          dnsResolver
+        )
         expect(output).toBeUndefined()
       })
 
       it('indicates that the metadata does not contain the proper domain claim', async () => {
-        const error = await verifyDomainClaim(claim, address, metadataUrlGetter)
+        const error = await verifyDomainClaimFromMetadata(claim, address, metadataUrlGetter)
         expect(error).toContain('Unable to verify domain claim')
       })
     })

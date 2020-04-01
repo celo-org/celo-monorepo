@@ -28,7 +28,7 @@ export async function verifyClaim(
     case ClaimTypes.ACCOUNT:
       return verifyAccountClaim(claim, address, metadataURLGetter)
     case ClaimTypes.DOMAIN:
-      return verifyDomainClaim(claim, address, metadataURLGetter)
+      return verifyDomainClaimFromMetadata(claim, address, metadataURLGetter)
     default:
       break
   }
@@ -80,7 +80,7 @@ type dnsResolverFunction = (
  * It verifies if a DNS domain includes in the TXT records an entry with name
  * `celo-site-verification` and a valid signature in base64
  */
-export const verifyDomainClaim = async (
+export const verifyDomainClaimFromMetadata = async (
   claim: DomainClaim,
   address: string,
   metadataURLGetter: MetadataURLGetter,
