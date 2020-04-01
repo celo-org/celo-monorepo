@@ -60,9 +60,10 @@ import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import { convertToPeriodDecimalSeparator, withDecimalSeparator } from 'src/utils/numberFormat'
 
-const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
-  ValidatedTextInput
+const AmountInput = withDecimalSeparator(
+  withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)
 )
 const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
@@ -174,7 +175,8 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   getDollarsAmount = () => {
-    const parsedInputAmount = parseInputAmount(this.state.amount)
+    const parsedInputAmount = parseInputAmount(convertToPeriodDecimalSeparator(this.state.amount))
+
     const { localCurrencyExchangeRate } = this.props
 
     const dollarsAmount =
@@ -190,9 +192,9 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   isAmountValid = () => {
-    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThanOrEqualTo(
-      DOLLAR_TRANSACTION_MIN_AMOUNT
-    )
+    const isAmountValid = parseInputAmount(
+      convertToPeriodDecimalSeparator(this.state.amount)
+    ).isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
     return {
       isAmountValid,
       isDollarBalanceSufficient:
@@ -271,7 +273,7 @@ export class SendAmount extends React.Component<Props, State> {
     navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
   }
 
-  renderButtons = (isAmountValid: boolean, isDollarBalanceSufficient: boolean) => {
+  renderButtons = (isAmountValid: boolean) => {
     const { t } = this.props
     const { characterLimitExceeded } = this.state
     const verificationStatus = this.getVerificationStatus()
@@ -328,7 +330,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   renderBottomContainer = () => {
-    const { isAmountValid, isDollarBalanceSufficient } = this.isAmountValid()
+    const { isAmountValid } = this.isAmountValid()
 
     const onPress = () => {
       if (!isAmountValid) {
@@ -340,11 +342,11 @@ export class SendAmount extends React.Component<Props, State> {
     if (!isAmountValid) {
       return (
         <TouchableWithoutFeedback onPress={onPress}>
-          {this.renderButtons(false, isDollarBalanceSufficient)}
+          {this.renderButtons(false)}
         </TouchableWithoutFeedback>
       )
     }
-    return this.renderButtons(true, isDollarBalanceSufficient)
+    return this.renderButtons(true)
   }
 
   render() {
@@ -399,7 +401,6 @@ export class SendAmount extends React.Component<Props, State> {
             autoFocus={true}
             numberOfDecimals={NUMBER_INPUT_MAX_DECIMALS}
             validator={ValidatorKind.Decimal}
-            lng={this.props.i18n.language}
           />
           <CommentInput
             title={t('global:for')}
