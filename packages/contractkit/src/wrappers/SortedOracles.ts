@@ -30,6 +30,18 @@ export interface OracleRate {
   medianRelation: MedianRelation
 }
 
+export interface OracleTimestamp {
+  address: Address
+  timestamp: BigNumber
+  medianRelation: MedianRelation
+}
+
+export interface OracleReport {
+  address: Address
+  rate: BigNumber
+  timestamp: BigNumber
+}
+
 export interface MedianRate {
   rate: BigNumber
 }
@@ -72,6 +84,15 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async isOracle(token: CeloToken, oracle: Address): Promise<boolean> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     return this.contract.methods.isOracle(tokenAddress, oracle).call()
+  }
+
+  /**
+   * Returns the list of whitelisted oracles for a given token.
+   * @returns The list of whitelisted oracles for a given token.
+   */
+  async getOracles(token: CeloToken): Promise<Address[]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    return this.contract.methods.getOracles(tokenAddress).call()
   }
 
   /**
@@ -155,6 +176,37 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       })
     }
     return rates
+  }
+
+  /**
+   * Gets all elements from the doubly linked list.
+   * @param token The CeloToken representing the token for which the Celo
+   *   Gold exchange rate is being reported. Example: CeloContract.StableToken
+   * @return An unpacked list of elements from largest to smallest.
+   */
+  async getTimestamps(token: CeloToken): Promise<OracleTimestamp[]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.getTimestamps(tokenAddress).call()
+    const timestamps: OracleTimestamp[] = []
+    for (let i = 0; i < response[0].length; i++) {
+      const medRelIndex = parseInt(response[2][i], 10)
+      timestamps.push({
+        address: response[0][i],
+        timestamp: valueToBigNumber(response[1][i]),
+        medianRelation: medRelIndex,
+      })
+    }
+    return timestamps
+  }
+
+  async getReports(token: CeloToken): Promise<OracleReport[]> {
+    const [rates, timestamps] = await Promise.all([this.getRates(token), this.getTimestamps(token)])
+    const reports: OracleReport[] = []
+    for (const rate of rates) {
+      const match = timestamps.filter((t: OracleTimestamp) => eqAddress(t.address, rate.address))
+      reports.push({ address: rate.address, rate: rate.rate, timestamp: match[0].timestamp })
+    }
+    return reports
   }
 
   private async findLesserAndGreaterKeys(
