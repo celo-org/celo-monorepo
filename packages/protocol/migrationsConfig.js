@@ -64,6 +64,7 @@ const DefaultConfig = {
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
+    // TODO(asa): Must be set before RC1
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
     carbonOffsettingFraction: 1 / 200,
     frozen: true,
@@ -178,6 +179,7 @@ const DefaultConfig = {
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold per validator
+      // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 180 * DAY,
     },
     validatorLockedGoldRequirements: {
@@ -188,7 +190,8 @@ const DefaultConfig = {
       exponent: 10,
       adjustmentSpeed: 0.1,
     },
-    membershipHistoryLength: 60,
+    // MUST BE KEPT IN SYNC WITH GROUP LOCKED GOLD DURATION
+    membershipHistoryLength: 180,
     commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
