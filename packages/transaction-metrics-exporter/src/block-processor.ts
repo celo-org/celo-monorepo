@@ -95,11 +95,13 @@ export class BlockProcessor {
 
   async fetchBlockState(blockNumber: number) {
     const promises = stateGetters.map(
-      ({ contract, method, args, transformValues, maxBucketSize }) => {
+      async ({ contract, method, args, transformValues, maxBucketSize }) => {
+        if (!(await this.contracts[contract].exists(blockNumber))) {
+          return
+        }
+        args = typeof args === 'function' ? args(blockNumber) : args
         this.contracts[contract].setDefaultBlock(blockNumber)
-        return (this.contracts as any)[contract][method](
-          ...(typeof args === 'function' ? args(blockNumber) : args)
-        )
+        return (this.contracts as any)[contract][method](...args)
           .then((returnData: any) => {
             this.contracts[contract].setDefaultBlock('latest')
             const data: DataResult = {
@@ -112,7 +114,7 @@ export class BlockProcessor {
             this.logEvent(LoggingCategory.State, data)
             this.logHistogram({ ...data, args }, maxBucketSize)
           })
-          .catch() as Promise<any>
+          .catch(() => '') as Promise<any>
       }
     )
     await Promise.all(promises)
@@ -176,7 +178,6 @@ export class BlockProcessor {
           }
         )
       )
-
       // tslint:disable-next-line
       const labels = {
         to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
@@ -195,20 +196,22 @@ export class BlockProcessor {
         })
 
         this.logEvent(LoggingCategory.ParsedTransaction, { ...parsedTx.callDetails, hash: tx.hash })
+        try {
+          for (const event of logExplorer.getKnownLogs(receipt)) {
+            Counters.transactionParsedLogs.inc({
+              contract: parsedTx.callDetails.contract,
+              function: parsedTx.callDetails.function,
+              log: event.event,
+            })
 
-        for (const event of logExplorer.getKnownLogs(receipt)) {
-          Counters.transactionParsedLogs.inc({
-            contract: parsedTx.callDetails.contract,
-            function: parsedTx.callDetails.function,
-            log: event.event,
-          })
+            // @ts-ignore We want to rename event => eventName to avoid overwriting
+            event.eventName = event.event
+            delete event.event
 
-          // @ts-ignore We want to rename event => eventName to avoid overwriting
-          event.eventName = event.event
-          delete event.event
-
-          this.logEvent(LoggingCategory.ParsedLog, event)
-        }
+            this.logEvent(LoggingCategory.ParsedLog, event)
+          }
+          // tslint:disable-next-line
+        } catch {}
       }
     }
   }

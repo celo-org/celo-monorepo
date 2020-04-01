@@ -32,6 +32,11 @@ export abstract class BaseWrapper<T extends Contract> {
 
   events = this.contract.events
 
+  async exists(block?: number) {
+    const code = await this.kit.web3.eth.getCode(this.address, block as any)
+    return code !== '0x'
+  }
+
   setDefaultBlock(block: number | 'latest') {
     this.contract.defaultBlock = block === 'latest' ? 'latest' : this.kit.web3.utils.toHex(block)
   }
