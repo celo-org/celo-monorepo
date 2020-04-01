@@ -60,7 +60,8 @@ import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { convertToPeriodDecimalSeparator, withDecimalSeparator } from 'src/utils/numberFormat'
+import { convertToPeriodDecimalSeparator } from 'src/utils/formatting'
+import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
 
 const AmountInput = withDecimalSeparator(
   withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)

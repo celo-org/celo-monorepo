@@ -1,5 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
+import { getNumberFormatSettings } from 'react-native-localize'
 import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 
@@ -120,4 +121,12 @@ export const getBalanceColor = (accountBalance: BigNumber): string => {
     return colors.errorRed
   }
   return colors.dark
+}
+
+export const convertToPeriodDecimalSeparator = (value: string) => {
+  const { decimalSeparator } = getNumberFormatSettings()
+  if (decimalSeparator !== '.') {
+    value = value.replace(decimalSeparator, '.')
+  }
+  return value
 }
