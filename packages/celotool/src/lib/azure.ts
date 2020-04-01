@@ -24,8 +24,11 @@ export async function switchToClusterFromEnv(
   const resourceGroup = fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
 
   if (currentCluster === null || currentCluster.trim() !== clusterName) {
+    // If a context is edited for some reason (eg switching default namespace),
+    // a warning and prompt is shown asking if the existing context should be
+    // overwritten. To avoid this, --overwrite-existing force overwrites.
     await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${resourceGroup} --name ${clusterName}`
+      `az aks get-credentials --resource-group ${resourceGroup} --name ${clusterName} --overwrite-existing`
     )
   }
   await setupCluster(celoEnv)
