@@ -21,7 +21,7 @@
     "@celo/utils": "^0.1.0",
     "apollo-datasource-rest": "^0.3.1",
     "apollo-server-express": "^2.4.2",
-    "bignumber.js": "^7.2.0",
+    "bignumber.js": "^9.0.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "firebase-admin": "^8.6.1",

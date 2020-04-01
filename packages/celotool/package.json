@@ -14,7 +14,7 @@
     "@google-cloud/storage": "^2.4.3",
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
-    "bignumber.js": "^7.2.0",
+    "bignumber.js": "^9.0.0",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
     "bls12377js": "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac",
