@@ -15,28 +15,23 @@ const headerHex =
 
 const TMP_PATH = '/tmp/e2e'
 
-function headerArray(web3: Web3, block: any) {
+function headerArray(block: any) {
   return [
     block.parentHash,
-    block.sha3Uncles,
     block.miner,
     block.stateRoot,
     block.transactionsRoot,
     block.receiptsRoot,
     block.logsBloom,
-    web3.utils.toHex(block.difficulty),
     block.number,
-    block.gasLimit,
     block.gasUsed,
     block.timestamp,
     block.extraData,
-    block.mixHash,
-    block.nonce,
   ]
 }
 
-function headerFromBlock(web3: Web3, block: any) {
-  return ensureLeading0x(rlp.encode(headerArray(web3, block)).toString('hex'))
+function headerFromBlock(block: any) {
+  return ensureLeading0x(rlp.encode(headerArray(block)).toString('hex'))
 }
 
 // Find a validator that double signed. Both blocks will have signatures from exactly 2F+1 validators.
@@ -169,7 +164,7 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const header = headerFromBlock(kit.web3, block)
+      const header = headerFromBlock(block)
       const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
       assert.equal(blockNumber, current.toString())
     })
@@ -185,7 +180,7 @@ describe('slashing tests', function(this: any) {
       const contract = await kit._web3Contracts.getElection()
       const current = await kit.web3.eth.getBlockNumber()
       const block = await kit.web3.eth.getBlock(current)
-      const header = headerFromBlock(kit.web3, block)
+      const header = headerFromBlock(block)
       const blockHash = await contract.methods.hashHeader(header).call()
       assert.equal(blockHash, block.hash)
     })
@@ -280,11 +275,11 @@ describe('slashing tests', function(this: any) {
 
       await waitForBlock(web3, doubleSigningBlock.number)
 
-      const other = headerFromBlock(web3, doubleSigningBlock)
+      const other = headerFromBlock(doubleSigningBlock)
 
       const num = await slasher.methods.getBlockNumberFromHeader(other).call()
 
-      const header = headerFromBlock(web3, await web3.eth.getBlock(num))
+      const header = headerFromBlock(await web3.eth.getBlock(num))
 
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
@@ -330,9 +325,9 @@ describe('slashing tests', function(this: any) {
       const election = await kit.contracts.getElection()
       await waitForBlock(web3, doubleSigningBlock.number)
 
-      const other = headerFromBlock(web3, doubleSigningBlock)
+      const other = headerFromBlock(doubleSigningBlock)
       const num = await slasher.getBlockNumberFromHeader(other)
-      const header = headerFromBlock(web3, await web3.eth.getBlock(num))
+      const header = headerFromBlock(await web3.eth.getBlock(num))
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await election.validatorSignerAddressFromSet(signerIdx, num)
 
