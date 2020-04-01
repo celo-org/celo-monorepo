@@ -29,6 +29,8 @@ export abstract class BaseWrapper<T extends Contract> {
   public getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
     return this.contract.getPastEvents(event, options)
   }
+
+  events = this.contract.events
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
@@ -64,6 +66,7 @@ type Parser<A, B> = (input: A) => B
 
 /** Identity Parser */
 export const identity = <A>(a: A) => a
+export const stringIdentity = (x: string) => x
 
 /**
  * Tuple parser

@@ -93,6 +93,20 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     })
   })
 
+  server.get('/papers/stability', (_, res) => {
+    res.redirect('/papers/Celo_Stability_Analysis.pdf')
+  })
+
+  server.get('/papers/cbdc-velocity', (_, res) => {
+    res.redirect('/papers/CBDC_Velocity_Copic-Franke.pdf')
+  })
+
+  server.get('/papers/whitepaper', (_, res) => {
+    res.redirect(
+      '/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
+    )
+  })
+
   server.get('/brand', (_, res) => {
     res.redirect('/experience/brand')
   })

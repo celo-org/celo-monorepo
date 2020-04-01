@@ -5,7 +5,7 @@ import {
   CeloTransactionObject,
   identity,
   proxyCall,
-  proxySend,
+  toTransactionObject,
   tupleParser,
   valueToBigNumber,
   valueToFrac,
@@ -47,6 +47,11 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * commit to the gold bucket
    */
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, valueToBigNumber)
+  /**
+   * Query last bucket update
+   * @returns The timestamp of the last time exchange buckets were updated.
+   */
+  lastBucketUpdate = proxyCall(this.contract.methods.lastBucketUpdate, undefined, valueToBigNumber)
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
@@ -101,15 +106,29 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The amount of buyToken that was transfered
    */
-  exchange: (
+  async exchange(
     sellAmount: BigNumber.Value,
     minBuyAmount: BigNumber.Value,
     sellGold: boolean
-  ) => CeloTransactionObject<string> = proxySend(
-    this.kit,
-    this.contract.methods.exchange,
-    tupleParser(valueToString, valueToString, identity)
-  )
+  ): Promise<CeloTransactionObject<string>> {
+    if (sellGold) {
+      const goldToken = await this.kit.contracts.getGoldToken()
+      await goldToken.increaseAllowance(this.address, sellAmount).send()
+    } else {
+      const stableToken = await this.kit.contracts.getStableToken()
+      await stableToken.increaseAllowance(this.address, sellAmount).send()
+    }
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.exchange(
+        valueToString(sellAmount),
+        valueToString(minBuyAmount),
+        sellGold
+      ),
+      // Don't estimate gas as the increaseAllowance may not be mined yet.
+      { from: this.kit.defaultAccount, gas: 1000000 }
+    )
+  }
 
   /**
    * Exchanges amount of cGLD in exchange for at least minUsdAmount of cUsd

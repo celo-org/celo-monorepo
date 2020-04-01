@@ -12,39 +12,18 @@ import {
   ViewProps,
   ViewStyle,
 } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { Cell, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { ErrorMessage } from './ErrorDisplay'
 
-function getErrorTransKey(field: string) {
-  let key = 'generic'
-
-  if (field === 'email' || key === 'unknownError') {
-    key = field
-  }
-  return key
-}
-
-export function ErrorMessage({ allErrors, field, t }) {
-  const key = getErrorTransKey(field)
-
-  return allErrors.includes(field) ? (
-    <Fade>
-      <Text style={[fonts.h6, textStyles.error]}>{t(`common:validationErrors.${key}`)}</Text>
-    </Fade>
-  ) : (
-    <View style={styles.errorPlaceholder} />
-  )
-}
-
-export function NameErrorArea({ t, formState, isMobile }) {
+export function NameErrorArea({ formState, isMobile }) {
   return (
     <Cell
       span={Spans.fourth}
       tabletSpan={Spans.full}
       style={isMobile ? [styles.verticalSpace, styles.alignStart] : styles.validationMessage}
     >
-      <ErrorMessage allErrors={formState.errors} field={'name'} t={t} />
+      <ErrorMessage allErrors={formState.errors} field={'name'} />
     </Cell>
   )
 }
@@ -80,7 +59,7 @@ export function HolisticField({
         tabletSpan={Spans.full}
         style={isMobile ? [styles.verticalSpace, styles.alignStart] : styles.validationMessage}
       >
-        <ErrorMessage allErrors={errors} field={fieldName} t={t} />
+        <ErrorMessage allErrors={errors} field={fieldName} />
       </Cell>
       <Cell
         span={Spans.half}
@@ -117,9 +96,6 @@ export const styles = StyleSheet.create({
   zeroVertical: {
     paddingVertical: 1,
   },
-  errorPlaceholder: {
-    height: 18,
-  },
   errorBorder: {
     borderColor: colors.error,
   },
@@ -129,9 +105,6 @@ export const styles = StyleSheet.create({
   label: {
     color: colors.secondary,
     lineHeight: 20,
-  },
-  labelBox: {
-    marginBottom: 5,
   },
 })
 
@@ -169,52 +142,6 @@ export class TextInput extends React.Component<TextInputProps & TextInputAuxProp
       <RNTextInput {...props} onFocus={this.onFocus} onBlur={this.onBlur} style={currentStyle} />
     )
   }
-}
-
-interface LabelProps {
-  name: string
-  multiline?: boolean
-  hasError: boolean
-  value: string
-  label: string
-  onInput: (x?: unknown) => void
-  isDarkMode?: boolean
-}
-
-export function LabeledInput({
-  name,
-  multiline,
-  hasError,
-  value,
-  onInput,
-  label,
-  isDarkMode,
-}: LabelProps) {
-  return (
-    <>
-      <View style={styles.labelBox}>
-        <Text accessibilityRole={'label'} style={[fonts.a, textStyles.medium, styles.label]}>
-          {label}
-        </Text>
-      </View>
-      <TextInput
-        multiline={multiline}
-        numberOfLines={3}
-        style={[
-          standardStyles.input,
-          fonts.p,
-          styles.input,
-          standardStyles.elementalMarginBottom,
-          isDarkMode && standardStyles.inputDarkMode,
-          hasError && styles.errorBorder,
-        ]}
-        focusStyle={isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused}
-        name={name}
-        value={value}
-        onChange={onInput}
-      />
-    </>
-  )
 }
 
 interface CheckboxProps {

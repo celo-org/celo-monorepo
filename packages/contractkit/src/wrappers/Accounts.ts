@@ -21,6 +21,7 @@ import {
 } from '../wrappers/BaseWrapper'
 
 interface AccountSummary {
+  address: string
   name: string
   authorizedSigners: {
     vote: Address
@@ -123,6 +124,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       this.getDataEncryptionKey(account),
     ])
     return {
+      address: account,
       name: ret[0],
       authorizedSigners: {
         vote: ret[1],
