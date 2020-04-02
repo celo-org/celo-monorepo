@@ -1912,7 +1912,7 @@ contract('Election', (accounts: string[]) => {
       )
 
       for (const account of vAccounts) {
-        await checkVoterInvariants(account, delta)
+        await checkVoterInvariants(account, delta, delta)
         const address = account.address
         // Need to fetch actual number due to potential rounding errors.
         const active = await election.getActiveVotesForGroupByAccount(group, address)
