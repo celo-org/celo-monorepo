@@ -28,6 +28,7 @@ export enum NameSpaces {
   faucet = 'faucet',
   home = 'home',
   jobs = 'jobs',
+  papers = 'papers',
   terms = 'terms',
   technology = 'technology',
 }

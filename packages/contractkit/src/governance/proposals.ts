@@ -94,6 +94,9 @@ export class ProposalBuilder {
       if (!txo) {
         throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
       }
+      if (tx.value === undefined) {
+        tx.value = '0'
+      }
       // TODO fix types
       return this.fromWeb3tx(txo, { to: (contract as any)._address, value: tx.value })
     })

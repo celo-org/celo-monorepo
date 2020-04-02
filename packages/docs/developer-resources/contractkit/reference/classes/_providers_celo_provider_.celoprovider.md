@@ -62,7 +62,7 @@ ___
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L69)*
+*Defined in [contractkit/src/providers/celo-provider.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L35)*
 
 **Parameters:**
 
@@ -78,7 +78,7 @@ ___
 
 ▸ **getAccounts**(): *Promise‹string[]›*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L77)*
+*Defined in [contractkit/src/providers/celo-provider.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L43)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **isLocalAccount**(`address?`: undefined | string): *boolean*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L83)*
+*Defined in [contractkit/src/providers/celo-provider.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L49)*
 
 **Parameters:**
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **send**(`payload`: JsonRpcPayload, `callback`: Callback‹JsonRpcResponse›): *void*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L90)*
+*Defined in [contractkit/src/providers/celo-provider.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L56)*
 
 Send method as expected by web3.js
 
@@ -123,6 +123,6 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:184](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L184)*
+*Defined in [contractkit/src/providers/celo-provider.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L134)*
 
 **Returns:** *void*

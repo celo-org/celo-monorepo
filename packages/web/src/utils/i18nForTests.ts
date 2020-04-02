@@ -21,6 +21,7 @@ NextI18NextInstance.i18n.use(initReactI18next).init({
       [NameSpaces.jobs]: require('public/static/locales/en/jobs.json'),
       [NameSpaces.technology]: require('public/static/locales/en/technology.json'),
       [NameSpaces.terms]: require('public/static/locales/en/terms.json'),
+      [NameSpaces.papers]: require('public/static/locales/en/papers.json'),
     },
   },
   // have a common namespace used around the full app
