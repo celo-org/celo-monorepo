@@ -85,12 +85,12 @@ const DefaultConfig = {
     frozen: true,
   },
   governance: {
-    queueExpiry: WEEK, // Change to 4 weeks once mainnet activated
-    dequeueFrequency: MINUTE, // Change to 1 week once mainnet activated
-    concurrentProposals: 3, // Change to 10 once mainnet activated
-    approvalStageDuration: 30 * MINUTE, // Change to 3 days once mainnet activated
-    referendumStageDuration: HOUR, // Change to 1 week once mainnet activated
-    executionStageDuration: WEEK,
+    queueExpiry: 4 * WEEK,
+    dequeueFrequency: HOUR, // Change to 1 week once mainnet activated
+    concurrentProposals: 3,
+    approvalStageDuration: DAY, // Change to 3 days once mainnet activated
+    referendumStageDuration: DAY, // Change to 1 week once mainnet activated
+    executionStageDuration: 3 * DAY,
     minDeposit: 100, // 100 cGLD
     participationBaseline: 8 / 10,
     participationBaselineFloor: 5 / 100,
