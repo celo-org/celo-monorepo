@@ -83,7 +83,7 @@
   "devDependencies": {
     "@firebase/app-types": "^0.5.0",
     "@sentry/types": "^5.10.0",
-    "@testing-library/jest-dom": "4.2.0",
+    "@testing-library/jest-dom": "^5.3.0",
     "@testing-library/react": "^9.4.0",
     "@types/airtable": "^0.5.7",
     "@types/hex-rgba": "^1.0.0",
