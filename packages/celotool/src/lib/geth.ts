@@ -38,6 +38,7 @@ const LOAD_TEST_TRANSFER_WEI = new BigNumber(10000)
 
 const GETH_IPC = 'geth.ipc'
 const DISCOVERY_PORT = 30303
+const BOOTNODE_DISCOVERY_PORT = 30301
 
 const BLOCKSCOUT_TIMEOUT = 12000 // ~ 12 seconds needed to see the transaction in the blockscout
 
@@ -72,7 +73,7 @@ export const getBootnodeEnode = async (namespace: string) => {
   const ip = await retrieveBootnodeIPAddress(namespace)
   const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.BOOTNODE, 0)
   const nodeId = privateKeyToPublicKey(privateKey)
-  return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
+  return [getEnodeAddress(nodeId, ip, BOOTNODE_DISCOVERY_PORT)]
 }
 
 const retrieveBootnodeIPAddress = async (namespace: string) => {

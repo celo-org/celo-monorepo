@@ -6,7 +6,7 @@ import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -151,21 +151,6 @@ export async function createAndUploadBackupSecretIfNotExists(serviceAccountName:
   return createAndUploadKubernetesSecretIfNotExists(BACKUP_GCS_SECRET_NAME, serviceAccountName)
 }
 
-export async function createServiceAccountIfNotExists(name: string) {
-  await switchToProjectFromEnv()
-  // TODO: add permissions for cloudsql editor to service account
-  const serviceAccountExists = await outputIncludes(
-    `gcloud iam service-accounts list`,
-    name,
-    `Service account ${name} exists, skipping creation`
-  )
-  if (!serviceAccountExists) {
-    await execCmdWithExitOnFailure(
-      `gcloud iam service-accounts create ${name} --display-name="${name}"`
-    )
-  }
-}
-
 export function getServiceAccountName(prefix: string) {
   // NOTE: trim to meet the max size requirements of service account names
   return `${prefix}-${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`.slice(0, 30)
@@ -225,7 +210,7 @@ export async function installCertManager() {
   )
 }
 
-export async function installAndEnableMetricsDeps() {
+export async function installAndEnableMetricsDeps(installPromToSd: boolean) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
     `kube-state-metrics`,
@@ -236,22 +221,24 @@ export async function installAndEnableMetricsDeps() {
       `helm install --name kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
     )
   }
-  const kubeStateMetricsPrometheusReleaseExists = await outputIncludes(
-    `helm list`,
-    `kube-state-metrics-prometheus-to-sd`,
-    `kube-state-metrics-prometheus-to-sd exists, skipping install`
-  )
-  if (!kubeStateMetricsPrometheusReleaseExists) {
-    const promToSdParams = [
-      `--set "metricsSources.kube-state-metrics=http://kube-state-metrics.default.svc.cluster.local:8080"`,
-      `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
-      `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
-    ]
-    await execCmdWithExitOnFailure(
-      `helm install --name kube-state-metrics-prometheus-to-sd ../helm-charts/prometheus-to-sd ${promToSdParams.join(
-        ' '
-      )}`
+  if (installPromToSd) {
+    const kubeStateMetricsPrometheusReleaseExists = await outputIncludes(
+      `helm list`,
+      `kube-state-metrics-prometheus-to-sd`,
+      `kube-state-metrics-prometheus-to-sd exists, skipping install`
     )
+    if (!kubeStateMetricsPrometheusReleaseExists) {
+      const promToSdParams = [
+        `--set "metricsSources.kube-state-metrics=http://kube-state-metrics.default.svc.cluster.local:8080"`,
+        `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
+        `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
+      ]
+      await execCmdWithExitOnFailure(
+        `helm install --name kube-state-metrics-prometheus-to-sd ../helm-charts/prometheus-to-sd ${promToSdParams.join(
+          ' '
+        )}`
+      )
+    }
   }
 }
 
