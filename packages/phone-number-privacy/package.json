@@ -7,8 +7,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "yarn build && firebase serve --only functions",
-    "deploy:staging": "firebase deploy --only functions --project celo-phone-number-privacy-stg",
-    "deploy:prod": "firebase deploy --only functions --project celo-phone-number-privacy",
+    "deploy:staging": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy-stg",
+    "deploy:prod": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
     "config:get:staging": "firebase functions:config:get --project celo-phone-number-privacy-stg",
     "config:get:prod": "firebase functions:config:get --project celo-phone-number-privacy",
     "clean": "tsc -b . --clean",

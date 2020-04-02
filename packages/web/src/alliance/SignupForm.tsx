@@ -2,7 +2,8 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { NewMember } from 'src/alliance/AllianceMember'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
-import { CheckboxWithLabel, ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
+import { CheckboxWithLabel, Form } from 'src/forms/FormComponents'
+import { LabeledInput } from 'src/forms/LabeledInput'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import Checkmark from 'src/icons/Checkmark'
 import { useScreenSize } from 'src/layout/ScreenSize'
@@ -38,23 +39,21 @@ export default function SignupForm() {
           <View style={styles.container}>
             <View style={isDesktop && standardStyles.row}>
               <View style={styles.inputContainer}>
-                <ErrorMessage t={t} field={'name'} allErrors={formState.errors} />
                 <LabeledInput
                   isDarkMode={true}
                   label={t('form.name')}
                   onInput={onInput}
-                  hasError={formState.errors.includes('name')}
+                  allErrors={formState.errors}
                   name="name"
                   value={formState.form.name}
                 />
               </View>
               <View style={styles.inputContainer}>
-                <ErrorMessage t={t} field={'email'} allErrors={formState.errors} />
                 <LabeledInput
                   isDarkMode={true}
                   label={t('form.email')}
                   onInput={onInput}
-                  hasError={formState.errors.includes('email')}
+                  allErrors={formState.errors}
                   name="email"
                   value={formState.form.email}
                 />
@@ -65,7 +64,6 @@ export default function SignupForm() {
                 isDarkMode={true}
                 label={t('form.contribution')}
                 onInput={onInput}
-                hasError={formState.errors.includes('contribution')}
                 name="contribution"
                 value={formState.form.contribution}
               />

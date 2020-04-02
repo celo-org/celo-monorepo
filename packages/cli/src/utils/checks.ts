@@ -262,7 +262,7 @@ class CheckBuilder {
       `${this.signer!} is vote signer or registered account`,
       this.withAccounts(async (accs) => {
         return accs.voteSignerToAccount(this.signer!).then(
-          () => true,
+          (addr) => !eqAddress(addr, NULL_ADDRESS),
           () => false
         )
       })
