@@ -341,7 +341,7 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey);
+    _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey);
     _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
@@ -629,7 +629,7 @@ contract Validators is
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
-      _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
       "Error updating ECDSA public key"
     );
     return true;
@@ -645,6 +645,7 @@ contract Validators is
    */
   function _updateEcdsaPublicKey(
     Validator storage validator,
+    address account,
     address signer,
     bytes memory ecdsaPublicKey
   ) private returns (bool) {
@@ -679,7 +680,7 @@ contract Validators is
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
-      _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
       "Error updating ECDSA public key"
     );
     require(
