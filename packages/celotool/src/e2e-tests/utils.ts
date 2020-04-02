@@ -362,14 +362,18 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
 export function getRosettaContext() {
   const argv = require('minimist')(process.argv.slice(2))
-  if (!argv.rosettabranch && !argv.localrosetta) {
+  if (
+    !(
+      (argv.rosettabranch && typeof argv.rosettabranch === 'string') ||
+      (argv.localrosetta && typeof argv.localrosetta === 'string')
+    )
+  ) {
     return null
   }
-
   const branch = argv.rosettabranch || 'master'
   const repoPath = argv.localrosetta || '/tmp/rosetta'
   const before = async () => {
-    if (!argv.rosettageth) {
+    if (!argv.localrosetta) {
       await spawnCmdWithExitOnFailure('rm', ['-rf', repoPath])
       await spawnCmdWithExitOnFailure('git', [
         'clone',

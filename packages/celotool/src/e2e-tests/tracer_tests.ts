@@ -13,7 +13,14 @@ import { EventLog, TransactionReceipt } from 'web3-core'
 import { Contract } from 'web3-eth-contract'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { spawnCmdWithExitOnFailure } from '../lib/utils'
-import { compileContract, deployReleaseGold, getContext, getRosettaContext, sleep } from './utils'
+import {
+  compileContract,
+  deployReleaseGold,
+  getContext,
+  getRosettaContext,
+  sleep,
+  waitForBlock,
+} from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const ValidatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
@@ -85,24 +92,23 @@ contract TestContract {
 }
 `
 
-const releaseGoldGrantsConfig = `[
+const releaseGoldGrants = [
   {
-    "releaseStartTime": "MAINNET+0",                  
-    "releaseCliffTime": 1,
-    "numReleasePeriods": 1,
-    "releasePeriod": 100000000,
-    "amountReleasedPerPeriod": 10,
-    "revocable": false,
-    "beneficiary": "${FromAddress}",
-    "releaseOwner": "${ReleaseGoldAddress}",
-    "refundAddress": "0x0000000000000000000000000000000000000000",
-    "subjectToLiquidityProvision": true,
-    "initialDistributionRatio": 1000,
-    "canValidate": true,
-    "canVote": true
-  }
+    releaseStartTime: 'MAINNET+0',
+    releaseCliffTime: 600,
+    numReleasePeriods: 40,
+    releasePeriod: 10,
+    amountReleasedPerPeriod: 10,
+    revocable: false,
+    beneficiary: FromAddress,
+    releaseOwner: ReleaseGoldAddress,
+    refundAddress: '0x0000000000000000000000000000000000000000',
+    subjectToLiquidityProvision: true,
+    initialDistributionRatio: 1000,
+    canValidate: true,
+    canVote: true,
+  },
 ]
-`
 
 class DerivedAccountAssets {
   lockedGold: BigNumber
@@ -839,31 +845,6 @@ describe('tracer tests', () => {
       }
     })
 
-    describe(`Deploying release gold`, () => {
-      let releaseGold: any
-      let trackAssets: Record<Address, AccountAssets>
-
-      before(async function(this: any) {
-        this.timeout(0)
-        const startBlockNumber = await kit.web3.eth.getBlockNumber()
-        releaseGold = await deployReleaseGold(
-          'testing',
-          ReleaseGoldAddress,
-          releaseGoldGrantsConfig,
-          TMP_PATH
-        )
-        const endBlockNumber = await kit.web3.eth.getBlockNumber()
-        console.info('ReleaseGold:')
-        console.info(releaseGold[0])
-        trackAssets = {}
-        for (let blockNumber = startBlockNumber; blockNumber <= endBlockNumber; blockNumber++) {
-          trackAssets = await trackAssetTransfers(kit, blockNumber, trackAssets)
-        }
-      })
-
-      it('should have deployed', () => assert.equal(releaseGold.length, 1))
-    })
-
     describe(`Deploying TestContract`, () => {
       let testContract: Contract
       let testContractDeployTransactionHash: string
@@ -966,6 +947,47 @@ describe('tracer tests', () => {
           transactionHash: receipt.transactionHash,
         }
       })
+    })
+
+    describe(`Deploying release gold`, () => {
+      let releaseGold: any
+      let trackAssets: Record<Address, AccountAssets>
+      const startAmount = new BigNumber(Web3.utils.toWei('1', 'ether'))
+      const fundAmount = new BigNumber(releaseGoldGrants[0].numReleasePeriods).times(
+        Web3.utils.toWei(releaseGoldGrants[0].amountReleasedPerPeriod.toString(), 'ether')
+      )
+
+      before(async function(this: any) {
+        this.timeout(0)
+        const startBlockNumber = (await kit.web3.eth.getBlockNumber()) + 1
+        await waitForBlock(kit.web3, startBlockNumber)
+        releaseGoldGrants[0].releaseStartTime = new Date().toString()
+        releaseGold = await deployReleaseGold(
+          'testing',
+          ReleaseGoldAddress,
+          JSON.stringify(releaseGoldGrants),
+          TMP_PATH
+        )
+        const endBlockNumber = await kit.web3.eth.getBlockNumber()
+        console.info(`ReleaseGold deployed in blocks [${startBlockNumber}-${endBlockNumber}]`)
+        trackAssets = {}
+        for (let blockNumber = startBlockNumber; blockNumber <= endBlockNumber; blockNumber++) {
+          trackAssets = await trackAssetTransfers(kit, blockNumber, trackAssets)
+        }
+        // console.info(trackAssets)
+      })
+
+      it('cGLD tracer should increment beneficiary by start amount', () =>
+        assertEqualBN(trackAssets[normalizeAddress(FromAddress)]?.gold, startAmount))
+
+      it('cGLD tracer should increment ReleaseGold proxy by funding amount', () =>
+        assertEqualBN(trackAssets[normalizeAddress(releaseGold[0].ProxyAddress)]?.gold, fundAmount))
+
+      it('cGLD tracer should decrement funder by total', () =>
+        assertEqualBN(
+          trackAssets[normalizeAddress(ReleaseGoldAddress)]?.gold,
+          fundAmount.plus(startAmount).times(-1)
+        ))
     })
 
     if (rosettaContext) {
