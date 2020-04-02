@@ -92,7 +92,7 @@ const DefaultConfig = {
     referendumStageDuration: 2 * DAY, // Change to 1 week once mainnet activated
     executionStageDuration: 3 * DAY,
     minDeposit: 100, // 100 cGLD
-    participationBaseline: 8 / 10,
+    participationBaseline: 0, // Start with no participation requirements, let the protocol adjust
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
