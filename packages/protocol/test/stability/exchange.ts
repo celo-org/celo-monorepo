@@ -358,6 +358,16 @@ contract('Exchange', (accounts: string[]) => {
         assertEqualBN(sellBucketSize, initialGoldBucket)
         assertEqualBN(buyBucketSize, initialStableBucket.times(2))
       })
+
+      it(`should return the same value if oracles median time is old`, async () => {
+        await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+        await timeTravel(updateFrequency + 10, web3)
+
+        const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
+
+        assertEqualBN(sellBucketSize, initialGoldBucket)
+        assertEqualBN(buyBucketSize, initialStableBucket)
+      })
     })
   })
 
