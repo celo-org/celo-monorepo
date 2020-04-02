@@ -984,11 +984,8 @@ describe('governance tests', () => {
       // Prepare for key rotation.
       const validatorWeb3 = new Web3(validatorRpc)
 
-      // const authWeb31 = 'ws://localhost:8559'
-      // const authWeb32 = 'ws://localhost:8561'
-
-      const authWeb31 = 'http://localhost:9559'
-      const authWeb32 = 'http://localhost:9561'
+      const authWeb31 = 'ws://localhost:8559'
+      const authWeb32 = 'ws://localhost:8561'
 
       const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
 
