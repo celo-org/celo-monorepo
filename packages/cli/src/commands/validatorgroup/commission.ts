@@ -47,8 +47,8 @@ export default class ValidatorGroupCommission extends BaseCommand {
         // .signerAccountIsValidatorGroup()
         .runChecks()
 
-      const tx = await validators.queueCommissionUpdate(commission)
-      await displaySendTx('queueCommissionUpdate', tx)
+      const tx = await validators.setNextCommissionUpdate(commission)
+      await displaySendTx('setNextCommissionUpdate', tx)
     } else if (res.flags.apply) {
       await newCheckBuilder(this, res.flags.from)
         .isSignerOrAccount()
