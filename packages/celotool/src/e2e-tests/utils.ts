@@ -360,6 +360,36 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   }
 }
 
+export function getRosettaContext() {
+  const argv = require('minimist')(process.argv.slice(2))
+  if (!argv.rosettabranch && !argv.localrosetta) {
+    return null
+  }
+
+  const branch = argv.rosettabranch || 'master'
+  const repoPath = argv.localrosetta || '/tmp/rosetta'
+  const before = async () => {
+    if (!argv.rosettageth) {
+      await spawnCmdWithExitOnFailure('rm', ['-rf', repoPath])
+      await spawnCmdWithExitOnFailure('git', [
+        'clone',
+        '--depth',
+        '1',
+        'https://github.com/celo-org/rosetta.git',
+        repoPath,
+        '-b',
+        branch,
+      ])
+      await spawnCmdWithExitOnFailure('git', ['checkout', branch], { cwd: repoPath })
+    }
+    await spawnCmdWithExitOnFailure('make', [], { cwd: repoPath })
+  }
+  return {
+    repoPath,
+    hooks: { before },
+  }
+}
+
 export async function compileContract(
   contractName: string,
   contractSource: string,
@@ -398,7 +428,7 @@ export async function deployReleaseGold(
   const grantsFile = `${grantsPrefix}.json`
   const outputFile = `${grantsPrefix}.output`
   fs.writeFileSync(grantsFile, grantsJson)
-  const args = ['-n', network, '-f', fromAddress, '-g', grantsFile, '-o', outputFile]
+  const args = ['-n', network, '-f', fromAddress, '-g', grantsFile, '-o', outputFile, '-really']
   await spawnCmdWithExitOnFailure('./scripts/bash/deploy_release_contracts.sh', args, {
     cwd: `${MonorepoRoot}/packages/protocol`,
   })

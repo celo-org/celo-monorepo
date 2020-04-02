@@ -13,7 +13,7 @@ import { EventLog, TransactionReceipt } from 'web3-core'
 import { Contract } from 'web3-eth-contract'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { spawnCmdWithExitOnFailure } from '../lib/utils'
-import { compileContract, deployReleaseGold, getContext, sleep } from './utils'
+import { compileContract, deployReleaseGold, getContext, getRosettaContext, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const ValidatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
@@ -418,6 +418,7 @@ describe('tracer tests', () => {
   }
 
   const context: any = getContext(gethConfig)
+  const rosettaContext: any = getRosettaContext()
   let kit: ContractKit
   let goldToken: GoldTokenWrapper
   let stableToken: StableTokenWrapper
@@ -860,7 +861,7 @@ describe('tracer tests', () => {
         }
       })
 
-      it('should have deployed', () => assertEqual(releaseGold.length, 1))
+      it('should have deployed', () => assert.equal(releaseGold.length, 1))
     })
 
     describe(`Deploying TestContract`, () => {
@@ -967,13 +968,17 @@ describe('tracer tests', () => {
       })
     })
 
-    const argv = require('minimist')(process.argv.slice(2))
-    if (argv.localrosetta && typeof argv.localrosetta === 'string') {
-      describe(`Rossetta tracer`, () => {
+    if (rosettaContext) {
+      describe(`Rossetta`, () => {
+        before(async function(this: any) {
+          this.timeout(0)
+          await rosettaContext.hooks.before()
+        })
+
         it('Tracer driver should succeed', async function(this: any) {
           this.timeout(0)
           await spawnCmdWithExitOnFailure('go', ['run', './examples/tracer/tracer.go'], {
-            cwd: argv.localrosetta,
+            cwd: rosettaContext.repoPath,
           })
         })
       })
