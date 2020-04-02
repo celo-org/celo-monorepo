@@ -236,6 +236,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     */
   function setReserveFraction(uint256 newReserveFraction) public onlyOwner {
     reserveFraction = FixidityLib.wrap(newReserveFraction);
+    require(reserveFraction.lt(FixidityLib.fixed1()), "reserve fraction must be smaller than 1");
     emit ReserveFractionSet(newReserveFraction);
   }
 

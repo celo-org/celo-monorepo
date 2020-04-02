@@ -296,7 +296,11 @@ contract('Exchange', (accounts: string[]) => {
       })
     })
 
-    it('should not allow a non-owner not set the minimum reports', async () => {
+    it('should not allow to set the reserve fraction greater or equal to one', async () => {
+      await assertRevert(exchange.setReserveFraction(toFixed(1)))
+    })
+
+    it('should not allow a non-owner not set the reserve fraction', async () => {
       await assertRevert(exchange.setReserveFraction(newReserveFraction, { from: accounts[1] }))
     })
   })
