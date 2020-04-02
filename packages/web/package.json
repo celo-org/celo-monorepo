@@ -54,7 +54,7 @@
     "net": "^1.0.2",
     "network-speed": "^2.0.4",
     "next": "^9.1.5",
-    "next-i18next": "^4.0.1",
+    "next-i18next": "^4.2.1",
     "next-images": "^1.2.0",
     "next-plugin-transpile-modules": "^2.0.0",
     "node-cache": "^5.0.2",

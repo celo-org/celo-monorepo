@@ -78,6 +78,11 @@
     "bignumber.js": "9.0.0",
     "prettier": "^1.19.1",
     "@types/prettier": "^1.19.0",
-    "eslint-utils": "^1.4.1"
+    "eslint-utils": "^1.4.1",
+    "set-value": "^3.0.2",
+    "decompress": "^4.2.1",
+    "https-proxy-agent": "^5.0.0",
+    "mixin-deep": "^2.0.1",
+    "js-yaml": "^3.13.1"
   }
 }

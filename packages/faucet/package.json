@@ -24,8 +24,8 @@
     "@celo/utils": "0.1.8",
     "debug": "^4.1.1",
     "firebase": "^7.8.0",
-    "firebase-admin": "^8.9.2",
-    "firebase-functions": "^3.3.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0",
     "twilio": "^3.39.3",
     "web3": "1.2.4",
     "web3-core-helpers": "1.2.4"

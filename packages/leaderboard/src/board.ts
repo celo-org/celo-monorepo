@@ -16,6 +16,7 @@ function addressToBinary(a: string) {
 }
 
 process.on('unhandledRejection', (reason, _promise) => {
+  // @ts-ignore
   console.log('Unhandled Rejection at:', reason.stack || reason)
   process.exit(0)
 })

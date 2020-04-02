@@ -20,11 +20,11 @@
     "@celo/contractkit": "0.3.1",
     "@celo/utils": "0.1.8",
     "apollo-datasource-rest": "^0.3.1",
-    "apollo-server-express": "^2.4.2",
+    "apollo-server-express": "^2.11.0",
     "bignumber.js": "^9.0.0",
     "dotenv": "^6.1.0",
-    "express": "^4.16.4",
-    "firebase-admin": "^8.6.1",
+    "express": "^4.17.1",
+    "firebase-admin": "^8.10.0",
     "graphql": "^14.1.1",
     "utf8": "^3.0.0",
     "web3-eth-abi": "1.2.4"
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^2.3.3",
     "@types/dotenv": "^4.0.3",
-    "@types/express": "^4.16.1",
+    "@types/express": "^4.17.4",
     "@types/utf8": "^2.1.6",
     "jest-fetch-mock": "^2.1.2",
     "tsc-watch": "^1.0.31",
