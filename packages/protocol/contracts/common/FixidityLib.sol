@@ -241,7 +241,7 @@ library FixidityLib {
   function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     require(y.value != 0, "can't divide by 0");
     uint256 X = x.value * FIXED1_UINT;
-    require(X / FIXED1_UINT == x.value);
+    require(X / FIXED1_UINT == x.value, "overflow at divide");
     return Fraction(X / y.value);
   }
 
