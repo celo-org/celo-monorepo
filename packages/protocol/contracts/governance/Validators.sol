@@ -486,9 +486,10 @@ contract Validators is
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
     if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(maxPayment).multiply(
-        validators[account].score
-      );
+      FixidityLib.Fraction memory totalPayment = FixidityLib
+        .newFixed(maxPayment)
+        .multiply(validators[account].score)
+        .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
       getStableToken().mint(group, groupPayment);
