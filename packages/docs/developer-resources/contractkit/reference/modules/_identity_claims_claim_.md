@@ -12,8 +12,8 @@
 ### Variables
 
 * [ClaimType](_identity_claims_claim_.md#const-claimtype)
+* [DOMAIN_TXT_HEADER](_identity_claims_claim_.md#const-domain_txt_header)
 * [SignedClaimType](_identity_claims_claim_.md#const-signedclaimtype)
-* [domainTxtHeader](_identity_claims_claim_.md#const-domaintxtheader)
 
 ### Functions
 
@@ -73,6 +73,14 @@ ___
 
 ___
 
+### `Const` DOMAIN_TXT_HEADER
+
+• **DOMAIN_TXT_HEADER**: *"celo-site-verification"* = "celo-site-verification"
+
+*Defined in [contractkit/src/identity/claims/claim.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L38)*
+
+___
+
 ### `Const` SignedClaimType
 
 • **SignedClaimType**: *TypeC‹object›* = t.type({
@@ -81,14 +89,6 @@ ___
 })
 
 *Defined in [contractkit/src/identity/claims/claim.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L33)*
-
-___
-
-### `Const` domainTxtHeader
-
-• **domainTxtHeader**: *"celo-site-verification"* = "celo-site-verification"
-
-*Defined in [contractkit/src/identity/claims/claim.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L38)*
 
 ## Functions
 
