@@ -86,10 +86,10 @@ const DefaultConfig = {
   },
   governance: {
     queueExpiry: 4 * WEEK,
-    dequeueFrequency: HOUR, // Change to 1 week once mainnet activated
+    dequeueFrequency: DAY, // Change to 1 week once mainnet activated
     concurrentProposals: 3,
     approvalStageDuration: DAY, // Change to 3 days once mainnet activated
-    referendumStageDuration: DAY, // Change to 1 week once mainnet activated
+    referendumStageDuration: 2 * DAY, // Change to 1 week once mainnet activated
     executionStageDuration: 3 * DAY,
     minDeposit: 100, // 100 cGLD
     participationBaseline: 8 / 10,
