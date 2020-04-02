@@ -1,10 +1,10 @@
-import GoogleStorageutils from './google-storage-utils'
+import { GoogleStorageUtils } from './google-storage-utils'
 
 const TAG = 'genesis-block-utils'
 
 export const GenesisBlocksGoogleStorageBucketName = 'genesis_blocks'
 
-export default class GenesisBlockUtils {
+export class GenesisBlockUtils {
   /**
    * Fetches the genesis block (as JSON data) from Google Storage.
    * If the network is not working, the method will reject the returned promise
@@ -13,7 +13,7 @@ export default class GenesisBlockUtils {
    */
   static async getGenesisBlockAsync(networkName: string): Promise<string> {
     console.debug(`${TAG} getGenesisBlockAsync("${networkName}") called`)
-    return GoogleStorageutils.fetchFileFromGoogleStorage(
+    return GoogleStorageUtils.fetchFileFromGoogleStorage(
       GenesisBlocksGoogleStorageBucketName,
       networkName
     )

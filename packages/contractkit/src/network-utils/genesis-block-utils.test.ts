@@ -1,13 +1,11 @@
-import { NETWORK_NAME } from '../contracts/network-name'
-import GenesisBlockUtils from '../src/genesis-block-utils'
-import { Logger, LogLevel } from '../src/logger'
+import { GenesisBlockUtils } from './genesis-block-utils'
+
+const NETWORK_NAME = 'alfajores'
 
 describe('Genesis block utils', () => {
   describe('#getGenesisBlockAsync', () => {
     it('should be able to get Genesis block', async () => {
-      Logger.setLogLevel(LogLevel.VERBOSE)
       const gensisBlock: string = await GenesisBlockUtils.getGenesisBlockAsync(NETWORK_NAME)
-      Logger.debug('Genesis block utils', `Genesis block is ${gensisBlock}`)
       // Fail if genesis block is not proper JSON.
       await JSON.parse(gensisBlock)
       // Fail if genesis block is less than 100 characters.
@@ -16,10 +14,8 @@ describe('Genesis block utils', () => {
     })
 
     it('should be able to get chain id from Genesis block', async () => {
-      Logger.setLogLevel(LogLevel.VERBOSE)
       const genesisBlock: string = await GenesisBlockUtils.getGenesisBlockAsync(NETWORK_NAME)
       const chainId: number = GenesisBlockUtils.getChainIdFromGenesis(genesisBlock)
-      Logger.debug('Genesis Block utils', `chainID is ${chainId}`)
       expect(chainId).toBeGreaterThan(0)
     })
   })
