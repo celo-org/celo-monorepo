@@ -4,8 +4,15 @@ import knex from 'knex'
 const DEV_MODE = process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
 interface Config {
+  blockchain: {
+    provider: string
+    blockscout: string
+  }
   salt: {
     key: string
+    unverifiedQueryCount: number
+    verifiedQueryCount: number
+    queryPerTransaction: number
   }
   db: {
     user: string
@@ -20,8 +27,16 @@ let config: Config
 if (DEV_MODE) {
   console.debug('Running in dev mode')
   config = {
+    blockchain: {
+      // TODO [amyslawson] figure out where to point these
+      provider: 'https://alfajores-forno.celo-testnet.org',
+      blockscout: 'https://alfajores-blockscout.celo-testnet.org',
+    },
     salt: {
       key: 'fakeSecretKey',
+      unverifiedQueryCount: 2,
+      verifiedQueryCount: 30,
+      queryPerTransaction: 2,
     },
     db: {
       user: 'postgres',
@@ -33,8 +48,15 @@ if (DEV_MODE) {
 } else {
   const functionConfig = functions.config()
   config = {
+    blockchain: {
+      provider: functionConfig.blockchain.provider,
+      blockscout: functionConfig.blockchain.blockscout,
+    },
     salt: {
       key: functionConfig.salt.key,
+      unverifiedQueryCount: functionConfig.salt.unverifiedQueryCount,
+      verifiedQueryCount: functionConfig.salt.verifiedQueryCount,
+      queryPerTransaction: functionConfig.salt.queryPerTransaction,
     },
     db: {
       user: functionConfig.db.username,
