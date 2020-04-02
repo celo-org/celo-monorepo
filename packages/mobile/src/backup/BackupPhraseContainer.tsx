@@ -152,11 +152,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.inputBorder,
     borderRadius: 4,
-    minHeight: 145,
+    minHeight: 125,
     padding: 14,
+    paddingTop: 16,
+    textAlignVertical: 'top',
   },
   socialPhraseInputText: {
-    minHeight: 100,
+    minHeight: 90,
   },
   button: {
     alignSelf: 'center',

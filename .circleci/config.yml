@@ -18,7 +18,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node10-gcloud
+    - image: celohq/node10-gcloud:v2
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -34,9 +34,9 @@ android-defaults: &android-defaults
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: celohq/circleci:geth1.9
+    - image: celohq/circleci:geth1.9-2
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: mrsmkl/gas-payment-change-m02-alt
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 
 general:
   artifacts:
@@ -410,7 +410,7 @@ jobs:
             set -euo pipefail
             cd packages/mobile
             # Create dummy Google services plist
-            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
+            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.dev.plist
             yarn run test:e2e:ios
       - store_artifacts:
           path: packages/mobile/e2e/artifacts

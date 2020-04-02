@@ -1,14 +1,12 @@
-import { Tx } from 'web3/eth/types'
-import { EncodedTransaction } from 'web3/types'
-import { Address } from '../base'
-import { signTransaction } from '../utils/signing-utils'
-import { RemoteAKVSigner } from '../utils/signers'
-import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'
+import { Address } from '@celo/utils/lib/address'
+import { RemoteAzureSigner } from './signers/remote-azure-signer'
+import { AzureKeyVaultClient } from './signers/azure-key-vault-client'
 // @ts-ignore-next-line
 import { BN } from 'bn.js'
 import { Wallet } from './wallet'
 import { RemoteWallet } from './remote-wallet'
-import { EIP712TypedData } from '../utils/sign-typed-data-utils'
+import { Signer } from './signers/signer'
+import * as ethUtil from 'ethereumjs-util'
 
 // Azure Key Vault implementation of a RemoteWallet
 export class AzureHSMWallet extends RemoteWallet implements Wallet {
@@ -19,47 +17,22 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
     this.keyVaultClient = new AzureKeyVaultClient(vaultName)
   }
 
-  protected async retrieveAccounts(): Promise<Map<Address, string>> {
+  protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
     const keys = await this.keyVaultClient.getKeys()
-    const addressToKeyName = new Map<Address, string>()
-    keys.forEach(async (key) => {
-      addressToKeyName.set(await this.getAddressFromKeyName(key), key)
-    })
-    return addressToKeyName
-  }
-
-  public async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
-    this.initializationRequired()
-    const address = txParams.from!.toString()
-    const keyName = this.getNativeKeyPathFor(address)
-    const remoteSigner = new RemoteAKVSigner(this.keyVaultClient, keyName)
-    return await signTransaction(txParams, remoteSigner)
-  }
-
-  /**
-   * @param address Address of the account to sign with
-   * @param data Hex string message to sign
-   * @return Signature hex string (order: rsv)
-   */
-  async signPersonalMessage(address: string, data: string): Promise<string> {
-    this.initializationRequired()
-
-    const keyName = this.getNativeKeyPathFor(address)
-    const remoteSigner = new RemoteAKVSigner(this.keyVaultClient, keyName)
-    return await remoteSigner.signPersonalMessage(data)
-  }
-
-  /**
-   * @param address Address of the account to sign with
-   * @param data the typed data object
-   * @return Signature hex string (order: rsv)
-   */
-  async signTypedData(address: Address, typedData: EIP712TypedData): Promise<string> {
-    this.initializationRequired()
-
-    const keyName = this.getNativeKeyPathFor(address)
-    const remoteSigner = new RemoteAKVSigner(this.keyVaultClient, keyName)
-    return await remoteSigner.signTypedData(typedData)
+    const addressToSigner = new Map<Address, Signer>()
+    for (let key of keys) {
+      try {
+        const address = await this.getAddressFromKeyName(key)
+        addressToSigner.set(address, new RemoteAzureSigner(this.keyVaultClient, key))
+      } catch (e) {
+        // Safely ignore non-secp256k1 keys
+        const message = e.message
+        if (!message.includes('Invalid secp256k1')) {
+          throw e
+        }
+      }
+    }
+    return addressToSigner
   }
 
   /**
@@ -67,8 +40,13 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
    * Useful for initially getting the 'from' field given a keyName
    * @param keyName Azure KeyVault key name
    */
-  async getAddressFromKeyName(keyName: string): Promise<string> {
+  async getAddressFromKeyName(keyName: string): Promise<Address> {
     const publicKey = await this.keyVaultClient.getPublicKey(keyName)
-    return AzureKeyVaultClient.getAddressFromPublicKey(publicKey)
+    const pkBuffer = publicKey.toBuffer()
+    if (!ethUtil.isValidPublic(pkBuffer, true)) {
+      throw new Error(`Invalid secp256k1 public key for keyname ${keyName}`)
+    }
+    const address = ethUtil.pubToAddress(pkBuffer, true)
+    return '0x' + address.toString('hex')
   }
 }

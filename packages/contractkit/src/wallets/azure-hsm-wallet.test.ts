@@ -1,11 +1,12 @@
-import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import { normalizeAddressWith0x, privateKeyToAddress, Address } from '@celo/utils/lib/address'
 import Web3 from 'web3'
-import { Tx } from 'web3/eth/types'
-import { EncodedTransaction } from 'web3/types'
-import { recoverTransaction } from '../utils/signing-utils'
+import { EncodedTransaction, Tx } from 'web3-core'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
+import { recoverTransaction } from '../utils/signing-utils'
 import { AzureHSMWallet } from './azure-hsm-wallet'
 
+// Env var should hold service principal credentials
+// https://www.npmjs.com/package/@azure/keyvault-keys
 require('dotenv').config()
 
 const VAULT_NAME = process.env.VAULT_NAME
@@ -26,8 +27,16 @@ describe('AzureHSMWallet class', () => {
   let wallet: AzureHSMWallet = new AzureHSMWallet(VAULT_NAME!)
 
   test('calling any function will fail before init', async () => {
-    await expect(wallet.getAccounts()).rejects.toThrowError()
-    await expect(wallet.hasAccount(ACCOUNT_ADDRESS1)).rejects.toThrowError()
+    try {
+      await wallet.getAccounts()
+    } catch (e) {
+      expect(e.message).toBe('wallet needs to be initialized first')
+    }
+    try {
+      await wallet.hasAccount(ACCOUNT_ADDRESS1)
+    } catch (e) {
+      expect(e.message).toBe('wallet needs to be initialized first')
+    }
   })
 
   beforeEach(async () => {
@@ -35,32 +44,65 @@ describe('AzureHSMWallet class', () => {
   })
 
   test('hasKey should return true for keys that are present', async () => {
+    // Invalid key should not be present
     expect(await wallet.hasAccount('this is not a valid private key')).toBeFalsy()
+
+    // Valid key should be present
     const address = await wallet.getAddressFromKeyName(KEY_NAME!)
     expect(await wallet.hasAccount(address)).toBeTruthy()
   })
 
   describe('with an account', () => {
     describe('signing', () => {
-      describe('using an unknown key', async () => {
+      describe('using an unknown key', () => {
+        let celoTransaction: Tx
         const unknownKey: string = 'invalidKey'
-        const unknownAddress: string = await wallet.getAddressFromKeyName(unknownKey)
-        test('fails calling signTransaction', async () => {
-          const tsParams: Tx = {
-            nonce: 'test',
-            gas: 'test',
-            to: 'test',
-            from: unknownAddress,
-            chainId: '1',
+        const unknownAddress: Address = ACCOUNT_ADDRESS1
+
+        beforeEach(() => {
+          return new Promise(async (resolve) => {
+            celoTransaction = {
+              from: unknownAddress,
+              to: unknownAddress,
+              chainId: 2,
+              value: Web3.utils.toWei('1', 'ether'),
+              nonce: 0,
+              gas: '10',
+              gasPrice: '99',
+              feeCurrency: '0x124356',
+              gatewayFeeRecipient: '0x1234',
+              gatewayFee: '0x5678',
+              data: '0xabcdef',
+            }
+            resolve()
+          })
+        })
+
+        test('fails getting address from key', async () => {
+          try {
+            await wallet.getAddressFromKeyName(unknownKey)
+          } catch (e) {
+            expect(e.message).toBe(
+              `Key ${unknownKey} not found in KeyVault ${process.env.VAULT_NAME}`
+            )
           }
-          await expect(wallet.signTransaction(tsParams)).rejects.toThrowError()
+        })
+
+        test('fails calling signTransaction', async () => {
+          try {
+            await wallet.signTransaction(celoTransaction)
+          } catch (e) {
+            expect(e.message).toBe(`Could not find address ${unknownAddress}`)
+          }
         })
 
         test('fails calling signPersonalMessage', async () => {
           const hexStr: string = '0xa1'
-          const unknownKey: string = 'invalidKey'
-          const unknownAddress: string = await wallet.getAddressFromKeyName(unknownKey)
-          await expect(wallet.signPersonalMessage(unknownAddress, hexStr)).rejects.toThrowError()
+          try {
+            await wallet.signPersonalMessage(unknownAddress, hexStr)
+          } catch (e) {
+            expect(e.message).toBe(`Could not find address ${unknownAddress}`)
+          }
         })
 
         test('fails calling signTypedData', async () => {
@@ -70,24 +112,29 @@ describe('AzureHSMWallet class', () => {
             message: { test: 'test' },
             primaryType: 'test',
           }
-          await expect(wallet.signTypedData(unknownAddress, typedData)).rejects.toThrowError()
+          try {
+            await wallet.signTypedData(unknownAddress, typedData)
+          } catch (e) {
+            expect(e.message).toBe(`Could not find address ${unknownAddress}`)
+          }
         })
       })
 
-      describe('using a known key', async () => {
-        describe('when calling signTransaction', async () => {
-          let celoTransaction: Tx
-          const knownKey: string = KEY_NAME!
-          const knownAddress: string = await wallet.getAddressFromKeyName(knownKey)
-          const otherAddress: string = ACCOUNT_ADDRESS1
+      describe('using a known key', () => {
+        let celoTransaction: Tx
+        const knownKey: string = KEY_NAME!
+        let knownAddress: Address
+        const otherAddress: string = ACCOUNT_ADDRESS1
 
-          beforeEach(async () => {
+        beforeEach(() => {
+          return new Promise(async (resolve) => {
+            knownAddress = await wallet.getAddressFromKeyName(knownKey)
             celoTransaction = {
               from: knownAddress,
               to: otherAddress,
-              chainId: '2',
+              chainId: 2,
               value: Web3.utils.toWei('1', 'ether'),
-              nonce: '0',
+              nonce: 0,
               gas: '10',
               gasPrice: '99',
               feeCurrency: '0x124356',
@@ -95,10 +142,14 @@ describe('AzureHSMWallet class', () => {
               gatewayFee: '0x5678',
               data: '0xabcdef',
             }
+            resolve()
           })
+        })
 
+        describe('when calling signTransaction', () => {
           test('succeeds', async () => {
-            await expect(wallet.signTransaction(celoTransaction)).resolves.not.toBeUndefined()
+            const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+            expect(signedTx).not.toBeUndefined()
           })
 
           test('with same signer', async () => {
@@ -111,20 +162,17 @@ describe('AzureHSMWallet class', () => {
         })
 
         describe('when calling signPersonalMessage', () => {
-          test('succeds', async () => {
-            const hexStr: string = '0xa1'
-            const knownKey: string = KEY_NAME!
-            const knownAddress: string = await wallet.getAddressFromKeyName(knownKey)
-            await expect(
-              wallet.signPersonalMessage(knownAddress, hexStr)
-            ).resolves.not.toBeUndefined()
+          test('succeeds', async () => {
+            const hexStr: string = ACCOUNT_ADDRESS1
+            const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
+            expect(signedMessage).not.toBeUndefined()
           })
 
           test.todo('returns a valid sign')
         })
 
         describe('when calling signTypedData', () => {
-          test.todo('succeds, needs a valid typedData to be tested')
+          test.todo('succeeds, needs a valid typedData to be tested')
           test.todo('returns a valid sign')
         })
       })

@@ -2,7 +2,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
-import { SortedOracles } from '../generated/types/SortedOracles'
+import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
   CeloTransactionObject,

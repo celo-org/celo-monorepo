@@ -1,6 +1,6 @@
 // tslint:disable: no-console
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3.d.ts" />
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -14,7 +14,13 @@ import Web3 from 'web3'
 import { connectPeers, connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { assertAlmostEqual, getHooks, sleep, waitToFinishInstanceSyncing } from './utils'
+import {
+  assertAlmostEqual,
+  getHooks,
+  sleep,
+  waitForEpochTransition,
+  waitToFinishInstanceSyncing,
+} from './utils'
 
 interface MemberSwapper {
   swap(): Promise<void>
@@ -22,6 +28,7 @@ interface MemberSwapper {
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
+const carbonOffsettingPartnerAddress = '0x1234567812345678123456781234567812345678'
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
@@ -198,6 +205,11 @@ describe('governance tests', () => {
         rpcport: 8553,
       },
     ],
+    migrationOverrides: {
+      epochRewards: {
+        carbonOffsettingPartner: carbonOffsettingPartnerAddress,
+      },
+    },
   }
 
   const hooks: any = getHooks(gethConfig)
@@ -216,10 +228,14 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
+    // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
-  after(hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const restart = async () => {
     await hooks.restart()
@@ -292,26 +308,6 @@ describe('governance tests', () => {
     assert.isFalse(currentBalance.isNaN())
     assert.isFalse(previousBalance.isNaN())
     assertAlmostEqual(currentBalance.minus(previousBalance), expected)
-  }
-
-  /*
-  const waitForBlock = async (blockNumber: number) => {
-    // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-    let currentBlock: number
-    do {
-      currentBlock = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (currentBlock < blockNumber)
-  }
-  */
-
-  const waitForEpochTransition = async (epoch: number) => {
-    // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-    let blockNumber: number
-    do {
-      blockNumber = await web3.eth.getBlockNumber()
-      await sleep(0.1)
-    } while (blockNumber % epoch !== 1)
   }
 
   const assertTargetVotingYieldChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -439,10 +435,10 @@ describe('governance tests', () => {
       assert.equal(epoch, 10)
 
       // Wait for an epoch transition so we can activate our vote.
-      await waitForEpochTransition(epoch)
+      await waitForEpochTransition(web3, epoch)
       await sleep(5.5)
       // Wait for an extra epoch transition to ensure everyone is connected to one another.
-      await waitForEpochTransition(epoch)
+      await waitForEpochTransition(web3, epoch)
 
       const groupWeb3Url = 'ws://localhost:8555'
 
@@ -734,6 +730,13 @@ describe('governance tests', () => {
         await assertBalanceChanged(reserve.options.address, blockNumber, expected, goldToken)
       }
 
+      const assertCarbonOffsettingBalanceChanged = async (
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        await assertBalanceChanged(carbonOffsettingPartnerAddress, blockNumber, expected, goldToken)
+      }
+
       const assertVotesUnchanged = async (blockNumber: number) => {
         await assertVotesChanged(blockNumber, new BigNumber(0))
       }
@@ -744,6 +747,10 @@ describe('governance tests', () => {
 
       const assertReserveBalanceUnchanged = async (blockNumber: number) => {
         await assertReserveBalanceChanged(blockNumber, new BigNumber(0))
+      }
+
+      const assertCarbonOffsettingBalanceUnchanged = async (blockNumber: number) => {
+        await assertCarbonOffsettingBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       const getStableTokenSupplyChange = async (blockNumber: number) => {
@@ -812,6 +819,14 @@ describe('governance tests', () => {
             .times(fromFixed(communityRewardFrac))
             .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
 
+          const carbonOffsettingFrac = new BigNumber(
+            await epochRewards.methods.getCarbonOffsettingFraction().call({}, blockNumber)
+          )
+          const expectedCarbonOffsettingPartnerAward = expectedVoterRewards
+            .plus(maxPotentialValidatorReward)
+            .times(fromFixed(carbonOffsettingFrac))
+            .div(new BigNumber(1).minus(fromFixed(communityRewardFrac)))
+
           const stableTokenSupplyChange = await getStableTokenSupplyChange(blockNumber)
           const expectedGoldTotalSupplyChange = expectedCommunityReward
             .plus(expectedVoterRewards)
@@ -819,8 +834,10 @@ describe('governance tests', () => {
           // Check TS calc'd rewards against solidity calc'd rewards
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
+          const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
           assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
           assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
+          assertAlmostEqual(expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
           // Check TS calc'd rewards against what happened
           await assertVotesChanged(blockNumber, expectedVoterRewards)
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
@@ -830,12 +847,17 @@ describe('governance tests', () => {
           )
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
+          await assertCarbonOffsettingBalanceChanged(
+            blockNumber,
+            expectedCarbonOffsettingPartnerAward
+          )
         } else {
           await assertVotesUnchanged(blockNumber)
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
           await assertReserveBalanceUnchanged(blockNumber)
           await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
+          await assertCarbonOffsettingBalanceUnchanged(blockNumber)
         }
       }
     })

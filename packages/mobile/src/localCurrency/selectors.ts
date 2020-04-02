@@ -1,7 +1,7 @@
 import { getRegionCode } from '@celo/utils/src/phoneNumbers'
 import CountryData from 'country-data'
 import { createSelector } from 'reselect'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import {
   LOCAL_CURRENCY_CODES,
   LocalCurrencyCode,

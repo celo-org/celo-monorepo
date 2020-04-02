@@ -15,6 +15,9 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
+import { FeeType } from 'src/fees/actions'
+import CalculateFee from 'src/fees/CalculateFee'
+import { getFeeDollars } from 'src/fees/selectors'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
@@ -26,6 +29,7 @@ import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface State {
   amountIsValid: boolean
@@ -34,9 +38,9 @@ interface State {
 type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
 
 interface StateProps {
+  account: string | null
   inviteInProgress: boolean
   dollarBalance: string
-  defaultCountryCode: string
 }
 
 interface DispatchProps {
@@ -47,9 +51,9 @@ interface DispatchProps {
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
+  account: currentAccountSelector(state),
   inviteInProgress: state.invite.isSendingInvite,
   dollarBalance: state.stableToken.balance || '0',
-  defaultCountryCode: state.account.defaultCountryCode,
 })
 
 const mapDispatchToProps = {
@@ -167,19 +171,33 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   render() {
+    const { account } = this.props
+    if (!account) {
+      throw Error('Account is required')
+    }
+
     const recipient = this.getRecipient()
+    const amount = getInvitationVerificationFeeInDollars()
+
     return (
       <SafeAreaView style={style.container}>
         <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
-          <TransferReviewCard
-            recipient={recipient}
-            type={TokenTransactionType.InviteSent}
-            address={recipient.address}
-            value={getInvitationVerificationFeeInDollars()}
-            e164PhoneNumber={recipient.e164PhoneNumber}
-            currency={CURRENCY_ENUM.DOLLAR}
-            fee={new BigNumber(0)}
-          />
+          <CalculateFee feeType={FeeType.INVITE} account={account} amount={amount} comment="">
+            {(asyncFee) => (
+              <TransferReviewCard
+                recipient={recipient}
+                type={TokenTransactionType.InviteSent}
+                address={recipient.address}
+                // It's only an invite without additional funds
+                value={new BigNumber(0)}
+                e164PhoneNumber={recipient.e164PhoneNumber}
+                currency={CURRENCY_ENUM.DOLLAR}
+                fee={getFeeDollars(asyncFee.result)}
+                isLoadingFee={asyncFee.loading}
+                feeError={asyncFee.error}
+              />
+            )}
+          </CalculateFee>
         </ReviewFrame>
       </SafeAreaView>
     )

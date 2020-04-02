@@ -6,21 +6,26 @@ import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native
 interface OwnProps {
   text: string
   title: string
-  image: ImageSourcePropType
   ctaList: CTA[]
+  image: ImageSourcePropType | React.ReactNode
 }
 
 type Props = OwnProps
 
 export function SimpleNotification(props: Props) {
+  const { text, title, ctaList, image } = props
+
+  const icon = React.isValidElement(image) ? (
+    image
+  ) : (
+    // @ts-ignore isValidElement check above ensures image is an image source type
+    <Image source={image} style={styles.image} resizeMode="contain" />
+  )
+
   return (
-    <BaseNotification
-      title={props.title}
-      icon={<Image source={props.image} style={styles.image} resizeMode="contain" />}
-      ctas={props.ctaList}
-    >
+    <BaseNotification title={title} icon={icon} ctas={ctaList}>
       <View style={styles.body}>
-        <Text style={fontStyles.subSmall}>{props.text}</Text>
+        <Text style={fontStyles.subSmall}>{text}</Text>
       </View>
     </BaseNotification>
   )

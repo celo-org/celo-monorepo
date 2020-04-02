@@ -3,9 +3,9 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3/types'
+import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
-import { Validators } from '../generated/types/Validators'
+import { Validators } from '../generated/Validators'
 import {
   BaseWrapper,
   CeloTransactionObject,

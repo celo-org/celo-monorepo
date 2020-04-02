@@ -18,6 +18,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -74,9 +75,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken, makerTokenBalance } = navigation.getParam('makerTokenDisplay')
+    const { makerToken } = navigation.getParam('makerTokenDisplay')
     return {
-      ...exchangeHeader(makerToken, makerTokenBalance),
+      ...exchangeHeader(makerToken),
     }
   }
 
@@ -235,7 +236,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   getSubtotalAmount = (): MoneyAmount => {
     return {
-      value: this.getOppositeInputTokenAmount(this.getInputTokenAmount()).toString(),
+      value: this.getOppositeInputTokenAmount(this.getInputTokenAmount()),
       currencyCode: CURRENCIES[this.getOppositeInputToken()].code,
     }
   }
@@ -284,8 +285,9 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             />
           </View>
           <HorizontalLine />
-          <View style={styles.subtotalContainer}>
-            <Text style={styles.exchangeBodyText}>
+          <LineItemRow
+            textStyle={styles.exchangeBodyText}
+            title={
               <Trans
                 i18nKey="inputSubtotal"
                 tOptions={{ context: this.isDollarInput() ? 'gold' : null }}
@@ -294,15 +296,15 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 Subtotal (@{' '}
                 <CurrencyDisplay
                   amount={{
-                    value: exchangeRateDisplay.toString(),
+                    value: exchangeRateDisplay,
                     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                   }}
                 />
                 )
               </Trans>
-            </Text>
-            <CurrencyDisplay style={styles.subtotal} amount={this.getSubtotalAmount()} />
-          </View>
+            }
+            amount={<CurrencyDisplay amount={this.getSubtotalAmount()} />}
+          />
         </KeyboardAwareScrollView>
         <View style={componentStyles.bottomContainer}>
           <Button
@@ -356,14 +358,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 39,
     height: 54, // setting height manually b.c. of bug causing text to jump on Android
-  },
-  subtotalContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-  },
-  subtotal: {
-    ...fontStyles.regular,
-    marginLeft: 10,
   },
 })

@@ -1,4 +1,6 @@
-/* tslint:disable: no-console */
+// tslint:disable:no-console
+// tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -8,12 +10,12 @@ import { unlockAccount } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
 import fs from 'fs'
-import { range } from 'lodash'
+import { merge, range } from 'lodash'
 import fetch from 'node-fetch'
 import path from 'path'
 import sleep from 'sleep-promise'
+import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
-import { TransactionReceipt } from 'web3/types'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -26,7 +28,7 @@ import {
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { spawnCmd, spawnCmdWithExitOnFailure } from './utils'
+import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
@@ -36,6 +38,7 @@ const LOAD_TEST_TRANSFER_WEI = new BigNumber(10000)
 
 const GETH_IPC = 'geth.ipc'
 const DISCOVERY_PORT = 30303
+const BOOTNODE_DISCOVERY_PORT = 30301
 
 const BLOCKSCOUT_TIMEOUT = 12000 // ~ 12 seconds needed to see the transaction in the blockscout
 
@@ -70,7 +73,7 @@ export const getBootnodeEnode = async (namespace: string) => {
   const ip = await retrieveBootnodeIPAddress(namespace)
   const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.BOOTNODE, 0)
   const nodeId = privateKeyToPublicKey(privateKey)
-  return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
+  return [getEnodeAddress(nodeId, ip, BOOTNODE_DISCOVERY_PORT)]
 }
 
 const retrieveBootnodeIPAddress = async (namespace: string) => {
@@ -691,6 +694,10 @@ export function importGenesis(genesisPath: string) {
   return JSON.parse(fs.readFileSync(genesisPath).toString())
 }
 
+export function getLogFilename(runPath: string, instance: GethInstanceConfig) {
+  return path.join(getDatadir(runPath, instance), 'logs.txt')
+}
+
 function getDatadir(runPath: string, instance: GethInstanceConfig) {
   const dir = path.join(getInstanceDir(runPath, instance), 'datadir')
   // @ts-ignore
@@ -854,6 +861,7 @@ export async function startGeth(
     isProxied,
     proxyport,
     ethstats,
+    gatewayFee,
   } = instance
 
   const privateKey = instance.privateKey || ''
@@ -921,6 +929,10 @@ export async function startGeth(
     gethArgs.push('--light.serve=0')
   }
 
+  if (gatewayFee) {
+    gethArgs.push(`--light.gatewayfee=${gatewayFee.toString()}`)
+  }
+
   if (validating) {
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
 
@@ -970,7 +982,7 @@ export async function startGeth(
     throw new Error(`Geth crashed! Error: ${err}`)
   })
 
-  const secondsToWait = 5
+  const secondsToWait = 30
 
   // Give some time for geth to come up
   if (rpcport) {
@@ -1140,4 +1152,65 @@ export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   await connectPeers(
     instances.filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
   )
+}
+
+export async function migrateContracts(
+  monorepoRoot: string,
+  validatorPrivateKeys: string[],
+  attestationKeys: string[],
+  validators: string[],
+  to: number = 1000,
+  overrides: any = {},
+  verbose: boolean = true
+) {
+  const migrationOverrides = merge(
+    {
+      downtimeSlasher: {
+        slashableDowntime: 6,
+      },
+      election: {
+        minElectableValidators: '1',
+      },
+      epochRewards: {
+        frozen: false,
+      },
+      exchange: {
+        frozen: false,
+      },
+      goldToken: {
+        frozen: false,
+      },
+      reserve: {
+        initialBalance: 100000000,
+      },
+      stableToken: {
+        initialBalances: {
+          addresses: validators.map(ensure0x),
+          values: validators.map(() => '10000000000000000000000'),
+        },
+        oracles: validators.map(ensure0x),
+        goldPrice: 10,
+        frozen: false,
+      },
+      validators: {
+        validatorKeys: validatorPrivateKeys.map(ensure0x),
+        attestationKeys: attestationKeys.map(ensure0x),
+      },
+    },
+    overrides
+  )
+
+  const args = [
+    '--cwd',
+    `${monorepoRoot}/packages/protocol`,
+    'init-network',
+    '-n',
+    'testing',
+    '-m',
+    JSON.stringify(migrationOverrides),
+    '-t',
+    to.toString(),
+  ]
+
+  await spawnCmdWithExitOnFailure('yarn', args, { silent: !verbose })
 }

@@ -1,14 +1,15 @@
 import debugFactory from 'debug'
-import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
+import { provider } from 'web3-core'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 
 const debugRpcPayload = debugFactory('rpc:payload')
 const debugRpcResponse = debugFactory('rpc:response')
 const debugRpcCallback = debugFactory('rpc:callback:exception')
 
 export function rpcCallHandler(
-  payload: JsonRPCRequest,
-  handler: (p: JsonRPCRequest) => Promise<any>,
-  callback: Callback<JsonRPCResponse>
+  payload: JsonRpcPayload,
+  handler: (p: JsonRpcPayload) => Promise<any>,
+  callback: Callback<JsonRpcResponse>
 ) {
   try {
     handler(payload)
@@ -23,7 +24,7 @@ export function rpcCallHandler(
       )
       .catch((error) => {
         // Called if the 'callback' fails
-        debugRpcCallback('Callback for handling the JsonRPCResponse fails')
+        debugRpcCallback('Callback for handling the JsonRpcResponse fails')
         debugRpcCallback('%O', error)
       })
   } catch (error) {
@@ -44,9 +45,9 @@ export function getRandomId(): number {
   return datePart + extraPart
 }
 
-function toRPCResponse(payload: JsonRPCRequest, result: any, error?: Error): JsonRPCResponse {
-  const response: JsonRPCResponse = {
-    id: payload.id,
+function toRPCResponse(payload: JsonRpcPayload, result: any, error?: Error): JsonRpcResponse {
+  const response: JsonRpcResponse = {
+    id: Number(payload.id),
     jsonrpc: payload.jsonrpc,
     result,
   }
@@ -61,38 +62,40 @@ function toRPCResponse(payload: JsonRPCRequest, result: any, error?: Error): Jso
 }
 
 export interface RpcCaller {
-  call: (method: string, params: any[]) => Promise<JsonRPCResponse>
-  send: (payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>) => void
+  call: (method: string, params: any[]) => Promise<JsonRpcResponse>
+  send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) => void
 }
 export class DefaultRpcCaller implements RpcCaller {
-  constructor(readonly provider: Provider, readonly jsonrpcVersion: string = '2.0') {}
+  constructor(readonly defaultProvider: provider, readonly jsonrpcVersion: string = '2.0') {}
 
-  public async call(method: string, params: any[]): Promise<JsonRPCResponse> {
+  public async call(method: string, params: any[]): Promise<JsonRpcResponse> {
     return new Promise((resolve, reject) => {
-      const payload: JsonRPCRequest = {
+      const payload: JsonRpcPayload = {
         id: getRandomId(),
         jsonrpc: this.jsonrpcVersion,
         method,
         params,
       }
-      this.send(payload, ((err: any, response: JsonRPCResponse) => {
+      this.send(payload, ((err: any, response: JsonRpcResponse) => {
         if (err != null) {
           reject(err)
         } else {
           resolve(response)
         }
-      }) as Callback<JsonRPCResponse>)
+      }) as Callback<JsonRpcResponse>)
     })
   }
 
-  public send(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>) {
+  public send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) {
     debugRpcPayload('%O', payload)
 
-    const decoratedCallback = ((error: Error, result: JsonRPCResponse) => {
+    const decoratedCallback = ((error: Error, result: JsonRpcResponse): void => {
       debugRpcResponse('%O', result)
       callback(error as any, result)
-    }) as Callback<JsonRPCResponse>
+    }) as Callback<JsonRpcResponse>
 
-    this.provider.send(payload, decoratedCallback)
+    if (this.defaultProvider && typeof this.defaultProvider !== 'string') {
+      this.defaultProvider.send(payload, decoratedCallback)
+    }
   }
 }

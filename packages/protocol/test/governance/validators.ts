@@ -38,9 +38,6 @@ const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 
-type SolBytes = Array<string | BigNumber>
-const toBytes = (input: any): SolBytes => input
-
 // @ts-ignore
 // TODO(mcortesi): Use BN
 Validators.numberFormat = 'BigNumber'
@@ -105,12 +102,10 @@ contract('Validators', (accounts: string[]) => {
   const commissionUpdateDelay = new BigNumber(3)
 
   // A random 64 byte hex string.
-  const blsPublicKey = toBytes(
+  const blsPublicKey =
     '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00'
-  )
-  const blsPoP = toBytes(
+  const blsPoP =
     '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
-  )
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -144,7 +139,7 @@ contract('Validators', (accounts: string[]) => {
 
   const registerValidator = async (validator: string) => {
     await mockLockedGold.setAccountTotalLockedGold(validator, validatorLockedGoldRequirements.value)
-    const publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+    const publicKey = await addressToPublicKey(validator, web3.eth.sign)
     await validators.registerValidator(publicKey, blsPublicKey, blsPoP, { from: validator })
   }
 
@@ -556,13 +551,13 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the account has authorized a validator signer', () => {
         let validatorRegistrationEpochNumber: number
-        let publicKey: SolBytes
+        let publicKey: string
         let signer: string
         beforeEach(async () => {
           signer = accounts[9]
           const sig = await getParsedSignatureOfAddress(web3, validator, signer)
           await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
-          publicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+          publicKey = await addressToPublicKey(signer, web3.eth.sign)
           resp = await validators.registerValidator(publicKey, blsPublicKey, blsPoP)
           validatorRegistrationEpochNumber = await currentEpochNumber(web3)
         })
@@ -623,7 +618,7 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the account is already a registered validator ', () => {
-      let publicKey: SolBytes
+      let publicKey: string
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
           validator,
@@ -632,7 +627,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+        publicKey = await addressToPublicKey(validator, web3.eth.sign)
         await validators.registerValidator(publicKey, blsPublicKey, blsPoP)
         await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
       })
@@ -645,7 +640,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        const publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+        const publicKey = await addressToPublicKey(validator, web3.eth.sign)
         await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
       })
     })
@@ -659,7 +654,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        const publicKey = toBytes(await addressToPublicKey(validator, web3.eth.sign))
+        const publicKey = await addressToPublicKey(validator, web3.eth.sign)
         await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
       })
     })
@@ -1064,10 +1059,10 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when the public key matches the signer', () => {
           let resp: any
-          let newPublicKey: SolBytes
+          let newPublicKey: string
           const signer = accounts[9]
           beforeEach(async () => {
-            newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             resp = await validators.updateEcdsaPublicKey(validator, signer, newPublicKey)
           })
 
@@ -1093,7 +1088,7 @@ contract('Validators', (accounts: string[]) => {
         describe('when the public key does not match the signer', () => {
           const signer = accounts[9]
           it('should revert', async () => {
-            const newPublicKey = toBytes(await addressToPublicKey(accounts[8], web3.eth.sign))
+            const newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
             await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
           })
         })
@@ -1103,7 +1098,7 @@ contract('Validators', (accounts: string[]) => {
         describe('when the public key matches the signer', () => {
           const signer = accounts[9]
           it('should revert', async () => {
-            const newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+            const newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
           })
         })
@@ -1112,8 +1107,8 @@ contract('Validators', (accounts: string[]) => {
   })
 
   describe('#updatePublicKeys()', () => {
-    const newBlsPublicKey: SolBytes = web3.utils.randomHex(96)
-    const newBlsPoP: SolBytes = web3.utils.randomHex(48)
+    const newBlsPublicKey: string = web3.utils.randomHex(96)
+    const newBlsPoP: string = web3.utils.randomHex(48)
     describe('when called by a registered validator', () => {
       const validator = accounts[0]
       beforeEach(async () => {
@@ -1127,10 +1122,10 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when the public key matches the signer', () => {
           let resp: any
-          let newPublicKey: SolBytes
+          let newPublicKey: string
           const signer = accounts[9]
           beforeEach(async () => {
-            newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+            newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             resp = await validators.updatePublicKeys(
               validator,
               signer,
@@ -1168,7 +1163,7 @@ contract('Validators', (accounts: string[]) => {
         describe('when the public key does not match the signer', () => {
           const signer = accounts[9]
           it('should revert', async () => {
-            const newPublicKey = toBytes(await addressToPublicKey(accounts[8], web3.eth.sign))
+            const newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
             await assertRevert(
               validators.updatePublicKeys(
                 validator,
@@ -1186,7 +1181,7 @@ contract('Validators', (accounts: string[]) => {
         describe('when the public key matches the signer', () => {
           const signer = accounts[9]
           it('should revert', async () => {
-            const newPublicKey = toBytes(await addressToPublicKey(signer, web3.eth.sign))
+            const newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
             await assertRevert(
               validators.updatePublicKeys(
                 validator,
@@ -1237,17 +1232,13 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the public key is not 96 bytes', () => {
         it('should revert', async () => {
-          await assertRevert(
-            validators.updateBlsPublicKey(toBytes(newBlsPublicKey + '01'), newBlsPoP)
-          )
+          await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey + '01', newBlsPoP))
         })
       })
 
       describe('when the proof of possession is not 48 bytes', () => {
         it('should revert', async () => {
-          await assertRevert(
-            validators.updateBlsPublicKey(newBlsPublicKey, toBytes(newBlsPoP + '01'))
-          )
+          await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey, newBlsPoP + '01'))
         })
       })
     })

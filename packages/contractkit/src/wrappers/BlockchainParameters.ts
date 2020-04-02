@@ -1,4 +1,4 @@
-import { BlockchainParameters } from '../generated/types/BlockchainParameters'
+import { BlockchainParameters } from '../generated/BlockchainParameters'
 import { BaseWrapper, proxySend } from './BaseWrapper'
 
 /**

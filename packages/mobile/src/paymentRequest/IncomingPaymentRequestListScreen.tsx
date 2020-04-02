@@ -12,7 +12,6 @@ import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identi
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
-  useBalanceInNavigationParam,
 } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
@@ -61,8 +60,6 @@ export const listItemRenderer = (params: {
 }
 
 const IncomingPaymentRequestListScreen = (props: Props) => {
-  const { dollarBalance, navigation } = props
-  useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList
       items={props.paymentRequests}

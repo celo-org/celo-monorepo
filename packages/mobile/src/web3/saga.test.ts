@@ -1,8 +1,9 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, delay, select } from 'redux-saga/effects'
-import { pincodeTypeSelector } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/selectors'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { completeWeb3Sync, updateWeb3SyncProgress } from 'src/web3/actions'
+import { getContractKit } from 'src/web3/contracts'
 import {
   checkWeb3SyncProgress,
   getOrCreateAccount,
@@ -13,7 +14,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 import { createMockStore, sleep } from 'test/utils'
 import { mockAccount } from 'test/values'
 
-const LAST_BLOCK_NUMBER = 1000
+const LAST_BLOCK_NUMBER = 200
 
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),
@@ -22,19 +23,6 @@ jest.mock('src/account/actions', () => ({
 
 jest.mock('src/navigator/NavigationService', () => ({
   navigateToError: jest.fn().mockReturnValueOnce(undefined),
-}))
-
-jest.mock('src/web3/contracts', () => ({
-  web3: {
-    eth: {
-      isSyncing: jest
-        .fn()
-        .mockReturnValueOnce({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })
-        .mockReturnValueOnce(false),
-      getBlock: jest.fn(() => ({ number: 1000 })),
-    },
-  },
-  isFornoMode: jest.fn().mockReturnValueOnce(false),
 }))
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
@@ -89,8 +77,18 @@ describe(waitForWeb3Sync, () => {
 
 describe(checkWeb3SyncProgress, () => {
   it('reports web3 status correctly', async () => {
+    getContractKit()
+      // @ts-ignore
+      .web3.eth.isSyncing.mockReturnValueOnce({
+        startingBlock: 0,
+        currentBlock: 10,
+        highestBlock: 100,
+      })
+      .mockReturnValueOnce(false)
+
     await expectSaga(checkWeb3SyncProgress)
       .withState(state)
+      .provide([[delay(100), true]])
       .put(updateWeb3SyncProgress({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })) // is syncing the first time
       .put(completeWeb3Sync(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)

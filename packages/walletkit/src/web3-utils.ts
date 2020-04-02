@@ -26,7 +26,8 @@ export class Web3Utils {
     // Use an RPC provider to route all other requests
     providerEngine.addProvider(rpcProvider)
     providerEngine.start()
-    const web3 = new Web3(providerEngine)
+    // TODO fix types
+    const web3 = new Web3(providerEngine as any)
     return web3
   }
 }

@@ -3,13 +3,13 @@ import LazyLoadFadin from 'react-lazyload-fadein'
 import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
 import { Contributor } from 'src/about/Contributor'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import External from 'src/icons/External'
 import BookLayout from 'src/layout/BookLayout'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
+import Outbound from 'src/shared/Outbound'
 import Responsive from 'src/shared/Responsive'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { fonts, standardStyles, textStyles } from 'src/styles'
 interface Props {
   contributors: Contributor[]
 }
@@ -97,9 +97,7 @@ const Portrait = React.memo(function _Portrait({
             <Text style={[fonts.p, textStyles.heavy, styles.name]}>{name}</Text>
             {url && (
               <View style={styles.outLink}>
-                <a href={externalize(url)} target="_blank">
-                  <External size={12} color={colors.dark} />
-                </a>
+                <Outbound url={url} />
               </View>
             )}
           </View>
@@ -121,15 +119,6 @@ function ContributorPlaceHolder({ uri }) {
       <Image source={{ uri }} style={styles.imagePreview} />
     </AspectRatio>
   )
-}
-
-function externalize(url: string) {
-  try {
-    const uri = new URL(url)
-    return uri.href
-  } catch {
-    return `//${url}`
-  }
 }
 
 // @ts-ignore

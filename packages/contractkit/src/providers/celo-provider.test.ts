@@ -1,6 +1,6 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { Tx } from 'web3/eth/types'
-import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
+import { provider, Tx } from 'web3-core'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { CeloProvider } from '../providers/celo-provider'
 
 // Random private keys
@@ -12,7 +12,7 @@ const ACCOUNT_ADDRESS2 = privateKeyToAddress(PRIVATE_KEY2)
 // These tests verify the signTransaction WITHOUT the ParamsPopulator
 describe('CeloProvider', () => {
   let mockCallback: any
-  let mockProvider: Provider
+  let mockProvider: provider
   let celoProvider: CeloProvider
   const interceptedByCeloProvider = [
     'eth_sendTransaction',
@@ -23,10 +23,10 @@ describe('CeloProvider', () => {
   ]
 
   beforeEach(() => {
-    mockCallback = jest.fn((payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): any => {
-      const response: JsonRPCResponse = {
+    mockCallback = jest.fn((payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): any => {
+      const response: JsonRpcResponse = {
         jsonrpc: payload.jsonrpc,
-        id: payload.id,
+        id: Number(payload.id),
         result: {
           params: payload.params,
           method: payload.method,
@@ -35,26 +35,31 @@ describe('CeloProvider', () => {
       callback(null, response)
     })
     mockProvider = {
+      host: '',
+      connected: true,
       send: mockCallback,
+      supportsSubscriptions: (): boolean => true,
+      disconnect: (): boolean => true,
     }
+
     celoProvider = new CeloProvider(mockProvider)
   })
 
   describe("when celo provider don't have any local account", () => {
     interceptedByCeloProvider.forEach((method: string) => {
       test(`fowards the call to '${method}' to the original provider`, (done) => {
-        const payload: JsonRPCRequest = {
+        const payload: JsonRpcPayload = {
           id: 0,
           jsonrpc: '2.0',
           method,
           params: ['1', '2'],
         }
-        const callback = (_error: null, _result: JsonRPCResponse) => {
+        const callback = (_error: null, _result: JsonRpcResponse) => {
           expect(mockCallback.mock.calls.length).toBe(1)
           expect(mockCallback.mock.calls[0][0].method).toBe(method)
           done()
         }
-        celoProvider.send(payload, callback as Callback<JsonRPCResponse>)
+        celoProvider.send(payload, callback as Callback<JsonRpcResponse>)
       })
     })
   })
@@ -127,36 +132,36 @@ describe('CeloProvider', () => {
     describe('but tries to use it with a different account', () => {
       interceptedByCeloProvider.forEach((method: string) => {
         test(`fowards the call to '${method}' to the original provider`, (done) => {
-          const payload: JsonRPCRequest = {
+          const payload: JsonRpcPayload = {
             id: 0,
             jsonrpc: '2.0',
             method,
             params: paramsForMethod(method, ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS1),
           }
-          const callback = (_error: null, _result: JsonRPCResponse) => {
+          const callback = (_error: null, _result: JsonRpcResponse) => {
             expect(mockCallback.mock.calls.length).toBe(1)
             expect(mockCallback.mock.calls[0][0].method).toBe(method)
             done()
           }
-          celoProvider.send(payload, callback as Callback<JsonRPCResponse>)
+          celoProvider.send(payload, callback as Callback<JsonRpcResponse>)
         })
       })
     })
 
     describe('using that account', () => {
       test("call 'send' with 'eth_sendTransaction' signs and send a eth_sendRawTransaction to the original provider", (done) => {
-        const payload: JsonRPCRequest = {
+        const payload: JsonRpcPayload = {
           id: 0,
           jsonrpc: '2.0',
           method: 'eth_sendTransaction',
           params: paramsForMethod('eth_sendTransaction', ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2),
         }
-        const callback = (_error: null, _result: JsonRPCResponse) => {
+        const callback = (_error: null, _result: JsonRpcResponse) => {
           expect(mockCallback.mock.calls.length).toBe(1)
           expect(mockCallback.mock.calls[0][0].method).toBe('eth_sendRawTransaction')
           done()
         }
-        celoProvider.send(payload, callback as Callback<JsonRPCResponse>)
+        celoProvider.send(payload, callback as Callback<JsonRpcResponse>)
       })
 
       test.todo(
@@ -167,19 +172,19 @@ describe('CeloProvider', () => {
         .filter((x) => x !== 'eth_sendTransaction' && x !== 'eth_signTypedData')
         .forEach((method: string) => {
           test(`call 'send' with '${method}' signs the message and don't call the original provider`, (done) => {
-            const payload: JsonRPCRequest = {
+            const payload: JsonRpcPayload = {
               id: 0,
               jsonrpc: '2.0',
               method,
               params: paramsForMethod(method, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2),
             }
-            const callback = (error: null, result: JsonRPCResponse) => {
+            const callback = (error: null, result: JsonRpcResponse) => {
               expect(error).toBeNull()
               expect(result).not.toBeFalsy()
               expect(mockCallback.mock.calls.length).toBe(0)
               done()
             }
-            celoProvider.send(payload, callback as Callback<JsonRPCResponse>)
+            celoProvider.send(payload, callback as Callback<JsonRpcResponse>)
           })
         })
     })

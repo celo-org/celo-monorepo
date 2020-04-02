@@ -6,7 +6,7 @@ import { chunk } from 'lodash'
 import { MinimalContact } from 'react-native-contacts'
 import { all, call, put, select } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
-import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
+import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -26,7 +26,7 @@ import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipien
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
-import { contractKit } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
@@ -129,6 +129,8 @@ function* lookupNewRecipients(
   Logger.debug(TAG, `Total new recipients found: ${newE164Numbers.length}`)
 
   yield put(incrementImportSyncProgress(allE164Numbers.length - newE164Numbers.length))
+
+  const contractKit = getContractKit()
 
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
@@ -246,6 +248,8 @@ export function* fetchPhoneAddresses(action: FetchPhoneAddressesAction) {
   const e164NumberToAddressUpdates: any = {}
   e164Numbers.map((n) => (e164NumberToAddressUpdates[n] = undefined))
   yield put(updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, {}))
+
+  const contractKit = getContractKit()
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
     contractKit.contracts.getAttestations,
