@@ -1,0 +1,68 @@
+# Options for the http server
+# Copy to wherever the bulldozer instance is run and rename to bulldozer.yml
+
+server:
+  # The listen address and port
+  address: "0.0.0.0"
+  port: 8080
+  # Uncomment the "tls_config" block to enable HTTPS support in the server.
+  # The cert and key files must be usable by net/http.ListenAndServeTLS().
+  # tls_config:
+  #   cert_file: /path/to/server.pem
+  #   key_file: /path/to/server.key
+
+# Options for logging output
+logging:
+  # If true, logs are printed in human-readable form. We recommend using
+  # "false" to output JSON-formatted logs in production
+  text: false
+
+  # Set a minimum logging level threshold
+  # Choose from: debug, info, warn, error
+  level: info
+
+# Options for the HTTP Cache
+cache:
+  # The maximum size of the cache (specified in human readable units)
+  max_size: 50 MB
+
+# Options for connecting to GitHub
+github:
+  # The URL of the GitHub homepage. Can also be set by the GITHUB_WEB_URL
+  # environment variable.
+  web_url: "https://github.com"
+  # The base URL for v3 (REST) API requests. Can also be set by the
+  # GITHUB_V3_API_URL environment variable.
+  v3_api_url: "https://api.github.com"
+  app:
+    # The integration ID of the GitHub app. Can also be set by the
+    # GITHUB_APP_INTEGRATION_ID environment variable.
+    integration_id: 1
+    # A random string used to validate webhooks. Can also be set by the
+    # GITHUB_APP_WEBHOOK_SECRET environment variable.
+    webhook_secret: "YOUR_SECRET_HERE"
+    # The private key of the GitHub app (.pem file download from GitHub). Can
+    # also be set by the GITHUB_APP_PRIVATE_KEY environment variable.
+    private_key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      xxxxx
+      xxxxx
+      xxxxx
+      -----END RSA PRIVATE KEY-----
+# Options for application behavior
+options:
+  # The path within repositories to find the bulldozer.yml config file
+  configuration_path: .bulldozer.yml
+  # The name of the application. This will affect the User-Agent header
+  # when making requests to Github.
+  app_name: bulldozer
+  # An optional personal access token associated with a normal GitHub user that
+  # is used to merge pull requests into protected branches with push
+  # restrictions. Can also be set by the BULLDOZER_PUSH_RESTRICTION_USER_TOKEN
+  # environment variable.
+  push_restriction_user_token: token
+  # Default repository config, the same as the config file described in README
+  default_repository_config:
+    merge:
+      blacklist:
+        labels: ["do not merge"]
