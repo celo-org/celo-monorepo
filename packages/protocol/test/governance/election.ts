@@ -1899,7 +1899,7 @@ contract('Election', (accounts: string[]) => {
       assertEqualBN(await election.getTotalVotes(), await election.getTotalVotesForGroup(group))
     }
 
-    const revokeAllAndCheckInvariants = async (voters: string[], delta: number = 0) => {
+    const revokeAllAndCheckInvariants = async (delta: number = 0) => {
       const vAccounts = await Promise.all(
         voters.map(async (v) => {
           return {
@@ -1973,7 +1973,7 @@ contract('Election', (accounts: string[]) => {
             await checkGroupInvariants(voterAccounts)
             await mineBlocks(EPOCH, web3)
           }
-          await revokeAllAndCheckInvariants(voters)
+          await revokeAllAndCheckInvariants()
         })
       })
 
@@ -2009,21 +2009,15 @@ contract('Election', (accounts: string[]) => {
             for (let j = 0; j < voterAccounts.length; j++) {
               voterAccounts[j] = await makeRandomAction(voterAccounts[j])
             }
-            //await Promise.all(voterAccounts.map(checkVoterInvariants, 1))
-            for (const va of voterAccounts) {
-              await checkVoterInvariants(va, 20)
-            }
+            await Promise.all(voterAccounts.map(checkVoterInvariants, 20))
             await checkGroupInvariants(voterAccounts, 20)
 
             await mineBlocks(EPOCH, web3)
             voterAccounts = await distributeEpochRewards(voterAccounts)
-            //await Promise.all(voterAccounts.map(checkVoterInvariants, 1))
-            for (const va of voterAccounts) {
-              await checkVoterInvariants(va, 20)
-            }
+            await Promise.all(voterAccounts.map(checkVoterInvariants, 20))
             await checkGroupInvariants(voterAccounts, 20)
           }
-          await revokeAllAndCheckInvariants(voters, 20)
+          await revokeAllAndCheckInvariants(20)
         })
       })
     })
