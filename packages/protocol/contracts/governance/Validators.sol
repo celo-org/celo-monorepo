@@ -583,8 +583,10 @@ contract Validators is
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
-    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
+    require(
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
+    );
     return true;
   }
 
@@ -608,6 +610,7 @@ contract Validators is
     require(blsPop.length == 48, "Wrong BLS PoP length");
     require(checkProofOfPossession(account, blsPublicKey, blsPop), "Invalid BLS PoP");
     validator.publicKeys.bls = blsPublicKey;
+    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
     return true;
   }
 
@@ -629,6 +632,28 @@ contract Validators is
       _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
       "Error updating ECDSA public key"
     );
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's ECDSA key.
+   * @param validator The validator whose ECDSA public key should be updated.
+   * @param signer The address with which the validator is signing consensus messages.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. Should
+   *   match `signer`. 64 bytes.
+   * @return True upon success.
+   */
+  function _updateEcdsaPublicKey(
+    Validator storage validator,
+    address signer,
+    bytes memory ecdsaPublicKey
+  ) private returns (bool) {
+    require(ecdsaPublicKey.length == 64, "Wrong ECDSA public key length");
+    require(
+      address(uint160(uint256(keccak256(ecdsaPublicKey)))) == signer,
+      "ECDSA key does not match signer"
+    );
+    validator.publicKeys.ecdsa = ecdsaPublicKey;
     emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
     return true;
   }
@@ -657,31 +682,10 @@ contract Validators is
       _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
       "Error updating ECDSA public key"
     );
-    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
-    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
-    return true;
-  }
-
-  /**
-   * @notice Updates a validator's ECDSA key.
-   * @param validator The validator whose ECDSA public key should be updated.
-   * @param signer The address with which the validator is signing consensus messages.
-   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. Should
-   *   match `signer`. 64 bytes.
-   * @return True upon success.
-   */
-  function _updateEcdsaPublicKey(
-    Validator storage validator,
-    address signer,
-    bytes memory ecdsaPublicKey
-  ) private returns (bool) {
-    require(ecdsaPublicKey.length == 64, "Wrong ECDSA public key length");
     require(
-      address(uint160(uint256(keccak256(ecdsaPublicKey)))) == signer,
-      "ECDSA key does not match signer"
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
     );
-    validator.publicKeys.ecdsa = ecdsaPublicKey;
     return true;
   }
 
