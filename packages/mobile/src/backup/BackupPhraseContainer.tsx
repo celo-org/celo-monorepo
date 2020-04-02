@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     minHeight: 125,
     padding: 14,
     paddingTop: 16,
+    textAlignVertical: 'top',
   },
   socialPhraseInputText: {
     minHeight: 90,

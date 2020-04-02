@@ -27,9 +27,9 @@ const DefaultConfig = {
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
-      major: 1,
+      major: 0,
       minor: 9,
-      patch: 8,
+      patch: 0,
     },
     blockGasLimit: 20000000,
   },

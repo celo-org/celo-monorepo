@@ -12,9 +12,6 @@ import { Logger } from './logger'
 
 const gasInflateFactor = 1.5
 
-// TODO(nategraf): Allow this parameter to be fetched from the full-node peer.
-const defaultGatewayFee = new BigNumber(10000)
-
 export function selectContractByAddress(contracts: Contract[], address: string) {
   const addresses = contracts.map((contract) => contract.options.address)
   const index = addresses.indexOf(address)
@@ -413,7 +410,7 @@ export async function sendTransactionAsyncWithWeb3Signing<T>(
     // we don't have access to web3 inside it, so, in the short-term
     // fill the fields here.
     const gatewayFeeRecipient = await web3.eth.getCoinbase()
-    const gatewayFee = '0x' + defaultGatewayFee.toString(16)
+    const gatewayFee = '0x0'
     Logger.debug(tag, `Gateway fee is ${gatewayFee} paid to ${gatewayFeeRecipient}`)
     const gasPrice = await getGasPrice(web3, feeCurrency)
 
