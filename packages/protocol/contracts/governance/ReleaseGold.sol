@@ -286,6 +286,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       maxDistribution = MAX_UINT;
     } else {
       uint256 totalBalance = getTotalBalance();
+      require(totalBalance > 0, "Do not set max distribution before factory sends the gold");
       maxDistribution = totalBalance.mul(distributionRatio).div(1000);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
