@@ -17,8 +17,10 @@ Contract for handling deposits needed for voting.
 ### Properties
 
 * [_relock](_wrappers_lockedgold_.lockedgoldwrapper.md#_relock)
+* [events](_wrappers_lockedgold_.lockedgoldwrapper.md#events)
 * [getAccountNonvotingLockedGold](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountnonvotinglockedgold)
 * [getAccountTotalLockedGold](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccounttotallockedgold)
+* [getTotalLockedGold](_wrappers_lockedgold_.lockedgoldwrapper.md#gettotallockedgold)
 * [lock](_wrappers_lockedgold_.lockedgoldwrapper.md#lock)
 * [unlock](_wrappers_lockedgold_.lockedgoldwrapper.md#unlock)
 * [withdraw](_wrappers_lockedgold_.lockedgoldwrapper.md#withdraw)
@@ -67,7 +69,7 @@ Name | Type |
     tupleParser(valueToString, valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L130)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:131](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L131)*
 
 Relocks gold that has been unlocked but not withdrawn.
 
@@ -88,6 +90,16 @@ Name | Type |
 
 ___
 
+###  events
+
+• **events**: *any* = this.contract.events
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
+
+___
+
 ###  getAccountNonvotingLockedGold
 
 • **getAccountNonvotingLockedGold**: *function* = proxyCall(
@@ -96,7 +108,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:152](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L152)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:164](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L164)*
 
 Returns the total amount of non-voting locked gold for an account.
 
@@ -124,7 +136,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:141](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L141)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:142](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L142)*
 
 Returns the total amount of locked gold for an account.
 
@@ -144,11 +156,38 @@ Name | Type |
 
 ___
 
+###  getTotalLockedGold
+
+• **getTotalLockedGold**: *function* = proxyCall(
+    this.contract.methods.getTotalLockedGold,
+    undefined,
+    valueToBigNumber
+  )
+
+*Defined in [contractkit/src/wrappers/LockedGold.ts:153](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L153)*
+
+Returns the total amount of locked gold in the system. Note that this does not include
+  gold that has been unlocked but not yet withdrawn.
+
+**`returns`** The total amount of locked gold in the system.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
 ###  lock
 
 • **lock**: *function* = proxySend(this.kit, this.contract.methods.lock)
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L66)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L67)*
 
 Locks gold to be used for voting.
 The gold to be locked, must be specified as the `tx.value`
@@ -173,7 +212,7 @@ ___
     tupleParser(valueToString)
   )
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L72)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L73)*
 
 Unlocks gold that becomes withdrawable after the unlocking period.
 
@@ -198,7 +237,7 @@ ___
     this.contract.methods.withdraw
   )
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L57)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L58)*
 
 Withdraws a gold that has been unlocked after the unlocking period has passed.
 
@@ -234,7 +273,7 @@ Contract address
 
 ▸ **computeInitialParametersForSlashing**(`account`: string, `penalty`: BigNumber): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L226)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:239](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L239)*
 
 Computes parameters for slashing `penalty` from `account`.
 
@@ -255,7 +294,7 @@ ___
 
 ▸ **computeParametersForSlashing**(`account`: string, `penalty`: BigNumber, `groups`: AddressListItem[]): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:233](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L233)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:246](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L246)*
 
 **Parameters:**
 
@@ -273,7 +312,7 @@ ___
 
 ▸ **getAccountSummary**(`account`: string): *Promise‹AccountSummary›*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L167)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:180](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L180)*
 
 **Parameters:**
 
@@ -289,7 +328,7 @@ ___
 
 ▸ **getAccountsSlashed**(`epochNumber`: number): *Promise‹[AccountSlashed](../interfaces/_wrappers_lockedgold_.accountslashed.md)[]›*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:204](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L204)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:217](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L217)*
 
 Retrieves AccountSlashed for epochNumber.
 
@@ -307,7 +346,7 @@ ___
 
 ▸ **getConfig**(): *Promise‹[LockedGoldConfig](../interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:161](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L161)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:173](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L173)*
 
 Returns current configuration parameters.
 
@@ -319,7 +358,7 @@ ___
 
 ▸ **getPendingWithdrawals**(`account`: string): *Promise‹[PendingWithdrawal](../interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)[]›*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:188](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L188)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:201](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L201)*
 
 Returns the pending withdrawals from unlocked gold for an account.
 
@@ -339,7 +378,7 @@ ___
 
 ▸ **getPendingWithdrawalsTotalValue**(`account`: [Address](../modules/_base_.md#address)): *Promise‹BigNumber‹››*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L78)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L79)*
 
 **Parameters:**
 
@@ -355,7 +394,7 @@ ___
 
 ▸ **relock**(`account`: [Address](../modules/_base_.md#address), `value`: BigNumber.Value): *Promise‹Array‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›››*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L90)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L91)*
 
 Relocks gold that has been unlocked but not withdrawn.
 

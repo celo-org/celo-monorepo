@@ -18,6 +18,7 @@ Contract for voting for validators and managing validator groups.
 
 * [affiliate](_wrappers_validators_.validatorswrapper.md#affiliate)
 * [deaffiliate](_wrappers_validators_.validatorswrapper.md#deaffiliate)
+* [events](_wrappers_validators_.validatorswrapper.md#events)
 * [forceDeaffiliateIfValidator](_wrappers_validators_.validatorswrapper.md#forcedeaffiliateifvalidator)
 * [getAccountLockedGoldRequirement](_wrappers_validators_.validatorswrapper.md#getaccountlockedgoldrequirement)
 * [getEpochNumber](_wrappers_validators_.validatorswrapper.md#getepochnumber)
@@ -28,9 +29,9 @@ Contract for voting for validators and managing validator groups.
 * [getValidatorMembershipHistoryExtraData](_wrappers_validators_.validatorswrapper.md#getvalidatormembershiphistoryextradata)
 * [isValidator](_wrappers_validators_.validatorswrapper.md#isvalidator)
 * [isValidatorGroup](_wrappers_validators_.validatorswrapper.md#isvalidatorgroup)
-* [queueCommissionUpdate](_wrappers_validators_.validatorswrapper.md#queuecommissionupdate)
 * [registerValidator](_wrappers_validators_.validatorswrapper.md#registervalidator)
 * [removeMember](_wrappers_validators_.validatorswrapper.md#removemember)
+* [setNextCommissionUpdate](_wrappers_validators_.validatorswrapper.md#setnextcommissionupdate)
 * [updateBlsPublicKey](_wrappers_validators_.validatorswrapper.md#updateblspublickey)
 * [updateCommission](_wrappers_validators_.validatorswrapper.md#updatecommission)
 
@@ -129,6 +130,16 @@ Fails if the account is not a validator with non-zero affiliation.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  events
+
+• **events**: *any* = this.contract.events
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
 
 ___
 
@@ -375,33 +386,6 @@ Name | Type |
 
 ___
 
-###  queueCommissionUpdate
-
-• **queueCommissionUpdate**: *function* = proxySend(
-    this.kit,
-    this.contract.methods.queueCommissionUpdate,
-    tupleParser(valueToFixidityString)
-  )
-
-*Defined in [contractkit/src/wrappers/Validators.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L83)*
-
-Queues an update to a validator group's commission.
-
-**`param`** Fixidity representation of the commission this group receives on epoch
-  payments made to its members. Must be in the range [0, 1.0].
-
-#### Type declaration:
-
-▸ (`commission`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`commission` | BigNumber.Value |
-
-___
-
 ###  registerValidator
 
 • **registerValidator**: *function* = proxySend(
@@ -446,6 +430,33 @@ The ValidatorGroup is specified by the `from` of the tx.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  setNextCommissionUpdate
+
+• **setNextCommissionUpdate**: *function* = proxySend(
+    this.kit,
+    this.contract.methods.setNextCommissionUpdate,
+    tupleParser(valueToFixidityString)
+  )
+
+*Defined in [contractkit/src/wrappers/Validators.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L83)*
+
+Queues an update to a validator group's commission.
+
+**`param`** Fixidity representation of the commission this group receives on epoch
+  payments made to its members. Must be in the range [0, 1.0].
+
+#### Type declaration:
+
+▸ (`commission`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`commission` | BigNumber.Value |
 
 ___
 

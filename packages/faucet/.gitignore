@@ -3,7 +3,6 @@ dist/
 # Firebase cache
 .firebase/
 
-
 serviceAccountKey.json
-
 firebase-debug.log
+database-rules.json
