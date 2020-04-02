@@ -28,6 +28,12 @@ contract Election is
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
+  // 1e20 ensures that units can be represented as precisely as possible to avoid rounding errors
+  // when translating to votes, without risking integer overflow.
+  // A maximum of 1,000,000,000 cGLD (1e27) yields a maximum of 1e47 units, whose product is at
+  // most 1e74, which is less than 2^256.
+  uint256 private constant UNIT_PRECISION_FACTOR = 100000000000000000000;
+
   struct PendingVote {
     // The value of the vote, in gold.
     uint256 value;
@@ -748,14 +754,11 @@ contract Election is
    * @return The corresponding number of units.
    */
   function votesToUnits(address group, uint256 value) private view returns (uint256) {
-    FixidityLib.Fraction memory fixedValue = FixidityLib.newFixed(value);
-    if (votes.active.forGroup[group].total == 0) {
-      return fixedValue.unwrap();
+    if (votes.active.forGroup[group].totalUnits == 0) {
+      return value.mul(UNIT_PRECISION_FACTOR);
     } else {
       return
-        fixedValue.multiply(FixidityLib.wrap(votes.active.forGroup[group].totalUnits)).unwrap().div(
-          votes.active.forGroup[group].total
-        );
+        value.mul(votes.active.forGroup[group].totalUnits).div(votes.active.forGroup[group].total);
     }
   }
 
@@ -766,14 +769,11 @@ contract Election is
    * @return The corresponding number of active votes.
    */
   function unitsToVotes(address group, uint256 value) private view returns (uint256) {
-    FixidityLib.Fraction memory fixedValue = FixidityLib.wrap(value);
     if (votes.active.forGroup[group].totalUnits == 0) {
       return 0;
     } else {
       return
-        fixedValue.multiply(FixidityLib.newFixed(votes.active.forGroup[group].total)).unwrap().div(
-          votes.active.forGroup[group].totalUnits
-        );
+        value.mul(votes.active.forGroup[group].total).div(votes.active.forGroup[group].totalUnits);
     }
   }
 

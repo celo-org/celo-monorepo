@@ -1741,7 +1741,7 @@ contract('Election', (accounts: string[]) => {
   })
 
   describe('#consistencyChecks', () => {
-    const debug = true
+    const debug = false
     const group = accounts[0]
     const voters = accounts.slice(1)
     interface Account {
@@ -1899,6 +1899,44 @@ contract('Election', (accounts: string[]) => {
       assertEqualBN(await election.getTotalVotes(), await election.getTotalVotesForGroup(group))
     }
 
+    const revokeAllAndCheckInvariants = async (voters: string[], delta: number = 0) => {
+      const vAccounts = await Promise.all(
+        voters.map(async (v) => {
+          return {
+            address: v,
+            active: await election.getActiveVotesForGroupByAccount(group, v),
+            pending: await election.getPendingVotesForGroupByAccount(group, v),
+            nonvoting: await mockLockedGold.nonvotingAccountBalance(v),
+          }
+        })
+      )
+
+      for (const account of vAccounts) {
+        await checkVoterInvariants(account, delta)
+        const address = account.address
+        // Need to fetch actual number due to potential rounding errors.
+        const active = await election.getActiveVotesForGroupByAccount(group, address)
+        if (active.gt(0)) {
+          await election.revokeActive(group, active.toFixed(), NULL_ADDRESS, NULL_ADDRESS, 0, {
+            from: address,
+          })
+          account.active = new BigNumber(0)
+          account.nonvoting = account.nonvoting.plus(active)
+        }
+        const pending = account.pending
+        if (pending.gt(0)) {
+          await election.revokePending(group, pending.toFixed(), NULL_ADDRESS, NULL_ADDRESS, 0, {
+            from: address,
+          })
+          account.pending = new BigNumber(0)
+          account.nonvoting = account.nonvoting.plus(pending)
+        }
+        assertEqualBN(await election.getActiveVotesForGroupByAccount(group, address), 0)
+        assertEqualBN(await election.getPendingVotesForGroupByAccount(group, address), 0)
+        assertEqualBN(await mockLockedGold.nonvotingAccountBalance(address), account.nonvoting)
+      }
+    }
+
     let voterAccounts: Account[]
     beforeEach(async () => {
       // 50M gives us 450M total locked gold
@@ -1928,64 +1966,22 @@ contract('Election', (accounts: string[]) => {
       this.timeout(0)
       describe('when no epoch rewards are distributed', () => {
         it('actual and expected should always match exactly', async () => {
-          for (let i = 0; i < 100; i++) {
+          // Fewer iterations is okay as this test is less "challenging" than the rewards case.
+          for (let i = 0; i < 10; i++) {
             voterAccounts = await Promise.all(voterAccounts.map(makeRandomAction))
             await Promise.all(voterAccounts.map(checkVoterInvariants))
             await checkGroupInvariants(voterAccounts)
             await mineBlocks(EPOCH, web3)
           }
+          await revokeAllAndCheckInvariants(voters)
         })
       })
 
-      describe.only('when epoch rewards are distributed', () => {
+      describe('when epoch rewards are distributed', () => {
         it('actual and expected should always match within a small delta', async () => {
-          // TODO(asa): Failing here
-          const revokeAll = async (vAccounts: Account[]) => {
-            // tslint:disable-next-line
-            for (let i = 0; i < vAccounts.length; i++) {
-              const address = vAccounts[i].address
-              const active = vAccounts[i].active
-              if (active.gt(0)) {
-                await election.revokeActive(
-                  group,
-                  active.toFixed(),
-                  NULL_ADDRESS,
-                  NULL_ADDRESS,
-                  0,
-                  {
-                    from: address,
-                  }
-                )
-                vAccounts[i].active = new BigNumber(0)
-                vAccounts[i].nonvoting = vAccounts[i].nonvoting.plus(active)
-              }
-              const pending = vAccounts[i].pending
-              if (pending.gt(0)) {
-                await election.revokePending(
-                  group,
-                  pending.toFixed(),
-                  NULL_ADDRESS,
-                  NULL_ADDRESS,
-                  0,
-                  {
-                    from: address,
-                  }
-                )
-                vAccounts[i].pending = new BigNumber(0)
-                vAccounts[i].nonvoting = vAccounts[i].nonvoting.plus(pending)
-              }
-              assertEqualBN(await election.getActiveVotesForGroupByAccount(group, address), 0)
-              assertEqualBN(await election.getPendingVotesForGroupByAccount(group, address), 0)
-              assertAlmostEqualBN(
-                await mockLockedGold.nonvotingAccountBalance(address),
-                vAccounts[i].nonvoting,
-                10
-              )
-            }
-          }
-
           const distributeEpochRewards = async (vAccounts: Account[]) => {
-            const reward = randomInteger((await election.getTotalVotes()).times(0.00032).dp(0))
+            // 1% compounded 100x gives up to a 2.7x multiplier.
+            const reward = randomInteger((await election.getTotalVotes()).times(0.01).dp(0))
             const activeTotal = vAccounts.reduce((a, b) => a.plus(b.active), new BigNumber(0))
             if (!reward.isZero() && !activeTotal.isZero()) {
               debugLog(`Distributing ${reward.toFixed()} in rewards to voters`)
@@ -2013,21 +2009,21 @@ contract('Election', (accounts: string[]) => {
             for (let j = 0; j < voterAccounts.length; j++) {
               voterAccounts[j] = await makeRandomAction(voterAccounts[j])
             }
-            //await Promise.all(voterAccounts.map(checkVoterInvariants, 50))
+            //await Promise.all(voterAccounts.map(checkVoterInvariants, 1))
             for (const va of voterAccounts) {
-              await checkVoterInvariants(va, 50)
+              await checkVoterInvariants(va, 20)
             }
-            await checkGroupInvariants(voterAccounts, 50)
+            await checkGroupInvariants(voterAccounts, 20)
 
             await mineBlocks(EPOCH, web3)
             voterAccounts = await distributeEpochRewards(voterAccounts)
-            //await Promise.all(voterAccounts.map(checkVoterInvariants, 0))
+            //await Promise.all(voterAccounts.map(checkVoterInvariants, 1))
             for (const va of voterAccounts) {
-              await checkVoterInvariants(va, 50)
+              await checkVoterInvariants(va, 20)
             }
-            await checkGroupInvariants(voterAccounts, 50)
+            await checkGroupInvariants(voterAccounts, 20)
           }
-          await revokeAll(voterAccounts)
+          await revokeAllAndCheckInvariants(voters, 20)
         })
       })
     })
