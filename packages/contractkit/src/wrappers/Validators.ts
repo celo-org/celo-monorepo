@@ -83,9 +83,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members. Must be in the range [0, 1.0].
    */
-  queueCommissionUpdate: (commission: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+  setNextCommissionUpdate: (commission: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.queueCommissionUpdate,
+    this.contract.methods.setNextCommissionUpdate,
     tupleParser(valueToFixidityString)
   )
 

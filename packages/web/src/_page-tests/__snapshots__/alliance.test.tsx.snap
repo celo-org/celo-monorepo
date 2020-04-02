@@ -2368,88 +2368,129 @@ exports[`Alliance renders 1`] = `
                     className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "height": "18px",
-                      }
-                    }
-                  />
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "marginBottom": "5px",
+                        "marginBottom": "10px",
                       }
                     }
                   >
-                    <label
-                      className="css-text-901oao"
-                      dir="auto"
+                    <div
+                      className="css-view-1dbjc4n"
                       style={
                         Object {
-                          "color": "rgba(129,134,139,1.00)",
-                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                          "fontSize": "16px",
-                          "fontWeight": "500",
-                          "lineHeight": "20px",
-                          "textRendering": "geometricPrecision",
+                          "marginBottom": "5px",
                         }
                       }
                     >
-                      Name
-                    </label>
-                  </div>
-                  <input
-                    autoCapitalize="sentences"
-                    autoComplete="on"
-                    autoCorrect="on"
-                    className="css-textinput-1cwyjr8"
-                    data-focusable={true}
-                    dir="auto"
-                    name="name"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    onFocus={[Function]}
-                    onKeyDown={[Function]}
-                    onKeyPress={[Function]}
-                    onSelect={[Function]}
-                    readOnly={false}
-                    spellCheck={true}
-                    style={
-                      Object {
-                        "WebkitAlignSelf": "center",
-                        "alignSelf": "center",
-                        "borderBottomColor": "rgba(221,221,221,1.00)",
-                        "borderBottomLeftRadius": "3px",
-                        "borderBottomRightRadius": "3px",
-                        "borderBottomWidth": "1px",
-                        "borderLeftColor": "rgba(221,221,221,1.00)",
-                        "borderLeftWidth": "1px",
-                        "borderRightColor": "rgba(221,221,221,1.00)",
-                        "borderRightWidth": "1px",
-                        "borderTopColor": "rgba(221,221,221,1.00)",
-                        "borderTopLeftRadius": "3px",
-                        "borderTopRightRadius": "3px",
-                        "borderTopWidth": "1px",
-                        "color": "rgba(255,255,255,1.00)",
-                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                        "fontSize": "20px",
-                        "lineHeight": "28px",
-                        "marginBottom": "20px",
-                        "marginLeft": "0px",
-                        "marginRight": "0px",
-                        "marginTop": "0px",
-                        "msFlexItemAlign": "center",
-                        "outlineWidth": "0px",
-                        "paddingBottom": "15px",
-                        "paddingLeft": "10px",
-                        "paddingRight": "10px",
-                        "paddingTop": "13px",
-                        "textRendering": "geometricPrecision",
-                        "width": "100%",
+                      <label
+                        className="css-text-901oao"
+                        dir="auto"
+                        style={
+                          Object {
+                            "color": "rgba(129,134,139,1.00)",
+                            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "lineHeight": "20px",
+                            "textRendering": "geometricPrecision",
+                          }
+                        }
+                      >
+                        Name
+                      </label>
+                    </div>
+                    <input
+                      aria-label="Name"
+                      autoCapitalize="sentences"
+                      autoComplete="on"
+                      autoCorrect="on"
+                      className="css-textinput-1cwyjr8"
+                      data-focusable={true}
+                      dir="auto"
+                      name="name"
+                      onBlur={[Function]}
+                      onChange={[Function]}
+                      onFocus={[Function]}
+                      onKeyDown={[Function]}
+                      onKeyPress={[Function]}
+                      onSelect={[Function]}
+                      readOnly={false}
+                      spellCheck={true}
+                      style={
+                        Object {
+                          "WebkitAlignSelf": "center",
+                          "alignSelf": "center",
+                          "borderBottomColor": "rgba(221,221,221,1.00)",
+                          "borderBottomLeftRadius": "3px",
+                          "borderBottomRightRadius": "3px",
+                          "borderBottomWidth": "1px",
+                          "borderLeftColor": "rgba(221,221,221,1.00)",
+                          "borderLeftWidth": "1px",
+                          "borderRightColor": "rgba(221,221,221,1.00)",
+                          "borderRightWidth": "1px",
+                          "borderTopColor": "rgba(221,221,221,1.00)",
+                          "borderTopLeftRadius": "3px",
+                          "borderTopRightRadius": "3px",
+                          "borderTopWidth": "1px",
+                          "color": "rgba(255,255,255,1.00)",
+                          "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                          "fontSize": "20px",
+                          "lineHeight": "28px",
+                          "marginBottom": "0px",
+                          "marginLeft": "0px",
+                          "marginRight": "0px",
+                          "marginTop": "0px",
+                          "msFlexItemAlign": "center",
+                          "outlineWidth": "0px",
+                          "paddingBottom": "15px",
+                          "paddingLeft": "10px",
+                          "paddingRight": "10px",
+                          "paddingTop": "13px",
+                          "textRendering": "geometricPrecision",
+                          "width": "100%",
+                        }
                       }
-                    }
-                    type="text"
-                    value=""
-                  />
+                      type="text"
+                      value=""
+                    />
+                    <div
+                      className="css-view-1dbjc4n"
+                      style={
+                        Object {
+                          "MozTransitionProperty": "max-height",
+                          "WebkitTransitionDuration": "600ms",
+                          "WebkitTransitionProperty": "max-height",
+                          "height": "auto",
+                          "marginBottom": "5px",
+                          "marginTop": "5px",
+                          "maxHeight": "0px",
+                          "transitionDuration": "600ms",
+                          "transitionProperty": "max-height",
+                        }
+                      }
+                    >
+                      <div
+                        className="css-text-901oao"
+                        dir="auto"
+                        style={
+                          Object {
+                            "MozTransitionProperty": "opacity",
+                            "WebkitTransitionDuration": "700ms",
+                            "WebkitTransitionProperty": "opacity",
+                            "color": "rgba(255,127,109,1.00)",
+                            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "lineHeight": "18px",
+                            "opacity": 0,
+                            "textRendering": "geometricPrecision",
+                            "transitionDuration": "700ms",
+                            "transitionProperty": "opacity",
+                          }
+                        }
+                      >
+                        Oops I’m blank!
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div
                   className="css-view-1dbjc4n"
@@ -2474,88 +2515,129 @@ exports[`Alliance renders 1`] = `
                     className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "height": "18px",
-                      }
-                    }
-                  />
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "marginBottom": "5px",
+                        "marginBottom": "10px",
                       }
                     }
                   >
-                    <label
-                      className="css-text-901oao"
-                      dir="auto"
+                    <div
+                      className="css-view-1dbjc4n"
                       style={
                         Object {
-                          "color": "rgba(129,134,139,1.00)",
-                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                          "fontSize": "16px",
-                          "fontWeight": "500",
-                          "lineHeight": "20px",
-                          "textRendering": "geometricPrecision",
+                          "marginBottom": "5px",
                         }
                       }
                     >
-                      Email
-                    </label>
-                  </div>
-                  <input
-                    autoCapitalize="sentences"
-                    autoComplete="on"
-                    autoCorrect="on"
-                    className="css-textinput-1cwyjr8"
-                    data-focusable={true}
-                    dir="auto"
-                    name="email"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    onFocus={[Function]}
-                    onKeyDown={[Function]}
-                    onKeyPress={[Function]}
-                    onSelect={[Function]}
-                    readOnly={false}
-                    spellCheck={true}
-                    style={
-                      Object {
-                        "WebkitAlignSelf": "center",
-                        "alignSelf": "center",
-                        "borderBottomColor": "rgba(221,221,221,1.00)",
-                        "borderBottomLeftRadius": "3px",
-                        "borderBottomRightRadius": "3px",
-                        "borderBottomWidth": "1px",
-                        "borderLeftColor": "rgba(221,221,221,1.00)",
-                        "borderLeftWidth": "1px",
-                        "borderRightColor": "rgba(221,221,221,1.00)",
-                        "borderRightWidth": "1px",
-                        "borderTopColor": "rgba(221,221,221,1.00)",
-                        "borderTopLeftRadius": "3px",
-                        "borderTopRightRadius": "3px",
-                        "borderTopWidth": "1px",
-                        "color": "rgba(255,255,255,1.00)",
-                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                        "fontSize": "20px",
-                        "lineHeight": "28px",
-                        "marginBottom": "20px",
-                        "marginLeft": "0px",
-                        "marginRight": "0px",
-                        "marginTop": "0px",
-                        "msFlexItemAlign": "center",
-                        "outlineWidth": "0px",
-                        "paddingBottom": "15px",
-                        "paddingLeft": "10px",
-                        "paddingRight": "10px",
-                        "paddingTop": "13px",
-                        "textRendering": "geometricPrecision",
-                        "width": "100%",
+                      <label
+                        className="css-text-901oao"
+                        dir="auto"
+                        style={
+                          Object {
+                            "color": "rgba(129,134,139,1.00)",
+                            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "lineHeight": "20px",
+                            "textRendering": "geometricPrecision",
+                          }
+                        }
+                      >
+                        Email
+                      </label>
+                    </div>
+                    <input
+                      aria-label="Email"
+                      autoCapitalize="sentences"
+                      autoComplete="on"
+                      autoCorrect="on"
+                      className="css-textinput-1cwyjr8"
+                      data-focusable={true}
+                      dir="auto"
+                      name="email"
+                      onBlur={[Function]}
+                      onChange={[Function]}
+                      onFocus={[Function]}
+                      onKeyDown={[Function]}
+                      onKeyPress={[Function]}
+                      onSelect={[Function]}
+                      readOnly={false}
+                      spellCheck={true}
+                      style={
+                        Object {
+                          "WebkitAlignSelf": "center",
+                          "alignSelf": "center",
+                          "borderBottomColor": "rgba(221,221,221,1.00)",
+                          "borderBottomLeftRadius": "3px",
+                          "borderBottomRightRadius": "3px",
+                          "borderBottomWidth": "1px",
+                          "borderLeftColor": "rgba(221,221,221,1.00)",
+                          "borderLeftWidth": "1px",
+                          "borderRightColor": "rgba(221,221,221,1.00)",
+                          "borderRightWidth": "1px",
+                          "borderTopColor": "rgba(221,221,221,1.00)",
+                          "borderTopLeftRadius": "3px",
+                          "borderTopRightRadius": "3px",
+                          "borderTopWidth": "1px",
+                          "color": "rgba(255,255,255,1.00)",
+                          "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                          "fontSize": "20px",
+                          "lineHeight": "28px",
+                          "marginBottom": "0px",
+                          "marginLeft": "0px",
+                          "marginRight": "0px",
+                          "marginTop": "0px",
+                          "msFlexItemAlign": "center",
+                          "outlineWidth": "0px",
+                          "paddingBottom": "15px",
+                          "paddingLeft": "10px",
+                          "paddingRight": "10px",
+                          "paddingTop": "13px",
+                          "textRendering": "geometricPrecision",
+                          "width": "100%",
+                        }
                       }
-                    }
-                    type="text"
-                    value=""
-                  />
+                      type="text"
+                      value=""
+                    />
+                    <div
+                      className="css-view-1dbjc4n"
+                      style={
+                        Object {
+                          "MozTransitionProperty": "max-height",
+                          "WebkitTransitionDuration": "600ms",
+                          "WebkitTransitionProperty": "max-height",
+                          "height": "auto",
+                          "marginBottom": "5px",
+                          "marginTop": "5px",
+                          "maxHeight": "0px",
+                          "transitionDuration": "600ms",
+                          "transitionProperty": "max-height",
+                        }
+                      }
+                    >
+                      <div
+                        className="css-text-901oao"
+                        dir="auto"
+                        style={
+                          Object {
+                            "MozTransitionProperty": "opacity",
+                            "WebkitTransitionDuration": "700ms",
+                            "WebkitTransitionProperty": "opacity",
+                            "color": "rgba(255,127,109,1.00)",
+                            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "lineHeight": "18px",
+                            "opacity": 0,
+                            "textRendering": "geometricPrecision",
+                            "transitionDuration": "700ms",
+                            "transitionProperty": "opacity",
+                          }
+                        }
+                      >
+                        Please enter a valid email
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div
@@ -2581,80 +2663,90 @@ exports[`Alliance renders 1`] = `
                   className="css-view-1dbjc4n"
                   style={
                     Object {
-                      "marginBottom": "5px",
+                      "marginBottom": "10px",
                     }
                   }
                 >
-                  <label
-                    className="css-text-901oao"
-                    dir="auto"
+                  <div
+                    className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "color": "rgba(129,134,139,1.00)",
-                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                        "fontSize": "16px",
-                        "fontWeight": "500",
-                        "lineHeight": "20px",
-                        "textRendering": "geometricPrecision",
+                        "marginBottom": "5px",
                       }
                     }
                   >
-                    How might you contribute to the Alliance?
-                  </label>
-                </div>
-                <input
-                  autoCapitalize="sentences"
-                  autoComplete="on"
-                  autoCorrect="on"
-                  className="css-textinput-1cwyjr8"
-                  data-focusable={true}
-                  dir="auto"
-                  name="contribution"
-                  onBlur={[Function]}
-                  onChange={[Function]}
-                  onFocus={[Function]}
-                  onKeyDown={[Function]}
-                  onKeyPress={[Function]}
-                  onSelect={[Function]}
-                  readOnly={false}
-                  spellCheck={true}
-                  style={
-                    Object {
-                      "WebkitAlignSelf": "center",
-                      "alignSelf": "center",
-                      "borderBottomColor": "rgba(221,221,221,1.00)",
-                      "borderBottomLeftRadius": "3px",
-                      "borderBottomRightRadius": "3px",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(221,221,221,1.00)",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(221,221,221,1.00)",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(221,221,221,1.00)",
-                      "borderTopLeftRadius": "3px",
-                      "borderTopRightRadius": "3px",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(255,255,255,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
-                      "marginBottom": "20px",
-                      "marginLeft": "0px",
-                      "marginRight": "0px",
-                      "marginTop": "0px",
-                      "msFlexItemAlign": "center",
-                      "outlineWidth": "0px",
-                      "paddingBottom": "15px",
-                      "paddingLeft": "10px",
-                      "paddingRight": "10px",
-                      "paddingTop": "13px",
-                      "textRendering": "geometricPrecision",
-                      "width": "100%",
+                    <label
+                      className="css-text-901oao"
+                      dir="auto"
+                      style={
+                        Object {
+                          "color": "rgba(129,134,139,1.00)",
+                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                          "fontSize": "16px",
+                          "fontWeight": "500",
+                          "lineHeight": "20px",
+                          "textRendering": "geometricPrecision",
+                        }
+                      }
+                    >
+                      How might you contribute to the Alliance?
+                    </label>
+                  </div>
+                  <input
+                    aria-label="How might you contribute to the Alliance?"
+                    autoCapitalize="sentences"
+                    autoComplete="on"
+                    autoCorrect="on"
+                    className="css-textinput-1cwyjr8"
+                    data-focusable={true}
+                    dir="auto"
+                    name="contribution"
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyPress={[Function]}
+                    onSelect={[Function]}
+                    readOnly={false}
+                    spellCheck={true}
+                    style={
+                      Object {
+                        "WebkitAlignSelf": "center",
+                        "alignSelf": "center",
+                        "borderBottomColor": "rgba(221,221,221,1.00)",
+                        "borderBottomLeftRadius": "3px",
+                        "borderBottomRightRadius": "3px",
+                        "borderBottomWidth": "1px",
+                        "borderLeftColor": "rgba(221,221,221,1.00)",
+                        "borderLeftWidth": "1px",
+                        "borderRightColor": "rgba(221,221,221,1.00)",
+                        "borderRightWidth": "1px",
+                        "borderTopColor": "rgba(221,221,221,1.00)",
+                        "borderTopLeftRadius": "3px",
+                        "borderTopRightRadius": "3px",
+                        "borderTopWidth": "1px",
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                        "fontSize": "20px",
+                        "lineHeight": "28px",
+                        "marginBottom": "0px",
+                        "marginLeft": "0px",
+                        "marginRight": "0px",
+                        "marginTop": "0px",
+                        "msFlexItemAlign": "center",
+                        "outlineWidth": "0px",
+                        "paddingBottom": "15px",
+                        "paddingLeft": "10px",
+                        "paddingRight": "10px",
+                        "paddingTop": "13px",
+                        "textRendering": "geometricPrecision",
+                        "width": "100%",
+                      }
                     }
-                  }
-                  type="text"
-                  value=""
-                />
+                    type="text"
+                    value=""
+                  />
+                </div>
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -7213,88 +7305,129 @@ exports[`Alliance renders 1`] = `
                   className="css-view-1dbjc4n"
                   style={
                     Object {
-                      "height": "18px",
-                    }
-                  }
-                />
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "marginBottom": "5px",
+                      "marginBottom": "10px",
                     }
                   }
                 >
-                  <label
-                    className="css-text-901oao"
-                    dir="auto"
+                  <div
+                    className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "color": "rgba(129,134,139,1.00)",
-                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                        "fontSize": "16px",
-                        "fontWeight": "500",
-                        "lineHeight": "20px",
-                        "textRendering": "geometricPrecision",
+                        "marginBottom": "5px",
                       }
                     }
                   >
-                    Name
-                  </label>
-                </div>
-                <input
-                  autoCapitalize="sentences"
-                  autoComplete="on"
-                  autoCorrect="on"
-                  className="css-textinput-1cwyjr8"
-                  data-focusable={true}
-                  dir="auto"
-                  name="name"
-                  onBlur={[Function]}
-                  onChange={[Function]}
-                  onFocus={[Function]}
-                  onKeyDown={[Function]}
-                  onKeyPress={[Function]}
-                  onSelect={[Function]}
-                  readOnly={false}
-                  spellCheck={true}
-                  style={
-                    Object {
-                      "WebkitAlignSelf": "center",
-                      "alignSelf": "center",
-                      "borderBottomColor": "rgba(221,221,221,1.00)",
-                      "borderBottomLeftRadius": "3px",
-                      "borderBottomRightRadius": "3px",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(221,221,221,1.00)",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(221,221,221,1.00)",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(221,221,221,1.00)",
-                      "borderTopLeftRadius": "3px",
-                      "borderTopRightRadius": "3px",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(255,255,255,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
-                      "marginBottom": "20px",
-                      "marginLeft": "0px",
-                      "marginRight": "0px",
-                      "marginTop": "0px",
-                      "msFlexItemAlign": "center",
-                      "outlineWidth": "0px",
-                      "paddingBottom": "15px",
-                      "paddingLeft": "10px",
-                      "paddingRight": "10px",
-                      "paddingTop": "13px",
-                      "textRendering": "geometricPrecision",
-                      "width": "100%",
+                    <label
+                      className="css-text-901oao"
+                      dir="auto"
+                      style={
+                        Object {
+                          "color": "rgba(129,134,139,1.00)",
+                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                          "fontSize": "16px",
+                          "fontWeight": "500",
+                          "lineHeight": "20px",
+                          "textRendering": "geometricPrecision",
+                        }
+                      }
+                    >
+                      Name
+                    </label>
+                  </div>
+                  <input
+                    aria-label="Name"
+                    autoCapitalize="sentences"
+                    autoComplete="on"
+                    autoCorrect="on"
+                    className="css-textinput-1cwyjr8"
+                    data-focusable={true}
+                    dir="auto"
+                    name="name"
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyPress={[Function]}
+                    onSelect={[Function]}
+                    readOnly={false}
+                    spellCheck={true}
+                    style={
+                      Object {
+                        "WebkitAlignSelf": "center",
+                        "alignSelf": "center",
+                        "borderBottomColor": "rgba(221,221,221,1.00)",
+                        "borderBottomLeftRadius": "3px",
+                        "borderBottomRightRadius": "3px",
+                        "borderBottomWidth": "1px",
+                        "borderLeftColor": "rgba(221,221,221,1.00)",
+                        "borderLeftWidth": "1px",
+                        "borderRightColor": "rgba(221,221,221,1.00)",
+                        "borderRightWidth": "1px",
+                        "borderTopColor": "rgba(221,221,221,1.00)",
+                        "borderTopLeftRadius": "3px",
+                        "borderTopRightRadius": "3px",
+                        "borderTopWidth": "1px",
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                        "fontSize": "20px",
+                        "lineHeight": "28px",
+                        "marginBottom": "0px",
+                        "marginLeft": "0px",
+                        "marginRight": "0px",
+                        "marginTop": "0px",
+                        "msFlexItemAlign": "center",
+                        "outlineWidth": "0px",
+                        "paddingBottom": "15px",
+                        "paddingLeft": "10px",
+                        "paddingRight": "10px",
+                        "paddingTop": "13px",
+                        "textRendering": "geometricPrecision",
+                        "width": "100%",
+                      }
                     }
-                  }
-                  type="text"
-                  value=""
-                />
+                    type="text"
+                    value=""
+                  />
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "MozTransitionProperty": "max-height",
+                        "WebkitTransitionDuration": "600ms",
+                        "WebkitTransitionProperty": "max-height",
+                        "height": "auto",
+                        "marginBottom": "5px",
+                        "marginTop": "5px",
+                        "maxHeight": "0px",
+                        "transitionDuration": "600ms",
+                        "transitionProperty": "max-height",
+                      }
+                    }
+                  >
+                    <div
+                      className="css-text-901oao"
+                      dir="auto"
+                      style={
+                        Object {
+                          "MozTransitionProperty": "opacity",
+                          "WebkitTransitionDuration": "700ms",
+                          "WebkitTransitionProperty": "opacity",
+                          "color": "rgba(255,127,109,1.00)",
+                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                          "fontSize": "16px",
+                          "fontWeight": "500",
+                          "lineHeight": "18px",
+                          "opacity": 0,
+                          "textRendering": "geometricPrecision",
+                          "transitionDuration": "700ms",
+                          "transitionProperty": "opacity",
+                        }
+                      }
+                    >
+                      Oops I’m blank!
+                    </div>
+                  </div>
+                </div>
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -7319,88 +7452,129 @@ exports[`Alliance renders 1`] = `
                   className="css-view-1dbjc4n"
                   style={
                     Object {
-                      "height": "18px",
-                    }
-                  }
-                />
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "marginBottom": "5px",
+                      "marginBottom": "10px",
                     }
                   }
                 >
-                  <label
-                    className="css-text-901oao"
-                    dir="auto"
+                  <div
+                    className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "color": "rgba(129,134,139,1.00)",
-                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                        "fontSize": "16px",
-                        "fontWeight": "500",
-                        "lineHeight": "20px",
-                        "textRendering": "geometricPrecision",
+                        "marginBottom": "5px",
                       }
                     }
                   >
-                    Email
-                  </label>
-                </div>
-                <input
-                  autoCapitalize="sentences"
-                  autoComplete="on"
-                  autoCorrect="on"
-                  className="css-textinput-1cwyjr8"
-                  data-focusable={true}
-                  dir="auto"
-                  name="email"
-                  onBlur={[Function]}
-                  onChange={[Function]}
-                  onFocus={[Function]}
-                  onKeyDown={[Function]}
-                  onKeyPress={[Function]}
-                  onSelect={[Function]}
-                  readOnly={false}
-                  spellCheck={true}
-                  style={
-                    Object {
-                      "WebkitAlignSelf": "center",
-                      "alignSelf": "center",
-                      "borderBottomColor": "rgba(221,221,221,1.00)",
-                      "borderBottomLeftRadius": "3px",
-                      "borderBottomRightRadius": "3px",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(221,221,221,1.00)",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(221,221,221,1.00)",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(221,221,221,1.00)",
-                      "borderTopLeftRadius": "3px",
-                      "borderTopRightRadius": "3px",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(255,255,255,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "20px",
-                      "lineHeight": "28px",
-                      "marginBottom": "20px",
-                      "marginLeft": "0px",
-                      "marginRight": "0px",
-                      "marginTop": "0px",
-                      "msFlexItemAlign": "center",
-                      "outlineWidth": "0px",
-                      "paddingBottom": "15px",
-                      "paddingLeft": "10px",
-                      "paddingRight": "10px",
-                      "paddingTop": "13px",
-                      "textRendering": "geometricPrecision",
-                      "width": "100%",
+                    <label
+                      className="css-text-901oao"
+                      dir="auto"
+                      style={
+                        Object {
+                          "color": "rgba(129,134,139,1.00)",
+                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                          "fontSize": "16px",
+                          "fontWeight": "500",
+                          "lineHeight": "20px",
+                          "textRendering": "geometricPrecision",
+                        }
+                      }
+                    >
+                      Email
+                    </label>
+                  </div>
+                  <input
+                    aria-label="Email"
+                    autoCapitalize="sentences"
+                    autoComplete="on"
+                    autoCorrect="on"
+                    className="css-textinput-1cwyjr8"
+                    data-focusable={true}
+                    dir="auto"
+                    name="email"
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyPress={[Function]}
+                    onSelect={[Function]}
+                    readOnly={false}
+                    spellCheck={true}
+                    style={
+                      Object {
+                        "WebkitAlignSelf": "center",
+                        "alignSelf": "center",
+                        "borderBottomColor": "rgba(221,221,221,1.00)",
+                        "borderBottomLeftRadius": "3px",
+                        "borderBottomRightRadius": "3px",
+                        "borderBottomWidth": "1px",
+                        "borderLeftColor": "rgba(221,221,221,1.00)",
+                        "borderLeftWidth": "1px",
+                        "borderRightColor": "rgba(221,221,221,1.00)",
+                        "borderRightWidth": "1px",
+                        "borderTopColor": "rgba(221,221,221,1.00)",
+                        "borderTopLeftRadius": "3px",
+                        "borderTopRightRadius": "3px",
+                        "borderTopWidth": "1px",
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                        "fontSize": "20px",
+                        "lineHeight": "28px",
+                        "marginBottom": "0px",
+                        "marginLeft": "0px",
+                        "marginRight": "0px",
+                        "marginTop": "0px",
+                        "msFlexItemAlign": "center",
+                        "outlineWidth": "0px",
+                        "paddingBottom": "15px",
+                        "paddingLeft": "10px",
+                        "paddingRight": "10px",
+                        "paddingTop": "13px",
+                        "textRendering": "geometricPrecision",
+                        "width": "100%",
+                      }
                     }
-                  }
-                  type="text"
-                  value=""
-                />
+                    type="text"
+                    value=""
+                  />
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "MozTransitionProperty": "max-height",
+                        "WebkitTransitionDuration": "600ms",
+                        "WebkitTransitionProperty": "max-height",
+                        "height": "auto",
+                        "marginBottom": "5px",
+                        "marginTop": "5px",
+                        "maxHeight": "0px",
+                        "transitionDuration": "600ms",
+                        "transitionProperty": "max-height",
+                      }
+                    }
+                  >
+                    <div
+                      className="css-text-901oao"
+                      dir="auto"
+                      style={
+                        Object {
+                          "MozTransitionProperty": "opacity",
+                          "WebkitTransitionDuration": "700ms",
+                          "WebkitTransitionProperty": "opacity",
+                          "color": "rgba(255,127,109,1.00)",
+                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                          "fontSize": "16px",
+                          "fontWeight": "500",
+                          "lineHeight": "18px",
+                          "opacity": 0,
+                          "textRendering": "geometricPrecision",
+                          "transitionDuration": "700ms",
+                          "transitionProperty": "opacity",
+                        }
+                      }
+                    >
+                      Please enter a valid email
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div
@@ -7426,80 +7600,90 @@ exports[`Alliance renders 1`] = `
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "marginBottom": "5px",
+                    "marginBottom": "10px",
                   }
                 }
               >
-                <label
-                  className="css-text-901oao"
-                  dir="auto"
+                <div
+                  className="css-view-1dbjc4n"
                   style={
                     Object {
-                      "color": "rgba(129,134,139,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "16px",
-                      "fontWeight": "500",
-                      "lineHeight": "20px",
-                      "textRendering": "geometricPrecision",
+                      "marginBottom": "5px",
                     }
                   }
                 >
-                  How might you contribute to the Alliance?
-                </label>
-              </div>
-              <input
-                autoCapitalize="sentences"
-                autoComplete="on"
-                autoCorrect="on"
-                className="css-textinput-1cwyjr8"
-                data-focusable={true}
-                dir="auto"
-                name="contribution"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                onSelect={[Function]}
-                readOnly={false}
-                spellCheck={true}
-                style={
-                  Object {
-                    "WebkitAlignSelf": "center",
-                    "alignSelf": "center",
-                    "borderBottomColor": "rgba(221,221,221,1.00)",
-                    "borderBottomLeftRadius": "3px",
-                    "borderBottomRightRadius": "3px",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(221,221,221,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(221,221,221,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(221,221,221,1.00)",
-                    "borderTopLeftRadius": "3px",
-                    "borderTopRightRadius": "3px",
-                    "borderTopWidth": "1px",
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "20px",
-                    "lineHeight": "28px",
-                    "marginBottom": "20px",
-                    "marginLeft": "0px",
-                    "marginRight": "0px",
-                    "marginTop": "0px",
-                    "msFlexItemAlign": "center",
-                    "outlineWidth": "0px",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "10px",
-                    "paddingRight": "10px",
-                    "paddingTop": "13px",
-                    "textRendering": "geometricPrecision",
-                    "width": "100%",
+                  <label
+                    className="css-text-901oao"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(129,134,139,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "lineHeight": "20px",
+                        "textRendering": "geometricPrecision",
+                      }
+                    }
+                  >
+                    How might you contribute to the Alliance?
+                  </label>
+                </div>
+                <input
+                  aria-label="How might you contribute to the Alliance?"
+                  autoCapitalize="sentences"
+                  autoComplete="on"
+                  autoCorrect="on"
+                  className="css-textinput-1cwyjr8"
+                  data-focusable={true}
+                  dir="auto"
+                  name="contribution"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  onFocus={[Function]}
+                  onKeyDown={[Function]}
+                  onKeyPress={[Function]}
+                  onSelect={[Function]}
+                  readOnly={false}
+                  spellCheck={true}
+                  style={
+                    Object {
+                      "WebkitAlignSelf": "center",
+                      "alignSelf": "center",
+                      "borderBottomColor": "rgba(221,221,221,1.00)",
+                      "borderBottomLeftRadius": "3px",
+                      "borderBottomRightRadius": "3px",
+                      "borderBottomWidth": "1px",
+                      "borderLeftColor": "rgba(221,221,221,1.00)",
+                      "borderLeftWidth": "1px",
+                      "borderRightColor": "rgba(221,221,221,1.00)",
+                      "borderRightWidth": "1px",
+                      "borderTopColor": "rgba(221,221,221,1.00)",
+                      "borderTopLeftRadius": "3px",
+                      "borderTopRightRadius": "3px",
+                      "borderTopWidth": "1px",
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "marginBottom": "0px",
+                      "marginLeft": "0px",
+                      "marginRight": "0px",
+                      "marginTop": "0px",
+                      "msFlexItemAlign": "center",
+                      "outlineWidth": "0px",
+                      "paddingBottom": "15px",
+                      "paddingLeft": "10px",
+                      "paddingRight": "10px",
+                      "paddingTop": "13px",
+                      "textRendering": "geometricPrecision",
+                      "width": "100%",
+                    }
                   }
-                }
-                type="text"
-                value=""
-              />
+                  type="text"
+                  value=""
+                />
+              </div>
             </div>
             <div
               className="css-view-1dbjc4n"
