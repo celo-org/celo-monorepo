@@ -602,15 +602,26 @@ contract('Validators', (accounts: string[]) => {
           assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
         })
 
-        it('should emit the ValidatorRegistered event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'ValidatorRegistered',
+        it('should emit the ValidatorEcdsaPublicKeyUpdated, ValidatorBlsPublicKeyUpdated, and ValidatorRegistered events', async () => {
+          assert.equal(resp.logs.length, 3)
+          assertContainSubset(resp.logs[0], {
+            event: 'ValidatorEcdsaPublicKeyUpdated',
             args: {
               validator,
               ecdsaPublicKey: publicKey,
+            },
+          })
+          assertContainSubset(resp.logs[1], {
+            event: 'ValidatorBlsPublicKeyUpdated',
+            args: {
+              validator,
               blsPublicKey,
+            },
+          })
+          assertContainSubset(resp.logs[2], {
+            event: 'ValidatorRegistered',
+            args: {
+              validator,
             },
           })
         })

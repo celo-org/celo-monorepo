@@ -127,7 +127,7 @@ contract Validators is
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event MembershipHistoryLengthSet(uint256 length);
-  event ValidatorRegistered(address indexed validator, bytes ecdsaPublicKey, bytes blsPublicKey);
+  event ValidatorRegistered(address indexed validator);
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
@@ -345,7 +345,7 @@ contract Validators is
     _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account, ecdsaPublicKey, blsPublicKey);
+    emit ValidatorRegistered(account);
     return true;
   }
 
