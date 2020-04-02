@@ -1165,24 +1165,6 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = merge(
     {
-      downtimeSlasher: {
-        slashableDowntime: 6,
-      },
-      election: {
-        minElectableValidators: '1',
-      },
-      epochRewards: {
-        frozen: false,
-      },
-      exchange: {
-        frozen: false,
-      },
-      goldToken: {
-        frozen: false,
-      },
-      reserve: {
-        initialBalance: 100000000,
-      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
@@ -1190,7 +1172,6 @@ export async function migrateContracts(
         },
         oracles: validators.map(ensure0x),
         goldPrice: 10,
-        frozen: false,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),
