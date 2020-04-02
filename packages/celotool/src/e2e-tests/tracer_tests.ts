@@ -8,15 +8,21 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { Address, normalizeAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import fs from 'fs'
 import Web3 from 'web3'
 import { EventLog, TransactionReceipt } from 'web3-core'
 import { Contract } from 'web3-eth-contract'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { spawnCmdWithExitOnFailure } from '../lib/utils'
-import { getContext, MonorepoRoot, sleep } from './utils'
+import { compileContract, deployReleaseGold, getContext, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
+const ValidatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
+const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
+const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
+const FromPrivateKey = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
+const ReleaseGoldAddress = '0x9CA2761bD9709449eF63d8aBa53EF0D4FF31cfEc'
+const ReleaseGoldPrivateKey = '4f5fad325dba678797c74b936098e84aa14099c2a4a01ffedc795a5fa9ea65e3'
+const TransferAmount: BigNumber = new BigNumber(Web3.utils.toWei('1', 'ether'))
 
 const testContractSource = `
 pragma solidity ^0.5.8;
@@ -77,6 +83,25 @@ contract TestContract {
     selfdestruct(to);
   }
 }
+`
+
+const releaseGoldGrantsConfig = `[
+  {
+    "releaseStartTime": "MAINNET+0",                  
+    "releaseCliffTime": 1,
+    "numReleasePeriods": 1,
+    "releasePeriod": 100000000,
+    "amountReleasedPerPeriod": 10,
+    "revocable": false,
+    "beneficiary": "${FromAddress}",
+    "releaseOwner": "${ReleaseGoldAddress}",
+    "refundAddress": "0x0000000000000000000000000000000000000000",
+    "subjectToLiquidityProvision": true,
+    "initialDistributionRatio": 1000,
+    "canValidate": true,
+    "canVote": true
+  }
+]
 `
 
 class DerivedAccountAssets {
@@ -351,12 +376,6 @@ export const logAllContracts = async (kit: ContractKit) => {
 }
 
 describe('tracer tests', () => {
-  const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
-  const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
-  const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
-  const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
-  const TransferAmount: BigNumber = new BigNumber(Web3.utils.toWei('1', 'ether'))
-
   const gethConfig: GethRunConfig = {
     runPath: TMP_PATH,
     networkId: 1101,
@@ -417,31 +436,50 @@ describe('tracer tests', () => {
   const restart = async () => {
     await context.hooks.restart()
     kit = newKit('http://localhost:8545')
-    kit.defaultAccount = validatorAddress
+    kit.defaultAccount = ValidatorAddress
     goldToken = await kit.contracts.getGoldToken()
     stableToken = await kit.contracts.getStableToken()
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+    await kit.web3.eth.personal.unlockAccount(ValidatorAddress, '', 1000000)
 
-    // Give the account we will send transfers as sufficient gold and dollars.
-    const startBalance = TransferAmount.times(500)
-    const resDollars = await transferCeloDollars(kit, validatorAddress, FromAddress, startBalance)
-    const resGold = await transferCeloGold(kit, validatorAddress, FromAddress, startBalance)
-    await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
+    const fundAccounts = [
+      { address: FromAddress, privateKey: FromPrivateKey },
+      { address: ReleaseGoldAddress, privateKey: ReleaseGoldPrivateKey },
+    ]
 
-    // Unlock FromAddress account
-    await kit.web3.eth.personal.importRawKey(DEF_FROM_PK, '')
-    await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+    for (const fundAccount of fundAccounts) {
+      // Give the account we will send transfers as sufficient gold and dollars.
+      const startBalance = TransferAmount.times(500)
+      const resDollars = await transferCeloDollars(
+        kit,
+        ValidatorAddress,
+        fundAccount.address,
+        startBalance
+      )
+      const resGold = await transferCeloGold(
+        kit,
+        ValidatorAddress,
+        fundAccount.address,
+        startBalance
+      )
+      await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
+
+      // Unlock fundAccount.address account
+      await kit.web3.eth.personal.importRawKey(fundAccount.privateKey, '')
+      await kit.web3.eth.personal.unlockAccount(fundAccount.address, '', 1000000)
+
+      // Create account for fundAccount.address
+      kit.defaultAccount = fundAccount.address
+      const accounts = await kit.contracts.getAccounts()
+      const createAccountTx = await accounts.createAccount()
+      const txResult = await createAccountTx.send()
+      await txResult.waitReceipt()
+    }
+
     kit.defaultAccount = FromAddress
-
-    // Create account for FromAddress
-    const accounts = await kit.contracts.getAccounts()
-    const createAccountTx = await accounts.createAccount()
-    const txResult = await createAccountTx.send()
-    await txResult.waitReceipt()
   }
 
   const testTransferGold = (name: string, transferFn: () => Promise<any>) => {
@@ -508,7 +546,6 @@ describe('tracer tests', () => {
         assertEqualBN(toFinalBalance.minus(toInitialBalance), new BigNumber(receivedBalance)))
 
       it(`balanceOf should decrement the sender's balance by the transfer amount`, () => {
-        console.info(`gasUsed=${receipt.gasUsed}, gasPrice=${txn.gasPrice}`)
         assertEqualBN(
           fromFinalBalance.minus(fromInitialBalance),
           new BigNumber(-sentBalance).minus(
@@ -802,29 +839,28 @@ describe('tracer tests', () => {
     })
 
     describe(`Deploying release gold`, () => {
+      let releaseGold: any
+      let trackAssets: Record<Address, AccountAssets>
+
       before(async function(this: any) {
         this.timeout(0)
-        // const startBlockNumber = await this.web3.eth.getBlockNumber()
-        const args = [
-          '--cwd',
-          `${MonorepoRoot}/packages/protocol`,
-          'run',
-          'truffle',
-          'exec',
-          `${MonorepoRoot}/packages/protocol/scripts/truffle/deploy_release_contracts.js`,
-          '--network',
+        const startBlockNumber = await kit.web3.eth.getBlockNumber()
+        releaseGold = await deployReleaseGold(
           'testing',
-          '--start_gold',
-          '50',
-          '--grants',
-          `${MonorepoRoot}/packages/protocol/scripts/truffle/releaseGoldContracts.json`,
-          '--output_file',
-          `${TMP_PATH}/releaseGold.txt`,
-          '--yesreally',
-        ]
-        await spawnCmdWithExitOnFailure('yarn', args)
-        // const endBlockNumber = await this.web3.eth.getBlockNumber()
+          ReleaseGoldAddress,
+          releaseGoldGrantsConfig,
+          TMP_PATH
+        )
+        const endBlockNumber = await kit.web3.eth.getBlockNumber()
+        console.info('ReleaseGold:')
+        console.info(releaseGold[0])
+        trackAssets = {}
+        for (let blockNumber = startBlockNumber; blockNumber <= endBlockNumber; blockNumber++) {
+          trackAssets = await trackAssetTransfers(kit, blockNumber, trackAssets)
+        }
       })
+
+      it('should have deployed', () => assertEqual(releaseGold.length, 1))
     })
 
     describe(`Deploying TestContract`, () => {
@@ -837,27 +873,9 @@ describe('tracer tests', () => {
 
       before(async function(this: any) {
         this.timeout(0)
-        const contractFile = `${TMP_PATH}/testContract.sol`
-        const outDir = `${TMP_PATH}/testContract.out`
-        fs.writeFileSync(contractFile, testContractSource)
-        await spawnCmdWithExitOnFailure('../../node_modules/solc/solcjs', [
-          '--bin',
-          contractFile,
-          '-o',
-          outDir,
-        ])
-        await spawnCmdWithExitOnFailure('../../node_modules/solc/solcjs', [
-          '--abi',
-          contractFile,
-          '-o',
-          outDir,
-        ])
-        const bytecode = fs.readFileSync(`${outDir}/_tmp_e2e_testContract_sol_TestContract.bin`)
-        const abi = JSON.parse(
-          fs.readFileSync(`${outDir}/_tmp_e2e_testContract_sol_TestContract.abi`).toString()
-        )
-        const contract = new kit.web3.eth.Contract(abi)
-        const testContractTx = await contract.deploy({ data: '0x' + bytecode })
+        const compiled = await compileContract('TestContract', testContractSource, TMP_PATH)
+        const contract = new kit.web3.eth.Contract(compiled.abi)
+        const testContractTx = await contract.deploy({ data: '0x' + compiled.bytecode })
         testContract = await testContractTx.send(
           { ...txOptions, value: TransferAmount.toFixed() },
           (_: Error, transactionHash: string) =>

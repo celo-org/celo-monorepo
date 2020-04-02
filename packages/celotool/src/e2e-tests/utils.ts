@@ -31,9 +31,9 @@ import {
 } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { spawnCmd } from '../lib/utils'
+import { spawnCmd, spawnCmdWithExitOnFailure } from '../lib/utils'
 
-export const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
 
 export async function initAndSyncGethWithRetry(
@@ -358,4 +358,49 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     validators,
     hooks: { before, after, restart, gethBinaryPath },
   }
+}
+
+export async function compileContract(
+  contractName: string,
+  contractSource: string,
+  tmpPath: string
+) {
+  const contractPrefix = `${tmpPath}/${contractName}`
+  const outDir = `${contractPrefix}.out`
+  fs.writeFileSync(`${contractPrefix}.sol`, contractSource)
+  await spawnCmdWithExitOnFailure(`${MonorepoRoot}/node_modules/solc/solcjs`, [
+    '--bin',
+    `${contractPrefix}.sol`,
+    '-o',
+    outDir,
+  ])
+  await spawnCmdWithExitOnFailure(`${MonorepoRoot}/node_modules/solc/solcjs`, [
+    '--abi',
+    `${contractPrefix}.sol`,
+    '-o',
+    outDir,
+  ])
+  const outputPrefix = contractPrefix.replace(/\//g, '_')
+  const bytecode = fs.readFileSync(`${outDir}/${outputPrefix}_sol_${contractName}.bin`)
+  const abi = JSON.parse(
+    fs.readFileSync(`${outDir}/${outputPrefix}_sol_${contractName}.abi`).toString()
+  )
+  return { abi, bytecode }
+}
+
+export async function deployReleaseGold(
+  network: string,
+  fromAddress: string,
+  grantsJson: string,
+  tmpPath: string
+) {
+  const grantsPrefix = `${tmpPath}/releaseGoldGrants`
+  const grantsFile = `${grantsPrefix}.json`
+  const outputFile = `${grantsPrefix}.output`
+  fs.writeFileSync(grantsFile, grantsJson)
+  const args = ['-n', network, '-f', fromAddress, '-g', grantsFile, '-o', outputFile]
+  await spawnCmdWithExitOnFailure('./scripts/bash/deploy_release_contracts.sh', args, {
+    cwd: `${MonorepoRoot}/packages/protocol`,
+  })
+  return JSON.parse(fs.readFileSync(outputFile).toString())
 }
