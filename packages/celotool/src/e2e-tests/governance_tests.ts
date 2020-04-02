@@ -164,7 +164,7 @@ describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
     migrate: true,
     runPath: TMP_PATH,
-    verbosity: 5,
+    verbosity: 0,
     migrateTo: 25,
     networkId: 1101,
     network: 'local',
@@ -432,7 +432,6 @@ describe('governance tests', () => {
           }
           handled[header.number] = true
           blockNumbers.push(header.number)
-          console.log(header.number, header.miner)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
           // Note that all of these actions MUST complete within the epoch.
           if (header.number % epoch === 0 && errorWhileChangingValidatorSet === '') {
@@ -799,27 +798,18 @@ describe('governance tests', () => {
           const totalVoterRewards = new BigNumber(targetRewards[1])
           const totalCommunityReward = new BigNumber(targetRewards[2])
           const carbonOffsettingPartnerAward = new BigNumber(targetRewards[3])
-          console.log('voter', expectedVoterRewards, totalVoterRewards)
           assertAlmostEqual(expectedVoterRewards, totalVoterRewards)
-          console.log('community', expectedCommunityReward, totalCommunityReward)
           assertAlmostEqual(expectedCommunityReward, totalCommunityReward)
-          console.log('carbon', expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
           assertAlmostEqual(expectedCarbonOffsettingPartnerAward, carbonOffsettingPartnerAward)
           // Check TS calc'd rewards against what happened
-          console.log('votes changed')
           await assertVotesChanged(blockNumber, expectedVoterRewards)
-          console.log('locked gold')
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
-          console.log('governance')
           await assertGovernanceBalanceChanged(
             blockNumber,
             expectedCommunityReward.plus(await blockBaseGasFee(blockNumber))
           )
-          console.log('reserve')
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
-          console.log('gold token')
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
-          console.log('carbon offsetting')
           await assertCarbonOffsettingBalanceChanged(
             blockNumber,
             expectedCarbonOffsettingPartnerAward
@@ -1021,7 +1011,6 @@ describe('governance tests', () => {
           handled[header.number] = true
           blockNumbers.push(header.number)
           miners.push(header.miner)
-          console.log(header.number, header.miner)
           // At the start of epoch N, perform actions so the validator set is different for epoch N + 1.
           // Note that all of these actions MUST complete within the epoch.
           if (
@@ -1031,7 +1020,6 @@ describe('governance tests', () => {
           ) {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
-            console.log('rotating')
             lastRotated = header.number
             await keyRotator.rotate()
           }
