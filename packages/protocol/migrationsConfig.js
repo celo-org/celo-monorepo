@@ -43,7 +43,7 @@ const DefaultConfig = {
     slashableDowntime: (12 * HOUR) / 5, // ~12 hours
   },
   election: {
-    minElectableValidators: '25', // Change to 50 once mainnet activated
+    minElectableValidators: '50',
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
