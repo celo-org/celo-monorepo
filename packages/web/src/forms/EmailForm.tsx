@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { ErrorDisplay } from 'src/forms/ErrorDisplay'
 import Form, { emailIsValid } from 'src/forms/Form'
 import { TextInput } from 'src/forms/TextInput'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { NameSpaces, useTranslation } from 'src/i18n'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -21,7 +23,7 @@ interface OwnProps {
 
 const blankForm = { email: '', fullName: '', list: '' }
 
-type Props = I18nProps & OwnProps
+type Props = OwnProps
 
 // return array of all invalid fields
 const validateFields = ({ email }: { email: string }) => {
@@ -40,8 +42,7 @@ const emailErrorStyle = (errors: string[]) => {
   return {}
 }
 
-function EmailForm({
-  t,
+export default React.memo(function EmailForm({
   isDarkMode,
   afterSubmit,
   submitText,
@@ -50,6 +51,8 @@ function EmailForm({
   route = '/contacts',
 }: Props) {
   const inputTheme = isDarkMode ? styles.inputDarkMode : styles.inputLightMode
+  const { isDesktop } = useScreenSize()
+  const { t } = useTranslation(NameSpaces.common)
 
   return (
     <Form route={route} blankForm={{ ...blankForm, list: listID }} validateWith={validateFields}>
@@ -82,7 +85,11 @@ function EmailForm({
                   required={true}
                 />
               </Responsive>
-
+              {!isDesktop && (
+                <View style={!!formState.errors.length && styles.feedbackMobile}>
+                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
+                </View>
+              )}
               <Responsive large={[styles.submitBtn, styles.submitBtnDesktop]}>
                 <Button
                   onPress={onPress}
@@ -91,25 +98,19 @@ function EmailForm({
                   size={SIZE.fullWidth}
                 />
               </Responsive>
-              <Responsive large={styles.feedback}>
-                <View style={styles.feedbackMobile}>
-                  {formState.isComplete && whenComplete}
-
-                  {formState.errors.length > 0 &&
-                    formState.errors.map((error) => (
-                      <Text style={[fonts.h6, textStyles.error]} key={error}>
-                        {t(`common:validationErrors.${error}`)}
-                      </Text>
-                    ))}
-                </View>
-              </Responsive>
+              <View style={styles.feedback}>
+                {isDesktop && (
+                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
+                )}
+              </View>
+              <View style={styles.success}>{formState.isComplete && whenComplete}</View>
             </View>
           </Responsive>
         )
       }}
     </Form>
   )
-}
+})
 
 export function After({ t, isDarkMode }) {
   return (
@@ -170,14 +171,12 @@ const styles = StyleSheet.create({
   },
   feedback: {
     position: 'absolute',
-    paddingVertical: 10,
     top: 65,
   },
   feedbackMobile: {
-    position: 'absolute',
-    paddingVertical: 10,
-    top: 135,
+    marginBottom: 5,
+  },
+  success: {
+    marginTop: 10,
   },
 })
-
-export default withNamespaces('applications')(EmailForm)

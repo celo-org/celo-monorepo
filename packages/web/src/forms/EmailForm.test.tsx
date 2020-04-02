@@ -13,7 +13,7 @@ describe('EmailForm', () => {
 
       expect(getByText(submitBTNText)).toBeVisible()
 
-      expect(queryByText('common:validationErrors.email')).not.toBeInTheDocument()
+      expect(queryByText('common:validationErrors.email')).not.toBeVisible()
     })
 
     it('does not show whenComplete', () => {
@@ -52,7 +52,7 @@ describe('EmailForm', () => {
 
       fireEvent.click(getByText(submitBTNText))
       await waitForDomChange()
-      expect(queryByText('common:validationErrors.email')).not.toBeInTheDocument()
+      expect(queryByText('common:validationErrors.email')).not.toBeVisible()
       expect(getByTestId(testID)).toBeInTheDocument()
     })
   })
