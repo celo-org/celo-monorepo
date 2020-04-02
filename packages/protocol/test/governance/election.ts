@@ -1912,7 +1912,7 @@ contract('Election', (accounts: string[]) => {
       )
 
       for (const account of vAccounts) {
-        await checkVoterInvariants(account, delta, delta)
+        await checkVoterInvariants(account, delta)
         const address = account.address
         // Need to fetch actual number due to potential rounding errors.
         const active = await election.getActiveVotesForGroupByAccount(group, address)
@@ -2009,12 +2009,12 @@ contract('Election', (accounts: string[]) => {
             for (let j = 0; j < voterAccounts.length; j++) {
               voterAccounts[j] = await makeRandomAction(voterAccounts[j])
             }
-            await Promise.all(voterAccounts.map(checkVoterInvariants, 20))
+            await Promise.all(voterAccounts.map((v) => checkVoterInvariants(v, 20)))
             await checkGroupInvariants(voterAccounts, 20)
 
             await mineBlocks(EPOCH, web3)
             voterAccounts = await distributeEpochRewards(voterAccounts)
-            await Promise.all(voterAccounts.map(checkVoterInvariants, 20))
+            await Promise.all(voterAccounts.map((v) => checkVoterInvariants(v, 20)))
             await checkGroupInvariants(voterAccounts, 20)
           }
           await revokeAllAndCheckInvariants(20)
