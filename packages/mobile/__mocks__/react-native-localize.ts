@@ -14,4 +14,10 @@ NativeModules.RNLocalize = {
   },
 }
 
-module.exports = jest.requireActual('react-native-localize')
+module.exports = {
+  ...jest.requireActual('react-native-localize'),
+  getNumberFormatSettings: jest.fn(() => ({
+    decimalSeparator: '.',
+    groupingSeparator: ',',
+  })),
+}

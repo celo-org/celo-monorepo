@@ -27,7 +27,7 @@ describe('inputValidation', () => {
     numbers.map((val) => val.replace('.', ',')),
     ValidatorKind.Decimal,
     '1,23',
-    { lng: 'es-419' }
+    { decimalSeparator: ',' }
   )
 
   validateFunction(
