@@ -43,7 +43,7 @@ const DefaultConfig = {
     slashableDowntime: (12 * HOUR) / 5, // ~12 hours
   },
   election: {
-    minElectableValidators: '5', // Change to 50 once mainnet activated
+    minElectableValidators: '25', // Change to 50 once mainnet activated
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
@@ -179,19 +179,19 @@ const DefaultConfig = {
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold per validator
-      // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 180 * DAY,
     },
     validatorLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold
+      // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 60 * DAY,
     },
     validatorScoreParameters: {
       exponent: 10,
       adjustmentSpeed: 0.1,
     },
-    // MUST BE KEPT IN SYNC WITH GROUP LOCKED GOLD DURATION
-    membershipHistoryLength: 180,
+    // MUST BE KEPT IN SYNC WITH VALIDATOR LOCKED GOLD DURATION
+    membershipHistoryLength: 60,
     commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
