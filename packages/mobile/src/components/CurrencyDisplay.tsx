@@ -100,17 +100,18 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
     case FormatType.Default:
       return getMoneyDisplayValue
     case FormatType.CentAware:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => getCentAwareMoneyDisplay(amount)
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
+        getCentAwareMoneyDisplay(amount)
     case FormatType.Fee:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => getFeeDisplayValue(amount)
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) => getFeeDisplayValue(amount)
     case FormatType.NetworkFee:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
         getNetworkFeeDisplayValue(amount)
     case FormatType.NetworkFeePrecise:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
         getNetworkFeeDisplayValue(amount, true)
     case FormatType.ExchangeRate:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
         getExchangeRateDisplayValue(amount)
   }
 }

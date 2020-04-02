@@ -18,6 +18,7 @@ Contract for handling an instance of a ReleaseGold contract.
 
 * [_relockGold](_wrappers_releasegold_.releasegoldwrapper.md#_relockgold)
 * [createAccount](_wrappers_releasegold_.releasegoldwrapper.md#createaccount)
+* [events](_wrappers_releasegold_.releasegoldwrapper.md#events)
 * [getBeneficiary](_wrappers_releasegold_.releasegoldwrapper.md#getbeneficiary)
 * [getCanValidate](_wrappers_releasegold_.releasegoldwrapper.md#getcanvalidate)
 * [getCanVote](_wrappers_releasegold_.releasegoldwrapper.md#getcanvote)
@@ -136,6 +137,16 @@ Beneficiary creates an account on behalf of the ReleaseGold contract.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  events
+
+• **events**: *any* = this.contract.events
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
 
 ___
 

@@ -2,8 +2,6 @@ import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
-const numeral = require('numeral')
-require('numeral/locales/es')
 
 const TAG = 'app/actions'
 
@@ -115,7 +113,6 @@ export const setNumberVerified = (numberVerified: boolean) => ({
 })
 
 export const setLanguage = (language: string, nextScreen?: Screens) => {
-  numeral.locale(language.substring(0, 2))
   i18n
     .changeLanguage(language)
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
