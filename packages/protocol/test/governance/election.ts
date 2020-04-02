@@ -1759,24 +1759,26 @@ contract('Election', (accounts: string[]) => {
     }
 
     const printAccount = async (account: Account) => {
-      debugLog(
-        `Expected ${
-          account.address
-        }:\n\tnonvoting: ${account.nonvoting.toFixed()}\n\tpending: ${account.pending.toFixed()}\n\tactive: ${account.active.toFixed()}`
-      )
-      debugLog(
-        `Actual ${account.address}:\n\tnonvoting: ${(
-          await mockLockedGold.nonvotingAccountBalance(account.address)
-        ).toFixed()}\n\tpending: ${(
-          await election.getPendingVotesForGroupByAccount(group, account.address)
-        ).toFixed()}\n\tactive: ${(
-          await election.getActiveVotesForGroupByAccount(group, account.address)
-        ).toFixed()}\n\tunits: ${(
-          await election.getActiveVoteUnitsForGroupByAccount(group, account.address)
-        ).toFixed()}\n\ttotalunits: ${(
-          await election.getActiveVoteUnitsForGroup(group)
-        ).toFixed()}\n\ttotalVotes: ${(await election.getActiveVotesForGroup(group)).toFixed()}`
-      )
+      if (debug) {
+        debugLog(
+          `Expected ${
+            account.address
+          }:\n\tnonvoting: ${account.nonvoting.toFixed()}\n\tpending: ${account.pending.toFixed()}\n\tactive: ${account.active.toFixed()}`
+        )
+        debugLog(
+          `Actual ${account.address}:\n\tnonvoting: ${(
+            await mockLockedGold.nonvotingAccountBalance(account.address)
+          ).toFixed()}\n\tpending: ${(
+            await election.getPendingVotesForGroupByAccount(group, account.address)
+          ).toFixed()}\n\tactive: ${(
+            await election.getActiveVotesForGroupByAccount(group, account.address)
+          ).toFixed()}\n\tunits: ${(
+            await election.getActiveVoteUnitsForGroupByAccount(group, account.address)
+          ).toFixed()}\n\ttotalunits: ${(
+            await election.getActiveVoteUnitsForGroup(group)
+          ).toFixed()}\n\ttotalVotes: ${(await election.getActiveVotesForGroup(group)).toFixed()}`
+        )
+      }
     }
 
     enum VoteActionType {
@@ -1966,7 +1968,6 @@ contract('Election', (accounts: string[]) => {
       this.timeout(0)
       describe('when no epoch rewards are distributed', () => {
         it('actual and expected should always match exactly', async () => {
-          // Fewer iterations is okay as this test is less "challenging" than the rewards case.
           for (let i = 0; i < 10; i++) {
             voterAccounts = await Promise.all(voterAccounts.map(makeRandomAction))
             await Promise.all(voterAccounts.map(checkVoterInvariants))
@@ -2004,20 +2005,18 @@ contract('Election', (accounts: string[]) => {
             return vAccounts
           }
 
-          for (let i = 0; i < 100; i++) {
+          for (let i = 0; i < 30; i++) {
             debugLog(`Starting iteration ${i}`)
-            for (let j = 0; j < voterAccounts.length; j++) {
-              voterAccounts[j] = await makeRandomAction(voterAccounts[j])
-            }
-            await Promise.all(voterAccounts.map((v) => checkVoterInvariants(v, 20)))
-            await checkGroupInvariants(voterAccounts, 20)
+            voterAccounts = await Promise.all(voterAccounts.map(makeRandomAction))
+            await Promise.all(voterAccounts.map((v) => checkVoterInvariants(v, 10)))
+            await checkGroupInvariants(voterAccounts, 10)
 
             await mineBlocks(EPOCH, web3)
             voterAccounts = await distributeEpochRewards(voterAccounts)
-            await Promise.all(voterAccounts.map((v) => checkVoterInvariants(v, 20)))
-            await checkGroupInvariants(voterAccounts, 20)
+            await Promise.all(voterAccounts.map((v) => checkVoterInvariants(v, 10)))
+            await checkGroupInvariants(voterAccounts, 10)
           }
-          await revokeAllAndCheckInvariants(20)
+          await revokeAllAndCheckInvariants(10)
         })
       })
     })
