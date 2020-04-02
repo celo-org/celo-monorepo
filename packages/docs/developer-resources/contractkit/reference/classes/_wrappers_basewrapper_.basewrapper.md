@@ -52,6 +52,10 @@ Base ContractWrapper
 
 * [constructor](_wrappers_basewrapper_.basewrapper.md#constructor)
 
+### Properties
+
+* [events](_wrappers_basewrapper_.basewrapper.md#events)
+
 ### Accessors
 
 * [address](_wrappers_basewrapper_.basewrapper.md#address)
@@ -72,6 +76,14 @@ Name | Type |
 `contract` | T |
 
 **Returns:** *[BaseWrapper](_wrappers_basewrapper_.basewrapper.md)*
+
+## Properties
+
+###  events
+
+• **events**: *any* = this.contract.events
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
 
 ## Accessors
 

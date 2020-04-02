@@ -254,6 +254,15 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   }
 
   /**
+   * @notice Returns the list of oracles for a particular token.
+   * @param token The address of the token whose oracles should be returned.
+   * @return The list of oracles for a particular token.
+   */
+  function getOracles(address token) external view returns (address[] memory) {
+    return oracles[token];
+  }
+
+  /**
    * @notice Removes an oracle value and updates the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
