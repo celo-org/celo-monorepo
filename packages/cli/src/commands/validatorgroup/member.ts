@@ -1,6 +1,6 @@
-import prompts from 'prompts'
 import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
+import prompts from 'prompts'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
