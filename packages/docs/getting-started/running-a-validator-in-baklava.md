@@ -157,20 +157,26 @@ At this point your proxy should be peering with other nodes as the come online. 
 
 Once block production starts, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of Governance Proposals in a process which will be a preview of the deployment process for the Celo Mainnet.
 
-`ReleaseGold` contracts will be used to provide the required testnet units of Celo Gold required to register a validator and vote. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process.
+As opposed to receiving testnet units of Celo Gold directly, `ReleaseGold` contracts will be used to provide the required balance to register a validator and vote. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract.
 
-### Overview of Actions Required
+### Core Contract Deployment
 
-The following sections outline the steps needed after core contracts and `ReleaseGold` contracts are deployed. On a high level, we will:
+Much of functionality of the Celo protocol is implemented in smart contracts, as opposed to entirely within the blockchain client itself. So at the start of block production, core features such as validator elections, will not be operational. In order to bring the network into its fully operational state, a deployer encoded in genesis block will create the core contracts and finally transfer ownership of the contracts to the Governance contract. In the Baklava network, cLabs will play the role of deployer.
 
-- Create accounts associated with `ReleaseGold` contracts' addresses
-- Lock up balance of `ReleaseGold`
-- Authorize validator signer key
-- Create and authorize validator group signer key
-- Create and authorize vote signer keys
-- Register validator and validator group
-- Affiliate validator with validator group
-- Vote
+Contract deployment will begin shorter after block production, and may take several hours to complete. On the Baklava network, the deployer address is `0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C` and one way to track progress of the deployment is to watch the transactions submitted by that address on [Blockscout](https://baklava-blockscout.celo-testnet.org/address/0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C/transactions).
+
+### Actions Required After Core Contract Deployment
+
+Once core contracts have been deployed, you will be able to register your validator and stand for election.
+The first election will run on the first epoch boundary after a minimum number of validators are registered and have votes.
+At this point, the genesis validators will be replaced by the elected validators, so it is important to register and vote even if you are in the genesis set.
+
+The following sections outline the actions you will need to take. On a high level, we will:
+
+- Register a Validator account using the funds in a `ReleaseGold` contract
+- Register a Validator Group using the funds in another `ReleaseGold` contract
+- Add the registered Validator to the Validator group
+- Vote for the group with funds from the `ReleaseGold` contract
 
 We will need to use 7 keys, so let's have a refresher on key management.
 
@@ -197,20 +203,25 @@ Running a Celo Validator node requires the management of several different keys,
 | Validator signer key   | This is the key that has permission to register and manage a Validator or Validator Group, and participate in BFT consensus.                                                                                                                                          |
 | Vote signer key        | This key can be used to vote in Validator elections and on-chain governance.                                                                                                                                                                                          |
 | Attestation signer key | This key is used to sign attestations in Celo's lightweight identity protocol.                                                                                                                                                                                        |
+{% hint style="warning" %}
+Account and signer keys must be unique and may not be reused.
+{% endhint %}
 
-Note that account and signer keys must be unique and may not be reused.
+In this guide, we will use the `ReleaseGold` contract in place of the Account key to hold the token balance and manage permissions of the other keys.
 
 #### Keys Required
 
 We will use 7 keys in the following setup, namely:
 
-- Validator account key (beneficiary address of `ReleaseGold` submitted through gist)
-- Validator group account key (beneficiary address of `ReleaseGold` submitted through gist)
-- Validator signer key (submitted through gist)
-- Validator group signer key (new)
-- Validator vote signer key (new)
-- Validator group signer key (new)
-- Validator attestation signer key (new)
+- Validator
+  - Beneficiary key (submitted through gist)
+  - Validator signer key (submitted through gist)
+  - Attestation key (new)
+  - Voter key (new)
+- Validator Group
+  - Beneficiary key (submitted through gist)
+  - Validator signer key (new)
+  - Voter key (new)
 
 ### Environment variables
 
@@ -251,7 +262,7 @@ There are number of new environment variables, and you may use this table as a r
 
 ### Create Accounts for `ReleaseGold` Addresses and Lock Up Gold
 
-In order to use the balances from `ReleaseGold` contracts, we need to create accounts associated with `ReleaseGold` addresses, which are published here (**insert link**).
+In order to use the balances from `ReleaseGold` contracts, we need to create accounts associated with the contract. In the Baklava network, after they have been deployed we will public a document mapping the beneficiary address to `ReleaseGold` contract addresses.
 
 ```bash
 # On your local machine
@@ -267,7 +278,11 @@ celocli releasegold:show --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli releasegold:show --contract $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-Create an account for each of the validator and validator group's `ReleaseGold` contract:
+{% hint style="info" %}
+The following commands should be run from a node with access to the beneficiary private key.
+{% endhint %}
+
+Create an account for each of the validator and validator group's `ReleaseGold` contracts:
 
 ```bash
 # On your local machine
@@ -275,7 +290,7 @@ celocli releasegold:create-account --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli releasegold:create-account --contract $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-Lock up the balance of `ReleaseGold`:
+Lock up 10k of the balance of `ReleaseGold` as the required stake:
 
 ```bash
 celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 10000000000000000000000
@@ -284,7 +299,7 @@ celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action l
 
 ### Authorize Validator Signer Key
 
-In order to authorize our Validator signer, we need to create a proof that we have possession of the Validator signer private key. We do so by signing a message that consists of the Validator account address. To generate the proof-of-possession, run the following command:
+In order to authorize our Validator signer, we need to create a proof that we have possession of the Validator signer private key. We do so by signing a message that consists of the account address. To generate the proof-of-possession, run the following command:
 
 ```bash
 # On the validator machine
@@ -319,7 +334,7 @@ export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
 export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
 ```
 
-We don't want to use our `ReleaseGold` account for validating, so let's authorize the validator signing key:
+In order to validate we need to authorize the validator signing key:
 
 ```bash
 # On your local machine
@@ -332,7 +347,10 @@ Unlike the Stake Off, we need a validator group signer key because we won't be a
 
 The steps to authorize validator group signer key are similar to the ones above. However, the validator group signer key stays on your local machine.
 
-In order to authorize our Validator Group signer, we need to create a proof that we have possession of the Validator Group signer private key. We do so by signing a message that consists of the Validator account address. To generate the proof-of-possession, run the following command:
+In order to authorize our Validator Group signer, we need to create a proof that we have possession of the Validator Group signer private key.
+We do so by signing a message that consists of the Validator Group account address (i.e. the `ReleaseGold` contract address).
+
+To generate the proof-of-possession, run the following command:
 
 ```bash
 # On your local machine
@@ -350,7 +368,7 @@ export CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-SIGNER-SIGNAT
 export CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-SIGNER-PUBLIC-KEY>
 ```
 
-Authorize your validator group signing key: (**not sure if the role is validator**)
+Authorize your validator group signing key:
 
 ```bash
 # On your local machine
@@ -370,16 +388,16 @@ Create a validator vote signer key:
 cd celo-accounts-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 export CELO_VALIDATOR_VOTE_SIGNER_ADDRESS=<YOUR-VALIDATOR-VOTE-SIGNER-ADDRESS>
+
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
 export CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-VOTE-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_VOTE_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-VOTE-SIGNER-PUBLIC-KEY>
 ```
 
-Authorize your validator vote signer key (**not sure if the role is voter**): 
+Authorize your validator vote signer key:
 
 ```bash
 # On your local machine
-celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role voter --signature 0x$CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_VOTE_SIGNER_ADDRESS
+celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role vote --signature 0x$CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_VOTE_SIGNER_ADDRESS
 ```
 
 #### Validator Group Vote Signer Key
@@ -391,16 +409,16 @@ Create a validator group vote signer key:
 cd celo-accounts-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 export CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-ADDRESS>
+
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
 export CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_GROUP_VOTE_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-PUBLIC-KEY>
 ```
 
-Authorize your validator group vote signer key (**not sure if the role is voter**): 
+Authorize your validator group vote signer key:
 
 ```bash
 # On your local machine
-celocli releasegold:authorize --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --role voter --signature 0x$CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS
+celocli releasegold:authorize --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --role vote --signature 0x$CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS
 ```
 
 ## Deployment Tips
