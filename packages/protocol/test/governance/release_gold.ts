@@ -54,24 +54,20 @@ const authorizationTestDescriptions = {
   },
 }
 
-interface FlagConfig {
-  revocable: boolean
-  subjectToLiquidityProvision: boolean
-  canVote: boolean
-  canValidate: boolean
-}
-
 interface ReleaseGoldConfig {
   releaseStartTime: number
   releaseCliffTime: number
   numReleasePeriods: number
   releasePeriod: number
   amountReleasedPerPeriod: BigNumber
+  revocable: boolean
   beneficiary: string
   releaseOwner: string
   refundAddress: string
+  subjectToLiquidityProvision: boolean
   initialDistributionRatio: number
-  flags: FlagConfig
+  canValidate: boolean
+  canVote: boolean
 }
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -128,16 +124,14 @@ contract('ReleaseGold', (accounts: string[]) => {
     numReleasePeriods: 4,
     releasePeriod: 3 * MONTH,
     amountReleasedPerPeriod: TOTAL_AMOUNT.div(4),
+    revocable: true,
     beneficiary,
     releaseOwner,
     refundAddress,
+    subjectToLiquidityProvision: false,
     initialDistributionRatio: 1000, // No distribution limit
-    flags: {
-      revocable: true,
-      subjectToLiquidityProvision: false,
-      canVote: true,
-      canValidate: false,
-    },
+    canVote: true,
+    canValidate: false,
   }
 
   const createNewReleaseGoldInstance = async (
@@ -155,32 +149,23 @@ contract('ReleaseGold', (accounts: string[]) => {
         from: owner,
       }
     )
-    const flagArray = [
-      releaseGoldSchedule.flags.revocable,
-      releaseGoldSchedule.flags.subjectToLiquidityProvision,
-      releaseGoldSchedule.flags.canVote,
-      releaseGoldSchedule.flags.canValidate,
-    ]
     await releaseGoldInstance.initialize(
       releaseGoldSchedule.releaseStartTime,
       releaseGoldSchedule.releaseCliffTime,
       releaseGoldSchedule.numReleasePeriods,
       releaseGoldSchedule.releasePeriod,
       releaseGoldSchedule.amountReleasedPerPeriod,
+      releaseGoldSchedule.revocable,
       releaseGoldSchedule.beneficiary,
       releaseGoldSchedule.releaseOwner,
       releaseGoldSchedule.refundAddress,
+      releaseGoldSchedule.subjectToLiquidityProvision,
       releaseGoldSchedule.initialDistributionRatio,
-      flagArray,
+      releaseGoldSchedule.canValidate,
+      releaseGoldSchedule.canVote,
       registry.address,
       { from: owner }
     )
-
-    // Restore defaults for mutable flags object
-    releaseGoldDefaultSchedule.flags.revocable = true
-    releaseGoldDefaultSchedule.flags.subjectToLiquidityProvision = false
-    releaseGoldDefaultSchedule.flags.canVote = true
-    releaseGoldDefaultSchedule.flags.canValidate = false
   }
 
   const getCurrentBlockchainTimestamp = (web3: Web3): Promise<number> =>
@@ -296,7 +281,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       it('should set revocable flag to releaseGold instance', async () => {
         const [releaseGoldRevocable, , ,] = await releaseGoldInstance.revocationInfo()
-        assert.equal(releaseGoldRevocable, releaseGoldDefaultSchedule.flags.revocable)
+        assert.equal(releaseGoldRevocable, releaseGoldDefaultSchedule.revocable)
       })
 
       it('should set releaseOwner to releaseGold instance', async () => {
@@ -825,9 +810,9 @@ contract('ReleaseGold', (accounts: string[]) => {
       describe(`#authorize${_.upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
         beforeEach(async () => {
           const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-          releaseGoldSchedule.flags.revocable = false
+          releaseGoldSchedule.revocable = false
           releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
-          releaseGoldSchedule.flags.canValidate = true
+          releaseGoldSchedule.canValidate = true
           await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
           await releaseGoldInstance.createAccount({ from: beneficiary })
 
@@ -973,8 +958,8 @@ contract('ReleaseGold', (accounts: string[]) => {
     describe('with ECDSA public key', () => {
       beforeEach(async () => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-        releaseGoldSchedule.flags.revocable = false
-        releaseGoldSchedule.flags.canValidate = true
+        releaseGoldSchedule.revocable = false
+        releaseGoldSchedule.canValidate = true
         releaseGoldSchedule.refundAddress = NULL_ADDRESS
         await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
         await releaseGoldInstance.createAccount({ from: beneficiary })
@@ -1006,8 +991,8 @@ contract('ReleaseGold', (accounts: string[]) => {
     describe('with bls keys', () => {
       beforeEach(async () => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-        releaseGoldSchedule.flags.revocable = false
-        releaseGoldSchedule.flags.canValidate = true
+        releaseGoldSchedule.revocable = false
+        releaseGoldSchedule.canValidate = true
         releaseGoldSchedule.refundAddress = NULL_ADDRESS
         await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
         await releaseGoldInstance.createAccount({ from: beneficiary })
@@ -1069,7 +1054,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should revert if releaseGold is non-revocable', async () => {
       const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-      releaseGoldSchedule.flags.revocable = false
+      releaseGoldSchedule.revocable = false
       releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
       await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
       await assertRevert(releaseGoldInstance.revoke({ from: releaseOwner }))
@@ -1804,7 +1789,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     describe('when the liquidity provision is observed and set false', () => {
       beforeEach(async () => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-        releaseGoldSchedule.flags.subjectToLiquidityProvision = true
+        releaseGoldSchedule.subjectToLiquidityProvision = true
         await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
         // Withdraw `beforeEach` creates one instance, have to grab the second
         const timeToTravel = 12 * MONTH + 1 * DAY
