@@ -239,7 +239,7 @@ const NetworkConfigs = {
       minElectableValidators: '25', // About half of the expected genesis set.
     },
     governance: {
-      // Set to be able to complete a proposal in about a day, but give eveyone a chance to participate.
+      // Set to be able to complete a proposal in about a day, but give everyone a chance to participate.
       dequeueFrequency: 4 * HOUR,
       approvalStageDuration: 4 * HOUR,
       referendumStageDuration: DAY,
