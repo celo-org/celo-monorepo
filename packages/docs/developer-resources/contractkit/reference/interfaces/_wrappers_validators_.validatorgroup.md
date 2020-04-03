@@ -11,11 +11,13 @@
 * [address](_wrappers_validators_.validatorgroup.md#address)
 * [affiliates](_wrappers_validators_.validatorgroup.md#affiliates)
 * [commission](_wrappers_validators_.validatorgroup.md#commission)
+* [lastSlashed](_wrappers_validators_.validatorgroup.md#lastslashed)
 * [members](_wrappers_validators_.validatorgroup.md#members)
 * [membersUpdated](_wrappers_validators_.validatorgroup.md#membersupdated)
 * [name](_wrappers_validators_.validatorgroup.md#name)
 * [nextCommission](_wrappers_validators_.validatorgroup.md#nextcommission)
 * [nextCommissionBlock](_wrappers_validators_.validatorgroup.md#nextcommissionblock)
+* [slashingMultiplier](_wrappers_validators_.validatorgroup.md#slashingmultiplier)
 
 ## Properties
 
@@ -40,6 +42,14 @@ ___
 • **commission**: *BigNumber*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L38)*
+
+___
+
+###  lastSlashed
+
+• **lastSlashed**: *BigNumber*
+
+*Defined in [contractkit/src/wrappers/Validators.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L41)*
 
 ___
 
@@ -80,3 +90,11 @@ ___
 • **nextCommissionBlock**: *BigNumber*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L40)*
+
+___
+
+###  slashingMultiplier
+
+• **slashingMultiplier**: *BigNumber*
+
+*Defined in [contractkit/src/wrappers/Validators.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L42)*
