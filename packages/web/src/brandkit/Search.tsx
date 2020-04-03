@@ -30,9 +30,12 @@ export default React.memo(function Search({ value, onChange }: Props) {
 export function useSearch() {
   const [query, setQuery] = React.useState('')
 
-  const onQueryChange = React.useCallback(({ nativeEvent }) => setQuery(nativeEvent.value), [
-    setQuery,
-  ])
+  const onQueryChange = React.useCallback(
+    (event) => {
+      setQuery(event.target.value)
+    },
+    [setQuery]
+  )
 
   return { query, onQueryChange }
 }

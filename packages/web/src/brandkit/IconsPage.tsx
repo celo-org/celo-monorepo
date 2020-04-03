@@ -10,6 +10,7 @@ import Search, { useSearch } from 'src/brandkit/Search'
 import { AssetTypes } from 'src/brandkit/tracking'
 import { I18nProps, NameSpaces, withNamespaces, useTranslation } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
+import FuzzySearch from 'fuzzy-search'
 
 interface Icons {
   icons: IconData[]
@@ -53,14 +54,15 @@ interface IconData {
 function Overview({ icons }: Icons) {
   const { t } = useTranslation(NameSpaces.brand)
   const { query, onQueryChange } = useSearch()
-
+  const searcher = new FuzzySearch(icons, ['name'])
+  const result = searcher.search(query)
   return (
     <View style={styles.container}>
       <PageHeadline title={t('icons.title')} headline={t('icons.headline')} />
       <CCLicense textI18nKey="icons.license" />
       <Search value={query} onChange={onQueryChange} />
       <View style={brandStyles.tiling}>
-        {icons.map((icon) => (
+        {result.map((icon) => (
           <IconShowcase
             key={icon.name}
             ratio={1}
