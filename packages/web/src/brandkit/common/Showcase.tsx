@@ -1,5 +1,5 @@
 import * as React from 'react'
-import FadeIn from 'react-lazyload-fadein'
+// import FadeIn from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
@@ -38,25 +38,25 @@ export default React.memo(function Showcase({
         { width: size },
       ]}
     >
-      <FadeIn>
-        {(load) => (
-          <View style={styles.previewContainer}>
-            <AspectRatio ratio={ratio}>
-              {loading ? (
-                <Spinner color={colors.primary} size="small" />
-              ) : (
-                <Image
-                  onLoadEnd={load}
-                  resizeMode="contain"
-                  accessibilityLabel={`Preview of ${name}`}
-                  source={{ uri: preview }}
-                  style={standardStyles.image}
-                />
-              )}
-            </AspectRatio>
-          </View>
-        )}
-      </FadeIn>
+      {/* <FadeIn>
+        {(load) => ( */}
+      <View style={styles.previewContainer}>
+        <AspectRatio ratio={ratio}>
+          {loading ? (
+            <Spinner color={colors.primary} size="small" />
+          ) : (
+            <Image
+              // onLoadEnd={load}
+              resizeMode="contain"
+              accessibilityLabel={`Preview of ${name}`}
+              source={{ uri: preview }}
+              style={standardStyles.image}
+            />
+          )}
+        </AspectRatio>
+      </View>
+      {/* )}
+      </FadeIn> */}
       <View style={styles.text}>
         <Text style={[fonts.h6, styles.title]}>{name}</Text>
         <Text style={fonts.legal}>{description}</Text>

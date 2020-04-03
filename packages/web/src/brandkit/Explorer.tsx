@@ -27,7 +27,7 @@ export function Explorer({ icons }: Icons) {
   const result = useFilteredResult(query, icons)
 
   return (
-    <>
+    <View style={{ minHeight: '100vh' }}>
       <Search value={query} onChange={onQueryChange} />
       <View style={brandStyles.tiling}>
         {result.map((icon) => (
@@ -44,7 +44,7 @@ export function Explorer({ icons }: Icons) {
           />
         ))}
       </View>
-    </>
+    </View>
   )
 }
 
