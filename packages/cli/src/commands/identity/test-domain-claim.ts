@@ -35,7 +35,7 @@ export default class TestDomainClaim extends ClaimCommand {
     const claim = existingClaims[0]
     console.info(`Fetching domain ${res.flags.domain} TXT records for verification`)
 
-    const output = await verifyDomainRecord(res.flags.from, claim)
+    const output = await verifyDomainRecord(claim, res.flags.from)
 
     if (output === undefined)
       console.info(

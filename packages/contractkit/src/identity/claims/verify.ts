@@ -28,7 +28,7 @@ export async function verifyClaim(
     case ClaimTypes.ACCOUNT:
       return verifyAccountClaim(claim, address, metadataURLGetter)
     case ClaimTypes.DOMAIN:
-      return verifyDomainClaimFromMetadata(claim, address, metadataURLGetter)
+      return verifyDomainRecord(claim, address)
     default:
       break
   }
@@ -110,12 +110,12 @@ export const verifyDomainClaimFromMetadata = async (
       ${metadataURL}: ${error.toString()}`
   }
 
-  return verifyDomainRecord(address, claimFound, dnsResolver)
+  return verifyDomainRecord(claimFound, address, dnsResolver)
 }
 
 export const verifyDomainRecord = async (
-  address: string,
   claim: DomainClaim,
+  address: string,
   dnsResolver: dnsResolverFunction = resolveTxt
 ) => {
   const found = await new Promise((resolve) => {
@@ -145,6 +145,6 @@ export const verifyDomainRecord = async (
   if (found) {
     return
   }
-  console.log(`NOT found`)
+  console.log(`Domain not validated correctly`)
   return `Unable to verify domain claim`
 }
