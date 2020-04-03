@@ -127,7 +127,6 @@ The repository has the following packages (sub projects):
 - [utils](packages/utils) - no README available (improve?)
 - [verification-pool-api](packages/verification-pool-api) - service that handles a pool of Verifier App instances and requests them to direct SMS for attestation purposes (deprecated)
 - [verifier](packages/verifier) - Android verifier app to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
-- [walletkit](packages/walletkit) - common functions to access smart contracts used by Celo Wallet (deprecated)
 - [web](packages/web) - Celo website ([live](https://celo.org/))
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
