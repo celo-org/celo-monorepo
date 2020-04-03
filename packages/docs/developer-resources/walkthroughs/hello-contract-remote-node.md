@@ -54,7 +54,7 @@ contract HelloWorld {
 }
 ```
 
-## Deploy locally
+## Prepare Deployment
 
 Let's create a migration to deploy the contract. For that, we need to create a file in the `./migrations/` folder named `2_deploy_helloworld.js`:
 
@@ -70,64 +70,10 @@ module.exports = function(deployer) {
 }
 ```
 
-To be able to actually deploy it though, we need a blockchain. For local development and testing, you can use the Celo fork of ganache. You can [learn more about Ganache-CLI here.](https://github.com/celo-org/ganache-cli)
-
-```text
-$ npm install -g @celo/ganache-cli
-```
-
-And then start ganache with:
-
-```text
-$ ganache-cli --port 7545
-```
-
-The `--port 7545` flag starts Ganache with a connection open on port `7545` . 
-
-{% hint style="info" %}
-In Ethereum development, it is common to connect to development networks on ports `7545`, `8545` and `9545`.   
-{% endhint %}
-
-In your `truffle-config.js`, you'll want to add your local test network under networks:
-
-```text
-  networks: {
-    test: {
-      host: "127.0.0.1",
-      port: 7545,
-      network_id: "*"
-    }
-  }
-```
-
-Ganache-cli will generate a new network id every time we start, so we accept any network id \("`*`"\).
-
 {% hint style="info" %}
 You can [learn more about Truffle configuration options here.](https://www.trufflesuite.com/docs/truffle/reference/configuration)
 {% endhint %}
 
-Then you can deploy your contract to your local network first:
-
-```text
-$ truffle migrate --network test
-```
-
-You can interact with your contract by running the truffle console:
-
-```text
-$ truffle console --network test
-truffle(test)> contract = await HelloWorld.deployed()
-undefined
-truffle(test)> contract.getName()
-'Celo'
-truffle(test)> contract.setName('MyName')
-{ tx:
-...
-truffle(test)> contract.getName()
-'MyName'
-```
-
-Deploying the contract locally is great for testing purposes, but let's deploy to a public test network so other developers can easily access the contract as well.
 
 ## Deploy to Alfajores \(Remotely\)
 
