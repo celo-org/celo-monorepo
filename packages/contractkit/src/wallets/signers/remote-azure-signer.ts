@@ -14,7 +14,7 @@ import { Signer } from './signer'
 /**
  * Signs the EVM transaction using an HSM key in Azure Key Vault
  */
-export class RemoteAzureSigner implements Signer {
+export class AzureHSMSigner implements Signer {
   private keyVaultClient: AzureKeyVaultClient
   private keyName: string
 

@@ -1,5 +1,5 @@
 import { Address } from '@celo/utils/lib/address'
-import { RemoteAzureSigner } from './signers/remote-azure-signer'
+import { AzureHSMSigner } from './signers/remote-azure-signer'
 import { AzureKeyVaultClient } from './signers/azure-key-vault-client'
 // @ts-ignore-next-line
 import { BN } from 'bn.js'
@@ -23,7 +23,7 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
     for (let key of keys) {
       try {
         const address = await this.getAddressFromKeyName(key)
-        addressToSigner.set(address, new RemoteAzureSigner(this.keyVaultClient, key))
+        addressToSigner.set(address, new AzureHSMSigner(this.keyVaultClient, key))
       } catch (e) {
         // Safely ignore non-secp256k1 keys
         const message = e.message
