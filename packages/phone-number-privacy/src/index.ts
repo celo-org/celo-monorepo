@@ -11,32 +11,19 @@ export const NUM_ATTESTATIONS_REQUIRED = 3
 const contractKit = getContractKit()
 const knex = connectToDatabase()
 
-export const getSalt = functions.https.onRequest((request, response) => {
+export const getSalt = functions.https.onRequest(async (request, response) => {
   confirmUser()
-  Promise.resolve(getRemainingQueryCount(request.body.account, request.body.phoneNumber)).then(
-    (remainingQueryCount) => {
-      if (remainingQueryCount <= 0) {
-        response.status(400).send('Requester exceeded salt service query quota')
-        return
-      }
-      const salt = computeBLSSalt(request.body.queryPhoneNumber, response)
-      Promise.resolve(incrementQueryCount(request.body.account))
-        .then(() => {
-          response.json({ success: true, salt })
-          return
-        })
-        .catch((e) => {
-          console.error('Failed to increment query count', e)
-          response.status(500).send('Failed to increment query count')
-          return
-        })
-    },
-    (e) => {
-      console.error('Failed to get query count', e)
-      response.status(500).send('Failed to get query count')
-      return
-    }
+  const remainingQueryCount = await getRemainingQueryCount(
+    request.body.account,
+    request.body.phoneNumber
   )
+  if (remainingQueryCount <= 0) {
+    response.status(400).send('Requester exceeded salt service query quota')
+    return
+  }
+  const salt = computeBLSSalt(request.body.queryPhoneNumber, response)
+  await incrementQueryCount(request.body.account)
+  response.json({ success: true, salt })
 })
 
 /*
