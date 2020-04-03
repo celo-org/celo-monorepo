@@ -78,7 +78,7 @@ docker run -v $PWD:/root/.celo --rm $CELO_IMAGE init /celo/genesis.json
 In order to allow the node to sync with the network, get the enode URLs of the bootnodes:
 
 ```bash
-export BOOTNODE_ENODES=$\(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes\)
+export BOOTNODE_ENODES=$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)
 ```
 
 ## Start the node
