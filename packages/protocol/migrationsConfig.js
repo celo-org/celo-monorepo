@@ -246,7 +246,7 @@ const NetworkConfigs = {
       executionStageDuration: WEEK,
     },
     lockedGold: {
-      unlockingPeriod: 18 * HOUR, // 1/4 of the mainnet period.
+      unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
     },
     validators: {
       groupLockedGoldRequirements: {
