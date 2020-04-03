@@ -2,11 +2,12 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { ErrorDisplay } from 'src/forms/ErrorDisplay'
 import Form, { emailIsValid } from 'src/forms/Form'
+import SubmitButton from 'src/forms/SubmitButton'
 import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { TextInput } from 'src/forms/TextInput'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { useScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles } from 'src/styles'
 
@@ -84,10 +85,10 @@ export default React.memo(function EmailForm({
                 </View>
               )}
               <Responsive large={[styles.submitBtn, styles.submitBtnDesktop]}>
-                <Button
+                <SubmitButton
+                  isLoading={formState.isLoading}
                   onPress={onSubmit}
                   text={submitText}
-                  kind={BTN.PRIMARY}
                   size={SIZE.fullWidth}
                 />
               </Responsive>

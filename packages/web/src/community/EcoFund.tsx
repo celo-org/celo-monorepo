@@ -6,6 +6,7 @@ import { H2 } from 'src/fonts/Fonts'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
+import SubmitButton from 'src/forms/SubmitButton'
 import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -136,9 +137,9 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                         allErrors={formState.errors}
                       />
                     ))}
-                    <Button
+                    <SubmitButton
+                      isLoading={formState.isLoading}
                       text={t('apply')}
-                      kind={BTN.PRIMARY}
                       onPress={onSubmit}
                       size={SIZE.big}
                       style={standardStyles.elementalMarginBottom}
@@ -180,9 +181,9 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                         allErrors={formState.errors}
                       />
                     ))}
-                    <Button
+                    <SubmitButton
+                      isLoading={formState.isLoading}
                       text={t('recommend')}
-                      kind={BTN.PRIMARY}
                       onPress={onSubmit}
                       style={standardStyles.elementalMarginBottom}
                       size={SIZE.big}

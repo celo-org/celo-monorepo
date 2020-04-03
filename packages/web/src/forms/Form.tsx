@@ -40,14 +40,6 @@ export function postForm(route: string, formData: FormState) {
   })
 }
 
-function findFormInParentTree(target) {
-  if (target.reportValidity || target.tagName === 'FORM') {
-    return target
-  } else {
-    return findFormInParentTree(target.parentNode)
-  }
-}
-
 export function emailIsValid(email: string) {
   return email && email.length && email.length < 254 && email.indexOf('@') > 0
 }

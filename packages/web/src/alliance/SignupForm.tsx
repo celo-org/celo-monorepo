@@ -5,10 +5,11 @@ import { CheckboxWithLabel } from 'src/forms/CheckboxWithLabel'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
+import SubmitButton from 'src/forms/SubmitButton'
 import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { useScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { SIZE } from 'src/shared/Button.3'
 import { standardStyles } from 'src/styles'
 
 const BLANK_FORM: NewMember = {
@@ -81,11 +82,11 @@ export default function SignupForm() {
           <View
             style={[standardStyles.centered, styles.buttonContainer, isMobile && styles.stretch]}
           >
-            <Button
+            <SubmitButton
+              isLoading={formState.isLoading}
               text={t('form.btn')}
               onDarkBackground={true}
               onPress={onSubmit}
-              kind={BTN.PRIMARY}
               style={styles.buttonText}
               size={isMobile ? SIZE.fullWidth : SIZE.big}
             />

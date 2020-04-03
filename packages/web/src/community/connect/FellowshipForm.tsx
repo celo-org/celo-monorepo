@@ -4,13 +4,12 @@ import { StyleSheet } from 'react-native'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
+import SubmitButton from 'src/forms/SubmitButton'
 import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import Spinner from 'src/shared/Spinner'
-import { colors, standardStyles } from 'src/styles'
-
+import { SIZE } from 'src/shared/Button.3'
+import { standardStyles } from 'src/styles'
 export class FellowshipForm extends React.Component<I18nProps> {
   render() {
     const { t } = this.props
@@ -85,13 +84,11 @@ export class FellowshipForm extends React.Component<I18nProps> {
               allStyle={[standardStyles.centered, standardStyles.elementalMarginTop]}
             >
               <Cell span={Spans.half} style={standardStyles.centered}>
-                <Button
-                  iconLeft={formState.isLoading && <Spinner size={'small'} color={colors.white} />}
-                  text={!formState.isLoading && t('submit')}
-                  kind={BTN.PRIMARY}
+                <SubmitButton
+                  isLoading={formState.isLoading}
+                  text={t('submit')}
                   onPress={onSubmit}
                   size={SIZE.big}
-                  disabled={formState.isLoading}
                   align={'center'}
                   style={standardStyles.elementalMarginBottom}
                 />
