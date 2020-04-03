@@ -29,6 +29,13 @@ export enum ProposalStage {
   Expiration = 'Expiration',
 }
 
+export enum VoteValue {
+  None = 'None',
+  Abstain = 'Abstain',
+  No = 'No',
+  Yes = 'Yes',
+}
+
 export interface ProposalStageDurations {
   [ProposalStage.Approval]: BigNumber // seconds
   [ProposalStage.Referendum]: BigNumber // seconds
@@ -57,6 +64,17 @@ export interface ProposalMetadata {
   timestamp: BigNumber
   transactionCount: number
   descriptionURL: string
+}
+
+export interface VoteRecord {
+  proposalId: BigNumber
+  value: BigNumber
+  value: VoteValue
+}
+
+export interface UpvoteRecord {
+  proposalId: BigNumber
+  value: BigNumber
 }
 
 export type ProposalParams = Parameters<Governance['methods']['propose']>
