@@ -37,7 +37,7 @@ github:
   app:
     # The integration ID of the GitHub app. Can also be set by the
     # GITHUB_APP_INTEGRATION_ID environment variable.
-    integration_id: 1
+    integration_id: 59603
     # A random string used to validate webhooks. Can also be set by the
     # GITHUB_APP_WEBHOOK_SECRET environment variable.
     webhook_secret: "YOUR_SECRET_HERE"
