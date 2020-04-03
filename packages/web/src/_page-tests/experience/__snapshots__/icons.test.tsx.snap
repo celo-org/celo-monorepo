@@ -1241,6 +1241,90 @@ exports[`Experience/Icons renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
+                  "marginLeft": "10px",
+                  "marginRight": "10px",
+                  "maxWidth": "500px",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "20px",
+                    "fontWeight": "500",
+                    "lineHeight": "24px",
+                    "marginBottom": "20px",
+                    "marginTop": "60px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                icons.searchLabel
+              </div>
+              <input
+                aria-label="search"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="search"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                placeholder="icons.searchPlaceholder"
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "5px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "5px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
+                }
+                type="text"
+                value=""
+              />
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
                   "WebkitBoxDirection": "normal",
                   "WebkitBoxLines": "multiple",
                   "WebkitBoxOrient": "horizontal",

@@ -9,6 +9,7 @@ import IconShowcase from 'src/brandkit/common/Showcase'
 import { AssetTypes } from 'src/brandkit/tracking'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
+import Search from 'src/brandkit/Search'
 
 export default React.memo(
   withNamespaces(NameSpaces.brand)(function IconsPage({ t }: I18nProps) {
@@ -32,11 +33,15 @@ interface IconData {
 
 const LOADING = new Array(12)
 
+function reduce() {}
+
 const Overview = withNamespaces(NameSpaces.brand)(function _Overview({ t }: I18nProps) {
   return (
     <View style={styles.container}>
       <PageHeadline title={t('icons.title')} headline={t('icons.headline')} />
       <CCLicense textI18nKey="icons.license" />
+
+      <Search value={''} onChange={reduce} />
       <View style={brandStyles.tiling}>
         <Fetch query="/api/experience/assets/icons">
           {({ loading, data }: { loading: boolean; data: IconData[] }) => {
