@@ -12,6 +12,7 @@ import {
   identity,
   proxyCall,
   proxySend,
+  stringIdentity,
   stringToBuffer,
   toTransactionObject,
   tupleParser,
@@ -27,13 +28,6 @@ export enum ProposalStage {
   Referendum = 'Referendum',
   Execution = 'Execution',
   Expiration = 'Expiration',
-}
-
-export enum VoteValue {
-  None = 'None',
-  Abstain = 'Abstain',
-  No = 'No',
-  Yes = 'Yes',
 }
 
 export interface ProposalStageDurations {
@@ -64,17 +58,6 @@ export interface ProposalMetadata {
   timestamp: BigNumber
   transactionCount: number
   descriptionURL: string
-}
-
-export interface VoteRecord {
-  proposalId: BigNumber
-  value: BigNumber
-  value: VoteValue
-}
-
-export interface UpvoteRecord {
-  proposalId: BigNumber
-  value: BigNumber
 }
 
 export type ProposalParams = Parameters<Governance['methods']['propose']>
@@ -129,6 +112,18 @@ export interface HotfixRecord {
   approved: boolean
   executed: boolean
   preparedEpoch: BigNumber
+}
+
+export interface VoteRecord {
+  proposalID: BigNumber
+  votes: BigNumber
+  value: VoteValue
+}
+
+export interface Voter {
+  upvote: UpvoteRecord
+  votes: VoteRecord[]
+  refundedDeposits: BigNumber
 }
 
 const ZERO_BN = new BigNumber(0)
@@ -372,12 +367,39 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
+   * Returns the corresponding vote record
+   * @param upvoter Address of upvoter
+   */
+  getVoteRecord: (
+    upvoter: Address,
+    dequeueIndex: BigNumber.Value
+  ) => Promise<VoteRecord> = proxyCall(
+    this.contract.methods.getVoteRecord,
+    tupleParser(identity, valueToString),
+    (o) => ({
+      proposalID: valueToBigNumber(o[0]),
+      value: Object.keys(VoteValue)[valueToInt(o[1])] as VoteValue,
+      votes: valueToBigNumber(o[2]),
+    })
+  )
+
+  /**
    * Returns whether a given proposal is queued.
    * @param proposalID Governance proposal UUID
    */
   isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(valueToString))
 
-  /**
+  /*
+   * Returns the value of proposal deposits that have been refunded.
+   * @param proposer Governance proposer address.
+   */
+  getRefundedDeposits = proxyCall(
+    this.contract.methods.refundedDeposits,
+    tupleParser(stringIdentity),
+    valueToBigNumber
+  )
+
+  /*
    * Returns the upvotes applied to a given proposal.
    * @param proposalID Governance proposal UUID
    */
@@ -423,6 +445,33 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
     const dequeueIds = dequeue.map(valueToBigNumber)
     return filterZeroes ? dequeueIds.filter((id) => !id.isZero()) : dequeueIds
+  }
+
+  /*
+   * Returns the vote records for a given voter.
+   */
+  async getVoteRecords(voter: Address): Promise<VoteRecord[]> {
+    const dequeue = await this.getDequeue()
+    const voteRecords = await Promise.all(dequeue.map((_, i) => this.getVoteRecord(voter, i)))
+    // Some vote records might no longer be relevant.
+    // const filteredVoteRecords = voteRecords.filter((record, i) => record.proposalID.equals(dequeue[i]))
+    return voteRecords
+  }
+
+  /*
+   * Returns information pertaining to a voter in governance.
+   */
+  async getVoter(voter: Address): Promise<Voter> {
+    const res = await Promise.all([
+      this.getUpvoteRecord(voter),
+      this.getVoteRecords(voter),
+      this.getRefundedDeposits(voter),
+    ])
+    return {
+      upvote: res[0],
+      votes: res[1],
+      refundedDeposits: res[2],
+    }
   }
 
   /**

@@ -1,8 +1,10 @@
+import { concurrentMap } from '@celo/utils/lib/async'
 import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
+import { toBuffer } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { printValueMapRecursive } from '../../utils/cli'
+import { printValueMap, printValueMapRecursive } from '../../utils/cli'
 
 export default class Show extends BaseCommand {
   static description = 'Show information about a governance proposal, hotfix, or voter.'
@@ -40,7 +42,7 @@ export default class Show extends BaseCommand {
     const id = res.flags.proposalID
     const raw = res.flags.raw
     const account = res.flags.account
-    const hash = res.flags.hash
+    const hotfix = res.flags.hotfix
 
     const governance = await this.kit.contracts.getGovernance()
     if (id) {
@@ -54,15 +56,15 @@ export default class Show extends BaseCommand {
         record.proposal = jsonproposal as any
       }
       printValueMapRecursive(record)
-    } else if (hash) {
-      const hashBuf = toBuffer(hash) as Buffer
-      const record = await governance.getHotfixRecord(hashBuf)
+    } else if (hotfix) {
+      const hotfixBuf = toBuffer(hotfix) as Buffer
+      const record = await governance.getHotfixRecord(hotfixBuf)
       printValueMap(record)
 
-      const passing = await governance.isHotfixPassing(hashBuf)
+      const passing = await governance.isHotfixPassing(hotfixBuf)
       printValueMap({ passing })
       if (!passing) {
-        const tally = await governance.hotfixWhitelistValidatorTally(hashBuf)
+        const tally = await governance.hotfixWhitelistValidatorTally(hotfixBuf)
         const quorum = await governance.minQuorumSize()
         printValueMap({
           tally,
@@ -71,16 +73,18 @@ export default class Show extends BaseCommand {
 
         const validators = await this.kit.contracts.getValidators()
         const accounts = await validators.currentValidatorAccountsSet()
-        const whitelist = await concurrentMap(5, accounts, async (validator) => {
-          const whitelisted = await governance.isHotfixWhitelistedBy(hashBuf, validator.signer)
-          return (await governance.isHotfixWhitelistedBy(hashBuf, validator.account)) || whitelisted
+        const whitelist = await concurrentMap(5, accounts, async (validator: any) => {
+          const whitelisted = await governance.isHotfixWhitelistedBy(hotfixBuf, validator.signer)
+          return (
+            (await governance.isHotfixWhitelistedBy(hotfixBuf, validator.account)) || whitelisted
+          )
         })
         printValueMapRecursive({
-          Validators: accounts.filter((_, idx) => res.flags.notyet !== whitelist[idx]),
+          Validators: accounts.filter((_, idx) => res.flags.notwhitelisted !== whitelist[idx]),
         })
       }
     } else if (account) {
-      // TODO(asa)
+      printValueMapRecursive(await governance.getVoter(account))
     }
   }
 }
