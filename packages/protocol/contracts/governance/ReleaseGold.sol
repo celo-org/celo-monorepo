@@ -206,7 +206,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     liquidityProvisionMet = flags[1] ? false : true;
     canVote = flags[2];
     canValidate = flags[3];
-    revocationInfo.canExpire = true;
+    // Nonvalidators (employees) opt-out of Escheat, validators are opt-in.
+    revocationInfo.canExpire = !canValidate;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
       releaseSchedule.amountReleasedPerPeriod > 0,
