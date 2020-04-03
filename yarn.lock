@@ -17671,9 +17671,9 @@ fuzzysort@^1.1.4:
   resolved "https://registry.yarnpkg.com/fuzzysort/-/fuzzysort-1.1.4.tgz#a0510206ed44532cbb52cf797bf5a3cb12acd4ba"
   integrity sha512-JzK/lHjVZ6joAg3OnCjylwYXYVjRiwTY6Yb25LvfpJHK8bjisfnZJ5bY8aVWwTwCXgxPNgLAtmHL+Hs5q1ddLQ==
 
-ganache-core@^2.6.0, "ganache-core@https://github.com/celo-org/ganache-core.git#845c36a":
+ganache-core@^2.6.0, "ganache-core@https://github.com/celo-org/ganache-core.git#3dbc32b":
   version "2.7.0"
-  resolved "https://github.com/celo-org/ganache-core.git#845c36a42bec596afdaf951b21b396f8dbe379d5"
+  resolved "https://github.com/celo-org/ganache-core.git#3dbc32b214b3bb8f0dda2bfd909850a752a73a55"
   dependencies:
     abstract-leveldown "3.0.0"
     async "2.6.2"
