@@ -27,6 +27,16 @@ export default React.memo(function Search({ value, onChange }: Props) {
   )
 })
 
+export function useSearch() {
+  const [query, setQuery] = React.useState('')
+
+  const onQueryChange = React.useCallback(({ nativeEvent }) => setQuery(nativeEvent.value), [
+    setQuery,
+  ])
+
+  return { query, onQueryChange }
+}
+
 const styles = StyleSheet.create({
   root: {
     maxWidth: 500,
