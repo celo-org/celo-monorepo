@@ -368,20 +368,24 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   /**
    * Returns the corresponding vote record
-   * @param upvoter Address of upvoter
+   * @param voter Address of voter
+   * @param proposalID Governance proposal UUID
    */
-  getVoteRecord: (
-    upvoter: Address,
-    dequeueIndex: BigNumber.Value
-  ) => Promise<VoteRecord> = proxyCall(
-    this.contract.methods.getVoteRecord,
-    tupleParser(identity, valueToString),
-    (o) => ({
-      proposalID: valueToBigNumber(o[0]),
-      value: Object.keys(VoteValue)[valueToInt(o[1])] as VoteValue,
-      votes: valueToBigNumber(o[2]),
-    })
-  )
+  async getVoteRecord(voter: Address, proposalID: BigNumber.Value): Promise<VoteRecord | null> {
+    try {
+      const proposalIndex = await this.getDequeueIndex(proposalID)
+      const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
+      return {
+        proposalID: valueToBigNumber(res[0]),
+        value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
+        votes: valueToBigNumber(res[2]),
+      }
+    } catch (_) {
+      // The proposal ID may not be present in the dequeued list, or the voter may not have a vote
+      // record for the proposal.
+      return null
+    }
+  }
 
   /**
    * Returns whether a given proposal is queued.
@@ -452,10 +456,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   async getVoteRecords(voter: Address): Promise<VoteRecord[]> {
     const dequeue = await this.getDequeue()
-    const voteRecords = await Promise.all(dequeue.map((_, i) => this.getVoteRecord(voter, i)))
-    // Some vote records might no longer be relevant.
-    // const filteredVoteRecords = voteRecords.filter((record, i) => record.proposalID.equals(dequeue[i]))
-    return voteRecords
+    const voteRecords = await Promise.all(dequeue.map((id) => this.getVoteRecord(voter, id)))
+    return voteRecords.filter((record) => record != null) as VoteRecord[]
   }
 
   /*
