@@ -18,12 +18,9 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string) {
-  let nodeIp
-  if (isVmBased()) {
-    nodeIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
-  } else {
-    nodeIp = await getPrivateTxNodeClusterIP(celoEnv)
-  }
+  const nodeIp = isVmBased()
+    ? await getInternalTxNodeLoadBalancerIP(celoEnv)
+    : await getPrivateTxNodeClusterIP(celoEnv)
   const nodeUrl = `http://${nodeIp}:8545`
   return [
     `--set celotool.image.repository=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY)}`,

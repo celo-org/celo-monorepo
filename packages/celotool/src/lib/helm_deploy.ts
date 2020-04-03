@@ -513,8 +513,8 @@ async function helmIPParameters(celoEnv: string) {
 
   ipAddressParameters.push(...singleAddressParameters)
 
-  const listOfAddresses = txAddresses.join('/')
-  ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfAddresses}`)
+  const listOfTxNodeAddresses = txAddresses.join('/')
+  ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfTxNodeAddresses}`)
 
   if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
@@ -543,8 +543,10 @@ async function helmIPParameters(celoEnv: string) {
       (address, i) => `--set geth.private_tx_nodes_${i}IpAddress=${address}`
     )
     ipAddressParameters.push(...privateTxAddressParameters)
-    const listOfAddresses = privateTxAddresses.join('/')
-    ipAddressParameters.push(`--set geth.private_tx_node_ip_addresses=${listOfAddresses}`)
+    const listOfPrivateTxNodeAddresses = privateTxAddresses.join('/')
+    ipAddressParameters.push(
+      `--set geth.private_tx_node_ip_addresses=${listOfPrivateTxNodeAddresses}`
+    )
   }
 
   return ipAddressParameters
