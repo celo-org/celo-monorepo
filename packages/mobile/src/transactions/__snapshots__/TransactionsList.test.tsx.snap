@@ -1044,8 +1044,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
           "currencyCode": "cGLD",
           "localAmount": Object {
             "currencyCode": "MXN",
-            "exchangeRate": "0.88666666666666666666666666666666666666666666666666666666666666666666666666666711",
-            "value": "26.6000000000000000000000000000000000000000000000000000000000000000000000000000133",
+            "exchangeRate": "0.8866666666666666666711",
+            "value": "26.600000000000000000133",
           },
           "value": "30",
         },
@@ -1068,8 +1068,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
           "currencyCode": "cGLD",
           "localAmount": Object {
             "currencyCode": "MXN",
-            "exchangeRate": "0.88666666666666666666666666666666666666666666666666666666666666666666666666666711",
-            "value": "26.6000000000000000000000000000000000000000000000000000000000000000000000000000133",
+            "exchangeRate": "0.8866666666666666666711",
+            "value": "26.600000000000000000133",
           },
           "value": "30",
         },
