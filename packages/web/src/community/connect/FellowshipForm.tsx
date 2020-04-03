@@ -16,7 +16,7 @@ export class FellowshipForm extends React.Component<I18nProps> {
     const { t } = this.props
     return (
       <FormContainer route="/fellowship" blankForm={blankForm()} validateWith={validateFields}>
-        {({ onAltSubmit, onInput, formState }) => (
+        {({ onSubmit, onInput, formState }) => (
           <Form style={styles.form}>
             <GridRow
               allStyle={gridStyle}
@@ -89,7 +89,7 @@ export class FellowshipForm extends React.Component<I18nProps> {
                   iconLeft={formState.isLoading && <Spinner size={'small'} color={colors.white} />}
                   text={!formState.isLoading && t('submit')}
                   kind={BTN.PRIMARY}
-                  onPress={onAltSubmit}
+                  onPress={onSubmit}
                   size={SIZE.big}
                   disabled={formState.isLoading}
                   align={'center'}

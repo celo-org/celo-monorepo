@@ -35,7 +35,7 @@ export default function SignupForm() {
   const { isMobile, isDesktop } = useScreenSize()
   return (
     <FormContainer route="/api/alliance" blankForm={BLANK_FORM} validateWith={validateWith}>
-      {({ formState, onInput, onCheck, onAltSubmit }) => (
+      {({ formState, onInput, onCheck, onSubmit }) => (
         <Form>
           <View style={styles.container}>
             <View style={isDesktop && standardStyles.row}>
@@ -84,7 +84,7 @@ export default function SignupForm() {
             <Button
               text={t('form.btn')}
               onDarkBackground={true}
-              onPress={onAltSubmit}
+              onPress={onSubmit}
               kind={BTN.PRIMARY}
               style={styles.buttonText}
               size={isMobile ? SIZE.fullWidth : SIZE.big}

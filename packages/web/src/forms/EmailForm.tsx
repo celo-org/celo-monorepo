@@ -18,7 +18,6 @@ interface OwnProps {
   route?: string
   listID?: string
   isDarkMode?: boolean
-  afterSubmit?: () => void
 }
 
 const blankForm = { email: '', fullName: '', list: '' }
@@ -44,7 +43,6 @@ const emailErrorStyle = (errors: string[]) => {
 
 export default React.memo(function EmailForm({
   isDarkMode,
-  afterSubmit,
   submitText,
   listID = NEWSLETTER_LIST,
   route = '/contacts',
@@ -55,13 +53,9 @@ export default React.memo(function EmailForm({
 
   return (
     <Form route={route} blankForm={{ ...blankForm, list: listID }} validateWith={validateFields}>
-      {({ formState, onInput, onAltSubmit }) => {
+      {({ formState, onInput, onSubmit }) => {
         const borderStyle = emailErrorStyle(formState.errors)
-        const onPress = () => {
-          if (onAltSubmit()) {
-            return afterSubmit && afterSubmit()
-          }
-        }
+
         return (
           <Responsive large={styles.container}>
             <View style={styles.mobileContainer}>
@@ -91,7 +85,7 @@ export default React.memo(function EmailForm({
               )}
               <Responsive large={[styles.submitBtn, styles.submitBtnDesktop]}>
                 <Button
-                  onPress={onPress}
+                  onPress={onSubmit}
                   text={submitText}
                   kind={BTN.PRIMARY}
                   size={SIZE.fullWidth}

@@ -120,7 +120,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                 blankForm={blankApplicationForm}
                 validateWith={invalidApplicationFields}
               >
-                {({ onAltSubmit, onInput, formState }) => (
+                {({ onSubmit, onInput, formState }) => (
                   <Form>
                     {ApplicationKeys.map((key) => (
                       <LabeledInput
@@ -139,7 +139,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                     <Button
                       text={t('apply')}
                       kind={BTN.PRIMARY}
-                      onPress={onAltSubmit}
+                      onPress={onSubmit}
                       size={SIZE.big}
                       style={standardStyles.elementalMarginBottom}
                       align={'flex-start'}
@@ -166,7 +166,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                 blankForm={blankRecForm}
                 validateWith={invalidRecFields}
               >
-                {({ onAltSubmit, onInput, formState }) => (
+                {({ onSubmit: onSubmit, onInput, formState }) => (
                   <Form>
                     {RecommendationKeys.map((key) => (
                       <LabeledInput
@@ -183,7 +183,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                     <Button
                       text={t('recommend')}
                       kind={BTN.PRIMARY}
-                      onPress={onAltSubmit}
+                      onPress={onSubmit}
                       style={standardStyles.elementalMarginBottom}
                       size={SIZE.big}
                       align={'flex-start'}

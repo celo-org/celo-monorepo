@@ -17,7 +17,6 @@ interface NativeEvent {
 
 interface ChildArguments {
   onSubmit: (any?: any) => Promise<void>
-  onAltSubmit: () => boolean
   onInput: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void
   onCheck: (event: { nativeEvent: NativeEvent }) => void
   onSelect: (key: string) => (event) => void
@@ -63,16 +62,6 @@ export default class Form extends React.Component<Props, State> {
     super(props, context)
     this.state = { form: props.blankForm, isComplete: false, isLoading: false, errors: [] }
   }
-  // think of this as browser native submit,
-  // deprecating
-  submit = async (event) => {
-    event.preventDefault()
-    const form = event.target.form || findFormInParentTree(event.target)
-    // note this has a side effect of showing native html validations to form submitter
-    if (form.reportValidity()) {
-      await this.postForm()
-    }
-  }
 
   postForm = async () => {
     this.setState({ isLoading: true })
@@ -95,14 +84,10 @@ export default class Form extends React.Component<Props, State> {
     return errors.length === 0
   }
 
-  // this will become onSubmit when submit is removed
-  altSubmit = () => {
+  onSubmit = () => {
     if (this.validates()) {
-      // tslint:disable
-      this.postForm()
-      return true
+      return this.postForm()
     }
-    return false
   }
 
   form = () => {
@@ -140,8 +125,7 @@ export default class Form extends React.Component<Props, State> {
 
   render() {
     return this.props.children({
-      onSubmit: this.submit,
-      onAltSubmit: this.altSubmit,
+      onSubmit: this.onSubmit,
       onInput: this.onInput,
       onCheck: this.onCheck,
       onSelect: this.onSelect,
