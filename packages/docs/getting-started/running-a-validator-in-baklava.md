@@ -305,7 +305,7 @@ export CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-SIGNER-PUBLI
 When we register our Validator Group, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
 
 ```bash
-# On the validator machine
+# On your validator machine
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_ADDRESS --bls
 ```
 
