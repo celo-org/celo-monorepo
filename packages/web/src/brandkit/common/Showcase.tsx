@@ -1,6 +1,6 @@
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
-import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
 import { AssetTypes } from 'src/brandkit/tracking'
@@ -11,7 +11,7 @@ import { colors, fonts, standardStyles } from 'src/styles'
 interface Props {
   name: string
   description: string
-  preview?: ImageURISource
+  preview?: string
   uri: string
   ratio: number
   loading: boolean
@@ -49,7 +49,7 @@ export default React.memo(function Showcase({
                   onLoadEnd={load}
                   resizeMode="contain"
                   accessibilityLabel={`Preview of ${name}`}
-                  source={preview}
+                  source={{ uri: preview }}
                   style={standardStyles.image}
                 />
               )}
