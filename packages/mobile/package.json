@@ -70,7 +70,6 @@
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.23",
     "node-libs-react-native": "^1.0.3",
-    "numeral": "^2.0.6",
     "react": "16.9.0",
     "react-apollo": "^2.5.8",
     "react-async-hook": "^3.4.0",
