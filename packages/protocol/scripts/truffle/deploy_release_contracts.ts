@@ -1,10 +1,9 @@
 import {
-  _setInitialProxyImplementation,
   getDeployedProxiedContract,
+  _setInitialProxyImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs = require('fs')
 import * as prompts from 'prompts'
 import {
   RegistryInstance,
@@ -13,6 +12,7 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 let argv: any
 let registry: any
@@ -80,6 +80,12 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
   }
+  const flags = [
+    releaseGoldConfig.revocable,
+    releaseGoldConfig.subjectToLiquidityProvision,
+    releaseGoldConfig.canVote,
+    releaseGoldConfig.canValidate,
+  ]
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,
@@ -94,14 +100,11 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.numReleasePeriods,
     releaseGoldConfig.releasePeriod,
     web3.utils.toHex(weiAmountReleasedPerPeriod),
-    releaseGoldConfig.revocable,
     releaseGoldConfig.beneficiary,
     releaseGoldConfig.releaseOwner,
     releaseGoldConfig.refundAddress,
-    releaseGoldConfig.subjectToLiquidityProvision,
     releaseGoldConfig.initialDistributionRatio,
-    releaseGoldConfig.canValidate,
-    releaseGoldConfig.canVote,
+    flags,
     registry.address
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)

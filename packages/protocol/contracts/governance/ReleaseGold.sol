@@ -31,6 +31,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   struct RevocationInfo {
     // Indicates if the contract is revocable.
     bool revocable;
+    // Indicates if the contract can expire `EXPIRATION_TIME` after releasing finishes.
+    bool canExpire;
     // Released gold instance balance at time of revocation.
     uint256 releasedBalanceAtRevoke;
     // The time at which the release schedule was revoked.
@@ -83,6 +85,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   event ReleaseGoldInstanceDestroyed(address indexed beneficiary, address indexed atAddress);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
+  event CanExpireSet(bool canExpire);
   event BeneficiarySet(address indexed beneficiary);
 
   modifier onlyReleaseOwner() {
@@ -141,6 +144,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   modifier onlyExpired() {
+    require(revocationInfo.canExpire, "Contract must be expirable");
     uint256 releaseEndTime = releaseSchedule.releaseStartTime.add(
       releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
     );
@@ -167,18 +171,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param numReleasePeriods Number of releasing periods.
    * @param releasePeriod Duration (in seconds) of each release period.
    * @param amountReleasedPerPeriod The released gold amount per period.
-   * @param revocable Whether the release schedule is revocable or not.
    * @param _beneficiary Address of the beneficiary to whom released tokens are transferred.
    * @param _releaseOwner Address capable of revoking, setting the liquidity provision
    *                      and setting the withdrawal amount.
    *                      0x0 if grant is not subject to these operations.
    * @param _refundAddress Address that receives refunded funds if contract is revoked.
    *                       0x0 if contract is not revocable.
-   * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
    *                                 indicating % of total balance available for distribution.
-   * @param _canValidate If this schedule's gold can be used for validating.
-   * @param _canVote If this schedule's gold can be used for voting.
+   * @param flags Array of boolean flags: [`revocable`, `subjectToLiquidityProvision`,
+   *                                       `canVote`, `canValidate`]
    * @param registryAddress Address of the deployed contracts registry.
    */
   function initialize(
@@ -187,14 +189,11 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 numReleasePeriods,
     uint256 releasePeriod,
     uint256 amountReleasedPerPeriod,
-    bool revocable,
     address payable _beneficiary,
     address _releaseOwner,
     address payable _refundAddress,
-    bool subjectToLiquidityProvision,
     uint256 initialDistributionRatio,
-    bool _canValidate,
-    bool _canVote,
+    bool[] calldata flags,
     address registryAddress
   ) external initializer {
     _transferOwnership(msg.sender);
@@ -203,6 +202,11 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     releaseSchedule.releasePeriod = releasePeriod;
     releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
     releaseSchedule.releaseStartTime = releaseStartTime;
+    revocationInfo.revocable = flags[0];
+    liquidityProvisionMet = flags[1] ? false : true;
+    canVote = flags[2];
+    canValidate = flags[3];
+    revocationInfo.canExpire = true;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
       releaseSchedule.amountReleasedPerPeriod > 0,
@@ -225,16 +229,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
         releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
       "Contract balance must equal the entire grant amount"
     );
-    require(!(revocable && _canValidate), "Revocable contracts cannot validate");
+    require(!(revocationInfo.revocable && canValidate), "Revocable contracts cannot validate");
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     require(
-      (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
+      (revocationInfo.revocable && _refundAddress != address(0)) ||
+        (!revocationInfo.revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
     );
 
     setRegistry(registryAddress);
     _setBeneficiary(_beneficiary);
-    revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
     refundAddress = _refundAddress;
 
@@ -248,10 +252,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     } else {
       maxDistribution = MAX_UINT;
     }
-
-    liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
-    canValidate = _canValidate;
-    canVote = _canVote;
     emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 
@@ -270,6 +270,20 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     require(!liquidityProvisionMet, "Liquidity provision has already been set");
     liquidityProvisionMet = true;
     emit LiquidityProvisionSet(beneficiary);
+  }
+
+  /**
+   * @notice Controls if the contract can be expired.
+   *         This would be called by beneficiarys who would like to validate with this contract
+   *         without worrying about future expiration.
+   */
+  function setCanExpire(bool _canExpire) external onlyBeneficiary {
+    require(
+      revocationInfo.canExpire != _canExpire,
+      "Expiration flag is already set to desired value"
+    );
+    revocationInfo.canExpire = _canExpire;
+    emit CanExpireSet(revocationInfo.canExpire);
   }
 
   /**
@@ -373,11 +387,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev Only callable `EXPIRATION_TIME` after the final gold release.
    */
   function expire() external nonReentrant onlyReleaseOwner onlyExpired {
-    IValidators validators = getValidators();
-    require(
-      !validators.isValidator(address(this)) && !validators.isValidatorGroup(address(this)),
-      "Cannot call `expire` on an instance registered as a validator or group"
-    );
     require(!isRevoked(), "Release schedule instance must not already be revoked");
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
