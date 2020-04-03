@@ -302,7 +302,7 @@ const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_ov
 
 // Use lodash merge to deeply override defaults.
 if (argv.network && NetworkConfigs[argv.network]) {
-  lodash.merge(config, NetworkConfigs[arv.network])
+  lodash.merge(config, NetworkConfigs[argv.network])
 }
 lodash.merge(config, migrationOverride)
 
