@@ -163,16 +163,16 @@ Once block production starts, core contracts and  `ReleaseGold` contracts will b
 
 The following sections outline the steps needed after core contracts and `ReleaseGold` contracts are deployed. On a high level, we will:
 
-- Authorize validator signer key with validator account key
-- Create and authorize validator group signer key with validator group account key
-- Register validator
-- Register valdiator group
-- Authorize validator vote signer key
-- Authorize validator group vote signer key
+- Create accounts associated with `ReleaseGold` contracts' addresses
+- Lock up balance of `ReleaseGold`
+- Authorize validator signer key
+- Create and authorize validator group signer key
+- Create and authorize vote signer keys
+- Register validator and validator group
 - Affiliate validator with validator group
 - Vote
 
-We will need to use a number of keys, so let's have a refresher on key management.
+We will need to use 7 keys, so let's have a refresher on key management.
 
 ### Key Management
 
@@ -202,7 +202,7 @@ Note that account and signer keys must be unique and may not be reused.
 
 #### Keys Required
 
-We will use 6 keys in the following setup, namely:
+We will use 7 keys in the following setup, namely:
 
 - Validator account key (beneficiary address of `ReleaseGold` submitted through gist)
 - Validator group account key (beneficiary address of `ReleaseGold` submitted through gist)
@@ -210,6 +210,7 @@ We will use 6 keys in the following setup, namely:
 - Validator group signer key (new)
 - Validator vote signer key (new)
 - Validator group signer key (new)
+- Validator attestation signer key (new)
 
 ### Environment variables
 
@@ -221,16 +222,22 @@ There are number of new environment variables, and you may use this table as a r
 | NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_ADDRESS               | The account address for the Validator                                                                                                |
+| CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
+| CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
+| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the validator group signer authorized by the validator group account                                                              |
+| CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator group signer address                                                                    |
+| CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the validator group signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the validator signer authorized by the validator account                                                              |
 | CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator signer address                                                                    |
 | CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the validator signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                                                                                        |
 | CELO_VALIDATOR_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                                                                                          |
-| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the validator group signer authorized by the validator group account                                                              |
-| CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator group signer address                                                                    |
-| CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the validator group signer key                                                                                  |
-| CELO_VALIDATOR_GROUP_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator Group instance                                                                                        |
-| CELO_VALIDATOR_GROUP_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                                                                                          |
+| CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS        | The address of the validator group vote signer                                                              |
+| CELO_VALIDATOR_GROUP_VOTE_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator group vote signer address                                                                    |
+| CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE      | The proof-of-possession of the validator group vote signer key                                                                                  |
+| CELO_VALIDATOR_VOTE_SIGNER_ADDRESS        | The address of the validator vote signer                                                              |
+| CELO_VALIDATOR_VOTE_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the validator vote signer address                                                                    |
+| CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE      | The proof-of-possession of the validator vote signer key                                                                                  |
 | PROXY_ENODE                          | The enode address for the Validator proxy                                                                                            |
 | PROXY_INTERNAL_IP                    | (Optional) The internal IP address over which your Validator can communicate with your Proxy                                         |
 | PROXY_EXTERNAL_IP                    | The external IP address of the Proxy. May be used by the Validator to communicate with the Proxy if PROXY_INTERNAL_IP is unspecified |
@@ -242,6 +249,39 @@ There are number of new environment variables, and you may use this table as a r
 | APP_SIGNATURE                        | The hash with which clients can auto-read SMS messages on android                                                                    |
 | SMS_PROVIDERS                        | A comma-separated list of providers you want to configure, we currently support `nexmo` & `twilio`                                   |
 
+### Create Accounts for `ReleaseGold` Addresses and Lock Up Gold
+
+In order to use the balances from `ReleaseGold` contracts, we need to create accounts associated with `ReleaseGold` addresses, which are published here (**insert link**).
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_GROUP_RG_ADDRESS=<YOUR-CELO-VALIDATOR-GROUP-RG-ADDRESS>
+export CELO_VALIDATOR_RG_ADDRESS=<YOUR-CELO-VALIDATOR-RG-ADDRESS>
+```
+
+Show the configuration `ReleaseGold` contracts:
+
+```bash
+# On your local machine
+celocli releasegold:show --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS
+celocli releasegold:show --contract $CELO_VALIDATOR_RG_ADDRESS
+```
+
+Create an account for each of the validator and validator group's `ReleaseGold` contract:
+
+```bash
+# On your local machine
+celocli releasegold:create-account --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS
+celocli releasegold:create-account --contract $CELO_VALIDATOR_RG_ADDRESS
+```
+
+Lock up the balance of `ReleaseGold`:
+
+```bash
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 10000000000000000000000
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 10000000000000000000000
+```
+
 ### Authorize Validator Signer Key
 
 In order to authorize our Validator signer, we need to create a proof that we have possession of the Validator signer private key. We do so by signing a message that consists of the Validator account address. To generate the proof-of-possession, run the following command:
@@ -250,8 +290,9 @@ In order to authorize our Validator signer, we need to create a proof that we ha
 # On the validator machine
 # Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
 export CELO_VALIDATOR_ADDRESS=<CELO-VALIDATOR-ADDRESS>
+export CELO_VALIDATOR_RG_ADDRESS=<YOUR-CELO-VALIDATOR-RG-ADDRESS>
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
 ```
 
 Save the signer address, public key, and proof-of-possession signature to your local machine:
@@ -267,7 +308,7 @@ Validators on the Celo network use BLS aggregated signatures to create blocks in
 
 ```bash
 # On the validator machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS --bls
 ```
 
 Save the resulting signature and public key to your local machine:
@@ -276,6 +317,13 @@ Save the resulting signature and public key to your local machine:
 # On your local machine
 export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
 export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
+```
+
+We don't want to use our `ReleaseGold` account for validating, so let's authorize the validator signing key:
+
+```bash
+# On your local machine
+celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
 ### Create and Authorize Validator Group Signer Key
@@ -291,7 +339,7 @@ In order to authorize our Validator Group signer, we need to create a proof that
 cd celo-accounts-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 export CELO_VALIDATOR_GROUP_SIGNER_ADDRESS=<YOUR-VALIDATOR-GROUP-SIGNER-ADDRESS>
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_ADDRESS
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
 ```
 
 Save the signer address, public key, and proof-of-possession signature to your local machine:
@@ -302,19 +350,57 @@ export CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-SIGNER-SIGNAT
 export CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-SIGNER-PUBLIC-KEY>
 ```
 
-When we register our Validator Group, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
-
-```bash
-# On your validator machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_ADDRESS --bls
-```
-
-Save the resulting signature and public key to your local machine:
+Authorize your validator group signing key: (**not sure if the role is validator**)
 
 ```bash
 # On your local machine
-export CELO_VALIDATOR_GROUP_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-GROUP-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_GROUP_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-SIGNER-BLS-PUBLIC-KEY>
+celocli releasegold:authorize --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_GROUP_SIGNER_ADDRESS
+```
+
+### Create and Authorize Validator and Validator Group Vote Signer Key
+
+In order to run for election, we need a vote signer key for your validator and one for your validator group.
+
+#### Validator Vote Signer Key
+
+Create a validator vote signer key:
+
+```bash
+# On your local machine
+cd celo-accounts-node
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+export CELO_VALIDATOR_VOTE_SIGNER_ADDRESS=<YOUR-VALIDATOR-VOTE-SIGNER-ADDRESS>
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
+export CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-VOTE-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_VOTE_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-VOTE-SIGNER-PUBLIC-KEY>
+```
+
+Authorize your validator vote signer key (**not sure if the role is voter**): 
+
+```bash
+# On your local machine
+celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role voter --signature 0x$CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_VOTE_SIGNER_ADDRESS
+```
+
+#### Validator Group Vote Signer Key
+
+Create a validator group vote signer key:
+
+```bash
+# On your local machine
+cd celo-accounts-node
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+export CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-ADDRESS>
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
+export CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_GROUP_VOTE_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-PUBLIC-KEY>
+```
+
+Authorize your validator group vote signer key (**not sure if the role is voter**): 
+
+```bash
+# On your local machine
+celocli releasegold:authorize --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --role voter --signature 0x$CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE --signer 0x$CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS
 ```
 
 ## Deployment Tips
