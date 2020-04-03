@@ -1,9 +1,9 @@
 import { FellowAppShape } from 'fullstack/Fellowship'
 import * as React from 'react'
 import { StyleSheet, Text } from 'react-native'
+import { ErrorMessage } from 'src/forms/ErrorDisplay'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import {
-  ErrorMessage,
   Form,
   HolisticField,
   NameErrorArea,
@@ -27,7 +27,7 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
         {({ onAltSubmit, onInput, formState }) => (
           <Form style={styles.form}>
             <GridRow tabletStyle={styles.emailNameArea} mobileStyle={styles.emailNameArea}>
-              {!isMobile && <NameErrorArea t={t} formState={formState} isMobile={isMobile} />}
+              {!isMobile && <NameErrorArea formState={formState} isMobile={isMobile} />}
               <Cell span={Spans.fourth} tabletSpan={Spans.full} style={cellStyle}>
                 <TextInput
                   style={[inputStyle, formState.errors.includes('name') && formStyles.errorBorder]}
@@ -40,7 +40,7 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
                   required={true}
                 />
               </Cell>
-              {isMobile && <NameErrorArea t={t} formState={formState} isMobile={isMobile} />}
+              {isMobile && <NameErrorArea formState={formState} isMobile={isMobile} />}
               <Cell span={Spans.fourth} tabletSpan={Spans.full} style={cellStyle}>
                 <TextInput
                   focusStyle={standardStyles.inputFocused}
@@ -63,7 +63,7 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
                   isMobile && formStyles.verticalSpace,
                 ]}
               >
-                <ErrorMessage allErrors={formState.errors} field={'email'} t={t} />
+                <ErrorMessage allErrors={formState.errors} field={'email'} />
               </Cell>
             </GridRow>
             <GridRow tabletStyle={styles.rowMobile} mobileStyle={styles.rowMobile}>

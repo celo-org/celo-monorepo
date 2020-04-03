@@ -17,7 +17,7 @@
 
 ▸ **mapFromPairs**<**A**, **B**>(`pairs`: Array‹[A, B]›): *Map‹A, B›*
 
-*Defined in [contractkit/src/explorer/base.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L24)*
+*Defined in [contractkit/src/explorer/base.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L28)*
 
 **Type parameters:**
 

@@ -281,6 +281,19 @@ export function assertEqualBN(
   )
 }
 
+export function assertAlmostEqualBN(
+  actual: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  margin: number | BN | BigNumber,
+  msg?: string
+) {
+  const diff = web3.utils.toBN(actual).sub(web3.utils.toBN(expected)).abs()
+  assert(
+    web3.utils.toBN(margin).gte(diff),
+    `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(10)}. ${msg || ''}`
+  )
+}
+
 export function assertEqualDpBN(
   value: number | BN | BigNumber,
   expected: number | BN | BigNumber,

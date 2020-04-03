@@ -8,7 +8,6 @@ module.exports = {
       tsConfig: 'tsconfig.jest.json',
     },
   },
-  setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
   moduleNameMapper: {
     '\\.(png|jpg|jpeg|gif)$': '<rootDir>/__mocks__/ImageStub.ts',
     '\\.(css|scss)$': '<rootDir>/__mocks__/ImageStub.ts',
@@ -17,5 +16,7 @@ module.exports = {
     'public/(.*)$': '<rootDir>/public/$1',
   },
   preset: 'react-native-web',
+  setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
+  setupFilesAfterEnv: ['./jestSetupAfter.ts'],
   testEnvironment: 'jsdom',
 }
