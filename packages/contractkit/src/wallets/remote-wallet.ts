@@ -89,14 +89,4 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
       throw new Error('wallet needs to be initialized first')
     }
   }
-
-  // protected getNativeKeyFor(account: Address): string {
-  //   if (account) {
-  //     const maybeDP = this.accountSigners.get(normalizeAddressWith0x(account))
-  //     if (maybeDP != null) {
-  //       return maybeDP
-  //     }
-  //   }
-  //   throw Error(`remote-wallet@getNativeKeyPathFor: Native key not found for ${account}`)
-  // }
 }
