@@ -94,7 +94,7 @@ export class FellowshipForm extends React.Component<I18nProps> {
                 />
                 <SuccessDisplay
                   isShowing={formState.isComplete}
-                  message={t('form.fellowshipSubmitted')}
+                  message={t('common:applicationSubmitted')}
                 />
               </Cell>
             </GridRow>

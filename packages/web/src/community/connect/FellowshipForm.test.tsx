@@ -62,9 +62,9 @@ describe('FellowshipForm', () => {
       queryAllByText('common:validationErrors:generic').forEach((element) =>
         expect(element).not.toBeVisible()
       )
-      await waitForElement(() => getByText('form.fellowshipSubmitted'))
+      await waitForElement(() => getByText('common:applicationSubmitted'))
 
-      expect(getByText('form.fellowshipSubmitted')).toBeTruthy()
+      expect(getByText('common:applicationSubmitted')).toBeVisible()
     })
   })
 })
