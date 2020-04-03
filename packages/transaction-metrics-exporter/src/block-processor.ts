@@ -132,7 +132,7 @@ export class BlockProcessor {
     Counters.blockheader.inc({ miner: block.miner })
 
     const blockTime = Number(block.timestamp) - Number(previousBlock.timestamp)
-    this.logEvent(LoggingCategory.Block, { ...block, blockTime })
+    this.logEvent(LoggingCategory.Block, { ...block, blockTime, blockNumber })
 
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
@@ -169,6 +169,7 @@ export class BlockProcessor {
                 ?.forEach?.((data: any) =>
                   this.logEvent(LoggingCategory.InternalTransaction, {
                     ...data,
+                    blockNumber,
                     createdContractCode: undefined,
                     init: undefined,
                   })
@@ -195,7 +196,11 @@ export class BlockProcessor {
           function: parsedTx.callDetails.function,
         })
 
-        this.logEvent(LoggingCategory.ParsedTransaction, { ...parsedTx.callDetails, hash: tx.hash })
+        this.logEvent(LoggingCategory.ParsedTransaction, {
+          ...parsedTx.callDetails,
+          hash: tx.hash,
+          blockNumber,
+        })
         try {
           for (const event of logExplorer.getKnownLogs(receipt)) {
             Counters.transactionParsedLogs.inc({
@@ -216,7 +221,7 @@ export class BlockProcessor {
     }
   }
 
-  private logEvent(name: string, details: object) {
+  private logEvent(name: string, details: any) {
     console.log(JSON.stringify({ event: name, ...details }))
   }
 
