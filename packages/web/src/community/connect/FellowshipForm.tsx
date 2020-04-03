@@ -1,14 +1,15 @@
 import { FellowAppShape } from 'fullstack/Fellowship'
 import * as React from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet } from 'react-native'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
+import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Spinner from 'src/shared/Spinner'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, standardStyles } from 'src/styles'
 
 export class FellowshipForm extends React.Component<I18nProps> {
   render() {
@@ -92,13 +93,12 @@ export class FellowshipForm extends React.Component<I18nProps> {
                   size={SIZE.big}
                   disabled={formState.isLoading}
                   align={'center'}
+                  style={standardStyles.elementalMarginBottom}
                 />
-
-                {formState.isComplete && (
-                  <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
-                    {t('form.fellowshipSubmitted')}
-                  </Text>
-                )}
+                <SuccessDisplay
+                  isShowing={formState.isComplete}
+                  message={t('form.fellowshipSubmitted')}
+                />
               </Cell>
             </GridRow>
           </Form>

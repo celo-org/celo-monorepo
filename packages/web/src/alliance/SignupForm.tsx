@@ -5,11 +5,11 @@ import { CheckboxWithLabel } from 'src/forms/CheckboxWithLabel'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
+import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import Checkmark from 'src/icons/Checkmark'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { colors, standardStyles } from 'src/styles'
+import { standardStyles } from 'src/styles'
 
 const BLANK_FORM: NewMember = {
   name: '',
@@ -87,10 +87,14 @@ export default function SignupForm() {
               onPress={onAltSubmit}
               kind={BTN.PRIMARY}
               style={styles.buttonText}
-              iconRight={formState.isComplete && <Checkmark color={colors.white} size={18} />}
               size={isMobile ? SIZE.fullWidth : SIZE.big}
             />
           </View>
+          <SuccessDisplay
+            style={styles.success}
+            isShowing={formState.isComplete}
+            message={t('common:applicationSubmitted')}
+          />
         </Form>
       )}
     </FormContainer>
@@ -111,6 +115,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
+  },
+  success: {
+    textAlign: 'center',
+    marginTop: 15,
   },
   container: { margin: 20 },
 })

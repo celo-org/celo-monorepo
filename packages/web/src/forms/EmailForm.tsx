@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { ErrorDisplay } from 'src/forms/ErrorDisplay'
 import Form, { emailIsValid } from 'src/forms/Form'
+import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { TextInput } from 'src/forms/TextInput'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, fonts, standardStyles } from 'src/styles'
 
 const NEWSLETTER_LIST = '1'
 export const DEVELOPER_LIST = '10'
@@ -16,7 +17,6 @@ interface OwnProps {
   submitText: string
   route?: string
   listID?: string
-  whenComplete: React.ReactNode
   isDarkMode?: boolean
   afterSubmit?: () => void
 }
@@ -46,7 +46,6 @@ export default React.memo(function EmailForm({
   isDarkMode,
   afterSubmit,
   submitText,
-  whenComplete,
   listID = NEWSLETTER_LIST,
   route = '/contacts',
 }: Props) {
@@ -103,7 +102,9 @@ export default React.memo(function EmailForm({
                   <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
                 )}
               </View>
-              <View style={styles.success}>{formState.isComplete && whenComplete}</View>
+            </View>
+            <View style={styles.success}>
+              <SuccessDisplay isShowing={formState.isComplete} message={t('common:shortSuccess')} />
             </View>
           </Responsive>
         )
@@ -111,14 +112,6 @@ export default React.memo(function EmailForm({
     </Form>
   )
 })
-
-export function After({ t, isDarkMode }) {
-  return (
-    <Text style={[fonts.h6, isDarkMode && textStyles.invert]}>
-      {t('common:stayConnectedThanks')}
-    </Text>
-  )
-}
 
 const borderWidth = 1
 const borderRadius = 3
