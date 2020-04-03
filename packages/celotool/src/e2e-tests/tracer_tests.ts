@@ -1,5 +1,6 @@
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { AllContracts } from '@celo/contractkit/lib/base'
+import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { traceBlock } from '@celo/contractkit/lib/utils/web3-utils'
 import { valueToBigNumber } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -23,11 +24,11 @@ import {
 } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
-const ValidatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
-const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
-const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
+const ValidatorAddress = normalizeAddress('0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95')
+const ToAddress = normalizeAddress('0xbBae99F0E1EE565404465638d40827b54D343638')
+const FromAddress = normalizeAddress('0x5409ed021d9299bf6814279a6a1411a7e866a631')
 const FromPrivateKey = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
-const ReleaseGoldAddress = '0x9CA2761bD9709449eF63d8aBa53EF0D4FF31cfEc'
+const ReleaseGoldAddress = normalizeAddress('0x9CA2761bD9709449eF63d8aBa53EF0D4FF31cfEc')
 const ReleaseGoldPrivateKey = '4f5fad325dba678797c74b936098e84aa14099c2a4a01ffedc795a5fa9ea65e3'
 const TransferAmount: BigNumber = new BigNumber(Web3.utils.toWei('1', 'ether'))
 
@@ -147,26 +148,53 @@ class AccountAssets extends DerivedAccountAssets {
   }
 }
 
+// tslint:disable-next-line:max-classes-per-file
+class Votes {
+  votes: Record<Address, BigNumber>
+
+  constructor() {
+    this.votes = {}
+  }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class Globals {
+  carbonOffsettingAddress: Address = ''
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class Assets {
+  globals: Globals
+  votes: Votes
+  accounts: Record<Address, AccountAssets>
+
+  constructor() {
+    this.globals = new Globals()
+    this.votes = new Votes()
+    this.accounts = {}
+  }
+}
+
 function getAccountAssets(
-  accounts: Record<Address, AccountAssets>,
+  assets: Assets,
   accountAddress: Address,
   filter: boolean
 ): AccountAssets | undefined {
   const address = normalizeAddress(accountAddress || '')
-  if (filter && !(address in accounts)) {
+  if (filter && !(address in assets.accounts)) {
     return undefined
   }
-  return accounts[address] || (accounts[address] = new AccountAssets())
+  return assets.accounts[address] || (assets.accounts[address] = new AccountAssets())
 }
 
 async function trackAssetTransfers(
   kit: ContractKit,
   blockNumber: number,
-  assets?: Record<Address, AccountAssets>,
+  assets?: Assets,
   filter: boolean = false,
   filterTracerStatus: string = 'success'
-): Promise<Record<Address, AccountAssets>> {
-  const ret = assets || {}
+): Promise<Assets> {
+  const ret = assets || new Assets()
 
   const goldTransfers = await traceBlock(kit.web3, blockNumber, 'cgldTransferTracer')
   for (const transaction of goldTransfers) {
@@ -305,18 +333,64 @@ async function trackAssetTransfers(
     }
   }
 
-  /*const epochNumber = await kit.getEpochNumberOfBlock(blockNumber)
-  const prevBlockEpochNumber = await kit.getEpochNumberOfBlock(blockNumber - 1
-  if (epochNumber !== prevBlockEpochNumber) {
-    const validatorRewards = await validators.getValidatorRewards(epochNumber - 1)
-    for (const reward of validatorRewards) {
-      const voterReward = await election.getVoterRewards(addr, epochNumber - 1)
+  const lockedGoldWrapper = await kit.contracts.getLockedGold()
+  const epochNumber = await kit.getEpochNumberOfBlock(blockNumber)
+  const slashed = await lockedGoldWrapper.getAccountsSlashed(epochNumber)
+  for (const slash of slashed) {
+    // can't tell if penalty was decremented from voting gold and/or locked gold
+    const reporter = getAccountAssets(ret, slash.reporter, filter)
+    if (reporter) {
+      reporter.lockedGold = reporter.lockedGold.plus(slash.reward)
     }
-  }*/
+  }
 
-  // ReleaseGold
+  const prevBlockEpochNumber = await kit.getEpochNumberOfBlock(blockNumber - 1)
+  if (epochNumber !== prevBlockEpochNumber) {
+    const validatorsWrapper = await kit.contracts.getValidators()
+    const validatorRewards = await validatorsWrapper.getValidatorRewards(epochNumber - 1)
+    for (const validatorReward of validatorRewards) {
+      const validator = getAccountAssets(
+        ret,
+        normalizeAddress(validatorReward.validator.address),
+        filter
+      )
+      if (validator) {
+        validator.lockedGold = validator.lockedGold.plus(validatorReward.validatorPayment)
+      }
+      const group = getAccountAssets(ret, normalizeAddress(validatorReward.group.address), filter)
+      if (group) {
+        group.lockedGold = group.lockedGold.plus(validatorReward.groupPayment)
+      }
+    }
 
-  // Slashing
+    const electionWrapper = await kit.contracts.getElection()
+    const voterRewards = await electionWrapper.getGroupVoterRewards(epochNumber - 1)
+    for (const voterReward of voterRewards) {
+      const group = normalizeAddress(voterReward.group.address)
+      const groupVotes = ret.votes.votes[group] || new BigNumber(0)
+      ret.votes.votes[group] = groupVotes.plus(voterReward.groupVoterPayment)
+    }
+  }
+
+  for (const accountAddress of Object.keys(ret.accounts)) {
+    const account = ret.accounts[accountAddress]
+    for (const address of Object.keys(account.releaseGold)) {
+      const asset = account.releaseGold[address]
+      const releaseGold = newReleaseGold(kit.web3, address)
+
+      const created = (
+        await releaseGold.getPastEvents('ReleaseGoldInstanceCreated', blockRange)
+      ).map((e: EventLog) => ({
+        beneficiary: normalizeAddress(e.returnValues.beneficiary),
+        atAddress: normalizeAddress(e.returnValues.atAddress),
+      }))
+      for (const create of created) {
+        assert.equal(create.beneficiary, FromAddress)
+        const balance = await kit.web3.eth.getBalance(create.atAddress)
+        asset.gold = asset.gold.plus(balance)
+      }
+    }
+  }
 
   return ret
 }
@@ -503,7 +577,7 @@ describe('tracer tests', () => {
     let toFinalBalance: BigNumber
     let receipt: TransactionReceipt
     let txn: any
-    let trackAssets: Record<Address, AccountAssets>
+    let trackAssets: Assets
     let filterTracerStatus: string
 
     describe(`transfer cGLD: ${name}`, () => {
@@ -511,8 +585,8 @@ describe('tracer tests', () => {
         this.timeout(0)
 
         const transferResult = await transferFn()
-        fromAddress = transferResult.fromAddress || FromAddress
-        toAddress = transferResult.toAddress || ToAddress
+        fromAddress = normalizeAddress(transferResult.fromAddress || FromAddress)
+        toAddress = normalizeAddress(transferResult.toAddress || ToAddress)
         sendAmount = transferResult.sendAmount || TransferAmount
         receiveAmount = transferResult.receiveAmount || TransferAmount
         sentBalance = transferResult.sentBalance || sendAmount
@@ -565,13 +639,13 @@ describe('tracer tests', () => {
 
       it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(toAddress)]?.gold || new BigNumber(0),
+          trackAssets.accounts[toAddress]?.gold || new BigNumber(0),
           new BigNumber(receiveAmount)
         ))
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(fromAddress)]?.gold || new BigNumber(0),
+          trackAssets.accounts[fromAddress]?.gold || new BigNumber(0),
           new BigNumber(-sendAmount)
         ))
     })
@@ -591,15 +665,15 @@ describe('tracer tests', () => {
     let toFinalBalance: BigNumber
     let receipt: TransactionReceipt
     let txn: any
-    let trackAssets: Record<Address, AccountAssets>
+    let trackAssets: Assets
 
     describe(`transfer cUSD: ${name}`, () => {
       before(async function(this: any) {
         this.timeout(0)
 
         const transferResult = await transferFn()
-        fromAddress = transferResult.fromAddress || FromAddress
-        toAddress = transferResult.toAddress || ToAddress
+        fromAddress = normalizeAddress(transferResult.fromAddress || FromAddress)
+        toAddress = normalizeAddress(transferResult.toAddress || ToAddress)
         sendAmount = transferResult.sendAmount || TransferAmount
         receiveAmount = transferResult.receiveAmount || TransferAmount
         sentBalance = transferResult.sentBalance || sendAmount
@@ -640,15 +714,15 @@ describe('tracer tests', () => {
           )
         ))
 
-      it(`cGLD tracer should increment the receiver's balance by the transfer amount`, () =>
+      it(`trackTransfers should increment the receiver's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(toAddress)].tokenUnits.cUSD,
+          trackAssets.accounts[toAddress].tokenUnits.cUSD,
           new BigNumber(receiveAmount)
         ))
 
-      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
+      it(`trackTransfers should decrement the sender's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(fromAddress)].tokenUnits.cUSD,
+          trackAssets.accounts[fromAddress].tokenUnits.cUSD,
           new BigNumber(-sentBalance).minus(
             goldGasCurrency
               ? new BigNumber(0)
@@ -682,27 +756,15 @@ describe('tracer tests', () => {
       }
     })
 
-    describe(`GoldToken.transfer`, () => {
-      let trackAssets: Record<Address, AccountAssets>
-      let receipt: TransactionReceipt
-
-      before(async function(this: any) {
-        this.timeout(0)
-        const tx = await goldToken.transfer(ToAddress, TransferAmount.toFixed())
-        const txResult = await tx.send()
-        receipt = await txResult.waitReceipt()
-        trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
-      })
-
-      it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackAssets[normalizeAddress(FromAddress)].gold,
-          new BigNumber(-TransferAmount)
-        ))
+    testTransferGold('with GoldToken.transfer', async () => {
+      const tx = await goldToken.transfer(ToAddress, TransferAmount.toFixed())
+      const txResult = await tx.send()
+      const receipt = await txResult.waitReceipt()
+      return { transactionHash: receipt.transactionHash }
     })
 
     describe(`Locking gold`, () => {
-      let trackAssets: Record<Address, AccountAssets>
+      let trackAssets: Assets
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -715,14 +777,11 @@ describe('tracer tests', () => {
       })
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackAssets[normalizeAddress(FromAddress)].gold,
-          new BigNumber(-TransferAmount)
-        ))
+        assertEqualBN(trackAssets.accounts[FromAddress].gold, new BigNumber(-TransferAmount)))
     })
 
     describe(`Unlocking gold`, () => {
-      let trackAssets: Record<Address, AccountAssets>
+      let trackAssets: Assets
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -734,15 +793,15 @@ describe('tracer tests', () => {
         trackAssets = await trackAssetTransfers(kit, receipt.blockNumber)
       })
 
-      it(`cGLD tracer should increment the sender's pending withdrawls by the transfer amount`, () =>
+      it(`trackTransfers should increment the sender's pending withdrawls by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(FromAddress)].lockedGoldPendingWithdrawl,
+          trackAssets.accounts[FromAddress].lockedGoldPendingWithdrawl,
           new BigNumber(TransferAmount)
         ))
     })
 
     describe(`Withdrawing unlocked gold`, () => {
-      let trackAssets: Record<Address, AccountAssets>
+      let trackAssets: Assets
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -759,14 +818,11 @@ describe('tracer tests', () => {
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackAssets[normalizeAddress(FromAddress)].gold,
-          new BigNumber(TransferAmount)
-        ))
+        assertEqualBN(trackAssets.accounts[FromAddress].gold, new BigNumber(TransferAmount)))
     })
 
     describe(`Exchanging gold for tokens`, () => {
-      let trackAssets: Record<Address, AccountAssets>
+      let trackAssets: Assets
       let receipt: TransactionReceipt
       let reserve: ReserveWrapper
 
@@ -787,20 +843,17 @@ describe('tracer tests', () => {
       })
 
       it(`cGLD tracer should decrement the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackAssets[normalizeAddress(FromAddress)].gold,
-          new BigNumber(-TransferAmount)
-        ))
+        assertEqualBN(trackAssets.accounts[FromAddress].gold, new BigNumber(-TransferAmount)))
 
       it(`cGLD tracer should increment the reserve's balance by the transfer amount`, () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(reserve.address)].gold,
+          trackAssets.accounts[normalizeAddress(reserve.address)].gold,
           new BigNumber(TransferAmount)
         ))
     })
 
     describe(`Exchanging tokens for gold`, () => {
-      let trackAssets: Record<Address, AccountAssets>
+      let trackAssets: Assets
       let receipt: TransactionReceipt
 
       before(async function(this: any) {
@@ -821,10 +874,7 @@ describe('tracer tests', () => {
       })
 
       it(`cGLD tracer should increment the sender's balance by the transfer amount`, () =>
-        assertEqualBN(
-          trackAssets[normalizeAddress(FromAddress)].gold,
-          new BigNumber(TransferAmount)
-        ))
+        assertEqualBN(trackAssets.accounts[FromAddress].gold, new BigNumber(TransferAmount)))
     })
 
     testTransferDollars('normal', async () => {
@@ -951,7 +1001,7 @@ describe('tracer tests', () => {
 
     describe(`Deploying release gold`, () => {
       let releaseGold: any
-      let trackAssets: Record<Address, AccountAssets>
+      let trackAssets: Assets
       const startAmount = new BigNumber(Web3.utils.toWei('1', 'ether'))
       const fundAmount = new BigNumber(releaseGoldGrants[0].numReleasePeriods).times(
         Web3.utils.toWei(releaseGoldGrants[0].amountReleasedPerPeriod.toString(), 'ether')
@@ -970,7 +1020,13 @@ describe('tracer tests', () => {
         )
         const endBlockNumber = await kit.web3.eth.getBlockNumber()
         console.info(`ReleaseGold deployed in blocks [${startBlockNumber}-${endBlockNumber}]`)
-        trackAssets = {}
+        trackAssets = new Assets()
+        const account = getAccountAssets(trackAssets, FromAddress, false)
+        if (account) {
+          account.releaseGold[
+            normalizeAddress(releaseGold[0].ProxyAddress)
+          ] = new ReleaseGoldAssets()
+        }
         for (let blockNumber = startBlockNumber; blockNumber <= endBlockNumber; blockNumber++) {
           trackAssets = await trackAssetTransfers(kit, blockNumber, trackAssets)
         }
@@ -978,15 +1034,26 @@ describe('tracer tests', () => {
       })
 
       it('cGLD tracer should increment beneficiary by start amount', () =>
-        assertEqualBN(trackAssets[normalizeAddress(FromAddress)]?.gold, startAmount))
+        assertEqualBN(trackAssets.accounts[FromAddress]?.gold, startAmount))
 
       it('cGLD tracer should increment ReleaseGold proxy by funding amount', () =>
-        assertEqualBN(trackAssets[normalizeAddress(releaseGold[0].ProxyAddress)]?.gold, fundAmount))
+        assertEqualBN(
+          trackAssets.accounts[normalizeAddress(releaseGold[0].ProxyAddress)]?.gold,
+          fundAmount
+        ))
 
       it('cGLD tracer should decrement funder by total', () =>
         assertEqualBN(
-          trackAssets[normalizeAddress(ReleaseGoldAddress)]?.gold,
+          trackAssets.accounts[ReleaseGoldAddress]?.gold,
           fundAmount.plus(startAmount).times(-1)
+        ))
+
+      it('trackTransfers should increment beneficiary ReleaseGold', () =>
+        assertEqualBN(
+          trackAssets.accounts[FromAddress]?.releaseGold[
+            normalizeAddress(releaseGold[0].ProxyAddress)
+          ]?.gold,
+          fundAmount
         ))
     })
 
