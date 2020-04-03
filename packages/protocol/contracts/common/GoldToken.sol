@@ -140,7 +140,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
    * @param to The account for which to mint tokens.
    * @param value The amount of cGLD to mint.
    */
-  function mint(address to, uint256 value) external onlyVm onlyWhenNotFrozen returns (bool) {
+  function mint(address to, uint256 value) external onlyVm returns (bool) {
     require(value > 0, "mint value must be > 0");
     totalSupply_ = totalSupply_.add(value);
 
