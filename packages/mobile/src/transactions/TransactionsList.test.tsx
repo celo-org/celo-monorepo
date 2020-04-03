@@ -204,18 +204,17 @@ it('renders the received data along with the standby transactions', async () => 
       exchangeRate: '1.33',
     },
   })
-  expect(standbyDollarToGold.takerAmount).toMatchObject({
+  const matcher = {
     value: new BigNumber(30),
     currencyCode: 'cGLD',
     localAmount: {
-      value: new BigNumber(
-        '26.6000000000000000000000000000000000000000000000000000000000000000000000000000133'
-      ),
+      value: '26.600000000000000000133',
       currencyCode: 'MXN',
-      exchangeRate:
-        '0.88666666666666666666666666666666666666666666666666666666666666666666666666666711',
+      exchangeRate: '0.8866666666666666666711',
     },
-  })
+  }
+
+  expect(JSON.stringify(standbyDollarToGold.takerAmount)).toEqual(JSON.stringify(matcher))
 
   // Check standby cGLD -> cUSD
   const standbyGoldToDollar = data[2]
@@ -228,18 +227,17 @@ it('renders the received data along with the standby transactions', async () => 
       exchangeRate: '1.33',
     },
   })
-  expect(standbyGoldToDollar.makerAmount).toMatchObject({
+  const match = {
     value: new BigNumber(30),
     currencyCode: 'cGLD',
     localAmount: {
-      value: new BigNumber(
-        '26.6000000000000000000000000000000000000000000000000000000000000000000000000000133'
-      ),
+      value: '26.600000000000000000133',
       currencyCode: 'MXN',
-      exchangeRate:
-        '0.88666666666666666666666666666666666666666666666666666666666666666666666666666711',
+      exchangeRate: '0.8866666666666666666711',
     },
-  })
+  }
+
+  expect(JSON.stringify(standbyGoldToDollar.makerAmount)).toEqual(JSON.stringify(match))
   expect(standbyGoldToDollar.takerAmount).toMatchObject({
     value: new BigNumber(20),
     currencyCode: 'cUSD',

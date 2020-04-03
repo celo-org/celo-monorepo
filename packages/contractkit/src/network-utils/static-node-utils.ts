@@ -1,11 +1,9 @@
-import { NETWORK_NAME } from '../contracts/network-name'
-import GoogleStorageUtils from './google-storage-utils'
-import { Logger } from './logger'
+import { GoogleStorageUtils } from './google-storage-utils'
 
 // The bucket where we store static_nodes information for all the networks.
 const StaticNodesGoogleStorageBucketName = `static_nodes`
 
-export default class StaticNodeUtils {
+export class StaticNodeUtils {
   static getStaticNodesGoogleStorageBucketName(): string {
     return StaticNodesGoogleStorageBucketName
   }
@@ -17,12 +15,6 @@ export default class StaticNodeUtils {
    * @param networkName Name of the network to fetch config for
    */
   static async getStaticNodesAsync(networkName: string): Promise<string> {
-    if (networkName !== NETWORK_NAME) {
-      Logger.error(
-        'getStaticNodesAsync',
-        `SDK was built for ${NETWORK_NAME} while the caller is requesting IP address of ${networkName}`
-      )
-    }
     const bucketName = StaticNodesGoogleStorageBucketName
     const fileName = networkName
     return GoogleStorageUtils.fetchFileFromGoogleStorage(bucketName, fileName)
