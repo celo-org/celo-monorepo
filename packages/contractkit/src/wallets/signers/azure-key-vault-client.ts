@@ -7,6 +7,9 @@ import BN, { BN } from 'bn.js'
 import { ec as EC } from 'elliptic'
 import { ecdsaRecover } from 'secp256k1'
 
+/**
+ * Provides an abstraction on Azure Key Vault for performing signing operations
+ */
 export class AzureKeyVaultClient {
   private readonly vaultName: string
   // Unique URI of the Azure Key Vault
@@ -23,8 +26,8 @@ export class AzureKeyVaultClient {
     this.vaultName = vaultName
     this.vaultUri = `https://${this.vaultName}.vault.azure.net`
     // DefaultAzureCredential supports service principal or managed identity
+    // If using a service principal, you must set the appropriate environment vars
     this.credential = new DefaultAzureCredential()
-    //this.credential = new UsernamePasswordCredential(process.env.AZURE_TENANT_ID!, process.env.AZURE_CLIENT_ID!, process.env.AZURE_USERNAME!, process.env.AZURE_PASSWORD!)
     this.keyClient = new KeyClient(this.vaultUri, this.credential)
   }
 
@@ -111,26 +114,6 @@ export class AzureKeyVaultClient {
     }
     return true
   }
-
-  // public static getAddressFromPublicKey(publicKey: BN): string {
-
-  //   const publicKeyBuffer = publicKey.toBuffer()
-  //   if(publicKeyBuffer.length != 64) {
-  //     throw new Error(`Invalid public key ${publicKey}`)
-  //   }
-  //   // Only take the lower 160bits of the hash
-  //   return ethUtil.keccak(publicKeyBuffer).slice(-20).toString('hex')
-
-  //   // const ecPublicKey2 = Nat.from(publicKey)
-  //   // // @ts-ignore-next-line
-  //   // const publicKeyString2 = '0x' + ecPublicKey2.encode('hex', false).slice(2)
-  //   // if (!BN.isBN(publicKey)) {
-  //   //   throw new Error(`Invalid public key ${publicKey}`)
-  //   // }
-  //   // const publicKeyString = ensureLeading0x(new BN(publicKey).toString("hex"))
-  //   // const publicHash = Account.keccak256(publicKeyString)
-  //   // return Account.toChecksum(ensureLeading0x(publicHash.slice(-40)))
-  // }
 
   /**
    * Returns true if the signature is in the "bottom" of the curve

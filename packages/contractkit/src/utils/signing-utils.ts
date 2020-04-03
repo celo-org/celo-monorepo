@@ -5,6 +5,8 @@ import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import { EncodedTransaction, Tx } from 'web3-core'
 // @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
+// @ts-ignore-next-line
+import { BN } from 'bn.js'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -174,4 +176,8 @@ export function recoverTransaction(rawTx: string): [Tx, string] {
   const signingDataHex = RLP.encode(signingData)
   const signer = Account.recover(getHashFromEncoded(signingDataHex), signature)
   return [celoTx, signer]
+}
+
+export function toPaddedBuffer(value: BN) {
+  return Bytes.pad(32, Bytes.fromNat('0x' + value.toString(16)))
 }

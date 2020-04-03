@@ -96,7 +96,7 @@ describe('LedgerWallet class', () => {
       try {
         wallet.getAccounts()
       } catch (e) {
-        expect(e.message).toBe('ledger-wallet needs to be initialized first')
+        expect(e.message).toBe('wallet needs to be initialized first')
       }
     })
 
@@ -104,7 +104,7 @@ describe('LedgerWallet class', () => {
       try {
         wallet.hasAccount(ACCOUNT_ADDRESS1)
       } catch (e) {
-        expect(e.message).toBe('ledger-wallet needs to be initialized first')
+        expect(e.message).toBe('wallet needs to be initialized first')
       }
     })
 
@@ -136,7 +136,7 @@ describe('LedgerWallet class', () => {
 
   describe('after initializing', () => {
     beforeEach(async () => {
-      await wallet.init({})
+      await wallet.init()
     })
 
     test('starts 5 accounts', () => {
