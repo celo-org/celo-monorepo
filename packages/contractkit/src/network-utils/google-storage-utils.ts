@@ -1,11 +1,13 @@
 import fetch from 'cross-fetch'
-import { Logger } from './logger'
+import debugFactory from 'debug'
+
+const debug = debugFactory('kit:network-utils:google-storage-utils')
 
 const TAG = 'google-storage-utils'
 
-export default class GoogleStorageUtils {
+export class GoogleStorageUtils {
   static async fetchFileFromGoogleStorage(bucketName: string, fileName: string): Promise<string> {
-    Logger.debug(
+    debug(
       `google-storage-utils@fetchFileFromGoogleStorage`,
       `Downloading file ${fileName} from ${bucketName}...`
     )
@@ -14,22 +16,22 @@ export default class GoogleStorageUtils {
     try {
       response = await fetch(url)
     } catch (error) {
-      Logger.info(
+      debug(
         `google-storage-utils@fetchFileFromGoogleStorage`,
         `${TAG} Fetch failed with error "${error}"`
       )
       throw error
     }
-    Logger.debug(
+    debug(
       `google-storage-utils@fetchFileFromGoogleStorage`,
       `${TAG} response for ${url} is ${JSON.stringify(response)}`
     )
 
     if (response.status >= 400) {
-      Logger.debug(`google-storage-utils@fetchFileFromGoogleStorage`, `Failed to fetch data`)
+      debug(`google-storage-utils@fetchFileFromGoogleStorage`, `Failed to fetch data`)
       throw new Error(await response.text())
     } else {
-      Logger.debug(`google-storage-utils@fetchFileFromGoogleStorage`, `Successfully fetched data`)
+      debug(`google-storage-utils@fetchFileFromGoogleStorage`, `Successfully fetched data`)
       return response.text()
     }
   }

@@ -843,10 +843,11 @@ contract Validators is
 
   /**
    * @notice Queues an update to a validator group's commission.
+   * If there was a previously scheduled update, that is overwritten.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members. Must be in the range [0, 1.0].
    */
-  function queueCommissionUpdate(uint256 commission) external {
+  function setNextCommissionUpdate(uint256 commission) external {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];

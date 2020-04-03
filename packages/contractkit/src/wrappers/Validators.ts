@@ -38,6 +38,8 @@ export interface ValidatorGroup {
   commission: BigNumber
   nextCommission: BigNumber
   nextCommissionBlock: BigNumber
+  lastSlashed: BigNumber
+  slashingMultiplier: BigNumber
 }
 
 export interface ValidatorReward {
@@ -58,6 +60,7 @@ export interface ValidatorsConfig {
   validatorLockedGoldRequirements: LockedGoldRequirements
   maxGroupSize: BigNumber
   membershipHistoryLength: BigNumber
+  slashingMultiplierResetPeriod: BigNumber
 }
 
 export interface GroupMembership {
@@ -80,9 +83,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members. Must be in the range [0, 1.0].
    */
-  queueCommissionUpdate: (commission: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+  setNextCommissionUpdate: (commission: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
-    this.contract.methods.queueCommissionUpdate,
+    this.contract.methods.setNextCommissionUpdate,
     tupleParser(valueToFixidityString)
   )
 
@@ -130,6 +133,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   /**
+   * Returns the reset period for slashing multiplier.
+   */
+  getSlashingMultiplierResetPeriod = proxyCall(
+    this.contract.methods.slashingMultiplierResetPeriod,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ValidatorsConfig> {
@@ -138,12 +150,14 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getGroupLockedGoldRequirements(),
       this.contract.methods.maxGroupSize().call(),
       this.contract.methods.membershipHistoryLength().call(),
+      this.getSlashingMultiplierResetPeriod(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
       maxGroupSize: valueToBigNumber(res[2]),
       membershipHistoryLength: valueToBigNumber(res[3]),
+      slashingMultiplierResetPeriod: res[4],
     }
   }
 
@@ -277,6 +291,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
         0
       ),
       affiliates: affiliates.map((v) => v.address),
+      slashingMultiplier: fromFixed(new BigNumber(res[5])),
+      lastSlashed: valueToBigNumber(res[6]),
     }
   }
 
@@ -422,10 +438,20 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
 
+  /**
+   * Removes a validator from the group for which it is a member.
+   * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
+   */
   forceDeaffiliateIfValidator = proxySend(
     this.kit,
     this.contract.methods.forceDeaffiliateIfValidator
   )
+
+  /**
+   * Resets a group's slashing multiplier if it has been >= the reset period since
+   * the last time the group was slashed.
+   */
+  resetSlashingMultiplier = proxySend(this.kit, this.contract.methods.resetSlashingMultiplier)
 
   /**
    * Adds a member to the end of a validator group's list of members.

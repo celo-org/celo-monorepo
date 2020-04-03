@@ -1767,7 +1767,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#queueCommissionUpdate()', () => {
+  describe('#setNextCommissionUpdate()', () => {
     describe('when the commission is different', () => {
       const newCommission = commission.plus(1)
       const group = accounts[0]
@@ -1777,7 +1777,7 @@ contract('Validators', (accounts: string[]) => {
 
         beforeEach(async () => {
           await registerValidatorGroup(group)
-          resp = await validators.queueCommissionUpdate(newCommission)
+          resp = await validators.setNextCommissionUpdate(newCommission)
         })
 
         it('should NOT set the validator group commission', async () => {
@@ -1807,13 +1807,13 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the commission is the same', () => {
         it('should revert', async () => {
-          await assertRevert(validators.queueCommissionUpdate(commission))
+          await assertRevert(validators.setNextCommissionUpdate(commission))
         })
       })
 
       describe('when the commission is greater than one', () => {
         it('should revert', async () => {
-          await assertRevert(validators.queueCommissionUpdate(fixed1.plus(1)))
+          await assertRevert(validators.setNextCommissionUpdate(fixed1.plus(1)))
         })
       })
     })
@@ -1830,7 +1830,7 @@ contract('Validators', (accounts: string[]) => {
       let resp: any
 
       beforeEach(async () => {
-        await validators.queueCommissionUpdate(newCommission)
+        await validators.setNextCommissionUpdate(newCommission)
         await mineBlocks(commissionUpdateDelay.toNumber(), web3)
         resp = await validators.updateCommission()
       })
@@ -1855,7 +1855,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when activationBlock has NOT passed', () => {
       it('should revert', async () => {
-        await validators.queueCommissionUpdate(newCommission)
+        await validators.setNextCommissionUpdate(newCommission)
         await assertRevert(validators.updateCommission())
       })
     })
@@ -1868,7 +1868,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when try to apply an already applied Commission', () => {
       it('should revert', async () => {
-        await validators.queueCommissionUpdate(newCommission)
+        await validators.setNextCommissionUpdate(newCommission)
         await mineBlocks(commissionUpdateDelay.toNumber(), web3)
         await validators.updateCommission()
         await assertRevert(validators.updateCommission())
