@@ -228,6 +228,7 @@ docker run \
       --verbosity=${geth_verbosity} \
       --ethstats=${node_name}@${ethstats_host} \
       --metrics \
+      --pprof \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       $ADDITIONAL_GETH_FLAGS"
 
