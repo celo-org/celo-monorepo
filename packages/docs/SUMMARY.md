@@ -11,7 +11,7 @@
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
-- [Glossary](getting-started/glossary.md)
+- [Glossary](GLOSSARY.md)
 
 ## Operations Manual
 
@@ -65,6 +65,7 @@
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
+  - [Celo Truffle Box](developer-resources/walkthroughs/celo-truffle-box.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview]()
   <!-- - [The Celo Protocol]()
@@ -141,6 +142,12 @@
       - [ContractKit](developer-resources/contractkit/reference/classes/_kit_.contractkit.md)
       - [KitOptions](developer-resources/contractkit/reference/interfaces/_kit_.kitoptions.md)
       - [NetworkConfig](developer-resources/contractkit/reference/interfaces/_kit_.networkconfig.md)
+      - [network-utils/genesis-block-utils](developer-resources/contractkit/reference/modules/_network_utils_genesis_block_utils_.md)
+      - [GenesisBlockUtils](developer-resources/contractkit/reference/classes/_network_utils_genesis_block_utils_.genesisblockutils.md)
+      - [network-utils/google-storage-utils](developer-resources/contractkit/reference/modules/_network_utils_google_storage_utils_.md)
+      - [GoogleStorageUtils](developer-resources/contractkit/reference/classes/_network_utils_google_storage_utils_.googlestorageutils.md)
+      - [network-utils/static-node-utils](developer-resources/contractkit/reference/modules/_network_utils_static_node_utils_.md)
+      - [StaticNodeUtils](developer-resources/contractkit/reference/classes/_network_utils_static_node_utils_.staticnodeutils.md)
       - [providers/celo-provider](developer-resources/contractkit/reference/modules/_providers_celo_provider_.md)
       - [CeloProvider](developer-resources/contractkit/reference/classes/_providers_celo_provider_.celoprovider.md)
       - [test-utils/PromiEventStub](developer-resources/contractkit/reference/modules/_test_utils_promieventstub_.md)
@@ -267,6 +274,9 @@
       - [ProposalBuilder](developer-resources/contractkit/reference/classes/_governance_proposals_.proposalbuilder.md)
       - [IdentityMetadataWrapper](developer-resources/contractkit/reference/classes/_identity_metadata_.identitymetadatawrapper.md)
       - [ContractKit](developer-resources/contractkit/reference/classes/_kit_.contractkit.md)
+      - [GenesisBlockUtils](developer-resources/contractkit/reference/classes/_network_utils_genesis_block_utils_.genesisblockutils.md)
+      - [GoogleStorageUtils](developer-resources/contractkit/reference/classes/_network_utils_google_storage_utils_.googlestorageutils.md)
+      - [StaticNodeUtils](developer-resources/contractkit/reference/classes/_network_utils_static_node_utils_.staticnodeutils.md)
       - [CeloProvider](developer-resources/contractkit/reference/classes/_providers_celo_provider_.celoprovider.md)
       - [DefaultRpcCaller](developer-resources/contractkit/reference/classes/_utils_rpc_caller_.defaultrpccaller.md)
       - [TxParamsNormalizer](developer-resources/contractkit/reference/classes/_utils_tx_params_normalizer_.txparamsnormalizer.md)
