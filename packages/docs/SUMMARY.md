@@ -65,6 +65,7 @@
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
+  - [Celo Truffle Box](developer-resources/walkthroughs/celo-truffle-box.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview]()
   <!-- - [The Celo Protocol]()

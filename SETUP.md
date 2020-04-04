@@ -218,8 +218,8 @@ source ~/.bashrc
 With Rust binaries in your PATH you should be able to run:
 
 ```bash
-rustup install 1.36.0
-rustup default 1.36.0
+rustup install 1.42.0
+rustup default 1.42.0
 ```
 
 If you're building Geth for Android, you require an NDK that has a cross-compilation toolchain. You can get it by appropriately defining the relevant environment variables, e.g.:
