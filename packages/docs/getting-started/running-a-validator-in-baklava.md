@@ -18,19 +18,19 @@ The setup of the Baklava network will differ from previous Stake Off deployments
 The deployment timeline is as follows (all dates are subject to change):
 
 * 3/31: Docker image with genesis block distributed
-* 3/31 - 4/6: Infrastructure setup
-* 4/6 16:00 UTC: Block production begins
-* 4/6: Celo Core Contracts and `ReleaseGold` contracts are deployed
-* 4/7: Governance proposal to start Validator rewards
-* 4/8: Governance proposal to unfreeze Celo Gold voter rewards
-* 4/9: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
-* 4/10: Faucet requests for non-genesis Validators accepted
+* 3/31 - 4/7: Infrastructure setup
+* 4/7 16:00 UTC: Block production begins
+* 4/7: Celo Core Contracts and `ReleaseGold` contracts are deployed
+* 4/8: Governance proposal to start Validator rewards
+* 4/9: Governance proposal to unfreeze Celo Gold voter rewards
+* 4/10: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
+* 4/13: Faucet requests for non-genesis Validators accepted
 
 {% hint style="info" %}
 A [timeline](https://celo.org/#timeline) of the Celo project is available to provide further context.
 {% endhint %}
 
-## Setup for Genesis Validators (Before 4/6)
+## Setup for Genesis Validators (Before 4/7)
 
 **If you provided your Validator signer address and BLS public key for genesis, the community is relying on your Validator to get the network started!**
 
@@ -153,7 +153,7 @@ docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 
 
 The `networkid` parameter value of `40120` indicates we are connecting to the new Baklava network.
 
-At this point your proxy should be peering with other nodes as the come online. Your Validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 6th at 1600 UTC, the Validator engine will start up, and after a couple of minutes to establish the Validator overlay network, block production will begin.
+At this point your proxy should be peering with other nodes as the come online. Your Validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 7th at 1600 UTC, the Validator engine will start up, and after a couple of minutes to establish the Validator overlay network, block production will begin.
 
 ## After Block Production Begins
 
