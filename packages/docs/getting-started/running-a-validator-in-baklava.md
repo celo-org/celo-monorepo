@@ -46,7 +46,7 @@ First we are going to setup the main environment variables related with the new 
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=33120
+export NETWORK_ID=40120
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
 
@@ -60,7 +60,11 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-testnet/celo-node:baklava` image is built from commit [`c82411259ac7a0b44a4705b7c5f6289f6e8292b2`](https://github.com/celo-org/celo-blockchain/commit/c82411259ac7a0b44a4705b7c5f6289f6e8292b2) and contains the [genesis block](https://storage.cloud.google.com/genesis_blocks/baklava) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Geth binary.
+The `us.gcr.io/celo-testnet/celo-node:baklava` image is built from commit [`c38f2fd30d2d7c4716a5181c9645121709b9004e`](https://github.com/celo-org/celo-blockchain/commit/c38f2fd30d2d7c4716a5181c9645121709b9004e) and contains the [genesis block](https://storage.cloud.google.com/genesis_blocks/baklava) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Geth binary.
+
+{% hint style="warning" %}
+Upgrading a node with version prior to `0.10.0`, released on April 4th, requires reset of the chain data. One way to accomplish this is by running `docker run -it -v $PWD:/root/.celo $CELO_IMAGE --nousb removedb`
+{% endhint %}
 
 ### Networking requirements
 
@@ -147,7 +151,7 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats.celo-testnet.org
 ```
 
-The `networkid` parameter value of `33120` indicates we are connecting to the new Baklava network.
+The `networkid` parameter value of `40120` indicates we are connecting to the new Baklava network.
 
 At this point your proxy should be peering with other nodes as the come online. Your Validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 6th at 1600 UTC, the Validator engine will start up, and after a couple of minutes to establish the Validator overlay network, block production will begin.
 

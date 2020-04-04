@@ -23,7 +23,7 @@ First we are going to setup the environment variables required for `Baklava` net
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=33120
+export NETWORK_ID=40120
 ```
 
 ## Pull the Celo Docker image
