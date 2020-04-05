@@ -48,6 +48,7 @@ const DefaultConfig = {
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
+    frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
@@ -204,12 +205,50 @@ const DefaultConfig = {
 }
 
 const NetworkConfigs = {
+  development: {
+    downtimeSlasher: {
+      slashableDowntime: 60, // epoch length is 100 for unit tests
+    },
+    election: {
+      minElectableValidators: '10',
+      frozen: false,
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    reserve: {
+      initialBalance: 100000000,
+      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+    },
+    reserveSpenderMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    stableToken: {
+      oracles: [network.from],
+      frozen: false,
+    },
+  },
   testing: {
     downtimeSlasher: {
       slashableDowntime: 6,
     },
     election: {
       minElectableValidators: '1',
+      frozen: false,
     },
     epochRewards: {
       frozen: false,
