@@ -24,11 +24,7 @@ export function ContactSyncBanner() {
     if (!isSynced) {
       return
     }
-    // Hide banner immediately if not loading contacts
-    if (!isLoadingContacts) {
-      setHasSynced(true)
-      return
-    }
+
     const timer = setTimeout(() => {
       setHasSynced(true)
     }, 3000)
