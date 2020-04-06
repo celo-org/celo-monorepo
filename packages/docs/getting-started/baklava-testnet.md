@@ -19,5 +19,5 @@ Your use of the Baklava Testnet is subject to the [Baklava Testnet Disclaimer](.
 ## Useful links
 
 - [Register for The Great Celo Stake Off](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform) - to receive an allocation Baklava Testnet Units
-- [Baklava Network Status](https://baklava-ethstats.celo-testnet.org) - to check the current availability of the testnet
+- [Baklava Network Status](https://baklava-celostats.celo-testnet.org) - to check the current availability of the testnet
 - [Baklava Network Block Explorer](https://baklava-blockscout.celo-testnet.org) - explore the history of the blockchain and view transaction details

@@ -149,6 +149,10 @@ export const getEnodesWithExternalIPAddresses = async (namespace: string) => {
   return getEnodesWithIpAddresses(namespace, true)
 }
 
+export function getPrivateTxNodeClusterIP(celoEnv: string) {
+  return retrieveClusterIPAddress('service', 'tx-nodes-private', celoEnv)
+}
+
 export const fetchPassword = (passwordFile: string) => {
   if (!fs.existsSync(passwordFile)) {
     console.error(`Password file at ${passwordFile} does not exists!`)
