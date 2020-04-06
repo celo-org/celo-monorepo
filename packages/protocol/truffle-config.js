@@ -15,6 +15,7 @@ const BAKLAVASTAGING_NETWORKID = 31416
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
+const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const ALFAJORESSTAGING_FROM = '0xf4314cb9046bece6aa54bb9533155434d0c76909'
 const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
 const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
@@ -110,6 +111,10 @@ const networks = {
   integration: {
     ...defaultConfig,
     from: INTEGRATION_FROM,
+  },
+  testing: {
+    ...defaultConfig,
+    from: INTEGRATION_TESTING_FROM,
   },
   argentinastaging: freeGasConfig,
   argentinaproduction: freeGasConfig,
