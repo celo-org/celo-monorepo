@@ -11,7 +11,7 @@
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
-- [Glossary](getting-started/glossary.md)
+- [Glossary](GLOSSARY.md)
 
 ## Operations Manual
 
