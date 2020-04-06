@@ -43,7 +43,7 @@ const DefaultConfig = {
     slashableDowntime: (12 * HOUR) / 5, // ~12 hours
   },
   election: {
-    minElectableValidators: '50',
+    minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
@@ -72,7 +72,7 @@ const DefaultConfig = {
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 20,
-    updateFrequency: 5 * MINUTE, // 5 minutes
+    updateFrequency: 5 * MINUTE,
     minimumReports: 5,
     frozen: true,
   },
@@ -92,7 +92,7 @@ const DefaultConfig = {
     referendumStageDuration: 2 * DAY, // Change to 1 week once mainnet activated
     executionStageDuration: 3 * DAY,
     minDeposit: 100, // 100 cGLD
-    participationBaseline: 0, // Start with no participation requirements, let the protocol adjust
+    participationBaseline: 5 / 100, // Start with low participation requirements, let the protocol adjust
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
@@ -196,7 +196,8 @@ const DefaultConfig = {
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 
-    // We register a number of C-Labs groups to contain an initial set of validators to run the network.
+    // Register a number of cLabs groups to contain an initial set of validators to run test
+    // networks.
     validatorKeys: [],
     attestationKeys: [],
     groupName: 'C-Labs',
