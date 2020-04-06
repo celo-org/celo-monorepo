@@ -1,12 +1,13 @@
 import { debounce } from 'debounce'
 import FuzzySearch from 'fuzzy-search'
 import * as React from 'react'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import IconShowcase from 'src/brandkit/common/Showcase'
 import Search, { useSearch } from 'src/brandkit/Search'
 import { AssetTypes } from 'src/brandkit/tracking'
 import { IconData, Icons } from './IconsPage'
+import { fonts } from 'src/styles'
 
 function useFilteredResult(query: string, initial) {
   const [result, setResult] = React.useState(initial)
@@ -24,13 +25,16 @@ function useFilteredResult(query: string, initial) {
 export function Explorer({ icons }: Icons) {
   const { query, onQueryChange } = useSearch()
 
-  const result = useFilteredResult(query, icons)
+  const results = useFilteredResult(query, icons)
 
   return (
     <View style={{ minHeight: '100vh' }}>
       <Search value={query} onChange={onQueryChange} />
+      {query ? (
+        <Text style={[fonts.micro, brandStyles.gap]}>{results.length} Icons Found</Text>
+      ) : null}
       <View style={brandStyles.tiling}>
-        {result.map((icon) => (
+        {results.map((icon) => (
           <IconShowcase
             key={icon.name}
             ratio={1}
