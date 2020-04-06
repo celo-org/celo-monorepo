@@ -177,6 +177,10 @@ An interaction that takes place solely through a transaction being executed on t
 
 The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof of Stake mechanism](../celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
 
+## RC1
+
+RC1, which stands for release candidate 1, is the first network which has the potential of the Celo mainnet. Should the community decide it is required, RC1 may be replaced by subsequent release candidate until it is the decided that the final version is ready to be declared the mainnet.
+
 ## Savings Circle
 
 A common practice in societies without easy access to banking (source); a peer-to-peer savings and loan group.
