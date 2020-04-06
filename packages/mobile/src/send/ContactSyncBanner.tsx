@@ -24,7 +24,6 @@ export function ContactSyncBanner() {
     if (!isSynced) {
       return
     }
-
     const timer = setTimeout(() => {
       setHasSynced(true)
     }, 3000)
