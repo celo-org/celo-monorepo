@@ -260,6 +260,11 @@ const NetworkConfigs = {
     },
     epochRewards: {
       frozen: false,
+      targetVotingYieldParameters: {
+        initial: 0.00016,
+        max: 0.0005,
+        adjustmentFactor: 0.1,
+      },
     },
     exchange: {
       frozen: false,
