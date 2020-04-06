@@ -29,9 +29,9 @@ import {
 import RecipientItem from 'src/recipients/RecipientItem'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
+import { ContactSyncBanner } from 'src/send/ContactSyncBanner'
 import Logger from 'src/utils/Logger'
 import { assertUnreachable } from 'src/utils/typescript'
-import { ContactSyncBanner } from 'src/send/ContactSyncBanner'
 
 interface Section {
   key: string
