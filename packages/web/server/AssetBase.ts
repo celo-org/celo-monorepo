@@ -38,7 +38,7 @@ async function fetchAssets(sheet: AssetSheet) {
       sort: [{ field: 'Order', direction: 'asc' }],
     })
     .eachPage((records, fetchNextPage) => {
-      records.forEach((r) => assets.push(normalize(r.fields)))
+      records.forEach((r) => assets.push(normalize(r.fields, r.id)))
       fetchNextPage()
     })
 
@@ -52,12 +52,13 @@ function getAirtable(sheet: AssetSheet): Table<Fields> {
 const IS_APROVED = 'Approved=1'
 const TERMS_SIGNED = 'Terms=1'
 
-function normalize(asset: Fields) {
+function normalize(asset: Fields, id: string) {
   return {
     name: asset.Name,
     description: asset.Description,
     preview: getPreview(asset),
     uri: getURI(asset),
+    id,
   }
 }
 

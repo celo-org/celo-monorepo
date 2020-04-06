@@ -29,6 +29,11 @@ export default React.memo(function Showcase({
   size,
   ratio,
 }: Props) {
+  const trackingData = React.useMemo(() => ({ name: `${name} ${assetType}`, type: assetType }), [
+    name,
+    assetType,
+  ])
+  const titleStyle = React.useMemo(() => [fonts.h6, styles.title], [styles.title])
   return (
     <View
       style={[
@@ -58,10 +63,10 @@ export default React.memo(function Showcase({
       {/* )}
       </FadeIn> */}
       <View style={styles.text}>
-        <Text style={[fonts.h6, styles.title]}>{name}</Text>
+        <Text style={titleStyle}>{name}</Text>
         <Text style={fonts.legal}>{description}</Text>
       </View>
-      <DownloadButton uri={uri} trackingData={{ name: `${name} ${assetType}`, type: assetType }} />
+      <DownloadButton uri={uri} trackingData={trackingData} />
     </View>
   )
 })

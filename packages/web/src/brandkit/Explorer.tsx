@@ -1,6 +1,6 @@
 import { debounce } from 'debounce'
-import * as React from 'react'
 import FuzzySearch from 'fuzzy-search'
+import * as React from 'react'
 import { View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import IconShowcase from 'src/brandkit/common/Showcase'
@@ -48,8 +48,10 @@ export function Explorer({ icons }: Icons) {
   )
 }
 
+const fields = ['name', 'description', 'array']
+
 function search(query: string, icons: IconData[]) {
-  const searcher = new FuzzySearch(icons, ['name', 'description'])
+  const searcher = new FuzzySearch(icons, fields)
   const result = searcher.search(query)
   return result
 }
