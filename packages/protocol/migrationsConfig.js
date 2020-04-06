@@ -7,6 +7,14 @@ const path = require('path')
 const lodash = require('lodash')
 const web3 = require('web3')
 
+const argv = minimist(process.argv.slice(2), {
+  default: {
+    build_directory: path.join(__dirname, 'build'),
+  },
+  string: ['migration_override', 'build_directory', 'network'],
+})
+const network = require('./truffle-config.js').networks[argv.network]
+
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
@@ -327,13 +335,6 @@ const linkedLibraries = {
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
-
-const argv = minimist(process.argv.slice(2), {
-  default: {
-    build_directory: path.join(__dirname, 'build'),
-  },
-  string: ['migration_override', 'build_directory', 'network'],
-})
 
 const config = lodash.cloneDeep(DefaultConfig)
 

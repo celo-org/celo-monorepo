@@ -4,7 +4,8 @@ const glob = require('glob-fs')({
 })
 const { exec, waitForPortOpen } = require('./lib/test-utils')
 const minimist = require('minimist')
-const network = require('./truffle-config.js').networks.development
+const networkName = 'development'
+const network = require('./truffle-config.js').networks[networkName]
 
 const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * seconds))
 
@@ -61,6 +62,8 @@ async function test() {
     }
     if (argv.coverage) {
       testArgs = testArgs.concat(['--network', 'coverage'])
+    } else {
+      testArgs = testArgs.concat(['--network', networkName])
     }
     if (argv.gas) {
       testArgs = testArgs.concat(['--color', '--gas'])
