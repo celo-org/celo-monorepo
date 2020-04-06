@@ -48,7 +48,7 @@ export function Explorer({ icons }: Icons) {
   )
 }
 
-const fields = ['name', 'description', 'array']
+const fields = ['name', 'description', 'tags']
 
 function search(query: string, icons: IconData[]) {
   const searcher = new FuzzySearch(icons, fields)
