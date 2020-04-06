@@ -75,7 +75,6 @@ export interface KitOptions {
 interface AccountBalance {
   gold: BigNumber
   usd: BigNumber
-  total: BigNumber
   lockedGold: BigNumber
   pending: BigNumber
 }
@@ -124,10 +123,6 @@ export class ContractKit {
       gold: goldBalance,
       lockedGold: lockedBalance,
       usd: dollarBalance,
-      total: goldBalance
-        .plus(lockedBalance)
-        .plus(await exchange.quoteUsdSell(dollarBalance))
-        .plus(pending),
       pending,
     }
   }
