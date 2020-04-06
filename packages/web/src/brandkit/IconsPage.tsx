@@ -46,6 +46,8 @@ export interface IconData {
   name: string
   preview: string
   uri: string
+  tags: string[]
+  id: string
 }
 
 function Overview({ icons }) {

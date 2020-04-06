@@ -1,13 +1,14 @@
 import { debounce } from 'debounce'
 import FuzzySearch from 'fuzzy-search'
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
 import IconShowcase from 'src/brandkit/common/Showcase'
 import Search, { useSearch } from 'src/brandkit/Search'
 import { AssetTypes } from 'src/brandkit/tracking'
-import { IconData, Icons } from './IconsPage'
+import { NameSpaces, useTranslation } from 'src/i18n'
 import { fonts } from 'src/styles'
+import { IconData, Icons } from './IconsPage'
 
 function useFilteredResult(query: string, initial) {
   const [result, setResult] = React.useState(initial)
@@ -24,33 +25,43 @@ function useFilteredResult(query: string, initial) {
 
 export function Explorer({ icons }: Icons) {
   const { query, onQueryChange } = useSearch()
-
-  const results = useFilteredResult(query, icons)
-
+  const { t } = useTranslation(NameSpaces.brand)
+  const results = useFilteredResult(query, icons).map((result) => result.id)
+  const visibleIcons = new Set(results)
   return (
     <View style={{ minHeight: '100vh' }}>
       <Search value={query} onChange={onQueryChange} />
       {query ? (
-        <Text style={[fonts.micro, brandStyles.gap]}>{results.length} Icons Found</Text>
+        <Text style={[fonts.micro, brandStyles.gap]}>
+          {t('icons.matching', { count: results.length })}
+        </Text>
       ) : null}
       <View style={brandStyles.tiling}>
-        {results.map((icon) => (
-          <IconShowcase
-            key={icon.name}
-            ratio={1}
-            description={icon.description}
-            name={icon.name}
-            preview={icon.preview}
-            uri={icon.uri}
-            loading={false}
-            assetType={AssetTypes.icon}
-            size={160}
-          />
+        {icons.map((icon) => (
+          <View key={icon.id} style={!visibleIcons.has(icon.id) && styles.offScreen}>
+            <IconShowcase
+              key={icon.name}
+              ratio={1}
+              description={icon.description}
+              name={icon.name}
+              preview={icon.preview}
+              uri={icon.uri}
+              loading={false}
+              assetType={AssetTypes.icon}
+              size={160}
+            />
+          </View>
         ))}
       </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  offScreen: {
+    display: 'none',
+  },
+})
 
 const fields = ['name', 'description', 'tags']
 
