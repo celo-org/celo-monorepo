@@ -26,7 +26,7 @@
 
 • **balanceStateData**: *[BalanceState](_wrappers_releasegold_.balancestate.md)*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L29)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L44)*
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 • **beneficiary**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L20)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L35)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **canValidate**: *boolean*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L24)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L39)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **canVote**: *boolean*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L25)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L40)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **isRevoked**: *boolean*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L27)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L42)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **liquidityProvisionMet**: *boolean*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L23)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L38)*
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 • **refundAddress**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L22)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L37)*
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 • **releaseGoldWrapperAddress**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L19)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L34)*
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 • **releaseOwner**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L21)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L36)*
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 • **releaseSchedule**: *ReleaseSchedule*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L26)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L41)*
 
 ___
 
@@ -106,4 +106,4 @@ ___
 
 • **revokedStateData**: *RevocationInfo*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L28)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L43)*
