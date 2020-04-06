@@ -126,6 +126,7 @@ metadata:
   labels:
     component: {{ .component_label }}
 spec:
+  sessionAffinity: ClientIP
   ports:
   - port: 8545
     name: rpc
@@ -261,22 +262,19 @@ spec:
           PROXY_ALLOW_PRIVATE_IP_FLAG=""
           [[ "$GETH_DEBUG" == "true" ]] && PROXY_ALLOW_PRIVATE_IP_FLAG="--proxy.allowprivateip"
 
-          RPC_APIS="eth,net,web3,debug"
-          {{- if .proxy }}
-          VALIDATOR_HEX_ADDRESS=$(cat /root/.celo/validator_address)
-          ADDITIONAL_FLAGS=" --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }} $PROXY_ALLOW_PRIVATE_IP_FLAG"
-          {{- else }}
-          ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
-          RPC_APIS=${RPC_APIS},txpool
-          {{- end -}}
+          RPC_APIS={{ .rpc_apis }}
+
+          {{ if .proxy }}
+          VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
+          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503 $PROXY_ALLOW_PRIVATE_IP_FLAG"
+          {{ end }}
           {{- if .unlock | default false }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
           {{- end -}}
           {{- if .expose }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=* --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS}"
-          {{ else }}
-          #ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 127.0.0.1 --rpcapi=${RPC_APIS} --ws --wsaddr 127.0.0.1 --wsapi=${RPC_APIS}"
           {{ end -}}
+
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --light.serve 90 \
