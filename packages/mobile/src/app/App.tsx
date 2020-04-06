@@ -71,7 +71,6 @@ export class App extends React.Component {
 
   render() {
     return (
-      // @ts-ignore Apollo doesn't like the typings
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
           <SafeAreaProvider>
