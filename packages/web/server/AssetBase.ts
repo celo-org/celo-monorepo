@@ -19,6 +19,7 @@ interface Fields extends FieldSet {
 }
 
 export enum AssetSheet {
+  Tags = 'Tags',
   Icons = 'Icons',
   Illustrations = 'Illustrations',
   AbstractGraphics = 'Abstract Graphics',
