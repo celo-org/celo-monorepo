@@ -55,7 +55,6 @@
     "@sentry/react-native": "^1.3.3",
     "@ungap/url-search-params": "^0.1.2",
     "Base64": "^1.0.1",
-    "add": "^2.0.6",
     "apollo-boost": "^0.3.1",
     "apollo-cache-persist": "^0.1.1",
     "bignumber.js": "^9.0.0",
@@ -136,8 +135,7 @@
     "utf8": "^3.0.0",
     "victory-native": "^34.0.0",
     "vm-browserify": "^1.0.1",
-    "web3": "1.2.4",
-    "yarn": "^1.22.4"
+    "web3": "1.2.4"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
