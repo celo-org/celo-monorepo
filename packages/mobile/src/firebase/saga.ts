@@ -1,5 +1,5 @@
 import firebase from '@react-native-firebase/app'
-import _database, { FirebaseDatabaseTypes } from '@react-native-firebase/database'
+import { FirebaseDatabaseTypes } from '@react-native-firebase/database'
 import { eventChannel } from 'redux-saga'
 import {
   all,

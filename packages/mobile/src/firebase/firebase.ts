@@ -1,6 +1,6 @@
 import firebase, { ReactNativeFirebase } from '@react-native-firebase/app'
-import _database from '@react-native-firebase/database'
-import _messaging from '@react-native-firebase/messaging'
+import '@react-native-firebase/database'
+import '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
 // import { Notification, NotificationOpen } from 'react-native-firebase/notifications'

@@ -1,6 +1,13 @@
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, "9.0"
+
+# Allow using RNFirebase as static frameworks
+# https://rnfirebase.io/#allow-ios-static-frameworks
+# Otherwise we get the following error:
+# `The 'Pods-celo' target has transitive dependencies that include statically linked binaries [...]`
+$RNFirebaseAsStaticFramework = true
+
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
 target "celo" do
