@@ -1,8 +1,22 @@
 ---
-description: Transfers reserve gold to other reserve address
+description: Shows information about reserve
 ---
 
 ## Commands
+
+### Status
+
+Shows information about reserve
+
+```
+USAGE
+  $ celocli reserve:status
+
+EXAMPLE
+  status
+```
+
+_See code: [packages/cli/src/commands/reserve/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/reserve/status.ts)_
 
 ### Transfergold
 

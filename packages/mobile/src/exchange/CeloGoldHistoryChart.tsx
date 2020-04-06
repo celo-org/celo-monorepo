@@ -224,8 +224,8 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
             {displayLocalCurrency(currentGoldRateInLocalCurrency)}
           </Text>
           <Text style={styles.goldPriceChange}>
-            {rateChange.gt(0) ? '▴' : '▾'} {rateChange.toFixed(2)} (
-            {rateChangeInPercentage.toFixed(2)}%)
+            {rateChange.gt(0) ? '▴' : '▾'} {rateChange.toFormat(2)} (
+            {rateChangeInPercentage.toFormat(2)}%)
           </Text>
         </View>
       </View>

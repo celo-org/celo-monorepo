@@ -19,7 +19,7 @@
 
 • **decimals**: *number*
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L23)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L24)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **inflationParameters**: *[InflationParameters](_wrappers_stabletokenwrapper_.inflationparameters.md)*
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L26)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L27)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L24)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L25)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **symbol**: *string*
 
-*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L25)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L26)*

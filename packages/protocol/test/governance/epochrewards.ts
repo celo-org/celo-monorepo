@@ -1,5 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  assertAlmostEqualBN,
   assertContainSubset,
   assertEqualBN,
   assertEqualDpBN,
@@ -419,6 +420,44 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
+  describe('#setTargetVotingYield()', () => {
+    const newTarget = targetVotingYieldParams.initial.plus(1)
+
+    describe('when called by the owner', () => {
+      let resp: any
+
+      beforeEach(async () => {
+        resp = await epochRewards.setTargetVotingYield(newTarget)
+      })
+
+      it('should set the new target voting yield', async () => {
+        const [target, ,] = await epochRewards.getTargetVotingYieldParameters()
+        assertEqualBN(target, newTarget)
+      })
+
+      it('should emit the TargetVotingYieldSet event', async () => {
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertContainSubset(log, {
+          event: 'TargetVotingYieldSet',
+          args: {
+            target: newTarget,
+          },
+        })
+      })
+    })
+
+    describe('when called by a non-owner', () => {
+      it('should revert', async () => {
+        await assertRevert(
+          epochRewards.setTargetVotingYield(newTarget, {
+            from: nonOwner,
+          })
+        )
+      })
+    })
+  })
+
   describe('#getTargetGoldTotalSupply()', () => {
     describe('when it has been fewer than 15 years since genesis', () => {
       const timeDelta: BigNumber = YEAR.times(10)
@@ -616,7 +655,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('#calculateTargetEpochRewards()', () => {
     describe('when there are active votes, a stable token exchange rate is set and the actual remaining supply is 10% more than the target remaining supply after rewards', () => {
-      const activeVotes = 1000000
+      const activeVotes = web3.utils.toWei('102398474')
       const timeDelta = YEAR.times(10)
       const numberValidators = 100
       let expectedMultiplier: BigNumber
@@ -652,6 +691,10 @@ contract('EpochRewards', (accounts: string[]) => {
         await timeTravelToDelta(timeDelta)
       })
 
+      it('should fetch the expected rewards multiplier', async () => {
+        assertEqualBN(await epochRewards.getRewardsMultiplier(), toFixed(expectedMultiplier))
+      })
+
       it('should return the target validator epoch payment times the rewards multiplier', async () => {
         const expected = targetValidatorEpochPayment.times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochRewards())[0], expected)
@@ -663,6 +706,7 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochRewards())[1], expected)
       })
+
       it('should return the correct amount for the community reward', async () => {
         const validatorReward = targetValidatorEpochPayment
           .times(numberValidators)
@@ -679,7 +723,26 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(fromFixed(communityRewardFraction))
           .times(expectedMultiplier)
           .integerValue(BigNumber.ROUND_FLOOR)
-        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected)
+        assertAlmostEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected, 1)
+      })
+
+      it('should return the correct amount for the carbon offsetting fund', async () => {
+        const validatorReward = targetValidatorEpochPayment
+          .times(numberValidators)
+          .div(exchangeRate)
+        const votingReward = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
+        const expected = validatorReward
+          .plus(votingReward)
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
+          .integerValue(BigNumber.ROUND_FLOOR)
+          .times(fromFixed(carbonOffsettingFraction))
+          .times(expectedMultiplier)
+          .integerValue(BigNumber.ROUND_FLOOR)
+        assertAlmostEqualBN((await epochRewards.calculateTargetEpochRewards())[3], expected, 1)
       })
     })
   })

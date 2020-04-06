@@ -36,8 +36,7 @@ e2e-defaults: &e2e-defaults
   docker:
     - image: celohq/circleci:geth1.9-2
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: alecps/headers
-
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 general:
   artifacts:
     - 'mobile/coverage'
@@ -157,8 +156,7 @@ jobs:
             # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
-            yarn build --scope @celo/walletkit
-            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit --ignore @celo/web
+            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/web
 
       - run:
           name: Check licenses
@@ -436,7 +434,7 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
+            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli run test
 
       - store_test_results:
           path: test-results
@@ -579,27 +577,6 @@ jobs:
               echo "There are git differences after generating contractkit docs"
               exit 1
             fi
-
-  walletkit-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: test alphanet
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajores
-            yarn --cwd=packages/walletkit test
-
-      - run:
-          name: test alphanet staging
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajoresstaging
-            yarn --cwd=packages/walletkit test
 
   cli-test:
     <<: *defaults
@@ -821,18 +798,6 @@ jobs:
             # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
             yarn add @celo/contractkit || yarn add @celo/contractkit
 
-  test-walletkit-npm-package-install:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node10-gcloud
-    steps:
-      - run:
-          name: Installing npm package - @celo/walletkit
-          command: |
-            # Try one more time in case the first attempt fails
-            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
-            yarn add @celo/walletkit || yarn add @celo/walletkit
-
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
@@ -856,9 +821,6 @@ workflows:
       - general-test:
           requires:
             - install_dependencies
-      - walletkit-test:
-          requires:
-            - install_dependencies
       - cli-test:
           requires:
             - install_dependencies
@@ -878,7 +840,6 @@ workflows:
       - protocol-test:
           requires:
             - lint-checks
-            - walletkit-test
       - typescript-test:
           requires:
             - install_dependencies
@@ -922,7 +883,6 @@ workflows:
     jobs:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
-      - test-walletkit-npm-package-install
       - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
@@ -940,10 +900,6 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
-      - walletkit-test:
-          requires:
-            - install_dependencies
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
-            - walletkit-test

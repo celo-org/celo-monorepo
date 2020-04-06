@@ -19,6 +19,7 @@ Contract for voting for validators and managing validator groups.
 * [_activate](_wrappers_election_.electionwrapper.md#_activate)
 * [electValidatorSigners](_wrappers_election_.electionwrapper.md#electvalidatorsigners)
 * [electabilityThreshold](_wrappers_election_.electionwrapper.md#electabilitythreshold)
+* [events](_wrappers_election_.electionwrapper.md#events)
 * [getGroupsVotedForByAccount](_wrappers_election_.electionwrapper.md#getgroupsvotedforbyaccount)
 * [getTotalVotesForGroupByAccount](_wrappers_election_.electionwrapper.md#gettotalvotesforgroupbyaccount)
 * [numberValidatorsInCurrentSet](_wrappers_election_.electionwrapper.md#numbervalidatorsincurrentset)
@@ -141,6 +142,16 @@ Returns the current election threshold.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  events
+
+• **events**: *any* = this.contract.events
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
 
 ___
 
