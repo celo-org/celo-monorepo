@@ -1,27 +1,48 @@
 import fetch from 'cross-fetch'
+import ArticleProps from 'fullstack/ArticleProps'
 import * as React from 'react'
 import ArticlesSection from 'src/community/connect/ArticlesSection'
+import { getSentry } from 'src/utils/sentry'
 
-async function getArticles() {
-  const res = await fetch('/proxy/medium', {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'GET',
-  })
+const BASE_PATH = '/api/blog'
+
+async function getArticles(tagged?: string) {
+  const path = tagged ? `${BASE_PATH}?tagged=${tagged}` : BASE_PATH
+
+  const res = await fetch(path, { method: 'GET' })
   return res.json()
 }
 
-export default class ArticleData extends React.PureComponent {
-  state = { articles: [], loaded: false }
+interface Props {
+  title: string
+  tagged?: string
+}
+
+interface State {
+  loaded: boolean
+  errored: boolean
+  articles: ArticleProps[]
+}
+
+export default class ArticleData extends React.PureComponent<Props, State> {
+  state = { articles: [], loaded: false, errored: false }
 
   componentDidMount = async () => {
-    const { articles } = await getArticles()
-    this.setState({ articles, loaded: true })
+    try {
+      const { articles } = await getArticles(this.props.tagged)
+      this.setState({ articles, loaded: true })
+    } catch (e) {
+      this.setState({ errored: true })
+      const Sentry = await getSentry()
+      Sentry.captureMessage(`ArticleData / ${e.message}`, 'error')
+    }
   }
 
   render() {
-    const { articles, loaded } = this.state
-    return <ArticlesSection articles={articles} loading={!loaded} />
+    const { articles, loaded, errored } = this.state
+    if (errored) {
+      return null
+    }
+    return <ArticlesSection title={this.props.title} articles={articles} loading={!loaded} />
   }
 }

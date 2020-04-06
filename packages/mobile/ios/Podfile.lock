@@ -335,8 +335,6 @@ PODS:
     - React
   - react-native-udp (2.6.1):
     - React
-  - react-native-version-check (3.3.0):
-    - React
   - react-native-webview (7.4.1):
     - React
   - React-RCTActionSheet (0.61.2):
@@ -413,7 +411,7 @@ PODS:
     - React
   - RNSecureKeyStore (1.0.0):
     - React
-  - RNSentry (1.0.7):
+  - RNSentry (1.3.3):
     - React
     - Sentry (~> 4.4.0)
   - RNShare (2.0.0):
@@ -474,7 +472,6 @@ DEPENDENCIES:
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
   - react-native-tcp (from `../../../node_modules/react-native-tcp`)
   - react-native-udp (from `../../../node_modules/react-native-udp`)
-  - react-native-version-check (from `../../../node_modules/react-native-version-check`)
   - react-native-webview (from `../../../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -596,8 +593,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-tcp"
   react-native-udp:
     :path: "../../../node_modules/react-native-udp"
-  react-native-version-check:
-    :path: "../../../node_modules/react-native-version-check"
   react-native-webview:
     :path: "../../../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -718,7 +713,6 @@ SPEC CHECKSUMS:
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
-  react-native-version-check: 7d578f3405cd9d673bbfd1225f727c87991e9ef9
   react-native-webview: e800df5dd1a0f3555fd543ebf7d881a9014851f2
   React-RCTActionSheet: 89b037c0fb7d2671607cb645760164e7e0c013f6
   React-RCTAnimation: e3cefa93c38c004c318f7ec04b883eb14b8b8235
@@ -744,7 +738,7 @@ SPEC CHECKSUMS:
   RNReanimated: 6abbbae2e5e72609d85aabd92a982a94566885f1
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
-  RNSentry: e57b6acd2424e185ba2e23ef78aa2186a40e83e0
+  RNSentry: 86baf0c87120cd5eb491d073989f8cbc1a2174c6
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
   RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
   Segment-Firebase: 5ab5aa1e962148c60e5582734ad68b320c647cef
@@ -752,6 +746,6 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: c66da841c6399b1bc159ddb85a372fb50501e909
+PODFILE CHECKSUM: b3a2d5a110fb5997ac07b1c1e6ca7416a059f01c
 
 COCOAPODS: 1.7.5

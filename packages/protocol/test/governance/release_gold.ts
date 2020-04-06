@@ -9,7 +9,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { Signature } from '@celo/utils/src/signatureUtils'
+import { addressToPublicKey, Signature } from '@celo/utils/src/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import {
@@ -25,6 +25,8 @@ import {
   MockElectionInstance,
   MockGovernanceContract,
   MockGovernanceInstance,
+  MockStableTokenContract,
+  MockStableTokenInstance,
   MockValidatorsContract,
   MockValidatorsInstance,
   RegistryContract,
@@ -32,7 +34,7 @@ import {
   ReleaseGoldContract,
   ReleaseGoldInstance,
 } from 'types'
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
 
@@ -72,6 +74,7 @@ const Accounts: AccountsContract = artifacts.require('Accounts')
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
+const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -81,6 +84,12 @@ const ReleaseGold: ReleaseGoldContract = artifacts.require('ReleaseGold')
 // @ts-ignore
 // TODO(mcortesi): Use BN
 LockedGold.numberFormat = 'BigNumber'
+// @ts-ignore
+ReleaseGold.numberFormat = 'BigNumber'
+// @ts-ignore
+MockStableToken.numberFormat = 'BigNumber'
+// @ts-ignore
+GoldToken.numberFormat = 'BigNumber'
 
 const MINUTE = 60
 const HOUR = 60 * 60
@@ -103,16 +112,18 @@ contract('ReleaseGold', (accounts: string[]) => {
   let mockElection: MockElectionInstance
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
+  let mockStableToken: MockStableTokenInstance
   let registry: RegistryInstance
   let releaseGoldInstance: ReleaseGoldInstance
   let proofOfWalletOwnership: Signature
+  const TOTAL_AMOUNT = ONE_GOLDTOKEN.times(10)
 
   const releaseGoldDefaultSchedule: ReleaseGoldConfig = {
     releaseStartTime: null, // To be adjusted on every run
     releaseCliffTime: HOUR,
     numReleasePeriods: 4,
     releasePeriod: 3 * MONTH,
-    amountReleasedPerPeriod: ONE_GOLDTOKEN.div(4),
+    amountReleasedPerPeriod: TOTAL_AMOUNT.div(4),
     revocable: true,
     beneficiary,
     releaseOwner,
@@ -157,9 +168,8 @@ contract('ReleaseGold', (accounts: string[]) => {
     )
   }
 
-  const getCurrentBlockchainTimestamp = async (web3: Web3) => {
-    return (await web3.eth.getBlock('latest')).timestamp
-  }
+  const getCurrentBlockchainTimestamp = (web3: Web3): Promise<number> =>
+    web3.eth.getBlock('latest').then((block) => Number(block.timestamp))
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -169,6 +179,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     mockElection = await MockElection.new()
     mockGovernance = await MockGovernance.new()
     mockValidators = await MockValidators.new()
+    mockStableToken = await MockStableToken.new()
 
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
@@ -178,6 +189,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, lockedGoldInstance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
     await lockedGoldInstance.initialize(registry.address, UNLOCKING_PERIOD)
     await goldTokenInstance.initialize(registry.address)
     await accountsInstance.initialize(registry.address)
@@ -190,6 +202,26 @@ contract('ReleaseGold', (accounts: string[]) => {
       await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.times(2), {
         from: accounts[8],
       })
+    })
+  })
+
+  describe('#transfer', () => {
+    const receiver = accounts[5]
+    const transferAmount = 10
+
+    beforeEach(async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+      await mockStableToken.mint(releaseGoldInstance.address, transferAmount)
+    })
+
+    it('should transfer stable token from the release gold instance', async () => {
+      const startBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
+      const startBalanceTo = await mockStableToken.balanceOf(receiver)
+      await releaseGoldInstance.transfer(receiver, transferAmount, { from: beneficiary })
+      const endBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
+      const endBalanceTo = await mockStableToken.balanceOf(receiver)
+      assertEqualBN(endBalanceFrom, startBalanceFrom.minus(transferAmount))
+      assertEqualBN(endBalanceTo, startBalanceTo.plus(transferAmount))
     })
   })
 
@@ -751,9 +783,9 @@ contract('ReleaseGold', (accounts: string[]) => {
         await releaseGoldInstance.setMaxDistribution(500, { from: releaseOwner })
       })
 
-      it('should set max distribution to 0.5 gold', async () => {
+      it('should set max distribution to 5 gold', async () => {
         const maxDistribution = await releaseGoldInstance.maxDistribution()
-        assertEqualBN(maxDistribution, ONE_GOLDTOKEN.div(2))
+        assertEqualBN(maxDistribution, TOTAL_AMOUNT.div(2))
       })
     })
 
@@ -764,7 +796,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       it('should set max distribution to max uint256', async () => {
         const maxDistribution = await releaseGoldInstance.maxDistribution()
-        assertGteBN(maxDistribution, ONE_GOLDTOKEN)
+        assertGteBN(maxDistribution, TOTAL_AMOUNT)
       })
     })
   })
@@ -819,6 +851,23 @@ contract('ReleaseGold', (accounts: string[]) => {
           )
         })
 
+        // The attestations signer does not send txs.
+        if (authorizationTestDescriptions[key].subject !== 'attestationSigner') {
+          it(`should transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance1 = await web3.eth.getBalance(authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            const balance2 = await web3.eth.getBalance(authorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), web3.utils.toWei('1'))
+          })
+        } else {
+          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance1 = await web3.eth.getBalance(authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            const balance2 = await web3.eth.getBalance(authorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
+          })
+        }
+
         it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(
@@ -857,6 +906,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         describe('when a previous authorization has been made', () => {
           const newAuthorized = accounts[6]
+          let balance1: string
           let newSig: any
           beforeEach(async () => {
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
@@ -865,6 +915,7 @@ contract('ReleaseGold', (accounts: string[]) => {
               releaseGoldInstance.address,
               newAuthorized
             )
+            balance1 = await web3.eth.getBalance(newAuthorized)
             await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s, {
               from: beneficiary,
             })
@@ -885,6 +936,11 @@ contract('ReleaseGold', (accounts: string[]) => {
             )
           })
 
+          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance2 = await web3.eth.getBalance(newAuthorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
+          })
+
           it('should preserve the previous authorization', async () => {
             assert.equal(
               await accountsInstance.authorizedBy(authorized),
@@ -892,6 +948,81 @@ contract('ReleaseGold', (accounts: string[]) => {
             )
           })
         })
+      })
+    })
+  })
+
+  describe('#authorizeWithPublicKeys', () => {
+    const authorized = accounts[4] // the account that is to be authorized for whatever role
+
+    describe('with ECDSA public key', () => {
+      beforeEach(async () => {
+        const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
+        releaseGoldSchedule.revocable = false
+        releaseGoldSchedule.canValidate = true
+        releaseGoldSchedule.refundAddress = NULL_ADDRESS
+        await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
+        await releaseGoldInstance.createAccount({ from: beneficiary })
+        const ecdsaPublicKey = await addressToPublicKey(authorized, web3.eth.sign)
+        const sig = await getParsedSignatureOfAddress(web3, releaseGoldInstance.address, authorized)
+        await releaseGoldInstance.authorizeValidatorSignerWithPublicKey(
+          authorized,
+          sig.v,
+          sig.r,
+          sig.s,
+          ecdsaPublicKey as any,
+          { from: beneficiary }
+        )
+      })
+
+      it('should set the authorized keys', async () => {
+        assert.equal(await accountsInstance.authorizedBy(authorized), releaseGoldInstance.address)
+        assert.equal(
+          await accountsInstance.getValidatorSigner(releaseGoldInstance.address),
+          authorized
+        )
+        assert.equal(
+          await accountsInstance.validatorSignerToAccount(authorized),
+          releaseGoldInstance.address
+        )
+      })
+    })
+
+    describe('with bls keys', () => {
+      beforeEach(async () => {
+        const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
+        releaseGoldSchedule.revocable = false
+        releaseGoldSchedule.canValidate = true
+        releaseGoldSchedule.refundAddress = NULL_ADDRESS
+        await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
+        await releaseGoldInstance.createAccount({ from: beneficiary })
+        const ecdsaPublicKey = await addressToPublicKey(authorized, web3.eth.sign)
+        const newBlsPublicKey = web3.utils.randomHex(96)
+        const newBlsPoP = web3.utils.randomHex(48)
+
+        const sig = await getParsedSignatureOfAddress(web3, releaseGoldInstance.address, authorized)
+        await releaseGoldInstance.authorizeValidatorSignerWithKeys(
+          authorized,
+          sig.v,
+          sig.r,
+          sig.s,
+          ecdsaPublicKey as any,
+          newBlsPublicKey,
+          newBlsPoP,
+          { from: beneficiary }
+        )
+      })
+
+      it('should set the authorized keys', async () => {
+        assert.equal(await accountsInstance.authorizedBy(authorized), releaseGoldInstance.address)
+        assert.equal(
+          await accountsInstance.getValidatorSigner(releaseGoldInstance.address),
+          authorized
+        )
+        assert.equal(
+          await accountsInstance.validatorSignerToAccount(authorized),
+          releaseGoldInstance.address
+        )
       })
     })
   })
@@ -927,6 +1058,89 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
       await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
       await assertRevert(releaseGoldInstance.revoke({ from: releaseOwner }))
+    })
+  })
+
+  describe('#expire', () => {
+    beforeEach(async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+    })
+
+    describe('when called before expiration time has passed', () => {
+      it('should revert', async () => {
+        await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+      })
+    })
+
+    describe('when the contract has finished releasing', () => {
+      beforeEach(async () => {
+        const timeToTravel = 12 * MONTH
+        await timeTravel(timeToTravel, web3)
+      })
+
+      it('should revert before `EXPIRATION_TIME` after release schedule end', async () => {
+        await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+      })
+
+      describe('when `EXPIRATION_TIME` has passed after release schedule completion', () => {
+        beforeEach(async () => {
+          const [releaseGoldStartTime, , , ,] = await releaseGoldInstance.releaseSchedule()
+          const expirationTime = await releaseGoldInstance.EXPIRATION_TIME()
+          const timeToTravel = releaseGoldStartTime.plus(expirationTime).toNumber()
+          await timeTravel(timeToTravel, web3)
+        })
+
+        describe('when not called by releaseOwner', () => {
+          it('should revert', async () => {
+            await assertRevert(releaseGoldInstance.expire())
+          })
+        })
+
+        describe('when called by releaseOwner', () => {
+          it('should succeed', async () => {
+            await releaseGoldInstance.expire({ from: releaseOwner })
+          })
+        })
+
+        describe('when an instance is expired', () => {
+          beforeEach(async () => {
+            await releaseGoldInstance.expire({ from: releaseOwner })
+          })
+
+          it('should revoke the contract', async () => {
+            const isRevoked = await releaseGoldInstance.isRevoked()
+            assert.equal(isRevoked, true)
+          })
+
+          it('should set the released balance at revocation to total withdrawn', async () => {
+            const [, releasedBalanceAtRevoke] = await releaseGoldInstance.revocationInfo()
+            // 0 gold withdrawn at this point
+            assertEqualBN(releasedBalanceAtRevoke, 0)
+          })
+
+          it('should allow refund of all remaining gold', async () => {
+            const refundAddressBalanceBefore = await goldTokenInstance.balanceOf(refundAddress)
+            await releaseGoldInstance.refundAndFinalize({ from: releaseOwner })
+            const refundAddressBalanceAfter = await goldTokenInstance.balanceOf(refundAddress)
+            assertEqualBN(refundAddressBalanceAfter.minus(refundAddressBalanceBefore), TOTAL_AMOUNT)
+          })
+        })
+
+        describe('when an instance is a registered validator or validator group', () => {
+          describe('registered validator', () => {
+            it('should revert', async () => {
+              await mockValidators.setValidator(releaseGoldInstance.address)
+              await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+            })
+          })
+          describe('registered validator', () => {
+            it('should revert', async () => {
+              await mockValidators.setValidatorGroup(releaseGoldInstance.address)
+              await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+            })
+          })
+        })
+      })
     })
   })
 
@@ -1063,11 +1277,9 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
-      // lock the entire releaseGold amount
       await releaseGoldInstance.lockGold(lockAmount, {
         from: beneficiary,
       })
-      // unlock the latter
       await releaseGoldInstance.unlockGold(lockAmount, {
         from: beneficiary,
       })
@@ -1084,6 +1296,8 @@ contract('ReleaseGold', (accounts: string[]) => {
         await lockedGoldInstance.getAccountTotalLockedGold(releaseGoldInstance.address),
         0
       )
+      // ReleaseGold locked balance should still reflect pending withdrawals
+      assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), lockAmount)
       assertEqualBN(
         await lockedGoldInstance.getAccountNonvotingLockedGold(releaseGoldInstance.address),
         0
@@ -1155,6 +1369,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           )
           assert.equal(values.length, 0)
           assert.equal(timestamps.length, 0)
+          assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), 0)
         })
       })
 
@@ -1415,7 +1630,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should allow distribution of initial balance and rewards', async () => {
-              const expectedWithdrawalAmount = ONE_GOLDTOKEN.plus(ONE_GOLDTOKEN.div(2))
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN.div(2))
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
           })
@@ -1427,12 +1642,14 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should scale released amount to 50% of initial balance plus rewards', async () => {
-              const expectedWithdrawalAmount = ONE_GOLDTOKEN.multipliedBy(0.75)
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN.div(2)).div(2)
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
 
             it('should not allow withdrawal of more than 50% gold', async () => {
-              const unexpectedWithdrawalAmount = ONE_GOLDTOKEN.multipliedBy(0.76)
+              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN)
+                .div(2)
+                .plus(1)
               await assertRevert(
                 releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
               )
@@ -1455,9 +1672,9 @@ contract('ReleaseGold', (accounts: string[]) => {
           })
 
           it('should only allow withdrawal of 50% of initial grant (not including rewards)', async () => {
-            const expectedWithdrawalAmount = ONE_GOLDTOKEN.div(2)
+            const expectedWithdrawalAmount = TOTAL_AMOUNT.div(2)
             await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
-            const unexpectedWithdrawalAmount = ONE_GOLDTOKEN.multipliedBy(0.51)
+            const unexpectedWithdrawalAmount = 1
             await assertRevert(
               releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
             )

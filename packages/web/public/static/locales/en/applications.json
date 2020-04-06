@@ -10,7 +10,7 @@
     "If you and/or your organization would like to learn more about our cash transfer mechanisms, please reach out.",
   "socialPaymentsTitle": "Social Payments",
   "socialPaymentsText1":
-    "In the US, apps like Venmo and Square’s Cash app make it easy to pay a friend back for lunch. In many parts of the world, a similar experience does not exist in the local market. Celo makes it easy to send fiat-pegged digital payments to any mobile phone anywhere, in a censorship resistant manner.",
+    "In the US, apps like Venmo and Square’s Cash app make it easy to pay a friend back for lunch. In many parts of the world, a similar experience does not exist in the local market. Celo makes it easy to send stable digital payments to any mobile phone anywhere, in a censorship resistant manner.",
   "socialPaymentsText2":
     "If you and/or your organization is interested in developing social payments applications or would like to discuss mobile money solutions, please reach out.",
   "getPaidTitle": "Get Paid To Participate",
@@ -41,8 +41,5 @@
       "jobs": "Jobs at Celo",
       "other": "Other"
     }
-  },
-  "validationErrors": {
-    "email": "Invalid Email Address"
   }
 }

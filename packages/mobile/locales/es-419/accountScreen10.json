@@ -4,7 +4,6 @@
   "languageSettings": "Configuración de idioma",
   "localCurrencySetting": "Moneda",
   "licenses": "Licencias",
-  "sendIssueReport": "Reportar un incidente",
   "security": "Seguridad",
   "requirePinOnAppOpen": "Requerir PIN en la aplicación abierta",
   "analytics": "Estadisticas de uso",
@@ -40,5 +39,14 @@
   "continue": "Continuar",
   "yourName": "Tu Nombre",
   "version": "Versión:",
-  "addressCopied": "Dirección copiada al portapapeles"
+  "addressCopied": "Dirección copiada al portapapeles",
+  "support": "Apoyo",
+  "contact": "Contacto",
+  "webFaq": "FAQ la web",
+  "forum": "Forum",
+  "contactText": "¿No puede encontrar lo que está buscando?",
+  "contactUs": "Contáctenos",
+  "tellUsMore": "Cuéntanos más",
+  "attachLogs": "Adjuntar registros",
+  "supportLegalCheckbox": "Al enviar, acepto compartir la información anterior y cualquier dato de registro de la aplicación adjunta con Celo Support."
 }

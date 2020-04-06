@@ -11,6 +11,7 @@ import Judgement, { Value } from 'src/brandkit/logo/Judgement'
 import LogoExample, { Logos } from 'src/brandkit/logo/LogoExample'
 import LogoWithBackground from 'src/brandkit/logo/LogoWithBackground'
 import { Digital, Print } from 'src/brandkit/logo/Minimums'
+import { GLYPH_TRACKING, LOGO_PKG_TRACKING, trackDownload } from 'src/brandkit/tracking'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -42,6 +43,11 @@ export default React.memo(
 const Overview = withNamespaces(NameSpaces.brand)(
   withScreenSize(function _Overview({ t, screen }: I18nProps & ScreenProps) {
     const glyphAreaStyle = screen === ScreenSizes.DESKTOP ? styles.pilar : styles.square
+
+    const onPressDownload = React.useCallback(async () => {
+      await trackDownload(LOGO_PKG_TRACKING)
+    }, [])
+
     return (
       <View style={styles.container}>
         <View style={styles.gap}>
@@ -50,6 +56,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <Button
             kind={BTN.PRIMARY}
             text={t('logo.overviewBtn')}
+            onPress={onPressDownload}
             href="/assets/CeloLogoPackage.zip"
           />
           <Text style={[fonts.h5, standardStyles.blockMarginTop]}>{t('licenseTitle')}</Text>
@@ -103,7 +110,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
             {t('logo.glyphTitle')}
           </Text>
           <Text style={fonts.p}>{t('logo.glyphText')}</Text>
-          <DownloadButton uri="/assets/CeloGlyphs.zip" />
+          <DownloadButton uri="/assets/CeloGlyphs.zip" trackingData={GLYPH_TRACKING} />
           <View style={[styles.tiling, standardStyles.elementalMarginTop]}>
             <View
               style={[

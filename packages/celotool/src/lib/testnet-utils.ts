@@ -1,5 +1,5 @@
-import { StaticNodeUtils } from '@celo/walletkit'
-import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/genesis-block-utils'
+import { StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlocksGoogleStorageBucketName } from '@celo/contractkit/lib/network-utils/genesis-block-utils'
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'

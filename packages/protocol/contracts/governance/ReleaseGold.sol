@@ -1,10 +1,12 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IReleaseGold.sol";
+import "./interfaces/IValidators.sol";
 import "../common/FixidityLib.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -35,7 +37,13 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 revokeTime;
   }
 
-  uint256 internal constant MAX_UINT = 0xffffffffffffffffffffffffffffffff;
+  // uint256(-1) == 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  uint256 internal constant MAX_UINT = uint256(-1);
+
+  // Duration (in seconds) after gold is fully released
+  // when gold should be switched back to control of releaseOwner.
+  // 2 years
+  uint256 public constant EXPIRATION_TIME = 63072000;
 
   // Beneficiary of the Celo Gold released in this contract.
   address payable public beneficiary;
@@ -72,6 +80,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   event ReleaseGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
+  event ReleaseGoldInstanceDestroyed(address indexed beneficiary, address indexed atAddress);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
   event BeneficiarySet(address indexed beneficiary);
@@ -131,7 +140,25 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     _;
   }
 
+  modifier onlyExpired() {
+    uint256 releaseEndTime = releaseSchedule.releaseStartTime.add(
+      releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
+    );
+    require(
+      block.timestamp >= releaseEndTime.add(EXPIRATION_TIME),
+      "`EXPIRATION_TIME` must have passed after the end of releasing"
+    );
+    _;
+  }
+
   function() external payable {} // solhint-disable no-empty-blocks
+
+  /**
+   * @notice Wrapper function for stable token transfer function.
+   */
+  function transfer(address to, uint256 value) external onlyWhenInProperState {
+    IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).transfer(to, value);
+  }
 
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
@@ -259,6 +286,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       maxDistribution = MAX_UINT;
     } else {
       uint256 totalBalance = getTotalBalance();
+      require(totalBalance > 0, "Do not set max distribution before factory sends the gold");
       maxDistribution = totalBalance.mul(distributionRatio).div(1000);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
@@ -302,7 +330,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "Requested amount is greater than available released funds"
     );
     require(
-      maxDistribution >= totalWithdrawn + amount,
+      maxDistribution >= totalWithdrawn.add(amount),
       "Requested amount exceeds current alloted maximum distribution"
     );
     require(
@@ -312,6 +340,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     totalWithdrawn = totalWithdrawn.add(amount);
     beneficiary.transfer(amount);
     if (getRemainingTotalBalance() == 0) {
+      emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
       selfdestruct(refundAddress);
     }
   }
@@ -325,6 +354,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     beneficiary.transfer(beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
     refundAddress.transfer(revokerAmount);
+    emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
     selfdestruct(refundAddress);
   }
 
@@ -336,6 +366,22 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = getCurrentReleasedTotalAmount();
     emit ReleaseScheduleRevoked(revocationInfo.revokeTime, revocationInfo.releasedBalanceAtRevoke);
+  }
+
+  /**
+   * @notice Mark the contract as expired, freeing all remaining gold for refund to `refundAddress`
+   * @dev Only callable `EXPIRATION_TIME` after the final gold release.
+   */
+  function expire() external nonReentrant onlyReleaseOwner onlyExpired {
+    IValidators validators = getValidators();
+    require(
+      !validators.isValidator(address(this)) && !validators.isValidatorGroup(address(this)),
+      "Cannot call `expire` on an instance registered as a validator or group"
+    );
+    require(!isRevoked(), "Release schedule instance must not already be revoked");
+    revocationInfo.revokeTime = block.timestamp;
+    revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
+    emit ReleaseScheduleRevoked(revocationInfo.revokeTime, totalWithdrawn);
   }
 
   /**
@@ -366,11 +412,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   /**
    * @notice Calculates remaining locked gold balance in the release schedule instance.
+   *         The returned amount also includes pending withdrawals to maintain consistent releases.
    * @return The remaining locked gold of the release schedule instance.
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
   function getRemainingLockedBalance() public view returns (uint256) {
-    return getLockedGold().getAccountTotalLockedGold(address(this));
+    uint256 pendingWithdrawalSum = 0;
+    if (getAccounts().isAccount(address(this))) {
+      pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
+    }
+    return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
   }
 
   /**
@@ -437,6 +488,18 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice Funds a signer address so that transaction fees can be paid.
+   * @param signer The signer address to fund.
+   * @dev Note that this effectively decreases the total balance by 1 cGLD.
+   */
+  function fundSigner(address payable signer) private {
+    // Fund signer account with 1 cGLD.
+    uint256 value = 1 ether;
+    signer.transfer(value);
+    require(getRemainingTotalBalance() > 0, "no remaining balance");
+  }
+
+  /**
    * @notice A wrapper function for the authorize vote signer account method.
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -445,12 +508,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeVoteSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanVote
     onlyWhenInProperState
   {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getVoteSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeVoteSigner(signer, v, r, s);
   }
 
@@ -463,13 +530,79 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanValidate
     onlyWhenInProperState
   {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeValidatorSigner(signer, v, r, s);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer with public key account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @dev The v,r and s signature should be a signed message by the beneficiary
+   *      encrypting the authorized address.
+   */
+  function authorizeValidatorSignerWithPublicKey(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
+    getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
+  }
+
+  /**
+   * @notice A wrapper function for the authorize validator signer with keys account method.
+   * @param signer The address of the signing key to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @dev The v,r and s signature should be a signed message by the beneficiary
+   *      encrypting the authorized address.
+   */
+  function authorizeValidatorSignerWithKeys(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
+    getAccounts().authorizeValidatorSignerWithKeys(
+      signer,
+      v,
+      r,
+      s,
+      ecdsaPublicKey,
+      blsPublicKey,
+      blsPop
+    );
   }
 
   /**
@@ -481,7 +614,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeAttestationSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanValidate

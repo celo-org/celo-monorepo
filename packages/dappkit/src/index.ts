@@ -16,7 +16,7 @@ import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
 import { chunk, find, flatMap, flatten, fromPairs, zipObject } from 'lodash'
-import { TransactionObject } from 'web3/eth/types'
+import { ContractSendMethod } from 'web3-eth-contract'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -117,8 +117,8 @@ async function getFeeCurrencyContractAddress(
   }
 }
 
-export interface TxParams<T> {
-  tx: TransactionObject<T>
+export interface TxParams {
+  tx: ContractSendMethod
   from: string
   to?: string
   feeCurrency?: FeeCurrency
@@ -126,9 +126,9 @@ export interface TxParams<T> {
   value?: string
 }
 
-export async function requestTxSig<T>(
+export async function requestTxSig(
   kit: ContractKit,
-  txParams: TxParams<T>[],
+  txParams: TxParams[],
   meta: DappKitRequestMeta
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic

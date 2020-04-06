@@ -64,12 +64,16 @@ contract EpochRewards is
   TargetVotingYieldParameters private targetVotingYieldParams;
   FixidityLib.Fraction private targetVotingGoldFraction;
   FixidityLib.Fraction private communityRewardFraction;
+  FixidityLib.Fraction private carbonOffsettingFraction;
+  address public carbonOffsettingPartner;
   uint256 public targetValidatorEpochPayment;
 
   event TargetVotingGoldFractionSet(uint256 fraction);
   event CommunityRewardFractionSet(uint256 fraction);
+  event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
+  event TargetVotingYieldSet(uint256 target);
   event RewardsMultiplierParametersSet(
     uint256 max,
     uint256 underspendAdjustmentFactor,
@@ -92,6 +96,8 @@ contract EpochRewards is
    * @param _targetVotingGoldFraction The percentage of floating Gold voting to target.
    * @param _targetValidatorEpochPayment The target validator epoch payment.
    * @param _communityRewardFraction The percentage of rewards that go the community funds.
+   * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
+   * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
    * @dev Should be called only once.
    */
   function initialize(
@@ -104,7 +110,9 @@ contract EpochRewards is
     uint256 rewardsMultiplierOverspendAdjustmentFactor,
     uint256 _targetVotingGoldFraction,
     uint256 _targetValidatorEpochPayment,
-    uint256 _communityRewardFraction
+    uint256 _communityRewardFraction,
+    address _carbonOffsettingPartner,
+    uint256 _carbonOffsettingFraction
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -117,7 +125,8 @@ contract EpochRewards is
     setTargetVotingGoldFraction(_targetVotingGoldFraction);
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
     setCommunityRewardFraction(_communityRewardFraction);
-    targetVotingYieldParams.target = FixidityLib.wrap(targetVotingYieldInitial);
+    setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
+    setTargetVotingYield(targetVotingYieldInitial);
     startTime = now;
   }
 
@@ -161,6 +170,29 @@ contract EpochRewards is
    */
   function getCommunityRewardFraction() external view returns (uint256) {
     return communityRewardFraction.unwrap();
+  }
+
+  /**
+   * @notice Sets the carbon offsetting fund.
+   * @param partner The address of the carbon offsetting partner.
+   * @param value The percentage of the total reward to be sent to the carbon offsetting partner.
+   * @return True upon success.
+   */
+  function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
+    require(partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap());
+    require(value < FixidityLib.fixed1().unwrap());
+    carbonOffsettingPartner = partner;
+    carbonOffsettingFraction = FixidityLib.wrap(value);
+    emit CarbonOffsettingFundSet(partner, value);
+    return true;
+  }
+
+  /**
+   * @notice Returns the carbon offsetting partner reward fraction.
+   * @return The percentage of total reward which goes to the carbon offsetting partner.
+   */
+  function getCarbonOffsettingFraction() external view returns (uint256) {
+    return carbonOffsettingFraction.unwrap();
   }
 
   /**
@@ -253,6 +285,23 @@ contract EpochRewards is
       "Max target voting yield must be lower than 100%"
     );
     emit TargetVotingYieldParametersSet(max, adjustmentFactor);
+    return true;
+  }
+
+  /**
+   * @notice Sets the target voting yield.  Uses fixed point arithmetic
+   * for protection against overflow.
+   * @param targetVotingYield The relative target block reward for voters.
+   * @return True upon success.
+   */
+  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner returns (bool) {
+    FixidityLib.Fraction memory target = FixidityLib.wrap(targetVotingYield);
+    require(
+      target.lte(targetVotingYieldParams.max),
+      "Target voting yield must be less than or equal to max"
+    );
+    targetVotingYieldParams.target = target;
+    emit TargetVotingYieldSet(targetVotingYield);
     return true;
   }
 
@@ -352,7 +401,9 @@ contract EpochRewards is
     // increase /= (1 - fraction) st the final community reward is fraction * increase
     targetGoldSupplyIncrease = FixidityLib
       .newFixed(targetGoldSupplyIncrease)
-      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
+      .divide(
+      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
+    )
       .fromFixed();
     return targetGoldSupplyIncrease;
   }
@@ -442,14 +493,14 @@ contract EpochRewards is
 
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch reward, the total rewards to voters, and the total community
-   * reward
+   * @return The per validator epoch reward, the total rewards to voters, the total community
+   * reward, and the total carbon offsetting partner reward.
    */
   function calculateTargetEpochRewards()
     external
     view
     onlyWhenNotFrozen
-    returns (uint256, uint256, uint256)
+    returns (uint256, uint256, uint256, uint256)
   {
     uint256 targetVoterReward = getTargetVoterRewards();
     uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
@@ -460,6 +511,11 @@ contract EpochRewards is
       FixidityLib
         .newFixed(targetGoldSupplyIncrease)
         .multiply(communityRewardFraction)
+        .multiply(rewardsMultiplier)
+        .fromFixed(),
+      FixidityLib
+        .newFixed(targetGoldSupplyIncrease)
+        .multiply(carbonOffsettingFraction)
         .multiply(rewardsMultiplier)
         .fromFixed()
     );

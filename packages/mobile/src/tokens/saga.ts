@@ -1,5 +1,5 @@
+import { CeloContract, CeloTransactionObject } from '@celo/contractkit'
 import { retryAsync } from '@celo/utils/src/async'
-import { getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -12,7 +12,7 @@ import { addStandbyTransaction, removeStandbyTransaction } from 'src/transaction
 import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
-import { contractKit, web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
@@ -47,6 +47,7 @@ export async function convertToContractDecimals(value: BigNumber, token: CURRENC
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
+  const contractKit = getContractKit()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()
@@ -101,7 +102,6 @@ export type TokenTransferAction = { type: string } & TokenTransfer
 
 interface TokenTransferFactory {
   actionName: string
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract
   tag: string
   currency: CURRENCY_ENUM
   fetchAction: () => any
@@ -109,19 +109,18 @@ interface TokenTransferFactory {
 
 // TODO(martinvol) this should go to the SDK
 export async function createTransaction(
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  currency: CURRENCY_ENUM,
   transferAction: BasicTokenTransfer
 ) {
   const { recipientAddress, amount, comment } = transferAction
+  const contract = await getTokenContract(currency)
 
-  // TODO(cmcewen): Use proper typing when there is a common interface
-  const tokenContract = await contractGetter(web3) // TODO(martinvol) add types specially here
-  const decimals: string = await tokenContract.methods.decimals().call()
+  const decimals = await contract.decimals()
   const decimalBigNum = new BigNumber(decimals)
   const decimalFactor = new BigNumber(10).pow(decimalBigNum.toNumber())
   const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor).toFixed(0)
 
-  const tx = tokenContract.methods.transferWithComment(
+  const tx = contract.transferWithComment(
     recipientAddress,
     convertedAmount.toString(),
     utf8.encode(comment)
@@ -134,6 +133,7 @@ export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, acco
   Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Checking account balance', account)
   const tokenContract = await getTokenContract(token)
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
+  // TODO consider having retry logic for ALL contract calls and txs. ContractKit should have this logic.
   const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
   Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Account balance', balanceInWei.toString())
   return balanceInWei
@@ -141,7 +141,6 @@ export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, acco
 
 export function tokenTransferFactory({
   actionName,
-  contractGetter,
   tag,
   currency,
   fetchAction,
@@ -169,7 +168,7 @@ export function tokenTransferFactory({
       try {
         const account = yield call(getConnectedUnlockedAccount)
 
-        const tx = yield call(createTransaction, contractGetter, {
+        const tx: CeloTransactionObject<boolean> = yield call(createTransaction, currency, {
           recipientAddress,
           amount,
           comment,
@@ -186,5 +185,15 @@ export function tokenTransferFactory({
         }
       }
     }
+  }
+}
+
+export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
+  const contractKit = getContractKit()
+  switch (currency) {
+    case CURRENCY_ENUM.GOLD:
+      return contractKit.registry.addressFor(CeloContract.GoldToken)
+    case CURRENCY_ENUM.DOLLAR:
+      return contractKit.registry.addressFor(CeloContract.StableToken)
   }
 }

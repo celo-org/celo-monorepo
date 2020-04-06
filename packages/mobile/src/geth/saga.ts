@@ -2,7 +2,7 @@ import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
-import { promptFornoIfNeededSelector } from 'src/account/reducer'
+import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,

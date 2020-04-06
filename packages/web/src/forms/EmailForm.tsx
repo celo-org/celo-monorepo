@@ -72,7 +72,7 @@ function EmailForm({
                     isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused
                   }
                   onChange={onInput}
-                  placeholder={t('form.email') + '*'}
+                  placeholder={t('common:email') + '*'}
                   placeholderTextColor={
                     isDarkMode ? colors.placeholderDarkMode : colors.placeholderGray
                   }
@@ -98,7 +98,7 @@ function EmailForm({
                   {formState.errors.length > 0 &&
                     formState.errors.map((error) => (
                       <Text style={[fonts.h6, textStyles.error]} key={error}>
-                        {t(`validationErrors.${error}`)}
+                        {t(`common:validationErrors.${error}`)}
                       </Text>
                     ))}
                 </View>

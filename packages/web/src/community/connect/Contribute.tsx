@@ -21,7 +21,9 @@ function Contribute({ t }: I18nProps) {
               size={SIZE.normal}
               text={t('contribute.button')}
               target={'_cfp'}
-              href={'https://medium.com/celohq/call-for-proposals-the-celo-fellowship-3c43b06b10f9'}
+              href={
+                'https://medium.com/celoOrg/call-for-proposals-the-celo-fellowship-3c43b06b10f9'
+              }
             />
           </View>
         </Cell>

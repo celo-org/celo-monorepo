@@ -37,7 +37,10 @@ describe('governance tests', () => {
     await context.hooks.before()
   })
 
-  after(context.hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await context.hooks.after()
+  })
 
   describe('Validator ordering', () => {
     before(async function() {

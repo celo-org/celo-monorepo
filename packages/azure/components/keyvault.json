@@ -14,41 +14,6 @@
         "enableRbacAuthorization": false,
         "accessPolicies": [
           {
-            "objectId": "[parameters('userObjectId')]",
-            "tenantId": "[subscription().tenantId]",
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "secrets": ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          },
-          {
             "objectId":
               "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('validatorUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
             "tenantId": "[subscription().tenantId]",
@@ -86,41 +51,6 @@
         "enableRbacAuthorization": false,
         "accessPolicies": [
           {
-            "objectId": "[parameters('userObjectId')]",
-            "tenantId": "[subscription().tenantId]",
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "secrets": ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          },
-          {
             "objectId":
               "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('proxyUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
             "tenantId": "[subscription().tenantId]",
@@ -157,41 +87,6 @@
         "enabledForDiskEncryption": false,
         "enableRbacAuthorization": false,
         "accessPolicies": [
-          {
-            "objectId": "[parameters('userObjectId')]",
-            "tenantId": "[subscription().tenantId]",
-            "permissions": {
-              "keys": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore"
-              ],
-              "secrets": ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"],
-              "certificates": [
-                "Get",
-                "List",
-                "Update",
-                "Create",
-                "Import",
-                "Delete",
-                "Recover",
-                "Backup",
-                "Restore",
-                "ManageContacts",
-                "ManageIssuers",
-                "GetIssuers",
-                "ListIssuers",
-                "SetIssuers",
-                "DeleteIssuers"
-              ]
-            }
-          },
           {
             "objectId":
               "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('attesterUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
@@ -242,17 +137,6 @@
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
-      "name":
-        "[concat(variables('validatorKeyVaultName'), '/', variables('validatorGethAccountSecretName'))]",
-      "apiVersion": "2018-02-14",
-      "location": "[parameters('location')]",
-      "dependsOn": ["[variables('validatorKeyVaultName')]"],
-      "properties": {
-        "value": "[parameters('validatorGethAccountSecret')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
       "name": "[concat(variables('attesterKeyVaultName'), '/attesterPostgreSQLPassword')]",
       "apiVersion": "2018-02-14",
       "location": "[parameters('location')]",
@@ -270,17 +154,6 @@
       "dependsOn": ["[variables('attesterKeyVaultName')]"],
       "properties": {
         "value": "[parameters('attesterPrivateKey')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name":
-        "[concat(variables('attesterKeyVaultName'), '/', variables('attesterGethAccountSecretName'))]",
-      "apiVersion": "2018-02-14",
-      "location": "[parameters('location')]",
-      "dependsOn": ["[variables('attesterKeyVaultName')]"],
-      "properties": {
-        "value": "[parameters('attesterGethAccountSecret')]"
       }
     },
     {

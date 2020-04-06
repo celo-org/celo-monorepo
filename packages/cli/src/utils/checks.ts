@@ -3,7 +3,7 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -99,6 +99,18 @@ class CheckBuilder {
 
   addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
     this.checks.push(check(name, predicate, errorMessage))
+    return this
+  }
+
+  addConditionalCheck(
+    name: string,
+    runCondition: boolean,
+    predicate: () => Promise<boolean> | boolean,
+    errorMessage?: string
+  ) {
+    if (runCondition) {
+      return this.addCheck(name, predicate, errorMessage)
+    }
     return this
   }
 
@@ -250,7 +262,7 @@ class CheckBuilder {
       `${this.signer!} is vote signer or registered account`,
       this.withAccounts(async (accs) => {
         return accs.voteSignerToAccount(this.signer!).then(
-          () => true,
+          (addr) => !eqAddress(addr, NULL_ADDRESS),
           () => false
         )
       })
@@ -323,6 +335,9 @@ class CheckBuilder {
       `Account isn't a member of a validator group`,
       this.withValidators(async (v, _signer, account) => {
         const { affiliation } = await v.getValidator(account)
+        if (!affiliation || eqAddress(affiliation, NULL_ADDRESS)) {
+          return true
+        }
         const { members } = await v.getValidatorGroup(affiliation!)
         return !members.includes(account)
       })
@@ -337,7 +352,18 @@ class CheckBuilder {
           account
         )
         const { duration } = await v.getValidatorLockedGoldRequirements()
-        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now()
+        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now() / 1000
+      })
+    )
+  }
+
+  resetSlashingmultiplierPeriodPassed = () => {
+    return this.addCheck(
+      `Enough time has passed since the last halving of the slashing multiplier`,
+      this.withValidators(async (v, _signer, account) => {
+        const { lastSlashed } = await v.getValidatorGroup(account)
+        const duration = await v.getSlashingMultiplierResetPeriod()
+        return duration.toNumber() + lastSlashed.toNumber() < Date.now() / 1000
       })
     )
   }

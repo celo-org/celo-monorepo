@@ -11,7 +11,7 @@ cleanup () {
 trap cleanup EXIT
 
 get_secret $VALIDATOR_KEY_VAULT 'validatorPrivateKey' > ${SECRET_DIR}/validatorPrivateKey
-get_secret $VALIDATOR_KEY_VAULT 'validatorGethAccountSecret' > ${SECRET_DIR}/validatorGethAccountSecret
+generate_password > ${SECRET_DIR}/accountPassword
 
 set -x
 
@@ -22,7 +22,7 @@ docker run \
   $GETH_NODE_DOCKER_IMAGE \
     account import \
     --keystore=${SECRET_DIR} \
-    --password=${SECRET_DIR}/validatorGethAccountSecret \
+    --password=${SECRET_DIR}/accountPassword \
     ${SECRET_DIR}/validatorPrivateKey
 
 docker run \
@@ -36,7 +36,7 @@ docker run \
     geth \
       --bootnodes=${BOOTNODES} \
       --keystore=${SECRET_DIR} \
-      --password=${SECRET_DIR}/validatorGethAccountSecret \
+      --password=${SECRET_DIR}/accountPassword \
       --unlock=$VALIDATOR_ACCOUNT_ADDRESS \
       --mine \
       --rpc \

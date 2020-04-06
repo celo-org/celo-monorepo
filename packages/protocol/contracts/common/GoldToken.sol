@@ -45,7 +45,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
    * @return True if the transaction succeeds.
    */
   // solhint-disable-next-line no-simple-event-func-name
-  function transfer(address to, uint256 value) external onlyWhenNotFrozen returns (bool) {
+  function transfer(address to, uint256 value) external returns (bool) {
     return _transfer(to, value);
   }
 
@@ -58,7 +58,6 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
    */
   function transferWithComment(address to, uint256 value, string calldata comment)
     external
-    onlyWhenNotFrozen
     returns (bool)
   {
     bool succeeded = _transfer(to, value);
@@ -133,6 +132,23 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
 
     allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
     emit Transfer(from, to, value);
+    return true;
+  }
+
+  /**
+   * @notice Mints new cGLD and gives it to 'to'.
+   * @param to The account for which to mint tokens.
+   * @param value The amount of cGLD to mint.
+   */
+  function mint(address to, uint256 value) external onlyVm returns (bool) {
+    require(value > 0, "mint value must be > 0");
+    totalSupply_ = totalSupply_.add(value);
+
+    bool success;
+    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
+    require(success, "Celo Gold transfer failed");
+
+    emit Transfer(address(0), to, value);
     return true;
   }
 

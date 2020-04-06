@@ -73,7 +73,7 @@ exports[`PastEventsPage renders 1`] = `
             }
           }
         >
-          events.refineBy
+          Refine By
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -323,7 +323,7 @@ exports[`PastEventsPage renders 1`] = `
           }
         }
       >
-        events.reppingCelo
+        Want to host a Celo Meet-up?
       </div>
       <div
         className="css-text-901oao"
@@ -360,6 +360,8 @@ exports[`PastEventsPage renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

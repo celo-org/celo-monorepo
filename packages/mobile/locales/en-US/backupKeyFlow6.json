@@ -2,6 +2,7 @@
   "getBackupKey": "Get Backup Key",
   "getYourKey": "Get Your Key",
   "viewBackupKey": "View Backup Key",
+  "setUpBackupKey": "Set Up Your Backup Key",
   "setUpSocialBackup": "Set Up Safeguards",
   "viewSafeguards": "View Safeguards",
   "failedFetchMnemonic": "Failed to fetch your Backup Key",
@@ -19,7 +20,8 @@
     "4": "For more security set up Safeguards for your wallet.",
     "5":
       "You’ve also set up Safeguards! You’ll be able to restore your account with the help of the two friends. ",
-    "6": "KEEP YOUR SAFEGUARDS SECRET"
+    "6": "KEEP YOUR SAFEGUARDS SECRET",
+    "7": "Now, we'll set up your key so you, and only you, can access your funds anytime, anywhere."
   },
   "backupSkipText": {
     "0": "Without a Backup Key, you can lose access to your wallet ",
@@ -48,6 +50,7 @@
   "importBackupFailed": "Importing Wallet Failed",
   "backupQuizFailed": "Incorrect Backup Key, please try again",
   "backupComplete": {
+    "header": "Backup Complete",
     "0": "Success!",
     "1": "Next, you can set up Safeguards.",
     "2": "You’re all set!"

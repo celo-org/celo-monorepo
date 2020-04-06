@@ -37,7 +37,6 @@ platform :android do
   desc 'Build the Android application - requires environment param'
   lane :build do |options|
     clean
-    sh('yarn', 'run', 'build:sdk', options[:sdkEnv])
     environment = options[:environment].capitalize
     ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx256m -XX:+HeapDumpOnOutOfMemoryError"'
     gradle(task: 'bundle' + environment + 'JsAndAssets', project_dir: 'android/')
@@ -102,6 +101,42 @@ platform :android do
     sdkEnv = options[:sdkEnv]
     build(environment: env, sdkEnv: sdkEnv)
   end
+end
+
+platform :ios do
+
+  desc 'Build the iOS application - requires environment param'
+  lane :build do |options|
+    gym(
+      workspace: 'ios/celo.xcworkspace',
+      scheme: "celo-#{options[:environment]}",
+      configuration: "Release",
+      xcargs: "-allowProvisioningUpdates",
+      output_directory: "build",
+      # verbose: true
+     ) 
+  end
+
+  desc 'Ship Alfajores to TestFlight'
+  lane :alfajores do
+    env = 'alfajores'
+    sdkEnv = 'alfajores'
+    build(environment: env, sdkEnv: sdkEnv)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc 'Ship Pilot to TestFlight'
+  lane :pilotapp do
+    env = 'pilot'
+    sdkEnv = 'pilot'
+    build(environment: env, sdkEnv: sdkEnv)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
 end
 
 

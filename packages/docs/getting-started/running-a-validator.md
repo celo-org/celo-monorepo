@@ -177,14 +177,14 @@ Next, we'll run a node on your local machine so that we can use these accounts t
 ```bash
 # On your local machine
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-docker run -v $PWD:/root/.celo --rm -it --entrypoint cp $CELO_IMAGE /celo/static-nodes.json /root/.celo/
+export BOOTNODE_ENODES=`docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes`
 ```
 
 To run the node:
 
 ```bash
 # On your local machine
-docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal
+docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --bootnodes $BOOTNODE_ENODES
 ```
 
 {% hint style="danger" %}
@@ -561,7 +561,7 @@ You can now run the node for the attestation service in the background. In the b
 ```bash
 # On the Attestation machine
 echo <ATTESTATION-SIGNER-PASSWORD> > .password
-docker run --name celo-attestations -it --restart always -p 8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --bootnodes $BOOTNODE_ENODES
+docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --bootnodes $BOOTNODE_ENODES
 ```
 
 Next we will set up the Attestation Service itself. First, specify the following environment variables:
@@ -739,10 +739,12 @@ screen -r -S celo-validator
 You can stop the Docker containers at any time without problem. If you stop your containers that means those containers stop providing service.
 The data dir of the validator and the proxy are Docker volumes mounted in the containers from the `celo-*-dir` you created at the very beginning. So if you don't remove that folder, you can stop or restart the containers without losing any data.
 
+It is recommended to use the Docker stop timeout parameter `-t` when stopping the containers. This allows time, in this case 60 seconds, for the Celo nodes to flush recent chain data it keeps in memory into the data directories. Omitting this may cause your blockchain data to corrupt, requiring the node to start syncing from scratch.
+
 You can stop the `celo-validator` and `celo-proxy` containers running:
 
 ```bash
-docker stop celo-validator celo-proxy
+docker stop celo-validator celo-proxy -t 60
 ```
 
 And you can remove the containers (not the data dir) running:

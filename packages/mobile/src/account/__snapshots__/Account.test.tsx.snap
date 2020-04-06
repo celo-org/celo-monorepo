@@ -21,27 +21,29 @@ exports[`Account renders correctly 1`] = `
         }
       >
         <View
+          accessible={true}
+          focusable={true}
+          isTVSelectable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
-              "flexDirection": "column",
-              "justifyContent": "center",
-              "marginBottom": 10,
+              "opacity": 1,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                },
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-              ]
+              Object {
+                "flexDirection": "column",
+                "justifyContent": "center",
+                "marginBottom": 10,
+              }
             }
           >
             <View
@@ -49,104 +51,120 @@ exports[`Account renders correctly 1`] = `
                 Array [
                   Object {
                     "alignItems": "center",
+                    "flexDirection": "row",
                     "justifyContent": "center",
                   },
                   Object {
-                    "backgroundColor": "#7AD6FE",
-                    "borderRadius": 20,
-                    "height": 40,
-                    "width": 40,
+                    "alignSelf": "center",
+                    "margin": "auto",
                   },
                 ]
               }
             >
-              <Image
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                  }
-                }
+              <View
                 style={
                   Array [
                     Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
+                      "alignItems": "center",
+                      "justifyContent": "center",
                     },
                     Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
                       "height": 40,
                       "width": 40,
                     },
                   ]
                 }
-              />
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                />
+              </View>
             </View>
-          </View>
-          <Text
-            ellipsizeMode="tail"
-            numberOfLines={1}
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                Object {
-                  "marginHorizontal": 20,
-                  "paddingTop": 6,
-                  "textAlign": "center",
-                },
-              ]
-            }
-          >
-            John Doe
-          </Text>
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "alignSelf": "center",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              }
-            }
-          >
             <Text
+              ellipsizeMode="tail"
+              numberOfLines={1}
               style={
                 Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "marginHorizontal": 20,
+                    "paddingTop": 6,
+                    "textAlign": "center",
+                  },
+                ]
+              }
+            >
+              John Doe
+            </Text>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "alignSelf": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
+                    },
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "#EEEEEE",
+                      "borderRadius": 3,
+                      "justifyContent": "center",
+                      "marginRight": 5,
+                      "paddingLeft": 6,
+                      "paddingRight": 3,
+                    },
+                  ]
+                }
+              >
+                🇺🇸 +1
+              </Text>
+              <Text
+                style={
                   Object {
                     "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 14,
                     "textAlignVertical": "center",
-                  },
-                  Object {
-                    "alignItems": "center",
-                    "backgroundColor": "#EEEEEE",
-                    "borderRadius": 3,
-                    "justifyContent": "center",
-                    "marginRight": 5,
-                    "paddingLeft": 6,
-                    "paddingRight": 3,
-                  },
-                ]
-              }
-            >
-              🇺🇸 +1
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 14,
-                  "textAlignVertical": "center",
+                  }
                 }
-              }
-            >
-              (415) 555-6666
-            </Text>
+              >
+                (415) 555-6666
+              </Text>
+            </View>
           </View>
         </View>
         <View>
@@ -937,7 +955,7 @@ exports[`Account renders correctly 1`] = `
                   }
                 }
               >
-                sendIssueReport
+                support
               </Text>
             </View>
             <View
@@ -993,7 +1011,7 @@ exports[`Account renders correctly 1`] = `
               }
             }
           >
-            version undefined
+            version appVersion
           </Text>
         </View>
         <View
@@ -1111,27 +1129,29 @@ exports[`Account renders correctly when dev mode active 1`] = `
         }
       >
         <View
+          accessible={true}
+          focusable={true}
+          isTVSelectable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
-              "flexDirection": "column",
-              "justifyContent": "center",
-              "marginBottom": 10,
+              "opacity": 1,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                },
-                Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
-                },
-              ]
+              Object {
+                "flexDirection": "column",
+                "justifyContent": "center",
+                "marginBottom": 10,
+              }
             }
           >
             <View
@@ -1139,104 +1159,120 @@ exports[`Account renders correctly when dev mode active 1`] = `
                 Array [
                   Object {
                     "alignItems": "center",
+                    "flexDirection": "row",
                     "justifyContent": "center",
                   },
                   Object {
-                    "backgroundColor": "#7AD6FE",
-                    "borderRadius": 20,
-                    "height": 40,
-                    "width": 40,
+                    "alignSelf": "center",
+                    "margin": "auto",
                   },
                 ]
               }
             >
-              <Image
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                  }
-                }
+              <View
                 style={
                   Array [
                     Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
+                      "alignItems": "center",
+                      "justifyContent": "center",
                     },
                     Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
                       "height": 40,
                       "width": 40,
                     },
                   ]
                 }
-              />
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                />
+              </View>
             </View>
-          </View>
-          <Text
-            ellipsizeMode="tail"
-            numberOfLines={1}
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                Object {
-                  "marginHorizontal": 20,
-                  "paddingTop": 6,
-                  "textAlign": "center",
-                },
-              ]
-            }
-          >
-            John Doe
-          </Text>
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "alignSelf": "center",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              }
-            }
-          >
             <Text
+              ellipsizeMode="tail"
+              numberOfLines={1}
               style={
                 Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "marginHorizontal": 20,
+                    "paddingTop": 6,
+                    "textAlign": "center",
+                  },
+                ]
+              }
+            >
+              John Doe
+            </Text>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "alignSelf": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
+                    },
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "#EEEEEE",
+                      "borderRadius": 3,
+                      "justifyContent": "center",
+                      "marginRight": 5,
+                      "paddingLeft": 6,
+                      "paddingRight": 3,
+                    },
+                  ]
+                }
+              >
+                🇺🇸 +1
+              </Text>
+              <Text
+                style={
                   Object {
                     "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 14,
                     "textAlignVertical": "center",
-                  },
-                  Object {
-                    "alignItems": "center",
-                    "backgroundColor": "#EEEEEE",
-                    "borderRadius": 3,
-                    "justifyContent": "center",
-                    "marginRight": 5,
-                    "paddingLeft": 6,
-                    "paddingRight": 3,
-                  },
-                ]
-              }
-            >
-              🇺🇸 +1
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 14,
-                  "textAlignVertical": "center",
+                  }
                 }
-              }
-            >
-              (415) 555-6666
-            </Text>
+              >
+                (415) 555-6666
+              </Text>
+            </View>
           </View>
         </View>
         <View>
@@ -2027,7 +2063,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   }
                 }
               >
-                sendIssueReport
+                support
               </Text>
             </View>
             <View
@@ -2243,7 +2279,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
               }
             }
           >
-            version undefined
+            version appVersion
           </Text>
         </View>
         <View

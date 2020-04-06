@@ -34,7 +34,7 @@
   "loading": {
     "verifyingNumber": "Verifying {{number}}",
     "keepOpen": "Please keep the app open",
-    "card1": "Verifying your phone number helps your friends find you on the Celo Network.",
+    "card1": "Verifying your account allows you to see which of your friends uses Celo Wallet.",
     "card2": "On Celo, you can send money to anyone using just their phone number.",
     "card3": "Celo is now requesting three text messages to confirm you own your phone number."
   },
