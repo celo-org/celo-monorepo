@@ -10,6 +10,7 @@ interface Props {
 export default React.memo(function Octocat({ color, size }: Props) {
   return (
     <Svg width={size} height={size} viewBox="0 0 25 24" fill="none">
+      <title>Github</title>
       <Path
         fillRule="evenodd"
         clipRule="evenodd"
