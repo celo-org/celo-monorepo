@@ -21,10 +21,9 @@ The deployment timeline is as follows (all dates are subject to change):
 * 3/31 - 4/7: Infrastructure setup
 * 4/7 16:00 UTC: Block production begins
 * 4/7: Celo Core Contracts and `ReleaseGold` contracts are deployed
-* 4/8: Governance proposal to start Validator rewards
-* 4/9: Governance proposal to unfreeze Celo Gold voter rewards
-* 4/10: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
-* 4/13: Faucet requests for non-genesis Validators accepted
+* 4/8: Governance proposal to start Validator rewards and voter rewards
+* 4/9: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
+* 4/10: Faucet requests for non-genesis Validators accepted
 
 {% hint style="info" %}
 A [timeline](https://celo.org/#timeline) of the Celo project is available to provide further context.
@@ -63,7 +62,7 @@ docker pull $CELO_IMAGE
 The `us.gcr.io/celo-testnet/celo-node:baklava` image is built from commit [`c38f2fd30d2d7c4716a5181c9645121709b9004e`](https://github.com/celo-org/celo-blockchain/commit/c38f2fd30d2d7c4716a5181c9645121709b9004e) and contains the [genesis block](https://storage.cloud.google.com/genesis_blocks/baklava) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Geth binary.
 
 {% hint style="warning" %}
-Upgrading a node with version prior to `0.10.0`, released on April 4th, requires reset of the chain data. One way to accomplish this is by running `docker run -it -v $PWD:/root/.celo $CELO_IMAGE --nousb removedb`
+Upgrading a node with version prior to `0.10.0`, released on April 4th, requires reset of the chain data. One way to accomplish this is by removing the `celo` directory within the data directory. **Make sure not to remove your keystore**
 {% endhint %}
 
 ### Networking requirements
@@ -88,7 +87,7 @@ You can then run the proxy with the following command. Be sure to replace `<YOUR
 
 ```bash
 # On the proxy machine
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
+docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-celostats.celo-testnet.org
 ```
 
 {% hint style="info" %}
@@ -545,7 +544,7 @@ You can inspect the current state of the Validator elections by running:
 celocli election:list
 ```
 
-You can check the status of your Validator, including whether it is elected and signing blocks, at [baklava-celostats.celo-testnet.org](https://baklava-ethstats.celo-testnet.org) or by running:
+You can check the status of your Validator, including whether it is elected and signing blocks, at [baklava-celostats.celo-testnet.org](https://baklava-celostats.celo-testnet.org) or by running:
 
 ```bash
 # On your local machine
