@@ -1,3 +1,4 @@
+/* tslint:disable:no-console */
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -24,6 +25,7 @@ module.exports = deploymentForCoreContract<ElectionInstance>(
   initializeArgs,
   async (election: ElectionInstance) => {
     if (config.election.frozen) {
+      console.log(`\tFreezing validator elections`)
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
         artifacts
