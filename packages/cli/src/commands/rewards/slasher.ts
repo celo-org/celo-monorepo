@@ -1,4 +1,3 @@
-// Not intended for publication.  Used only as scaffolding to develop contractkit.
 import { Address } from '@celo/contractkit'
 import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
 import { mapAddressListDataOnto } from '@celo/utils/lib/address'
@@ -15,18 +14,21 @@ export default class Slasher extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: "Slasher's address" }),
+    automatic: flags.boolean({ description: 'Automatically monitor and slash for downtime' }),
     dryRun: flags.boolean({ description: 'Dry run' }),
-    slashableDowntime: flags.integer({ description: 'Downtime to slash for' }),
-    slashValidator: Flags.address({ description: 'Slash validator address' }),
     forDowntimeEndingAtBlock: flags.integer({
-      description: 'Slash validator for downtime ending at block',
+      description: 'Manually slash validator for downtime ending at block',
     }),
+    from: Flags.address({ required: true, description: "Slasher's address" }),
+    slashableDowntime: flags.integer({
+      description: 'Overrides downtime threshold for automatically slashing',
+    }),
+    slashValidator: Flags.address({ description: 'Manually slash this validator address' }),
   }
 
   static args = []
 
-  static examples = ['slasher']
+  static examples = ['slasher --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --automatic']
 
   async run() {
     const res = this.parse(Slasher)
@@ -47,10 +49,14 @@ export default class Slasher extends BaseCommand {
         res.flags.forDowntimeEndingAtBlock,
         res.flags.dryRun
       )
-    } else {
+    } else if (res.flags.automatic) {
       const slashableDowntime =
         res.flags.slashableDowntime || (await downtimeSlasher.slashableDowntime())
       await this.slasher(slashableDowntime, res.flags.dryRun)
+    } else {
+      throw new Error(
+        'Either --automatic or --slashValidator and --forDowntimeEndingAtBlock is required'
+      )
     }
   }
 
