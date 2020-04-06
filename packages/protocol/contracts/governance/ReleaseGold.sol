@@ -207,7 +207,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     releaseSchedule.releasePeriod = releasePeriod;
     releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
     releaseSchedule.releaseStartTime = releaseStartTime;
-    // Nonvalidators (employees) opt-out of Escheat, validators are opt-in.
+    // Expiry is opt-in for folks who can validate, opt-out for folks who cannot.
+    // This is because folks who are running Validators or Groups are likely to want to keep
+    // cGLD in the ReleaseGold contract even after it becomes withdrawable.
     revocationInfo.canExpire = !canValidate;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
@@ -279,8 +281,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   /**
    * @notice Controls if the contract can be expired.
-   *         This would be called by beneficiarys who would like to validate with this contract
-   *         without worrying about future expiration.
+   * @param _canExpire If the contract is expirable.
    */
   function setCanExpire(bool _canExpire) external onlyBeneficiary {
     require(

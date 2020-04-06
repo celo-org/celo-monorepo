@@ -400,7 +400,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
 
   /**
    * Sets the contract's `canExpire` field to `_canExpire`
-   * @param _canExpire If the contract may be expired after `EXPIRATION_TIME`
+   * @param _canExpire If the contract can expire `EXPIRATION_TIME` after the release schedule finishes.
    */
   setCanExpire = proxySend(this.kit, this.contract.methods.setCanExpire)
 

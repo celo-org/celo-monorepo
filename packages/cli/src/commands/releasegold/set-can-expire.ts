@@ -16,7 +16,9 @@ export default class SetCanExpire extends ReleaseGoldCommand {
       required: true,
       description: 'canExpire value',
     }),
-    yesreally: flags.boolean({ description: 'Override prompt to set liquidity (be careful!)' }),
+    yesreally: flags.boolean({
+      description: 'Override prompt to set expiration flag (be careful!)',
+    }),
   }
 
   static args = []

@@ -22,7 +22,7 @@
 
 • **currentReleasedTotalAmount**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L30)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L15)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **maxDistribution**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L25)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L10)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **remainingLockedBalance**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L29)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L14)*
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **remainingTotalBalance**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L27)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L12)*
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • **remainingUnlockedBalance**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L28)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L13)*
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 • **totalBalance**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L26)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L11)*
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 • **totalWithdrawn**: *string*
 
-*Defined in [contractkit/src/wrappers/ReleaseGold.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L24)*
+*Defined in [contractkit/src/wrappers/ReleaseGold.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/ReleaseGold.ts#L9)*
