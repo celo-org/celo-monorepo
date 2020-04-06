@@ -1,5 +1,8 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
+import {
+  deploymentForCoreContract,
+  getDeployedProxiedContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { ElectionInstance, FreezerInstance } from 'types'
