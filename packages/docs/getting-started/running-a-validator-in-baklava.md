@@ -21,10 +21,9 @@ The deployment timeline is as follows (all dates are subject to change):
 * 3/31 - 4/7: Infrastructure setup
 * 4/7 16:00 UTC: Block production begins
 * 4/7: Celo Core Contracts and `ReleaseGold` contracts are deployed
-* 4/8: Governance proposal to start Validator rewards
-* 4/9: Governance proposal to unfreeze Celo Gold voter rewards
-* 4/10: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
-* 4/13: Faucet requests for non-genesis Validators accepted
+* 4/8: Governance proposal to start Validator rewards and voter rewards
+* 4/9: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
+* 4/10: Faucet requests for non-genesis Validators accepted
 
 {% hint style="info" %}
 A [timeline](https://celo.org/#timeline) of the Celo project is available to provide further context.
