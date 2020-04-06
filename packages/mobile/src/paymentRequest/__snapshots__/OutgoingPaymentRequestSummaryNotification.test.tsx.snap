@@ -115,6 +115,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly 1`] = `
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
@@ -124,12 +125,14 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly 1`] = `
                       "lineHeight": 20,
                     },
                     Object {
-                      "fontFamily": "Hind-SemiBold",
+                      "color": "#81868B",
                     },
                   ]
                 }
               >
-                200000.00
+                
+                $
+                266,000.00
               </Text>
             </Text>
             <View>
@@ -314,8 +317,28 @@ exports[`OutgoingPaymentRequestSummaryNotification when more 1 requests renders 
                   "lineHeight": 18,
                 }
               }
+              testID="OutgoingPaymentRequestNotification/FAKE_ID_1/Title"
             >
-              outgoingPaymentRequestNotificationTitle
+              Requested
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                266,000.00
+              </Text>
+               
+              from 
+              0x32142315123dasfas3e23r2r3
             </Text>
             <View
               style={
@@ -543,6 +566,7 @@ exports[`OutgoingPaymentRequestSummaryNotification when more than 2 requests ren
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
@@ -552,12 +576,14 @@ exports[`OutgoingPaymentRequestSummaryNotification when more than 2 requests ren
                       "lineHeight": 20,
                     },
                     Object {
-                      "fontFamily": "Hind-SemiBold",
+                      "color": "#81868B",
                     },
                   ]
                 }
               >
-                200000.00
+                
+                $
+                266,000.00
               </Text>
             </Text>
             <View>

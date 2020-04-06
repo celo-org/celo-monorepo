@@ -1,0 +1,76 @@
+#Copyright 2019 Google LLC
+
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+
+#https://www.apache.org/licenses/LICENSE-2.0
+
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: prometheus
+    chart: prometheus-stackdriver
+    release: prometheus-stackdriver
+    heritage: prometheus-stackdriver
+    component: prometheus-stackdriver
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus-server
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:{{ .Values.prometheus.imageTag }}
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus/"
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus/
+            - name: prometheus-storage-volume
+              mountPath: /prometheus/
+        - name: sidecar
+          image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:{{ .Values.sidecar.imageTag }}
+          imagePullPolicy: Always
+          args:
+            - --stackdriver.project-id={{ .Values.gcloud.project }}
+            - --prometheus.wal-directory=/prometheus/wal
+            - --stackdriver.kubernetes.location={{ .Values.gcloud.region }}
+            - --stackdriver.kubernetes.cluster-name={{ .Values.cluster }}
+          ports:
+            - name: sidecar
+              containerPort: 9091
+          volumeMounts:
+            - name: prometheus-storage-volume
+              mountPath: /prometheus
+            - name: prometheus-service-account-key
+              mountPath: /var/secrets/google
+          env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/prometheus-service-account.json
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            defaultMode: 420
+            name: prometheus-server-conf
+
+        - name: prometheus-storage-volume
+          emptyDir: {}
+
+        - name: prometheus-service-account-key
+          secret:
+            secretName: prometheus-service-account-key

@@ -196,6 +196,8 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1429,6 +1431,8 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://celo.org/privacy"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1537,263 +1541,6 @@ exports[`FAQ renders 1`] = `
         }
       >
         If you enable the Celo Wallet app permission to read your contacts’ names and photos, you will see those photos in the Wallet. This enables a more personalized and enhanced experience, and this data will only be available to you on your own device - it is not shared with other users.
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "WebkitAlignSelf": "center",
-        "WebkitBoxDirection": "normal",
-        "WebkitBoxOrient": "vertical",
-        "WebkitFlexDirection": "column",
-        "alignSelf": "center",
-        "flexDirection": "column",
-        "marginBottom": "30px",
-        "marginTop": "30px",
-        "maxWidth": "100vw",
-        "msFlexDirection": "column",
-        "msFlexItemAlign": "center",
-        "paddingLeft": "10px",
-        "paddingRight": "10px",
-        "width": "100%",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "24px",
-            "lineHeight": "32px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        What is the Celo Rewards app?
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "20px",
-            "lineHeight": "28px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        The Celo Rewards app is a proof of concept for the identity protocol that would allow for any user to earn more Celo Gold in the system by actively participating in the verification process of other users. Users of the app with spare capacity to send text messages, could earn additional value for sending those verification text messages. Read more about the identity protocol
-         
-        <div
-          className="css-view-1dbjc4n"
-          onClick={[Function]}
-          onMouseDown={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
-          style={
-            Object {
-              "display": "inline",
-            }
-          }
-        >
-          <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
-            data-focusable={true}
-            dir="auto"
-            href="https://docs.celo.org/celo-codebase/protocol/identity"
-            role="link"
-            style={
-              Object {
-                "WebkitTextDecorationStyle": "solid",
-                "cursor": "pointer",
-                "display": "inline",
-                "opacity": 1,
-                "textDecoration": "underline",
-                "textDecorationStyle": "solid",
-              }
-            }
-          >
-            here
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "WebkitAlignSelf": "center",
-        "WebkitBoxDirection": "normal",
-        "WebkitBoxOrient": "vertical",
-        "WebkitFlexDirection": "column",
-        "alignSelf": "center",
-        "flexDirection": "column",
-        "marginBottom": "30px",
-        "marginTop": "30px",
-        "maxWidth": "100vw",
-        "msFlexDirection": "column",
-        "msFlexItemAlign": "center",
-        "paddingLeft": "10px",
-        "paddingRight": "10px",
-        "width": "100%",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "24px",
-            "lineHeight": "32px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        How do I get more Celo Gold?
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "20px",
-            "lineHeight": "28px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Please, go ahead and download the Celo Rewards app
-         
-        <div
-          className="css-view-1dbjc4n"
-          onClick={[Function]}
-          onMouseDown={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
-          style={
-            Object {
-              "display": "inline",
-            }
-          }
-        >
-          <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
-            data-focusable={true}
-            dir="auto"
-            href="https://celo.org/rewards"
-            role="link"
-            style={
-              Object {
-                "WebkitTextDecorationStyle": "solid",
-                "cursor": "pointer",
-                "display": "inline",
-                "opacity": 1,
-                "textDecoration": "underline",
-                "textDecorationStyle": "solid",
-              }
-            }
-          >
-            here
-          </a>
-        </div>
-        !
       </div>
     </div>
   </div>
@@ -1999,6 +1746,8 @@ exports[`FAQ renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

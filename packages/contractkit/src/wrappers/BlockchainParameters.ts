@@ -1,5 +1,5 @@
-import { BlockchainParameters } from '../generated/types/BlockchainParameters'
-import { BaseWrapper, proxySend } from './BaseWrapper'
+import { BlockchainParameters } from '../generated/BlockchainParameters'
+import { BaseWrapper, proxyCall, proxySend, valueToInt } from './BaseWrapper'
 
 /**
  * Network parameters that are configurable by governance.
@@ -12,6 +12,11 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
     this.kit,
     this.contract.methods.setIntrinsicGasForAlternativeFeeCurrency
   )
+
+  /**
+   * Getting the block gas limit.
+   */
+  getBlockGasLimit = proxyCall(this.contract.methods.blockGasLimit, undefined, valueToInt)
   /**
    * Setting the block gas limit.
    */

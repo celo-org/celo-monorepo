@@ -28,14 +28,14 @@
   "dependencies": {
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "0.1.8-dev",
+    "@celo/utils": "0.1.9-dev",
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/netinfo": "^4.4.0",
     "@segment/analytics-react-native": "^1.1.0-beta.2",
     "@segment/analytics-react-native-firebase": "^1.1.0-beta.2",
     "apollo-boost": "^0.3.1",
     "apollo-cache-persist": "^0.1.1",
-    "bignumber.js": "^7.2.0",
+    "bignumber.js": "^9.0.0",
     "date-fns": "^2.0.0-alpha.27",
     "graphql": "^14.1.1",
     "i18next": "^19.0.2",
@@ -60,7 +60,7 @@
     "react-redux": "^7.1.1",
     "redux": "^4.0.4",
     "redux-persist": "^6.0.0",
-    "web3-utils": "1.0.0-beta.37"
+    "web3-utils": "1.2.4"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
@@ -70,7 +70,6 @@
     "@types/react": "^16.8.19",
     "@types/react-native": "^0.60.19",
     "@types/react-test-renderer": "^16.9.0",
-    "@types/web3": "^1.0.18",
     "babel-core": "7.0.0-bridge.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",

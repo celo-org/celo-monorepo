@@ -10,35 +10,20 @@ import {
   TextStyle,
   View,
   ViewProps,
+  ViewStyle,
 } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { Cell, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { ErrorMessage } from './ErrorDisplay'
 
-export function ErrorMessage({ allErrors, field, t }) {
-  let key = 'generic'
-
-  if (field === 'email' || key === 'unknownError') {
-    key = field
-  }
-
-  return allErrors.includes(field) ? (
-    <Fade>
-      <Text style={[fonts.h6, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
-    </Fade>
-  ) : (
-    <View style={styles.errorPlaceholder} />
-  )
-}
-
-export function NameErrorArea({ t, formState, isMobile }) {
+export function NameErrorArea({ formState, isMobile }) {
   return (
     <Cell
       span={Spans.fourth}
       tabletSpan={Spans.full}
       style={isMobile ? [styles.verticalSpace, styles.alignStart] : styles.validationMessage}
     >
-      <ErrorMessage allErrors={formState.errors} field={'name'} t={t} />
+      <ErrorMessage allErrors={formState.errors} field={'name'} />
     </Cell>
   )
 }
@@ -74,7 +59,7 @@ export function HolisticField({
         tabletSpan={Spans.full}
         style={isMobile ? [styles.verticalSpace, styles.alignStart] : styles.validationMessage}
       >
-        <ErrorMessage allErrors={errors} field={fieldName} t={t} />
+        <ErrorMessage allErrors={errors} field={fieldName} />
       </Cell>
       <Cell
         span={Spans.half}
@@ -111,9 +96,6 @@ export const styles = StyleSheet.create({
   zeroVertical: {
     paddingVertical: 1,
   },
-  errorPlaceholder: {
-    height: 18,
-  },
   errorBorder: {
     borderColor: colors.error,
   },
@@ -122,9 +104,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     color: colors.secondary,
-  },
-  labelBox: {
-    marginBottom: 5,
+    lineHeight: 20,
   },
 })
 
@@ -164,38 +144,81 @@ export class TextInput extends React.Component<TextInputProps & TextInputAuxProp
   }
 }
 
-interface LabelProps {
+interface CheckboxProps {
+  checked: boolean
   name: string
-  multiline?: boolean
-  hasError: boolean
-  value: string
-  label: string
-  onInput: (x?: unknown) => void
+  onPress: (x: any) => void
 }
 
-export function LabeledInput({ name, multiline, hasError, value, onInput, label }: LabelProps) {
+export function Checkbox({ checked, onPress, name }: CheckboxProps) {
   return (
-    <>
-      <View style={styles.labelBox}>
-        <Text accessibilityRole={'label'} style={[fonts.a, textStyles.medium, styles.label]}>
-          {label}
-        </Text>
-      </View>
-      <TextInput
-        multiline={multiline}
-        numberOfLines={3}
+    <View style={checkBoxStyles.border}>
+      <Text
         style={[
-          standardStyles.input,
-          fonts.p,
-          styles.input,
-          standardStyles.elementalMarginBottom,
-          hasError && styles.errorBorder,
+          checkBoxStyles.checkMark,
+          checked ? checkBoxStyles.checkMarkChecked : checkBoxStyles.hidden,
         ]}
-        focusStyle={standardStyles.inputFocused}
-        name={name}
-        value={value}
-        onChange={onInput}
-      />
-    </>
+      >
+        ✓
+      </Text>
+      {createElement('input', {
+        type: 'checkbox',
+        name,
+        checked,
+        onClick: onPress,
+        style: checkBoxStyles.hidden,
+      })}
+    </View>
   )
 }
+
+interface NativeLabelProps {
+  children: React.ReactNode
+  for: string
+  onPress: (x: any) => void
+  style?: ViewStyle
+}
+
+export function Label({ children, for: htmlFor, onPress, style }: NativeLabelProps) {
+  return createElement('label', { for: htmlFor, name: htmlFor, children, onClick: onPress, style })
+}
+
+export function CheckboxWithLabel({
+  checked,
+  onPress,
+  name,
+  label,
+}: CheckboxProps & { label: string }) {
+  return (
+    <View style={standardStyles.row}>
+      <Checkbox checked={checked} onPress={onPress} name={name} />
+
+      <Text style={[fonts.a, textStyles.medium, styles.label]}>
+        <Label for={name} onPress={onPress} style={checkBoxStyles.label}>
+          {label}
+        </Label>
+      </Text>
+    </View>
+  )
+}
+
+const checkBoxStyles = StyleSheet.create({
+  border: {
+    paddingHorizontal: 2,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: colors.gray,
+  },
+  checkMark: {
+    color: colors.gray,
+    position: 'absolute',
+    transform: [{ translateY: -2 }, { translateX: 1 }],
+    transitionProperty: 'opacity',
+    transitionDuration: '100ms',
+  },
+  checkMarkChecked: {
+    opacity: 1,
+  },
+  hidden: { opacity: 0 },
+  label: { paddingHorizontal: 10 },
+})

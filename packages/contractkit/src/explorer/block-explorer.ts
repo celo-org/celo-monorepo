@@ -1,6 +1,6 @@
 import { Address } from '@celo/utils/lib/address'
+import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
-import { Block, Transaction } from 'web3/eth/types'
 import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
@@ -70,9 +70,11 @@ export class BlockExplorer {
   parseBlock(block: Block): ParsedBlock {
     const parsedTx: ParsedTx[] = []
     for (const tx of block.transactions) {
-      const maybeKnownCall = this.tryParseTx(tx)
-      if (maybeKnownCall != null) {
-        parsedTx.push(maybeKnownCall)
+      if (typeof tx !== 'string') {
+        const maybeKnownCall = this.tryParseTx(tx)
+        if (maybeKnownCall != null) {
+          parsedTx.push(maybeKnownCall)
+        }
       }
     }
 
@@ -83,13 +85,25 @@ export class BlockExplorer {
   }
 
   tryParseTx(tx: Transaction): null | ParsedTx {
-    const contractMapping = this.addressMapping.get(tx.to)
+    const callDetails = this.tryParseTxInput(tx.to!, tx.input)
+    if (!callDetails) {
+      return null
+    }
+
+    return {
+      tx,
+      callDetails,
+    }
+  }
+
+  tryParseTxInput(address: string, input: string): null | CallDetails {
+    const contractMapping = this.addressMapping.get(address)
     if (contractMapping == null) {
       return null
     }
 
-    const callSignature = tx.input.slice(0, 10)
-    const encodedParameters = tx.input.slice(10)
+    const callSignature = input.slice(0, 10)
+    const encodedParameters = input.slice(10)
 
     const matchedAbi = contractMapping.fnMapping.get(callSignature)
     if (matchedAbi == null) {
@@ -100,16 +114,11 @@ export class BlockExplorer {
       abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
 
-    const callDetails: CallDetails = {
+    return {
       contract: contractMapping.details.name,
       function: matchedAbi.name!,
       paramMap: params,
       argList: args,
-    }
-
-    return {
-      tx,
-      callDetails,
     }
   }
 }

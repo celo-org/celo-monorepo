@@ -7,14 +7,13 @@ import {
   SignTxRequest,
   SignTxResponseSuccess,
 } from '@celo/utils/src/dappkit'
-import BigNumber from 'bignumber.js'
 import { call, select, takeLeading } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -62,6 +61,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
 
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
+      const contractKit = getContractKit()
       // TODO offload this logic to walletkit or contractkit, otherwise they
       // could diverge again and create another bug
       // See https://github.com/celo-org/celo-monorepo/issues/3045
@@ -69,7 +69,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
       // In walletKit we use web3.eth.getCoinbase() to get gateway fee recipient
       // but that's throwing errors here. Not sure why, but txs work without it.
       const gatewayFeeRecipient = undefined
-      const gatewayFee = '0x' + new BigNumber(10000).toString(16)
+      const gatewayFee = undefined
       const gas = Math.round(tx.estimatedGas * 1.5)
 
       const params: any = {
@@ -87,7 +87,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         params.to = tx.to
       }
       Logger.debug(TAG, 'Signing tx with params', JSON.stringify(params))
-      const signedTx = await web3.eth.signTransaction(params)
+      const signedTx = await contractKit.web3.eth.signTransaction(params)
       return signedTx.raw
     })
   )

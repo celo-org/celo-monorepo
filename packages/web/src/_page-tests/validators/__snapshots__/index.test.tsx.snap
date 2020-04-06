@@ -420,7 +420,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            makeWithCelo
+            Build Celo
           </div>
         </h2>
         <h4
@@ -449,7 +449,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            makeWithCeloSubtitle
+            Get a taste of Baklava, Celo’s incentivized testnet, and participate in The Great Celo Stake Off
           </div>
         </h4>
       </div>
@@ -579,7 +579,8 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            greatStakeOff
+            The Great Celo
+Stake Off
           </div>
         </h2>
         <h4
@@ -668,7 +669,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          purposeTitle
+          Purpose
         </h3>
       </div>
       <div
@@ -707,6 +708,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
+          Learn how to run a node on Celo’s peer-to-peer network and take a slice of up to 
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
             dir="auto"
@@ -734,6 +736,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
+          * subject to 
           <div
             className="css-view-1dbjc4n"
             onClick={[Function]}
@@ -754,6 +757,8 @@ exports[`BuildPage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/stake-off/terms"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -828,7 +833,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          challengeTitle
+          The Challenge
         </h3>
       </div>
       <div
@@ -864,7 +869,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          challengeText
+          Starting December 4th, all chefs, bakers, and validators were invited to compete for the ultimate glory: honor, food, and Celo Gold.
         </div>
       </div>
     </div>
@@ -923,7 +928,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          whoTitle
+          Who
         </h3>
       </div>
       <div
@@ -958,7 +963,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          whoText
+          If you have a technical background and you’re interested in open source, security, or building & operating infrastructure, you’d make a perfect Celo validator!
         </div>
       </div>
     </div>
@@ -1021,7 +1026,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            ranking
+            Ranking Baklava Validators
           </h3>
           <h2
             aria-level="2"
@@ -1041,7 +1046,8 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            leaderboardTitle
+            The Great Celo Stake Off
+Leaderboard
           </h2>
           <div
             className="css-view-1dbjc4n"
@@ -1326,7 +1332,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                unitOfMeasure
+                Baklava Testnet Units (BTUs)
               </div>
             </div>
             <div
@@ -1412,7 +1418,7 @@ exports[`BuildPage renders 1`] = `
                       }
                     }
                   >
-                    expandLeaderboard
+                    Expand Leaderboard
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -1496,6 +1502,8 @@ exports[`BuildPage renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="/stake-off/terms"
+                    onClick={[Function]}
+                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -1600,7 +1608,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              stackSubtitle
+              Full Stack Approach
             </h2>
             <h3
               aria-level="3"
@@ -1620,7 +1628,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              stackTitle
+              Celo Layers of Technology
             </h3>
             <div
               className="css-text-901oao"
@@ -1636,7 +1644,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              stackDescription
+              Each layer of the technical stack is designed to meet mobile user needs.
             </div>
           </div>
         </div>
@@ -1734,7 +1742,7 @@ exports[`BuildPage renders 1`] = `
               }
               tabIndex="0"
             >
-              mobile.title
+              Applications
             </div>
             <div
               className="css-text-901oao"
@@ -1749,7 +1757,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              mobile.text
+              Send or Request cUSD easily with anyone in your address book, powered by decentralized phone number verification
             </div>
             <ul
               className="css-reset-4rbku5 css-view-1dbjc4n"
@@ -1779,7 +1787,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                mobile.nonCustodial
+                Non-custodial wallet
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -1798,7 +1806,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                mobile.mobileUltra
+                Mobile ultralight client
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -1817,7 +1825,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                mobile.exchange
+                Exchange between cUSD and cGLD
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -1836,7 +1844,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                mobile.qr
+                QR Code Support
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -1855,7 +1863,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                mobile.sdk
+                Mobile first SDK
               </li>
             </ul>
           </div>
@@ -1884,6 +1892,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1932,7 +1942,7 @@ exports[`BuildPage renders 1`] = `
                 }
                 target="blank"
               >
-                installWallet
+                Install Wallet
               </a>
             </div>
             <div
@@ -1987,6 +1997,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2022,7 +2034,7 @@ exports[`BuildPage renders 1`] = `
                   }
                   target="blank"
                 >
-                  seeCode
+                  See Code
                 </a>
               </div>
             </div>
@@ -2102,7 +2114,7 @@ exports[`BuildPage renders 1`] = `
               }
               tabIndex="0"
             >
-              protocol.title
+              Core Contracts
             </div>
             <div
               className="css-text-901oao"
@@ -2117,7 +2129,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              protocol.text
+              Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, tracks the value of the US Dollar.
             </div>
             <ul
               className="css-reset-4rbku5 css-view-1dbjc4n"
@@ -2147,7 +2159,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                protocol.algoReserve
+                Algorithmic reserve-backed stabilization mechanism
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -2166,7 +2178,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                protocol.cryptoCollat
+                Crypto-asset collateralized
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -2185,7 +2197,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                protocol.native
+                Native support for multiple stablecoins
               </li>
             </ul>
           </div>
@@ -2214,6 +2226,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2262,7 +2276,7 @@ exports[`BuildPage renders 1`] = `
                 }
                 target="blank"
               >
-                readMore
+                Read More
               </a>
             </div>
             <div
@@ -2317,6 +2331,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2352,7 +2368,7 @@ exports[`BuildPage renders 1`] = `
                   }
                   target="blank"
                 >
-                  seeCode
+                  See Code
                 </a>
               </div>
             </div>
@@ -2432,7 +2448,7 @@ exports[`BuildPage renders 1`] = `
               }
               tabIndex="0"
             >
-              proof.title
+              Blockchain
             </div>
             <div
               className="css-text-901oao"
@@ -2447,7 +2463,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              proof.text
+              Open source smart contract platform built on decentralized infrastructure.
             </div>
             <ul
               className="css-reset-4rbku5 css-view-1dbjc4n"
@@ -2477,7 +2493,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                proof.permissionless
+                Proof of Stake based consensus with high throughput, low latency, and zero carbon
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -2496,7 +2512,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                proof.rewardsWeighted
+                Incentives for serving mobile devices
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
@@ -2515,7 +2531,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                proof.onChain
+                On-chain governance
               </li>
             </ul>
           </div>
@@ -2544,6 +2560,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/overview"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2592,7 +2610,7 @@ exports[`BuildPage renders 1`] = `
                 }
                 target="blank"
               >
-                readMore
+                Read More
               </a>
             </div>
             <div
@@ -2647,6 +2665,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2682,7 +2702,7 @@ exports[`BuildPage renders 1`] = `
                   }
                   target="blank"
                 >
-                  seeCode
+                  See Code
                 </a>
               </div>
             </div>
@@ -2726,7 +2746,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            stackBrowseTitle
+            Browse the Code
           </h4>
           <div
             className="css-text-901oao"
@@ -2743,7 +2763,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            stackBrowseCopy
+            Explore and contribute to the Celo codebase
              
           </div>
           <div
@@ -2761,6 +2781,8 @@ exports[`BuildPage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://github.com/celo-org"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -2810,7 +2832,7 @@ exports[`BuildPage renders 1`] = `
               }
               target="_blank"
             >
-              stackBrowseButton
+              View On Github
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -2917,7 +2939,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              featureTitle
+              Platform Features
             </h3>
           </div>
         </div>
@@ -3061,7 +3083,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.stableValueCurrencies
+                  Stable Value Currencies
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3076,7 +3098,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.stableText
+                  Native support for multiple ERC20-like stable currencies.
                 </div>
               </div>
             </div>
@@ -3197,7 +3219,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.phonePKI
+                  Phone Number Public Key Infrastructure
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3212,7 +3234,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.pkiText
+                  Mapping of phone numbers to addresses to facilitate user experience.
                 </div>
               </div>
             </div>
@@ -3333,7 +3355,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.onChainGov
+                  On-chain Governance
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3348,7 +3370,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.govText
+                  Protocol changes managed via on-chain governance.
                 </div>
               </div>
             </div>
@@ -3469,7 +3491,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.selfCustody
+                  Self Custody
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3484,7 +3506,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.custodyText
+                  Users have access to and control of their account secret keys.
                 </div>
               </div>
             </div>
@@ -3605,7 +3627,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.proofOfStake
+                  Proof of Stake
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3620,7 +3642,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.stakeText
+                  Permissionless consensus algorithm running on decentralized infrastructure.
                 </div>
               </div>
             </div>
@@ -3741,7 +3763,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.fastUltraLight
+                  Very Fast Sync for Ultra-light Clients
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3756,7 +3778,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.ultraText
+                  Block headers optimized for fast mobile phone synchronization.
                 </div>
               </div>
             </div>
@@ -3877,7 +3899,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.gasMultiCurrency
+                  Gas Payable in Multiple Currencies
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3892,7 +3914,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.gasText
+                  Option to pay transaction fees in stable currency.
                 </div>
               </div>
             </div>
@@ -4013,7 +4035,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.programmable
+                  Programmable (Full EVM Compatibility)
                 </div>
                 <div
                   className="css-text-901oao"
@@ -4028,7 +4050,7 @@ exports[`BuildPage renders 1`] = `
                     }
                   }
                 >
-                  feat.programmableText
+                  Programmable smart contract platform compatible with Ethereum Virtual Machine.
                 </div>
               </div>
             </div>
@@ -4097,7 +4119,7 @@ exports[`BuildPage renders 1`] = `
           }
         }
       >
-        engage.topTitle
+        Engage with Celo
       </h2>
       <div
         className="css-view-1dbjc4n"
@@ -4124,7 +4146,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.developers.noun
+          For Developers
         </h3>
         <h4
           aria-level="4"
@@ -4143,7 +4165,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.developers.verb
+          Extend & Enrich the Ecosystem
         </h4>
         <div
           className="css-text-901oao"
@@ -4159,7 +4181,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.developers.network
+          Alfajores Testnet
         </div>
         <div
           className="react-reveal"
@@ -4254,7 +4276,8 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.developers.caption
+          Try out the Celo Protocol and Celo Wallet.
+Build dApps for the Celo platform.
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -4296,6 +4319,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/wallet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4343,7 +4368,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                engage.developers.primaryAction
+                Get Wallet
               </a>
             </div>
           </div>
@@ -4514,7 +4539,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.faucet.title
+            Add Alfajores Funds
           </div>
           <div
             className="css-text-901oao"
@@ -4530,7 +4555,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.faucet.copy
+            Top up your wallet on an existing Testnet account
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -4575,6 +4600,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4594,7 +4621,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                engage.faucet.btnText
+                Get Funds
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -4769,7 +4796,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.docs.title
+            Documentation
           </div>
           <div
             className="css-text-901oao"
@@ -4785,7 +4812,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.docs.copy
+            Learn about the technology behind the Celo Protocol & Celo Wallet
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -4830,6 +4857,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4849,7 +4878,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                engage.docs.btnText
+                Read Documentation
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -4953,7 +4982,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.validators.noun
+          For Validators and Full Nodes
         </h3>
         <h4
           aria-level="4"
@@ -4972,7 +5001,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.validators.verb
+          Operate Celo
         </h4>
         <div
           className="css-text-901oao"
@@ -4988,7 +5017,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.validators.network
+          Baklava Testnet
         </div>
         <div
           className="react-reveal"
@@ -5083,7 +5112,8 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.validators.caption
+          Participate in testing and hardening the Celo Protocol.
+Deploy a Full Node or Validator and win prizes.
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -5125,6 +5155,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoOrg/announcing-the-great-celo-stake-off-12eb15dd5eb0"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5172,7 +5204,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                engage.validators.primaryAction
+                Register
               </a>
             </div>
           </div>
@@ -5343,7 +5375,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.tutorial.title
+            Tutorial
           </div>
           <div
             className="css-text-901oao"
@@ -5359,7 +5391,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.tutorial.copy
+            Deploy Celo blockchain software and connect to Baklava
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5404,6 +5436,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://docs.celo.org/getting-started/running-a-validator"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5423,7 +5457,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                engage.tutorial.btnText
+                Read Tutorial
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -5598,7 +5632,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.blog.title
+            Technical Blog
           </div>
           <div
             className="css-text-901oao"
@@ -5614,7 +5648,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            engage.blog.copy
+            Learn about Proof of Stake, validating and incentives in the Celo Protocol
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -5659,6 +5693,8 @@ exports[`BuildPage renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5678,7 +5714,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                engage.blog.btnText
+                Read Blog
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -5778,7 +5814,7 @@ exports[`BuildPage renders 1`] = `
           }
         }
       >
-        engage.contributeTitle
+        Contribute To Celo
       </h3>
       <div
         className="css-text-901oao"
@@ -5795,7 +5831,7 @@ exports[`BuildPage renders 1`] = `
           }
         }
       >
-        engage.contributeText
+        There are a variety of resources to support contributions to Celo, including: grants, security bounties, an Ecosystem Fund, fellowships, and more.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -5812,6 +5848,8 @@ exports[`BuildPage renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://c-labs.typeform.com/to/gj9aUp"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -5859,7 +5897,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          engage.contributeBtn
+          Get Involved
         </a>
       </div>
     </div>
@@ -6039,7 +6077,7 @@ exports[`BuildPage renders 1`] = `
           }
         }
       >
-        conductLabel
+        Code of Conduct
       </h3>
     </div>
     <div
@@ -6075,7 +6113,7 @@ exports[`BuildPage renders 1`] = `
           }
         }
       >
-        conductText
+        Shared norms and behaviors are the foundation of a beautiful community. Please read and respect our code of conduct.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -6092,6 +6130,8 @@ exports[`BuildPage renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="/code-of-conduct"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -6139,7 +6179,7 @@ exports[`BuildPage renders 1`] = `
             }
           }
         >
-          conductBtn
+          Read Document
         </a>
       </div>
     </div>
@@ -6199,7 +6239,7 @@ exports[`BuildPage renders 1`] = `
           }
         }
       >
-        experienceLabel
+        Experience
       </h3>
     </div>
     <div
@@ -6318,7 +6358,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                channels.brand.name
+                Brand Toolkit
               </div>
             </a>
             <div
@@ -6334,7 +6374,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              channels.brand.text
+              Design with Celo
             </div>
           </div>
         </div>
@@ -6395,7 +6435,7 @@ exports[`BuildPage renders 1`] = `
           }
         }
       >
-        socialLabel
+        Engage
       </h3>
     </div>
     <div
@@ -6534,6 +6574,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/@celoDevs"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6577,6 +6619,8 @@ exports[`BuildPage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://twitter.com/CeloOrg"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -6662,7 +6706,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                channels.github.name
+                GitHub
               </div>
             </a>
             <div
@@ -6678,7 +6722,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              channels.github.text
+              Contribute to the codebase
             </div>
           </div>
         </div>
@@ -6744,7 +6788,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                channels.discord.name
+                Discord
               </div>
             </a>
             <div
@@ -6760,7 +6804,8 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              channels.discord.text
+              Collaborate and get
+developer support
             </div>
           </div>
         </div>
@@ -6824,7 +6869,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                channels.forum.name
+                Forum
               </div>
             </a>
             <div
@@ -6840,7 +6885,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              channels.forum.text
+              Ask technical questions
             </div>
           </div>
         </div>
@@ -6925,7 +6970,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                channels.events.name
+                Events
               </div>
             </a>
             <div
@@ -6941,7 +6986,7 @@ exports[`BuildPage renders 1`] = `
                 }
               }
             >
-              channels.events.text
+              Connect in Person
             </div>
           </div>
         </div>
@@ -6971,6 +7016,7 @@ exports[`BuildPage renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"image.png\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "contain",
@@ -6984,6 +7030,12 @@ exports[`BuildPage renders 1`] = `
                 "zIndex": -1,
               }
             }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="image.png"
           />
         </div>
         <div
@@ -7011,7 +7063,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            stayConnected
+            Stay connected
           </h3>
           <div
             className="css-text-901oao"
@@ -7027,7 +7079,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            receiveUpdates
+            Receive the latest updates to your inbox
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -7054,7 +7106,7 @@ exports[`BuildPage renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.email*"
+              placeholder="Email*"
               readOnly={false}
               required={true}
               spellCheck={true}
@@ -7159,7 +7211,7 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                signUp
+                Sign Up
               </a>
             </div>
             <div

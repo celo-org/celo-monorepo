@@ -32,7 +32,10 @@ const PAGES = [
   {
     title: 'Introduction',
     href: ROOT,
-    sections: [],
+    sections: [
+      { title: 'Overview', href: `${ROOT}#${hashNav.brandIntro.overview}` },
+      { title: 'Brand Voice', href: `${ROOT}#${hashNav.brandIntro.brandVoice}` },
+    ],
   },
   {
     title: 'Logo',

@@ -15,10 +15,10 @@ export const vNeg1Schema = {
     message: null,
     dismissMessageAfter: null,
     analyticsEnabled: true,
-    doingPinVerification: false,
     lockWithPinEnabled: false,
     appState: AppState.Active,
     locked: false,
+    lastTimeBackgrounded: 0,
   },
   networkInfo: {
     connected: true,

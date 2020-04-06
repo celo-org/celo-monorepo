@@ -131,7 +131,6 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
             "flex": 1,
             "fontFamily": "Hind-Regular",
             "padding": 8,
-            "textAlignVertical": "top",
           }
         }
         testID="PhoneNumberField"
@@ -282,7 +281,6 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
               "flex": 1,
               "fontFamily": "Hind-Regular",
               "padding": 8,
-              "textAlignVertical": "top",
             }
           }
           testID="CountryNameField"
@@ -379,7 +377,6 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
             "flex": 1,
             "fontFamily": "Hind-Regular",
             "padding": 8,
-            "textAlignVertical": "top",
           }
         }
         testID="PhoneNumberField"

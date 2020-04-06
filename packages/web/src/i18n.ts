@@ -22,11 +22,13 @@ export enum NameSpaces {
   brand = 'brand',
   codeofconduct = 'codeofconduct',
   community = 'community',
+  alliance = 'alliance',
   download = 'download',
   dev = 'dev',
   faucet = 'faucet',
   home = 'home',
   jobs = 'jobs',
+  papers = 'papers',
   terms = 'terms',
   technology = 'technology',
 }

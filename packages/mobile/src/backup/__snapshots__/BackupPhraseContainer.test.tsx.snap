@@ -52,8 +52,10 @@ exports[`renders correctly for input backup phrase 1`] = `
             "fontFamily": "Hind-Regular",
             "fontSize": 16,
             "lineHeight": 24,
-            "minHeight": 145,
+            "minHeight": 125,
             "padding": 14,
+            "paddingTop": 16,
+            "textAlignVertical": "top",
           },
           false,
         ]
@@ -117,11 +119,13 @@ exports[`renders correctly for input social backup phrase 1`] = `
             "fontFamily": "Hind-Regular",
             "fontSize": 16,
             "lineHeight": 24,
-            "minHeight": 145,
+            "minHeight": 125,
             "padding": 14,
+            "paddingTop": 16,
+            "textAlignVertical": "top",
           },
           Object {
-            "minHeight": 100,
+            "minHeight": 90,
           },
         ]
       }

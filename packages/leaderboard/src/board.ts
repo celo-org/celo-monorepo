@@ -1,9 +1,8 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { Client } from 'pg'
-import Web3 from 'web3'
 
 const GoogleSpreadsheet = require('google-spreadsheet')
 
@@ -142,8 +141,7 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
 }
 
 async function readAssoc(lst: string[]) {
-  const web3 = new Web3(LEADERBOARD_WEB3)
-  const kit: ContractKit = newKitFromWeb3(web3)
+  const kit: ContractKit = newKit(LEADERBOARD_WEB3)
   const accounts: AccountsWrapper = await kit.contracts.getAccounts()
   await Promise.all(
     lst.map(async (a) => {

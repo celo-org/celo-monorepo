@@ -85,12 +85,17 @@ yargs
         .option('migration_override', {
           type: 'string',
           description: 'Path to JSON containing config values to use in migrations',
+        })
+        .option('release_gold_contracts', {
+          type: 'string',
+          description: 'JSON list of release gold contracts',
         }),
     (args) =>
       exitOnError(
         generateDevChain(args.filename, {
           upto: args.upto,
           migrationOverride: args.migration_override,
+          releaseGoldContracts: args.release_gold_contracts,
           targz: true,
         })
       )
@@ -206,6 +211,25 @@ function runMigrations(opts: { upto?: number; migrationOverride?: string } = {})
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
+function deployReleaseGold(releaseGoldContracts: string) {
+  const cmdArgs = ['truffle', 'exec', 'scripts/truffle/deploy_release_contracts.js']
+  cmdArgs.push('--network')
+  // TODO(lucas): investigate if this can be found dynamically
+  cmdArgs.push('development')
+  cmdArgs.push('--from')
+  cmdArgs.push('0x5409ED021D9299bf6814279A6A1411A7e866A631')
+  cmdArgs.push('--grants')
+  cmdArgs.push(releaseGoldContracts)
+  cmdArgs.push('--start_gold')
+  cmdArgs.push('10')
+  // --yesreally command to bypass prompts
+  cmdArgs.push('--yesreally')
+  cmdArgs.push('--build_directory')
+  cmdArgs.push(ProtocolRoot + 'build')
+
+  return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
+}
+
 async function runDevChainFromTar(filename: string) {
   const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
   // tslint:disable-next-line: no-console
@@ -242,6 +266,7 @@ async function runDevChain(
     migrationOverride?: string
     targz?: boolean
     runMigrations?: boolean
+    releaseGoldContracts?: string
   } = {}
 ) {
   if (opts.reset) {
@@ -255,6 +280,12 @@ async function runDevChain(
       throw Error('Migrations failed')
     }
   }
+  if (opts.releaseGoldContracts) {
+    const code = await deployReleaseGold(opts.releaseGoldContracts)
+    if (code !== 0) {
+      throw Error('ReleaseGold deployment failed')
+    }
+  }
   return stopGanache
 }
 
@@ -263,6 +294,7 @@ async function generateDevChain(
   opts: {
     upto?: number
     migrationOverride?: string
+    releaseGoldContracts?: string
     targz?: boolean
   } = {}
 ) {
@@ -279,6 +311,7 @@ async function generateDevChain(
     runMigrations: true,
     upto: opts.upto,
     migrationOverride: opts.migrationOverride,
+    releaseGoldContracts: opts.releaseGoldContracts,
   })
   await stopGanache()
   if (opts.targz && chainTmp) {

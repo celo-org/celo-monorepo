@@ -101,7 +101,8 @@ exports[`UserAgreement renders 1`] = `
           }
         }
       >
-        agreementTitle
+        User Agreement and Terms:
+ Celo Alfajores Testnet
       </h1>
     </div>
   </div>
@@ -214,6 +215,8 @@ exports[`UserAgreement renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="/privacy"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -262,6 +265,8 @@ You understand that you are participating in a test, and that the Celo Services 
             data-focusable={true}
             dir="auto"
             href="https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -315,6 +320,8 @@ The Company reserves the right in its sole and absolute discretion to terminate 
             data-focusable={true}
             dir="auto"
             href="/privacy"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

@@ -15,6 +15,7 @@ import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
+import { newMultiSig } from './generated/MultiSig'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
@@ -42,6 +43,7 @@ const ContractFactories = {
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
   [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -111,6 +113,9 @@ export class Web3ContractCache {
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
+  getMultiSig(address: string) {
+    return this.getContract(CeloContract.MultiSig, address)
+  }
   getRandom() {
     return this.getContract(CeloContract.Random)
   }
@@ -136,14 +141,14 @@ export class Web3ContractCache {
   /**
    * Get native web3 contract wrapper
    */
-  async getContract<C extends keyof typeof ContractFactories>(contract: C) {
+  async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
       const createFn = ContractFactories[contract] as CFType[C]
       // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
-        await this.kit.registry.addressFor(contract)
+        address ? address : await this.kit.registry.addressFor(contract)
       ) as NonNullable<ContractCacheMap[C]>
     }
     // we know it's defined (thus the !)

@@ -17,7 +17,7 @@
 
 ▸ **mapFromPairs**<**A**, **B**>(`pairs`: Array‹[A, B]›): *Map‹A, B›*
 
-*Defined in [contractkit/src/explorer/base.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L24)*
+*Defined in [contractkit/src/explorer/base.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L28)*
 
 **Type parameters:**
 
@@ -37,7 +37,7 @@ ___
 
 ###  obtainKitContractDetails
 
-▸ **obtainKitContractDetails**(`kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹object[]›*
+▸ **obtainKitContractDetails**(`kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]›*
 
 *Defined in [contractkit/src/explorer/base.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L13)*
 
@@ -47,4 +47,4 @@ Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](../classes/_kit_.contractkit.md) |
 
-**Returns:** *Promise‹object[]›*
+**Returns:** *Promise‹[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]›*
