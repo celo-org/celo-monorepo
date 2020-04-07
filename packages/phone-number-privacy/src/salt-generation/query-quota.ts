@@ -1,7 +1,7 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import fetch from 'node-fetch'
 import config from '../config'
-import { getPerformedQueryCount } from '../database/wrappers/accout'
+import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit } from '../web3/contracts'
 
 const NUM_ATTESTATIONS_REQUIRED = 3

@@ -53,8 +53,8 @@ if (DEV_MODE) {
     },
     salt: {
       key: functionConfig.salt.key,
-      unverifiedQueryMax: functionConfig.salt.unverifiedQueryCount,
-      additionalVerifiedQueryMax: functionConfig.salt.verifiedQueryCount,
+      unverifiedQueryMax: functionConfig.salt.unverifiedQueryMax,
+      additionalVerifiedQueryMax: functionConfig.salt.additionalVerifiedQueryMax,
       queryPerTransaction: functionConfig.salt.queryPerTransaction,
     },
     db: {

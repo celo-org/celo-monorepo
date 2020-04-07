@@ -34,10 +34,6 @@ export async function incrementQueryCount(account: string) {
     (await knex(ACCOUNTS_TABLE)
       .insert(data)
       .timeout(10000)
-      .then(() => console.log('successful insertion'))
-      .catch((error) => {
-        // TODO [amyslawson] think of failure case here
-        console.error(error)
-      }))
+      .then(() => console.log('successful insertion')))
   )
 }
