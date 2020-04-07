@@ -1,8 +1,8 @@
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
-import { Wallet, WalletBase } from './wallet'
 import { Signer } from './signers/signer'
+import { Wallet, WalletBase } from './wallet'
 
 /**
  * Abstract class representing a remote wallet that requires async initialization

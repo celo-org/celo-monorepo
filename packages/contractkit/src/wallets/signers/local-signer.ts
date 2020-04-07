@@ -1,6 +1,6 @@
+import { trimLeading0x } from '@celo/utils/lib/address'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
-import { trimLeading0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
@@ -40,7 +40,7 @@ export class LocalSigner implements Signer {
 
     const sig = ethUtil.ecsign(msgHashBuff, pkBuffer)
     return {
-      v: parseInt(sig.v),
+      v: parseInt(sig.v, 10),
       r: Buffer.from(sig.r),
       s: Buffer.from(sig.s),
     }
@@ -53,7 +53,7 @@ export class LocalSigner implements Signer {
     const pkBuffer = Buffer.from(trimmedKey, 'hex')
     const sig = ethUtil.ecsign(dataBuff, pkBuffer)
     return {
-      v: parseInt(sig.v),
+      v: parseInt(sig.v, 10),
       r: Buffer.from(sig.r),
       s: Buffer.from(sig.s),
     }

@@ -1,14 +1,14 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/utils/lib/address'
+import * as ethUtil from 'ethereumjs-util'
+import { EncodedTransaction, Tx } from 'web3-core'
+import { Address } from '../base'
+import { EIP712TypedData } from '../utils/sign-typed-data-utils'
 import {
   chainIdTransformationForSigning,
   encodeTransaction,
   rlpEncodedTx,
   signatureFormatter,
 } from '../utils/signing-utils'
-import * as ethUtil from 'ethereumjs-util'
-import { EncodedTransaction, Tx } from 'web3-core'
-import { Address } from '../base'
-import { EIP712TypedData } from '../utils/sign-typed-data-utils'
 import { Signer } from './signers/signer'
 
 export interface Wallet {

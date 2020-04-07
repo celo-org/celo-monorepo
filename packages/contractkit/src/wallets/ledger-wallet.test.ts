@@ -6,17 +6,17 @@ import {
 } from '@celo/utils/lib/address'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
+import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
 import {
   chainIdTransformationForSigning,
   getHashFromEncoded,
-  recoverTransaction,
   recoverEIP712TypedDataSigner,
   recoverMessageSigner,
+  recoverTransaction,
 } from '../utils/signing-utils'
 import { LedgerWallet } from './ledger-wallet'
-import * as ethUtil from 'ethereumjs-util'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))

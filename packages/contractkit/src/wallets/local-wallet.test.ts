@@ -3,9 +3,9 @@ import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
 import {
-  recoverTransaction,
-  recoverMessageSigner,
   recoverEIP712TypedDataSigner,
+  recoverMessageSigner,
+  recoverTransaction,
 } from '../utils/signing-utils'
 import { LocalWallet } from './local-wallet'
 

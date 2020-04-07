@@ -1,8 +1,8 @@
-import { AzureKeyVaultClient } from './azure-key-vault-client'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
+import { AzureKeyVaultClient } from './azure-key-vault-client'
 import { Signer } from './signer'
 
 /**

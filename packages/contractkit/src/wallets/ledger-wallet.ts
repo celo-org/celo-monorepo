@@ -2,11 +2,11 @@ import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'
 import { Address } from '../base'
-import { Wallet } from './wallet'
-import { RemoteWallet } from './remote-wallet'
-import { Signer } from './signers/signer'
-import { LedgerSigner } from './signers/ledger-signer'
 import { transportErrorFriendlyMessage } from '../utils/ledger-utils'
+import { RemoteWallet } from './remote-wallet'
+import { LedgerSigner } from './signers/ledger-signer'
+import { Signer } from './signers/signer'
+import { Wallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5

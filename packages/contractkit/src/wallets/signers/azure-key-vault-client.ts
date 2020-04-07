@@ -1,5 +1,5 @@
 import { DefaultAzureCredential } from '@azure/identity'
-import { KeyClient, CryptographyClient, KeyVaultKey } from '@azure/keyvault-keys'
+import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
 import BN = require('bn.js')
 import { ec as EC } from 'elliptic'
 import { ecdsaRecover } from 'secp256k1'
@@ -30,7 +30,7 @@ export class AzureKeyVaultClient {
 
   public async getKeys(): Promise<string[]> {
     const keyNames = new Array<string>()
-    for await (let keyProperties of this.keyClient.listPropertiesOfKeys()) {
+    for await (const keyProperties of this.keyClient.listPropertiesOfKeys()) {
       keyNames.push(keyProperties.name)
     }
     return keyNames
@@ -67,9 +67,9 @@ export class AzureKeyVaultClient {
     // The output of this will be a 64 byte array.
     // The first 32 are the value for R and the rest is S
     if (
-      typeof signResult == 'undefined' ||
-      typeof signResult.result == 'undefined' ||
-      signResult.result.length != 64
+      typeof signResult === 'undefined' ||
+      typeof signResult.result === 'undefined' ||
+      signResult.result.length !== 64
     ) {
       throw new Error(`Invalid signature returned from Azure: ${signResult}`)
     }
@@ -132,7 +132,7 @@ export class AzureKeyVaultClient {
           return i
         }
       } catch (e) {
-        if (e.message == 'Public key could not be recover') {
+        if (e.message === 'Public key could not be recover') {
           throw new Error('Invalid public key. Ensure that the key type is ECDSA')
         }
       }
@@ -142,14 +142,14 @@ export class AzureKeyVaultClient {
 
   private async getKey(keyName: string): Promise<KeyVaultKey> {
     try {
-      let signingKey = await this.keyClient.getKey(keyName)
+      const signingKey = await this.keyClient.getKey(keyName)
 
       if (
-        typeof signingKey == 'undefined' ||
-        typeof signingKey.id == 'undefined' ||
-        typeof signingKey.key == 'undefined' ||
-        typeof signingKey.key.x == 'undefined' ||
-        typeof signingKey.key.y == 'undefined'
+        typeof signingKey === 'undefined' ||
+        typeof signingKey.id === 'undefined' ||
+        typeof signingKey.key === 'undefined' ||
+        typeof signingKey.key.x === 'undefined' ||
+        typeof signingKey.key.y === 'undefined'
       ) {
         throw new Error(`Invalid key data returned from Azure: ${signingKey}`)
       }

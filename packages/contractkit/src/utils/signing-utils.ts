@@ -2,10 +2,10 @@ import { ensureLeading0x } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
+import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
-import * as ethUtil from 'ethereumjs-util'
-import { generateTypedDataHash, EIP712TypedData } from './sign-typed-data-utils'
+import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -110,7 +110,7 @@ export function signatureFormatter(signature: {
   s: string
 }): { v: number; r: Buffer; s: Buffer } {
   return {
-    v: parseInt(makeEven(trimLeadingZero(ensureLeading0x(signature.v)))),
+    v: parseInt(makeEven(trimLeadingZero(ensureLeading0x(signature.v))), 16),
     r: Buffer.from(makeEven(trimLeadingZero(ensureLeading0x(signature.r)))),
     s: Buffer.from(makeEven(trimLeadingZero(ensureLeading0x(signature.s)))),
   }
@@ -139,9 +139,9 @@ export async function encodeTransaction(
       to: rlpEncoded.transaction.to!.toString(),
       value: rlpEncoded.transaction.value!.toString(),
       input: rlpEncoded.transaction.data!,
-      v: v,
-      r: r,
-      s: s,
+      v,
+      r,
+      s,
       hash,
     },
     raw: rawTransaction,

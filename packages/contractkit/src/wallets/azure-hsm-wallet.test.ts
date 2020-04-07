@@ -1,19 +1,19 @@
 import {
+  Address,
   normalizeAddressWith0x,
   privateKeyToAddress,
-  Address,
   trimLeading0x,
 } from '@celo/utils/lib/address'
+import BN = require('bn.js')
+import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
 import {
-  recoverTransaction,
-  recoverMessageSigner,
   recoverEIP712TypedDataSigner,
+  recoverMessageSigner,
+  recoverTransaction,
 } from '../utils/signing-utils'
 import { AzureHSMWallet } from './azure-hsm-wallet'
-import * as ethUtil from 'ethereumjs-util'
-import BN = require('bn.js')
 import { Signature } from './signers/azure-key-vault-client'
 
 // Env var should hold service principal credentials
@@ -21,25 +21,31 @@ import { Signature } from './signers/azure-key-vault-client'
 require('dotenv').config()
 
 const USING_MOCK =
-  typeof process.env.KEY_NAME == 'undefined' || process.env.KEY_NAME == '<KEY_NAME>'
+  typeof process.env.KEY_NAME === 'undefined' || process.env.KEY_NAME === '<KEY_NAME>'
 const KEY_NAME = USING_MOCK ? 'secp' : process.env.KEY_NAME
-let VAULT_NAME = USING_MOCK ? 'mockVault' : process.env.VAULT_NAME
+const VAULT_NAME = USING_MOCK ? 'mockVault' : process.env.VAULT_NAME
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
 const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
 const CHAIN_ID = 44378
 
-const keyVaultAddresses: { [key: string]: { address: string; privateKey: string } } = {
-  secp: {
-    address: ACCOUNT_ADDRESS1,
-    privateKey: PRIVATE_KEY1,
-  },
-  secp2: {
-    address: ACCOUNT_ADDRESS2,
-    privateKey: PRIVATE_KEY2,
-  },
-}
+const keyVaultAddresses: Map<string, { address: string; privateKey: string }> = new Map([
+  [
+    'secp',
+    {
+      address: ACCOUNT_ADDRESS1,
+      privateKey: PRIVATE_KEY1,
+    },
+  ],
+  [
+    'secp2',
+    {
+      address: ACCOUNT_ADDRESS2,
+      privateKey: PRIVATE_KEY2,
+    },
+  ],
+])
 
 // Sample data from the official EIP-712 example:
 // https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
@@ -104,23 +110,19 @@ describe('AzureHSMWallet class', () => {
         .mockImplementation((_transport: any) => {
           return {
             getKeys: async (): Promise<string[]> => {
-              const keys = Array<string>()
-              for (var key in keyVaultAddresses) {
-                keys.push(key)
-              }
-              return keys
+              return Array.from(keyVaultAddresses.keys())
             },
             getPublicKey: async (keyName: string): Promise<BN> => {
-              if (!keyVaultAddresses[keyName]) {
+              if (!keyVaultAddresses.has(keyName)) {
                 throw new Error(`Key ${keyName} not found in KeyVault ${VAULT_NAME}`)
               }
-              const privKey = keyVaultAddresses[keyName].privateKey
+              const privKey = keyVaultAddresses.get(keyName)!.privateKey
               const pubKey = ethUtil.privateToPublic(ethUtil.toBuffer(privKey))
               return new BN(pubKey as Buffer)
             },
             signMessage: async (message: Buffer, keyName: string): Promise<Signature> => {
-              if (keyVaultAddresses[keyName]) {
-                const trimmedKey = trimLeading0x(keyVaultAddresses[keyName].privateKey)
+              if (keyVaultAddresses.has(keyName)) {
+                const trimmedKey = trimLeading0x(keyVaultAddresses.get(keyName)!.privateKey)
                 const pkBuffer = Buffer.from(trimmedKey, 'hex')
                 const signature = ethUtil.ecsign(message, pkBuffer)
                 return new Signature(signature.v - 27, new BN(signature.r), new BN(signature.s))

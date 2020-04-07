@@ -1,10 +1,10 @@
 import { Address, ensureLeading0x } from '@celo/utils/lib/address'
+import * as ethUtil from 'ethereumjs-util'
+import { RemoteWallet } from './remote-wallet'
 import { AzureHSMSigner } from './signers/azure-hsm-signer'
 import { AzureKeyVaultClient } from './signers/azure-key-vault-client'
-import { Wallet } from './wallet'
-import { RemoteWallet } from './remote-wallet'
 import { Signer } from './signers/signer'
-import * as ethUtil from 'ethereumjs-util'
+import { Wallet } from './wallet'
 
 // Azure Key Vault implementation of a RemoteWallet
 export class AzureHSMWallet extends RemoteWallet implements Wallet {
@@ -22,7 +22,7 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
     }
     const keys = await this.keyVaultClient.getKeys()
     const addressToSigner = new Map<Address, Signer>()
-    for (let key of keys) {
+    for (const key of keys) {
       try {
         const address = await this.getAddressFromKeyName(key)
         addressToSigner.set(address, new AzureHSMSigner(this.keyVaultClient, key))

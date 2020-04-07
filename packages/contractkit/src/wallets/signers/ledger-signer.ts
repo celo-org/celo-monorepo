@@ -1,10 +1,10 @@
 import { trimLeading0x } from '@celo/utils/lib/address'
+import { TransportStatusError } from '@ledgerhq/errors'
+import * as ethUtil from 'ethereumjs-util'
+import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
 import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
-import { TransportStatusError } from '@ledgerhq/errors'
-import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
-import * as ethUtil from 'ethereumjs-util'
 
 /**
  * Signs the EVM transaction with a Ledger device
@@ -76,7 +76,7 @@ export class LedgerSigner implements Signer {
       const sig = await this.ledger!.signPersonalMessage(this.derivationPath, trimmedData)
 
       return {
-        v: parseInt(sig.v),
+        v: parseInt(sig.v, 10),
         r: Buffer.from(sig.r),
         s: Buffer.from(sig.s),
       }
