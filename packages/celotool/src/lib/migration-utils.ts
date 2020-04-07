@@ -9,9 +9,6 @@ import {
 } from './generate_utils'
 import { ensure0x } from './utils'
 
-const DEFAULT_ELECTION_MIN_VALIDATORS = '1'
-const DEFAULT_EPOCH_REWARDS_FROZEN = 'false'
-const DEFAULT_EXCHANGE_FROZEN = 'false'
 const DEFAULT_FAUCET_CUSD_WEI = '60000000000000000000000' /* 60k Celo Dollars */
 
 export function minerForEnv() {
@@ -46,19 +43,6 @@ export function migrationOverrides() {
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
 
   return {
-    election: {
-      minElectableValidators: fetchEnvOrFallback(
-        envVar.ELECTION_MIN_VALIDATORS,
-        DEFAULT_ELECTION_MIN_VALIDATORS
-      ),
-    },
-    epochRewards: {
-      frozen:
-        fetchEnvOrFallback(envVar.EPOCH_REWARDS_FROZEN, DEFAULT_EPOCH_REWARDS_FROZEN) === 'true',
-    },
-    exchange: {
-      frozen: fetchEnvOrFallback(envVar.EXCHANGE_FROZEN, DEFAULT_EXCHANGE_FROZEN) === 'true',
-    },
     stableToken: {
       initialBalances: {
         addresses: initialAddresses,

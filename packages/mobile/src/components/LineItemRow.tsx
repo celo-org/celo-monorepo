@@ -1,35 +1,39 @@
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native'
 
 interface LineItemProps {
-  currencySymbol: string
-  amount?: string
-  title: string
+  style?: ViewStyle
+  textStyle?: TextStyle
+  amount?: string | React.ReactNode
+  title: string | React.ReactNode
   titleIcon?: React.ReactNode
   isLoading?: boolean
   hasError?: boolean
 }
 
-function LineItemRow({
-  currencySymbol,
+export default function LineItemRow({
+  style,
+  textStyle: textStyleProp,
   amount,
   title,
   titleIcon,
   isLoading,
   hasError,
 }: LineItemProps) {
+  const textStyle = [styles.text, textStyleProp]
+
   return (
-    <View style={style.lineItemRow}>
-      <View style={style.lineItemDescription}>
-        <Text style={style.lineItemText}>{title}</Text>
+    <View style={[styles.container, style]}>
+      <View style={styles.description}>
+        <Text style={textStyle}>{title}</Text>
         {titleIcon}
       </View>
-      {!!amount && <Text style={style.lineItemText}>{amount}</Text>}
-      {hasError && <Text style={style.lineItemText}>---</Text>}
+      {!!amount && <Text style={textStyle}>{amount}</Text>}
+      {hasError && <Text style={textStyle}>---</Text>}
       {isLoading && (
-        <View style={style.loadingContainer}>
+        <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color={colors.celoGreen} />
         </View>
       )}
@@ -37,20 +41,20 @@ function LineItemRow({
   )
 }
 
-export default LineItemRow
-
-const style = StyleSheet.create({
-  lineItemDescription: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  lineItemRow: {
+const styles = StyleSheet.create({
+  container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 5,
+    marginVertical: 5,
   },
-  lineItemText: {
-    ...fontStyles.subSmall,
+  description: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 5,
+  },
+  text: {
+    ...fontStyles.body,
+    fontSize: 15,
     color: colors.dark,
   },
   loadingContainer: {

@@ -8,8 +8,8 @@ import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
-import { Block, BlockHeader } from 'web3/eth/types'
-import { WebsocketProvider } from 'web3/providers'
+import { WebsocketProvider } from 'web3-core'
+import { Block, BlockHeader } from 'web3-eth'
 import { Counters } from './metrics'
 
 const EMPTY_INPUT = 'empty_input'
@@ -139,7 +139,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     const block = await blockExplorer.fetchBlock(header.number)
     const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
 
-    const blockTime = block.timestamp - previousBlock.timestamp
+    const blockTime = block.timestamp - Number(previousBlock.timestamp)
     logEvent('RECEIVED_BLOCK', { ...block, blockTime })
 
     const parsedBlock = blockExplorer.parseBlock(block)

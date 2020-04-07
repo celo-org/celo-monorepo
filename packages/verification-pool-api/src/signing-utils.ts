@@ -2,10 +2,9 @@
 
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 import * as _ from 'lodash'
+import Web3 from 'web3'
 import * as helpers from 'web3-core-helpers'
 import * as utils from 'web3-utils'
-
-import Web3 = require('web3')
 
 function isNot(value: any) {
   return _.isUndefined(value) || _.isNull(value)

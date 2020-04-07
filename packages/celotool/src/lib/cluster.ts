@@ -2,7 +2,6 @@ import sleep from 'sleep-promise'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   createAndUploadBackupSecretIfNotExists,
-  createServiceAccountIfNotExists,
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
@@ -10,6 +9,7 @@ import {
   redeployTiller,
   uploadStorageClass,
 } from './helm_deploy'
+import { createServiceAccountIfNotExists } from './service-account-utils'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
@@ -72,18 +72,22 @@ export async function createClusterIfNotExists() {
   return false
 }
 
-export async function setupCluster(celoEnv: string, createdCluster: boolean) {
-  const envType = fetchEnv(envVar.ENV_TYPE)
-
+export async function createNamespaceIfNotExists(namespace: string) {
   const namespaceExists = await outputIncludes(
-    `kubectl get namespaces ${celoEnv} || true`,
-    celoEnv,
-    `Namespace ${celoEnv} exists, skipping creation`
+    `kubectl get namespaces ${namespace} || true`,
+    namespace,
+    `Namespace ${namespace} exists, skipping creation`
   )
   if (!namespaceExists) {
     console.info('Creating kubernetes namespace')
-    await execCmdWithExitOnFailure(`kubectl create namespace ${celoEnv}`)
+    await execCmdWithExitOnFailure(`kubectl create namespace ${namespace}`)
   }
+}
+
+export async function setupCluster(celoEnv: string, createdCluster: boolean) {
+  const envType = fetchEnv(envVar.ENV_TYPE)
+
+  await createNamespaceIfNotExists(celoEnv)
 
   const blockchainBackupServiceAccountName = getServiceAccountName('blockchain-backup-for')
   console.info(`Service account for blockchain backup is \"${blockchainBackupServiceAccountName}\"`)
@@ -112,7 +116,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   await installCertManagerAndNginx()
 
   if (envType !== EnvTypes.DEVELOPMENT) {
-    await installAndEnableMetricsDeps()
+    await installAndEnableMetricsDeps(true)
   } else {
     console.info('Skipping metrics installation for this development env.')
   }

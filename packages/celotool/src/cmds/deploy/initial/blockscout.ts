@@ -4,10 +4,10 @@ import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
-  createServiceAccountIfNotExists,
   getServiceAccountName,
   grantRoles,
 } from 'src/lib/helm_deploy'
+import { createServiceAccountIfNotExists } from 'src/lib/service-account-utils'
 import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 

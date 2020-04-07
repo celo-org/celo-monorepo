@@ -90,10 +90,10 @@ testWithGanache('Validators Wrapper', (web3) => {
     expect(members).toContain(validatorAccount)
   })
 
-  test('SBAT queueCommissionUpdate', async () => {
+  test('SBAT setNextCommissionUpdate', async () => {
     const groupAccount = accounts[0]
     await setupGroup(groupAccount)
-    await validators.queueCommissionUpdate('0.2').sendAndWaitForReceipt({
+    await validators.setNextCommissionUpdate('0.2').sendAndWaitForReceipt({
       from: groupAccount,
     })
     const commission = (await validators.getValidatorGroup(groupAccount)).nextCommission
@@ -104,7 +104,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     const groupAccount = accounts[0]
     await setupGroup(groupAccount)
     const txOpts = { from: groupAccount }
-    await validators.queueCommissionUpdate('0.2').sendAndWaitForReceipt(txOpts)
+    await validators.setNextCommissionUpdate('0.2').sendAndWaitForReceipt(txOpts)
     await mineBlocks(3, web3)
     await validators.updateCommission().sendAndWaitForReceipt(txOpts)
 

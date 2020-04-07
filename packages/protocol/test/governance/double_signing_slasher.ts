@@ -104,9 +104,9 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   describe('#slash()', () => {
     const blockNumber = 110
     const validatorIndex = 5
-    const headerA = ['0x12', '0x12', '0x12']
-    const headerB = ['0x13', '0x13', '0x13']
-    const headerC = ['0x11', '0x13', '0x14']
+    const headerA = '0x121212'
+    const headerB = '0x131313'
+    const headerC = '0x111314'
     beforeEach(async () => {
       await slasher.setBlockNumber(headerA, blockNumber)
       await slasher.setBlockNumber(headerB, blockNumber + 1)

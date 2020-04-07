@@ -764,7 +764,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              cover.title
+              A global community of creators
             </h1>
             <div
               className="css-text-901oao"
@@ -781,7 +781,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              cover.joinMovement
+              Join the movement
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -808,7 +808,7 @@ exports[`Community renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="form.email*"
+                placeholder="Email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}
@@ -913,7 +913,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  common:signUp
+                  Sign Up
                 </a>
               </div>
               <div
@@ -1031,7 +1031,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenetTitle
+              What we care about
             </h2>
             <h4
               aria-level="4"
@@ -1050,7 +1050,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenetSubtitle
+              Our community tenets
             </h4>
           </div>
         </div>
@@ -1129,7 +1129,7 @@ exports[`Community renders 1`] = `
             >
               1
               . 
-              tenets.1
+              Designing for All
             </h3>
             <h4
               aria-level="4"
@@ -1148,7 +1148,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.subtitles.1
+              We believe that, to create a truly inclusive financial system, we must begin by serving those who need it most.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1251,7 +1251,11 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.text.1
+              Globally, about one in every three adults do not have a bank account.  As a simple consequence of this, they don’t have a straightforward means of receiving or storing value across distance, and therefore are excluded from a large part of the global economy. They don’t have a way of establishing assets or credit history on which to receive loans. They can’t receive remittances without a large processing fee. In this context, the simple ability to store and transmit small quantities of money with little overhead can have a transformative impact.
+
+We believe that to create a truly inclusive financial system, we must start by building an infrastructure to serve those excluded from the current system. Further, we believe that if we are able do so, the resulting system will be more useful, more resilient, more full-featured, and more accessible for everybody.
+
+Therefore, when we design our tools, we keep in the front of our mind the people who need them the most.  This is our primary motivation
             </div>
           </div>
         </div>
@@ -1321,7 +1325,7 @@ exports[`Community renders 1`] = `
             >
               2
               . 
-              tenets.2
+              Innovating on Money
             </h3>
             <h4
               aria-level="4"
@@ -1340,7 +1344,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.subtitles.2
+              We recognize that the features of money, like the features of any widely used technology, have a considerable impact on society.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1443,7 +1447,9 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.text.2
+              The primary features of society’s media of exchange have changed little since the Bank of Sweden and Bank of England started issuing notes in the late 1600’s. Our means of payment are, by and large, loaned into existence, national in nature, fractional reserve backed, and established by fiat. While this design has been and will continue to be useful for a large variety of transactions, it obscures a vast design space, some of which has been explored on the margins, including: time banks, mutual credit, local currencies backed by local goods, demurrage-charged currencies, natural-capital backed currencies, money gifted into existence through a basic income, and others.
+
+We believe that many of these features have great potential for positive impact, and that we would be well-served to have a world in which the way value is stored and transmitted is more an ecology than a monoculture.
             </div>
           </div>
         </div>
@@ -1513,7 +1519,7 @@ exports[`Community renders 1`] = `
             >
               3
               . 
-              tenets.3
+              Striving for Beauty
             </h3>
             <h4
               aria-level="4"
@@ -1532,7 +1538,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.subtitles.3
+              We aim, as best we can, to create beauty.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1635,7 +1641,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.text.3
+              There are two twin truths around which we orient our values and culture: that each person has a unique purpose, and that everyone is connected.  We believe that a financial environment that supports both of these complementary truths -- that connects us to one another and supports each person in following their own path -- can help to create a more beautiful world.  So, too, we believe that a working environment that supports these truths -- that fosters our intrinsic connectedness to one another, and gives focus to each person’s unique purpose through project choice and thoughtful reflection -- can help to create a more beautiful working community.  Therefore, we strive to lean into these truths.  More generally, we try, as much as possible, to create beauty in each of the little things we do.
             </div>
           </div>
         </div>
@@ -1705,7 +1711,7 @@ exports[`Community renders 1`] = `
             >
               4
               . 
-              tenets.4
+              Embodying Humility
             </h3>
             <h4
               aria-level="4"
@@ -1724,7 +1730,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.subtitles.4
+              We strive to think lightly of ourselves and deeply of the world.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1827,7 +1833,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              tenets.text.4
+              To do any of the things we aim to do -- design for many people, innovate on the medium of exchange, strive to create beauty in the little things -- requires us to be humble, to be empathetic, to learn from our mistakes and others’ successes.  Even more than audacity, doing anything meaningful requires humility.
             </div>
           </div>
         </div>
@@ -1960,7 +1966,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              codeOfConduct.title
+              Our Foundation
             </h3>
             <h4
               aria-level="4"
@@ -1980,7 +1986,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              codeOfConduct.text
+              Shared norms and behaviors are the foundation of a beautiful community. Please read and support the effort.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1997,6 +2003,8 @@ exports[`Community renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="/code-of-conduct"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2045,7 +2053,7 @@ exports[`Community renders 1`] = `
                 }
                 target="_tab"
               >
-                codeOfConduct.button
+                Read Code
               </a>
             </div>
           </div>
@@ -2125,7 +2133,7 @@ exports[`Community renders 1`] = `
             }
           }
         >
-          events.title
+          Connect in person
         </h2>
       </div>
     </div>
@@ -2193,7 +2201,7 @@ exports[`Community renders 1`] = `
             }
           }
         >
-          events.refineBy
+          Refine By
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -2443,7 +2451,7 @@ exports[`Community renders 1`] = `
           }
         }
       >
-        events.reppingCelo
+        Want to host a Celo Meet-up?
       </div>
       <div
         className="css-text-901oao"
@@ -2480,6 +2488,8 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -2664,6 +2674,8 @@ exports[`Community renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/past-events"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -2685,7 +2697,7 @@ exports[`Community renders 1`] = `
               }
               target="_new"
             >
-              events.pastEvents
+              Past Events
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -2796,7 +2808,7 @@ exports[`Community renders 1`] = `
               }
             }
           >
-            articles.title
+            Community voices
           </h2>
         </div>
       </div>
@@ -3100,7 +3112,9 @@ exports[`Community renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="https://medium.com/@celo.org"
+              href="https://medium.com/celoOrg"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -3122,7 +3136,7 @@ exports[`Community renders 1`] = `
               }
               target="_blog"
             >
-              common:readMoreFromOurBlog
+              Read more on our blog
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -3140,7 +3154,7 @@ exports[`Community renders 1`] = `
                   width={16}
                 >
                   <title>
-                    Medium Logo
+                    Medium
                   </title>
                   <path
                     d="M0 0V24H24V0H0ZM19.9385 5.68615L18.6511 6.92062C18.5403 7.00554 18.4849 7.14462 18.5083 7.28246V16.3495C18.4849 16.4874 18.5403 16.6265 18.6511 16.7114L19.9089 17.9446V18.2154H13.5852V17.9446L14.8874 16.6806C15.0154 16.5526 15.0154 16.5157 15.0154 16.32V8.99077L11.3957 18.1858H10.9058L6.69046 8.99077V15.1532C6.656 15.4117 6.74215 15.6726 6.92431 15.8609L8.61785 17.9151V18.1858H3.81538V17.9151L5.50892 15.8609C5.68985 15.6726 5.77108 15.4105 5.72677 15.1532V8.02708C5.74769 7.82892 5.67138 7.63323 5.52369 7.50031L4.01846 5.68615V5.41538H8.69292L12.3065 13.3391L15.4818 5.41538H19.9385V5.68615Z"
@@ -3262,7 +3276,7 @@ exports[`Community renders 1`] = `
               }
             }
           >
-            contribute.title
+            Have an idea for the Celo ecosystem? Propose a project as a Fellow or apply to the Celo Ecosystem Fund.
           </h2>
           <div
             className="css-view-1dbjc4n"
@@ -3307,6 +3321,8 @@ exports[`Community renders 1`] = `
                 data-focusable={true}
                 dir="auto"
                 href="https://medium.com/celoOrg/call-for-proposals-the-celo-fellowship-3c43b06b10f9"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3327,7 +3343,7 @@ exports[`Community renders 1`] = `
                 }
                 target="_cfp"
               >
-                contribute.button
+                Call for Proposals
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -3447,7 +3463,7 @@ exports[`Community renders 1`] = `
           }
         }
       >
-        ecoFund.title
+        Celo Ecosystem Venture Fund
       </h2>
       <div
         className="css-text-901oao"
@@ -3463,7 +3479,7 @@ exports[`Community renders 1`] = `
           }
         }
       >
-        ecoFund.poweredBy
+        By Polychain
       </div>
       <div
         className="css-text-901oao"
@@ -3480,7 +3496,7 @@ exports[`Community renders 1`] = `
           }
         }
       >
-        ecoFund.description
+        The Celo Ecosystem Venture Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible monetary system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -3527,7 +3543,7 @@ exports[`Community renders 1`] = `
               }
             }
           >
-            ecoFund.generalPartner
+            General Partner
           </div>
           <div
             aria-label="Polychain"
@@ -3602,7 +3618,7 @@ exports[`Community renders 1`] = `
               }
             }
           >
-            ecoFund.limitedPartners
+            Limited Partners
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -3734,6 +3750,8 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="/validators"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -3755,7 +3773,7 @@ exports[`Community renders 1`] = `
               }
             }
           >
-            ecoFund.link
+            Learn about building on Celo
             <div
               className="css-view-1dbjc4n"
               style={
@@ -3901,7 +3919,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              ecoFund.applyForFunding
+              Apply for Funding
             </a>
           </div>
           <div
@@ -4010,7 +4028,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              ecoFund.recommendProject
+              Recommend a Project 
             </a>
           </div>
         </div>
@@ -4036,548 +4054,891 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Organization Name
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="org"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Organization Name
+                </label>
+              </div>
+              <input
+                aria-label="Organization Name"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="org"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Organization URL
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="url"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Organization URL
+                </label>
+              </div>
+              <input
+                aria-label="Organization URL"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="url"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Tell us about your organization in a sentence
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="about"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Tell us about your organization in a sentence
+                </label>
+              </div>
+              <input
+                aria-label="Tell us about your organization in a sentence"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="about"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                What does your organization do?
-              </label>
-            </div>
-            <textarea
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="product"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              rows={3}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  What does your organization do?
+                </label>
+              </div>
+              <textarea
+                aria-label="What does your organization do?"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="product"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                rows={3}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              value=""
-            />
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Founder email filling out application
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="founderEmail"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Founder email filling out application
+                </label>
+              </div>
+              <input
+                aria-label="Founder email filling out application"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="founderEmail"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Please enter a valid email
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Cofounder emails (if relevant)
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="coFounderEmail"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Cofounder emails (if relevant)
+                </label>
+              </div>
+              <input
+                aria-label="Cofounder emails (if relevant)"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="coFounderEmail"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Please enter a valid email
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Optional: URL of a simple 1 minute unlisted YouTube, Vimeo, or Youku video introducing the founder(s)
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="video"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Optional: URL of a simple 1 minute unlisted YouTube, Vimeo, or Youku video introducing the founder(s)
+                </label>
+              </div>
+              <input
+                aria-label="Optional: URL of a simple 1 minute unlisted YouTube, Vimeo, or Youku video introducing the founder(s)"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="video"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -4647,7 +5008,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                apply
+                Apply
               </a>
             </div>
             <div
@@ -4662,10 +5023,41 @@ exports[`Community renders 1`] = `
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "height": "18px",
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
                   }
                 }
-              />
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
             </div>
           </form>
         </div>
@@ -4684,392 +5076,637 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Your Email Address
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="email"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Your Email Address
+                </label>
+              </div>
+              <input
+                aria-label="Your Email Address"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="email"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Please enter a valid email
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Organization you are Recommending
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="org"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Organization you are Recommending
+                </label>
+              </div>
+              <input
+                aria-label="Organization you are Recommending"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="org"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                One founder’s email
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="founderEmail"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  One founder’s email
+                </label>
+              </div>
+              <input
+                aria-label="One founder’s email"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="founderEmail"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Please enter a valid email
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                One founder's name
-              </label>
-            </div>
-            <input
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="founderName"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  One founder's name
+                </label>
+              </div>
+              <input
+                aria-label="One founder's name"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="founderName"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              type="text"
-              value=""
-            />
+                type="text"
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "marginBottom": "5px",
+                  "marginBottom": "10px",
                 }
               }
             >
-              <label
-                className="css-text-901oao"
-                dir="auto"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "color": "rgba(129,134,139,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "textRendering": "geometricPrecision",
+                    "marginBottom": "5px",
                   }
                 }
               >
-                Why do you recommend this applicant?
-              </label>
-            </div>
-            <textarea
-              autoCapitalize="sentences"
-              autoComplete="on"
-              autoCorrect="on"
-              className="css-textinput-1cwyjr8"
-              data-focusable={true}
-              dir="auto"
-              name="why"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onSelect={[Function]}
-              readOnly={false}
-              rows={3}
-              spellCheck={true}
-              style={
-                Object {
-                  "WebkitAlignSelf": "center",
-                  "alignSelf": "center",
-                  "borderBottomColor": "rgba(61,61,61,0.20)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(61,61,61,0.20)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(61,61,61,0.20)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(61,61,61,0.20)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
-                  "marginBottom": "20px",
-                  "marginLeft": "0px",
-                  "marginRight": "0px",
-                  "marginTop": "0px",
-                  "msFlexItemAlign": "center",
-                  "outlineWidth": "0px",
-                  "paddingBottom": "15px",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                  "paddingTop": "13px",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
+                <label
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(129,134,139,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "20px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Why do you recommend this applicant?
+                </label>
+              </div>
+              <textarea
+                aria-label="Why do you recommend this applicant?"
+                autoCapitalize="sentences"
+                autoComplete="on"
+                autoCorrect="on"
+                className="css-textinput-1cwyjr8"
+                data-focusable={true}
+                dir="auto"
+                name="why"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyPress={[Function]}
+                onSelect={[Function]}
+                readOnly={false}
+                rows={3}
+                spellCheck={true}
+                style={
+                  Object {
+                    "WebkitAlignSelf": "center",
+                    "alignSelf": "center",
+                    "borderBottomColor": "rgba(61,61,61,0.20)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(61,61,61,0.20)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(61,61,61,0.20)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(61,61,61,0.20)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "lineHeight": "28px",
+                    "marginBottom": "0px",
+                    "marginLeft": "0px",
+                    "marginRight": "0px",
+                    "marginTop": "0px",
+                    "msFlexItemAlign": "center",
+                    "outlineWidth": "0px",
+                    "paddingBottom": "15px",
+                    "paddingLeft": "10px",
+                    "paddingRight": "10px",
+                    "paddingTop": "13px",
+                    "textRendering": "geometricPrecision",
+                    "width": "100%",
+                  }
                 }
-              }
-              value=""
-            />
+                value=""
+              />
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
+            </div>
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -5139,7 +5776,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                recommend
+                Recommend
               </a>
             </div>
             <div
@@ -5154,10 +5791,41 @@ exports[`Community renders 1`] = `
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "height": "18px",
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
                   }
                 }
-              />
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(255,127,109,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  Oops I’m blank!
+                </div>
+              </div>
             </div>
           </form>
         </div>
@@ -5615,6 +6283,8 @@ exports[`Community renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://en.wikipedia.org/wiki/EigenTrust"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -5654,6 +6324,8 @@ exports[`Community renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="https://en.wikipedia.org/wiki/Sepandar_Kamvar"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -5968,7 +6640,7 @@ exports[`Community renders 1`] = `
             }
           }
         >
-          fellows.formTitle
+          Start your fellowship application
         </h2>
       </div>
     </div>
@@ -6056,10 +6728,41 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "height": "18px",
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
                 }
               }
-            />
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                Oops I’m blank!
+              </div>
+            </div>
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -6094,7 +6797,7 @@ exports[`Community renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.name"
+              placeholder="Full name"
               readOnly={false}
               required={true}
               spellCheck={true}
@@ -6169,7 +6872,7 @@ exports[`Community renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.email"
+              placeholder="Email"
               readOnly={false}
               required={true}
               spellCheck={true}
@@ -6238,10 +6941,41 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "height": "18px",
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
                 }
               }
-            />
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                Please enter a valid email
+              </div>
+            </div>
           </div>
         </div>
         <div
@@ -6290,10 +7024,41 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "height": "18px",
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
                 }
               }
-            />
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                Oops I’m blank!
+              </div>
+            </div>
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -6328,7 +7093,7 @@ exports[`Community renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.ideas"
+              placeholder="What do you want to create?"
               readOnly={false}
               required={true}
               rows={3}
@@ -6417,10 +7182,41 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "height": "18px",
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
                 }
               }
-            />
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                Oops I’m blank!
+              </div>
+            </div>
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -6455,7 +7251,7 @@ exports[`Community renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.bio"
+              placeholder="Tell us about yourself"
               readOnly={false}
               required={true}
               rows={3}
@@ -6544,10 +7340,41 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "height": "18px",
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
                 }
               }
-            />
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                Oops I’m blank!
+              </div>
+            </div>
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -6582,7 +7409,7 @@ exports[`Community renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.deliverables"
+              placeholder="What are your expected deliverables?"
               readOnly={false}
               required={true}
               rows={3}
@@ -6671,10 +7498,41 @@ exports[`Community renders 1`] = `
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "height": "18px",
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
                 }
               }
-            />
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                Oops I’m blank!
+              </div>
+            </div>
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -6709,7 +7567,7 @@ exports[`Community renders 1`] = `
               onKeyDown={[Function]}
               onKeyPress={[Function]}
               onSelect={[Function]}
-              placeholder="form.resume"
+              placeholder="Link to LinkedIn or other personal website"
               readOnly={false}
               required={true}
               spellCheck={true}
@@ -6877,7 +7735,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                submit
+                Submit
               </a>
             </div>
           </div>
@@ -6976,7 +7834,7 @@ exports[`Community renders 1`] = `
             }
           }
         >
-          conductLabel
+          Code of Conduct
         </h3>
       </div>
       <div
@@ -7012,7 +7870,7 @@ exports[`Community renders 1`] = `
             }
           }
         >
-          conductText
+          Shared norms and behaviors are the foundation of a beautiful community. Please read and respect our code of conduct.
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -7029,6 +7887,8 @@ exports[`Community renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="/code-of-conduct"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -7076,7 +7936,7 @@ exports[`Community renders 1`] = `
               }
             }
           >
-            conductBtn
+            Read Document
           </a>
         </div>
       </div>
@@ -7136,7 +7996,7 @@ exports[`Community renders 1`] = `
             }
           }
         >
-          experienceLabel
+          Experience
         </h3>
       </div>
       <div
@@ -7255,7 +8115,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  channels.brand.name
+                  Brand Toolkit
                 </div>
               </a>
               <div
@@ -7271,7 +8131,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                channels.brand.text
+                Design with Celo
               </div>
             </div>
           </div>
@@ -7332,7 +8192,7 @@ exports[`Community renders 1`] = `
             }
           }
         >
-          socialLabel
+          Engage
         </h3>
       </div>
       <div
@@ -7408,7 +8268,7 @@ exports[`Community renders 1`] = `
                     width={40}
                   >
                     <title>
-                      Twitter Logo
+                      Twitter
                     </title>
                     <path
                       d="M8.80544 24C19.3715 24 25.1507 14.7676 25.1507 6.7613C25.1507 6.49907 25.1451 6.23802 25.1339 5.97815C26.255 5.12295 27.2306 4.0563 28 2.84083C26.9707 3.32277 25.863 3.6476 24.7005 3.79407C25.8866 3.044 26.7971 1.85688 27.2261 0.442957C26.1162 1.13751 24.8864 1.64189 23.5782 1.91357C22.531 0.737081 21.0381 0 19.3861 0C16.2131 0 13.6405 2.71326 13.6405 6.05847C13.6405 6.5345 13.6909 6.99636 13.7894 7.43932C9.016 7.18653 4.78128 4.77567 1.9488 1.10916C1.45488 2.00453 1.1704 3.04518 1.1704 4.15435C1.1704 6.25692 2.18512 8.11143 3.72624 9.19697C2.78432 9.16626 1.8984 8.8934 1.12448 8.43863C1.12336 8.46343 1.12336 8.48942 1.12336 8.5154C1.12336 11.4496 3.10352 13.8994 5.73216 14.4546C5.24944 14.5928 4.74208 14.6672 4.21792 14.6672C3.84832 14.6672 3.48768 14.6282 3.13824 14.5573C3.8696 16.9647 5.98976 18.7164 8.50528 18.7648C6.53856 20.3902 4.06224 21.3588 1.37088 21.3588C0.9072 21.3588 0.45024 21.3304 0 21.2749C2.5424 22.9971 5.5608 24 8.80544 24Z"
@@ -7471,6 +8331,8 @@ exports[`Community renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://twitter.com/@celoDevs"
+                    onClick={[Function]}
+                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -7514,6 +8376,8 @@ exports[`Community renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="https://twitter.com/CeloOrg"
+                    onClick={[Function]}
+                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -7574,6 +8438,9 @@ exports[`Community renders 1`] = `
                     viewBox="0 0 25 24"
                     width={41}
                   >
+                    <title>
+                      Github
+                    </title>
                     <path
                       clipRule="evenodd"
                       d="M12.3019 0C5.50526 0 0 5.50526 0 12.3019C0 17.7392 3.52669 22.3458 8.4127 23.977C9.0244 24.0902 9.25095 23.7126 9.25095 23.3804C9.25095 23.0858 9.2434 22.3156 9.23585 21.2885C5.81488 22.0286 5.08991 19.6422 5.08991 19.6422C4.53108 18.2225 3.72304 17.8373 3.72304 17.8373C2.60537 17.0746 3.80611 17.0897 3.80611 17.0897C5.03705 17.1803 5.69405 18.3584 5.69405 18.3584C6.78906 20.2388 8.57129 19.6951 9.27361 19.3779C9.38688 18.585 9.70406 18.0412 10.0514 17.7316C7.32524 17.4295 4.45556 16.3723 4.45556 11.66C4.45556 10.3158 4.93132 9.22074 5.72426 8.35984C5.59588 8.04266 5.17298 6.79662 5.83754 5.10501C5.83754 5.10501 6.87213 4.77274 9.22074 6.36616C10.2025 6.0943 11.2522 5.95837 12.3019 5.95082C13.344 5.95837 14.4013 6.0943 15.383 6.36616C17.7316 4.77274 18.7662 5.10501 18.7662 5.10501C19.4383 6.79662 19.0154 8.05021 18.887 8.35984C19.6724 9.22074 20.1482 10.3158 20.1482 11.66C20.1482 16.3874 17.271 17.422 14.5297 17.7316C14.9677 18.1092 15.3679 18.8644 15.3679 20.0123C15.3679 21.6586 15.3528 22.9801 15.3528 23.3879C15.3528 23.7202 15.5718 24.0978 16.1986 23.977C21.0846 22.3458 24.6038 17.7392 24.6038 12.3094C24.6038 5.50526 19.0985 0 12.3019 0Z"
@@ -7599,7 +8466,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  channels.github.name
+                  GitHub
                 </div>
               </a>
               <div
@@ -7615,7 +8482,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                channels.github.text
+                Contribute to the codebase
               </div>
             </div>
           </div>
@@ -7656,6 +8523,9 @@ exports[`Community renders 1`] = `
                     viewBox="0 0 40 46"
                     width={40}
                   >
+                    <title>
+                      Chat
+                    </title>
                     <path
                       clipRule="evenodd"
                       d="M4.68571 0H35.3143C37.8971 0 40 2.093 40 4.6865V45.5L35.0857 41.1775L32.32 38.6295L29.3943 35.9222L30.6057 40.131H4.68571C2.10286 40.131 0 38.038 0 35.4445V4.6865C0 2.093 2.10286 0 4.68571 0ZM24.9828 27.8687C25.6686 28.7332 26.4914 29.7115 26.4914 29.7115C31.5428 29.5522 33.4857 26.2535 33.4857 26.2535C33.4857 18.928 30.1943 12.9902 30.1943 12.9902C26.9028 10.5332 23.7714 10.6015 23.7714 10.6015L23.4514 10.9655C27.3371 12.1485 29.1428 13.8547 29.1428 13.8547C26.7657 12.558 24.4343 11.921 22.2628 11.6707C20.6171 11.4887 19.04 11.5342 17.6457 11.7162C17.526 11.7162 17.4237 11.7336 17.3084 11.7531C17.2916 11.756 17.2745 11.7589 17.2571 11.7617C16.4571 11.83 14.5143 12.1257 12.0686 13.195C11.2229 13.5817 10.72 13.8547 10.72 13.8547C10.72 13.8547 12.6171 12.0575 16.7314 10.8745L16.5028 10.6015C16.5028 10.6015 13.3714 10.5332 10.08 12.9902C10.08 12.9902 6.78857 18.928 6.78857 26.2535C6.78857 26.2535 8.70856 29.5522 13.76 29.7115C13.76 29.7115 14.6057 28.6877 15.2914 27.8232C12.3886 26.9587 11.2914 25.1387 11.2914 25.1387C11.2914 25.1387 11.52 25.298 11.9314 25.5255C11.9543 25.5482 11.9771 25.571 12.0228 25.5937C12.0571 25.6165 12.0914 25.6336 12.1257 25.6506C12.16 25.6677 12.1943 25.6847 12.2286 25.7075C12.8 26.026 13.3714 26.2762 13.8971 26.481C14.8343 26.845 15.9543 27.209 17.2571 27.4592C18.9714 27.7777 20.9828 27.8915 23.1771 27.482C24.2514 27.3 25.3486 26.9815 26.4914 26.5037C27.2914 26.208 28.1828 25.7757 29.12 25.1615C29.12 25.1615 27.9771 27.027 24.9828 27.8687ZM13.5312 21.6129C13.5312 20.2252 14.5598 19.0877 15.8627 19.0877C17.1655 19.0877 18.217 20.2252 18.1941 21.6129C18.1941 23.0007 17.1655 24.1382 15.8627 24.1382C14.5827 24.1382 13.5312 23.0007 13.5312 21.6129ZM21.8741 21.6129C21.8741 20.2252 22.9027 19.0877 24.2055 19.0877C25.5084 19.0877 26.537 20.2252 26.537 21.6129C26.537 23.0007 25.5084 24.1382 24.2055 24.1382C22.9255 24.1382 21.8741 23.0007 21.8741 21.6129Z"
@@ -7681,7 +8551,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  channels.discord.name
+                  Discord
                 </div>
               </a>
               <div
@@ -7697,7 +8567,8 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                channels.discord.text
+                Collaborate and get
+developer support
               </div>
             </div>
           </div>
@@ -7738,6 +8609,9 @@ exports[`Community renders 1`] = `
                     viewBox="0 0 41 40"
                     width={40}
                   >
+                    <title>
+                      Forum
+                    </title>
                     <path
                       d="M39.7038 16.5524C38.3862 8.49677 31.8162 1.81812 23.7535 0.329378C14.2427 -1.42664 4.5866 3.9899 1.21367 12.9724C0.414984 15.1004 0.00157366 17.3019 0.000792161 19.576C-0.00155232 26.2429 0.00235515 32.9099 0.00391814 39.5768V39.9886C0.294634 39.9886 0.539242 39.9894 0.783849 39.9886C7.35934 39.9824 13.9356 40.0363 20.5103 39.9511C26.3668 39.8745 31.2105 37.4699 35.0672 33.1006C37.7001 30.1168 39.2654 26.6165 39.8296 22.6739C39.8992 22.1862 39.9516 21.6962 40.0117 21.207V18.7844C39.9101 18.0404 39.825 17.2933 39.7038 16.5524ZM20.0031 31.5977C18.2127 31.5977 16.5185 31.189 15.007 30.4599L7.9103 32.1276L9.8359 25.4904C8.97782 23.8789 8.49095 22.0393 8.49095 20.0856C8.49095 13.7273 13.6449 8.57336 20.0031 8.57336C26.3614 8.57336 31.5161 13.7273 31.5161 20.0856C31.5161 26.4438 26.3614 31.5977 20.0031 31.5977Z"
                       fill="#2E3338"
@@ -7761,7 +8635,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  channels.forum.name
+                  Forum
                 </div>
               </a>
               <div
@@ -7777,7 +8651,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                channels.forum.text
+                Ask technical questions
               </div>
             </div>
           </div>
@@ -7830,6 +8704,7 @@ exports[`Community renders 1`] = `
                       style={
                         Object {
                           "backgroundColor": "rgba(0,0,0,0.00)",
+                          "backgroundImage": "url(\\"image.png\\")",
                           "backgroundPosition": "center",
                           "backgroundRepeat": "no-repeat",
                           "backgroundSize": "contain",
@@ -7843,6 +8718,12 @@ exports[`Community renders 1`] = `
                           "zIndex": -1,
                         }
                       }
+                    />
+                    <img
+                      alt=""
+                      className="css-accessibilityImage-9pa8cd"
+                      draggable={false}
+                      src="image.png"
                     />
                   </div>
                 </div>
@@ -7862,7 +8743,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  channels.events.name
+                  Events
                 </div>
               </a>
               <div
@@ -7878,7 +8759,7 @@ exports[`Community renders 1`] = `
                   }
                 }
               >
-                channels.events.text
+                Connect in Person
               </div>
             </div>
           </div>
@@ -7908,6 +8789,7 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -7921,6 +8803,12 @@ exports[`Community renders 1`] = `
                   "zIndex": -1,
                 }
               }
+            />
+            <img
+              alt=""
+              className="css-accessibilityImage-9pa8cd"
+              draggable={false}
+              src="image.png"
             />
           </div>
           <div
@@ -7948,7 +8836,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              stayConnected
+              Stay connected
             </h3>
             <div
               className="css-text-901oao"
@@ -7964,7 +8852,7 @@ exports[`Community renders 1`] = `
                 }
               }
             >
-              receiveUpdates
+              Receive the latest updates to your inbox
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -7991,7 +8879,7 @@ exports[`Community renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="form.email*"
+                placeholder="Email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}
@@ -8096,7 +8984,7 @@ exports[`Community renders 1`] = `
                     }
                   }
                 >
-                  signUp
+                  Sign Up
                 </a>
               </div>
               <div

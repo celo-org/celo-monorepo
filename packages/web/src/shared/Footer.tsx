@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
+import Instagram from 'src/icons/Instagram'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import TwiterLogo from 'src/icons/TwitterLogo'
@@ -12,10 +13,10 @@ import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
 import ChangeStory from 'src/shared/ChangeStory'
 import InlineAnchor from 'src/shared/InlineAnchor'
-import menu, { CeloLinks } from 'src/shared/menu-items'
+import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.DEVELOPERS, menu.COMMUNITY]
+const FOOTER_MENU = [menu.HOME, ...MAIN_MENU]
 
 interface Props {
   isVertical?: boolean
@@ -86,6 +87,11 @@ const Social = React.memo(function _Social() {
             <YouTube color={colors.dark} size={height} />
           </a>
         </View>
+        <View style={styles.socialIcon}>
+          <a target="_blank" rel="noopener" href={CeloLinks.instagram}>
+            <Instagram size={height} />
+          </a>
+        </View>
       </View>
     </Responsive>
   )
@@ -103,20 +109,22 @@ const Navigation = React.memo(function _Navigation({
   currentPage = null,
 }: NavProps) {
   return (
-    <Responsive large={styles.menu} medium={styles.menuTablet}>
+    <Responsive large={styles.menu} medium={isVertical ? styles.verticalMenu : styles.menuTablet}>
       <View style={isVertical ? styles.verticalMenu : styles.menuMobile}>
-        {menuItems.map((item, index) => {
+        {FOOTER_MENU.map((item, index) => {
           const linkIsToCurrentPage = isVertical && currentPage === item.link
           const btnKind = linkIsToCurrentPage ? BTN.TERTIARY : BTN.NAV
+          const verticalItemStyle = linkIsToCurrentPage
+            ? styles.currentMenuItem
+            : styles.verticalMenuItem
+
           return (
             <View
               key={index}
               style={[
                 styles.menuItem,
                 !isVertical && index === 0 && { marginLeft: 0 },
-                isVertical
-                  ? linkIsToCurrentPage && styles.currentMenuItem
-                  : styles.verticalMenuItem,
+                isVertical && verticalItemStyle,
               ]}
             >
               {/*
@@ -163,6 +171,7 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
 const styles = StyleSheet.create({
   social: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     width: '100%',
     marginTop: 30,
@@ -218,7 +227,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-around',
   },
-  verticalMenuItem: {},
+  verticalMenuItem: {
+    marginVertical: 20,
+  },
   currentMenuItem: {
     marginVertical: 30,
   },

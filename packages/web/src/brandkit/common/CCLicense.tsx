@@ -1,11 +1,9 @@
 import * as React from 'react'
 import { Text } from 'react-native'
-
 import { brandStyles } from 'src/brandkit/common/constants'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
-
 import InlineAnchor from 'src/shared/InlineAnchor'
-import { CeloLinks } from 'src/shared/menu-items'
+import pagePaths from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
 
 interface Props {
@@ -18,14 +16,12 @@ export default withNamespaces(NameSpaces.brand)(function CCLicense({
 }: Props & I18nProps) {
   return (
     <>
-      <Text style={[fonts.h5a, brandStyles.gap, standardStyles.blockMarginTop]}>
+      <Text style={[fonts.h5, brandStyles.gap, standardStyles.blockMarginTop]}>
         {t('licenseTitle')}
       </Text>
       <Text style={[fonts.p, brandStyles.gap, standardStyles.elementalMargin]}>
-        <Trans i18nKey={textI18nKey}>
-          <InlineAnchor href={CeloLinks.iconsLicense}>
-            Creative Commons Attribution-NoDerivatives 4.0 International License
-          </InlineAnchor>
+        <Trans ns={NameSpaces.brand} i18nKey={textI18nKey}>
+          <InlineAnchor href={pagePaths.CODE_OF_CONDUCT.link}>Code of Conduct</InlineAnchor>
         </Trans>
       </Text>
     </>

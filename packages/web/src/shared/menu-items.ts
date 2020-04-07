@@ -1,29 +1,31 @@
-import DevelopersPage from 'pages/developers'
-
-export const menuItems = {
+export const pagePaths = {
   HOME: {
     name: 'Home',
     link: '/',
-  },
-  APPLICATIONS: {
-    name: 'Applications',
-    link: '/applications',
   },
   ABOUT_US: {
     name: 'About',
     link: '/about',
   },
-  BUILD: {
-    name: 'Validators',
-    link: '/validators',
+  ALLIANCE_COLLECTIVE: {
+    name: 'Alliance',
+    link: '/alliance',
   },
-  VALIDATORS_LIST: {
-    name: 'Validators List',
-    link: '/validators/explore',
+  APPLICATIONS: {
+    name: 'Applications',
+    link: '/applications',
   },
   BRAND: {
     name: 'Experience - Brand Kit',
     link: '/experience/brand',
+  },
+  BUILD: {
+    name: 'Validators',
+    link: '/validators',
+  },
+  CODE_OF_CONDUCT: {
+    name: 'Code of Conduct',
+    link: '/code-of-conduct',
   },
   COMMUNITY: {
     name: 'Community',
@@ -33,9 +35,13 @@ export const menuItems = {
     name: 'Developers',
     link: '/developers',
   },
-  SDK_DEVELOPERS: {
-    name: DevelopersPage,
-    link: '/developers',
+  FAQ: {
+    name: 'FAQ',
+    link: '/faq',
+  },
+  FAUCET: {
+    name: 'Faucet',
+    link: '/developers/faucet',
   },
   JOBS: {
     name: 'Join',
@@ -53,16 +59,24 @@ export const menuItems = {
     name: 'Terms',
     link: '/terms',
   },
-  CODE_OF_CONDUCT: {
-    name: 'Code of Conduct',
-    link: '/code-of-conduct',
+  VALIDATORS_LIST: {
+    name: 'Validators List',
+    link: '/validators/explore',
   },
 }
+
+export const MAIN_MENU = [
+  pagePaths.ABOUT_US,
+  pagePaths.JOBS,
+  pagePaths.BUILD,
+  pagePaths.DEVELOPERS,
+  pagePaths.ALLIANCE_COLLECTIVE,
+  pagePaths.COMMUNITY,
+]
 
 // TODO: Temporary link to the master branch documentation for 'sdkDocs' and 'sdkTutorial'
 export enum CeloLinks {
   agreement = '/user-agreement',
-  faq = '/faq',
   faucet = '/developers/faucet',
   iconsLicense = 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',
   discord = 'https://discord.gg/6yWMkgM',
@@ -76,9 +90,12 @@ export enum CeloLinks {
   sdkTutorial = 'https://docs.celo.org/v/master/developer-guide/start',
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
+  coinlist = 'https://coinlist.co/celo?utm_source=celo%20website&utm_medium=website%20widget&utm_campaign=celowebsite_20200318',
   gitHub = 'https://github.com/celo-org',
+  instagram = 'https://www.instagram.com/celoorg/',
   twitter = 'https://twitter.com/CeloOrg',
-  mediumUser = 'https://medium.com/@celo.org',
+  medium = 'https://medium.com/celoOrg',
+  mediumUser = 'https://medium.com/@celoorg',
   mediumPublication = 'https://medium.com/celoOrg',
   fundingRequest = 'https://c-labs.typeform.com/to/gj9aUp',
   linkedIn = 'https://www.linkedin.com/company/celoOrg/',
@@ -125,7 +142,8 @@ export const hashNav = {
     newsletter: 'newsletter',
   },
   join: { roles: 'roles' },
-  home: { partnerships: 'partnerships' },
+  home: { partnerships: 'partnerships', timeline: 'timeline' },
+  brandIntro: { overview: 'overview', brandVoice: 'brand-voice' },
   brandLogo: { overview: 'overview', space: 'space-and-sizing', backgrounds: 'backgrounds' },
   brandColor: { overview: 'overview', backgrounds: 'background-colors' },
   brandComposition: {
@@ -143,4 +161,4 @@ export const hashNav = {
   brandTypography: { overview: 'overview', scale: 'type-scale' },
 }
 
-export default menuItems
+export default pagePaths

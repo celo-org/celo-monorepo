@@ -18,8 +18,40 @@ type Account {
 }
 
 /**
+ * Leaf Node Types
+ */
+
+type RequestStatus extends String {
+  validate() { 
+    this == 'Pending' ||
+    this == 'Working' ||
+    this == 'Done'    ||
+    this == 'Failed'
+  }
+}
+
+type RequestType extends String {
+  validate() {
+    this == 'Faucet' ||
+    this == 'Invite'
+  }
+}
+
+/**
  * Node Paths
  */
+
+path / {
+  // Only admin access
+  read() { false }
+  write() { false }
+}
+
+path /{net} {
+  // Only admin access
+  read() { false }
+  write() { false }
+}
 
 path /{net}/requests {
   // Only admin access
@@ -57,23 +89,3 @@ isAllowed(ref) {
   return auth.uid == "gYOD4GPV86OlqQh33Loc5lh0Yo02" || auth.uid == "LLnGFlilnxbXrb5pZzvjiDeUJ6l2"
 }
 
-
-/**
- * Leaf Node Types
- */
-
-type RequestStatus extends String {
-  validate() { 
-    this == 'Pending' ||
-    this == 'Working' ||
-    this == 'Done'    ||
-    this == 'Failed'
-  }
-}
-
-type RequestType extends String {
-  validate() {
-    this == 'Faucet' ||
-    this == 'Invite'
-  }
-}

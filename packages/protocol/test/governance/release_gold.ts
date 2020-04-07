@@ -34,7 +34,7 @@ import {
   ReleaseGoldContract,
   ReleaseGoldInstance,
 } from 'types'
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
 
@@ -116,13 +116,14 @@ contract('ReleaseGold', (accounts: string[]) => {
   let registry: RegistryInstance
   let releaseGoldInstance: ReleaseGoldInstance
   let proofOfWalletOwnership: Signature
+  const TOTAL_AMOUNT = ONE_GOLDTOKEN.times(10)
 
   const releaseGoldDefaultSchedule: ReleaseGoldConfig = {
     releaseStartTime: null, // To be adjusted on every run
     releaseCliffTime: HOUR,
     numReleasePeriods: 4,
     releasePeriod: 3 * MONTH,
-    amountReleasedPerPeriod: ONE_GOLDTOKEN.div(4),
+    amountReleasedPerPeriod: TOTAL_AMOUNT.div(4),
     revocable: true,
     beneficiary,
     releaseOwner,
@@ -167,9 +168,8 @@ contract('ReleaseGold', (accounts: string[]) => {
     )
   }
 
-  const getCurrentBlockchainTimestamp = async (web3: Web3) => {
-    return (await web3.eth.getBlock('latest')).timestamp
-  }
+  const getCurrentBlockchainTimestamp = (web3: Web3): Promise<number> =>
+    web3.eth.getBlock('latest').then((block) => Number(block.timestamp))
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
@@ -783,9 +783,9 @@ contract('ReleaseGold', (accounts: string[]) => {
         await releaseGoldInstance.setMaxDistribution(500, { from: releaseOwner })
       })
 
-      it('should set max distribution to 0.5 gold', async () => {
+      it('should set max distribution to 5 gold', async () => {
         const maxDistribution = await releaseGoldInstance.maxDistribution()
-        assertEqualBN(maxDistribution, ONE_GOLDTOKEN.div(2))
+        assertEqualBN(maxDistribution, TOTAL_AMOUNT.div(2))
       })
     })
 
@@ -796,7 +796,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       it('should set max distribution to max uint256', async () => {
         const maxDistribution = await releaseGoldInstance.maxDistribution()
-        assertGteBN(maxDistribution, ONE_GOLDTOKEN)
+        assertGteBN(maxDistribution, TOTAL_AMOUNT)
       })
     })
   })
@@ -851,6 +851,23 @@ contract('ReleaseGold', (accounts: string[]) => {
           )
         })
 
+        // The attestations signer does not send txs.
+        if (authorizationTestDescriptions[key].subject !== 'attestationSigner') {
+          it(`should transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance1 = await web3.eth.getBalance(authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            const balance2 = await web3.eth.getBalance(authorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), web3.utils.toWei('1'))
+          })
+        } else {
+          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance1 = await web3.eth.getBalance(authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            const balance2 = await web3.eth.getBalance(authorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
+          })
+        }
+
         it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
           await assertRevert(
@@ -889,6 +906,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         describe('when a previous authorization has been made', () => {
           const newAuthorized = accounts[6]
+          let balance1: string
           let newSig: any
           beforeEach(async () => {
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
@@ -897,6 +915,7 @@ contract('ReleaseGold', (accounts: string[]) => {
               releaseGoldInstance.address,
               newAuthorized
             )
+            balance1 = await web3.eth.getBalance(newAuthorized)
             await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s, {
               from: beneficiary,
             })
@@ -915,6 +934,11 @@ contract('ReleaseGold', (accounts: string[]) => {
               await authorizationTest.authorizedSignerToAccount(newAuthorized),
               releaseGoldInstance.address
             )
+          })
+
+          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance2 = await web3.eth.getBalance(newAuthorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
           })
 
           it('should preserve the previous authorization', async () => {
@@ -1098,10 +1122,22 @@ contract('ReleaseGold', (accounts: string[]) => {
             const refundAddressBalanceBefore = await goldTokenInstance.balanceOf(refundAddress)
             await releaseGoldInstance.refundAndFinalize({ from: releaseOwner })
             const refundAddressBalanceAfter = await goldTokenInstance.balanceOf(refundAddress)
-            assertEqualBN(
-              refundAddressBalanceAfter.minus(refundAddressBalanceBefore),
-              ONE_GOLDTOKEN
-            )
+            assertEqualBN(refundAddressBalanceAfter.minus(refundAddressBalanceBefore), TOTAL_AMOUNT)
+          })
+        })
+
+        describe('when an instance is a registered validator or validator group', () => {
+          describe('registered validator', () => {
+            it('should revert', async () => {
+              await mockValidators.setValidator(releaseGoldInstance.address)
+              await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+            })
+          })
+          describe('registered validator', () => {
+            it('should revert', async () => {
+              await mockValidators.setValidatorGroup(releaseGoldInstance.address)
+              await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+            })
           })
         })
       })
@@ -1241,11 +1277,9 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('beneficiary should unlock his locked gold and add a pending withdrawal', async () => {
-      // lock the entire releaseGold amount
       await releaseGoldInstance.lockGold(lockAmount, {
         from: beneficiary,
       })
-      // unlock the latter
       await releaseGoldInstance.unlockGold(lockAmount, {
         from: beneficiary,
       })
@@ -1262,6 +1296,8 @@ contract('ReleaseGold', (accounts: string[]) => {
         await lockedGoldInstance.getAccountTotalLockedGold(releaseGoldInstance.address),
         0
       )
+      // ReleaseGold locked balance should still reflect pending withdrawals
+      assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), lockAmount)
       assertEqualBN(
         await lockedGoldInstance.getAccountNonvotingLockedGold(releaseGoldInstance.address),
         0
@@ -1333,6 +1369,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           )
           assert.equal(values.length, 0)
           assert.equal(timestamps.length, 0)
+          assertEqualBN(await releaseGoldInstance.getRemainingLockedBalance(), 0)
         })
       })
 
@@ -1593,7 +1630,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should allow distribution of initial balance and rewards', async () => {
-              const expectedWithdrawalAmount = ONE_GOLDTOKEN.plus(ONE_GOLDTOKEN.div(2))
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN.div(2))
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
           })
@@ -1605,12 +1642,14 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should scale released amount to 50% of initial balance plus rewards', async () => {
-              const expectedWithdrawalAmount = ONE_GOLDTOKEN.multipliedBy(0.75)
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN.div(2)).div(2)
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
 
             it('should not allow withdrawal of more than 50% gold', async () => {
-              const unexpectedWithdrawalAmount = ONE_GOLDTOKEN.multipliedBy(0.76)
+              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN)
+                .div(2)
+                .plus(1)
               await assertRevert(
                 releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
               )
@@ -1633,9 +1672,9 @@ contract('ReleaseGold', (accounts: string[]) => {
           })
 
           it('should only allow withdrawal of 50% of initial grant (not including rewards)', async () => {
-            const expectedWithdrawalAmount = ONE_GOLDTOKEN.div(2)
+            const expectedWithdrawalAmount = TOTAL_AMOUNT.div(2)
             await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
-            const unexpectedWithdrawalAmount = ONE_GOLDTOKEN.multipliedBy(0.51)
+            const unexpectedWithdrawalAmount = 1
             await assertRevert(
               releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
             )

@@ -202,9 +202,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {
-                      "color": "#81868B",
-                    },
                     Array [
                       Object {
                         "marginLeft": "auto",
@@ -217,6 +214,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                         "lineHeight": 20,
                       },
                     ],
+                    Object {
+                      "color": "#81868B",
+                    },
                   ]
                 }
               >
@@ -237,9 +237,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {
-                      "color": "#42D689",
-                    },
                     Array [
                       Object {
                         "fontFamily": "Hind-SemiBold",
@@ -248,6 +245,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                       },
                       false,
                     ],
+                    Object {
+                      "color": "#42D689",
+                    },
                   ]
                 }
               >
@@ -283,9 +283,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Object {
-                      "color": "#FBCC5C",
-                    },
                     Array [
                       Object {
                         "fontFamily": "Hind-SemiBold",
@@ -294,6 +291,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                       },
                       false,
                     ],
+                    Object {
+                      "color": "#FBCC5C",
+                    },
                   ]
                 }
               >

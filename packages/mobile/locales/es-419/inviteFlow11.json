@@ -25,8 +25,8 @@
   "inviteAnyone": "Invite a cualquiera en tu lista de contactos para enviar y recibir valor",
   "inviteComplete": "Invitación completa",
   "inviteReceived": "Invitación recibida",
-  "escrowPaymentNotificationTitle": "Invitó a ({{amount}}) {{mobile}}",
-  "escrowPaymentNotificationLine": "<0>{{recipientPhone}} por</0> <1>{{amount}}</1>",
-  "escrowPaymentNotificationLine_missingRecipientPhone": "<0>Desconocido por</0> <1>{{amount}}</1>",
-  "defaultComment": "Invitación enviada"
+  "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)",
+  "escrowPaymentNotificationLine": "<0>{{recipientPhone}} por</0> <1></1>",
+  "escrowPaymentNotificationLine_missingRecipientPhone": "<0>Desconocido por</0> <1></1>",
+  "defaultComment": "Pago invitado y enviado"
 }
