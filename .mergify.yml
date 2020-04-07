@@ -1,0 +1,25 @@
+pull_request_rules:
+  - name: Automatically merge on CI success and code review
+    conditions:
+      # Add this label when you are ready to automerge the pull request.       
+      - "label=automerge"
+      # Exclude drafts
+      - "-draft"
+      # At least one approval required
+      - "#approved-reviews-by>=1"
+      # Only enable this when the pull request is being merged into master
+      - "base=master"
+      # List of all the tests that should pass.
+      - "status-success=ci/circleci: install_dependencies"
+      - "status-success=ci/circleci: lint-checks"
+      - "status-success=ci/circleci: general-test"
+      - "status-success=ci/circleci: mobile-test"
+      - "status-success=ci/circleci: mobile-test-build-app"
+      - "status-success=ci/circleci: protocol-test"
+      - "status-success=ci/circleci: end-to-end-geth-transfer-test"
+      - "status-success=ci/circleci: end-to-end-geth-sync-test"
+      - "status-success=ci/circleci: end-to-end-geth-governance-test"
+    actions:
+      merge:
+        method: squash 
+        strict: true
