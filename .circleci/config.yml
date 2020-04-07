@@ -37,7 +37,6 @@ e2e-defaults: &e2e-defaults
     - image: celohq/circleci:geth1.9-2
   environment:
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-
 general:
   artifacts:
     - 'mobile/coverage'

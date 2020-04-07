@@ -149,6 +149,10 @@ export const getEnodesWithExternalIPAddresses = async (namespace: string) => {
   return getEnodesWithIpAddresses(namespace, true)
 }
 
+export function getPrivateTxNodeClusterIP(celoEnv: string) {
+  return retrieveClusterIPAddress('service', 'tx-nodes-private', celoEnv)
+}
+
 export const fetchPassword = (passwordFile: string) => {
   if (!fs.existsSync(passwordFile)) {
     console.error(`Password file at ${passwordFile} does not exists!`)
@@ -1187,6 +1191,11 @@ export async function migrateContracts(
       },
       epochRewards: {
         frozen: false,
+        targetVotingYieldParameters: {
+          initial: 0.00016,
+          max: 0.0005,
+          adjustmentFactor: 0.1,
+        },
       },
       exchange: {
         frozen: false,
@@ -1204,7 +1213,6 @@ export async function migrateContracts(
         },
         oracles: validators.map(ensure0x),
         goldPrice: 10,
-        frozen: false,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),

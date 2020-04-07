@@ -11,7 +11,8 @@ const web3 = require('web3')
 // http://mikemcl.github.io/bignumber.js/#exponential-at
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
-const MINUTE = 60
+const SECOND = 1
+const MINUTE = 60 * SECOND
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 const WEEK = 7 * DAY
@@ -206,6 +207,79 @@ const DefaultConfig = {
   },
 }
 
+const NetworkConfigs = {
+  testing: {
+    downtimeSlasher: {
+      slashableDowntime: 6,
+    },
+    election: {
+      minElectableValidators: '1',
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000,
+    },
+  },
+  baklava: {
+    blockchainParameters: {
+      minimumClientVersion: {
+        major: 0,
+        minor: 10,
+        patch: 0,
+      },
+    },
+    election: {
+      minElectableValidators: '25', // About half of the expected genesis set.
+    },
+    governance: {
+      // Set to be able to complete a proposal in about a day, but give everyone a chance to participate.
+      dequeueFrequency: 4 * HOUR,
+      approvalStageDuration: 4 * HOUR,
+      referendumStageDuration: DAY,
+      executionStageDuration: WEEK,
+    },
+    lockedGold: {
+      unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+    },
+    stableToken: {
+      oracles: [
+        '0x0d473f73AAf1C2bf7EBd2be7196C71dBa6C1724b',
+        '0x8F7ca85A9E4A18B551b765706bd0B6f26927D86F',
+        '0x3EaEe6C693420Ae86643EB2837978da8eEbf973f',
+        '0xDd3E5FcE22938c0f482004527D468a8799C4a61E',
+        '0xFb2Ee4Da251fC6A9DF7eb8d5c4ea1DeC99d127eA',
+        '0xd321C7356DFB5b6F4AD9e5B58C51B46409fe1442',
+        '0xbbbC38f6a383293522d4aEDaA98b7d2D73E90A73',
+        '0xB9E0b0B8fdA1001392c8fFd19f6B7ad5286589F2',
+        '0x44740e3eedfD3a2A2e7662de9165a6E20bBcC72C',
+        '0x7a2cb0438e7B9801C29B39Ff94439aFf930CDf9F',
+      ],
+    },
+    validators: {
+      groupLockedGoldRequirements: {
+        duration: 15 * DAY, // 1/12 of the mainnet duration.
+      },
+      validatorLockedGoldRequirements: {
+        duration: 5 * DAY, // 1/12 of the mainnet duration.
+      },
+      membershipHistoryLength: 15, // Number of epochs in the group lockup period.
+    },
+  },
+}
+
+NetworkConfigs.baklavastaging = NetworkConfigs.baklava
+
 const linkedLibraries = {
   FixidityLib: [
     'LockedGold',
@@ -237,13 +311,17 @@ const argv = minimist(process.argv.slice(2), {
   default: {
     build_directory: path.join(__dirname, 'build'),
   },
-  string: ['migration_override', 'build_directory'],
+  string: ['migration_override', 'build_directory', 'network'],
 })
 
-const config = DefaultConfig
+const config = lodash.cloneDeep(DefaultConfig)
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-// use lodash merge to deeply override defaults
+
+// Use lodash merge to deeply override defaults.
+if (argv.network && NetworkConfigs[argv.network]) {
+  lodash.merge(config, NetworkConfigs[argv.network])
+}
 lodash.merge(config, migrationOverride)
 
 module.exports = {
