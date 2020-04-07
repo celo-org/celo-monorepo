@@ -172,10 +172,11 @@ export const getFaucetedAccounts = (mnemonic: string) => {
     faucetBalance()
   )
 
+  const oracleCount = parseInt(fetchEnvOrFallback(envVar.ORACLES, '1'), 10)
   const oracleAccounts = getFaucetedAccountsFor(
     AccountType.PRICE_ORACLE,
     mnemonic,
-    1,
+    oracleCount,
     oracleBalance()
   )
 

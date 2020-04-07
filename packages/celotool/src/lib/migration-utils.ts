@@ -38,6 +38,7 @@ export function migrationOverrides() {
   const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
   const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 10)
   const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
+  const oracleCount = parseInt(fetchEnvOrFallback(envVar.ORACLES, '1'), 10)
 
   const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
@@ -48,7 +49,7 @@ export function migrationOverrides() {
         addresses: initialAddresses,
         values: initialAddresses.map(() => initialBalance),
       },
-      oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1), minerForEnv()],
+      oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, oracleCount), minerForEnv()],
     },
     validators: {
       validatorKeys: validatorKeys(),
