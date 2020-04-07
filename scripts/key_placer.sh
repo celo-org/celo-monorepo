@@ -32,7 +32,6 @@ files=(
   ".env.mnemonic.baklava"
   ".env.mnemonic.baklavastaging"
   ".env.mnemonic.integration"
-  ".env.mnemonic.integrationtesting"
   ".env.mnemonic.pilot"
   ".env.mnemonic.pilotstaging"
   ".env.mnemonic.rc0"

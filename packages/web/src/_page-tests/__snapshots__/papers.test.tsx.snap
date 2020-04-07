@@ -375,7 +375,7 @@ exports[`Papers renders 1`] = `
               }
               target="_blank"
             >
-              读纸
+              阅读
               <div
                 className="css-view-1dbjc4n"
                 style={

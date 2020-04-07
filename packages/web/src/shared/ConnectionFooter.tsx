@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import devNews from 'src/dev/devNews.png'
 import { H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import sendCoinIcon from 'src/icons/send-green-coin-lg-bg.png'
 import BookLayout from 'src/layout/BookLayout'
 import { GridRow } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -49,7 +49,7 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
           <EventsChannel isDarkMode={false} />
         </View>
         <View>
-          <Image resizeMode="contain" source={{ uri: devNews }} style={styles.emailLogo} />
+          <Image resizeMode="contain" source={{ uri: sendCoinIcon }} style={styles.emailLogo} />
           <View style={styles.form}>
             <H3 style={styles.formTitle}>{t('stayConnected')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>

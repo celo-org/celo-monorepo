@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
-import InstagramLogo from 'src/icons/instagram.png'
+import Instagram from 'src/icons/Instagram'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
 import TwiterLogo from 'src/icons/TwitterLogo'
@@ -89,7 +89,7 @@ const Social = React.memo(function _Social() {
         </View>
         <View style={styles.socialIcon}>
           <a target="_blank" rel="noopener" href={CeloLinks.instagram}>
-            <Image source={InstagramLogo} style={styles.imageIcon} />
+            <Instagram size={height} />
           </a>
         </View>
       </View>
@@ -178,10 +178,6 @@ const styles = StyleSheet.create({
   },
   socialMobile: { alignSelf: 'center', justifyContent: 'center' },
   socialDesktop: { marginTop: 10 },
-  imageIcon: {
-    height: 25,
-    width: 25,
-  },
   socialIcon: {
     paddingRight: 25,
   },

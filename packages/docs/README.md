@@ -110,7 +110,7 @@ Alfajores Testnet links:
 
 - [Alfajores Testnet Faucet](https://celo.org/build/faucet) - get testnet tokens to experiment with
 - [Celo Wallet for Alfajores](https://celo.org/build/wallet) - download the Android wallet app for the testnet from the Play Store
-- [Alfajores Testnet Network Status](https://alfajores-ethstats.celo-testnet.org) - to check the current availability of the testnet
+- [Alfajores Testnet Network Status](https://alfajores-celostats.celo-testnet.org) - to check the current availability of the testnet
 - [Alfajores Testnet Block Explorer](https://alfajores-blockscout.celo-testnet.org) - explore the history of the blockchain and view transaction details
 
 Ask questions, find answers, and get in touch:
