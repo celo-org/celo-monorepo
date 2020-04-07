@@ -32,7 +32,7 @@ export async function traceTransaction(
     params: [Web3Utils.toHex(transaction), { tracer }],
   }
   const trace = await providerRPC(web3.currentProvider, query)
-  return trace.result
+  return trace.result || trace.error
 }
 
 export async function traceBlock(web3: Web3, blockNumber: number, tracer: string): Promise<any[]> {
@@ -43,7 +43,7 @@ export async function traceBlock(web3: Web3, blockNumber: number, tracer: string
     params: [Web3Utils.toHex(blockNumber), { tracer }],
   }
   const trace = await providerRPC(web3.currentProvider, query)
-  return trace.result.map((e: any) => e.result)
+  return trace.result ? trace.result.map((e: any) => e.result || e.error) : trace.error
 }
 
 async function providerRPC(

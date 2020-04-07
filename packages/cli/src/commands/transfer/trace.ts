@@ -15,6 +15,8 @@ export default class Trace extends BaseCommand {
     transaction: flags.string({ description: 'Transaction hash to trace' }),
   }
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(Trace)
     const tracer =
