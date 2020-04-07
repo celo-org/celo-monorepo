@@ -68,6 +68,7 @@ const testnetEnvVars: TerraformVars = {
   in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
   istanbul_request_timeout_ms: envVar.ISTANBUL_REQUEST_TIMEOUT_MS,
   network_id: envVar.NETWORK_ID,
+  private_tx_node_count: envVar.PRIVATE_TX_NODES,
   proxied_validator_count: envVar.PROXIED_VALIDATORS,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
@@ -96,6 +97,11 @@ const testnetResourcesToReset = [
   'module.tx_node.google_compute_instance.full_node.*',
   'module.tx_node.random_id.full_node_disk.*',
   'module.tx_node.google_compute_disk.full_node.*',
+  // private tx-nodes
+  'module.tx_node_private.random_id.full_node.*',
+  'module.tx_node_private.google_compute_instance.full_node.*',
+  'module.tx_node_private.random_id.full_node_disk.*',
+  'module.tx_node_private.google_compute_disk.full_node.*',
   // tx-node load balancer instance group
   'module.tx_node_lb.random_id.external',
   'module.tx_node_lb.google_compute_instance_group.external',
@@ -325,6 +331,13 @@ export async function generateAndUploadSecrets(celoEnv: string) {
     const secrets = generateNodeSecretEnvVars(AccountType.TX_NODE, i)
     await uploadSecrets(celoEnv, secrets, `tx-node-${i}`)
   }
+  // Private tx Nodes
+  const privateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  for (let i = 0; i < privateTxNodeCount; i++) {
+    // Ensure there is no overlap with tx node keys
+    const secrets = generateNodeSecretEnvVars(AccountType.TX_NODE, i, 1000 + i)
+    await uploadSecrets(celoEnv, secrets, `tx-node-private-${i}`)
+  }
   // Validators
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   for (let i = 0; i < validatorCount; i++) {
@@ -358,9 +371,13 @@ function generateBootnodeSecretEnvVars() {
   })
 }
 
-function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
+function generateNodeSecretEnvVars(
+  accountType: AccountType,
+  index: number,
+  keyIndex: number = index
+) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const privateKey = generatePrivateKey(mnemonic, accountType, index)
+  const privateKey = generatePrivateKey(mnemonic, accountType, keyIndex)
   const secrets: NodeSecrets = {
     ACCOUNT_ADDRESS: privateKeyToAddress(privateKey),
     BOOTNODE_ENODE_ADDRESS: generatePublicKey(mnemonic, AccountType.BOOTNODE, 0),
@@ -434,7 +451,7 @@ export function getVmSshCommand(instanceName: string) {
 }
 
 export async function getNodeVmName(celoEnv: string, nodeType: string, index?: number) {
-  const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
+  const nodeTypesWithRandomSuffixes = ['tx-node', 'tx-node-private', 'proxy']
   const nodeTypesWithNoIndex = ['bootnode']
 
   let instanceName
