@@ -301,6 +301,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   function setMaxDistribution(uint256 distributionRatio) external onlyReleaseOwner {
     require(distributionRatio <= 1000, "Max distribution ratio must be within bounds");
+    require(
+      maxDistribution != MAX_UINT,
+      "Cannot set max distribution lower if already set to 1000"
+    );
     // If ratio is 1000, we set maxDistribution to maxUint to account for future rewards.
     if (distributionRatio == 1000) {
       maxDistribution = MAX_UINT;
