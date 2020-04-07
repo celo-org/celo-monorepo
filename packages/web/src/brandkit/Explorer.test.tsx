@@ -79,14 +79,17 @@ describe(Explorer, () => {
       expect(getByText('petals')).not.toBeVisible()
       expect(getByText('Tree')).not.toBeVisible()
     })
+
     it('finds by description', async () => {
       const { getByText } = await search()
       expect(getByText('star')).toBeVisible()
     })
+
     it('finds by name', async () => {
       const { getByText } = await search()
       expect(getByText('Stellar Nebula')).toBeVisible()
     })
+
     it('finds by tag', async () => {
       const { getByText } = await search()
       expect(getByText('Orion')).toBeVisible()

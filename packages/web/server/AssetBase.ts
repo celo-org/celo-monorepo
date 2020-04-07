@@ -25,15 +25,20 @@ export enum AssetSheet {
   AbstractGraphics = 'Abstract Graphics',
 }
 
-export default async function getAssets(sheet: AssetSheet) {
+export default async function combineTagsWithAssets(sheet: AssetSheet) {
+  const [tags, assets] = await Promise.all([getTags(), getAssets(sheet)])
+  return assets.map((record) => normalize(record.fields, record.id, tags))
+}
+
+async function getAssets(sheet: AssetSheet) {
   return cache(`brand-assets-${sheet}`, fetchAssets, { args: sheet, minutes: 10 })
 }
 
-export async function getTags() {
+async function getTags() {
   return cache(`brand-assets-tags`, fetchTags, { minutes: 10 })
 }
 
-async function fetchTags(): Promise<Record<string, { Name: string }>> {
+async function fetchTags(): Promise<Record<string, Tag>> {
   const tags = {}
   await getAirtable(AssetSheet.Tags)
     .select({
@@ -50,8 +55,6 @@ async function fetchTags(): Promise<Record<string, { Name: string }>> {
 async function fetchAssets(sheet: AssetSheet) {
   const assets = []
 
-  const tags = await fetchTags()
-
   await getAirtable(sheet)
     .select({
       pageSize: 100,
@@ -59,10 +62,9 @@ async function fetchAssets(sheet: AssetSheet) {
       sort: [{ field: 'Order', direction: 'asc' }],
     })
     .eachPage((records, fetchNextPage) => {
-      records.forEach((r) => assets.push(normalize(r.fields, r.id, tags)))
+      records.forEach((r) => assets.push(r))
       fetchNextPage()
     })
-
   return assets
 }
 
@@ -73,7 +75,11 @@ function getAirtable(sheet: AssetSheet): Table<Fields> {
 const IS_APROVED = 'Approved=1'
 const TERMS_SIGNED = 'Terms=1'
 
-function normalize(asset: Fields, id: string, tags) {
+interface Tag {
+  Name: string
+}
+
+function normalize(asset: Fields, id: string, tags: Record<string, Tag>) {
   return {
     name: asset.Name,
     description: asset.Description,
