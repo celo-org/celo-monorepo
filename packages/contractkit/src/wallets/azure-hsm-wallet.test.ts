@@ -173,11 +173,12 @@ describe('AzureHSMWallet class', () => {
     beforeEach(async () => {
       await wallet.init()
     })
-
-    test('hasKey should return true for keys that are present', async () => {
+    test('hasKey should return false for keys that are not present', async () => {
       // Invalid key should not be present
       expect(await wallet.hasAccount('this is not a valid private key')).toBeFalsy()
+    })
 
+    test('hasKey should return true for keys that are present', async () => {
       // Valid key should be present
       const address = await wallet.getAddressFromKeyName(KEY_NAME!)
       expect(await wallet.hasAccount(address)).toBeTruthy()
