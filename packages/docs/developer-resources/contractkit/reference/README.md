@@ -20,9 +20,9 @@ ContractKit supports the following functionality:
 To install:
 
 ```bash
-npm install @celo/contractkit@baklava
+npm install @celo/contractkit
 // or
-yarn add @celo/contractkit@baklava
+yarn add @celo/contractkit
 ```
 
 You will need node version `8.13.0` or higher.
