@@ -88,11 +88,6 @@ variable proxied_validator_count {
   description = "Number of validator_count validators that are hidden behind proxies"
 }
 
-variable tx_node_count {
-  type        = number
-  description = "Number of tx-nodes that are created"
-}
-
 variable validator_count {
   type        = number
   description = "Number of validators to create"
